@@ -9,6 +9,7 @@ import {
 import QuestionaryDetails, {
   TableRowData,
 } from 'components/questionary/QuestionaryDetails';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -21,6 +22,7 @@ type VisitRegistrationReviewProps = {
 };
 
 function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
+  const { toFormattedDateTime } = useFormattedDateTime();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -29,10 +31,21 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const isSubmitted = state.registration.isRegistrationSubmitted;
+  const registration = state.registration;
 
   const additionalDetails: TableRowData[] = [
-    { label: 'Status', value: isSubmitted ? 'Submitted' : 'Draft' },
+    {
+      label: 'Status',
+      value: registration.isRegistrationSubmitted ? 'Submitted' : 'Draft',
+    },
+    {
+      label: 'Start date',
+      value: toFormattedDateTime(registration.startsAt),
+    },
+    {
+      label: 'End date',
+      value: toFormattedDateTime(registration.endsAt),
+    },
   ];
 
   return (
@@ -72,12 +85,10 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
               }
             )()
           }
-          disabled={isSubmitted}
-          variant="contained"
-          color="primary"
+          disabled={registration.isRegistrationSubmitted}
           data-cy="submit-visit-registration-button"
         >
-          {isSubmitted ? '✔ Submitted' : 'Submit'}
+          {registration.isRegistrationSubmitted ? '✔ Submitted' : 'Submit'}
         </NavigButton>
       </NavigationFragment>
     </div>

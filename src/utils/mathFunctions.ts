@@ -30,5 +30,7 @@ export const standardDeviation = (numbers: number[]) => {
   return Number(stdDev.toFixed(2));
 };
 
-export const getGrades = (reviews: Review[] | null | undefined) =>
-  reviews?.map((review) => review.grade as number) ?? [];
+export const getGradesFromReviews = (reviews: Review[]) =>
+  reviews
+    .map((review) => review.grade)
+    .filter((grade): grade is number => typeof grade === 'number');

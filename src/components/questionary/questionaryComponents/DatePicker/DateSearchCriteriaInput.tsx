@@ -1,35 +1,49 @@
-import DateFnsUtils from '@date-io/date-fns';
+import DateAdapter from '@mui/lab/AdapterLuxon';
+import DatePicker from '@mui/lab/DatePicker';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
   FormControl,
   Grid,
   InputLabel,
   MenuItem,
   Select,
-} from '@material-ui/core';
-import {
-  KeyboardDatePicker,
-  MuiPickersUtilsProvider,
-} from '@material-ui/pickers';
-import React, { useState } from 'react';
+  TextField,
+  useTheme,
+} from '@mui/material';
+import { DateTime } from 'luxon';
+import React, { useState, useEffect } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
-import { QuestionFilterCompareOperator } from 'generated/sdk';
+import { QuestionFilterCompareOperator, SettingsId } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 function DateSearchCriteriaInput({
   onChange,
   searchCriteria,
 }: SearchCriteriaInputProps) {
-  const [value, setValue] = useState<Date | null>(
-    searchCriteria ? new Date(searchCriteria?.value as string) : null
+  const theme = useTheme();
+  const { format, mask } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
+  const [value, setValue] = useState<DateTime | null>(
+    searchCriteria
+      ? DateTime.fromISO((searchCriteria.value as string) || '')
+      : null
   );
   const [comparator, setComparator] = useState<QuestionFilterCompareOperator>(
     searchCriteria?.compareOperator ?? QuestionFilterCompareOperator.EQUALS
   );
 
+  useEffect(() => {
+    if (!searchCriteria?.value) {
+      setValue(null);
+    }
+  }, [searchCriteria?.value]);
+
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} alignItems="end">
       <Grid item xs={6}>
-        <FormControl style={{ width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel shrink id="comparator">
             Operator
           </InputLabel>
@@ -39,7 +53,7 @@ function DateSearchCriteriaInput({
                 .value as QuestionFilterCompareOperator;
               setComparator(newComparator);
               if (value) {
-                onChange(newComparator, value.toISOString());
+                onChange(newComparator, value.toJSDate().toISOString());
               }
             }}
             value={comparator}
@@ -62,27 +76,36 @@ function DateSearchCriteriaInput({
         </FormControl>
       </Grid>
       <Grid item xs={6}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDatePicker
-            disableToolbar
-            format="yyyy-MM-dd"
-            variant="inline"
-            autoOk={true}
-            label="Date"
+        <LocalizationProvider dateAdapter={DateAdapter}>
+          <DatePicker
+            inputFormat={format || undefined}
+            mask={mask}
+            renderInput={(props) => (
+              <TextField
+                {...props}
+                required
+                margin="none"
+                size="small"
+                fullWidth
+                data-cy="value"
+                InputLabelProps={{
+                  shrink: value ? true : undefined,
+                }}
+              />
+            )}
+            label={`Date(${format})`}
             value={value}
-            onChange={(date: Date | null) => {
-              if (date && !isNaN(date.getTime())) {
-                date.setUTCHours(0, 0, 0, 0);
-                onChange(comparator, date.toISOString());
+            onChange={(date: DateTime | null) => {
+              const newDate = date?.startOf('day');
+
+              if (newDate && newDate.isValid) {
+                onChange(comparator, newDate.toJSDate().toISOString());
               }
-              setValue(date);
+              setValue(newDate || null);
             }}
-            InputLabelProps={{
-              shrink: value ? true : undefined,
-            }}
-            data-cy="value"
+            desktopModeMediaQuery={theme.breakpoints.up('sm')}
           />
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
       </Grid>
     </Grid>
   );

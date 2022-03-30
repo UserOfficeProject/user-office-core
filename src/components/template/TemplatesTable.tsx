@@ -2,16 +2,16 @@ import MaterialTable, {
   Column,
   MaterialTableProps,
 } from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import Archive from '@material-ui/icons/Archive';
-import Delete from '@material-ui/icons/Delete';
-import Edit from '@material-ui/icons/Edit';
-import FileCopy from '@material-ui/icons/FileCopy';
-import PostAddIcon from '@material-ui/icons/PostAdd';
-import PublishIcon from '@material-ui/icons/Publish';
-import ShareIcon from '@material-ui/icons/Share';
-import UnarchiveIcon from '@material-ui/icons/Unarchive';
+import Archive from '@mui/icons-material/Archive';
+import Delete from '@mui/icons-material/Delete';
+import Edit from '@mui/icons-material/Edit';
+import FileCopy from '@mui/icons-material/FileCopy';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import PublishIcon from '@mui/icons-material/Publish';
+import ShareIcon from '@mui/icons-material/Share';
+import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import { Typography } from '@mui/material';
+import Button from '@mui/material/Button';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
@@ -206,6 +206,10 @@ const TemplatesTable = ({
   const EditIconComponent = () => <Edit />;
   const FileCopyIconComponent = () => <FileCopy />;
 
+  const templatesWithId = templates.map((template) =>
+    Object.assign(template, { id: template.templateId })
+  );
+
   return (
     <>
       <InputDialog open={show} onClose={() => setShow(false)}>
@@ -235,9 +239,7 @@ const TemplatesTable = ({
         }
         columns={columns}
         isLoading={loadingTemplates}
-        data={templates.map((template) =>
-          Object.assign(template, { id: template.templateId })
-        )}
+        data={templatesWithId}
         actions={[
           ...customActions,
           {
@@ -308,8 +310,6 @@ const TemplatesTable = ({
         <Button
           startIcon={<PublishIcon />}
           type="button"
-          variant="contained"
-          color="primary"
           onClick={() => {
             history.push('/ImportTemplate');
           }}
@@ -320,8 +320,6 @@ const TemplatesTable = ({
         <Button
           startIcon={<PostAddIcon />}
           type="button"
-          variant="contained"
-          color="primary"
           onClick={() => setShow(true)}
           data-cy="create-new-button"
         >

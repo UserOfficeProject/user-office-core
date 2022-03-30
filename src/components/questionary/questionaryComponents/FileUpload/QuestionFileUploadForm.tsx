@@ -1,5 +1,5 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -22,7 +22,7 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
         config: Yup.object({
-          file_type: Yup.array(),
+          file_type: Yup.array().required().min(1, 'File type is required'),
           small_label: Yup.string(),
           max_files: Yup.number(),
         }),
@@ -36,7 +36,6 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
             label="Key"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -46,7 +45,6 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
             label="Question"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
@@ -59,7 +57,6 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
               placeholder="(e.g. only PDF accepted)"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="small_label"
             />
@@ -71,13 +68,12 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
               label="Is required"
               id="Is-Required-Input"
               component={FormikUICustomCheckbox}
-              margin="normal"
               fullWidth
               data-cy="required"
             />
             <Field
               name="config.file_type"
-              label="Accepted file types (leave empty for any)"
+              label="Accepted file types"
               id="fileType"
               component={FormikUICustomSelect}
               multiple
@@ -91,6 +87,7 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
               ]}
               fullWidth
               data-cy="file_type"
+              required
             />
             <Field
               name="config.max_files"
@@ -98,7 +95,6 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
               label="Max number of files"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max_files"
             />

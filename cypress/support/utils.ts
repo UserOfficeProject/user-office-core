@@ -147,31 +147,31 @@ const testActionButton = (
 ) => {
   switch (state) {
     case 'completed':
-      cy.get(`[title="${title}"]`).should('not.be.disabled');
+      cy.get(`[aria-label="${title}"]`).should('not.be.disabled');
 
-      cy.get(`[title="${title}"]`).find('.MuiBadge-badge').contains('✔');
+      cy.get(`[aria-label="${title}"]`).find('.MuiBadge-badge').contains('✔');
       break;
     case 'active':
-      cy.get(`[title="${title}"]`).should('not.be.disabled');
+      cy.get(`[aria-label="${title}"]`).should('not.be.disabled');
 
-      cy.get(`[title="${title}"]`)
+      cy.get(`[aria-label="${title}"]`)
         .find('.MuiBadge-badge')
         .should('have.css', 'background-color', 'rgb(235, 26, 108)');
       break;
 
     case 'neutral':
-      cy.get(`[title="${title}"]`).should('not.be.disabled');
+      cy.get(`[aria-label="${title}"]`).should('not.be.disabled');
 
-      cy.get(`[title="${title}"]`)
+      cy.get(`[aria-label="${title}"]`)
         .find('.MuiBadge-badge')
         .should('not.have.css', 'background-color', 'rgb(235, 26, 108)');
       break;
 
     case 'inactive':
-      cy.get(`[title="${title}"]`).find('button').should('be.disabled');
+      cy.get(`[aria-label="${title}"]`).find('button').should('be.disabled');
       break;
     case 'invisible':
-      cy.get(`[title="${title}"]`).should('not.exist');
+      cy.get(`[aria-label="${title}"]`).should('not.exist');
       break;
   }
 };

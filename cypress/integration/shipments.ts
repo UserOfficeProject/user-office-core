@@ -32,7 +32,6 @@ context('Shipments tests', () => {
       teamLeadUserId: PI.id,
       scheduledEventId: existingScheduledEventId,
     });
-    cy.viewport(1920, 1080);
   });
 
   it('Co-proposer should see that he can declare shipment', () => {
@@ -105,7 +104,7 @@ context('Shipments tests', () => {
 
     cy.contains(existingProposal.title)
       .parent()
-      .find(`[title="${declareShipmentTitle}"]`)
+      .find(`[aria-label="${declareShipmentTitle}"]`)
       .click();
 
     cy.get('[data-cy=add-button]').click();
@@ -156,7 +155,7 @@ context('Shipments tests', () => {
 
     cy.get('body').type('{esc}');
 
-    cy.contains('1 shipment(s)');
+    cy.contains('1 item(s)');
 
     cy.visit('/');
 

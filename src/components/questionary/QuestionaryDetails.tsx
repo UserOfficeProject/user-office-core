@@ -1,8 +1,9 @@
-import { makeStyles, Typography } from '@material-ui/core';
-import Table, { TableProps } from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
+import Table, { TableProps } from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { FC } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -21,6 +22,9 @@ const useStyles = makeStyles(() => ({
   },
   value: {
     width: '35%',
+  },
+  break: {
+    wordBreak: 'break-word',
   },
 }));
 
@@ -83,7 +87,7 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
           {title}
         </Typography>
       )}
-      <Table size="small" {...restProps}>
+      <Table className={classes.break} size="small" {...restProps}>
         <TableBody>
           {/* Additional details */}
           {additionalDetails?.map((row, index) =>

@@ -1,4 +1,4 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import { Formik, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
@@ -29,7 +29,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   componentWrapper: {
-    margin: theme.spacing(1, 0),
+    margin: theme.spacing(2, 0, 0, 0),
   },
   disabled: {
     pointerEvents: 'none',
@@ -262,8 +262,6 @@ export default function QuestionaryStepView(props: {
                   onClick={saveHandler}
                   disabled={!state.isDirty}
                   isBusy={isSubmitting}
-                  variant="contained"
-                  color="primary"
                   data-cy="save-button"
                 >
                   Save
@@ -272,8 +270,6 @@ export default function QuestionaryStepView(props: {
               <NavigButton
                 onClick={submitForm}
                 isBusy={isSubmitting}
-                variant="contained"
-                color="primary"
                 data-cy="save-and-continue-button"
               >
                 Save and continue

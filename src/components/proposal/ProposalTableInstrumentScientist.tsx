@@ -1,9 +1,9 @@
 import MaterialTable, { Column } from '@material-table/core';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import Edit from '@material-ui/icons/Edit';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import Visibility from '@material-ui/icons/Visibility';
+import Edit from '@mui/icons-material/Edit';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import Visibility from '@mui/icons-material/Visibility';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import {
   getTranslation,
   ResourceId,
@@ -13,7 +13,7 @@ import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
-  TabNames,
+  PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
@@ -34,6 +34,64 @@ import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
+
+let columns: Column<ProposalViewData>[] = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 120 },
+    sorting: false,
+    removable: false,
+    field: 'rowActionButtons',
+  },
+  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Title',
+    field: 'title',
+    ...{ width: 'auto' },
+  },
+  {
+    title: 'Time allocation',
+    render: (rowData) =>
+      `${rowData.technicalTimeAllocation ?? 0} (${
+        rowData.allocationTimeUnit
+      }s)`,
+    hidden: false,
+  },
+  {
+    title: 'Technical status',
+    render: (rowData) => rowData.technicalStatus,
+  },
+  {
+    title: 'Submitted',
+    render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+  },
+  { title: 'Status', field: 'statusName' },
+  {
+    title: 'Final Status',
+    field: 'finalStatus',
+    render: (rowData: ProposalViewData): string =>
+      rowData.finalStatus
+        ? getTranslation(rowData.finalStatus as ResourceId)
+        : '',
+  },
+  {
+    title: 'Instrument',
+    field: 'instrumentName',
+    emptyValue: '-',
+  },
+  {
+    title: 'Call',
+    field: 'callShortCode',
+    emptyValue: '-',
+    hidden: true,
+  },
+  {
+    title: 'SEP',
+    field: 'sepCode',
+    emptyValue: '-',
+    hidden: true,
+  },
+];
 
 const ProposalTableInstrumentScientist: React.FC = () => {
   const { user } = useContext(UserContext);
@@ -96,13 +154,16 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           }
         >
           <IconButton
-            data-cy="view-proposal"
             onClick={() => {
               setUrlQueryParams({ reviewModal: rowData.primaryKey });
             }}
             style={iconButtonStyle}
           >
-            {showView ? <Visibility /> : <Edit />}
+            {showView ? (
+              <Visibility data-cy="view-proposal-and-technical-review" />
+            ) : (
+              <Edit data-cy="edit-technical-review" />
+            )}
           </IconButton>
         </Tooltip>
 
@@ -120,64 +181,6 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       </>
     );
   };
-
-  let columns: Column<ProposalViewData>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      removable: false,
-      render: RowActionButtons,
-    },
-    { title: 'Proposal ID', field: 'proposalId' },
-    {
-      title: 'Title',
-      field: 'title',
-      ...{ width: 'auto' },
-    },
-    {
-      title: 'Time allocation',
-      render: (rowData) =>
-        `${rowData.technicalTimeAllocation ?? 0} (${
-          rowData.allocationTimeUnit
-        }s)`,
-      hidden: false,
-    },
-    {
-      title: 'Technical status',
-      render: (rowData) => rowData.technicalStatus,
-    },
-    {
-      title: 'Submitted',
-      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
-    },
-    { title: 'Status', field: 'statusName' },
-    {
-      title: 'Final Status',
-      field: 'finalStatus',
-      render: (rowData: ProposalViewData): string =>
-        rowData.finalStatus
-          ? getTranslation(rowData.finalStatus as ResourceId)
-          : '',
-    },
-    {
-      title: 'Instrument',
-      field: 'instrumentName',
-      emptyValue: '-',
-    },
-    {
-      title: 'Call',
-      field: 'callShortCode',
-      emptyValue: '-',
-      hidden: true,
-    },
-    {
-      title: 'SEP',
-      field: 'sepCode',
-      emptyValue: '-',
-      hidden: true,
-    },
-  ];
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
   if (localStorageValue) {
@@ -201,10 +204,21 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
-  const instrumentScientistProposalReviewTabs: TabNames[] = [
-    'Proposal information',
-    'Technical review',
+  const instrumentScientistProposalReviewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
   ];
+
+  /** NOTE:
+   * Including the id property for https://material-table-core.com/docs/breaking-changes#id
+   * Including the action buttons as property to avoid the console warning(https://github.com/material-table-core/core/issues/286)
+   */
+  const proposalDataWithIdAndRowActions = proposalsData.map((proposal) =>
+    Object.assign(proposal, {
+      id: proposal.primaryKey,
+      rowActionButtons: RowActionButtons(proposal),
+    })
+  );
 
   return (
     <>
@@ -247,9 +261,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         icons={tableIcons}
         title={'Proposals'}
         columns={columns}
-        data={proposalsData.map((proposal) =>
-          Object.assign(proposal, { id: proposal.primaryKey })
-        )}
+        data={proposalDataWithIdAndRowActions}
         isLoading={loading}
         options={{
           search: true,

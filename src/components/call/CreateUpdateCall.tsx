@@ -1,8 +1,9 @@
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
 } from '@user-office-software/duo-validation/lib/Call';
+import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 
@@ -15,6 +16,7 @@ import {
   TemplateGroupId,
   FeatureId,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -31,6 +33,7 @@ type CreateUpdateCallProps = {
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
   const { features } = useContext(FeatureContext);
+  const { timezone } = useFormattedDateTime();
 
   const { templates: proposalTemplates } = useActiveTemplates(
     TemplateGroupId.PROPOSAL,
@@ -44,11 +47,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { proposalWorkflows, loadingProposalWorkflows } =
     useProposalWorkflowsData();
 
-  const currentDayStart = new Date();
-  currentDayStart.setHours(0, 0, 0, 0);
-
-  const currentDayEnd = new Date();
-  currentDayEnd.setHours(23, 59, 59, 999);
+  const currentDayStart = DateTime.now()
+    .setZone(timezone || undefined)
+    .startOf('day');
+  const currentDayEnd = DateTime.now()
+    .setZone(timezone || undefined)
+    .endOf('day');
 
   /**
    * NOTE: This is needed because the ESI template field is hidden under feature flag.
@@ -60,6 +64,15 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     ? ''
     : undefined;
 
+  const getDateTimeFromISO = (value: string) =>
+    DateTime.fromISO(value, {
+      zone: timezone || undefined,
+    }).isValid
+      ? DateTime.fromISO(value, {
+          zone: timezone || undefined,
+        })
+      : null;
+
   const initialValues = call
     ? {
         ...call,
@@ -69,6 +82,17 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         esiTemplateId: call.esiTemplateId || initialEsiTemplateId,
         proposalWorkflowId: call.proposalWorkflowId || '',
         referenceNumberFormat: call.referenceNumberFormat || '',
+        startCall: getDateTimeFromISO(call.startCall),
+        endCall: getDateTimeFromISO(call.endCall),
+        startReview: getDateTimeFromISO(call.startReview),
+        endReview: getDateTimeFromISO(call.endReview),
+        startSEPReview: getDateTimeFromISO(call.startSEPReview),
+        endSEPReview: getDateTimeFromISO(call.endSEPReview),
+        startNotify: getDateTimeFromISO(call.startNotify),
+        endNotify: getDateTimeFromISO(call.endNotify),
+        startCycle: getDateTimeFromISO(call.startCycle),
+        endCycle: getDateTimeFromISO(call.endCycle),
+        submissionMessage: call.submissionMessage || '',
       }
     : {
         shortCode: '',
@@ -91,6 +115,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
+        submissionMessage: '',
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {

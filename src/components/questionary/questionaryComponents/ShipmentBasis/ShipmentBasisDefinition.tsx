@@ -1,4 +1,4 @@
-import LocalShippingIcon from '@material-ui/icons/LocalShipping';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';

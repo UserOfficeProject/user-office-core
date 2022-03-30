@@ -1,5 +1,4 @@
-import { Typography } from '@material-ui/core';
-import dateformat from 'dateformat';
+import { Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -11,6 +10,7 @@ import SuperMaterialTable, {
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -32,6 +32,9 @@ const getFilterStatus = (callStatus: string | CallStatus) =>
 
 const CallsTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
+  const { timezone, toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
   >(null);
@@ -60,24 +63,21 @@ const CallsTable: React.FC = () => {
     }));
   };
 
+  // NOTE: Here we keep the columns inside the component just because of the timezone shown in the title
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
     {
-      title: 'Start Date',
-      field: 'startCall',
-      render: (rowData: Call): string =>
-        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy'),
+      title: `Start Date (${timezone})`,
+      field: 'formattedStartCall',
     },
     {
-      title: 'End Date',
-      field: 'endCall',
-      render: (rowData: Call): string =>
-        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
+      title: `End Date (${timezone})`,
+      field: 'formattedEndCall',
     },
     {
       title: 'Reference number format',
       field: 'referenceNumberFormat',
-      render: (rowData: Call): string => rowData.referenceNumberFormat || '',
+      emptyValue: '-',
     },
     {
       title: 'Proposal Workflow',
@@ -212,6 +212,12 @@ const CallsTable: React.FC = () => {
     />
   );
 
+  const callsWithFormattedData = calls.map((call) => ({
+    ...call,
+    formattedStartCall: toFormattedDateTime(call.startCall),
+    formattedEndCall: toFormattedDateTime(call.endCall),
+  }));
+
   return (
     <div data-cy="calls-table">
       <CallStatusFilter
@@ -252,7 +258,7 @@ const CallsTable: React.FC = () => {
           </Typography>
         }
         columns={columns}
-        data={calls}
+        data={callsWithFormattedData}
         isLoading={loadingCalls}
         detailPanel={[
           {

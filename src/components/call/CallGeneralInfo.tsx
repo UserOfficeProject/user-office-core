@@ -1,4 +1,6 @@
-import DateFnsUtils from '@date-io/date-fns';
+import HelpIcon from '@mui/icons-material/Help';
+import DateAdapter from '@mui/lab/AdapterLuxon';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
   Button,
   createStyles,
@@ -16,14 +18,13 @@ import {
   TableRow,
   Theme,
   Typography,
-  withStyles,
-} from '@material-ui/core';
-import HelpIcon from '@material-ui/icons/Help';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+  useTheme,
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-material-ui';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import React, { useContext, useEffect } from 'react';
+import { TextField } from 'formik-mui';
+import { DateTimePicker } from 'formik-mui-lab';
+import React, { useContext } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -35,6 +36,7 @@ import {
   ProposalWorkflow,
   UpdateCallMutationVariables,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 const CallGeneralInfo: React.FC<{
   templates: GetTemplatesQuery['templates'];
@@ -50,6 +52,9 @@ const CallGeneralInfo: React.FC<{
   loadingTemplates,
 }) => {
   const { features } = useContext(FeatureContext);
+  const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
+
+  const theme = useTheme();
 
   const proposalWorkflowOptions = proposalWorkflows.map((proposalWorkflow) => ({
     text: proposalWorkflow.name,
@@ -66,17 +71,7 @@ const CallGeneralInfo: React.FC<{
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
-  const { startCall, endCall } = formik.values;
-
-  useEffect(() => {
-    if (endCall && endCall < startCall) {
-      formik.setFieldValue('endCall', startCall);
-      /** NOTE: Set field untouched because if we try to update the endCall before startCall and then
-       *  set startCall after endCall it can show error message even though we update the endCall automatically.
-       */
-      formik.setFieldTouched('endCall', false);
-    }
-  }, [startCall, endCall, formik]);
+  const { startCall } = formik.values;
 
   function validateRefNumFormat(input: string) {
     let errorMessage;
@@ -144,36 +139,52 @@ const CallGeneralInfo: React.FC<{
         id="short-code-input"
         type="text"
         component={TextField}
-        margin="normal"
         inputProps={{ maxLength: '20' }}
         fullWidth
         required
         data-cy="short-code"
       />
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
           name="startCall"
-          label="Start"
+          label={`Start (${timezone})`}
           id="start-call-input"
-          format="yyyy-MM-dd"
-          component={KeyboardDatePicker}
-          margin="normal"
-          fullWidth
+          inputFormat={dateTimeFormat}
+          mask={mask}
+          // NOTE: We need to have ampm set to false because otherwise the mask doesn't work properly and suggestion format when you type is not shown at all
+          ampm={false}
+          component={DateTimePicker}
+          inputProps={{ placeholder: dateTimeFormat }}
+          allowSameDateSelection
+          textField={{
+            fullWidth: true,
+            required: true,
+            'data-cy': 'start-date',
+          }}
+          // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
-          data-cy="start-date"
         />
-
         <Field
           name="endCall"
-          label="End"
+          label={`End (${timezone})`}
           id="end-call-input"
-          format="yyyy-MM-dd"
-          component={KeyboardDatePicker}
-          margin="normal"
-          fullWidth
+          inputFormat={dateTimeFormat}
+          mask={mask}
+          ampm={false}
+          allowSameDateSelection
+          component={DateTimePicker}
+          inputProps={{ placeholder: dateTimeFormat }}
+          textField={{
+            fullWidth: true,
+            required: true,
+            'data-cy': 'end-date',
+          }}
+          // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
+          // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           minDate={startCall}
           required
-          data-cy="end-date"
         />
         <Field
           name="referenceNumberFormat"
@@ -192,7 +203,6 @@ const CallGeneralInfo: React.FC<{
                   onClose={handleClose}
                   aria-labelledby="customized-dialog-title"
                   open={open}
-                  color="primary"
                 >
                   <DialogContent dividers>
                     <Typography gutterBottom color="inherit" variant="body1">
@@ -241,7 +251,7 @@ const CallGeneralInfo: React.FC<{
                     </Typography>
                   </DialogContent>
                   <DialogActions>
-                    <Button autoFocus onClick={handleClose} color="primary">
+                    <Button autoFocus variant="text" onClick={handleClose}>
                       Close
                     </Button>
                   </DialogActions>
@@ -249,11 +259,10 @@ const CallGeneralInfo: React.FC<{
               </InputAdornment>
             ),
           }}
-          margin="normal"
           fullWidth
           data-cy="reference-number-format"
         />
-      </MuiPickersUtilsProvider>
+      </LocalizationProvider>
       <FormikDropdown
         name="templateId"
         label="Call template"
@@ -309,7 +318,6 @@ const CallGeneralInfo: React.FC<{
         id="title-input"
         type="text"
         component={TextField}
-        margin="normal"
         fullWidth
         inputProps={{ maxLength: '100' }}
         data-cy="title"
@@ -320,7 +328,6 @@ const CallGeneralInfo: React.FC<{
         id="description-input"
         type="text"
         component={TextField}
-        margin="normal"
         multiline
         fullWidth
         data-cy="description"

@@ -1,6 +1,6 @@
-import { StylesProvider } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import Close from '@material-ui/icons/Close';
+import Close from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
 import React, { ErrorInfo, useContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
@@ -114,12 +114,21 @@ const Routes: React.FC<RouteProps> = () => {
 };
 
 class App extends React.Component {
-  static getDerivedStateFromError(): void {
+  state = { errorUserInformation: '' };
+  static getDerivedStateFromError() {
     // Update state so the next render will show the fallback UI.
+    const user = localStorage.getItem('user');
+    const errorUserInformation = {
+      id: user ? JSON.parse(user).id : 'Not logged in',
+      currentRole: localStorage.getItem('currentRole'),
+    };
+
     localStorage.removeItem('token');
     localStorage.removeItem('currentRole');
     localStorage.removeItem('user');
     localStorage.removeItem('expToken');
+
+    return { errorUserInformation };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
@@ -128,6 +137,7 @@ class App extends React.Component {
       errorMessage = JSON.stringify({
         error: error.toString(),
         errorInfo: errorInfo.componentStack.toString(),
+        user: this.state.errorUserInformation,
       });
     } catch (e) {
       errorMessage = 'Exception while preparing error message';
@@ -144,7 +154,7 @@ class App extends React.Component {
 
   render(): JSX.Element {
     return (
-      <StylesProvider injectFirst>
+      <StyledEngineProvider injectFirst>
         <CookiesProvider>
           <SnackbarProvider
             ref={this.notistackRef}
@@ -156,10 +166,10 @@ class App extends React.Component {
               </IconButton>
             )}
           >
-            <UserContextProvider>
-              <SettingsContextProvider>
+            <SettingsContextProvider>
+              <Theme>
                 <FeatureContextProvider>
-                  <Theme>
+                  <UserContextProvider>
                     <DownloadContextProvider>
                       <ReviewAndAssignmentContextProvider>
                         <Router>
@@ -169,13 +179,13 @@ class App extends React.Component {
                         </Router>
                       </ReviewAndAssignmentContextProvider>
                     </DownloadContextProvider>
-                  </Theme>
+                  </UserContextProvider>
                 </FeatureContextProvider>
-              </SettingsContextProvider>
-            </UserContextProvider>
+              </Theme>
+            </SettingsContextProvider>
           </SnackbarProvider>
         </CookiesProvider>
-      </StylesProvider>
+      </StyledEngineProvider>
     );
   }
 }

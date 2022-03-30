@@ -1,23 +1,22 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import AppBar from '@material-ui/core/AppBar';
-import IconButton from '@material-ui/core/IconButton';
-import MuiLink from '@material-ui/core/Link';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import MenuIcon from '@material-ui/icons/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import AppBar from '@mui/material/AppBar';
+import IconButton from '@mui/material/IconButton';
+import MuiLink from '@mui/material/Link';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import React, { useContext, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useMemo, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
 
 import AccountActionButton from './AccountActionButton';
-
 const drawerWidth = 250;
 
 type AppToolbarProps = {
@@ -25,25 +24,36 @@ type AppToolbarProps = {
   open: boolean;
   /** Text of the button link in the information modal. */
   handleDrawerOpen: () => void;
+  header: string;
 };
 
-const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
+const AppToolbar: React.FC<AppToolbarProps> = ({
+  open,
+  handleDrawerOpen,
+  header,
+}) => {
   const { settings } = useContext(SettingsContext);
-
+  const location = useLocation();
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
+  const [logo, setLogo] = useState('');
 
+  if (location.pathname === '/') document.title = 'User Office Dashboard';
   const logoFilename = settings.get(
     SettingsId.HEADER_LOGO_FILENAME
   )?.settingsValue;
-  let logo;
-  if (logoFilename) {
-    logo = require('images/' + logoFilename).default;
-  }
+
+  useEffect(() => {
+    async function fetchData() {
+      const importedLogo = await import('images/' + logoFilename);
+      setLogo(importedLogo.default);
+    }
+    fetchData();
+  }, [logoFilename]);
 
   const useStyles = makeStyles((theme) => ({
     appBar: {
-      zIndex: theme.zIndex.drawer + 1,
+      zIndex: isTabletOrMobile ? theme.zIndex.drawer : theme.zIndex.drawer + 1,
       transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -125,7 +135,9 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
             noWrap
             className={classes.title}
           >
-            | User Office
+            {location.pathname === '/'
+              ? 'User Office / Dashboard'
+              : 'User Office / ' + header}
           </Typography>
         )}
         <div className={classes.horizontalSpacing}>

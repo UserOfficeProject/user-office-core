@@ -10,7 +10,7 @@ mutation createUser(
   $refreshToken: String!
   $gender: String!
   $nationality: Int!
-  $birthdate: String!
+  $birthdate: DateTime!
   $organisation: Int!
   $department: String!
   $position: String!

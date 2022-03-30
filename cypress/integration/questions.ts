@@ -1,12 +1,11 @@
 import faker from 'faker';
 
-import { DataType } from '../../src/generated/sdk';
+import { DataType, TemplateCategoryId } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('Questions tests', () => {
   beforeEach(() => {
     cy.resetDB(true);
-    cy.viewport(1920, 1080);
   });
 
   const textQuestion = faker.lorem.words(2);
@@ -16,16 +15,16 @@ context('Questions tests', () => {
     cy.login('officer');
     cy.visit('/');
 
-    cy.navigateToTemplatesSubmenu('Proposal');
-
-    cy.contains(initialDBData.template.name)
-      .parent()
-      .get("[title='Edit']")
-      .click();
-
-    cy.createTextQuestion(textQuestion, {
-      isRequired: true,
-      isMultipleLines: true,
+    cy.createQuestion({
+      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      dataType: DataType.TEXT_INPUT,
+    }).then((questionResult) => {
+      if (questionResult.createQuestion.question) {
+        cy.updateQuestion({
+          id: questionResult.createQuestion.question.id,
+          question: textQuestion,
+        });
+      }
     });
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
@@ -79,5 +78,30 @@ context('Questions tests', () => {
     cy.get('[data-cy=questions-table]')
       .contains(samplesQuestion)
       .should('exist');
+  });
+
+  it('Officer can delete question', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.createQuestion({
+      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      dataType: DataType.TEXT_INPUT,
+    }).then((questionResult) => {
+      if (questionResult.createQuestion.question) {
+        cy.updateQuestion({
+          id: questionResult.createQuestion.question.id,
+          question: textQuestion,
+        });
+      }
+    });
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    cy.contains(textQuestion).should('exist');
+    cy.contains(textQuestion).closest('tr').find('[title=Delete]').click();
+    cy.get('[title=Save]').click();
+    cy.finishedLoading();
+    cy.contains(textQuestion).should('not.exist');
   });
 });

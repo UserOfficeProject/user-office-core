@@ -11,11 +11,7 @@ generates:
         field: true
         object: false
         inputValue: false
-      maybeValue: T | null
     plugins:
       - typescript
       - typescript-operations
       - typescript-graphql-request
-config:
-  scalars:
-    TzLessDateTime: "string"

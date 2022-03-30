@@ -1,6 +1,6 @@
-import moment, { Moment } from 'moment';
+import { DateTime } from 'luxon';
 
-import { Scalars } from 'generated/sdk';
+import { DateConfig, Scalars } from 'generated/sdk';
 
 function paddZero(num: number): string {
   if (num < 10) {
@@ -87,28 +87,65 @@ export function timeAgo(dateParam: Date | Scalars['DateTime'] | null): string {
   return getFormattedDate(date); // 10. January 2017. at 10:20
 }
 
-export function daysRemaining(date: Date) {
-  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  const firstDate = new Date();
-  const secondDate = date;
+export function timeRemaining(toDate: Date): string {
+  const fromNow = DateTime.now();
+  const untilDate = DateTime.fromJSDate(toDate);
 
-  return Math.round(
-    Math.abs((firstDate.getTime() - secondDate.getTime()) / oneDay)
-  );
-}
+  const { days, hours, minutes } = untilDate.diff(fromNow, [
+    'days',
+    'hours',
+    'minutes',
+    'seconds',
+  ]);
 
-export const TZ_LESS_DATE_TIME_FORMAT = 'yyyy-MM-DD HH:mm:ss';
-
-export const TZ_LESS_DATE_TIME_LOW_PREC_FORMAT = 'yyyy-MM-DD HH:mm';
-
-export function parseTzLessDateTime(tzLessDateTime: string): Moment {
-  return moment(tzLessDateTime, TZ_LESS_DATE_TIME_FORMAT);
-}
-
-export function toTzLessDateTime(dateTime: Moment | Date | string): string {
-  if (dateTime instanceof Date || typeof dateTime === 'string') {
-    dateTime = moment(dateTime);
+  if (days > 30) {
+    return '';
+  } else if (days >= 1) {
+    return `${days} day${days > 1 ? 's' : ''} remaining`;
+  } else if (hours >= 1) {
+    return `${hours} hour${hours > 1 ? 's' : ''} remaining`;
+  } else if (minutes >= 1) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''} remaining`;
+  } else {
+    return '';
   }
-
-  return dateTime.format(TZ_LESS_DATE_TIME_FORMAT);
 }
+
+export const minMaxDateTimeCalculations = ({
+  minDate,
+  maxDate,
+  defaultDate,
+  includeTime,
+}: Pick<DateConfig, 'minDate' | 'maxDate' | 'defaultDate' | 'includeTime'>) => {
+  const defaultFieldMinDate = minDate
+    ? DateTime.fromISO(minDate).startOf(includeTime ? 'minute' : 'day')
+    : null;
+  const defaultFieldMaxDate = maxDate
+    ? DateTime.fromISO(maxDate).startOf(includeTime ? 'minute' : 'day')
+    : null;
+  const defaultFieldDate = defaultDate
+    ? DateTime.fromISO(defaultDate).startOf(includeTime ? 'minute' : 'day')
+    : null;
+
+  const isDefaultBeforeMinDate =
+    defaultFieldDate &&
+    defaultFieldMinDate &&
+    defaultFieldMinDate > defaultFieldDate;
+  const isDefaultAfterMaxDate =
+    defaultFieldDate &&
+    defaultFieldMaxDate &&
+    defaultFieldMaxDate < defaultFieldDate;
+
+  const isMinAfterMaxDate =
+    defaultFieldMinDate &&
+    defaultFieldMaxDate &&
+    defaultFieldMinDate > defaultFieldMaxDate;
+
+  return {
+    defaultFieldMinDate,
+    defaultFieldMaxDate,
+    isDefaultBeforeMinDate,
+    isDefaultAfterMaxDate,
+    isMinAfterMaxDate,
+  };
+};

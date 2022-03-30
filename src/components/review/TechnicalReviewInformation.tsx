@@ -1,13 +1,14 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { getTranslation } from '@user-office-software/duo-localisation';
 import React, { Fragment } from 'react';
 
-import { TechnicalReview } from 'generated/sdk';
+import { useCheckAccess } from 'components/common/Can';
+import { TechnicalReview, UserRole } from 'generated/sdk';
 import { getFullUserName } from 'utils/user';
 
 type TechnicalReviewInformationProps = {
@@ -23,6 +24,7 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
   props
 ) => {
   const classes = useStyles();
+  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
 
   if (!props.data) {
     return <p>Proposal has no technical review</p>;
@@ -41,6 +43,16 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
               {props.data.status && getTranslation(props.data.status)}
             </TableCell>
           </TableRow>
+          {isInstrumentScientist && (
+            <TableRow key="comment">
+              <TableCell>Internal Comment</TableCell>
+              <TableCell
+                dangerouslySetInnerHTML={{
+                  __html: props.data?.comment || '-',
+                }}
+              />
+            </TableRow>
+          )}
           <TableRow key="comment">
             <TableCell>Comment</TableCell>
             <TableCell

@@ -1,10 +1,4 @@
-import {
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-} from '@material-ui/core';
+import { FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useState } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
@@ -19,7 +13,7 @@ function FileUploadSearchCriteriaInput({
   return (
     <Grid container>
       <Grid item xs={12}>
-        <FormControl style={{ width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel shrink id="has-attachments">
             Has attachments
           </InputLabel>

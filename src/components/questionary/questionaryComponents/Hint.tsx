@@ -1,4 +1,4 @@
-import { Box, BoxProps } from '@material-ui/core';
+import { Box, BoxProps } from '@mui/material';
 import React from 'react';
 /**
  * Label with predefined styles.
@@ -8,7 +8,13 @@ import React from 'react';
  */
 function Hint(props: BoxProps) {
   return (
-    <Box fontSize={12} fontStyle="italic" color="#888" {...props}>
+    <Box
+      fontSize={12}
+      fontStyle="italic"
+      color="#888"
+      marginTop="4px"
+      {...props}
+    >
       {props.children}
     </Box>
   );

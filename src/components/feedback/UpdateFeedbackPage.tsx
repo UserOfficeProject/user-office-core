@@ -1,8 +1,7 @@
-import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import { useParams } from 'react-router';
 
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import UpdateFeedback from './UpdateFeedback';
 
@@ -14,14 +13,10 @@ export default function UpdateFeedbackPage() {
   }
 
   return (
-    <ContentContainer maxWidth="md">
-      <Grid container>
-        <Grid item xs={12}>
-          <StyledPaper>
-            <UpdateFeedback feedbackId={+feedbackId} />
-          </StyledPaper>
-        </Grid>
-      </Grid>
-    </ContentContainer>
+    <StyledContainer>
+      <StyledPaper>
+        <UpdateFeedback feedbackId={+feedbackId} />
+      </StyledPaper>
+    </StyledContainer>
   );
 }

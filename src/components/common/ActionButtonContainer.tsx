@@ -1,10 +1,10 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { PropsWithChildren } from 'react';
 
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 
 const useStyles = makeStyles((theme) => ({
-  buttonContainer: {
+  StyledButtonContainer: {
     justifyItems: 'flex-end',
     marginTop: theme.spacing(3),
     '& button': {
@@ -20,8 +20,8 @@ export function ActionButtonContainer({
   const classes = useStyles();
 
   return (
-    <ButtonContainer className={classes.buttonContainer} {...rest}>
+    <StyledButtonContainer className={classes.StyledButtonContainer} {...rest}>
       {children}
-    </ButtonContainer>
+    </StyledButtonContainer>
   );
 }

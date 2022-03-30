@@ -1,10 +1,10 @@
-import { Tooltip } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
-import { Check, MergeType } from '@material-ui/icons';
+import { Check, MergeType } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
+import Button from '@mui/material/Button';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
-import { Checkbox, TextField } from 'formik-material-ui';
+import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
@@ -152,7 +152,6 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
                 type="checkbox"
                 component={Checkbox}
                 checked={values.verified}
-                color="primary"
                 onChange={(): void =>
                   setFieldValue('verified', !values.verified)
                 }
@@ -173,8 +172,6 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
                     <MergeType style={{ transform: 'rotate(90deg)' }} />
                   }
                   type="button"
-                  variant="outlined"
-                  color="primary"
                   data-cy="merge"
                   disabled={isExecutingCall}
                   onClick={() =>
@@ -188,8 +185,6 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             )}
             <Button
               type="submit"
-              variant="contained"
-              color="primary"
               data-cy="submit"
               disabled={isExecutingCall}
               startIcon={<Check />}

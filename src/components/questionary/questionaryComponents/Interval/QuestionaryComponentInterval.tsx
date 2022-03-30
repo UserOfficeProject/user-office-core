@@ -1,26 +1,25 @@
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormLabel from '@material-ui/core/FormLabel';
-import Grid from '@material-ui/core/Grid';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormLabel from '@mui/material/FormLabel';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field, getIn } from 'formik';
 import React, { useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { IntervalConfig } from 'generated/sdk';
+import { IntervalConfig, Unit } from 'generated/sdk';
+import expressionToFunction from 'utils/expressionToFunction';
 
 const useStyles = makeStyles((theme) => ({
   unitField: {
     paddingRight: theme.spacing(1),
-    alignSelf: 'flex-end',
   },
   singleUnit: {
     alignItems: 'flex-end',
-    display: 'flex',
-    height: '100%',
     fontSize: '1rem',
     padding: '0px 5px',
   },
@@ -43,7 +42,9 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
   const [stateValue, setStateValue] = useState<{
     min: AcceptableUserInput;
     max: AcceptableUserInput;
-    unit: string;
+    unit: Unit | null; // unit can be null, in case user has specified answer before units were added to the question
+    siMin: AcceptableUserInput;
+    siMax: AcceptableUserInput;
   }>(answer.value);
 
   const classes = useStyles();
@@ -66,30 +67,46 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
       return <Field type="hidden" value="" name={unitFieldId} />;
     } else if (config.units?.length === 1) {
       return (
-        <span className={`${classes.singleUnit} MuiFormControl-marginNormal`}>
-          {stateValue.unit}
-        </span>
+        <FormControl className={`${classes.singleUnit}`} margin="normal">
+          {stateValue.unit?.symbol}
+        </FormControl>
       );
     } else {
       return (
-        <Select
-          label="Unit"
-          value={stateValue.unit}
-          onChange={(e) => {
-            const newState = { ...stateValue, unit: e.target.value as string };
-            setStateValue(newState);
-            onComplete(newState);
-          }}
-          name={unitFieldId}
-          data-cy={unitFieldId}
-          className="MuiFormControl-marginDense"
-        >
-          {config.units?.map((unit) => (
-            <MenuItem value={unit} key={unit}>
-              {unit}
-            </MenuItem>
-          ))}
-        </Select>
+        <FormControl margin="dense">
+          <InputLabel htmlFor={unitFieldId} shrink>
+            Unit
+          </InputLabel>
+          <Select
+            id={unitFieldId}
+            label="Unit"
+            value={stateValue.unit?.id ?? ''}
+            onChange={(e) => {
+              const newUnitId = e.target.value as string;
+              // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+              const unit = config.units?.find((u) => u.id === newUnitId)!;
+              const convertToSi = expressionToFunction(
+                unit.siConversionFormula
+              );
+              const newState: typeof stateValue = {
+                ...stateValue,
+                unit,
+                siMin: convertToSi(stateValue.min),
+                siMax: convertToSi(stateValue.max),
+              };
+              setStateValue(newState);
+              onComplete(newState);
+            }}
+            name={unitFieldId}
+            data-cy={unitFieldId}
+          >
+            {config.units?.map(({ id, unit, symbol }) => (
+              <MenuItem value={id} key={id}>
+                {`${symbol} (${unit})`}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       );
     }
   };
@@ -101,7 +118,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
       margin="dense"
       fullWidth
     >
-      <Grid container>
+      <Grid container alignItems="flex-end">
         <Grid item xs={12}>
           <FormLabel>
             <>
@@ -119,12 +136,19 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           <TextField
             label="Min"
             id={`${id}-Min`}
-            onChange={(e) =>
-              setStateValue({
+            onChange={(event) => {
+              const unit = stateValue.unit;
+              const newValue = getNumberOrDefault(event.target.value, '');
+              const convertToSi = unit
+                ? expressionToFunction(unit.siConversionFormula)
+                : () => newValue;
+              const newStateValue: typeof stateValue = {
                 ...stateValue,
-                min: getNumberOrDefault(e.target.value, stateValue.min),
-              })
-            }
+                min: newValue,
+                siMin: convertToSi(newValue),
+              };
+              setStateValue(newStateValue);
+            }}
             onBlur={() => onComplete(stateValue)}
             value={stateValue.min}
             data-cy={minFieldId}
@@ -140,12 +164,19 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           <TextField
             label="Max"
             id={`${id}-Max`}
-            onChange={(e) =>
-              setStateValue({
+            onChange={(event) => {
+              const unit = stateValue.unit;
+              const newValue = getNumberOrDefault(event.target.value, '');
+              const convertToSi = unit
+                ? expressionToFunction(unit.siConversionFormula)
+                : () => newValue;
+              const newStateValue: typeof stateValue = {
                 ...stateValue,
-                max: getNumberOrDefault(e.target.value, stateValue.max),
-              })
-            }
+                max: newValue,
+                siMax: convertToSi(newValue),
+              };
+              setStateValue(newStateValue);
+            }}
             onBlur={() => onComplete(stateValue)}
             value={stateValue.max}
             data-cy={maxFieldId}

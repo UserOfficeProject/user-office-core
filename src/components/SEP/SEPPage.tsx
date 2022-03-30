@@ -1,4 +1,3 @@
-import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import { useParams } from 'react-router';
 
@@ -8,7 +7,7 @@ import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import { Sep, UserRole } from 'generated/sdk';
 import { useSEPData } from 'hooks/SEP/useSEPData';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import SEPGeneralInfo from './General/SEPGeneralInfo';
 import SEPMeetingComponentsView from './MeetingComponents/SEPMeetingComponentsView';
@@ -33,47 +32,43 @@ const SEPPage: React.FC = () => {
 
   if (loading) {
     return (
-      <ContentContainer>
-        <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
-      </ContentContainer>
+      <StyledContainer>
+        <StyledPaper>
+          <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
+        </StyledPaper>
+      </StyledContainer>
     );
   }
 
   if (!sep) {
     return (
-      <ContentContainer>
-        <Grid container>
-          <Grid item xs={12}>
-            <StyledPaper>SEP not found</StyledPaper>
-          </Grid>
-        </Grid>
-      </ContentContainer>
+      <StyledContainer>
+        <StyledPaper>SEP not found</StyledPaper>
+      </StyledContainer>
     );
   }
 
   return (
-    <ContentContainer>
-      <Grid container>
-        <Grid item xs={12}>
-          <SimpleTabs tabNames={tabNames}>
-            <SEPGeneralInfo
-              data={sep}
-              onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
-            />
-            <SEPMembers
-              data={sep}
-              sepId={sep.id}
-              onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
-            />
-            <SEPProposalsAndAssignmentsView sepId={sep.id} />
-            <SEPMeetingComponentsView sepId={sep.id} />
-            {hasAccessRights && (
-              <EventLogList changedObjectId={sep.id} eventType="SEP" />
-            )}
-          </SimpleTabs>
-        </Grid>
-      </Grid>
-    </ContentContainer>
+    <StyledContainer>
+      <StyledPaper>
+        <SimpleTabs tabNames={tabNames}>
+          <SEPGeneralInfo
+            data={sep}
+            onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
+          />
+          <SEPMembers
+            data={sep}
+            sepId={sep.id}
+            onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
+          />
+          <SEPProposalsAndAssignmentsView sepId={sep.id} />
+          <SEPMeetingComponentsView sepId={sep.id} />
+          {hasAccessRights && (
+            <EventLogList changedObjectId={sep.id} eventType="SEP" />
+          )}
+        </SimpleTabs>
+      </StyledPaper>
+    </StyledContainer>
   );
 };
 

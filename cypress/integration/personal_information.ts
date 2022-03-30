@@ -5,13 +5,13 @@ import initialDBData from '../support/initialDBData';
 context('Personal information tests', () => {
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   const newFirstName = faker.name.firstName();
   const newMiddleName = faker.name.firstName();
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
+  const otherOrg = faker.commerce.department();
   const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.phoneNumber('0##########');
@@ -35,6 +35,8 @@ context('Personal information tests', () => {
     cy.get("[name='department']").clear().type(newDepartment);
 
     cy.get("[name='telephone']").clear().type(newTelephone);
+
+    cy.get("[name='otherOrganisation']").clear().type(otherOrg);
 
     cy.contains('Update Profile').click();
 
@@ -67,7 +69,10 @@ context('Personal information tests', () => {
 
     cy.finishedLoading();
 
-    cy.contains('Andersson').parent().find('button[title="Edit user"]').click();
+    cy.contains('Andersson')
+      .parent()
+      .find('button[aria-label="Edit user"]')
+      .click();
 
     cy.get('main').as('mainContentElement');
     cy.get('@mainContentElement').contains('Settings').click();
@@ -102,16 +107,17 @@ context('Personal information tests', () => {
 
     cy.finishedLoading();
 
-    cy.contains('User roles');
+    cy.get('[data-cy="role-selection-table"]').contains('User roles');
 
-    cy.contains('SEP Chair', { matchCase: false })
+    cy.get('[data-cy="role-selection-table"]')
+      .contains('SEP Chair', { matchCase: false })
       .parent()
       .find('button')
       .click();
 
     cy.finishedLoading();
 
-    cy.contains('Proposals to review');
+    cy.contains('Proposals to grade');
 
     cy.get('[data-cy="SEPRoles-menu-items"]')
       .find('.MuiListItem-root')

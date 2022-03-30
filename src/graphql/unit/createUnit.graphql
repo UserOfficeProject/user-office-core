@@ -1,0 +1,10 @@
+mutation createUnit($id: String!, $unit: String!, $quantity: String!, $symbol: String!, $siConversionFormula: String!) {
+  createUnit(id: $id, unit: $unit,quantity: $quantity,symbol: $symbol, siConversionFormula: $siConversionFormula) {
+    unit {
+      ...unit
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

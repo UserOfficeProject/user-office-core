@@ -1,5 +1,5 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -21,7 +21,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
-            file_type: Yup.array(),
+            file_type: Yup.array().required().min(1, 'File type is required'),
             small_label: Yup.string(),
             max_files: Yup.number(),
           }),
@@ -39,7 +39,6 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               placeholder="(e.g. only PDF accepted)"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="small_label"
             />
@@ -50,13 +49,12 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               name="config.required"
               label="Is required"
               component={FormikUICustomCheckbox}
-              margin="normal"
               fullWidth
               data-cy="required"
             />
             <Field
               name="config.file_type"
-              label="Accepted file types (leave empty for any)"
+              label="Accepted file types"
               id="fileType"
               component={FormikUICustomSelect}
               multiple
@@ -70,6 +68,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               ]}
               fullWidth
               data-cy="file_type"
+              required
             />
             <Field
               name="config.max_files"
@@ -77,7 +76,6 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               id="Max-files-id"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max_files"
             />

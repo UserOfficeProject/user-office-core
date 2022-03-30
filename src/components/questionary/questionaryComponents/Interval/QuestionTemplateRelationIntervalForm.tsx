@@ -1,30 +1,26 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Autocomplete from '@mui/lab/Autocomplete';
+import MaterialTextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
-import React, { FC } from 'react';
+import { TextField } from 'formik-mui';
+import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
+import { IntervalConfig } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-const useStyles = makeStyles(() => ({
-  units: {
-    minWidth: '100%',
-  },
-}));
-
 export const QuestionTemplateRelationIntervalForm: FC<
   QuestionTemplateRelationFormProps
 > = (props) => {
-  const classes = useStyles();
+  const intervalConfig = props.questionRel.config as IntervalConfig;
   const { units } = useUnitsData();
+  const [selectedUnits, setSelectedUnits] = useState(intervalConfig.units);
 
   return (
     <QuestionTemplateRelationFormShell
@@ -34,7 +30,15 @@ export const QuestionTemplateRelationIntervalForm: FC<
         question: Yup.object({
           config: Yup.object({
             required: Yup.bool(),
-            units: Yup.array().of(Yup.string()),
+            units: Yup.array().of(
+              Yup.object({
+                id: Yup.string(),
+                quantity: Yup.string(),
+                siConversionFormula: Yup.string(),
+                symbol: Yup.string(),
+                unit: Yup.string(),
+              })
+            ),
           }),
         }),
       })}
@@ -48,7 +52,6 @@ export const QuestionTemplateRelationIntervalForm: FC<
             id="small-label-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'small-label' }}
           />
@@ -57,19 +60,26 @@ export const QuestionTemplateRelationIntervalForm: FC<
               name="config.required"
               component={FormikUICustomCheckbox}
               label="Check to make this field mandatory"
-              margin="normal"
               fullWidth
               InputProps={{ 'data-cy': 'required' }}
             />
 
-            <Field
-              name="config.units"
-              component={FormikUICustomSelect}
+            <Autocomplete
+              id="config-units"
               multiple
-              label="Units"
-              margin="normal"
-              availableOptions={units.map((unit) => unit.name)}
-              className={classes.units}
+              options={units}
+              getOptionLabel={({ unit, symbol, quantity }) =>
+                `${symbol} (${unit}) - ${quantity}`
+              }
+              renderInput={(params) => (
+                <MaterialTextField {...params} label="Units" margin="none" />
+              )}
+              onChange={(_event, newValue) => {
+                setSelectedUnits(newValue);
+                formikProps.setFieldValue('config.units', newValue);
+              }}
+              value={selectedUnits ?? undefined}
+              data-cy="units"
             />
           </TitledContainer>
 

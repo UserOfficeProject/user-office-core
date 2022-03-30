@@ -1,10 +1,7 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
-import {
-  TemplateGroupId,
-  TemplateCategoryId,
-  DataType,
-} from '../../src/generated/sdk';
+import { TemplateGroupId } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 faker.seed(1);
@@ -30,11 +27,10 @@ context('visits tests', () => {
       managementTimeAllocation: 5,
       managementDecisionSubmitted: true,
     });
-    cy.viewport(1920, 1080);
   });
 
-  const startDateQuestionTitle = 'Visit start';
-  const endDateQuestionTitle = 'Visit end';
+  const startQuestion = 'Visit start';
+  const endQuestion = 'Visit end';
 
   const formTeamTitle = 'Define who is coming';
   const registerVisitTitle = 'Define your own visit';
@@ -59,8 +55,8 @@ context('visits tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
-    cy.createDateQuestion(startDateQuestionTitle);
-    cy.createDateQuestion(endDateQuestionTitle);
+    cy.contains(visitTemplate.name);
+    cy.contains(visitTemplate.description);
   });
 
   it('PI should see that he is able to form team', () => {
@@ -79,6 +75,8 @@ context('visits tests', () => {
     cy.login(visitor);
     cy.visit('/');
 
+    cy.finishedLoading();
+
     cy.contains(/Upcoming experiments/i).should('not.exist');
   });
 
@@ -95,7 +93,7 @@ context('visits tests', () => {
     cy.testActionButton(declareShipmentTitle, 'neutral');
 
     // create visit
-    cy.get(`[title="${formTeamTitle}"]`).first().click();
+    cy.get(`[aria-label="${formTeamTitle}"]`).first().click();
 
     // test error messages
     cy.get('[type="submit"]').click();
@@ -104,6 +102,7 @@ context('visits tests', () => {
 
     // add visitors
     cy.get('[data-cy=add-participant-button]').click();
+    cy.finishedLoading();
     cy.get('[name=email]').type('david@teleworm.us{enter}');
     cy.finishedLoading();
     cy.contains('Beckley').parent().find('[type=checkbox]').click();
@@ -116,6 +115,8 @@ context('visits tests', () => {
       .click();
 
     cy.get('[data-cy=create-visit-button]').click();
+
+    cy.finishedLoading();
 
     cy.reload();
 
@@ -135,6 +136,8 @@ context('visits tests', () => {
     cy.login(visitor);
     cy.visit('/');
 
+    cy.finishedLoading();
+
     cy.contains(/Upcoming experiments/i).should('exist');
 
     cy.testActionButton(formTeamTitle, 'invisible');
@@ -144,52 +147,19 @@ context('visits tests', () => {
   });
 
   it('Visitor should be able to register for a visit', () => {
+    const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+      initialDBData.formats.dateFormat
+    );
+    const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+      initialDBData.formats.dateFormat
+    );
+
     cy.createTemplate({
       groupId: TemplateGroupId.VISIT_REGISTRATION,
       name: visitTemplate.name,
       description: visitTemplate.description,
-    }).then((result) => {
-      const template = result.createTemplate.template;
-      if (template) {
-        const topicId = template.steps[0].topic.id;
-        cy.createQuestion({
-          categoryId: TemplateCategoryId.VISIT_REGISTRATION,
-          dataType: DataType.DATE,
-        }).then((questionResult) => {
-          const question = questionResult.createQuestion.question;
-          if (question) {
-            cy.updateQuestion({
-              id: question.id,
-              question: startDateQuestionTitle,
-            });
-            cy.createQuestionTemplateRelation({
-              questionId: question.id,
-              templateId: template.templateId,
-              sortOrder: 1,
-              topicId: topicId,
-            });
-          }
-        });
-        cy.createQuestion({
-          categoryId: TemplateCategoryId.VISIT_REGISTRATION,
-          dataType: DataType.DATE,
-        }).then((questionResult) => {
-          const question = questionResult.createQuestion.question;
-          if (question) {
-            cy.updateQuestion({
-              id: question.id,
-              question: endDateQuestionTitle,
-            });
-            cy.createQuestionTemplateRelation({
-              questionId: question.id,
-              templateId: template.templateId,
-              sortOrder: 1,
-              topicId: topicId,
-            });
-          }
-        });
-      }
     });
+
     cy.createVisit({
       team: [coProposer.id, visitor.id],
       teamLeadUserId: coProposer.id,
@@ -199,13 +169,28 @@ context('visits tests', () => {
     cy.login(visitor);
     cy.visit('/');
 
+    cy.finishedLoading();
+
     // test if the actions are available after co-proposer defined the team
     cy.testActionButton(registerVisitTitle, 'active');
 
-    cy.get(`[title="${registerVisitTitle}"]`).first().click();
+    cy.get(`[aria-label="${registerVisitTitle}"]`).first().click();
 
-    cy.contains(startDateQuestionTitle).parent().click().type('2021-07-20');
-    cy.contains(endDateQuestionTitle).parent().click().type('2021-07-21');
+    cy.get('[data-cy=save-and-continue-button]').click();
+    cy.contains(/invalid date/i).should('exist');
+
+    cy.contains(startQuestion).parent().click().clear().type('101010');
+    cy.get('[data-cy=save-and-continue-button]').click();
+    cy.contains(/Invalid date/i).should('exist');
+
+    cy.contains(startQuestion).parent().click().clear().type(endDate);
+    cy.contains(endQuestion).parent().click().clear().type(startDate);
+
+    cy.get('[data-cy=save-and-continue-button]').click();
+    cy.contains(/end date can't be before start date/i).should('exist');
+
+    cy.contains(startQuestion).parent().click().clear().type(startDate);
+    cy.contains(endQuestion).parent().click().clear().type(endDate);
 
     cy.get('[data-cy=save-and-continue-button]').click();
 
@@ -227,30 +212,34 @@ context('visits tests', () => {
     cy.login(PI);
     cy.visit('/');
 
+    cy.finishedLoading();
+
     cy.contains(/Upcoming experiments/i).should('exist');
 
     cy.testActionButton(registerVisitTitle, 'active');
     cy.testActionButton(individualTrainingTitle, 'active');
 
-    cy.get(`[title="${formTeamTitle}"]`).first().click();
+    cy.get(`[aria-label="${formTeamTitle}"]`).first().click();
 
     cy.get('[role="dialog"]')
       .contains('Carlsson')
       .parent()
-      .find('[title=Delete]')
+      .find('[aria-label=Delete]')
       .click();
 
-    cy.get('[title="Save"]').click();
+    cy.get('[aria-label="Save"]').click();
+
+    cy.finishedLoading();
 
     cy.get('[data-cy=create-visit-button]').click();
 
-    cy.contains('2023-01-07 10:00')
+    cy.contains(initialDBData.scheduledEvents.upcoming.startsAt)
       .parent()
-      .get(`[title="${registerVisitTitle}]`)
+      .get(`[aria-label="${registerVisitTitle}]`)
       .should('not.exist');
-    cy.contains('2023-01-07 10:00')
+    cy.contains(initialDBData.scheduledEvents.upcoming.startsAt)
       .parent()
-      .get(`[title="${individualTrainingTitle}]`)
+      .get(`[aria-label="${individualTrainingTitle}]`)
       .should('not.exist');
   });
 });

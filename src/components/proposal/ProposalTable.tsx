@@ -1,12 +1,12 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Edit from '@material-ui/icons/Edit';
-import FileCopy from '@material-ui/icons/FileCopy';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import Visibility from '@material-ui/icons/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Edit from '@mui/icons-material/Edit';
+import FileCopy from '@mui/icons-material/FileCopy';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import Visibility from '@mui/icons-material/Visibility';
+import { Typography } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
@@ -14,6 +14,7 @@ import { Redirect } from 'react-router';
 import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { ProposalData } from 'hooks/proposal/useProposalData';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -38,6 +39,18 @@ type ProposalTableProps = {
   confirm: WithConfirmType;
 };
 
+const columns = [
+  { title: 'Proposal ID', field: 'proposalId' },
+  { title: 'Title', field: 'title' },
+  { title: 'Status', field: 'publicStatus' },
+  {
+    title: 'Call',
+    field: 'call.shortCode',
+    emptyValue: '-',
+  },
+  { title: 'Created', field: 'created' },
+];
+
 const ProposalTable = ({
   title,
   search,
@@ -52,29 +65,29 @@ const ProposalTable = ({
     PartialProposalsDataType[] | undefined
   >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
-  const [proposalToClonePk, setProposalToCloneId] = useState<number | null>(
-    null
-  );
+  const [proposalToClone, setProposalToClone] = useState<Pick<
+    ProposalData,
+    'primaryKey' | 'questionary'
+  > | null>(null);
 
+  // TODO: This api call here should be replaced with a hook for getting user proposals.
   useEffect(() => {
+    let unmounted = false;
+
     searchQuery().then((data) => {
+      if (unmounted) {
+        return;
+      }
+
       if (data) {
         setPartialProposalsData(data.data);
       }
     });
-  }, [searchQuery]);
 
-  const columns = [
-    { title: 'Proposal ID', field: 'proposalId' },
-    { title: 'Title', field: 'title' },
-    { title: 'Status', field: 'publicStatus' },
-    {
-      title: 'Call',
-      field: 'call.shortCode',
-      emptyValue: '-',
-    },
-    { title: 'Created', field: 'created' },
-  ];
+    return () => {
+      unmounted = true;
+    };
+  }, [searchQuery]);
 
   const [editProposalPk, setEditProposalPk] = useState(0);
 
@@ -91,18 +104,18 @@ const ProposalTable = ({
   };
 
   const cloneProposalsToCall = async (call: Call) => {
-    setProposalToCloneId(null);
+    setProposalToClone(null);
 
-    if (!call?.id || !proposalToClonePk) {
+    if (!call?.id || !proposalToClone) {
       return;
     }
 
     const result = await api('Proposal cloned successfully').cloneProposals({
       callId: call.id,
-      proposalsToClonePk: [proposalToClonePk],
+      proposalsToClonePk: [proposalToClone.primaryKey],
     });
 
-    const [resultProposal] = result.cloneProposals.proposals;
+    const [resultProposal] = result.cloneProposals.proposals ?? [];
 
     if (
       !result.cloneProposals.rejection &&
@@ -141,6 +154,7 @@ const ProposalTable = ({
           <CallSelectModalOnProposalsClone
             cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
+            templateId={proposalToClone?.questionary.templateId}
           />
         </DialogContent>
       </Dialog>
@@ -179,11 +193,13 @@ const ProposalTable = ({
           {
             icon: FileCopy,
             tooltip: 'Clone proposal',
-            onClick: (event, rowData) => {
-              setProposalToCloneId(
-                (rowData as PartialProposalsDataType).primaryKey
-              );
-              setOpenCallSelection(true);
+            onClick: (_event, rowData) => {
+              api()
+                .getProposal({ primaryKey: rowData.primaryKey })
+                .then((result) => {
+                  setProposalToClone(result.proposal);
+                  setOpenCallSelection(true);
+                });
             },
           },
           {

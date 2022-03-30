@@ -1,12 +1,12 @@
-import { Button, Typography } from '@material-ui/core';
-import PublishIcon from '@material-ui/icons/Publish';
+import PublishIcon from '@mui/icons-material/Publish';
+import { Button, Typography } from '@mui/material';
 import React, { ChangeEvent } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 
-import { getFileContents } from './ImportTemplatePage';
+import { getFileContents } from '../template/import/ImportTemplatePage';
 
-export function SelectTemplateFile(props: {
+export function SelectImportFile(props: {
   onFileSelected: (json: string) => void;
 }) {
   const onFileSelected = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +20,7 @@ export function SelectTemplateFile(props: {
   return (
     <>
       <Typography variant="body2" component="div">
-        Please select the template file you wish to import.
+        Please select the file you wish to import.
       </Typography>
       <label>
         <input
@@ -31,7 +31,7 @@ export function SelectTemplateFile(props: {
           onChange={onFileSelected}
         />
         <ActionButtonContainer>
-          <Button variant="contained" component="span">
+          <Button component="span">
             <PublishIcon /> Select file
           </Button>
         </ActionButtonContainer>

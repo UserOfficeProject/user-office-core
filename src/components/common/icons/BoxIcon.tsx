@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconTypeMap } from '@material-ui/core/SvgIcon';
+import SvgIcon, { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import React from 'react';
 
 // NOTE: The icon is taken from: https://materialdesignicons.com/

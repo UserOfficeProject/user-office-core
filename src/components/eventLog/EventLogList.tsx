@@ -1,10 +1,10 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import dateformat from 'dateformat';
+import { Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import { EventLog } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -19,6 +19,19 @@ type EventLogListProps = {
   eventType?: string;
 };
 
+const columns = [
+  {
+    title: 'Changed by',
+    render: (rowData: EventLog): string =>
+      `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
+  },
+  {
+    title: 'Changed on',
+    field: 'changedOnFormatted',
+  },
+  { title: 'Event type', field: 'eventType' },
+];
+
 const EventLogList: React.FC<EventLogListProps> = ({
   changedObjectId = '*',
   eventType = '*',
@@ -27,19 +40,12 @@ const EventLogList: React.FC<EventLogListProps> = ({
     eventType,
     changedObjectId.toString()
   );
-  const columns = [
-    {
-      title: 'Changed by',
-      render: (rowData: EventLog): string =>
-        `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
-    },
-    {
-      title: 'Changed on',
-      render: (rowData: EventLog): string =>
-        dateformat(new Date(rowData.eventTStamp), 'dd-mmm-yyyy HH:MM:ss'),
-    },
-    { title: 'Event type', field: 'eventType' },
-  ];
+  const { toFormattedDateTime } = useFormattedDateTime();
+
+  const eventLogsDataWithFormattedDates = eventLogsData.map((eventLog) => ({
+    ...eventLog,
+    changedOnFormatted: toFormattedDateTime(eventLog.eventTStamp),
+  }));
 
   return (
     <div data-cy="event-logs-table">
@@ -51,9 +57,7 @@ const EventLogList: React.FC<EventLogListProps> = ({
           </Typography>
         }
         columns={columns}
-        data={eventLogsData.map((changedObject) =>
-          Object.assign(changedObject, { id: changedObject.changedObjectId })
-        )}
+        data={eventLogsDataWithFormattedDates}
         isLoading={loading}
         options={{
           search: true,

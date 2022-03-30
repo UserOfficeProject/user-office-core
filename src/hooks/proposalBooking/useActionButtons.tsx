@@ -1,9 +1,9 @@
 import { Action } from '@material-table/core';
-import FeedbackIcon from '@material-ui/icons/Feedback';
-import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
-import GroupIcon from '@material-ui/icons/Group';
-import SchoolIcon from '@material-ui/icons/School';
-import moment from 'moment';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import GroupIcon from '@mui/icons-material/Group';
+import SchoolIcon from '@mui/icons-material/School';
+import { DateTime } from 'luxon';
 import React, { ReactNode, useContext } from 'react';
 import { useHistory } from 'react-router';
 
@@ -20,7 +20,6 @@ import {
   ProposalBookingStatusCore,
   ProposalEndStatus,
 } from 'generated/sdk';
-import { parseTzLessDateTime } from 'utils/Time';
 
 import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
 
@@ -209,10 +208,14 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         (reg) => reg.userId === user.id
       );
       if (registration) {
-        const trainingExpiryDate: Date | null =
+        const trainingExpiryDate: string | null =
           registration.trainingExpiryDate || null;
 
-        if (moment(trainingExpiryDate) > parseTzLessDateTime(event.startsAt)) {
+        if (
+          trainingExpiryDate &&
+          DateTime.fromISO(trainingExpiryDate) >
+            DateTime.fromISO(event.startsAt)
+        ) {
           buttonState = 'completed';
         } else {
           buttonState = 'active';

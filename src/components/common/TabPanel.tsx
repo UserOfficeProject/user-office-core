@@ -1,9 +1,9 @@
-import AppBar from '@material-ui/core/AppBar';
-import Box from '@material-ui/core/Box';
-import useTheme from '@material-ui/core/styles/useTheme';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
-import Typography from '@material-ui/core/Typography';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import Typography from '@mui/material/Typography';
+import useTheme from '@mui/styles/useTheme';
 import React, { useEffect } from 'react';
 import {
   NumberParam,
@@ -11,8 +11,6 @@ import {
   useQueryParams,
   withDefault,
 } from 'use-query-params';
-
-import { StyledPaper } from 'styles/StyledComponents';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -55,6 +53,7 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
   tabNames,
   children,
   isInsideModal,
+  ...other
 }) => {
   const theme = useTheme();
   const [query, setQuery] = useQueryParams({
@@ -64,7 +63,7 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
   });
 
   const handleChange = (
-    event: React.ChangeEvent<Record<string, unknown>>,
+    event: React.SyntheticEvent<Element, Event>,
     newValue: number
   ) => {
     const tabValue = newValue > 0 ? newValue : undefined;
@@ -87,7 +86,7 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
   }, [setQuery, isInsideModal]);
 
   return (
-    <StyledPaper>
+    <>
       <AppBar position="static" color="default">
         <Tabs
           value={isInsideModal ? query.modalTab : query.tab}
@@ -95,6 +94,7 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
           textColor="primary"
           variant="fullWidth"
           aria-label="full width tabs example"
+          {...other}
         >
           {tabNames.map((tabName, i) => (
             <Tab key={i} label={tabName} {...a11yProps(i)} />
@@ -112,7 +112,7 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
           {tabContent}
         </TabPanel>
       ))}
-    </StyledPaper>
+    </>
   );
 };
 

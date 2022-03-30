@@ -1,8 +1,8 @@
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -29,13 +29,17 @@ const useStyles = makeStyles((theme) => ({
 type CallSelectModalOnProposalsCloneProps = {
   close: () => void;
   cloneProposalsToCall: (call: Call) => Promise<void>;
+  templateId?: number;
 };
 
 const CallSelectModalOnProposalsClone: React.FC<
   CallSelectModalOnProposalsCloneProps
-> = ({ close, cloneProposalsToCall }) => {
+> = ({ close, cloneProposalsToCall, templateId }) => {
   const classes = useStyles();
-  const { calls, loadingCalls } = useCallsData({ isActive: true });
+  const { calls, loadingCalls } = useCallsData({
+    isActive: true,
+    templateIds: templateId ? [templateId] : undefined,
+  });
 
   return (
     <Container component="main" maxWidth="xs">
@@ -86,8 +90,6 @@ const CallSelectModalOnProposalsClone: React.FC<
             <Button
               type="submit"
               fullWidth
-              variant="contained"
-              color="primary"
               className={classes.submit}
               disabled={isSubmitting}
               data-cy="submit"

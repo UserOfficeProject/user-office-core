@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 
 import {
@@ -15,7 +16,6 @@ import {
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
-import { toTzLessDateTime } from 'utils/Time';
 
 export type ProposalScheduledEvent = Pick<
   ScheduledEventCore,
@@ -66,7 +66,11 @@ export function useProposalBookingsScheduledEvents({
     setLoading(true);
     api()
       .getUserProposalBookingsWithEvents({
-        ...(onlyUpcoming ? { endsAfter: toTzLessDateTime(new Date()) } : null),
+        ...(onlyUpcoming
+          ? {
+              endsAfter: DateTime.now().toUTC().toISO(),
+            }
+          : null),
         status: notDraft
           ? [
               ProposalBookingStatusCore.ACTIVE,

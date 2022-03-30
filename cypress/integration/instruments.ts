@@ -3,6 +3,11 @@ import faker from 'faker';
 import { TechnicalReviewStatus } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
+const selectAllProposalsFilterStatus = () => {
+  cy.get('[data-cy="status-filter"]').click();
+  cy.get('[role="listbox"] [data-value="0"]').click();
+};
+
 context('Instrument tests', () => {
   const proposal1 = {
     title: faker.random.words(2),
@@ -33,7 +38,6 @@ context('Instrument tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   // TODO: Maybe this should be moved to permission testing.
@@ -84,7 +88,10 @@ context('Instrument tests', () => {
       cy.createInstrument(instrument1);
 
       cy.contains('Instruments').click();
-      cy.contains(instrument1.name).parent().find('[title="Edit"]').click();
+      cy.contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
       cy.get('#name').clear();
       cy.get('#name').type(newName);
       cy.get('#shortCode').clear();
@@ -110,7 +117,7 @@ context('Instrument tests', () => {
 
       cy.contains('call 1')
         .parent()
-        .find('[title="Assign Instrument"]')
+        .find('[aria-label="Assign Instrument"]')
         .click();
 
       cy.contains(instrument1.name).parent().find('[type="checkbox"]').check();
@@ -128,9 +135,12 @@ context('Instrument tests', () => {
 
       cy.contains('Instruments').click();
 
-      cy.contains(instrument1.name).parent().find('[title="Delete"]').click();
+      cy.contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({ variant: 'success', text: 'Instrument removed' });
 
@@ -238,7 +248,7 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name)
         .parent()
-        .find('[title="Assign scientist"]')
+        .find('[aria-label="Assign scientist"]')
         .click();
 
       cy.get('[data-cy="co-proposers"]')
@@ -291,12 +301,10 @@ context('Instrument tests', () => {
       cy.get('@dialog').contains('Technical review').click();
 
       cy.get('[data-cy="reviewed-by-info"]').should('exist');
-      cy.get('[data-cy="reviewed-by-info"]')
-        .invoke('attr', 'title')
-        .should(
-          'eq',
-          `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
-        );
+      cy.get('[data-cy="reviewed-by-info"]').should(
+        'contain',
+        `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
+      );
     });
 
     it('User Officer should be able to re-open submitted technical review', () => {
@@ -360,12 +368,10 @@ context('Instrument tests', () => {
 
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
-
+      selectAllProposalsFilterStatus();
       cy.contains(proposal1.title)
         .parent()
-        .find('[data-cy="view-proposal"]')
+        .find('[data-cy="edit-technical-review"]')
         .click();
       cy.get('[role="dialog"]').contains('Technical review').click();
 
@@ -383,17 +389,17 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name)
         .parent()
-        .find('[title="Show Scientists"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(scientist2.lastName);
 
       cy.contains(scientist2.lastName)
         .parent()
-        .find('[title="Delete"]')
+        .find('[aria-label="Delete"]')
         .click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',
@@ -412,7 +418,10 @@ context('Instrument tests', () => {
     it('User Officer should be able to update beamline manager', () => {
       cy.contains('Instruments').click();
 
-      cy.contains(instrument1.name).parent().find('[title="Edit"]').click();
+      cy.contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
 
       cy.get('[data-cy=beamline-manager]').click();
 
@@ -498,7 +507,10 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name);
 
-      cy.get('[title="Show Scientists"]').first().should('exist').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]')
+        .first()
+        .should('exist')
+        .click();
 
       cy.contains(scientist2.lastName);
     });
@@ -506,8 +518,7 @@ context('Instrument tests', () => {
     it('Instrument scientist should be able to see proposals assigned to instrument where he is instrument scientist', () => {
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
     });
@@ -515,8 +526,7 @@ context('Instrument tests', () => {
     it('Instrument scientist should have a call and instrument filter', () => {
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
 
@@ -571,8 +581,7 @@ context('Instrument tests', () => {
       });
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
       cy.contains(proposal2.title);
@@ -588,7 +597,7 @@ context('Instrument tests', () => {
         .find('input[type="checkbox"]')
         .check();
 
-      cy.get('[title="Download proposals"]').click();
+      cy.get('[aria-label="Download proposals"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -611,12 +620,11 @@ context('Instrument tests', () => {
       const publicComment = faker.random.words(2);
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title)
         .parent()
-        .find('[data-cy="view-proposal"]')
+        .find('[data-cy="edit-technical-review"]')
         .click();
       cy.get('[role="dialog"]').as('dialog');
       cy.finishedLoading();
@@ -689,10 +697,36 @@ context('Instrument tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains('20');
+    });
+
+    it('Technical review assignee should see edit icon if assigned to review a proposal and review is not submitted', () => {
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .should('exist')
+        .click();
+
+      cy.closeModal();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .should('exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('not.exist');
     });
   });
 });

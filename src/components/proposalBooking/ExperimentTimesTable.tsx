@@ -1,20 +1,35 @@
-import MaterialTable, { Options } from '@material-table/core';
+import MaterialTable, { Column, Options } from '@material-table/core';
 import React from 'react';
 
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { ProposalScheduledEvent } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { tableIcons } from 'utils/materialIcons';
-import {
-  parseTzLessDateTime,
-  TZ_LESS_DATE_TIME_LOW_PREC_FORMAT,
-} from 'utils/Time';
 import { getFullUserName } from 'utils/user';
 
 type ExperimentTimesTableProps = {
   title: string;
   isLoading: boolean;
   proposalScheduledEvents: ProposalScheduledEvent[];
-  options?: Partial<Options<JSX.Element>>;
+  options?: Partial<Options<ProposalScheduledEvent>>;
 };
+
+const columns: Column<ProposalScheduledEvent>[] = [
+  { title: 'Proposal title', field: 'proposal.title' },
+  { title: 'Proposal ID', field: 'proposal.proposalId' },
+  { title: 'Instrument', field: 'instrument.name' },
+  {
+    title: 'Local contact',
+    render: (rowData) => getFullUserName(rowData.localContact),
+  },
+  {
+    title: 'Starts at',
+    field: 'startsAtFormatted',
+  },
+  {
+    title: 'Ends at',
+    field: 'endsAtFormatted',
+  },
+];
 
 export default function ExperimentsTable({
   title,
@@ -22,37 +37,25 @@ export default function ExperimentsTable({
   proposalScheduledEvents,
   options,
 }: ExperimentTimesTableProps) {
+  const { toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
+
+  const proposalScheduledEventsWithFormattedDates = proposalScheduledEvents.map(
+    (event) => ({
+      ...event,
+      startsAtFormatted: toFormattedDateTime(event.startsAt),
+      endsAtFormatted: toFormattedDateTime(event.endsAt),
+    })
+  );
+
   return (
     <MaterialTable
       icons={tableIcons}
       title={title}
       isLoading={isLoading}
-      columns={[
-        { title: 'Proposal title', field: 'proposal.title' },
-        { title: 'Proposal ID', field: 'proposal.proposalId' },
-        { title: 'Instrument', field: 'instrument.name' },
-        {
-          title: 'Local contact',
-          render: (rowData) => getFullUserName(rowData.localContact),
-        },
-        {
-          title: 'Starts at',
-          field: 'startsAt',
-          render: (rowData) =>
-            parseTzLessDateTime(rowData.startsAt).format(
-              TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-            ),
-        },
-        {
-          title: 'Ends at',
-          field: 'endsAt',
-          render: (rowData) =>
-            parseTzLessDateTime(rowData.endsAt).format(
-              TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-            ),
-        },
-      ]}
-      data={proposalScheduledEvents}
+      columns={columns}
+      data={proposalScheduledEventsWithFormattedDates}
       options={{
         search: false,
         padding: 'dense',

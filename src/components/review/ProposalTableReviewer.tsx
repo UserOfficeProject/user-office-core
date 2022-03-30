@@ -1,10 +1,10 @@
 import MaterialTable, { Column } from '@material-table/core';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import DoneAll from '@material-ui/icons/DoneAll';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import RateReviewIcon from '@material-ui/icons/RateReview';
-import Visibility from '@material-ui/icons/Visibility';
+import DoneAll from '@mui/icons-material/DoneAll';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import Visibility from '@mui/icons-material/Visibility';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import React, { useState, useContext, useEffect } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
@@ -31,7 +31,9 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import ProposalReviewContent, { TabNames } from './ProposalReviewContent';
+import ProposalReviewContent, {
+  PROPOSAL_MODAL_TAB_NAMES,
+} from './ProposalReviewContent';
 import ProposalReviewModal from './ProposalReviewModal';
 import ReviewerFilterComponent, {
   defaultReviewerQueryFilter,
@@ -62,6 +64,25 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.YOU ? ReviewerFilter.YOU : ReviewerFilter.ALL;
 
+let columns: Column<UserWithReview>[] = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 120 },
+    sorting: false,
+    field: 'rowActions',
+  },
+  { title: 'Proposal ID', field: 'proposalId' },
+  { title: 'Title', field: 'title' },
+  { title: 'Grade', field: 'grade' },
+  {
+    title: 'Review status',
+    render: (user) => capitalize(user.status),
+    customSort: (a, b) => a.status.localeCompare(b.status),
+  },
+  { title: 'Call', field: 'callShortCode' },
+  { title: 'Instrument', field: 'instrumentShortCode' },
+];
+
 const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
   confirm,
 }) => {
@@ -76,6 +97,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     instrument: NumberParam,
     reviewStatus: defaultReviewStatusQueryFilter,
     reviewModal: NumberParam,
+    modalTab: NumberParam,
     reviewer: defaultReviewerQueryFilter,
   });
 
@@ -182,19 +204,45 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     }
   }, [userData, urlQueryParams.selection]);
 
+  const reviewerProposalReviewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
+    PROPOSAL_MODAL_TAB_NAMES.GRADE,
+  ];
+
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
   const RowActionButtons = (rowData: UserWithReview) => (
     <>
-      <Tooltip title="Review proposal">
+      <Tooltip
+        title={
+          rowData.status === ReviewStatus.DRAFT
+            ? 'Grade proposal'
+            : 'View proposal'
+        }
+      >
         <IconButton
           onClick={() => {
-            setUrlQueryParams({ reviewModal: rowData.reviewId });
+            setUrlQueryParams({
+              reviewModal: rowData.reviewId,
+              modalTab:
+                rowData.status === ReviewStatus.DRAFT
+                  ? reviewerProposalReviewTabs.indexOf(
+                      PROPOSAL_MODAL_TAB_NAMES.GRADE
+                    )
+                  : reviewerProposalReviewTabs.indexOf(
+                      PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION
+                    ),
+            });
           }}
         >
-          {rowData.status === 'SUBMITTED' ? <Visibility /> : <RateReviewIcon />}
+          {rowData.status === ReviewStatus.DRAFT ? (
+            <RateReviewIcon data-cy="grade-proposal-icon" />
+          ) : (
+            <Visibility data-cy="view-proposal-details-icon" />
+          )}
         </IconButton>
       </Tooltip>
       <Tooltip title="Download Proposal">
@@ -215,25 +263,6 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
       'data-cy'?: string;
     }
   ): JSX.Element => <DoneAll {...props} />;
-
-  let columns: Column<UserWithReview>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      render: RowActionButtons,
-    },
-    { title: 'Proposal ID', field: 'proposalId' },
-    { title: 'Title', field: 'title' },
-    { title: 'Grade', field: 'grade' },
-    {
-      title: 'Review status',
-      render: (user) => capitalize(user.status),
-      customSort: (a, b) => a.status.localeCompare(b.status),
-    },
-    { title: 'Call', field: 'callShortCode' },
-    { title: 'Instrument', field: 'instrumentShortCode' },
-  ];
 
   columns = setSortDirectionOnSortColumn(
     columns,
@@ -307,14 +336,12 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     }
   };
 
-  const reviewerProposalReviewTabs: TabNames[] = [
-    'Proposal information',
-    'Technical review',
-    'Grade',
-  ];
-
   const proposalToReview = preselectedProposalsData.find(
     (review) => review.reviewId === urlQueryParams.reviewModal
+  );
+
+  const preselectedProposalsDataWithRowActions = preselectedProposalsData.map(
+    (proposal) => ({ ...proposal, rowActions: RowActionButtons(proposal) })
   );
 
   return (
@@ -348,10 +375,10 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         }}
       />
       <ProposalReviewModal
-        title={`Review proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
+        title={`Proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={() => {
-          setUrlQueryParams({ reviewModal: undefined });
+          setUrlQueryParams({ reviewModal: undefined, modalTab: undefined });
           updateView();
         }}
       >
@@ -362,9 +389,9 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
       </ProposalReviewModal>
       <MaterialTable
         icons={tableIcons}
-        title={'Proposals to review'}
+        title={'Proposals to grade'}
         columns={columns}
-        data={preselectedProposalsData}
+        data={preselectedProposalsDataWithRowActions}
         isLoading={loading}
         options={{
           search: false,

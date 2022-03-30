@@ -1,5 +1,6 @@
-import { Button, Link, makeStyles, Paper, Typography } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
+import { Button, Link, Paper, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { Fragment, useContext, useState } from 'react';
 
@@ -23,22 +24,24 @@ import {
 } from 'generated/sdk';
 import { ProposalData, useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
+import { StyledPaper } from 'styles/StyledComponents';
 
 import AssignTechnicalReview from './AssignTechnicalReview';
 import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 
-export type TabNames =
-  | 'Proposal information'
-  | 'Technical review'
-  | 'Reviews'
-  | 'Admin'
-  | 'Grade'
-  | 'Logs';
+export enum PROPOSAL_MODAL_TAB_NAMES {
+  PROPOSAL_INFORMATION = 'Proposal information',
+  TECHNICAL_REVIEW = 'Technical review',
+  REVIEWS = 'Reviews',
+  ADMIN = 'Admin',
+  GRADE = 'Grade',
+  LOGS = 'Logs',
+}
 
 type ProposalReviewContentProps = {
-  tabNames: TabNames[];
+  tabNames: PROPOSAL_MODAL_TAB_NAMES[];
   proposalPk?: number | null;
   reviewId?: number | null;
   sepId?: number | null;
@@ -84,7 +87,9 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
     return (
       <Box display="flex" flexDirection="column" alignItems="center">
         <h2>Proposal not found</h2>
-        <Button onClick={() => console.log('Not implemented')}>Retry</Button>
+        <Button variant="text" onClick={() => console.log('Not implemented')}>
+          Retry
+        </Button>
       </Box>
     );
   }
@@ -113,8 +118,10 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
       <Typography variant="h6" component="h2" gutterBottom>
         Assign to someone else?
       </Typography>
-      If you think there is a better candidate to do the review for the
-      proposal, you can re-assign it to someone else
+      <p>
+        If you think there is a better candidate to do the review for the
+        proposal, you can re-assign it to someone else
+      </p>
       <div>
         {showReassign ? (
           <AssignTechnicalReview
@@ -215,9 +222,11 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   });
 
   return (
-    <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
-      {tabsContent}
-    </SimpleTabs>
+    <StyledPaper>
+      <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
+        {tabsContent}
+      </SimpleTabs>
+    </StyledPaper>
   );
 };
 

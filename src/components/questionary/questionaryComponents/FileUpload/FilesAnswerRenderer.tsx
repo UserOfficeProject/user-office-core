@@ -1,5 +1,5 @@
-import Link from '@material-ui/core/Link';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Link from '@mui/material/Link';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { FileIdWithCaptionAndFigure } from 'components/common/FileUploadComponent';

@@ -1,23 +1,29 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import InputLabel from '@material-ui/core/InputLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import InputLabel from '@mui/material/InputLabel';
+import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';
 
+import { useCheckAccess } from 'components/common/Can';
+import ErrorMessage from 'components/common/ErrorMessage';
+import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import UOLoader from 'components/common/UOLoader';
+import GradeGuidePage from 'components/pages/GradeGuidePage';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ReviewStatus,
   ReviewWithNextProposalStatus,
   Review,
+  UserRole,
 } from 'generated/sdk';
-import { ButtonContainer } from 'styles/StyledComponents';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -45,6 +51,7 @@ type ProposalGradeProps = {
 type GradeFormType = {
   grade: string | number;
   comment: string;
+  submitted: boolean;
   saveOnly: boolean;
 };
 
@@ -58,6 +65,12 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   const { api } = useDataApiWithFeedback();
   const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
   const [shouldSubmit, setShouldSubmit] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasAccessRights = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
 
   if (!review) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -66,6 +79,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   const initialValues = {
     grade: review.grade?.toString() || '',
     comment: review.comment || '',
+    submitted: review.status === ReviewStatus.SUBMITTED,
     saveOnly: true,
   };
 
@@ -81,36 +95,41 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   };
 
   const isDisabled = (isSubmitting: boolean) =>
-    isSubmitting || review.status === ReviewStatus.SUBMITTED;
+    isSubmitting ||
+    (review.status === ReviewStatus.SUBMITTED && !hasAccessRights);
 
   const handleSubmit = async (values: GradeFormType) => {
-    const data = await api(shouldSubmit ? 'Submitted' : 'Updated').addReview({
+    const {
+      updateReview: { rejection, review: updatedReview },
+    } = await api(shouldSubmit ? 'Submitted' : 'Updated').updateReview({
       reviewID: review.id,
-      //This should be taken care of in validationSchema
       grade: +values.grade,
       comment: values.comment ? values.comment : '',
-      status: shouldSubmit ? ReviewStatus.SUBMITTED : ReviewStatus.DRAFT,
+      status:
+        shouldSubmit || values.submitted
+          ? ReviewStatus.SUBMITTED
+          : ReviewStatus.DRAFT,
       sepID: review.sepID,
     });
 
-    if (!data.addReview.rejection && data.addReview.review) {
+    if (!rejection && updatedReview) {
       setReview({
         ...review,
-        comment: data.addReview.review.comment,
-        grade: data.addReview.review.grade,
-        status: data.addReview.review.status,
+        comment: updatedReview.comment,
+        grade: updatedReview.grade,
+        status: updatedReview.status,
       });
-      setAssignmentReview(
-        data.addReview.review as ReviewWithNextProposalStatus
-      );
+      setAssignmentReview(updatedReview as ReviewWithNextProposalStatus);
     }
     onChange();
+    setIsSubmitting(false);
   };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
+        setIsSubmitting(true);
         if (shouldSubmit) {
           confirm(
             async () => {
@@ -120,6 +139,9 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               title: 'Please confirm',
               description:
                 'I am aware that no further changes to the grade are possible after submission.',
+              onCancel: () => {
+                setIsSubmitting(false);
+              },
             }
           )();
         } else {
@@ -128,7 +150,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
       }}
       validationSchema={proposalGradeValidationSchema}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form>
           <PromptIfDirty />
           <CssBaseline />
@@ -157,6 +179,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
             }}
             disabled={isDisabled(isSubmitting)}
           />
+          <ErrorMessage name="comment" />
           <Box marginTop={1} width={150}>
             <Field
               name="grade"
@@ -175,34 +198,46 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               data-cy="grade-proposal"
             />
           </Box>
-          <ButtonContainer>
+          <StyledButtonContainer>
             {isSubmitting && (
               <Box display="flex" alignItems="center" mx={1}>
                 <UOLoader buttonSized />
               </Box>
             )}
+            {hasAccessRights && (
+              <Field
+                id="submitted"
+                name="submitted"
+                component={FormikUICustomCheckbox}
+                label="Submitted"
+                disabled={isSubmitting}
+                data-cy="is-grade-submitted"
+              />
+            )}
+            <ButtonWithDialog label="Grading guide">
+              <GradeGuidePage />
+            </ButtonWithDialog>
             <Button
               disabled={isDisabled(isSubmitting)}
-              variant="contained"
               color="secondary"
               type="submit"
               onClick={() => setShouldSubmit(false)}
             >
               Save
             </Button>
-            <Button
-              className={classes.button}
-              disabled={isDisabled(isSubmitting)}
-              variant="contained"
-              color="primary"
-              type="submit"
-              onClick={() => setShouldSubmit(true)}
-            >
-              {review.status === ReviewStatus.SUBMITTED
-                ? 'Submitted'
-                : 'Submit'}
-            </Button>
-          </ButtonContainer>
+            {!hasAccessRights && (
+              <Button
+                className={classes.button}
+                disabled={isDisabled(isSubmitting)}
+                type="submit"
+                onClick={() => setShouldSubmit(true)}
+              >
+                {review.status === ReviewStatus.SUBMITTED
+                  ? 'Submitted'
+                  : 'Submit'}
+              </Button>
+            )}
+          </StyledButtonContainer>
         </Form>
       )}
     </Formik>

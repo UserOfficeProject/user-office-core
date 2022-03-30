@@ -1,3 +1,4 @@
+import EditIcon from '@mui/icons-material/Edit';
 import {
   Tooltip,
   IconButton,
@@ -6,19 +7,18 @@ import {
   DialogContent,
   DialogActions,
   Button,
-} from '@material-ui/core';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
-import EditIcon from '@material-ui/icons/Edit';
+} from '@mui/material';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { updateTimeAllocationValidationSchema } from '@user-office-software/duo-validation';
 import clsx from 'clsx';
 import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -128,15 +128,13 @@ const OverwriteTimeAllocationDialog = ({
             <DialogActions>
               <Button
                 onClick={() => onClose()}
-                color="primary"
+                variant="text"
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                color="primary"
-                variant="contained"
                 disabled={isSubmitting}
                 data-cy="save-time-allocation"
               >
@@ -224,14 +222,6 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
               </TableRow>
               <TableRow key="comments">
                 <TableCell className={classes.textBold}>
-                  Internal comment
-                </TableCell>
-                <TableCell
-                  dangerouslySetInnerHTML={{
-                    __html: technicalReview?.comment || '-',
-                  }}
-                />
-                <TableCell className={classes.textBold}>
                   Comments for the review panel
                 </TableCell>
                 <TableCell
@@ -239,8 +229,6 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
                     __html: technicalReview?.publicComment || '-',
                   }}
                 />
-              </TableRow>
-              <TableRow key="reviewer">
                 <TableCell className={classes.textBold}>Reviewer</TableCell>
                 <TableCell>
                   {getFullUserName(technicalReview?.reviewer)}

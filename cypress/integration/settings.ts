@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   AllocationTimeUnits,
@@ -10,7 +11,6 @@ import initialDBData from '../support/initialDBData';
 context('Settings tests', () => {
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   describe('Proposal statuses tests', () => {
@@ -46,7 +46,7 @@ context('Settings tests', () => {
       cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
       cy.get('@proposalStatusesTable')
-        .find('span[title="Last Page"] > button')
+        .find('span[aria-label="Last Page"] > button')
         .as('lastPageButtonElement');
 
       cy.get('@lastPageButtonElement').click({ force: true });
@@ -76,7 +76,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
 
-      cy.contains('DRAFT').parent().find('[title="Edit"]').click();
+      cy.contains('DRAFT').parent().find('[aria-label="Edit"]').click();
 
       cy.get('#shortCode').should('be.disabled');
 
@@ -106,12 +106,12 @@ context('Settings tests', () => {
       cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
       cy.get('@proposalStatusesTable')
-        .find('span[title="Last Page"] > button')
+        .find('span[aria-label="Last Page"] > button')
         .as('lastPageButtonElement');
 
       cy.get('@lastPageButtonElement').click({ force: true });
 
-      cy.contains(name).parent().find('[title="Delete"]').click();
+      cy.contains(name).parent().find('[aria-label="Delete"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -133,8 +133,7 @@ context('Settings tests', () => {
     let prevProposalStatusId: number;
     let createdEsiTemplateId: number;
 
-    const currentDayStart = new Date();
-    currentDayStart.setHours(0, 0, 0, 0);
+    const currentDayStart = DateTime.now().startOf('day');
 
     const updatedCall = {
       shortCode: faker.random.alphaNumeric(15),
@@ -149,8 +148,8 @@ context('Settings tests', () => {
       startCycle: currentDayStart,
       endCycle: currentDayStart,
       allocationTimeUnit: AllocationTimeUnits.DAY,
-      cycleComment: faker.lorem.word(),
-      surveyComment: faker.lorem.word(),
+      cycleComment: faker.lorem.word(10),
+      surveyComment: faker.lorem.word(10),
       templateId: initialDBData.template.id,
     };
 
@@ -341,7 +340,7 @@ context('Settings tests', () => {
 
       cy.contains(proposalTitle)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('Save and continue').click();
@@ -375,7 +374,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.get('[name="proposal_basis.title"]').clear().type(editedProposalTitle);
@@ -416,10 +415,9 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]').last().click();
+      cy.get('[aria-label="Edit"]').last().click();
 
-      cy.contains('Edit').click();
-
+      cy.get('[data-cy="Edit-button"]').click();
       cy.get('#name').clear().type(updatedWorkflowName);
       cy.get('#description').clear().type(updatedWorkflowDescription);
       cy.get('[data-cy="submit"]').click();
@@ -438,7 +436,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.contains(workflowName).parent().find('[title="Edit"]').click();
+      cy.contains(workflowName).parent().find('[aria-label="Edit"]').click();
 
       cy.finishedLoading();
 
@@ -474,7 +472,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.contains(workflowName).parent().find('[title="Edit"]').click();
+      cy.contains(workflowName).parent().find('[aria-label="Edit"]').click();
 
       cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
 
@@ -532,7 +530,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('Save and continue').click();
@@ -625,7 +623,7 @@ context('Settings tests', () => {
 
       cy.get('[type="checkbox"]').first().check();
 
-      cy.get("[title='Assign proposals to SEP']").first().click();
+      cy.get("[aria-label='Assign proposals to SEP']").first().click();
 
       cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
 
@@ -681,15 +679,15 @@ context('Settings tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.get("[title='Edit']").first().click();
+      cy.get("[aria-label='Edit']").first().click();
 
       cy.contains('Members').click();
 
-      cy.get('[title="Set SEP Chair"]').click();
+      cy.get('[aria-label="Set SEP Chair"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="Select user"]').first().click();
+      cy.get('[aria-label="Select user"]').first().click();
 
       cy.notification({
         variant: 'success',
@@ -700,7 +698,7 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[title='Assign SEP Member']").first().click();
+      cy.get("[aria-label='Assign SEP Member']").first().click();
 
       cy.finishedLoading();
 
@@ -718,10 +716,11 @@ context('Settings tests', () => {
       });
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.get("[title='Show Reviewers']").first().click();
-      cy.contains('Nilsson').parent().find('[title="Review proposal"]').click();
-
-      cy.get('[role="dialog"]').contains('Grade').click({ force: true });
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+      cy.contains('Nilsson')
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
@@ -729,13 +728,12 @@ context('Settings tests', () => {
 
       cy.get('[role="listbox"] > [role="option"]').first().click();
 
-      cy.contains('Submit').click();
+      cy.get('[data-cy="is-grade-submitted"]').click();
+      cy.get('[type="submit"]').contains('Save').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'Updated' });
 
-      cy.notification({ variant: 'success', text: 'Submitted' });
-
-      cy.get('[aria-label="close"]').click();
+      cy.closeModal();
 
       cy.get('[role="dialog"]').should('not.exist');
       cy.contains('SEP Meeting');
@@ -812,7 +810,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.contains(workflowName).parent().find('[title="Edit"]').click();
+      cy.contains(workflowName).parent().find('[aria-label="Edit"]').click();
 
       cy.get('[data-cy="remove-workflow-status-button"]').first().click();
 
@@ -1027,7 +1025,7 @@ context('Settings tests', () => {
 
       cy.get('#accessToken').should('contain.value', 'Bearer ');
 
-      cy.get('[title="Copy"]').should('exist');
+      cy.get('[aria-label="Copy"]').should('exist');
 
       cy.get('#accessToken')
         .invoke('val')
@@ -1037,7 +1035,7 @@ context('Settings tests', () => {
             url: '/graphql',
             body: {
               query:
-                'query { proposalsView(filter: {}) { primaryKey title proposalId}}',
+                'query { proposalsView(filter: {}) { totalCount proposalViews { primaryKey title proposalId }}}',
             },
             auth: {
               bearer: (accessToken as string).split(' ')[1],
@@ -1047,7 +1045,10 @@ context('Settings tests', () => {
               'application/json'
             );
             expect(response.status).to.be.equal(200);
-            expect(response.body.data.proposalsView).to.be.an('array');
+            expect(response.body.data.proposalsView).to.be.deep.equal({
+              totalCount: 0,
+              proposalViews: [],
+            });
           });
         });
     });
@@ -1064,7 +1065,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('API access tokens').click();
 
-      cy.contains(accessTokenName).parent().find('[title="Edit"]').click();
+      cy.contains(accessTokenName).parent().find('[aria-label="Edit"]').click();
 
       cy.finishedLoading();
 
@@ -1079,7 +1080,7 @@ context('Settings tests', () => {
         text: 'Api access token updated successfully!',
       });
 
-      cy.get('[title="Copy"]').should('exist');
+      cy.get('[aria-label="Copy"]').should('exist');
 
       cy.get('#accessToken')
         .invoke('val')
@@ -1090,7 +1091,7 @@ context('Settings tests', () => {
             url: '/graphql',
             body: {
               query:
-                'query { proposalsView(filter: {}) { primaryKey title proposalId}}',
+                'query { proposalsView(filter: {}) { totalCount proposalViews { primaryKey title proposalId }}}',
             },
             auth: {
               bearer: removedAccessToken.split(' ')[1],
@@ -1117,8 +1118,11 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('API access tokens').click();
 
-      cy.contains(accessTokenName).parent().find('[title="Delete"]').click();
-      cy.get('[title="Save"]').click();
+      cy.contains(accessTokenName)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',
