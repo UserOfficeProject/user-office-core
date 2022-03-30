@@ -250,7 +250,9 @@ export default class UserMutations {
         )) as UserWithRole;
       } catch (error) {
         // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
-        if ((error as { code: string }).code === '23503') {
+        const errorCode = (error as { code: string }).code;
+
+        if (errorCode === '23503' || errorCode === '23505') {
           return rejection(
             'Can not create user because account already exists',
             { args },

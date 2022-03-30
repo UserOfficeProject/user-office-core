@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { dateQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { DateTime } from 'luxon';
 
 import { DateConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -28,9 +29,19 @@ export const dateDefinition: Question = {
     (relation.config as DateConfig).defaultDate || null,
   filterQuery: (queryBuilder, filter) => {
     const value = JSON.parse(filter.value).value;
+    // NOTE: For exact comparison we need to use like interval of whole day because for now filter works only with date without time.
+    const valuePlusOneDay = DateTime.fromISO(value, { zone: 'utc' })
+      .plus({ day: 1 })
+      .toISO();
+
     switch (filter.compareOperator) {
       case QuestionFilterCompareOperator.EQUALS:
-        return queryBuilder.andWhereRaw("answers.answer->>'value'=?", value);
+        return queryBuilder
+          .andWhereRaw("(answer->>'value')::timestamp >= (?)::timestamp", value)
+          .andWhereRaw(
+            "(answer->>'value')::timestamp < (?)::timestamp",
+            valuePlusOneDay
+          );
       case QuestionFilterCompareOperator.GREATER_THAN:
         return queryBuilder.andWhereRaw(
           "(answer->>'value')::timestamp > (?)::timestamp",
