@@ -4,8 +4,6 @@ import { DateTime } from 'luxon';
 import initialDBData from '../support/initialDBData';
 
 context('Proposal administration tests', () => {
-  const DATE_FORMAT = 'yyyy-MM-dd';
-
   const proposalName1 = faker.lorem.words(3);
   const proposalName2 = faker.lorem.words(3);
   const proposalFixedName = '0000. Alphabetically first title';
@@ -471,13 +469,19 @@ context('Proposal administration tests', () => {
 
       const DATE_ANSWER = answers.proposal.date.value;
 
-      const DATE_BEFORE = DateTime.fromFormat(DATE_ANSWER, DATE_FORMAT)
+      const DATE_BEFORE = DateTime.fromFormat(
+        DATE_ANSWER,
+        initialDBData.formats.dateFormat
+      )
         .minus({ days: 1 })
-        .toFormat(DATE_FORMAT);
+        .toFormat(initialDBData.formats.dateFormat);
 
-      const DATE_AFTER = DateTime.fromFormat(DATE_ANSWER, DATE_FORMAT)
+      const DATE_AFTER = DateTime.fromFormat(
+        DATE_ANSWER,
+        initialDBData.formats.dateFormat
+      )
         .plus({ days: 1 })
-        .toFormat(DATE_FORMAT);
+        .toFormat(initialDBData.formats.dateFormat);
 
       cy.get('[data-cy=question-list]').click();
       cy.contains(questions.date.text).click();
@@ -488,12 +492,11 @@ context('Proposal administration tests', () => {
       cy.contains('Search').click();
       cy.contains(proposal.title).should('not.exist');
 
-      // TODO: This should be allowed here: https://github.com/UserOfficeProject/user-office-frontend/pull/815
-      // cy.get('[data-cy=comparator]').click();
-      // cy.get('[role=listbox]').contains('Exact').click();
-      // cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
-      // cy.contains('Search').click();
-      // cy.contains(proposal.title).should('exist');
+      cy.get('[data-cy=comparator]').click();
+      cy.get('[role=listbox]').contains('Exact').click();
+      cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
+      cy.contains('Search').click();
+      cy.contains(proposal.title).should('exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('After').click();

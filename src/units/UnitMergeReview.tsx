@@ -1,7 +1,6 @@
-import Alert from '@mui/lab/Alert';
 import { Button, Card, CardContent, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import produce from 'immer';
-import { DateTime } from 'luxon';
 import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router';
 
@@ -9,9 +8,11 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { ConflictResolver, DiffInfo } from 'components/common/ConflictResolver';
 import {
   ConflictResolutionStrategy,
+  SettingsId,
   UnitComparison,
   UnitsImportWithValidation,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 interface UnitMergeReviewProps {
@@ -28,12 +29,13 @@ const hasUnresolvedConflicts = (questionComparisons: UnitComparison[]) =>
 
 export function UnitMergeReview(props: UnitMergeReviewProps) {
   const { api } = useDataApiWithFeedback();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
   const history = useHistory();
   const templateExport = props.data;
   const { version, json, errors } = templateExport;
-  const exportDate = DateTime.fromISO(templateExport.exportDate).toFormat(
-    'dd-MM-yyyy'
-  );
+  const exportDate = toFormattedDateTime(templateExport.exportDate);
 
   const [state, setState] = useState({ ...templateExport });
 

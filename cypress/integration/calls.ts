@@ -19,8 +19,8 @@ context('Calls tests', () => {
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
-    endCall: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
+    startCall: DateTime.fromJSDate(faker.date.past()),
+    endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -57,8 +57,8 @@ context('Calls tests', () => {
 
   const updatedCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startDate: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
-    endDate: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
+    startDate: DateTime.fromJSDate(faker.date.past()),
+    endDate: DateTime.fromJSDate(faker.date.future()),
   };
 
   const proposalWorkflow = {
@@ -116,18 +116,19 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = faker.date
-        .past()
-        .toISOString()
-        .slice(0, 16)
-        .replace('T', ' ');
-      const endDate = faker.date
-        .future()
-        .toISOString()
-        .slice(0, 16)
-        .replace('T', ' ');
-      const invalidPastDate = faker.date.past().toISOString().slice(0, 10); // no time
-      const invalidFutureDate = faker.date.future().toISOString().slice(0, 10); // no time
+      const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+        initialDBData.formats.dateTimeFormat
+      );
+      const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+        initialDBData.formats.dateTimeFormat
+      );
+
+      const invalidPastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+        initialDBData.formats.dateFormat + ' HH'
+      ); // no minutes
+      const invalidFutureDate = DateTime.fromJSDate(
+        faker.date.future()
+      ).toFormat(initialDBData.formats.dateFormat + ' HH'); // no minutes
 
       cy.contains('Proposals');
 
@@ -150,9 +151,11 @@ context('Calls tests', () => {
 
       cy.contains('Invalid Date');
 
-      cy.get('[data-cy=start-date] input').clear().type(invalidPastDate);
       // NOTE: Luxon adapter still doesn't work well with newest MUI lab version to support placeholder text (https://github.com/mui/material-ui/issues/29851)
-      // .should('have.value', invalidPastDate + ' __:__');
+      cy.get('[data-cy=start-date] input')
+        .clear()
+        .type(invalidPastDate)
+        .should('have.value', invalidPastDate + ':');
 
       cy.contains('Invalid Date');
 
@@ -161,9 +164,11 @@ context('Calls tests', () => {
         .type(startDate)
         .should('have.value', startDate);
 
-      cy.get('[data-cy=end-date] input').clear().type(invalidFutureDate);
       // NOTE: Luxon adapter still doesn't work well with newest MUI lab version to support placeholder text (https://github.com/mui/material-ui/issues/29851)
-      // .should('have.value', invalidFutureDate + ' __:__');
+      cy.get('[data-cy=end-date] input')
+        .clear()
+        .type(invalidFutureDate)
+        .should('have.value', invalidFutureDate + ':');
 
       cy.get('[data-cy=end-date] input')
         .clear()
@@ -214,7 +219,8 @@ context('Calls tests', () => {
       const tomorrowDate = DateTime.now()
         .plus({ days: 1 })
         .startOf('day')
-        .toFormat('yyyy-MM-dd HH:mm')
+        // TODO: Find a way how to access the settings format here and not hard coding it like this.
+        .toFormat(initialDBData.formats.dateTimeFormat)
         .toString();
 
       cy.contains('Proposals');
@@ -241,19 +247,22 @@ context('Calls tests', () => {
         .type(tomorrowDate)
         .should('have.value', tomorrowDate);
 
-      cy.get('[data-cy=end-date] input').should('have.value', tomorrowDate);
+      cy.get('[data-cy=end-date]').should(
+        'include.text',
+        'End call date can not be before start call date'
+      );
     });
 
     it('A user-officer should be able to create a call', () => {
       const { shortCode, startCall, endCall, templateName, esiTemplateName } =
         newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callStartDate =
-        startCall ||
-        faker.date.past().toISOString().slice(0, 16).replace('T', ' ');
-      const callEndDate =
-        endCall ||
-        faker.date.future().toISOString().slice(0, 16).replace('T', ' ');
+      const callStartDate = startCall.toFormat(
+        initialDBData.formats.dateTimeFormat
+      );
+      const callEndDate = endCall.toFormat(
+        initialDBData.formats.dateTimeFormat
+      );
       const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
@@ -310,6 +319,12 @@ context('Calls tests', () => {
 
     it('A user-officer should be able to edit a call', () => {
       const { shortCode, startDate, endDate } = updatedCall;
+      const updatedCallStartDate = startDate.toFormat(
+        initialDBData.formats.dateTimeFormat
+      );
+      const updatedCallEndDate = endDate.toFormat(
+        initialDBData.formats.dateTimeFormat
+      );
 
       const refNumFormat = '211{digits:5}';
 
@@ -335,13 +350,13 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=start-date] input')
         .clear()
-        .type(startDate)
-        .should('have.value', startDate);
+        .type(updatedCallStartDate)
+        .should('have.value', updatedCallStartDate);
 
       cy.get('[data-cy=end-date] input')
         .clear()
-        .type(endDate)
-        .should('have.value', endDate);
+        .type(updatedCallEndDate)
+        .should('have.value', updatedCallEndDate);
 
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,

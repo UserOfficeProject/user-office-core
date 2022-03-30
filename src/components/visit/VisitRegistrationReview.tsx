@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import React, { useContext } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
@@ -10,6 +9,7 @@ import {
 import QuestionaryDetails, {
   TableRowData,
 } from 'components/questionary/QuestionaryDetails';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -22,6 +22,7 @@ type VisitRegistrationReviewProps = {
 };
 
 function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
+  const { toFormattedDateTime } = useFormattedDateTime();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -39,11 +40,11 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
     },
     {
       label: 'Start date',
-      value: DateTime.fromISO(registration.startsAt).toFormat('yyyy-MM-dd'),
+      value: toFormattedDateTime(registration.startsAt),
     },
     {
       label: 'End date',
-      value: DateTime.fromISO(registration.endsAt).toFormat('yyyy-MM-dd'),
+      value: toFormattedDateTime(registration.endsAt),
     },
   ];
 

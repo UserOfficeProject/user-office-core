@@ -24,20 +24,19 @@ import withStyles from '@mui/styles/withStyles';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
 import { DateTimePicker } from 'formik-mui-lab';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   AllocationTimeUnits,
   CreateCallMutationVariables,
   FeatureId,
   GetTemplatesQuery,
   ProposalWorkflow,
-  SettingsId,
   UpdateCallMutationVariables,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 const CallGeneralInfo: React.FC<{
   templates: GetTemplatesQuery['templates'];
@@ -53,9 +52,9 @@ const CallGeneralInfo: React.FC<{
   loadingTemplates,
 }) => {
   const { features } = useContext(FeatureContext);
-  const theme = useTheme();
+  const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
 
-  const settingsContext = useContext(SettingsContext);
+  const theme = useTheme();
 
   const proposalWorkflowOptions = proposalWorkflows.map((proposalWorkflow) => ({
     text: proposalWorkflow.name,
@@ -72,17 +71,7 @@ const CallGeneralInfo: React.FC<{
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
-  const { startCall, endCall } = formik.values;
-
-  useEffect(() => {
-    if (endCall && endCall < startCall) {
-      formik.setFieldValue('endCall', startCall);
-      /** NOTE: Set field untouched because if we try to update the endCall before startCall and then
-       *  set startCall after endCall it can show error message even though we update the endCall automatically.
-       */
-      formik.setFieldTouched('endCall', false);
-    }
-  }, [startCall, endCall, formik]);
+  const { startCall } = formik.values;
 
   function validateRefNumFormat(input: string) {
     let errorMessage;
@@ -133,9 +122,6 @@ const CallGeneralInfo: React.FC<{
     })
   )(TableRow);
 
-  const timezone =
-    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
-
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
   }
@@ -163,8 +149,12 @@ const CallGeneralInfo: React.FC<{
           name="startCall"
           label={`Start (${timezone})`}
           id="start-call-input"
-          inputFormat="yyyy-MM-dd HH:mm"
+          inputFormat={dateTimeFormat}
+          mask={mask}
+          // NOTE: We need to have ampm set to false because otherwise the mask doesn't work properly and suggestion format when you type is not shown at all
+          ampm={false}
           component={DateTimePicker}
+          inputProps={{ placeholder: dateTimeFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -179,9 +169,12 @@ const CallGeneralInfo: React.FC<{
           name="endCall"
           label={`End (${timezone})`}
           id="end-call-input"
-          inputFormat="yyyy-MM-dd HH:mm"
+          inputFormat={dateTimeFormat}
+          mask={mask}
+          ampm={false}
           allowSameDateSelection
           component={DateTimePicker}
+          inputProps={{ placeholder: dateTimeFormat }}
           textField={{
             fullWidth: true,
             required: true,

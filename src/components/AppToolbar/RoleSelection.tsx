@@ -8,16 +8,17 @@ import { Role } from 'generated/sdk';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 const columns = [
-  { title: 'Role', field: 'title' },
   {
     title: 'Action',
     field: 'roleAction',
   },
+  { title: 'Role', field: 'title' },
 ];
 
-const RoleSelection: React.FC = () => {
+const RoleSelection: React.FC<{ onClose: FunctionType }> = ({ onClose }) => {
   const { currentRole, token, handleNewToken } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
@@ -66,6 +67,8 @@ const RoleSelection: React.FC = () => {
 
       setTimeout(() => {
         handleNewToken(result.selectRole.token);
+
+        onClose();
       }, 500);
     }
   };

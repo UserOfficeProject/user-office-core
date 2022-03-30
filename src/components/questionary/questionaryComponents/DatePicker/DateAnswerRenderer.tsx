@@ -1,18 +1,22 @@
-import { DateTime } from 'luxon';
 import React from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
-import { DateConfig } from 'generated/sdk';
+import { DateConfig, SettingsId } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 const DateAnswerRenderer: AnswerRenderer = ({ config, value }) => {
+  const settingsFormatToUse = (config as DateConfig).includeTime
+    ? SettingsId.DATE_TIME_FORMAT
+    : SettingsId.DATE_FORMAT;
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse,
+  });
+
   if (!value) {
     return <span>Left blank</span>;
   }
-  const format = (config as DateConfig).includeTime
-    ? 'dd-MMM-yyyy HH:mm'
-    : 'dd-MMM-yyyy';
 
-  return <span>{DateTime.fromISO(value).toFormat(format)}</span>;
+  return <span>{toFormattedDateTime(value)}</span>;
 };
 
 export default DateAnswerRenderer;

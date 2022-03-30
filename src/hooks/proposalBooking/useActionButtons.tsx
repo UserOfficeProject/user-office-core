@@ -20,7 +20,6 @@ import {
   ProposalBookingStatusCore,
   ProposalEndStatus,
 } from 'generated/sdk';
-import { parseTzLessDateTime } from 'utils/Time';
 
 import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
 
@@ -209,13 +208,13 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         (reg) => reg.userId === user.id
       );
       if (registration) {
-        const trainingExpiryDate: Date | null =
+        const trainingExpiryDate: string | null =
           registration.trainingExpiryDate || null;
 
         if (
           trainingExpiryDate &&
-          DateTime.fromJSDate(trainingExpiryDate) >
-            parseTzLessDateTime(event.startsAt)
+          DateTime.fromISO(trainingExpiryDate) >
+            DateTime.fromISO(event.startsAt)
         ) {
           buttonState = 'completed';
         } else {

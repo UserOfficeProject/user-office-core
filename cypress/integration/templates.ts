@@ -1,6 +1,7 @@
 import path from 'path';
 
 import faker, { lorem } from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   DataType,
@@ -682,6 +683,31 @@ context('Template tests', () => {
 
     it('should render the Date field with default value and min max values when set', () => {
       let dateFieldId: string;
+      const minDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+        initialDBData.formats.dateFormat
+      );
+      const earlierThanMinDate = DateTime.fromFormat(
+        minDate,
+        initialDBData.formats.dateFormat
+      )
+        .minus({ day: 1 })
+        .toFormat(initialDBData.formats.dateFormat);
+      const maxDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+        initialDBData.formats.dateFormat
+      );
+      const laterThanMaxDate = DateTime.fromFormat(
+        maxDate,
+        initialDBData.formats.dateFormat
+      )
+        .plus({ day: 1 })
+        .toFormat(initialDBData.formats.dateFormat);
+      const defaultDate = DateTime.now().toFormat(
+        initialDBData.formats.dateFormat
+      );
+
+      const tomorrowDate = DateTime.now()
+        .plus({ day: 1 })
+        .toFormat(initialDBData.formats.dateFormat);
 
       cy.login('officer');
       cy.visit('/');
@@ -706,9 +732,9 @@ context('Template tests', () => {
 
       cy.get('[data-cy=question]').clear().type(dateQuestion.title);
 
-      cy.get('[data-cy="minDate"] input').type('2020-01-01');
-      cy.get('[data-cy="maxDate"] input').type('2020-01-31');
-      cy.get('[data-cy="defaultDate"] input').type('2020-01-10');
+      cy.get('[data-cy="minDate"] input').type(minDate);
+      cy.get('[data-cy="maxDate"] input').type(maxDate);
+      cy.get('[data-cy="defaultDate"] input').type(defaultDate);
 
       cy.contains('Save').click();
 
@@ -728,16 +754,13 @@ context('Template tests', () => {
 
       cy.contains(dateQuestion.title).click();
 
-      cy.get('[data-cy="minDate"] input').should('have.value', '2020-01-01');
-      cy.get('[data-cy="maxDate"] input').should('have.value', '2020-01-31');
-      cy.get('[data-cy="defaultDate"] input').should(
-        'have.value',
-        '2020-01-10'
-      );
+      cy.get('[data-cy="minDate"] input').should('have.value', minDate);
+      cy.get('[data-cy="maxDate"] input').should('have.value', maxDate);
+      cy.get('[data-cy="defaultDate"] input').should('have.value', defaultDate);
 
-      cy.get('[data-cy="minDate"] input').clear().type('2021-01-01');
-      cy.get('[data-cy="maxDate"] input').clear().type('2021-01-31');
-      cy.get('[data-cy="defaultDate"] input').clear().type('2021-01-10');
+      cy.get('[data-cy="minDate"] input').clear().type(minDate);
+      cy.get('[data-cy="maxDate"] input').clear().type(maxDate);
+      cy.get('[data-cy="defaultDate"] input').clear().type(defaultDate);
 
       cy.contains('Update').click();
 
@@ -752,17 +775,17 @@ context('Template tests', () => {
       cy.get('body').then(() => {
         cy.get(`[data-cy="${dateFieldId}.value"] input`).as('dateField');
 
-        cy.get('@dateField').should('have.value', '2021-01-10');
+        cy.get('@dateField').should('have.value', defaultDate);
 
-        cy.get('@dateField').clear().type('2020-01-01');
+        cy.get('@dateField').clear().type(earlierThanMinDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no earlier than');
 
-        cy.get('@dateField').clear().type('2022-01-01');
+        cy.get('@dateField').clear().type(laterThanMaxDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no latter than');
 
-        cy.get('@dateField').clear().type('2021-01-15');
+        cy.get('@dateField').clear().type(tomorrowDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no').should('not.exist');
       });
@@ -1217,6 +1240,9 @@ context('Template tests', () => {
     });
 
     it('User can create proposal with template', () => {
+      const dateTimeFieldValue = DateTime.fromJSDate(
+        faker.date.past()
+      ).toFormat(initialDBData.formats.dateTimeFormat);
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
@@ -1251,7 +1277,7 @@ context('Template tests', () => {
       cy.contains('15').click();
       cy.get(`[data-cy='${timeId}.value'] input`)
         .clear()
-        .type('2022-02-20 20:00');
+        .type(dateTimeFieldValue);
 
       cy.get(`#${multipleChoiceId}`).click();
       cy.contains(multipleChoiceQuestion.answers[0]).click();
@@ -1292,7 +1318,7 @@ context('Template tests', () => {
       cy.contains(multipleChoiceQuestion.answers[0]);
       cy.contains(multipleChoiceQuestion.answers[1]).should('not.exist');
       cy.contains(multipleChoiceQuestion.answers[2]);
-      cy.contains('20-Feb-2022 20:00');
+      cy.contains(dateTimeFieldValue);
 
       cy.contains(richTextInputQuestion.title);
       cy.get(`[data-cy="${richTextInputId}_open"]`).click();

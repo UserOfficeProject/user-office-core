@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 import { ReactNode } from 'react';
 
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import {
   ProposalScheduledEvent,
@@ -11,10 +12,6 @@ import {
 } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
-import {
-  parseTzLessDateTime,
-  TZ_LESS_DATE_TIME_LOW_PREC_FORMAT,
-} from 'utils/Time';
 import { getFullUserName } from 'utils/user';
 
 const columns: Column<ProposalScheduledEvent>[] = [
@@ -27,19 +24,11 @@ const columns: Column<ProposalScheduledEvent>[] = [
   },
   {
     title: 'Starts at',
-    field: 'startsAt',
-    render: (rowData) =>
-      parseTzLessDateTime(rowData.startsAt).toFormat(
-        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-      ),
+    field: 'startsAtFormatted',
   },
   {
     title: 'Ends at',
-    field: 'endsAt',
-    render: (rowData) =>
-      parseTzLessDateTime(rowData.endsAt).toFormat(
-        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-      ),
+    field: 'endsAtFormatted',
   },
 ];
 
@@ -49,6 +38,9 @@ export default function UserUpcomingExperimentsTable() {
       onlyUpcoming: true,
       notDraft: true,
     });
+  const { toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 
@@ -78,6 +70,14 @@ export default function UserUpcomingExperimentsTable() {
     return null;
   }
 
+  const proposalScheduledEventsWithFormattedDates = proposalScheduledEvents.map(
+    (event) => ({
+      ...event,
+      startsAtFormatted: toFormattedDateTime(event.startsAt),
+      endsAtFormatted: toFormattedDateTime(event.endsAt),
+    })
+  );
+
   return (
     <Grid item xs={12} data-cy="upcoming-experiments">
       <StyledPaper>
@@ -94,7 +94,7 @@ export default function UserUpcomingExperimentsTable() {
           title="Upcoming experiments"
           isLoading={loading}
           columns={columns}
-          data={proposalScheduledEvents}
+          data={proposalScheduledEventsWithFormattedDates}
           options={{
             search: false,
             padding: 'dense',

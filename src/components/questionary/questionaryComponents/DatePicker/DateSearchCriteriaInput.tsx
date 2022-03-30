@@ -11,22 +11,34 @@ import {
   useTheme,
 } from '@mui/material';
 import { DateTime } from 'luxon';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
-import { QuestionFilterCompareOperator } from 'generated/sdk';
+import { QuestionFilterCompareOperator, SettingsId } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 function DateSearchCriteriaInput({
   onChange,
   searchCriteria,
 }: SearchCriteriaInputProps) {
   const theme = useTheme();
-  const [value, setValue] = useState<Date | null>(
-    searchCriteria ? new Date(searchCriteria?.value as string) : null
+  const { format, mask } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
+  const [value, setValue] = useState<DateTime | null>(
+    searchCriteria
+      ? DateTime.fromISO((searchCriteria.value as string) || '')
+      : null
   );
   const [comparator, setComparator] = useState<QuestionFilterCompareOperator>(
     searchCriteria?.compareOperator ?? QuestionFilterCompareOperator.EQUALS
   );
+
+  useEffect(() => {
+    if (!searchCriteria?.value) {
+      setValue(null);
+    }
+  }, [searchCriteria?.value]);
 
   return (
     <Grid container spacing={2} alignItems="end">
@@ -41,7 +53,7 @@ function DateSearchCriteriaInput({
                 .value as QuestionFilterCompareOperator;
               setComparator(newComparator);
               if (value) {
-                onChange(newComparator, value.toISOString());
+                onChange(newComparator, value.toJSDate().toISOString());
               }
             }}
             value={comparator}
@@ -66,7 +78,8 @@ function DateSearchCriteriaInput({
       <Grid item xs={6}>
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
-            inputFormat="yyyy-MM-dd"
+            inputFormat={format || undefined}
+            mask={mask}
             renderInput={(props) => (
               <TextField
                 {...props}
@@ -80,13 +93,13 @@ function DateSearchCriteriaInput({
                 }}
               />
             )}
-            label="Date"
+            label={`Date(${format})`}
             value={value}
             onChange={(date: DateTime | null) => {
-              const newDate = date?.startOf('day').toJSDate();
+              const newDate = date?.startOf('day');
 
-              if (newDate && !isNaN(newDate.getTime())) {
-                onChange(comparator, newDate.toISOString());
+              if (newDate && newDate.isValid) {
+                onChange(comparator, newDate.toJSDate().toISOString());
               }
               setValue(newDate || null);
             }}

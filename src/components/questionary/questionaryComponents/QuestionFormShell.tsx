@@ -93,7 +93,11 @@ export const QuestionFormShell = (
               >
                 Delete
               </Button>
-              <Button type="submit" data-cy="submit">
+              <Button
+                type="submit"
+                data-cy="submit"
+                disabled={!formikProps.isValid}
+              >
                 Save
               </Button>
             </ActionButtonContainer>

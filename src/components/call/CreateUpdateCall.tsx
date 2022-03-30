@@ -9,15 +9,14 @@ import React, { useContext } from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   Call,
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
   FeatureId,
-  SettingsId,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -34,7 +33,7 @@ type CreateUpdateCallProps = {
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
   const { features } = useContext(FeatureContext);
-  const settingsContext = useContext(SettingsContext);
+  const { timezone } = useFormattedDateTime();
 
   const { templates: proposalTemplates } = useActiveTemplates(
     TemplateGroupId.PROPOSAL,
@@ -48,11 +47,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { proposalWorkflows, loadingProposalWorkflows } =
     useProposalWorkflowsData();
 
-  const timezone =
-    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
-
-  const currentDayStart = DateTime.now().setZone(timezone).startOf('day');
-  const currentDayEnd = DateTime.now().setZone(timezone).endOf('day');
+  const currentDayStart = DateTime.now()
+    .setZone(timezone || undefined)
+    .startOf('day');
+  const currentDayEnd = DateTime.now()
+    .setZone(timezone || undefined)
+    .endOf('day');
 
   /**
    * NOTE: This is needed because the ESI template field is hidden under feature flag.
@@ -66,8 +66,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
 
   const getDateTimeFromISO = (value: string) =>
     DateTime.fromISO(value, {
-      zone: timezone,
-    });
+      zone: timezone || undefined,
+    }).isValid
+      ? DateTime.fromISO(value, {
+          zone: timezone || undefined,
+        })
+      : null;
 
   const initialValues = call
     ? {
@@ -88,6 +92,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         endNotify: getDateTimeFromISO(call.endNotify),
         startCycle: getDateTimeFromISO(call.startCycle),
         endCycle: getDateTimeFromISO(call.endCycle),
+        submissionMessage: call.submissionMessage || '',
       }
     : {
         shortCode: '',
@@ -110,6 +115,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
+        submissionMessage: '',
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {

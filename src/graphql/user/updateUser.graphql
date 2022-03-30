@@ -7,7 +7,7 @@ mutation updateUser(
   $preferredname: String
   $gender: String!
   $nationality: Int!
-  $birthdate: String!
+  $birthdate: DateTime!
   $organisation: Int!
   $department: String!
   $position: String!

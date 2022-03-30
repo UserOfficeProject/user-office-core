@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import { TemplateGroupId } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
@@ -146,8 +147,12 @@ context('visits tests', () => {
   });
 
   it('Visitor should be able to register for a visit', () => {
-    const startDate = '2022-01-01';
-    const endDate = '2022-01-07';
+    const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+      initialDBData.formats.dateFormat
+    );
+    const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+      initialDBData.formats.dateFormat
+    );
 
     cy.createTemplate({
       groupId: TemplateGroupId.VISIT_REGISTRATION,
@@ -224,13 +229,15 @@ context('visits tests', () => {
 
     cy.get('[aria-label="Save"]').click();
 
+    cy.finishedLoading();
+
     cy.get('[data-cy=create-visit-button]').click();
 
-    cy.contains('2023-01-07 10:00')
+    cy.contains(initialDBData.scheduledEvents.upcoming.startsAt)
       .parent()
       .get(`[aria-label="${registerVisitTitle}]`)
       .should('not.exist');
-    cy.contains('2023-01-07 10:00')
+    cy.contains(initialDBData.scheduledEvents.upcoming.startsAt)
       .parent()
       .get(`[aria-label="${individualTrainingTitle}]`)
       .should('not.exist');

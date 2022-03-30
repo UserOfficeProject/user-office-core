@@ -2,6 +2,11 @@ import { DataType } from '../../src/generated/sdk';
 
 // NOTE: Instruments, proposal and scheduled events are seeded only if resetDB(true).
 export default {
+  // TODO: Try to fetch the formats from the DB settings
+  formats: {
+    dateFormat: 'dd-MM-yyyy',
+    dateTimeFormat: 'dd-MM-yyyy HH:mm',
+  },
   call: {
     id: 1,
     shortCode: 'call 1',
@@ -72,7 +77,7 @@ export default {
         value: true,
       },
       date: {
-        value: '2030-01-01',
+        value: '01-01-2030',
       },
       embellishment: {
         value: '<h1>Embellishment value<h1>',
@@ -207,20 +212,20 @@ export default {
   scheduledEvents: {
     upcoming: {
       id: 996,
-      startsAt: '2023-01-07 10:00',
-      endsAt: '2023-01-07 11:00',
+      startsAt: '07-01-2023 10:00',
+      endsAt: '07-01-2023 11:00',
     },
     upcomingDraft: {
-      startsAt: '2023-01-07 12:00',
-      endsAt: '2023-01-07 13:00',
+      startsAt: '07-01-2023 12:00',
+      endsAt: '07-01-2023 13:00',
     },
     ended: {
-      startsAt: '2020-01-07 10:00',
-      endsAt: '2020-01-07 11:00',
+      startsAt: '07-01-2020 10:00',
+      endsAt: '07-01-2020 11:00',
     },
     completed: {
-      startsAt: '2023-02-07 12:00',
-      endsAt: '2023-02-07 13:00',
+      startsAt: '07-02-2023 12:00',
+      endsAt: '07-02-2023 13:00',
     },
   },
 };
