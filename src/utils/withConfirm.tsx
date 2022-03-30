@@ -1,4 +1,4 @@
-import { Alert, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -78,11 +78,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
           onClose={handleCancel}
         >
           {title && (
-            <DialogTitle className={classes.title}>
-              <Typography variant="h6" component="h1" gutterBottom>
-                {title}
-              </Typography>
-            </DialogTitle>
+            <DialogTitle className={classes.title}>{title}</DialogTitle>
           )}
           {description && (
             <DialogContent>

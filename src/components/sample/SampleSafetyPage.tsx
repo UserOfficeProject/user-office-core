@@ -125,7 +125,11 @@ function SampleEvaluationDialog(props: {
               multiline
               fullWidth
               disabled={isSubmitting}
-              InputProps={{ rows: 4, rowsMax: 10, 'data-cy': 'safety-comment' }}
+              InputProps={{
+                minRows: 4,
+                maxRows: 10,
+                'data-cy': 'safety-comment',
+              }}
             />
 
             <ActionButtonContainer>

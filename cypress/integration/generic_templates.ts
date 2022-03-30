@@ -33,8 +33,8 @@ context('GenericTemplates tests', () => {
   const updatedCall = {
     id: initialDBData.call.id,
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 10),
-    endCall: faker.date.future().toISOString().slice(0, 10),
+    startCall: DateTime.fromJSDate(faker.date.past()),
+    endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,

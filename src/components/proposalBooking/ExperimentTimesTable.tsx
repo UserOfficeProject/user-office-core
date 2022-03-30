@@ -1,12 +1,9 @@
 import MaterialTable, { Column, Options } from '@material-table/core';
 import React from 'react';
 
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { ProposalScheduledEvent } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { tableIcons } from 'utils/materialIcons';
-import {
-  parseTzLessDateTime,
-  TZ_LESS_DATE_TIME_LOW_PREC_FORMAT,
-} from 'utils/Time';
 import { getFullUserName } from 'utils/user';
 
 type ExperimentTimesTableProps = {
@@ -26,19 +23,11 @@ const columns: Column<ProposalScheduledEvent>[] = [
   },
   {
     title: 'Starts at',
-    field: 'startsAt',
-    render: (rowData) =>
-      parseTzLessDateTime(rowData.startsAt).toFormat(
-        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-      ),
+    field: 'startsAtFormatted',
   },
   {
     title: 'Ends at',
-    field: 'endsAt',
-    render: (rowData) =>
-      parseTzLessDateTime(rowData.endsAt).toFormat(
-        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-      ),
+    field: 'endsAtFormatted',
   },
 ];
 
@@ -48,13 +37,25 @@ export default function ExperimentsTable({
   proposalScheduledEvents,
   options,
 }: ExperimentTimesTableProps) {
+  const { toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
+
+  const proposalScheduledEventsWithFormattedDates = proposalScheduledEvents.map(
+    (event) => ({
+      ...event,
+      startsAtFormatted: toFormattedDateTime(event.startsAt),
+      endsAtFormatted: toFormattedDateTime(event.endsAt),
+    })
+  );
+
   return (
     <MaterialTable
       icons={tableIcons}
       title={title}
       isLoading={isLoading}
       columns={columns}
-      data={proposalScheduledEvents}
+      data={proposalScheduledEventsWithFormattedDates}
       options={{
         search: false,
         padding: 'dense',

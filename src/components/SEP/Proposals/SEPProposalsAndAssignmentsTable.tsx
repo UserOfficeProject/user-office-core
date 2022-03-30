@@ -23,6 +23,7 @@ import {
   ProposalStatus,
   Review,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
   useSEPProposalsData,
@@ -68,9 +69,7 @@ const SEPProposalColumns = [
   },
   {
     title: 'Date assigned',
-    field: 'dateAssigned',
-    render: (rowData: SEPProposalType): string =>
-      DateTime.fromISO(rowData.dateAssigned).toFormat('dd-MMM-yyyy HH:mm:ss'),
+    field: 'dateAssignedFormatted',
   },
   {
     title: 'Reviewers',
@@ -129,6 +128,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   const { api } = useDataApiWithFeedback();
   const [proposalPk, setProposalPk] = useState<null | number>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
+  const { toFormattedDateTime } = useFormattedDateTime();
 
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -191,7 +191,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
             ...(proposalItem.assignments ?? []),
             ...assignedMembers.map(({ role = null, ...user }) => ({
               sepMemberUserId: user.id,
-              dateAssigned: Date.now(),
+              dateAssigned: DateTime.now(),
               user,
               role,
               review:
@@ -325,8 +325,11 @@ const SEPProposalsAndAssignmentsTable: React.FC<
     [setSEPProposalsData, sepId, api]
   );
 
-  const SEPProposalsWitId = initialValues.map((sepProposal) =>
-    Object.assign(sepProposal, { id: sepProposal.proposalPk })
+  const SEPProposalsWitIdAndFormattedDate = initialValues.map((sepProposal) =>
+    Object.assign(sepProposal, {
+      id: sepProposal.proposalPk,
+      dateAssignedFormatted: toFormattedDateTime(sepProposal.dateAssigned),
+    })
   );
 
   return (
@@ -379,7 +382,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
                 SEP Proposals
               </Typography>
             }
-            data={SEPProposalsWitId}
+            data={SEPProposalsWitIdAndFormattedDate}
             isLoading={loadingSEPProposals}
             localization={{
               toolbar: {

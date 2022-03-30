@@ -37,7 +37,7 @@ export const SettingsContextProvider: React.FC = (props) => {
     );
   }
 
-  const settingsMap = settings?.reduce(function (settingsMap, settings) {
+  const settingsMap = settings.reduce(function (settingsMap, settings) {
     settingsMap.set(settings.id, settings);
 
     return settingsMap;

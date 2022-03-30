@@ -1,4 +1,4 @@
-import { Button, TextField, Autocomplete } from '@mui/material';
+import { Button, TextField, Autocomplete, Grid } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
@@ -16,11 +16,6 @@ type AssignTechnicalReviewProps = {
 };
 
 const useStyles = makeStyles((theme) => ({
-  userList: {
-    width: '300px',
-    marginTop: theme.spacing(3),
-    display: 'inline-block',
-  },
   submitButton: {
     marginLeft: theme.spacing(2),
   },
@@ -48,69 +43,78 @@ function AssignTechnicalReview({
     usersData.users.find((user) => user.id === userId);
 
   return (
-    <>
-      <Autocomplete
-        id="user-list"
-        options={usersData.users}
-        renderInput={(params) => <TextField {...params} />}
-        getOptionLabel={(option) => getFullUserName(option)}
-        onChange={(_event, newValue) => {
-          if (newValue) {
-            setSelectedUser(newValue.id);
-          }
-        }}
-        className={classes.userList}
-        value={userIdToUser(selectedUser)}
-        disableClearable
-        data-cy="user-list"
-        disabled={proposal.technicalReview?.submitted}
-      />
-      <Button
-        onClick={() => {
-          if (selectedUser) {
-            confirm(
-              () =>
-                api(
-                  `Assigned to ${getFullUserName(userIdToUser(selectedUser))}`
-                )
-                  .updateTechnicalReviewAssignee({
-                    userId: selectedUser,
-                    proposalPks: [proposal.primaryKey],
-                  })
-                  .then((result) => {
-                    onProposalUpdated({
-                      ...proposal,
-                      ...result.updateTechnicalReviewAssignee.proposals?.[0],
-                    });
-                  }),
-              {
-                title: 'Are you sure?',
-                description: `You are about to set ${getFullUserName(
-                  userIdToUser(selectedUser)
-                )} as a technical reviewer for this proposal. Are you sure?`,
-              }
-            )();
-          }
-        }}
-        data-cy="re-assign-submit"
-        type="button"
-        className={classes.submitButton}
-        disabled={proposal.technicalReview?.submitted}
-      >
-        Assign
-      </Button>
-
-      <Button
-        onClick={() => {
-          onProposalUpdated(proposal);
-        }}
-        type="button"
-        variant="outlined"
-        className={classes.submitButton}
-      >
-        Cancel
-      </Button>
-    </>
+    <Grid container alignItems="center">
+      <Grid item xs={3}>
+        <Autocomplete
+          id="user-list"
+          options={usersData.users}
+          renderInput={(params) => (
+            <TextField {...params} label="Technical reviewer" margin="none" />
+          )}
+          getOptionLabel={(option) => getFullUserName(option)}
+          onChange={(_event, newValue) => {
+            if (newValue) {
+              setSelectedUser(newValue.id);
+            }
+          }}
+          value={userIdToUser(selectedUser)}
+          disableClearable
+          data-cy="user-list"
+          disabled={proposal.technicalReview?.submitted}
+        />
+      </Grid>
+      <Grid item xs={1}>
+        <Button
+          onClick={() => {
+            if (selectedUser) {
+              confirm(
+                () =>
+                  api(
+                    `Assigned to ${getFullUserName(userIdToUser(selectedUser))}`
+                  )
+                    .updateTechnicalReviewAssignee({
+                      userId: selectedUser,
+                      proposalPks: [proposal.primaryKey],
+                    })
+                    .then((result) => {
+                      onProposalUpdated({
+                        ...proposal,
+                        ...result.updateTechnicalReviewAssignee.proposals?.[0],
+                      });
+                    }),
+                {
+                  title: 'Are you sure?',
+                  description: `You are about to set ${getFullUserName(
+                    userIdToUser(selectedUser)
+                  )} as a technical reviewer for this proposal. Are you sure?`,
+                }
+              )();
+            }
+          }}
+          data-cy="re-assign-submit"
+          type="button"
+          variant="contained"
+          color="primary"
+          className={classes.submitButton}
+          disabled={proposal.technicalReview?.submitted}
+        >
+          Assign
+        </Button>
+      </Grid>
+      <Grid item xs={1}>
+        <Button
+          onClick={() => {
+            onProposalUpdated(proposal);
+          }}
+          type="button"
+          variant="outlined"
+          color="primary"
+          className={classes.submitButton}
+        >
+          Cancel
+        </Button>
+      </Grid>
+    </Grid>
   );
 }
 

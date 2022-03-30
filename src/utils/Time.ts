@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { Scalars } from 'generated/sdk';
+import { DateConfig, Scalars } from 'generated/sdk';
 
 function paddZero(num: number): string {
   if (num < 10) {
@@ -111,20 +111,41 @@ export function timeRemaining(toDate: Date): string {
   }
 }
 
-export const TZ_LESS_DATE_TIME_FORMAT = 'yyyy-MM-dd HH:mm:ss';
+export const minMaxDateTimeCalculations = ({
+  minDate,
+  maxDate,
+  defaultDate,
+  includeTime,
+}: Pick<DateConfig, 'minDate' | 'maxDate' | 'defaultDate' | 'includeTime'>) => {
+  const defaultFieldMinDate = minDate
+    ? DateTime.fromISO(minDate).startOf(includeTime ? 'minute' : 'day')
+    : null;
+  const defaultFieldMaxDate = maxDate
+    ? DateTime.fromISO(maxDate).startOf(includeTime ? 'minute' : 'day')
+    : null;
+  const defaultFieldDate = defaultDate
+    ? DateTime.fromISO(defaultDate).startOf(includeTime ? 'minute' : 'day')
+    : null;
 
-export const TZ_LESS_DATE_TIME_LOW_PREC_FORMAT = 'yyyy-MM-dd HH:mm';
+  const isDefaultBeforeMinDate =
+    defaultFieldDate &&
+    defaultFieldMinDate &&
+    defaultFieldMinDate > defaultFieldDate;
+  const isDefaultAfterMaxDate =
+    defaultFieldDate &&
+    defaultFieldMaxDate &&
+    defaultFieldMaxDate < defaultFieldDate;
 
-export function parseTzLessDateTime(tzLessDateTime: string) {
-  return DateTime.fromSQL(tzLessDateTime);
-}
+  const isMinAfterMaxDate =
+    defaultFieldMinDate &&
+    defaultFieldMaxDate &&
+    defaultFieldMinDate > defaultFieldMaxDate;
 
-export function toTzLessDateTime(dateTime: DateTime | Date | string): string {
-  if (dateTime instanceof Date) {
-    dateTime = DateTime.fromJSDate(dateTime);
-  } else if (typeof dateTime === 'string') {
-    dateTime = DateTime.fromISO(dateTime);
-  }
-
-  return dateTime.toFormat(TZ_LESS_DATE_TIME_FORMAT);
-}
+  return {
+    defaultFieldMinDate,
+    defaultFieldMaxDate,
+    isDefaultBeforeMinDate,
+    isDefaultAfterMaxDate,
+    isMinAfterMaxDate,
+  };
+};

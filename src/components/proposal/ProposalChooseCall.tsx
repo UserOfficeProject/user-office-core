@@ -6,12 +6,12 @@ import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
 
 import { Call } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { timeRemaining } from 'utils/Time';
 
@@ -31,14 +31,11 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
 }) => {
   const history = useHistory();
   const classes = useStyles();
+  const { toFormattedDateTime } = useFormattedDateTime();
 
   const handleSelect = (callId: number, templateId: number | null) => {
     const url = `/ProposalCreate/${callId}/${templateId}`;
     history.push(url);
-  };
-
-  const formatDate = (date: Date) => {
-    return DateTime.fromJSDate(date).toFormat('dd-MMM-yyyy HH:mm');
   };
 
   return (
@@ -74,20 +71,17 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
               >
                 <ListItemText
                   primary={header}
+                  secondaryTypographyProps={{ component: 'div' }}
                   secondary={
-                    <Fragment>
-                      <Typography component="div" className={classes.date}>
-                        {`Application deadline: ${formatDate(
+                    <>
+                      <Typography component="p" className={classes.date}>
+                        {`Application deadline: ${toFormattedDateTime(
                           call.endCall
                         )} ${timeRemainingText}`}
                       </Typography>
-                      <Typography component="div">
-                        {call.description}
-                      </Typography>
-                      <Typography component="div">
-                        {call.cycleComment}
-                      </Typography>
-                    </Fragment>
+                      <Typography component="p">{call.description}</Typography>
+                      <Typography component="p">{call.cycleComment}</Typography>
+                    </>
                   }
                 />
                 <ListItemSecondaryAction>

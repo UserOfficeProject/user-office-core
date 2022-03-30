@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
@@ -20,7 +21,12 @@ import React, { useState, useContext } from 'react';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import { UpdateUserMutationVariables, UserRole } from 'generated/sdk';
+import {
+  SettingsId,
+  UpdateUserMutationVariables,
+  UserRole,
+} from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useGetFields } from 'hooks/user/useGetFields';
 import { useUserData } from 'hooks/user/useUserData';
@@ -56,8 +62,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function UpdateUserInformation(props: { id: number }) {
+  const theme = useTheme();
   const { currentRole } = useContext(UserContext);
   const { userData, setUserData } = useUserData(props);
+  const { format, mask } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
   const { api } = useDataApiWithFeedback();
   const fieldsContent = useGetFields();
   const { institutions, loadingInstitutions } = useInstitutionsData();
@@ -65,9 +75,36 @@ export default function UpdateUserInformation(props: { id: number }) {
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const classes = useStyles();
 
+  // NOTE: User should be older than 18 years.
+  const userMaxBirthDate = DateTime.now().minus({ years: 18 });
+
   if (loadingInstitutions || !fieldsContent || !userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
+
+  const initialValues = {
+    username: userData.username,
+    firstname: userData.firstname,
+    middlename: userData.middlename,
+    lastname: userData.lastname,
+    preferredname: userData.preferredname,
+    gender:
+      userData.gender !== 'male' && userData.gender !== 'female'
+        ? 'other'
+        : userData.gender,
+    othergender: userData.gender,
+    nationality: userData.nationality || '',
+    birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
+    organisation: userData.organisation,
+    department: userData.department,
+    position: userData.position,
+    oldEmail: userData.email,
+    email: userData.email,
+    telephone: userData.telephone,
+    telephone_alt: userData.telephone_alt,
+    user_title: userData.user_title,
+    orcid: userData.orcid,
+  };
 
   if (!institutionsList.length) {
     setInstitutionsList(
@@ -131,31 +168,7 @@ export default function UpdateUserInformation(props: { id: number }) {
     <React.Fragment>
       <Formik
         validateOnChange={false}
-        initialValues={{
-          username: userData.username,
-          firstname: userData.firstname,
-          middlename: userData.middlename,
-          lastname: userData.lastname,
-          preferredname: userData.preferredname,
-          gender:
-            userData.gender !== 'male' && userData.gender !== 'female'
-              ? 'other'
-              : userData.gender,
-          othergender: userData.gender,
-          nationality: userData.nationality,
-          birthdate: DateTime.fromMillis(parseInt(userData.birthdate)).toFormat(
-            'yyyy-MM-dd'
-          ),
-          organisation: userData.organisation,
-          department: userData.department,
-          position: userData.position,
-          oldEmail: userData.email,
-          email: userData.email,
-          telephone: userData.telephone,
-          telephone_alt: userData.telephone_alt,
-          user_title: userData.user_title,
-          orcid: userData.orcid,
-        }}
+        initialValues={initialValues}
         onSubmit={async (values, actions): Promise<void> => {
           const newValues = {
             id: props.id,
@@ -290,12 +303,16 @@ export default function UpdateUserInformation(props: { id: number }) {
                     name="birthdate"
                     label="Birthdate"
                     id="birthdate-input"
-                    inputFormat="yyyy-MM-dd"
+                    inputFormat={format}
+                    mask={mask}
+                    inputProps={{ placeholder: format }}
                     component={DatePicker}
                     textField={{
                       fullWidth: true,
                       'data-cy': 'birthdate',
                     }}
+                    maxDate={userMaxBirthDate}
+                    desktopModeMediaQuery={theme.breakpoints.up('sm')}
                   />
                 </LocalizationProvider>
               </Grid>

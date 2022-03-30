@@ -107,9 +107,10 @@ context('Personal information tests', () => {
 
     cy.finishedLoading();
 
-    cy.contains('User roles');
+    cy.get('[data-cy="role-selection-table"]').contains('User roles');
 
-    cy.contains('SEP Chair', { matchCase: false })
+    cy.get('[data-cy="role-selection-table"]')
+      .contains('SEP Chair', { matchCase: false })
       .parent()
       .find('button')
       .click();

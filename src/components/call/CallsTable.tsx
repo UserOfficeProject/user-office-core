@@ -1,6 +1,5 @@
 import { Typography } from '@mui/material';
-import { DateTime } from 'luxon';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -10,13 +9,8 @@ import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { SettingsContext } from 'context/SettingsContextProvider';
-import {
-  Call,
-  InstrumentWithAvailabilityTime,
-  SettingsId,
-  UserRole,
-} from 'generated/sdk';
+import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -38,7 +32,9 @@ const getFilterStatus = (callStatus: string | CallStatus) =>
 
 const CallsTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
-  const settingsContext = useContext(SettingsContext);
+  const { timezone, toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
   >(null);
@@ -66,9 +62,6 @@ const CallsTable: React.FC = () => {
       isActive: getFilterStatus(callStatus),
     }));
   };
-
-  const timezone =
-    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
 
   // NOTE: Here we keep the columns inside the component just because of the timezone shown in the title
   const columns = [
@@ -221,12 +214,8 @@ const CallsTable: React.FC = () => {
 
   const callsWithFormattedData = calls.map((call) => ({
     ...call,
-    formattedStartCall: DateTime.fromISO(call.startCall, {
-      zone: timezone,
-    }).toFormat('dd-MMM-yyyy HH:mm'),
-    formattedEndCall: DateTime.fromISO(call.endCall, {
-      zone: timezone,
-    }).toFormat('dd-MMM-yyyy HH:mm'),
+    formattedStartCall: toFormattedDateTime(call.startCall),
+    formattedEndCall: toFormattedDateTime(call.endCall),
   }));
 
   return (

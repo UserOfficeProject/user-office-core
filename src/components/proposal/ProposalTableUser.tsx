@@ -79,14 +79,12 @@ const ProposalTableUser: React.FC = () => {
   }, [api]);
 
   return (
-    <div>
-      <ProposalTable
-        title="My proposals"
-        search={false}
-        searchQuery={sendUserProposalRequest}
-        isLoading={loading}
-      />
-    </div>
+    <ProposalTable
+      title="My proposals"
+      search={false}
+      searchQuery={sendUserProposalRequest}
+      isLoading={loading}
+    />
   );
 };
 
