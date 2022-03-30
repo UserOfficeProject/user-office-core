@@ -42,8 +42,8 @@ export class UpdateUserArgs {
   @Field(() => Int, { nullable: true })
   public nationality?: number;
 
-  @Field(() => String, { nullable: true })
-  public birthdate?: string;
+  @Field({ nullable: true })
+  public birthdate?: Date;
 
   @Field(() => Int, { nullable: true })
   public organisation?: number;
@@ -74,6 +74,9 @@ export class UpdateUserArgs {
 
   @Field(() => String, { nullable: true })
   public refreshToken?: string;
+
+  @Field(() => String, { nullable: true })
+  public otherOrganisation?: string;
 }
 
 @ArgsType()

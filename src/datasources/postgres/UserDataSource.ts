@@ -304,7 +304,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     orcid_refreshtoken: string,
     gender: string,
     nationality: number,
-    birthdate: string,
+    birthdate: Date,
     organisation: number,
     department: string,
     position: string,

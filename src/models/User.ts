@@ -36,7 +36,7 @@ export class User {
     public refreshToken: string,
     public gender: string,
     public nationality: number,
-    public birthdate: string,
+    public birthdate: Date,
     public organisation: number,
     public department: string,
     public position: string,

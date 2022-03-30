@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { ScheduledEventsCoreFilter } from '../../resolvers/queries/ScheduledEventsCoreQuery';
@@ -21,8 +21,8 @@ export default class ScheduledEventDataSourceMock
       new ScheduledEventCore(
         1,
         ScheduledEventBookingType.USER_OPERATIONS,
-        moment().toDate(),
-        moment().add(2, 'days').toDate(),
+        DateTime.now().toJSDate(),
+        DateTime.now().plus({ days: 2 }).toJSDate(),
         1,
         1,
         ProposalBookingStatusCore.ACTIVE,
@@ -31,8 +31,8 @@ export default class ScheduledEventDataSourceMock
       new ScheduledEventCore(
         2,
         ScheduledEventBookingType.USER_OPERATIONS,
-        moment().toDate(),
-        moment().add(2, 'days').toDate(),
+        DateTime.now().toJSDate(),
+        DateTime.now().plus({ days: 2 }).toJSDate(),
         2,
         2,
         ProposalBookingStatusCore.ACTIVE,
@@ -42,8 +42,8 @@ export default class ScheduledEventDataSourceMock
       new ScheduledEventCore(
         3,
         ScheduledEventBookingType.USER_OPERATIONS,
-        moment().subtract(366, 'days').toDate(),
-        moment().subtract(365, 'days').toDate(),
+        DateTime.now().plus({ days: -366 }).toJSDate(),
+        DateTime.now().plus({ days: -365 }).toJSDate(),
         3,
         3,
         ProposalBookingStatusCore.COMPLETED,
@@ -53,8 +53,8 @@ export default class ScheduledEventDataSourceMock
       new ScheduledEventCore(
         4,
         ScheduledEventBookingType.USER_OPERATIONS,
-        moment().subtract(28, 'days').toDate(),
-        moment().subtract(27, 'days').toDate(),
+        DateTime.now().plus({ days: -28 }).toJSDate(),
+        DateTime.now().plus({ days: -27 }).toJSDate(),
         4,
         4,
         ProposalBookingStatusCore.COMPLETED,

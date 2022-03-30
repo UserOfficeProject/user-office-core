@@ -33,6 +33,7 @@ const apolloServer = async (app: Express) => {
         __dirname + '/../resolvers/**/*Mutation.{ts,js}',
         __dirname + '/../resolvers/**/*Resolver.{ts,js}',
       ],
+      dateScalarMode: 'isoDate',
       orphanedTypes: [...orphanedTypes],
       validate: false,
     },

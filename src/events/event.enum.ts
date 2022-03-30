@@ -27,6 +27,7 @@ export enum Event {
   PROPOSAL_RESERVED = 'PROPOSAL_RESERVED',
   PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
   PROPOSAL_STATUS_UPDATED = 'PROPOSAL_STATUS_UPDATED',
+  CALL_CREATED = 'CALL_CREATED',
   CALL_ENDED = 'CALL_ENDED',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
@@ -151,6 +152,7 @@ export const EventLabel = new Map<Event, string>([
     Event.CALL_ENDED,
     'Event occurs on a specific call end date set on the call',
   ],
+  [Event.CALL_CREATED, 'Event occurs on a when a call is created'],
   [
     Event.CALL_REVIEW_ENDED,
     'Event occurs on a specific call review end date set on the call',
