@@ -12,7 +12,7 @@ import {
   userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -46,11 +46,11 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserMutations {
-  private userAuth = container.resolve(UserAuthorization);
   //Set as a class variable to avoid excessive calls to database
   private externalAuth: boolean;
 
   constructor(
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
     @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
   ) {
@@ -449,7 +449,7 @@ export default class UserMutations {
 
   async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
     try {
-      const dummyUser = await this.dataSource.externalTokenLogin(externalToken);
+      const dummyUser = await this.userAuth.externalTokenLogin(externalToken);
 
       if (!dummyUser) {
         return rejection('User not found', { externalToken });
@@ -480,7 +480,7 @@ export default class UserMutations {
 
       if (this.externalAuth) {
         if (decodedToken.externalToken) {
-          this.dataSource.logout(decodedToken.externalToken);
+          this.userAuth.logout(decodedToken.externalToken);
         } else {
           return rejection('No external token found in JWT', { token });
         }
