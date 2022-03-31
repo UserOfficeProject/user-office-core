@@ -84,6 +84,7 @@ export default class InstrumentMutations {
       });
   }
 
+  @EventBus(Event.INSTRUMENT_DELETED)
   @ValidateArgs(deleteInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async delete(

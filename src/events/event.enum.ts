@@ -55,6 +55,7 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
   PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
+  INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -227,4 +228,5 @@ export const EventLabel = new Map<Event, string>([
     Event.PROPOSAL_BOOKING_TIME_REOPENED,
     'Event occurs when the time slot booking is re-opened in the scheduler',
   ],
+  [Event.INSTRUMENT_DELETED, 'Event occurs when the instrument is removed'],
 ]);
