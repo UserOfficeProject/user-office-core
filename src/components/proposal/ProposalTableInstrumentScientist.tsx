@@ -16,8 +16,9 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { Proposal, ProposalsFilter } from 'generated/sdk';
+import { FeatureId, Proposal, ProposalsFilter } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -35,66 +36,9 @@ import ProposalFilterBar, {
 } from './ProposalFilterBar';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 
-let columns: Column<ProposalViewData>[] = [
-  {
-    title: 'Actions',
-    cellStyle: { padding: 0, minWidth: 120 },
-    sorting: false,
-    removable: false,
-    field: 'rowActionButtons',
-  },
-  { title: 'Proposal ID', field: 'proposalId' },
-  {
-    title: 'Title',
-    field: 'title',
-    ...{ width: 'auto' },
-  },
-  {
-    title: 'Time allocation',
-    render: (rowData) =>
-      `${rowData.technicalTimeAllocation ?? 0} (${
-        rowData.allocationTimeUnit
-      }s)`,
-    hidden: false,
-  },
-  {
-    title: 'Technical status',
-    render: (rowData) => rowData.technicalStatus,
-  },
-  {
-    title: 'Submitted',
-    render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
-  },
-  { title: 'Status', field: 'statusName' },
-  {
-    title: 'Final Status',
-    field: 'finalStatus',
-    render: (rowData: ProposalViewData): string =>
-      rowData.finalStatus
-        ? getTranslation(rowData.finalStatus as ResourceId)
-        : '',
-  },
-  {
-    title: 'Instrument',
-    field: 'instrumentName',
-    emptyValue: '-',
-  },
-  {
-    title: 'Call',
-    field: 'callShortCode',
-    emptyValue: '-',
-    hidden: true,
-  },
-  {
-    title: 'SEP',
-    field: 'sepCode',
-    emptyValue: '-',
-    hidden: true,
-  },
-];
-
 const ProposalTableInstrumentScientist: React.FC = () => {
   const { user } = useContext(UserContext);
+  const featureContext = useContext(FeatureContext);
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<ProposalUrlQueryParamsType>({
       call: NumberParam,
@@ -130,6 +74,80 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsInstrumentScientist', null);
+
+  const isTechnicalReviewEnabled = featureContext.features.get(
+    FeatureId.TECHNICAL_REVIEW
+  )?.isEnabled;
+
+  const isInstrumentManagementEnabled = featureContext.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+
+  let columns: Column<ProposalViewData>[] = [
+    {
+      title: 'Actions',
+      cellStyle: { padding: 0, minWidth: 120 },
+      sorting: false,
+      removable: false,
+      field: 'rowActionButtons',
+    },
+    { title: 'Proposal ID', field: 'proposalId' },
+    {
+      title: 'Title',
+      field: 'title',
+      ...{ width: 'auto' },
+    },
+    {
+      title: 'Time allocation',
+      render: (rowData) =>
+        `${rowData.technicalTimeAllocation ?? 0} (${
+          rowData.allocationTimeUnit
+        }s)`,
+      hidden: false,
+    },
+    ...(isTechnicalReviewEnabled
+      ? [
+          {
+            title: 'Technical status',
+            render: (rowData: ProposalViewData) => rowData.technicalStatus,
+          },
+        ]
+      : []),
+    {
+      title: 'Submitted',
+      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+    },
+    { title: 'Status', field: 'statusName' },
+    {
+      title: 'Final Status',
+      field: 'finalStatus',
+      render: (rowData: ProposalViewData): string =>
+        rowData.finalStatus
+          ? getTranslation(rowData.finalStatus as ResourceId)
+          : '',
+    },
+    ...(isInstrumentManagementEnabled
+      ? [
+          {
+            title: 'Instrument',
+            field: 'instrumentName',
+            emptyValue: '-',
+          },
+        ]
+      : []),
+    {
+      title: 'Call',
+      field: 'callShortCode',
+      emptyValue: '-',
+      hidden: true,
+    },
+    {
+      title: 'SEP',
+      field: 'sepCode',
+      emptyValue: '-',
+      hidden: true,
+    },
+  ];
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -206,7 +224,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
   const instrumentScientistProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
+    ...(isTechnicalReviewEnabled
+      ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
+      : []),
   ];
 
   /** NOTE:

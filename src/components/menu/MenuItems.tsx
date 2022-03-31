@@ -140,6 +140,10 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     FeatureId.SCHEDULER
   )?.isEnabled;
 
+  const isInstrumentManagementEnabled = context.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+
   const user = (
     <div data-cy="user-menu-items">
       <Tooltip title="Dashboard">
@@ -215,14 +219,16 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="People" />
         </ListItem>
       </Tooltip>
-      <Tooltip title="Instruments">
-        <ListItem component={NavLink} to="/Instruments" button>
-          <ListItemIcon>
-            <ScienceIcon />
-          </ListItemIcon>
-          <ListItemText primary="Instruments" />
-        </ListItem>
-      </Tooltip>
+      {isInstrumentManagementEnabled && (
+        <Tooltip title="Instruments">
+          <ListItem component={NavLink} to="/Instruments" button>
+            <ListItemIcon>
+              <ScienceIcon />
+            </ListItemIcon>
+            <ListItemText primary="Instruments" />
+          </ListItem>
+        </Tooltip>
+      )}
       <Tooltip title="Scientific evaluation panels">
         <ListItem component={NavLink} to="/SEPs" button>
           <ListItemIcon>
@@ -299,12 +305,14 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/Instruments" button>
-        <ListItemIcon>
-          <GroupWorkIcon />
-        </ListItemIcon>
-        <ListItemText primary="Instruments" />
-      </ListItem>
+      {isInstrumentManagementEnabled && (
+        <ListItem component={NavLink} to="/Instruments" button>
+          <ListItemIcon>
+            <GroupWorkIcon />
+          </ListItemIcon>
+          <ListItemText primary="Instruments" />
+        </ListItem>
+      )}
       {isSchedulerEnabled && (
         <ListItem component={NavLink} to="/UpcomingExperimentTimes" button>
           <ListItemIcon>
