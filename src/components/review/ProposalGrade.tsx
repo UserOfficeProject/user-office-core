@@ -168,12 +168,10 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               branding: false,
             }}
             onEditorChange={(content, editor) => {
-              const normalizedContent = content.replace(/(?:\r\n|\r|\n)/g, '');
+              const isStartContentDifferentThanCurrent =
+                editor.startContent !== editor.contentDocument.body.innerHTML;
 
-              if (
-                normalizedContent !== editor.startContent ||
-                editor.isDirty()
-              ) {
+              if (isStartContentDifferentThanCurrent || editor.isDirty()) {
                 setFieldValue('comment', content);
               }
             }}
