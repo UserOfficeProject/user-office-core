@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 
+import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import 'reflect-metadata';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
@@ -20,6 +21,7 @@ import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
+import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
@@ -51,8 +53,11 @@ mapClass(Tokens.ScheduledEventDataSource, ScheduledEventDataSourceMock);
 mapClass(Tokens.ShipmentDataSource, ShipmentDataSourceMock);
 mapClass(Tokens.SystemDataSource, SystemDataSourceMock);
 mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
+mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
+
+mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

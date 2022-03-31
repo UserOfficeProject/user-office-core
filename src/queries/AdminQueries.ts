@@ -22,10 +22,6 @@ export default class AdminQueries {
     return await this.dataSource.getNationalities();
   }
 
-  async getUnits() {
-    return await this.dataSource.getUnits();
-  }
-
   async getCountries() {
     return await this.dataSource.getCountries();
   }

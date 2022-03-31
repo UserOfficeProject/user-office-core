@@ -12,7 +12,7 @@ import {
   userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -46,11 +46,11 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserMutations {
-  private userAuth = container.resolve(UserAuthorization);
   //Set as a class variable to avoid excessive calls to database
   private externalAuth: boolean;
 
   constructor(
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
     @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
   ) {
@@ -203,11 +203,12 @@ export default class UserMutations {
         id: user.id,
         password: args.password,
       });
-
+      //update user record and set placeholder flag to false
       const updatedUser = await this.dataSource
         .update({
           ...user,
           ...args,
+          placeholder: false,
         })
         .then((user) => user as UserWithRole)
         .catch((err) => {
@@ -249,7 +250,9 @@ export default class UserMutations {
         )) as UserWithRole;
       } catch (error) {
         // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
-        if ((error as { code: string }).code === '23503') {
+        const errorCode = (error as { code: string }).code;
+
+        if (errorCode === '23503' || errorCode === '23505') {
           return rejection(
             'Can not create user because account already exists',
             { args },
@@ -289,7 +292,7 @@ export default class UserMutations {
   }
 
   @ValidateArgs(updateUserValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized()
   @EventBus(Event.USER_UPDATED)
   async update(
     agent: UserWithRole | null,
@@ -312,12 +315,22 @@ export default class UserMutations {
       });
     }
 
+    let organisationId = args.organisation;
+    // Check if user has other as selected org and if so create it
+    if (args.otherOrganisation) {
+      organisationId = await this.dataSource.createOrganisation(
+        args.otherOrganisation,
+        false
+      );
+    }
+
     delete args.orcid;
     delete args.refreshToken;
 
     user = {
       ...user,
       ...args,
+      organisation: organisationId ?? user.organisation,
     };
 
     return this.dataSource
@@ -436,7 +449,7 @@ export default class UserMutations {
 
   async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
     try {
-      const dummyUser = await this.dataSource.externalTokenLogin(externalToken);
+      const dummyUser = await this.userAuth.externalTokenLogin(externalToken);
 
       if (!dummyUser) {
         return rejection('User not found', { externalToken });
@@ -467,7 +480,7 @@ export default class UserMutations {
 
       if (this.externalAuth) {
         if (decodedToken.externalToken) {
-          this.dataSource.logout(decodedToken.externalToken);
+          this.userAuth.logout(decodedToken.externalToken);
         } else {
           return rejection('No external token found in JWT', { token });
         }
@@ -541,20 +554,20 @@ export default class UserMutations {
     try {
       const decoded = verifyToken<EmailVerificationJwtPayload>(token);
       const user = await this.dataSource.getUser(decoded.id);
-      //Check that user exist and that it has not been updated since token creation
-      if (
-        user &&
-        user.updated === decoded.updated &&
-        decoded.type === 'emailVerification'
-      ) {
+      //Check that user exist
+      if (user && decoded.type === 'emailVerification') {
         await this.dataSource.setUserEmailVerified(user.id);
 
         return true;
       } else {
-        return rejection('Can not verify user', { user });
+        return rejection('Can not verify user', { user, decoded });
       }
     } catch (error) {
-      return rejection('Can not verify email', {}, error);
+      return rejection(
+        'Can not verify email, please contact user office for help',
+        {},
+        error
+      );
     }
   }
 
@@ -570,7 +583,7 @@ export default class UserMutations {
   }
 
   @ValidateArgs(updatePasswordValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized()
   async updatePassword(
     agent: UserWithRole | null,
     { id, password }: { id: number; password: string }

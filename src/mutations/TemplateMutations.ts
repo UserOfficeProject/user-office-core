@@ -35,13 +35,13 @@ import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/Creat
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { ConflictResolution } from '../resolvers/mutations/ImportTemplateMutation';
 import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
 import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
+import { ConflictResolution } from '../resolvers/types/ConflictResolution';
 @injectable()
 export default class TemplateMutations {
   constructor(
@@ -470,7 +470,7 @@ export default class TemplateMutations {
       return await this.dataSource.validateTemplateImport(templateAsJson);
     } catch (error) {
       return rejection(
-        'Could not validate template import',
+        `Could not validate template import. ${error}`,
         { agent, templateAsJson },
         error
       );

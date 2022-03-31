@@ -304,7 +304,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     orcid_refreshtoken: string,
     gender: string,
     nationality: number,
-    birthdate: string,
+    birthdate: Date,
     organisation: number,
     department: string,
     position: string,
@@ -390,13 +390,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     first?: number,
     offset?: number,
     userRole?: UserRole,
-    subtractUsers?: [number]
+    subtractUsers?: [number],
+    order = 'desc'
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { organisation: 'i.institution_id' })
-      .orderBy('users.user_id', 'desc')
+      .orderBy('users.user_id', order)
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
@@ -644,17 +645,5 @@ export default class PostgresUserDataSource implements UserDataSource {
         (role: RoleRecord) =>
           new Role(role.role_id, role.short_code, role.title)
       );
-  }
-
-  async externalTokenLogin(token: string): Promise<null> {
-    return null;
-  }
-
-  async logout(token: string): Promise<void> {
-    return;
-  }
-
-  async isExternalTokenValid(token: string): Promise<boolean> {
-    return true;
   }
 }

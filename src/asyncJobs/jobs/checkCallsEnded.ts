@@ -47,8 +47,8 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
   }
 };
 
-// NOTE: Run every day at 00:05
-const options = { timeToRun: '5 0 * * *' };
+// NOTE: Run each hour at minute 0
+const options = { timeToRun: '0 * * * *' };
 
 const checkCallsEndedJob: UserOfficeAsyncJob = {
   functionToRun: checkCallsEnded,

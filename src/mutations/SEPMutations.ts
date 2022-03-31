@@ -25,7 +25,7 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
-import { UserWithRole, UserRole, User } from '../models/User';
+import { UserWithRole, UserRole } from '../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignSepReviewersToProposalArgs,
@@ -185,16 +185,35 @@ export default class SEPMutations {
       );
     }
 
-    const isMemberChairOrSecretaryOfSEP =
+    const sepMemberToRemoveRoles = await this.userDataSource.getUserRoles(
+      args.memberId
+    );
+
+    // NOTE: Finding role by shortCode because it is not possible by id (args.roleId is of type UserRole and role is of type Role and they are not aligned).
+    const sepMemberRoleToRemove = sepMemberToRemoveRoles.find(
+      (role) => role.shortCode === UserRole[args.roleId].toLowerCase()
+    );
+
+    if (!sepMemberRoleToRemove) {
+      return rejection(
+        'Could not remove member from SEP because specified role not found on user',
+        { agent, args }
+      );
+    }
+
+    const isMemberToRemoveChairOrSecretaryOfSEP =
       await this.userAuth.isChairOrSecretaryOfSEP(
-        { id: args.memberId } as User,
+        {
+          id: args.memberId,
+          currentRole: sepMemberRoleToRemove,
+        } as UserWithRole,
         args.sepId
       );
 
     // SEP Chair and SEP Secretary can not
     // modify SEP Chair and SEP Secretary members
     if (isChairOrSecretaryOfSEP && !isUserOfficer) {
-      if (isMemberChairOrSecretaryOfSEP) {
+      if (isMemberToRemoveChairOrSecretaryOfSEP) {
         return rejection(
           `Could not remove member from SEP because SEP Chair and 
            SEP Secretary can not modify SEP Chair and SEP Secretary members`,
@@ -204,7 +223,7 @@ export default class SEPMutations {
     }
 
     return this.dataSource
-      .removeMemberFromSEP(args, isMemberChairOrSecretaryOfSEP)
+      .removeMemberFromSEP(args, isMemberToRemoveChairOrSecretaryOfSEP)
       .catch((error) => {
         return rejection(
           'Could not remove member from scientific evaluation panel',

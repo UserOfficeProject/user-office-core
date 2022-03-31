@@ -41,7 +41,7 @@ describe('Test if predefined async jobs are running correctly', () => {
     expect(mockJobFunction.mock.calls.length).toBe(1);
   });
 
-  it('Should run callEnded job once in 24 hours', (done) => {
+  it('Should run callEnded job once an hour', () => {
     const functionWithMockedDataSource = async () => {
       const callsThatAreEnded = await checkCallsEndedJob.functionToRun(
         callDataSourceMock
@@ -52,8 +52,6 @@ describe('Test if predefined async jobs are running correctly', () => {
       for (const callThatEnded of callsThatAreEnded) {
         expect(callThatEnded).toHaveProperty('callEnded', true);
       }
-
-      done();
     };
 
     const mockedFunction = jest.spyOn(checkCallsEndedJob, 'functionToRun');
@@ -71,7 +69,7 @@ describe('Test if predefined async jobs are running correctly', () => {
 
     clock.restore();
 
-    expect(mockedFunction).toHaveBeenCalledTimes(1);
+    expect(mockedFunction).toHaveBeenCalledTimes(24);
   });
 
   it('Should run callReviewEnded job once in 24 hours', (done) => {

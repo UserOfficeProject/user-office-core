@@ -9,7 +9,6 @@ import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
 import { Settings } from '../../models/Settings';
-import { Unit } from '../../models/Unit';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
@@ -33,7 +32,6 @@ import {
   PageTextRecord,
   SettingsRecord,
   TokensAndPermissionsRecord,
-  UnitRecord,
   UserRecord,
 } from './records';
 
@@ -52,54 +50,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         (count: CountryRecord) => new Entry(count.country_id, count.country)
       );
   }
-  async createUnit(unit: Unit): Promise<Unit | null> {
-    const [unitRecord]: UnitRecord[] = await database
-      .insert({
-        unit: unit.name,
-      })
-      .into('units')
-      .returning('*');
 
-    if (!unitRecord) {
-      throw new Error('Could not create unit');
-    }
-
-    return {
-      id: unitRecord.unit_id,
-      name: unitRecord.unit,
-    };
-  }
-
-  async deleteUnit(id: number): Promise<Unit> {
-    const [unitRecord]: UnitRecord[] = await database('units')
-      .where('units.unit_id', id)
-      .del()
-      .from('units')
-      .returning('*');
-
-    if (!unitRecord) {
-      throw new Error(`Could not delete unit with id:${id}`);
-    }
-
-    return {
-      id: unitRecord.unit_id,
-      name: unitRecord.unit,
-    };
-  }
-  async getUnits(): Promise<Unit[]> {
-    return await database
-      .select()
-      .from('units')
-      .orderBy('unit', 'asc')
-      .then((intDB: UnitRecord[]) =>
-        intDB.map((int) => {
-          return {
-            id: int.unit_id,
-            name: int.unit,
-          };
-        })
-      );
-  }
   async updateInstitution(
     institution: Institution
   ): Promise<Institution | null> {
@@ -114,7 +65,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!institutionRecord) {
-      throw new Error(`Could not update page with id:${institution.id}`);
+      throw new Error(`Could not update institution with id:${institution.id}`);
     }
 
     return {
@@ -191,12 +142,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
-    const [pagetextRecord]: PageTextRecord[] = await database
-      .update({
-        content,
+    const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
+      .insert({
+        pagetext_id: id,
+        content: content,
       })
-      .from('pagetext')
-      .where('pagetext_id', id)
+      .onConflict('pagetext_id')
+      .merge()
       .returning('*');
 
     if (!pagetextRecord) {

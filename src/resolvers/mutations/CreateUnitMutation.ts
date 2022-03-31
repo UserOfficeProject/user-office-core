@@ -6,8 +6,20 @@ import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateUnitArgs {
-  @Field(() => String)
-  name: string;
+  @Field()
+  id: string;
+
+  @Field()
+  unit: string;
+
+  @Field()
+  quantity: string;
+
+  @Field()
+  symbol: string;
+
+  @Field()
+  siConversionFormula: string;
 }
 
 @Resolver()
@@ -15,7 +27,7 @@ export class CreateUnitMutation {
   @Mutation(() => UnitResponseWrap)
   createUnit(@Args() args: CreateUnitArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.admin.createUnit(context.user, args),
+      context.mutations.unit.createUnit(context.user, args),
       UnitResponseWrap
     );
   }

@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
+import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
 
 async function setStfcColourTheme() {
@@ -29,7 +30,7 @@ async function setStfcColourTheme() {
 
 async function enableDefaultStfcFeatures() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  await db.setFeatures([FeatureId.EXTERNAL_AUTH], true);
+  await db.setFeatures([FeatureId.EXTERNAL_AUTH, FeatureId.EMAIL_SEARCH], true);
   await db.updateSettings(
     SettingsId.EXTERNAL_AUTH_LOGIN_URL,
     process.env.EXTERNAL_AUTH_LOGIN_URL
@@ -39,4 +40,6 @@ async function enableDefaultStfcFeatures() {
 export async function configureSTFCEnvironment() {
   await setStfcColourTheme();
   await enableDefaultStfcFeatures();
+  await setTimezone();
+  await setDateTimeFormats();
 }

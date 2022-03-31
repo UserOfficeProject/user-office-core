@@ -4,12 +4,10 @@ import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
 import { Settings, SettingsId } from '../../models/Settings';
-import { Unit } from '../../models/Unit';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
-export const dummyUnit = new Unit(1, 'Second');
 
 export const dummyInstitution = new Institution(1, 'ESS', 1, true);
 export const dummyApiAccessToken = new Permissions(
@@ -41,18 +39,7 @@ export class AdminDataSourceMock implements AdminDataSource {
   ): Promise<FeatureId[]> {
     return features;
   }
-  updateUnit(unit: Unit): Promise<Unit | null> {
-    throw new Error('Method not implemented.');
-  }
-  async createUnit(unit: Unit): Promise<Unit | null> {
-    return dummyUnit;
-  }
-  async deleteUnit(id: number): Promise<Unit> {
-    return dummyUnit;
-  }
-  async getUnits(): Promise<Unit[]> {
-    return [dummyUnit];
-  }
+
   async getInstitutionUsers(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails[]> {

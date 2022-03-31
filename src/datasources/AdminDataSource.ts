@@ -4,7 +4,6 @@ import { Feature, FeatureId } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { Permissions } from '../models/Permissions';
 import { Settings, SettingsId } from '../models/Settings';
-import { Unit } from '../models/Unit';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
@@ -30,9 +29,6 @@ export interface AdminDataSource {
   setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
   getSettings(): Promise<Settings[]>;
   getSetting(id: SettingsId): Promise<Settings>;
-  createUnit(unit: Unit): Promise<Unit | null>;
-  deleteUnit(id: number): Promise<Unit>;
-  getUnits(): Promise<Unit[]>;
   createApiAccessToken(
     args: CreateApiAccessTokenInput,
     accessTokenId: string,

@@ -150,6 +150,8 @@ class PostgresVisitDataSource implements VisitDataSource {
       trainingExpiryDate,
       isRegistrationSubmitted,
       registrationQuestionaryId,
+      startsAt,
+      endsAt,
     }: UpdateVisitRegistrationArgs
   ): Promise<VisitRegistration> {
     return database('visits_has_users')
@@ -157,6 +159,8 @@ class PostgresVisitDataSource implements VisitDataSource {
         training_expiry_date: trainingExpiryDate,
         is_registration_submitted: isRegistrationSubmitted,
         registration_questionary_id: registrationQuestionaryId,
+        starts_at: startsAt,
+        ends_at: endsAt,
       })
       .where({ visit_id: visitId })
       .andWhere({ user_id: userId })

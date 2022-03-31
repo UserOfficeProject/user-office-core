@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -11,11 +12,11 @@ import { User, UserWithRole } from '../models/User';
 @injectable()
 export class UserAuthorization {
   constructor(
-    @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
-    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.UserDataSource) protected userDataSource: UserDataSource,
+    @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource
+    protected proposalDataSource: ProposalDataSource,
+    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -53,14 +54,21 @@ export class UserAuthorization {
   }
 
   async isChairOrSecretaryOfSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     sepId: number
   ): Promise<boolean> {
     if (agent == null || !agent.id || !sepId) {
       return false;
     }
 
-    return this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId);
+    const hasChairOrSecretaryAsCurrentRole =
+      agent.currentRole?.shortCode === Roles.SEP_CHAIR ||
+      agent.currentRole?.shortCode === Roles.SEP_SECRETARY;
+
+    return (
+      hasChairOrSecretaryAsCurrentRole &&
+      this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId)
+    );
   }
 
   hasGetAccessByToken(agent: UserWithRole) {
@@ -85,7 +93,7 @@ export class UserAuthorization {
   }
 
   async isExternalTokenValid(externalToken: string): Promise<boolean> {
-    return await this.userDataSource.isExternalTokenValid(externalToken);
+    return true;
   }
 
   async listReadableUsers(
@@ -132,5 +140,13 @@ export class UserAuthorization {
     const readableUsers = await this.listReadableUsers(agent, [id]);
 
     return readableUsers.includes(id);
+  }
+
+  async externalTokenLogin(token: string): Promise<User | null> {
+    return null;
+  }
+
+  async logout(token: string): Promise<void> {
+    return;
   }
 }

@@ -124,10 +124,11 @@ export default class SEPQueries {
     let reviewerId = null;
 
     if (
+      agent &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
     ) {
-      reviewerId = agent!.id;
+      reviewerId = agent.id;
     }
 
     return this.dataSource.getSEPProposalAssignments(

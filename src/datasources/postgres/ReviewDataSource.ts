@@ -1,9 +1,9 @@
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
-import { AddReviewArgs } from '../../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
+import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
 import { ReviewRecord, TechnicalReviewRecord } from './records';
@@ -30,7 +30,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       technicalReview.time_allocation,
       technicalReview.status,
       technicalReview.submitted,
-      technicalReview.reviewer_id
+      technicalReview.reviewer_id,
+      JSON.stringify(technicalReview.files)
     );
   }
 
@@ -46,6 +47,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       status,
       reviewerId,
       submitted = false,
+      files,
     } = args;
 
     if (shouldUpdateReview) {
@@ -58,6 +60,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           status,
           submitted,
           reviewer_id: reviewerId,
+          files,
         })
         .from('technical_review')
         .where('proposal_pk', proposalPk)
@@ -76,6 +79,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         status,
         submitted,
         reviewer_id: reviewerId,
+        files,
       })
       .returning('*')
       .into('technical_review')
@@ -131,7 +135,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return this.createReviewObject(reviewRecord);
   }
 
-  async updateReview(args: AddReviewArgs): Promise<Review> {
+  async updateReview(args: UpdateReviewArgs): Promise<Review> {
     const { reviewID, comment, grade, status, sepID } = args;
 
     return database

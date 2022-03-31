@@ -77,7 +77,7 @@ export class User implements Partial<UserOrigin> {
   public nationality: number;
 
   @Field()
-  public birthdate: string;
+  public birthdate: Date;
 
   @Field(() => Int)
   public organisation: number;

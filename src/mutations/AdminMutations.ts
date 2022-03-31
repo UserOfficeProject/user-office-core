@@ -13,11 +13,9 @@ import { Page } from '../models/Admin';
 import { Institution } from '../models/Institution';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
-import { Unit } from '../models/Unit';
 import { UserWithRole } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
-import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
@@ -102,18 +100,6 @@ export default class AdminMutations {
     );
 
     return await this.dataSource.createInstitution(institution);
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async createUnit(agent: UserWithRole | null, args: CreateUnitArgs) {
-    const unit = new Unit(0, args.name);
-
-    return await this.dataSource.createUnit(unit);
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async deleteUnit(agent: UserWithRole | null, id: number) {
-    return await this.dataSource.deleteUnit(id);
   }
 
   @Authorized([Roles.USER_OFFICER])

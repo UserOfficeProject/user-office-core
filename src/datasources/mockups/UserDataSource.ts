@@ -43,7 +43,7 @@ export const dummyUserOfficer = new User(
   '683142616',
   'male',
   12,
-  '1990-01-25',
+  new Date('1990-01-25'),
   3,
   'IT department',
   'Producer',
@@ -73,7 +73,7 @@ export const dummyUser = new User(
   '568567353',
   'male',
   2,
-  '1981-05-04',
+  new Date('1981-05-04'),
   3,
   'IT department',
   'Architect',
@@ -95,6 +95,11 @@ export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
+};
+
+export const dummySEPChairWithRole: UserWithRole = {
+  ...dummyUser,
+  currentRole: { id: 4, title: 'SEP Chair', shortCode: 'sep_chair' },
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -128,7 +133,7 @@ export const dummyPlaceHolderUser = new User(
   '568567353',
   'male',
   2,
-  '1981-05-04',
+  new Date('1981-05-04'),
   3,
   'IT department',
   'Architect',
@@ -153,7 +158,7 @@ export const dummyUserNotOnProposal = new User(
   'Apricot',
   'female',
   3,
-  '1991-11-08',
+  new Date('1991-11-08'),
   5,
   'IT department',
   'Facilitator',
@@ -281,6 +286,8 @@ export class UserDataSourceMock implements UserDataSource {
       ];
     } else if (id === 1001) {
       return [{ id: 2, shortCode: 'sep_reviewer', title: 'User' }];
+    } else if (id === dummySEPChairWithRole.id) {
+      return [{ id: 4, shortCode: 'sep_chair', title: 'SEP Chair' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }

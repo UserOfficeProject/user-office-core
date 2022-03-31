@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
+import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
 
 async function setEssColourTheme() {
@@ -39,4 +40,6 @@ async function enableDefaultEssFeatures() {
 export async function configureESSDevelopmentEnvironment() {
   await setEssColourTheme();
   await enableDefaultEssFeatures();
+  await setTimezone();
+  await setDateTimeFormats();
 }
