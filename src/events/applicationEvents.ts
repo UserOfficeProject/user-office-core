@@ -1,5 +1,5 @@
 import { Call } from '../models/Call';
-import { InstrumentHasProposals } from '../models/Instrument';
+import { Instrument, InstrumentHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review, ReviewWithNextProposalStatus } from '../models/Review';
@@ -273,9 +273,15 @@ interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
   type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED;
   scheduledEvent: ScheduledEventCore;
 }
+
 interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
   type: Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED;
   scheduledEvents: ScheduledEventCore[];
+}
+
+interface InstrumentDeletedEvent extends GeneralEvent {
+  type: Event.INSTRUMENT_DELETED;
+  instrument: Instrument;
 }
 
 export type ApplicationEvent =
@@ -328,4 +334,5 @@ export type ApplicationEvent =
   | ProposalSEPMeetingReorderEvent
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
-  | ProposalBookingTimeSlotsRemovedEvent;
+  | ProposalBookingTimeSlotsRemovedEvent
+  | InstrumentDeletedEvent;
