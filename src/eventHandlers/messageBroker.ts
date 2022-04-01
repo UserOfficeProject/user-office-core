@@ -235,6 +235,12 @@ export function createPostToRabbitMQHandler() {
         await rabbitMQ.sendBroadcast(Event.PROPOSAL_CREATED, json);
         break;
       }
+      case Event.INSTRUMENT_DELETED: {
+        const json = JSON.stringify(event.instrument);
+
+        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        break;
+      }
       case Event.PROPOSAL_SUBMITTED: {
         const json = await getProposalMessageData(event.proposal);
 

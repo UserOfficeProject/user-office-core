@@ -12,7 +12,7 @@ import {
   userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -46,11 +46,11 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserMutations {
-  private userAuth = container.resolve(UserAuthorization);
   //Set as a class variable to avoid excessive calls to database
   private externalAuth: boolean;
 
   constructor(
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
     @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
   ) {
@@ -250,7 +250,9 @@ export default class UserMutations {
         )) as UserWithRole;
       } catch (error) {
         // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
-        if ((error as { code: string }).code === '23503') {
+        const errorCode = (error as { code: string }).code;
+
+        if (errorCode === '23503' || errorCode === '23505') {
           return rejection(
             'Can not create user because account already exists',
             { args },
@@ -447,7 +449,7 @@ export default class UserMutations {
 
   async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
     try {
-      const dummyUser = await this.dataSource.externalTokenLogin(externalToken);
+      const dummyUser = await this.userAuth.externalTokenLogin(externalToken);
 
       if (!dummyUser) {
         return rejection('User not found', { externalToken });
@@ -478,7 +480,7 @@ export default class UserMutations {
 
       if (this.externalAuth) {
         if (decodedToken.externalToken) {
-          this.dataSource.logout(decodedToken.externalToken);
+          this.userAuth.logout(decodedToken.externalToken);
         } else {
           return rejection('No external token found in JWT', { token });
         }

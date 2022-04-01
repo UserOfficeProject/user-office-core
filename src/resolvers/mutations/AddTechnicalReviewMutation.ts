@@ -35,6 +35,9 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
 
   @Field(() => Int, { nullable: true })
   public reviewerId: number;
+
+  @Field(() => String, { nullable: true })
+  public files: string;
 }
 
 @Resolver()

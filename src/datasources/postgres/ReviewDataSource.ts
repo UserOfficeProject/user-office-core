@@ -30,7 +30,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       technicalReview.time_allocation,
       technicalReview.status,
       technicalReview.submitted,
-      technicalReview.reviewer_id
+      technicalReview.reviewer_id,
+      JSON.stringify(technicalReview.files)
     );
   }
 
@@ -46,6 +47,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       status,
       reviewerId,
       submitted = false,
+      files,
     } = args;
 
     if (shouldUpdateReview) {
@@ -58,6 +60,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           status,
           submitted,
           reviewer_id: reviewerId,
+          files,
         })
         .from('technical_review')
         .where('proposal_pk', proposalPk)
@@ -76,6 +79,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         status,
         submitted,
         reviewer_id: reviewerId,
+        files,
       })
       .returning('*')
       .into('technical_review')
