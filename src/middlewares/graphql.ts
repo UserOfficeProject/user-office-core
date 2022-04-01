@@ -104,6 +104,13 @@ const apolloServer = async (app: Express) => {
                 : false,
           } as UserWithRole;
         }
+        user = {
+          ...user,
+          hasCurrentRole: await userAuthorization.hasRole(
+            user,
+            user.currentRole?.shortCode as string
+          ),
+        };
       }
 
       const context: ResolverContext = { ...baseContext, user };
