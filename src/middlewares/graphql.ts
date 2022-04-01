@@ -12,6 +12,7 @@ import { container } from 'tsyringe';
 import 'reflect-metadata';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
+import { Tokens } from '../config/Tokens';
 import { ResolverContext } from '../context';
 import { UserWithRole } from '../models/User';
 import federationSources from '../resolvers/federationSources';
@@ -32,6 +33,7 @@ const apolloServer = async (app: Express) => {
         __dirname + '/../resolvers/**/*Mutation.{ts,js}',
         __dirname + '/../resolvers/**/*Resolver.{ts,js}',
       ],
+      dateScalarMode: 'isoDate',
       orphanedTypes: [...orphanedTypes],
       validate: false,
     },
@@ -74,7 +76,9 @@ const apolloServer = async (app: Express) => {
       let user = null;
       const userId = req.user?.user?.id as number;
       const accessTokenId = req.user?.accessTokenId;
-      const userAuthorization = container.resolve(UserAuthorization);
+      const userAuthorization = container.resolve<UserAuthorization>(
+        Tokens.UserAuthorization
+      );
 
       if (req.user) {
         if (accessTokenId) {

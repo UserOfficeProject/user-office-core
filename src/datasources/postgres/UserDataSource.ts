@@ -304,7 +304,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     orcid_refreshtoken: string,
     gender: string,
     nationality: number,
-    birthdate: string,
+    birthdate: Date,
     organisation: number,
     department: string,
     position: string,
@@ -645,17 +645,5 @@ export default class PostgresUserDataSource implements UserDataSource {
         (role: RoleRecord) =>
           new Role(role.role_id, role.short_code, role.title)
       );
-  }
-
-  async externalTokenLogin(token: string): Promise<null> {
-    return null;
-  }
-
-  async logout(token: string): Promise<void> {
-    return;
-  }
-
-  async isExternalTokenValid(token: string): Promise<boolean> {
-    return true;
   }
 }
