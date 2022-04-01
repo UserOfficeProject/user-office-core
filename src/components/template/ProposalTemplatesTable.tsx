@@ -1,42 +1,47 @@
 import MaterialTable, { Column } from '@material-table/core';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import { DateTime } from 'luxon';
 import React, { useCallback, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import { Call, ProposalTemplate, TemplateGroupId } from 'generated/sdk';
+import { ProposalTemplate, TemplateGroupId } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 
 import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
 
-const callListColumns = [
-  { title: 'Short Code', field: 'shortCode' },
-  {
-    title: 'Start Date',
-    field: 'startCall',
-    render: (rowData: Call) =>
-      DateTime.fromISO(rowData.startCall).toFormat('dd-MMM-yyyy'),
-  },
-  {
-    title: 'End Date',
-    field: 'endCall',
-    render: (rowData: Call) =>
-      DateTime.fromISO(rowData.endCall).toFormat('dd-MMM-yyyy'),
-  },
-];
-
 function CallsList(props: { filterTemplateId: number }) {
   const { calls } = useCallsData({ templateIds: [props.filterTemplateId] });
+  const { toFormattedDateTime, timezone } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
+
+  const callListColumns = [
+    { title: 'Short Code', field: 'shortCode' },
+    {
+      title: `Start Date(${timezone})`,
+      field: 'startCallFormatted',
+    },
+    {
+      title: `End Date(${timezone})`,
+      field: 'endCallFormatted',
+    },
+  ];
+
+  const callsWithFormattedDates = calls.map((call) => ({
+    ...call,
+    startCallFormatted: toFormattedDateTime(call.startCall),
+    endCallFormatted: toFormattedDateTime(call.endCall),
+  }));
 
   return (
     <MaterialTable
       icons={tableIcons}
       title="Calls"
       columns={callListColumns}
-      data={calls}
+      data={callsWithFormattedDates}
     />
   );
 }

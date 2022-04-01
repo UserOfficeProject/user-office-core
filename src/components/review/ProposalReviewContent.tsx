@@ -118,8 +118,10 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
       <Typography variant="h6" component="h2" gutterBottom>
         Assign to someone else?
       </Typography>
-      If you think there is a better candidate to do the review for the
-      proposal, you can re-assign it to someone else
+      <p>
+        If you think there is a better candidate to do the review for the
+        proposal, you can re-assign it to someone else
+      </p>
       <div>
         {showReassign ? (
           <AssignTechnicalReview

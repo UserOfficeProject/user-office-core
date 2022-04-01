@@ -2,7 +2,6 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ShareIcon from '@mui/icons-material/Share';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { DateTime } from 'luxon';
 import React from 'react';
 import { useHistory } from 'react-router';
 import { useQueryParams } from 'use-query-params';
@@ -12,7 +11,8 @@ import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { UserRole, Unit } from 'generated/sdk';
+import { UserRole, Unit, SettingsId } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { downloadBlob } from 'utils/downloadBlob';
 import { tableIcons } from 'utils/materialIcons';
@@ -29,6 +29,9 @@ const columns = [
 
 const UnitTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
   const history = useHistory();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -101,10 +104,7 @@ const UnitTable: React.FC = () => {
                     const blob = new Blob([result.unitsAsJson], {
                       type: 'application/json;charset=utf8',
                     });
-                    downloadBlob(
-                      blob,
-                      `units_${DateTime.now().toFormat('yyyy-LLL-dd')}.json`
-                    );
+                    downloadBlob(blob, `units_${toFormattedDateTime()}.json`);
                   });
               }}
               data-cy="export-units-button"

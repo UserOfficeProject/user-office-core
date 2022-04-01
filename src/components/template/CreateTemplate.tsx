@@ -59,8 +59,8 @@ const CreateTemplate = (props: {
               component={TextField}
               fullWidth
               multiline
-              rowsMax="16"
-              rows="3"
+              maxRows="16"
+              minRows="3"
               data-cy="description"
             />
             <Button type="submit" fullWidth data-cy="submit">

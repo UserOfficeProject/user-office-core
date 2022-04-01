@@ -6,4 +6,5 @@ fragment coreTechnicalReview on TechnicalReview {
   status
   proposalPk
   submitted
+  files
 }

@@ -1,10 +1,5 @@
-import {
-  Dialog,
-  DialogContent,
-  Divider,
-  Typography,
-  Alert,
-} from '@mui/material';
+import { Dialog, DialogContent, Typography, Alert, Paper } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -34,10 +29,29 @@ const shipmentToListRow = (
   };
 };
 
+const useStyles = makeStyles((theme) => ({
+  questionLabel: {
+    opacity: 0.54,
+    fontWeight: 400,
+    fontSize: '1rem',
+  },
+  container: {
+    padding: '1rem',
+    marginTop: theme.spacing(1),
+  },
+  alert: {
+    margin: `${theme.spacing(2)}px 0`,
+  },
+  paper: {
+    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+  },
+}));
+
 function DeclareShipments({
   scheduledEventId,
   confirm,
 }: DeclareShipmentsProps) {
+  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -97,46 +111,44 @@ function DeclareShipments({
 
   return (
     <>
-      <Typography
-        variant="h4"
-        style={{ marginBottom: '12px', textAlign: 'center' }}
-      >
+      <Typography variant="h6" component="h2" gutterBottom>
         Declare Shipments
       </Typography>
-      <Typography>
+      <Typography variant="body1">
         Follow the steps below to declare your shipments:
-        <ol style={{ margin: 0, paddingBottom: '22px' }}>
+        <ol style={{ margin: 0 }}>
           <li>Add all the shipments (one shipment per parcel)</li>
           <li>Download labels</li>
           <li>Post the shipment</li>
         </ol>
       </Typography>
       {!hasLocalContact && (
-        <Alert severity="warning">
+        <Alert severity="warning" className={classes.alert}>
           Shipment declarations are not possible until the local contact has
           been assigned to your scheduled event
         </Alert>
       )}
-      <QuestionnairesList
-        addButtonLabel="Add Shipment"
-        data={shipments.map(shipmentToListRow) ?? []}
-        onEditClick={(item) =>
-          api()
-            .getShipment({ shipmentId: item.id })
-            .then(({ shipment }) => {
-              setSelectedShipment(shipment);
-              setIsModalOpen(true);
-            })
-        }
-        onDeleteClick={onDeleteClicked}
-        onAddNewClick={hasLocalContact ? onAddClicked : undefined}
-        style={{ maxWidth: '100%' }}
-      />
-      <Divider style={{ margin: '12px 0' }} />
-      <Typography variant="body1" align="right">
-        {`${shipments.length} shipment(s)`}
-      </Typography>
 
+      <Paper className={classes.paper}>
+        <Typography variant="h6" gutterBottom>
+          Your shipment list
+        </Typography>
+        <QuestionnairesList
+          addButtonLabel="Add Shipment"
+          data={shipments.map(shipmentToListRow) ?? []}
+          onEditClick={(item) =>
+            api()
+              .getShipment({ shipmentId: item.id })
+              .then(({ shipment }) => {
+                setSelectedShipment(shipment);
+                setIsModalOpen(true);
+              })
+          }
+          onDeleteClick={onDeleteClicked}
+          onAddNewClick={hasLocalContact ? onAddClicked : undefined}
+          style={{ maxWidth: '100%' }}
+        />
+      </Paper>
       <Dialog
         aria-labelledby="shipment-declaration"
         aria-describedby="shipment-declaration-description"

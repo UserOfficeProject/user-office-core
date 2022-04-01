@@ -19,6 +19,8 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(1),
   },
   singleUnit: {
+    alignItems: 'flex-end',
+    fontSize: '1rem',
     padding: '0px 5px',
   },
 }));

@@ -116,8 +116,8 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             component={TextField}
             fullWidth
             multiline
-            rowsMax="16"
-            rows="3"
+            maxRows="16"
+            minRows="3"
             data-cy="description"
             disabled={isExecutingCall}
           />

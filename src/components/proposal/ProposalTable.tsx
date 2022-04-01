@@ -70,12 +70,23 @@ const ProposalTable = ({
     'primaryKey' | 'questionary'
   > | null>(null);
 
+  // TODO: This api call here should be replaced with a hook for getting user proposals.
   useEffect(() => {
+    let unmounted = false;
+
     searchQuery().then((data) => {
+      if (unmounted) {
+        return;
+      }
+
       if (data) {
         setPartialProposalsData(data.data);
       }
     });
+
+    return () => {
+      unmounted = true;
+    };
   }, [searchQuery]);
 
   const [editProposalPk, setEditProposalPk] = useState(0);

@@ -3,7 +3,9 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -30,6 +32,8 @@ const AccountActionButton: React.FC = () => {
     setAnchorEl(null);
   };
 
+  const handleModalClose = () => setShow(false);
+
   const handleOnLogout = () => {
     handleLogout();
   };
@@ -40,12 +44,19 @@ const AccountActionButton: React.FC = () => {
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
-        onClose={(): void => setShow(false)}
+        onClose={handleModalClose}
         style={{ backdropFilter: 'blur(6px)' }}
+        maxWidth="xs"
+        fullWidth
       >
         <DialogContent>
-          <RoleSelection />
+          <RoleSelection onClose={handleModalClose} />
         </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={handleModalClose}>
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
       <>
         <IconButton

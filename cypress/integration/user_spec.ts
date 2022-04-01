@@ -1,4 +1,7 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
+
+import initialDBData from '../support/initialDBData';
 
 context('User tests', () => {
   // Login details
@@ -8,10 +11,7 @@ context('User tests', () => {
   const firstName = faker.name.firstName();
   const lastName = faker.name.lastName();
 
-  const birthDate = faker.date
-    .past(80, '2002-01-01')
-    .toISOString()
-    .slice(0, 10);
+  const birthDate = DateTime.fromJSDate(faker.date.past(80, '2002-01-01'));
 
   //Organization detail
   const department = faker.commerce.department();
@@ -28,6 +28,7 @@ context('User tests', () => {
   });
 
   it('A user should be able to create a new account with mandatory fields only', () => {
+    const birthDateValue = birthDate.toFormat(initialDBData.formats.dateFormat);
     cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
@@ -60,8 +61,9 @@ context('User tests', () => {
     cy.contains('Swedish').click();
 
     cy.get('[data-cy=birthdate] input')
-      .type(birthDate)
-      .should('have.value', birthDate);
+      .clear()
+      .type(birthDateValue)
+      .should('have.value', birthDateValue);
 
     //Organization details
     cy.get('#organisation-input').click();
@@ -141,10 +143,7 @@ context('User tests', () => {
 
     const middleName = faker.name.firstName();
     const preferredName = faker.name.firstName();
-    const birthDate = faker.date
-      .past(80, '2002-01-01')
-      .toISOString()
-      .slice(0, 10);
+    const birthDateValue = birthDate.toFormat(initialDBData.formats.dateFormat);
 
     //Organization detail
     const department = faker.commerce.department();
@@ -194,8 +193,9 @@ context('User tests', () => {
     cy.contains('Swedish').click();
 
     cy.get('[data-cy=birthdate] input')
-      .type(birthDate)
-      .should('have.value', birthDate);
+      .clear()
+      .type(birthDateValue)
+      .should('have.value', birthDateValue);
 
     //Organization details
     cy.get('#organisation-input').click();

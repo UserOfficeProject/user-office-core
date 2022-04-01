@@ -146,13 +146,12 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                     branding: false,
                   }}
                   onEditorChange={(content, editor) => {
-                    const normalizedContent = content.replace(
-                      /(?:\r\n|\r|\n)/g,
-                      ''
-                    );
+                    const isStartContentDifferentThanCurrent =
+                      editor.startContent !==
+                      editor.contentDocument.body.innerHTML;
 
                     if (
-                      normalizedContent !== editor.startContent ||
+                      isStartContentDifferentThanCurrent ||
                       editor.isDirty()
                     ) {
                       setFieldValue('commentForUser', content);
@@ -186,13 +185,12 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                     branding: false,
                   }}
                   onEditorChange={(content, editor) => {
-                    const normalizedContent = content.replace(
-                      /(?:\r\n|\r|\n)/g,
-                      ''
-                    );
+                    const isStartContentDifferentThanCurrent =
+                      editor.startContent !==
+                      editor.contentDocument.body.innerHTML;
 
                     if (
-                      normalizedContent !== editor.startContent ||
+                      isStartContentDifferentThanCurrent ||
                       editor.isDirty()
                     ) {
                       setFieldValue('commentForManagement', content);

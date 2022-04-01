@@ -429,7 +429,11 @@ export function FileUploadComponent(props: {
   }
 
   const amountFilesInfo =
-    maxFiles > 1 ? <span>Max: {maxFiles} file(s)</span> : null;
+    maxFiles > 1 ? (
+      <Box component="span" display="block">
+        Max: {maxFiles} file(s)
+      </Box>
+    ) : null;
 
   const fileTypeInfo = fileType.split(',').map((type) => {
     return type.includes('*') ? 'any ' + type.split('/')[0] : type;
