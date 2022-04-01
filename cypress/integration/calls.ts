@@ -215,7 +215,7 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able to create a call with end dates before start dates', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const yesterdayDate = DateTime.now().plus({ days: -1 }).day;
+      const yesterdayDate = DateTime.now().minus({ days: 1 }).day;
       const tomorrowDate = DateTime.now()
         .plus({ days: 1 })
         .startOf('day')
@@ -235,10 +235,17 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=end-date]').find('[data-testid="CalendarIcon"]').click();
 
-      cy.get('[role="dialog"] .MuiCalendarPicker-root .MuiPickersDay-root')
-        .contains(yesterdayDate)
-        .closest('button')
-        .should('be.disabled');
+      const isStartOfMonth = DateTime.now().day == 1;
+      if (isStartOfMonth) {
+        cy.get('[role="dialog"] [title="Previous month"]').should(
+          'be.disabled'
+        );
+      } else {
+        cy.get('[role="dialog"] .MuiCalendarPicker-root .MuiPickersDay-root')
+          .contains(yesterdayDate)
+          .closest('button')
+          .should('be.disabled');
+      }
 
       cy.get('[data-cy=start-date] input').click();
 
