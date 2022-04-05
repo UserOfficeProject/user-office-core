@@ -95,7 +95,7 @@ context('Calls tests', () => {
     });
   });
 
-  // TODO: Maybe this should be moved to another file called permiisons because its testing more call permissions than calls.
+  // TODO: Maybe this should be moved to another file called permissions because its testing more call permissions than calls.
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
     cy.visit('/');
@@ -215,8 +215,12 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able to create a call with end dates before start dates', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const yesterdayDate = DateTime.now().plus({ days: -1 }).day;
-      const tomorrowDate = DateTime.now()
+      const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
+      const today = DateTime.fromJSDate(todayJsDate); // set date to specific date to easier test the validation
+      cy.clock(todayJsDate);
+
+      const yesterday = today.minus({ days: 1 }).day;
+      const tomorrow = today
         .plus({ days: 1 })
         .startOf('day')
         // TODO: Find a way how to access the settings format here and not hard coding it like this.
@@ -236,7 +240,7 @@ context('Calls tests', () => {
       cy.get('[data-cy=end-date]').find('[data-testid="CalendarIcon"]').click();
 
       cy.get('[role="dialog"] .MuiCalendarPicker-root .MuiPickersDay-root')
-        .contains(yesterdayDate)
+        .contains(yesterday)
         .closest('button')
         .should('be.disabled');
 
@@ -244,8 +248,8 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=start-date] input')
         .clear()
-        .type(tomorrowDate)
-        .should('have.value', tomorrowDate);
+        .type(tomorrow)
+        .should('have.value', tomorrow);
 
       cy.get('[data-cy=end-date]').should(
         'include.text',

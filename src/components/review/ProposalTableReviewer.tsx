@@ -35,9 +35,6 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from './ProposalReviewContent';
 import ProposalReviewModal from './ProposalReviewModal';
-import ReviewerFilterComponent, {
-  defaultReviewerQueryFilter,
-} from './ReviewerFilter';
 import ReviewStatusFilter, {
   defaultReviewStatusQueryFilter,
 } from './ReviewStatusFilter';
@@ -60,9 +57,6 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
     : selected === ReviewStatus.DRAFT
     ? ReviewStatus.DRAFT
     : undefined; // if the selected status is not a valid status assume we want to see everything
-
-const getFilterReviewer = (selected: string | ReviewerFilter) =>
-  selected === ReviewerFilter.YOU ? ReviewerFilter.YOU : ReviewerFilter.ALL;
 
 let columns: Column<UserWithReview>[] = [
   {
@@ -98,7 +92,6 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     reviewStatus: defaultReviewStatusQueryFilter,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    reviewer: defaultReviewerQueryFilter,
   });
 
   const [selectedProposals, setSelectedProposals] = useState<
@@ -121,7 +114,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
       callId: selectedCallId,
       instrumentId: selectedInstrumentId,
       status: getFilterStatus(urlQueryParams.reviewStatus),
-      reviewer: getFilterReviewer(urlQueryParams.reviewer),
+      reviewer: ReviewerFilter.YOU,
     });
 
   const handleStatusFilterChange = (reviewStatus: ReviewStatus) => {
@@ -129,14 +122,6 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     setUserWithReviewsFilter((filter) => ({
       ...filter,
       status: getFilterStatus(reviewStatus),
-    }));
-  };
-
-  const handleReviewOwnerFilterChange = (reviewer: ReviewerFilter) => {
-    setUrlQueryParams((queries) => ({ ...queries, reviewer }));
-    setUserWithReviewsFilter((filter) => ({
-      ...filter,
-      reviewer,
     }));
   };
 
@@ -346,10 +331,6 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
 
   return (
     <>
-      <ReviewerFilterComponent
-        reviewer={urlQueryParams.reviewer}
-        onChange={handleReviewOwnerFilterChange}
-      />
       <ReviewStatusFilter
         reviewStatus={urlQueryParams.reviewStatus}
         onChange={handleStatusFilterChange}
