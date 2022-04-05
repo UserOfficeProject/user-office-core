@@ -110,12 +110,8 @@ export class ProposalAuthorization {
 
     const sepIdsUserIsMemberOf = sepsUserIsMemberOf.map((sep) => sep.id);
 
-    /**
-     * NOTE: Everybody who is on a(member of) SEP(Scientific evaluation panel) is able to view and review a proposal.
-     * If we like to limit that we can just send userId on the getUserReviews and query for reviews that are only on that specific user.
-     */
     return this.reviewDataSource
-      .getUserReviews(sepIdsUserIsMemberOf)
+      .getUserReviews(sepIdsUserIsMemberOf, agent.id)
       .then((reviews) => {
         return reviews.some((review) => review.proposalPk === proposalPk);
       });
