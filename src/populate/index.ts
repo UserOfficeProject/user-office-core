@@ -80,7 +80,7 @@ const createUsers = async () => {
       faker.random.uuid(),
       dummy.gender(),
       dummy.positiveNumber(20),
-      faker.date.past(30).toLocaleDateString(),
+      faker.date.past(30),
       dummy.positiveNumber(20),
       faker.commerce.department(),
       faker.name.jobTitle(),

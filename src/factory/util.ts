@@ -1,5 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import request from 'request';
 
 import { Answer } from '../models/Questionary';
@@ -35,6 +35,7 @@ export const bufferRequestBody = (req: request.Request) =>
     req.on('complete', () => resolve(Buffer.concat(buffer).toString()));
   });
 
-export function getCurrentTimestamp() {
-  return moment.utc().format('YYYY-MM-DD_hhmmss');
-}
+const DATE_TIMESTAMP_FORMAT = 'yyyy-MM-dd_HHmmss';
+
+export const getCurrentTimestamp = () =>
+  DateTime.now().toUTC().toFormat(DATE_TIMESTAMP_FORMAT);

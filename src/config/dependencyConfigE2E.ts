@@ -1,6 +1,7 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -55,6 +56,8 @@ mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
+
+mapClass(Tokens.UserAuthorization, UserAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

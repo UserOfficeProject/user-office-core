@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import fs from 'fs/promises';
 
 import { logger } from '@user-office-software/duo-logger';

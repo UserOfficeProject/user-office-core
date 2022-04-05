@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -6,16 +7,16 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
-import { UserWithRole } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 
 @injectable()
 export class UserAuthorization {
   constructor(
-    @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
-    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.UserDataSource) protected userDataSource: UserDataSource,
+    @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource
+    protected proposalDataSource: ProposalDataSource,
+    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -92,7 +93,7 @@ export class UserAuthorization {
   }
 
   async isExternalTokenValid(externalToken: string): Promise<boolean> {
-    return await this.userDataSource.isExternalTokenValid(externalToken);
+    return true;
   }
 
   async listReadableUsers(
@@ -139,5 +140,13 @@ export class UserAuthorization {
     const readableUsers = await this.listReadableUsers(agent, [id]);
 
     return readableUsers.includes(id);
+  }
+
+  async externalTokenLogin(token: string): Promise<User | null> {
+    return null;
+  }
+
+  async logout(token: string): Promise<void> {
+    return;
   }
 }

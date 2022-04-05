@@ -72,16 +72,12 @@ export class InstrumentResolver {
 export async function resolveInstrumentReference(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...params: any
-): Promise<Instrument> {
+): Promise<Instrument | null> {
   // the order of the parameters and types are messed up,
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
   // this was the easies way to make the compiler happy and use real types
   const [reference, ctx]: [Pick<Instrument, 'id'>, ResolverContext] = params;
 
-  // dataSource.get can be null, even with non-null operator the compiler complains
-  return (await (ctx.queries.instrument.byRef(
-    ctx.user,
-    reference.id
-  ) as unknown)) as Instrument;
+  return await ctx.queries.instrument.byRef(ctx.user, reference.id);
 }

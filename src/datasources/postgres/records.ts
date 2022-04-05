@@ -205,7 +205,7 @@ export interface UserRecord {
   readonly orcid: string;
   readonly gender: string;
   readonly nationality: number;
-  readonly birthdate: string;
+  readonly birthdate: Date;
   readonly organisation: number;
   readonly department: string;
   readonly organisation_address: string;

@@ -79,7 +79,6 @@ export const registerEnums = () => {
   registerEnumType(ComparisonStatus, {
     name: 'QuestionComparisonStatus',
   });
-
   registerEnumType(ConflictResolutionStrategy, {
     name: 'ConflictResolutionStrategy',
   });

@@ -11,7 +11,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TzLessDateTime } from '../CustomScalars';
 import { ScheduledEventCore } from './ScheduledEvent';
 
 export function If(
@@ -55,10 +54,10 @@ export class ProposalBookingScheduledEventFilterCore {
   @Field(() => ScheduledEventBookingType, { nullable: true })
   bookingType?: ScheduledEventBookingType | null;
 
-  @Field(() => TzLessDateTime, { nullable: true })
+  @Field({ nullable: true })
   endsAfter?: Date;
 
-  @Field(() => TzLessDateTime, { nullable: true })
+  @Field({ nullable: true })
   endsBefore?: Date;
 
   @Field(() => [ProposalBookingStatusCore], { nullable: true })
