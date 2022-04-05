@@ -226,6 +226,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
             </Button>
             {!hasAccessRights && (
               <Button
+                data-cy="submit-grade"
                 className={classes.button}
                 disabled={isDisabled(isSubmitting)}
                 type="submit"

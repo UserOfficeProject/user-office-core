@@ -632,9 +632,19 @@ context('SEP reviews tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
-        variant: 'success',
-        text: 'Proposal review submitted successfully!',
+        variant: 'error',
+        text: 'REJECTED',
       });
+
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.setTinyMceContent('comment', faker.lorem.words(3));
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[role="listbox"] > [role="option"]').first().click();
+      cy.get('[data-cy=submit-grade]').click();
+      cy.get('[data-cy=confirm-ok]').click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Submitted' });
+      cy.closeModal();
 
       cy.contains(proposal1.proposalTitle).parent().contains('Submitted');
     });
@@ -1378,6 +1388,8 @@ context('SEP meeting components tests', () => {
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('[data-cy="grade-proposal"]').click();
       cy.get('[role="listbox"] > [role="option"]').first().click();
+      cy.get('[data-cy=save-grade]').click();
+      cy.notification({ variant: 'success', text: 'Updated' });
     });
   });
 });
