@@ -2214,7 +2214,6 @@ export type QueryQuestionsArgs = {
 
 export type QueryReviewArgs = {
   reviewId: Scalars['Int'];
-  sepId?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -3975,7 +3974,6 @@ export type GetProposalReviewsQuery = { proposalReviews: Array<{ id: number, use
 
 export type GetReviewQueryVariables = Exact<{
   reviewId: Scalars['Int'];
-  sepId?: InputMaybe<Scalars['Int']>;
 }>;
 
 
@@ -7157,8 +7155,8 @@ export const GetProposalReviewsDocument = gql`
 }
     `;
 export const GetReviewDocument = gql`
-    query getReview($reviewId: Int!, $sepId: Int) {
-  review(reviewId: $reviewId, sepId: $sepId) {
+    query getReview($reviewId: Int!) {
+  review(reviewId: $reviewId) {
     ...coreReview
     proposal {
       primaryKey

@@ -1364,26 +1364,8 @@ context('SEP meeting components tests', () => {
       cy.visit('/');
     });
 
-    it('SEP Reviewer should be able to see reviews even if he/she is not direct reviewer but only member of the SEP', () => {
+    it('SEP Reviewer should not be able to see reviews he/she is not a direct reviewer', () => {
       cy.get('main table tbody').contains('No records to display');
-
-      cy.get('[data-cy="reviewer-filter"]').click();
-
-      cy.get('[data-value="ALL"]').click();
-
-      cy.finishedLoading();
-
-      cy.contains(proposal1.proposalTitle)
-        .parent()
-        .find('[aria-label="Grade proposal"]')
-        .click();
-
-      cy.finishedLoading();
-
-      cy.contains(proposal1.proposalTitle);
-      cy.get('[role="dialog"]').contains('Grade');
-      cy.get('textarea[id="comment"]').should('exist');
-      cy.get('button[type="submit"]').should('exist');
     });
   });
 });
