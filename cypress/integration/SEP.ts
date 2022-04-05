@@ -1360,12 +1360,24 @@ context('SEP meeting components tests', () => {
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer2.id],
       });
-      cy.login(sepMembers.reviewer2);
-      cy.visit('/');
     });
 
     it('SEP Reviewer should not be able to see reviews he/she is not a direct reviewer', () => {
+      cy.login(sepMembers.reviewer2);
+      cy.visit('/');
       cy.get('main table tbody').contains('No records to display');
+    });
+
+    it('SEP Reviewer should be able to give review', () => {
+      cy.login(sepMembers.reviewer);
+      cy.visit('/');
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy=save-grade]').click();
+      cy.contains('comment is a required field');
+      cy.contains('grade is a required field');
+      cy.setTinyMceContent('comment', faker.lorem.words(3));
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[role="listbox"] > [role="option"]').first().click();
     });
   });
 });

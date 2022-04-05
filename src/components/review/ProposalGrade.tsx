@@ -1,3 +1,4 @@
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -23,7 +24,6 @@ import {
   UserRole,
 } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -191,12 +191,12 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                 (i + 1).toString()
               )}
               disabled={isDisabled(isSubmitting)}
-              required
               nbrOptionShown={10}
               data-cy="grade-proposal"
             />
           </Box>
-          <StyledButtonContainer>
+          <ErrorMessage name="grade" />
+          <Stack direction="row" justifyContent="flex-end">
             {isSubmitting && (
               <Box display="flex" alignItems="center" mx={1}>
                 <UOLoader buttonSized />
@@ -216,6 +216,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               <GradeGuidePage />
             </ButtonWithDialog>
             <Button
+              data-cy="save-grade"
               disabled={isDisabled(isSubmitting)}
               color="secondary"
               type="submit"
@@ -235,7 +236,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                   : 'Submit'}
               </Button>
             )}
-          </StyledButtonContainer>
+          </Stack>
         </Form>
       )}
     </Formik>

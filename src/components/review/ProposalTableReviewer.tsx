@@ -58,9 +58,6 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
     ? ReviewStatus.DRAFT
     : undefined; // if the selected status is not a valid status assume we want to see everything
 
-const getFilterReviewer = (selected: string | ReviewerFilter) =>
-  selected === ReviewerFilter.YOU ? ReviewerFilter.YOU : ReviewerFilter.ALL;
-
 let columns: Column<UserWithReview>[] = [
   {
     title: 'Actions',
