@@ -1,23 +1,19 @@
-import makeStyles from '@mui/styles/makeStyles';
+import { Box, BoxProps } from '@mui/material';
 import { ErrorMessage as FormikErrorMessage, ErrorMessageProps } from 'formik';
 import React from 'react';
 
-const useStyles = makeStyles((theme) => ({
-  error: {
-    color: theme.palette.error.main,
-    margin: theme.spacing(2),
-  },
-}));
 /**
  * Error message for Formik forms with applied styles
  * @param props
  * @returns
  */
-function ErrorMessage(props: ErrorMessageProps) {
-  const classes = useStyles();
+function ErrorMessage(props: Pick<ErrorMessageProps, 'name'> & BoxProps) {
+  const { name, ...boxProps } = props;
 
   return (
-    <FormikErrorMessage className={classes.error} {...props} component="span" />
+    <Box color={'red'} {...boxProps}>
+      <FormikErrorMessage name={name} component={'span'} />
+    </Box>
   );
 }
 
