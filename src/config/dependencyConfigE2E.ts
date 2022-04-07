@@ -24,6 +24,7 @@ import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSour
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
   createSkipListeningHandler,
@@ -62,6 +63,8 @@ mapClass(Tokens.UserAuthorization, UserAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SkipSendMailService);
+
+mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
