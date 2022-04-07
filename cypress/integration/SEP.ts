@@ -1381,6 +1381,7 @@ context('SEP meeting components tests', () => {
     it('SEP Reviewer should be able to give review', () => {
       cy.login(sepMembers.reviewer);
       cy.visit('/');
+      cy.finishedLoading();
       cy.get('[data-cy="grade-proposal-icon"]').click();
       cy.get('[data-cy=save-grade]').click();
       cy.contains('comment is a required field');
