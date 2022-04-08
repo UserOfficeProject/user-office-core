@@ -703,7 +703,10 @@ context('SEP reviews tests', () => {
       cy.get('[data-cy="submit-proposal-reviews"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
 
-      // cy.notification({text: '', variant: 'success'})
+      cy.notification({
+        text: 'Proposals review submitted successfully',
+        variant: 'success',
+      });
     });
   });
 });

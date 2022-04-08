@@ -1,3 +1,4 @@
+import DoneAll from '@mui/icons-material/DoneAll';
 import Save from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -208,7 +209,13 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               color="secondary"
               type="submit"
               onClick={() => setShouldSubmit(false)}
-              startIcon={isSubmitting ? <UOLoader buttonSized /> : <Save />}
+              startIcon={
+                isSubmitting && !shouldSubmit ? (
+                  <UOLoader buttonSized />
+                ) : (
+                  <Save />
+                )
+              }
             >
               Save
             </Button>
@@ -218,6 +225,13 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                 disabled={isDisabled(isSubmitting)}
                 type="submit"
                 onClick={() => setShouldSubmit(true)}
+                startIcon={
+                  isSubmitting && shouldSubmit ? (
+                    <UOLoader buttonSized />
+                  ) : (
+                    <DoneAll />
+                  )
+                }
               >
                 {review.status === ReviewStatus.SUBMITTED
                   ? 'Submitted'
