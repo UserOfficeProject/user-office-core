@@ -2,6 +2,7 @@ import {
   proposalGradeValidationSchema,
   proposalTechnicalReviewValidationSchema,
   addUserForReviewValidationSchema,
+  submitProposalReviewValidationSchema,
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
@@ -124,7 +125,7 @@ export default class ReviewMutations {
   }
 
   @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)
-  @ValidateArgs(proposalGradeValidationSchema, ['comment'])
+  @ValidateArgs(submitProposalReviewValidationSchema)
   @Authorized()
   async submitProposalReview(
     agent: UserWithRole | null,
@@ -145,6 +146,14 @@ export default class ReviewMutations {
       return rejection(
         'Can not submit proposal review because of insufficient permissions',
         { agent, args }
+      );
+    }
+
+    const isReviewValid = await proposalGradeValidationSchema.isValid(review);
+    if (isReviewValid === false) {
+      return rejection(
+        'Can not submit proposal review because review fields are not valid.',
+        { args }
       );
     }
 
