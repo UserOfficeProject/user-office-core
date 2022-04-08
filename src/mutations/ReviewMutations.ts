@@ -172,6 +172,58 @@ export default class ReviewMutations {
       });
   }
 
+  @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED)
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async submitTechnicalReview(
+    agent: UserWithRole | null,
+    args: SubmitTechnicalReviewInput
+  ): Promise<TechnicalReview | Rejection> {
+    const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
+      agent,
+      args.proposalPk
+    );
+    if (!hasWriteRights) {
+      return rejection(
+        'Can not set technical review because of insufficient permissions',
+        { agent, args }
+      );
+    }
+
+    const technicalReview = await this.dataSource.getTechnicalReview(
+      args.proposalPk
+    );
+
+    if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
+      return rejection('Request is impersonating another user', {
+        args,
+        agent,
+      });
+    }
+
+    const isReviewValid = await proposalTechnicalReviewValidationSchema.isValid(
+      technicalReview
+    );
+    if (isReviewValid === false) {
+      return rejection(
+        'Can not submit proposal technical review because fields are not valid.',
+        { args }
+      );
+    }
+
+    const shouldUpdateReview = technicalReview !== null;
+
+    return this.dataSource
+      .setTechnicalReview(args, shouldUpdateReview)
+      .then((review) => review)
+      .catch((err) => {
+        return rejection(
+          'An error occurred while trying to submit a technical review',
+          { agent, args },
+          err
+        );
+      });
+  }
+
   @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED)
   @ValidateArgs(proposalTechnicalReviewValidationSchema, [
     'comment',
@@ -196,9 +248,7 @@ export default class ReviewMutations {
     const technicalReview = await this.dataSource.getTechnicalReview(
       args.proposalPk
     );
-    const technicalReviewExists = technicalReview !== null;
-
-    const shouldUpdateReview = technicalReviewExists ? true : false;
+    const shouldUpdateReview = technicalReview !== null;
 
     if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
       return rejection('Request is impersonating another user', {
@@ -212,7 +262,7 @@ export default class ReviewMutations {
       .then((review) => review)
       .catch((err) => {
         return rejection(
-          'Can not set technical review because review already submitted',
+          'An error occurred while trying to submit a technical review',
           { agent, args },
           err
         );
