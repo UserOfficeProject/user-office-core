@@ -1,4 +1,5 @@
 import MaterialTable, { Column } from '@material-table/core';
+import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
@@ -8,8 +9,14 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
-import React, { useContext } from 'react';
-import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
+import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
+import React, { useContext, useState, useEffect } from 'react';
+import {
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
@@ -17,7 +24,11 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
-import { Proposal, ProposalsFilter } from 'generated/sdk';
+import {
+  Proposal,
+  ProposalsFilter,
+  SubmitTechnicalReviewInput,
+} from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -29,11 +40,12 @@ import {
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
-import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -93,25 +105,28 @@ let columns: Column<ProposalViewData>[] = [
   },
 ];
 
-const ProposalTableInstrumentScientist: React.FC = () => {
+const ProposalTableInstrumentScientist: React.FC<{
+  confirm: WithConfirmType;
+}> = ({ confirm }) => {
   const { user } = useContext(UserContext);
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<ProposalUrlQueryParamsType>({
-      call: NumberParam,
-      instrument: NumberParam,
-      proposalStatus: NumberParam,
-      questionId: StringParam,
-      compareOperator: StringParam,
-      value: StringParam,
-      dataType: StringParam,
-      reviewModal: NumberParam,
-      ...DefaultQueryParams,
-    });
+  const { api } = useDataApiWithFeedback();
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    ...DefaultQueryParams,
+    call: NumberParam,
+    instrument: NumberParam,
+    proposalStatus: withDefault(NumberParam, 2),
+    questionId: StringParam,
+    compareOperator: StringParam,
+    value: StringParam,
+    dataType: StringParam,
+    reviewModal: NumberParam,
+    modalTab: NumberParam,
+  });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
-  const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
+  const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
-    proposalStatusId: urlQueryParams.proposalStatus || 2,
+    proposalStatusId: urlQueryParams.proposalStatus,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
@@ -126,10 +141,41 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     questionFilter: proposalFilter.questionFilter,
   });
 
+  const [preselectedProposalsData, setPreselectedProposalsData] = useState<
+    ProposalViewData[]
+  >([]);
+
+  useEffect(() => {
+    if (urlQueryParams.selection.length > 0) {
+      const selection = new Set(urlQueryParams.selection);
+
+      setPreselectedProposalsData(
+        proposalsData.map((proposal) => ({
+          ...proposal,
+          tableData: {
+            checked: selection.has(proposal.primaryKey.toString()),
+          },
+        }))
+      );
+    } else {
+      setPreselectedProposalsData(
+        proposalsData.map((proposal) => ({
+          ...proposal,
+          tableData: { checked: false },
+        }))
+      );
+    }
+  }, [proposalsData, urlQueryParams.selection]);
+
   const downloadPDFProposal = useDownloadPDFProposal();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsInstrumentScientist', null);
+
+  const instrumentScientistProposalReviewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
+  ];
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -155,7 +201,16 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         >
           <IconButton
             onClick={() => {
-              setUrlQueryParams({ reviewModal: rowData.primaryKey });
+              setUrlQueryParams({
+                reviewModal: rowData.primaryKey,
+                modalTab: showView
+                  ? instrumentScientistProposalReviewTabs.indexOf(
+                      PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION
+                    )
+                  : instrumentScientistProposalReviewTabs.indexOf(
+                      PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW
+                    ),
+              });
             }}
             style={iconButtonStyle}
           >
@@ -182,6 +237,136 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     );
   };
 
+  // Bulk submit proposal reviews.
+  const submitTechnicalReviews = async (
+    selectedProposals: ProposalViewData[]
+  ) => {
+    if (selectedProposals?.length) {
+      const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
+      const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
+        selectedProposals.map((proposal) => ({
+          proposalPk: proposal.primaryKey,
+          reviewerId: proposal.technicalReviewAssignee || user.id,
+          submitted: true,
+        }));
+
+      const result = await api(
+        `Proposal${shouldAddPluralLetter} technical review submitted successfully!`
+      ).submitTechnicalReviews({
+        technicalReviews: submittedTechnicalReviewsInput,
+      });
+
+      const isError = !!result.submitTechnicalReviews.rejection;
+
+      if (!isError) {
+        const newProposalsData = proposalsData.map((proposalData) => ({
+          ...proposalData,
+          technicalReviewSubmitted: selectedProposals.find(
+            (selectedProposal) =>
+              selectedProposal.primaryKey === proposalData.primaryKey
+          )
+            ? 1
+            : proposalData.technicalReviewSubmitted,
+        }));
+        setProposalsData(newProposalsData);
+      }
+    }
+  };
+
+  const handleSearchChange = (searchText: string) => {
+    setUrlQueryParams({ search: searchText ? searchText : undefined });
+  };
+
+  const handleColumnHiddenChange = (columnChange: Column<ProposalViewData>) => {
+    const proposalColumns = columns.map(
+      (proposalColumn: Column<ProposalViewData>) => ({
+        hidden:
+          proposalColumn.title === columnChange.title
+            ? columnChange.hidden
+            : proposalColumn.hidden,
+        title: proposalColumn.title,
+      })
+    );
+
+    setLocalStorageValue(proposalColumns);
+  };
+
+  const handleColumnSelectionChange = (selectedItems: ProposalViewData[]) => {
+    setUrlQueryParams((params) => ({
+      ...params,
+      selection:
+        selectedItems.length > 0
+          ? selectedItems.map((selectedItem) =>
+              selectedItem.primaryKey.toString()
+            )
+          : undefined,
+    }));
+  };
+
+  const handleColumnSortOrderChange = (
+    orderedColumnId: number,
+    orderDirection: 'desc' | 'asc'
+  ) => {
+    setUrlQueryParams &&
+      setUrlQueryParams({
+        sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+        sortDirection: orderDirection ? orderDirection : undefined,
+      });
+  };
+
+  const handleBulkDownloadClick = (
+    event: React.MouseEventHandler<HTMLButtonElement>,
+    rowData: ProposalViewData | ProposalViewData[]
+  ) => {
+    if (!Array.isArray(rowData)) {
+      return;
+    }
+
+    downloadPDFProposal(
+      rowData.map((row) => row.primaryKey),
+      rowData[0].title
+    );
+  };
+
+  const handleBulkTechnicalReviewsSubmit = async (
+    _: React.MouseEventHandler<HTMLButtonElement>,
+    selectedRowsData: ProposalViewData | ProposalViewData[]
+  ) => {
+    if (!Array.isArray(selectedRowsData)) {
+      return;
+    }
+
+    const invalid = [];
+
+    for await (const rowData of selectedRowsData) {
+      const isValidSchema =
+        await proposalTechnicalReviewValidationSchema.isValid({
+          status: rowData.status,
+          timeAllocation: rowData.technicalTimeAllocation,
+        });
+      if (!isValidSchema) {
+        invalid.push(rowData);
+      }
+    }
+
+    confirm(
+      async () => {
+        await submitTechnicalReviews(selectedRowsData);
+      },
+      {
+        title: 'Submit technical reviews',
+        description:
+          'No further changes to technical reviews are possible after submission. Are you sure you want to submit the selected proposals technical reviews?',
+        alertText:
+          invalid.length > 0
+            ? `Some of the selected proposals are missing some required input. Please correct the status and time allocation for the proposal(s) with ID: ${invalid
+                .map((proposal) => proposal.proposalId)
+                .join(', ')}`
+            : '',
+      }
+    )();
+  };
+
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
   if (localStorageValue) {
     columns = columns.map((column) => ({
@@ -199,25 +384,27 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   );
 
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const DoneAllIcon = (
+    props: JSX.IntrinsicAttributes & {
+      children?: React.ReactNode;
+      'data-cy'?: string;
+    }
+  ): JSX.Element => <DoneAll {...props} />;
 
-  const proposalToReview = proposalsData.find(
+  const proposalToReview = preselectedProposalsData.find(
     (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
-
-  const instrumentScientistProposalReviewTabs = [
-    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
-  ];
 
   /** NOTE:
    * Including the id property for https://material-table-core.com/docs/breaking-changes#id
    * Including the action buttons as property to avoid the console warning(https://github.com/material-table-core/core/issues/286)
    */
-  const proposalDataWithIdAndRowActions = proposalsData.map((proposal) =>
-    Object.assign(proposal, {
-      id: proposal.primaryKey,
-      rowActionButtons: RowActionButtons(proposal),
-    })
+  const proposalDataWithIdAndRowActions = preselectedProposalsData.map(
+    (proposal) =>
+      Object.assign(proposal, {
+        id: proposal.primaryKey,
+        rowActionButtons: RowActionButtons(proposal),
+      })
   );
 
   return (
@@ -229,16 +416,25 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           setProposalsData(
             proposalsData.map((proposal) => {
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
-                return Object.assign(
-                  proposal,
-                  updatedProposal
-                ) as ProposalViewData;
+                return {
+                  ...proposal,
+                  technicalReviewAssignee:
+                    updatedProposal.technicalReviewAssignee,
+                  technicalReviewSubmitted: updatedProposal.technicalReview
+                    ?.submitted
+                    ? 1
+                    : 0,
+                  technicalStatus:
+                    updatedProposal.technicalReview?.status || '',
+                  technicalTimeAllocation:
+                    updatedProposal.technicalReview?.timeAllocation || null,
+                };
               } else {
                 return proposal;
               }
             })
           );
-          setUrlQueryParams({ reviewModal: undefined });
+          setUrlQueryParams({ reviewModal: undefined, modalTab: undefined });
         }}
         reviewItemId={urlQueryParams.reviewModal}
       >
@@ -279,39 +475,23 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           }),
           pageSize: 20,
         }}
-        onSearchChange={(searchText) => {
-          setUrlQueryParams({ search: searchText ? searchText : undefined });
-        }}
-        onChangeColumnHidden={(columnChange) => {
-          const proposalColumns = columns.map(
-            (proposalColumn: Column<ProposalViewData>) => ({
-              hidden:
-                proposalColumn.title === columnChange.title
-                  ? columnChange.hidden
-                  : proposalColumn.hidden,
-              title: proposalColumn.title,
-            })
-          );
-
-          setLocalStorageValue(proposalColumns);
-        }}
-        onOrderChange={(orderedColumnId, orderDirection) => {
-          setUrlQueryParams &&
-            setUrlQueryParams({
-              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-              sortDirection: orderDirection ? orderDirection : undefined,
-            });
-        }}
+        onSearchChange={handleSearchChange}
+        onChangeColumnHidden={handleColumnHiddenChange}
+        onSelectionChange={handleColumnSelectionChange}
+        onOrderChange={handleColumnSortOrderChange}
         actions={[
           {
             icon: GetAppIconComponent,
             tooltip: 'Download proposals',
-            onClick: (event, rowData): void => {
-              downloadPDFProposal(
-                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
-                (rowData as ProposalViewData[])[0].title
-              );
-            },
+            onClick: handleBulkDownloadClick,
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: DoneAllIcon.bind(null, {
+              'data-cy': 'submit-proposal-reviews',
+            }),
+            tooltip: 'Submit proposal reviews',
+            onClick: handleBulkTechnicalReviewsSubmit,
             position: 'toolbarOnSelect',
           },
         ]}
@@ -320,4 +500,4 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   );
 };
 
-export default ProposalTableInstrumentScientist;
+export default withConfirm(ProposalTableInstrumentScientist);
