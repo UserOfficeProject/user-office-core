@@ -44,6 +44,7 @@ const createRabbitMQMessageBroker = () => {
     hostname: process.env.RABBITMQ_HOSTNAME,
     username: process.env.RABBITMQ_USERNAME,
     password: process.env.RABBITMQ_PASSWORD,
+    vhost: process.env.RABBITMQ_VIRTUAL_HOST ?? '/',
   });
 
   return messageBroker;
@@ -233,6 +234,12 @@ export function createPostToRabbitMQHandler() {
         const json = await getProposalMessageData(event.proposal);
 
         await rabbitMQ.sendBroadcast(Event.PROPOSAL_CREATED, json);
+        break;
+      }
+      case Event.INSTRUMENT_DELETED: {
+        const json = JSON.stringify(event.instrument);
+
+        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
         break;
       }
       case Event.PROPOSAL_SUBMITTED: {
