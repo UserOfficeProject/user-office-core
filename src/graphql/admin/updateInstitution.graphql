@@ -4,9 +4,8 @@ mutation updateInstitution($id: Int!, $name: String!, $country: Int!, $verified:
       id
       verified
       name
-      country{
-        id
-        value
+      country {
+        ...country
       }
     }
     rejection {

@@ -3,9 +3,8 @@ mutation createInstitution($name: String!, $country: Int!, $verified: Boolean!) 
     institution {
       id
       name
-      country{
-        id
-        value
+      country {
+        ...country
       }
       verified
     }
