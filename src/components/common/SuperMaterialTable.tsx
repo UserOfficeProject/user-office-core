@@ -37,7 +37,7 @@ export const DefaultQueryParams = {
 export type SortDirectionType = 'asc' | 'desc' | undefined;
 
 interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
-  createModal: (
+  createModal?: (
     onUpdate: (
       object: RowData | null,
       shouldCloseAfterUpdate?: boolean
@@ -186,7 +186,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
           setEditObject(null);
         }}
       >
-        {createModal(onUpdated, onCreated, editObject)}
+        {createModal?.(onUpdated, onCreated, editObject)}
       </InputDialog>
       <MaterialTable
         {...props}
@@ -245,7 +245,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
             });
         }}
       />
-      {hasAccess.create && (
+      {hasAccess.create && createModal && (
         <ActionButtonContainer>
           {extraActionButtons && extraActionButtons}
           <Button

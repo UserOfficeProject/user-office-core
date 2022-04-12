@@ -20,8 +20,11 @@ import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
+import { encodeDate } from 'use-query-params';
 
 import Tooltip from 'components/common/MenuTooltip';
+import { getRelativeDatesFromToday } from 'components/experiment/DateFilter';
+import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, UserRole } from 'generated/sdk';
 
@@ -140,6 +143,8 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     FeatureId.SCHEDULER
   )?.isEnabled;
 
+  const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
+
   const user = (
     <div data-cy="user-menu-items">
       <Tooltip title="Dashboard">
@@ -199,6 +204,20 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Proposals" />
         </ListItem>
       </Tooltip>
+      {isSchedulerEnabled && (
+        <Tooltip title="Experiments">
+          <ListItem
+            component={NavLink}
+            to={`/ExperimentPage?from=${encodeDate(from)}&to=${encodeDate(to)}`}
+            button
+          >
+            <ListItemIcon>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText primary="Experiments" />
+          </ListItem>
+        </Tooltip>
+      )}
       <Tooltip title="Calls">
         <ListItem component={NavLink} to="/Calls" button>
           <ListItemIcon>

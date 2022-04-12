@@ -112,7 +112,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
             <Button
               disabled={isSubmitting}
               type="submit"
-              data-cy="create-visit-button"
+              data-cy="create-update-visit-button"
             >
               {visit ? 'Update' : 'Create'}
             </Button>

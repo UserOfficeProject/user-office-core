@@ -1,4 +1,6 @@
+import { Link } from '@mui/material';
 import Button from '@mui/material/Button';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -9,26 +11,38 @@ interface ButtonWithDialogProps {
   label: string;
 }
 
+const useStyles = makeStyles(() => ({
+  container: {
+    width: '500px',
+  },
+  button: {
+    cursor: 'pointer',
+  },
+}));
+
 function ButtonWithDialog({ children, label }: ButtonWithDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const classes = useStyles();
 
   return (
     <>
-      <Button variant="text" onClick={() => setIsDialogOpen(true)}>
+      <Link onClick={() => setIsDialogOpen(true)} className={classes.button}>
         {label}
-      </Button>
+      </Link>
       <InputDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-        {children}
-        <ActionButtonContainer>
-          <Button
-            type="button"
-            variant="outlined"
-            onClick={() => setIsDialogOpen(false)}
-            data-cy="close-dialog"
-          >
-            Close
-          </Button>
-        </ActionButtonContainer>
+        <div className={classes.container}>
+          {children}
+          <ActionButtonContainer>
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={() => setIsDialogOpen(false)}
+              data-cy="close-dialog"
+            >
+              Close
+            </Button>
+          </ActionButtonContainer>
+        </div>
       </InputDialog>
     </>
   );
