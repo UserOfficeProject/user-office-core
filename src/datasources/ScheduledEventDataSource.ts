@@ -1,9 +1,9 @@
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
-import { ScheduledEventsCoreFilter } from '../resolvers/queries/ScheduledEventsCoreQuery';
+import { ScheduledEventsCoreArgs } from '../resolvers/queries/ScheduledEventsCoreQuery';
 
 export interface ScheduledEventDataSource {
   getScheduledEventsCore(
-    filter: ScheduledEventsCoreFilter
+    args: ScheduledEventsCoreArgs
   ): Promise<ScheduledEventCore[]>;
   getScheduledEventCore(id: number): Promise<ScheduledEventCore | null>;
 }

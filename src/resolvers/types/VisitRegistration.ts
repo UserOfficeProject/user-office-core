@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { TemplateCategoryId } from '../../models/Template';
 import { VisitRegistration as VisitRegistrationOrig } from '../../models/VisitRegistration';
+import { TrainingStatus } from './../../models/VisitRegistration';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Questionary } from './Questionary';
 
@@ -58,5 +59,13 @@ export class UserVisitResolver {
       userVisit.registrationQuestionaryId || 0,
       TemplateCategoryId.VISIT_REGISTRATION
     );
+  }
+
+  @FieldResolver(() => TrainingStatus)
+  async trainingStatus(
+    @Root() userVisit: VisitRegistration,
+    @Ctx() context: ResolverContext
+  ): Promise<TrainingStatus> {
+    return context.queries.visit.getTrainingStatus(userVisit);
   }
 }
