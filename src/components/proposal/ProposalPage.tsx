@@ -57,7 +57,7 @@ export default function ProposalPage() {
     useProposalStatusesData();
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper data-cy="officer-proposals-table">
         <ProposalFilterBar
           calls={{ data: calls, isLoading: loadingCalls }}

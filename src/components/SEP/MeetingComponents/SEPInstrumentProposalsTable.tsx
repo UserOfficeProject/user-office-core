@@ -144,6 +144,11 @@ const assignmentColumns = [
     render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone): string =>
       rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
   },
+  {
+    title: 'Recommendation',
+    field: 'proposal.sepMeetingDecision.recommendation',
+    emptyValue: 'Unset',
+  },
 ];
 
 const SEPInstrumentProposalsTable: React.FC<

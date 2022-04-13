@@ -49,7 +49,7 @@ const SEPPage: React.FC = () => {
   }
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth="xl">
       <StyledPaper>
         <SimpleTabs tabNames={tabNames}>
           <SEPGeneralInfo
