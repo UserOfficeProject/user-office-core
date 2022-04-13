@@ -61,7 +61,7 @@ function ExperimentTable() {
   const { scheduledEvents, setScheduledEvents, loadingEvents, setArgs } =
     useScheduledEvents({});
 
-  const { timezone, toFormattedDateTime } = useFormattedDateTime({
+  const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
 
