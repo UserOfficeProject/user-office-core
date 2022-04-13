@@ -6,14 +6,17 @@ import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
 import { Institution } from 'generated/sdk';
+import { useGetFields } from 'hooks/user/useGetFields';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { Option } from 'utils/utilTypes';
 
 type CreateUpdateInstitutionProps = {
   close: (institution: Institution | null) => void;
@@ -26,22 +29,42 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
 }) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const history = useHistory();
-
+  const fieldsContent = useGetFields();
+  const [countriesList, setCountriesList] = useState<Option[]>([]);
   const initialValues = institution
     ? {
         name: institution.name,
+        country: institution.country.id,
         verified: institution.verified,
       }
     : {
         name: '',
+        country: 0,
         verified: false,
       };
 
-  const createInstitution = async (verified: boolean, name: string) => {
+  if (!fieldsContent) {
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
+  }
+
+  if (!countriesList.length) {
+    setCountriesList(
+      fieldsContent.countries.map((country) => {
+        return { text: country.value, value: country.id };
+      })
+    );
+  }
+
+  const createInstitution = async (
+    verified: boolean,
+    name: string,
+    country: number
+  ) => {
     const response = await api(
       'Institution created successfully!'
     ).createInstitution({
       name,
+      country,
       verified,
     });
 
@@ -56,6 +79,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
   const updateInstitution = async (
     id: number,
     verified: boolean,
+    country: number,
     name: string
   ) => {
     const response = await api(
@@ -64,6 +88,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
       id,
       name,
       verified,
+      country,
     });
     const { rejection: error, institution } = response.updateInstitution;
     if (error) {
@@ -81,13 +106,19 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
           ? await updateInstitution(
               institution.id,
               values.verified,
+              values.country,
               values.name
             )
-          : await createInstitution(values.verified, values.name);
+          : await createInstitution(
+              values.verified,
+              values.name,
+              values.country
+            );
       }}
       validationSchema={Yup.object().shape({
         name: Yup.string().required(),
         verified: Yup.boolean().required(),
+        country: Yup.number().positive('Country is required').required(),
       })}
     >
       {({ values, setFieldValue }) => (
@@ -104,6 +135,14 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             data-cy="name"
             fullWidth
             disabled={isExecutingCall}
+            required
+          />
+          <FormikUIAutocomplete
+            name="country"
+            label="Country"
+            items={countriesList}
+            data-cy="country"
+            required
           />
           <FormControlLabel
             style={{ marginTop: '10px' }}
@@ -166,6 +205,10 @@ CreateUpdateInstitution.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     verified: PropTypes.bool.isRequired,
+    country: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      value: PropTypes.string.isRequired,
+    }).isRequired,
   }),
   close: PropTypes.func.isRequired,
 };

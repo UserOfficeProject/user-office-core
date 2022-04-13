@@ -163,7 +163,9 @@ const SignUp: React.FC<SignUpProps> = (props) => {
   const [, cookiePageContent] = useGetPageContent(PageName.COOKIEPAGE);
 
   const fieldsContent = useGetFields();
-  const { institutions, loadingInstitutions } = useInstitutionsData();
+  const { institutions, loadingInstitutions } = useInstitutionsData({
+    country: false,
+  });
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
