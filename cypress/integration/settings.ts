@@ -565,7 +565,9 @@ context('Settings tests', () => {
       cy.get('[data-cy="timeAllocation"] input').clear().type('20');
 
       cy.get('[data-cy="technical-review-status"]').click();
-      cy.contains('Feasible').click();
+      cy.get('[data-cy="technical-review-status-options"]')
+        .contains('Feasible')
+        .click();
 
       cy.setTinyMceContent('comment', internalComment);
       cy.setTinyMceContent('publicComment', publicComment);
@@ -629,7 +631,7 @@ context('Settings tests', () => {
 
       cy.get('#selectedSEPId-input').first().click();
 
-      cy.get("[id='menu-selectedSEPId'] li").first().click();
+      cy.get('[data-cy="sep-selection-options"] li').first().click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -844,12 +846,12 @@ context('Settings tests', () => {
       cy.contains('Add multi-column row').click();
 
       cy.get('#selectedParentDroppableId-input').click();
-      cy.get(
-        '[role="presentation"] [data-value="proposalWorkflowConnections_0"]'
-      ).click();
+      cy.get('[data-cy="selectParentDroppableGroup-options"] li')
+        .first()
+        .click();
 
-      cy.get('#numberOfColumns-input').click();
-      cy.get('[role="presentation"] [data-value="2"]').click();
+      cy.get('[data-cy="numberOfColumns"]').click();
+      cy.get('[data-cy="numberOfColumnsOptions"] li[data-value="2"]').click();
 
       cy.contains('Add row').click();
 
@@ -945,7 +947,9 @@ context('Settings tests', () => {
       cy.get('[data-cy="timeAllocation"] input').clear().type('20');
 
       cy.get('[data-cy="technical-review-status"]').click();
-      cy.get('[role="presentation"]').contains('Feasible').click();
+      cy.get('[data-cy="technical-review-status-options"]')
+        .contains('Feasible')
+        .click();
 
       cy.setTinyMceContent('comment', internalComment);
       cy.setTinyMceContent('publicComment', publicComment);
@@ -972,7 +976,9 @@ context('Settings tests', () => {
       cy.get('[data-cy="timeAllocation"] input').clear().type('0');
 
       cy.get('[data-cy="technical-review-status"]').click();
-      cy.get('[role="presentation"]').contains('Unfeasible').click();
+      cy.get('[data-cy="technical-review-status-options"]')
+        .contains('Unfeasible')
+        .click();
 
       cy.get('[data-cy="is-review-submitted"]').click();
 

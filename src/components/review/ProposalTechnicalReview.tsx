@@ -1,13 +1,15 @@
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-mui';
-import React, { useContext, useState, useEffect } from 'react';
+import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
+import React, { useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -15,8 +17,6 @@ import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
-import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import { UserContext } from 'context/UserContextProvider';
 import {
   TechnicalReviewStatus,
@@ -27,6 +27,7 @@ import {
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
+import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles((theme) => ({
@@ -79,6 +80,18 @@ const ProposalTechnicalReview = ({
     submitted: data?.submitted || false,
     files: data?.files || '',
   };
+
+  const statusOptions: Option[] = [
+    { text: 'Feasible', value: TechnicalReviewStatus.FEASIBLE },
+    {
+      text: 'Partially feasible',
+      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+    },
+    {
+      text: 'Unfeasible',
+      value: TechnicalReviewStatus.UNFEASIBLE,
+    },
+  ];
 
   const PromptIfDirty = () => {
     const formik = useFormikContext();
@@ -185,31 +198,35 @@ const ProposalTechnicalReview = ({
           }
         }}
       >
-        {({ isSubmitting, setFieldValue }) => (
+        {({ isSubmitting, setFieldValue, values }) => (
           <Form>
             <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
-                <FormikDropdown
-                  name="status"
-                  label="Status"
-                  items={[
-                    { text: 'Feasible', value: TechnicalReviewStatus.FEASIBLE },
-                    {
-                      text: 'Partially feasible',
-                      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
-                    },
-                    {
-                      text: 'Unfeasible',
-                      value: TechnicalReviewStatus.UNFEASIBLE,
-                    },
-                  ]}
-                  disabled={shouldDisableForm(isSubmitting)}
-                  InputProps={{
-                    'data-cy': 'technical-review-status',
-                  }}
-                  required
-                />
+                <FormControl fullWidth margin="normal">
+                  <InputLabel
+                    htmlFor="status"
+                    shrink={!!values.status}
+                    required
+                  >
+                    Status
+                  </InputLabel>
+                  <Field
+                    name="status"
+                    type="text"
+                    component={Select}
+                    data-cy="technical-review-status"
+                    disabled={shouldDisableForm(isSubmitting)}
+                    MenuProps={{ 'data-cy': 'technical-review-status-options' }}
+                    required
+                  >
+                    {statusOptions.map(({ value, text }) => (
+                      <MenuItem value={value} key={value}>
+                        {text}
+                      </MenuItem>
+                    ))}
+                  </Field>
+                </FormControl>
               </Grid>
               <Grid item sm={6} xs={12}>
                 <Field
@@ -333,8 +350,11 @@ const ProposalTechnicalReview = ({
                     <Field
                       id="submitted"
                       name="submitted"
-                      component={FormikUICustomCheckbox}
-                      label="Submitted"
+                      component={CheckboxWithLabel}
+                      type="checkbox"
+                      Label={{
+                        label: 'Submitted',
+                      }}
                       disabled={isSubmitting}
                       data-cy="is-review-submitted"
                     />

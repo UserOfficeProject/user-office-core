@@ -1,22 +1,23 @@
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { Editor } from '@tinymce/tinymce-react';
 import { administrationProposalValidationSchema } from '@user-office-software/duo-validation/lib/Proposal';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-mui';
+import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
-import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import { UserRole } from 'generated/sdk';
 import { ProposalEndStatus } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { Option } from 'utils/utilTypes';
 
 export type AdministrationFormData = {
   proposalPk: number;
@@ -47,6 +48,13 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
     managementTimeAllocation: data.managementTimeAllocation || '',
     managementDecisionSubmitted: data.managementDecisionSubmitted,
   };
+
+  const statusOptions: Option[] = [
+    { text: 'Unset', value: ProposalEndStatus.UNSET },
+    { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
+    { text: 'Reserved', value: ProposalEndStatus.RESERVED },
+    { text: 'Rejected', value: ProposalEndStatus.REJECTED },
+  ];
 
   const PromptIfDirty = () => {
     const formik = useFormikContext();
@@ -93,24 +101,34 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
           await handleProposalAdministration(administrationValues);
         }}
       >
-        {({ isSubmitting, setFieldValue }) => (
+        {({ isSubmitting, setFieldValue, values }) => (
           <Form>
             <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <FormikDropdown
-                  name="finalStatus"
-                  label="Final status"
-                  data-cy="proposalFinalStatus"
-                  items={[
-                    { text: 'Unset', value: ProposalEndStatus.UNSET },
-                    { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
-                    { text: 'Reserved', value: ProposalEndStatus.RESERVED },
-                    { text: 'Rejected', value: ProposalEndStatus.REJECTED },
-                  ]}
-                  required
-                  disabled={!isUserOfficer || isSubmitting}
-                />
+                <FormControl fullWidth margin="normal">
+                  <InputLabel
+                    htmlFor="finalStatus"
+                    shrink={!!values.finalStatus}
+                    required
+                  >
+                    Status
+                  </InputLabel>
+                  <Field
+                    name="finalStatus"
+                    component={Select}
+                    data-cy="proposal-final-status"
+                    disabled={!isUserOfficer || isSubmitting}
+                    MenuProps={{ 'data-cy': 'proposal-final-status-options' }}
+                    required
+                  >
+                    {statusOptions.map(({ value, text }) => (
+                      <MenuItem value={value} key={value}>
+                        {text}
+                      </MenuItem>
+                    ))}
+                  </Field>
+                </FormControl>
               </Grid>
               <Grid item xs={6}>
                 <Field
@@ -205,8 +223,11 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                     <Field
                       id="managementDecisionSubmitted"
                       name="managementDecisionSubmitted"
-                      component={FormikUICustomCheckbox}
-                      label="Submitted"
+                      component={CheckboxWithLabel}
+                      type="checkbox"
+                      Label={{
+                        label: 'Submitted',
+                      }}
                       data-cy="is-management-decision-submitted"
                     />
                     <Button

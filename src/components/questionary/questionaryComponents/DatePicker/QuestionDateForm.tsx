@@ -2,12 +2,11 @@ import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { DatePicker, DateTimePicker } from 'formik-mui-lab';
 import React, { FC, useContext } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -102,9 +101,11 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
             <Field
               name="config.includeTime"
               id="Include-time-Input"
-              label="Include time"
-              component={FormikUICustomCheckbox}
-              fullWidth
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Include time',
+              }}
               inputProps={{ 'data-cy': 'includeTime' }}
             />
             <Field
@@ -121,9 +122,11 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
               <Field
                 name="config.required"
                 id="Is-Required-Input"
-                label="Is required"
-                component={FormikUICustomCheckbox}
-                fullWidth
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Is required',
+                }}
                 data-cy="required"
               />
               <LocalizationProvider dateAdapter={DateAdapter}>

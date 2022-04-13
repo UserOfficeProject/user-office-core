@@ -6,6 +6,7 @@ import {
   CreateApiAccessTokenMutationVariables,
   getSdk,
 } from '../../src/generated/sdk';
+import initialDBData from './initialDBData';
 
 const KEY_CODES = {
   space: 32,
@@ -141,37 +142,47 @@ const getTinyMceContent = (tinyMceId: string) => {
   });
 };
 
+const getIconByCyTag = (cyTag: string) => {
+  return cy
+    .get('[data-cy=upcoming-experiments]')
+    .contains(initialDBData.scheduledEvents.upcoming.startsAt)
+    .closest('TR')
+    .find(`[data-cy="${cyTag}"]`);
+};
+const getButtonByIconCyTag = (cyTag: string) =>
+  getIconByCyTag(cyTag).closest('button');
+
 const testActionButton = (
-  title: string,
+  iconCyTag: string,
   state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
 ) => {
   switch (state) {
     case 'completed':
-      cy.get(`[aria-label="${title}"]`).should('not.be.disabled');
+      getButtonByIconCyTag(iconCyTag).should('not.be.disabled');
 
-      cy.get(`[aria-label="${title}"]`).find('.MuiBadge-badge').contains('✔');
+      getButtonByIconCyTag(iconCyTag).find('.MuiBadge-badge').contains('✔');
       break;
     case 'active':
-      cy.get(`[aria-label="${title}"]`).should('not.be.disabled');
+      getButtonByIconCyTag(iconCyTag).should('not.be.disabled');
 
-      cy.get(`[aria-label="${title}"]`)
+      getButtonByIconCyTag(iconCyTag)
         .find('.MuiBadge-badge')
         .should('have.css', 'background-color', 'rgb(235, 26, 108)');
       break;
 
     case 'neutral':
-      cy.get(`[aria-label="${title}"]`).should('not.be.disabled');
+      getButtonByIconCyTag(iconCyTag).should('not.be.disabled');
 
-      cy.get(`[aria-label="${title}"]`)
+      getButtonByIconCyTag(iconCyTag)
         .find('.MuiBadge-badge')
         .should('not.have.css', 'background-color', 'rgb(235, 26, 108)');
       break;
 
     case 'inactive':
-      cy.get(`[aria-label="${title}"]`).find('button').should('be.disabled');
+      getButtonByIconCyTag(iconCyTag).should('be.disabled');
       break;
     case 'invisible':
-      cy.get(`[aria-label="${title}"]`).should('not.exist');
+      getIconByCyTag(iconCyTag).should('not.exist');
       break;
   }
 };

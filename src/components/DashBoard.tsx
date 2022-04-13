@@ -23,6 +23,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
+import ExperimentPage from './experiment/ExperimentPage';
 import CreateFeedbackPage from './feedback/CreateFeedbackPage';
 import UpdateFeedbackPage from './feedback/UpdateFeedbackPage';
 import InstitutionPage from './institution/InstitutionPage';
@@ -280,6 +281,14 @@ const Dashboard: React.FC = () => {
             path="/Proposals"
             component={ProposalPage}
           />
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Experiments"
+              path="/ExperimentPage"
+              component={ExperimentPage}
+            />
+          )}
           <TitledRoute
             setHeader={setHeader}
             title="Page Editor"

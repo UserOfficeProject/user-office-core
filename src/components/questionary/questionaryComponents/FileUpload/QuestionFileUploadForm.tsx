@@ -1,10 +1,10 @@
+import ListItemText from '@mui/material/ListItemText';
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
+import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
+import MultiMenuItem from 'components/common/MultiMenuItem';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
@@ -14,6 +14,14 @@ import { QuestionFormShell } from '../QuestionFormShell';
 export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
+  const availableFileTypeOptions = [
+    { label: '.pdf', value: '.pdf' },
+    { label: '.doc', value: '.doc' },
+    { label: '.docx', value: '.docx' },
+    { label: 'audio/*', value: 'audio/*' },
+    { label: 'video/*', value: 'video/*' },
+    { label: 'image/*', value: 'image/*' },
+  ];
 
   return (
     <QuestionFormShell
@@ -65,30 +73,49 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              label="Is required"
               id="Is-Required-Input"
-              component={FormikUICustomCheckbox}
-              fullWidth
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
               data-cy="required"
             />
             <Field
+              id="fileType"
               name="config.file_type"
               label="Accepted file types"
-              id="fileType"
-              component={FormikUICustomSelect}
               multiple
-              availableOptions={[
-                '.pdf',
-                '.doc',
-                '.docx',
-                'audio/*',
-                'video/*',
-                'image/*',
-              ]}
-              fullWidth
+              onClose={(event: React.SyntheticEvent) => {
+                event.preventDefault();
+              }}
+              renderValue={(selected?: string[] | string) => {
+                if (typeof selected === 'string') {
+                  return selected;
+                }
+
+                return selected?.join(', ') || '';
+              }}
+              formControl={{
+                fullWidth: true,
+                required: true,
+                margin: 'normal',
+              }}
+              inputProps={{
+                id: 'fileType',
+              }}
+              component={Select}
               data-cy="file_type"
-              required
-            />
+              labelId="fileType-label"
+            >
+              {availableFileTypeOptions.map(({ value, label }) => {
+                return (
+                  <MultiMenuItem value={value} key={value}>
+                    <ListItemText primary={label} />
+                  </MultiMenuItem>
+                );
+              })}
+            </Field>
             <Field
               name="config.max_files"
               id="Max-number-Input"

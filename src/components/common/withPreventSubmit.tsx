@@ -1,3 +1,4 @@
+import { TextFieldProps } from '@mui/material';
 import React, { KeyboardEvent } from 'react';
 
 interface WithPreventSubmitProps {
@@ -8,8 +9,7 @@ interface WithPreventSubmitProps {
  * Returns modified WrapperComponent which will not trigger submit form submission when ENTER is pressed
  * @param WrappedComponent
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-const withPreventSubmit = <P extends object>(
+const withPreventSubmit = <P extends TextFieldProps>(
   WrappedComponent: React.ComponentType<P>
 ): React.FC<P & WithPreventSubmitProps> => {
   return function withPreventSubmitComponent({
