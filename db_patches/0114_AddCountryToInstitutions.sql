@@ -6,6 +6,7 @@ BEGIN
     ALTER TABLE "institutions" ADD CONSTRAINT country_id_fkey 
         FOREIGN KEY ("country_id") 
         REFERENCES "countries" ("country_id");
+    ALTER TABLE "institutions" ALTER COLUMN country_id DROP DEFAULT;
     END IF;
 END;
 $$
