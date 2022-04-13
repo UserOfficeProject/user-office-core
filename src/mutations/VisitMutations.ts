@@ -121,6 +121,19 @@ export default class VisitMutations {
       );
     }
 
+    const isTeamleadPartOfTheTeam = args.team.some(
+      (teamMember) => teamMember === args.teamLeadUserId
+    );
+
+    if (isTeamleadPartOfTheTeam === false) {
+      return rejection(
+        'Can not create visit because team lead is not part of the team',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
     try {
       const visit = await this.dataSource.createVisit(
         args,

@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon';
 
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { ScheduledEventsCoreFilter } from '../../resolvers/queries/ScheduledEventsCoreQuery';
 import { ScheduledEventDataSource } from '../ScheduledEventDataSource';
+import { ScheduledEventsCoreArgs } from './../../resolvers/queries/ScheduledEventsCoreQuery';
 import {
   ScheduledEventBookingType,
   ProposalBookingStatusCore,
@@ -67,19 +67,19 @@ export default class ScheduledEventDataSourceMock
     return this.scheduledEvents.find((esi) => esi.id === id) || null;
   }
 
-  async getScheduledEventsCore(
-    filter: ScheduledEventsCoreFilter
-  ): Promise<ScheduledEventCore[]> {
+  async getScheduledEventsCore({
+    filter,
+  }: ScheduledEventsCoreArgs): Promise<ScheduledEventCore[]> {
     return this.scheduledEvents
       .filter((esi) => {
-        if (filter.endsBefore) {
+        if (filter?.endsBefore) {
           return esi.endsAt < filter.endsBefore;
         }
 
         return true;
       })
       .filter((esi) => {
-        if (filter.endsAfter) {
+        if (filter?.endsAfter) {
           return esi.endsAt > filter.endsAfter;
         }
 
