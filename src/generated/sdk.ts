@@ -3370,6 +3370,8 @@ export type AddClientLogMutationVariables = Exact<{
 
 export type AddClientLogMutation = { addClientLog: { isSuccess: boolean | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
+export type CountryFragment = { id: number, value: string };
+
 export type CreateApiAccessTokenMutationVariables = Exact<{
   name: Scalars['String'];
   accessPermissions: Scalars['String'];
@@ -3423,7 +3425,14 @@ export type GetInstitutionsQueryVariables = Exact<{
 }>;
 
 
-export type GetInstitutionsQuery = { institutions: Array<{ id: number, name: string, verified: boolean, country: { id: number, value: string } }> | null };
+export type GetInstitutionsQuery = { institutions: Array<{ id: number, name: string, verified: boolean }> | null };
+
+export type GetInstitutionsWithCountryQueryVariables = Exact<{
+  filter?: InputMaybe<InstitutionsFilter>;
+}>;
+
+
+export type GetInstitutionsWithCountryQuery = { institutions: Array<{ id: number, name: string, verified: boolean, country: { id: number, value: string } }> | null };
 
 export type GetPageContentQueryVariables = Exact<{
   id: PageName;
@@ -4979,6 +4988,12 @@ export type UpdateVisitRegistrationMutationVariables = Exact<{
 
 export type UpdateVisitRegistrationMutation = { updateVisitRegistration: { registration: { userId: number, visitId: number, registrationQuestionaryId: number | null, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null, startsAt: any | null, endsAt: any | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
+export const CountryFragmentDoc = gql`
+    fragment country on Entry {
+  id
+  value
+}
+    `;
 export const RejectionFragmentDoc = gql`
     fragment rejection on Rejection {
   reason
@@ -5969,8 +5984,7 @@ export const CreateInstitutionDocument = gql`
       id
       name
       country {
-        id
-        value
+        ...country
       }
       verified
     }
@@ -5979,7 +5993,8 @@ export const CreateInstitutionDocument = gql`
     }
   }
 }
-    ${RejectionFragmentDoc}`;
+    ${CountryFragmentDoc}
+${RejectionFragmentDoc}`;
 export const DeleteApiAccessTokenDocument = gql`
     mutation deleteApiAccessToken($accessTokenId: String!) {
   deleteApiAccessToken(deleteApiAccessTokenInput: {accessTokenId: $accessTokenId}) {
@@ -6035,14 +6050,22 @@ export const GetInstitutionsDocument = gql`
   institutions(filter: $filter) {
     id
     name
-    country {
-      id
-      value
-    }
     verified
   }
 }
     `;
+export const GetInstitutionsWithCountryDocument = gql`
+    query getInstitutionsWithCountry($filter: InstitutionsFilter) {
+  institutions(filter: $filter) {
+    id
+    name
+    verified
+    country {
+      ...country
+    }
+  }
+}
+    ${CountryFragmentDoc}`;
 export const GetPageContentDocument = gql`
     query getPageContent($id: PageName!) {
   getPageContent(id: $id)
@@ -6076,8 +6099,7 @@ export const MergeInstitutionsDocument = gql`
       verified
       name
       country {
-        id
-        value
+        ...country
       }
     }
     rejection {
@@ -6085,7 +6107,8 @@ export const MergeInstitutionsDocument = gql`
     }
   }
 }
-    ${RejectionFragmentDoc}`;
+    ${CountryFragmentDoc}
+${RejectionFragmentDoc}`;
 export const PrepareDbDocument = gql`
     mutation prepareDB($includeSeeds: Boolean!) {
   prepareDB(includeSeeds: $includeSeeds) {
@@ -6134,8 +6157,7 @@ export const UpdateInstitutionDocument = gql`
       verified
       name
       country {
-        id
-        value
+        ...country
       }
     }
     rejection {
@@ -6143,7 +6165,8 @@ export const UpdateInstitutionDocument = gql`
     }
   }
 }
-    ${RejectionFragmentDoc}`;
+    ${CountryFragmentDoc}
+${RejectionFragmentDoc}`;
 export const AssignInstrumentsToCallDocument = gql`
     mutation assignInstrumentsToCall($instrumentIds: [Int!]!, $callId: Int!) {
   assignInstrumentsToCall(
@@ -9060,6 +9083,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getInstitutions(variables?: GetInstitutionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstitutionsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetInstitutionsQuery>(GetInstitutionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstitutions', 'query');
+    },
+    getInstitutionsWithCountry(variables?: GetInstitutionsWithCountryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstitutionsWithCountryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetInstitutionsWithCountryQuery>(GetInstitutionsWithCountryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstitutionsWithCountry', 'query');
     },
     getPageContent(variables: GetPageContentQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPageContentQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetPageContentQuery>(GetPageContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPageContent', 'query');

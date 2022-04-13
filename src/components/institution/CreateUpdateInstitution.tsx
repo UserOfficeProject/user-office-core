@@ -11,11 +11,12 @@ import { useHistory } from 'react-router';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
 import { Institution } from 'generated/sdk';
 import { useGetFields } from 'hooks/user/useGetFields';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { Option } from 'utils/utilTypes';
 
 type CreateUpdateInstitutionProps = {
   close: (institution: Institution | null) => void;
@@ -136,7 +137,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             disabled={isExecutingCall}
             required
           />
-          <FormikDropdown
+          <FormikUIAutocomplete
             name="country"
             label="Country"
             items={countriesList}

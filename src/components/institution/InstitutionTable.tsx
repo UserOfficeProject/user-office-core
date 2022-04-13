@@ -21,7 +21,9 @@ const InstitutionPage: React.FC = () => {
     loadingInstitutions,
     institutions,
     setInstitutionsWithLoading: setInstitutions,
-  } = useInstitutionsData();
+  } = useInstitutionsData({
+    country: true,
+  });
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
