@@ -1,14 +1,18 @@
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
+import { Select } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
-import FormikDropdown from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 
 const addNewWorkflowConnectionsRowValidationSchema = yup.object().shape({
   selectedParentDroppableId: yup
@@ -42,11 +46,11 @@ const AddNewWorkflowConnectionsRow: React.FC<
   const classes = useStyles();
 
   const initialValues: {
-    selectedParentDroppableId: string;
-    numberOfColumns: number | '';
+    selectedParentDroppableId?: string;
+    numberOfColumns?: number;
   } = {
-    selectedParentDroppableId: '',
-    numberOfColumns: '',
+    selectedParentDroppableId: undefined,
+    numberOfColumns: undefined,
   };
 
   return (
@@ -54,15 +58,17 @@ const AddNewWorkflowConnectionsRow: React.FC<
       <Formik
         initialValues={initialValues}
         onSubmit={async (values): Promise<void> => {
-          addNewWorkflowConnectionsRow(
-            values.numberOfColumns as number,
-            values.selectedParentDroppableId
-          );
-          close();
+          if (values.selectedParentDroppableId) {
+            addNewWorkflowConnectionsRow(
+              values.numberOfColumns as number,
+              values.selectedParentDroppableId
+            );
+            close();
+          }
         }}
         validationSchema={addNewWorkflowConnectionsRowValidationSchema}
       >
-        {({ isSubmitting }): JSX.Element => (
+        {({ isSubmitting, values }): JSX.Element => (
           <Form>
             <Typography className={classes.cardHeader}>
               New workflow connection row
@@ -70,7 +76,7 @@ const AddNewWorkflowConnectionsRow: React.FC<
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <FormikDropdown
+                <FormikUIAutocomplete
                   name="selectedParentDroppableId"
                   label="Select parent droppable group"
                   items={parentDroppableIds.map((parentDroppableId, index) => ({
@@ -82,16 +88,33 @@ const AddNewWorkflowConnectionsRow: React.FC<
                       : 'Default droppable group',
                   }))}
                   required
+                  data-cy="selectParentDroppableGroup"
                 />
-                <FormikDropdown
-                  name="numberOfColumns"
-                  label="Select number of columns"
-                  items={[2, 3, 4].map((numberOfColumn) => ({
-                    value: numberOfColumn,
-                    text: numberOfColumn.toString(),
-                  }))}
-                  required
-                />
+                <FormControl fullWidth>
+                  <InputLabel
+                    htmlFor="numberOfColumns"
+                    shrink={!!values.numberOfColumns}
+                  >
+                    Select number of columns
+                  </InputLabel>
+                  <Field
+                    id="numberOfColumns"
+                    name="numberOfColumns"
+                    type="text"
+                    component={Select}
+                    data-cy="numberOfColumns"
+                    required
+                    MenuProps={{ 'data-cy': 'numberOfColumnsOptions' }}
+                  >
+                    {[2, 3, 4].map((numberOfColumn) => {
+                      return (
+                        <MenuItem value={numberOfColumn} key={numberOfColumn}>
+                          {numberOfColumn}
+                        </MenuItem>
+                      );
+                    })}
+                  </Field>
+                </FormControl>
               </Grid>
             </Grid>
             <Button

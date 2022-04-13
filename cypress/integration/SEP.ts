@@ -165,10 +165,13 @@ context('SEP reviews tests', () => {
 
       cy.get("[aria-label='Assign proposals to SEP']").first().click();
 
-      cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
-      cy.get('#selectedSEPId-input').first().click();
+      cy.get('[data-cy="sep-selection"] input').should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+      cy.get('[data-cy="sep-selection"]').click();
 
-      cy.get('[role="presentation"] .MuiList-root').contains(sep1.code).click();
+      cy.get('[data-cy="sep-selection-options"]').contains(sep1.code).click();
 
       cy.get('[data-cy="submit"]').click();
 

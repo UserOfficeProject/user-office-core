@@ -19,3 +19,11 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T;
 export type FunctionType<T = void, U = unknown[]> = (
   ...args: U extends unknown[] ? U : [U]
 ) => T;
+
+/**
+ * Usually used type for Formik Autocomplete
+ */
+export interface Option {
+  text: string;
+  value: string | number;
+}

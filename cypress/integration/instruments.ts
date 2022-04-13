@@ -78,7 +78,6 @@ context('Instrument tests', () => {
       cy.contains(instrument1.name);
       cy.contains(instrument1.shortCode);
       cy.contains(instrument1.description);
-      cy.contains(scientist1.lastName);
     });
 
     it('User Officer should be able to update Instrument', () => {
@@ -204,7 +203,7 @@ context('Instrument tests', () => {
 
       cy.get('#selectedInstrumentId-input').first().click();
 
-      cy.get("[id='menu-selectedInstrumentId'] li")
+      cy.get('[data-cy="instrument-selection-options"] li')
         .contains(instrument1.name)
         .click();
 
@@ -227,7 +226,14 @@ context('Instrument tests', () => {
 
       cy.contains('Loading...').should('not.exist');
 
-      cy.get('[data-cy="clear-selection"]').click();
+      cy.get('[data-cy="instrument-selection"] input').should(
+        'have.value',
+        instrument1.name
+      );
+
+      cy.get('[data-cy="instrument-selection"] input').click();
+
+      cy.get('[title="Clear"]').click();
 
       cy.get('[data-cy="remove-instrument-alert"]').should('exist');
 
@@ -789,7 +795,9 @@ context('Instrument tests', () => {
         .click();
 
       cy.get('[data-cy="technical-review-status"]').click();
-      cy.get('[data-value="FEASIBLE"]').click();
+      cy.get('[data-cy="technical-review-status-options"]')
+        .contains('Feasible')
+        .click();
       cy.get('[data-cy="timeAllocation"] input').type('10');
 
       cy.get('[data-cy="save-technical-review"]').click();

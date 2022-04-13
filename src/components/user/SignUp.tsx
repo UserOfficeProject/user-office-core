@@ -7,15 +7,18 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
+import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUserValidationSchema } from '@user-office-software/duo-validation';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
+import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import { DatePicker } from 'formik-mui-lab';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
@@ -23,9 +26,10 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+// import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
-import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
 import InformationModal from 'components/pages/InformationModal';
 import { UserContext } from 'context/UserContextProvider';
@@ -33,6 +37,7 @@ import {
   PageName,
   CreateUserMutationVariables,
   SettingsId,
+  Maybe,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
@@ -41,6 +46,7 @@ import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import { useGetFields } from 'hooks/user/useGetFields';
 import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
 import orcid from 'images/orcid.png';
+import { Option } from 'utils/utilTypes';
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
@@ -197,21 +203,31 @@ const SignUp: React.FC<SignUpProps> = (props) => {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
-  const initialValues = {
-    user_title: '',
+  const initialValues: Omit<
+    CreateUserMutationVariables,
+    'gender' | 'nationality' | 'organisation'
+  > & {
+    gender: Maybe<string>;
+    othergender: string;
+    organisation: Maybe<number>;
+    nationality: Maybe<number>;
+    confirmPassword: string;
+    privacy_agreement: boolean;
+    cookie_policy: boolean;
+  } = {
+    user_title: null,
     firstname: firstname as string,
     middlename: '',
     lastname: lastname as string,
     password: '',
     confirmPassword: '',
     preferredname: '',
-    gender: '',
+    gender: null,
     othergender: '',
-    nationality: '',
+    nationality: null,
     birthdate: userMaxBirthDate,
-    organisation: '',
+    organisation: null,
     department: '',
-    organisation_address: '',
     position: '',
     email: (email as string) || '',
     telephone: '',
@@ -222,6 +238,20 @@ const SignUp: React.FC<SignUpProps> = (props) => {
     orcidHash: orcData?.orcidHash as string,
     refreshToken: orcData?.refreshToken as string,
   };
+
+  const userTitleOptions: Option[] = [
+    { text: 'Ms.', value: 'Ms.' },
+    { text: 'Mr.', value: 'Mr.' },
+    { text: 'Dr.', value: 'Dr.' },
+    { text: 'Prof.', value: 'Prof.' },
+    { text: 'Rather not say', value: 'unspecified' },
+  ];
+
+  const genderOptions: Option[] = [
+    { text: 'Female', value: 'female' },
+    { text: 'Male', value: 'male' },
+    { text: 'Other', value: 'other' },
+  ];
 
   if (!institutionsList.length) {
     setInstitutionsList(
@@ -261,11 +291,16 @@ const SignUp: React.FC<SignUpProps> = (props) => {
         validateOnChange={false}
         initialValues={initialValues}
         onSubmit={async (values): Promise<void> => {
-          if (orcData && orcData.orcid) {
+          if (
+            orcData &&
+            orcData.orcid &&
+            values.nationality &&
+            values.organisation
+          ) {
             const newValues = {
               ...values,
-              nationality: +values.nationality,
-              organisation: +values.organisation,
+              nationality: values.nationality,
+              organisation: values.organisation,
               orcid: orcData?.orcid as string,
               orcidHash: orcData?.orcidHash as string,
               refreshToken: orcData?.refreshToken as string,
@@ -273,7 +308,9 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                 ? values.preferredname
                 : values.firstname,
               gender:
-                values.gender === 'other' ? values.othergender : values.gender,
+                values.gender === 'other'
+                  ? values.othergender
+                  : values.gender ?? '',
             };
 
             await sendSignUpRequest(newValues);
@@ -435,20 +472,32 @@ const SignUp: React.FC<SignUpProps> = (props) => {
 
                   <CardContent>
                     <LocalizationProvider dateAdapter={DateAdapter}>
-                      <FormikDropdown
-                        name="user_title"
-                        label="Title"
-                        items={[
-                          { text: 'Ms.', value: 'Ms.' },
-                          { text: 'Mr.', value: 'Mr.' },
-                          { text: 'Dr.', value: 'Dr.' },
-                          { text: 'Prof.', value: 'Prof.' },
-                          { text: 'Rather not say', value: 'unspecified' },
-                        ]}
-                        data-cy="title"
-                        required
-                        disabled={!orcData}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel
+                          htmlFor="user_title"
+                          shrink={!!values.user_title}
+                          required
+                        >
+                          Title
+                        </InputLabel>
+                        <Field
+                          id="user_title"
+                          name="user_title"
+                          type="text"
+                          component={Select}
+                          data-cy="title"
+                          disabled={!orcData}
+                          required
+                        >
+                          {userTitleOptions.map(({ value, text }) => {
+                            return (
+                              <MenuItem value={value} key={value}>
+                                {text}
+                              </MenuItem>
+                            );
+                          })}
+                        </Field>
+                      </FormControl>
                       <Field
                         name="firstname"
                         label="First name"
@@ -491,18 +540,32 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         data-cy="preferredname"
                         disabled={!orcData}
                       />
-                      <FormikDropdown
-                        name="gender"
-                        label="Gender"
-                        items={[
-                          { text: 'Female', value: 'female' },
-                          { text: 'Male', value: 'male' },
-                          { text: 'Other', value: 'other' },
-                        ]}
-                        data-cy="gender"
-                        required
-                        disabled={!orcData}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel
+                          htmlFor="user_title"
+                          shrink={!!values.gender}
+                          required
+                        >
+                          Gender
+                        </InputLabel>
+                        <Field
+                          id="gender"
+                          name="gender"
+                          type="text"
+                          component={Select}
+                          data-cy="gender"
+                          disabled={!orcData}
+                          required
+                        >
+                          {genderOptions.map(({ value, text }) => {
+                            return (
+                              <MenuItem value={value} key={value}>
+                                {text}
+                              </MenuItem>
+                            );
+                          })}
+                        </Field>
+                      </FormControl>
                       {values.gender === 'other' && (
                         <Field
                           name="othergender"
@@ -516,13 +579,14 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                           disabled={!orcData}
                         />
                       )}
-                      <FormikDropdown
+                      <FormikUIAutocomplete
                         name="nationality"
                         label="Nationality"
                         items={nationalitiesList}
+                        disabled={!orcData}
+                        noOptionsText="No items"
                         data-cy="nationality"
                         required
-                        disabled={!orcData}
                       />
                       <Field
                         name="birthdate"
@@ -551,51 +615,50 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     4. Organisation details
                   </Typography>
                   <CardContent>
-                    <Grid container spacing={1}>
+                    <Field
+                      name="position"
+                      label="Position"
+                      id="position-input"
+                      type="text"
+                      component={TextField}
+                      fullWidth
+                      data-cy="position"
+                      required
+                      disabled={!orcData}
+                    />
+                    <Field
+                      name="department"
+                      label="Department"
+                      id="department-input"
+                      type="text"
+                      component={TextField}
+                      fullWidth
+                      data-cy="department"
+                      required
+                      disabled={!orcData}
+                    />
+                    <FormikUIAutocomplete
+                      name="organisation"
+                      label="Organisation"
+                      items={institutionsList}
+                      disabled={!orcData}
+                      noOptionsText="No items"
+                      data-cy="organisation"
+                      required
+                    />
+                    {values.organisation && +values.organisation === 1 && (
                       <Field
-                        name="position"
-                        label="Position"
-                        id="position-input"
+                        name="otherOrganisation"
+                        label="Please specify organisation"
+                        id="organisation-input"
                         type="text"
                         component={TextField}
                         fullWidth
-                        data-cy="position"
+                        data-cy="otherOrganisation"
                         required
                         disabled={!orcData}
                       />
-                      <Field
-                        name="department"
-                        label="Department"
-                        id="department-input"
-                        type="text"
-                        component={TextField}
-                        fullWidth
-                        data-cy="department"
-                        required
-                        disabled={!orcData}
-                      />
-                      <FormikDropdown
-                        name="organisation"
-                        label="Organisation"
-                        items={institutionsList}
-                        data-cy="organisation"
-                        required
-                        disabled={!orcData}
-                      />
-                      {+values.organisation === 1 && (
-                        <Field
-                          name="otherOrganisation"
-                          label="Please specify organisation"
-                          id="organisation-input"
-                          type="text"
-                          component={TextField}
-                          fullWidth
-                          data-cy="otherOrganisation"
-                          required
-                          disabled={!orcData}
-                        />
-                      )}
-                    </Grid>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -631,7 +694,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                 </Card>
                 <Field
                   name="privacy_agreement"
-                  className={classes.agreeBox}
                   component={CheckboxWithLabel}
                   type="checkbox"
                   Label={{
@@ -653,7 +715,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                 <Field
                   name="cookie_policy"
                   type="checkbox"
-                  className={classes.agreeBox}
                   component={CheckboxWithLabel}
                   Label={{
                     classes: { label: classes.agreeBox },

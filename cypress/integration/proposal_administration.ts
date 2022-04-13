@@ -50,13 +50,15 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=view-proposal]').click();
       cy.finishedLoading();
       cy.get('[role="dialog"]').contains('Admin').click();
-      cy.get('#finalStatus-input').should('exist');
+      cy.get('[data-cy="proposal-final-status"]').should('exist');
       cy.get('[role="dialog"]').contains('Logs').click();
       cy.get('[role="dialog"]').contains('Admin').click();
 
-      cy.get('#finalStatus-input').click();
+      cy.get('[data-cy="proposal-final-status"]').click();
 
-      cy.get('[data-value="ACCEPTED"]').click();
+      cy.get('[data-cy="proposal-final-status-options"] li')
+        .contains('Accepted')
+        .click();
 
       cy.get('[data-cy="managementTimeAllocation"] input')
         .clear()

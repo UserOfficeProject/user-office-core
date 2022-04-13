@@ -885,7 +885,8 @@ context('Template tests', () => {
       cy.get('[data-cy=units]').contains('celsius');
       cy.get('[data-cy=units]').contains('kelvin');
 
-      cy.get('[data-cy="numberValueConstraint"]').contains(
+      cy.get('[data-cy="numberValueConstraint"] input').should(
+        'have.value',
         'Only positive numbers'
       );
 
