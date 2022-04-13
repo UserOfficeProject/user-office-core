@@ -37,6 +37,9 @@ type SepProposalWithAverageScoreAndAvailabilityZone = SepProposal & {
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles((theme) => ({
   root: {
+    '& tr td': {
+      whiteSpace: 'nowrap',
+    },
     '& tr:last-child td': {
       border: 'none',
     },
@@ -62,6 +65,12 @@ const useStyles = makeStyles((theme) => ({
   disabled: {
     color: theme.palette.text.disabled,
   },
+  proposalTitle: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '200px',
+  },
 }));
 
 type SEPInstrumentProposalsTableProps = {
@@ -79,7 +88,7 @@ const assignmentColumns = [
   },
   {
     title: 'Title',
-    field: 'proposal.title',
+    field: 'proposalTitle',
   },
   {
     title: 'ID',
@@ -549,6 +558,16 @@ const SEPInstrumentProposalsTable: React.FC<
       id: proposal.proposalPk,
       rowActions: RowActionButtons(proposal),
       timeAllocation: ProposalTimeAllocationColumn(proposal),
+      proposalTitle: (
+        <Tooltip
+          className={classes.proposalTitle}
+          title={proposal.proposal.title}
+          enterDelay={1000}
+          enterNextDelay={1000}
+        >
+          <div>{proposal.proposal.title}</div>
+        </Tooltip>
+      ),
     }));
 
   /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
