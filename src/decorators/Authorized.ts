@@ -50,9 +50,9 @@ const Authorized = (roles: Roles[] = []) => {
         return await originalMethod?.apply(this, args);
       }
 
-      const hasAccessRights =
-        agent.hasCurrentRole &&
-        roles.some((role) => role === agent.currentRole?.shortCode);
+      const hasAccessRights = roles.some(
+        (role) => role === agent.currentRole?.shortCode
+      );
 
       if (hasAccessRights) {
         return await originalMethod?.apply(this, args);

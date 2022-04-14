@@ -56,7 +56,6 @@ export interface UserWithRole extends User {
   isApiAccessToken?: boolean;
   externalToken?: string;
   externalTokenValid?: boolean;
-  hasCurrentRole?: boolean;
 }
 
 export enum UserRole {

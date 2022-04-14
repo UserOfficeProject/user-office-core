@@ -59,7 +59,6 @@ export const dummyUserOfficer = new User(
 export const dummyUserOfficerWithRole: UserWithRole = {
   ...dummyUserOfficer,
   currentRole: { id: 2, title: 'User Officer', shortCode: 'user_officer' },
-  hasCurrentRole: true,
 };
 
 export const dummyUser = new User(
@@ -91,19 +90,16 @@ export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
   ...dummyUser,
   id: 1,
   currentRole: { id: 1, title: 'Principal investigator', shortCode: 'pi' },
-  hasCurrentRole: true,
 };
 
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
-  hasCurrentRole: true,
 };
 
 export const dummySEPChairWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 4, title: 'SEP Chair', shortCode: 'sep_chair' },
-  hasCurrentRole: true,
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -113,7 +109,6 @@ export const dummySampleReviewer: UserWithRole = {
     title: 'Sample Reviewer',
     shortCode: 'sample_safety_reviewer',
   },
-  hasCurrentRole: true,
 };
 
 export const dummyInstrumentScientist: UserWithRole = {
@@ -124,7 +119,6 @@ export const dummyInstrumentScientist: UserWithRole = {
     title: 'Instrument Scientist',
     shortCode: 'instrument_scientist',
   },
-  hasCurrentRole: true,
 };
 
 export const dummyPlaceHolderUser = new User(
@@ -180,7 +174,6 @@ export const dummyUserNotOnProposal = new User(
 export const dummyUserNotOnProposalWithRole: UserWithRole = {
   ...dummyUserNotOnProposal,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
-  hasCurrentRole: true,
 };
 
 export class UserDataSourceMock implements UserDataSource {
