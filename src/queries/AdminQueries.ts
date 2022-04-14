@@ -25,6 +25,11 @@ export default class AdminQueries {
   async getCountries() {
     return await this.dataSource.getCountries();
   }
+
+  async getCountry(id: number) {
+    return await this.dataSource.getCountry(id);
+  }
+
   async getInstitutions(filter?: InstitutionsFilter) {
     return await this.dataSource.getInstitutions(filter);
   }

@@ -4,7 +4,6 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
-import { IS_DANGEROUS_GOODS_KEY, Shipment } from '../../models/Shipment';
 import { DataType, Question } from '../../models/Template';
 import { Unit } from '../../models/Unit';
 import { UserWithRole } from '../../models/User';
@@ -16,7 +15,9 @@ import { UserDataSource } from './../../datasources/UserDataSource';
 import { AnswerBasic } from './../../models/Questionary';
 import {
   HEIGHT_KEY,
+  IS_DANGEROUS_GOODS_KEY,
   LENGTH_KEY,
+  Shipment,
   WEIGHT_KEY,
   WIDTH_KEY,
   STORAGE_TEMPERATURE_KEY,

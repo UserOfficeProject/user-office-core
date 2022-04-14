@@ -49,10 +49,12 @@ export const fileUploadDefinition: Question = {
       case QuestionFilterCompareOperator.EXISTS:
         if (value === true) {
           return queryBuilder.andWhereRaw(
+            // eslint-disable-next-line quotes
             "jsonb_array_length((answers.answer->>'value')::jsonb) > 0"
           );
         } else {
           return queryBuilder.andWhereRaw(
+            // eslint-disable-next-line quotes
             "jsonb_array_length((answers.answer->>'value')::jsonb) = 0"
           );
         }

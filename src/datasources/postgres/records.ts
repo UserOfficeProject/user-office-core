@@ -303,6 +303,7 @@ export interface NationalityRecord {
 export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
+  readonly country_id: number;
   readonly verified: boolean;
 }
 
@@ -1003,6 +1004,7 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
   return new Institution(
     institution.institution_id,
     institution.institution,
+    institution.country_id,
     institution.verified
   );
 };
