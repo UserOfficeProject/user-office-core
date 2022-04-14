@@ -49,9 +49,6 @@ const notification = ({
     case 'error':
       notificationQuerySelector = '.snackbar-error #notistack-snackbar';
       break;
-    case 'warning':
-      notificationQuerySelector = '.snackbar-warning #notistack-snackbar';
-      break;
     default:
       notificationQuerySelector = '.snackbar-success #notistack-snackbar';
       break;
