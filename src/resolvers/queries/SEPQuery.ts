@@ -34,7 +34,7 @@ export class SEPQuery {
   @Query(() => [SEPProposal], { nullable: true })
   async sepProposals(
     @Arg('sepId', () => Int) sepId: number,
-    @Arg('callId', () => Int) callId: number,
+    @Arg('callId', () => Int, { nullable: true }) callId: number | null,
     @Ctx() context: ResolverContext
   ): Promise<SEPProposal[] | null> {
     return context.queries.sep.getSEPProposals(context.user, { sepId, callId });
