@@ -225,7 +225,10 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
-  async getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]> {
+  async getSEPProposals(
+    sepId: number,
+    callId: number | null
+  ): Promise<SEPProposal[]> {
     const sepProposals: SEPProposalRecord[] = await database
       .select(['sp.*'])
       .from('SEP_Proposals as sp')
