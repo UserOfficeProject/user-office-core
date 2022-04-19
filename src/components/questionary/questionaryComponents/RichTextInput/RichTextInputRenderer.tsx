@@ -1,23 +1,18 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import {
   AnswerRenderer,
   QuestionRenderer,
 } from 'components/questionary/QuestionaryComponentRegistry';
+import stripHtml from 'utils/stripHtml';
 
-const useStyles = makeStyles(() => ({
-  visibilityIconAligned: {
-    marginLeft: '-12px',
-  },
-}));
+import { addElipsis } from '../../../../utils/addElipsis';
 
 export const RichTextInputRendererComponent: React.FC<{
   id: string;
@@ -25,20 +20,21 @@ export const RichTextInputRendererComponent: React.FC<{
   valueToRender: string;
 }> = ({ id, title, valueToRender }) => {
   const [open, setOpen] = useState(false);
-  const classes = useStyles();
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   return (
     <span>
-      <IconButton
+      <Typography
+        variant="body1"
         onClick={handleClickOpen}
         data-cy={`${id}_open`}
-        className={classes.visibilityIconAligned}
+        sx={{ cursor: 'pointer', ':hover': { textDecoration: 'underline' } }}
       >
-        <VisibilityIcon />
-      </IconButton>
+        {`${addElipsis(stripHtml(valueToRender), 100)}`}
+      </Typography>
+
       <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
         <DialogTitle>{title}</DialogTitle>
 
