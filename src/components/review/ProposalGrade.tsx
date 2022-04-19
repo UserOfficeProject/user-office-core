@@ -5,7 +5,6 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Stack from '@mui/material/Stack';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
@@ -17,6 +16,7 @@ import { useCheckAccess } from 'components/common/Can';
 import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
+import NavigationFragment from 'components/questionary/NavigationFragment';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ReviewStatus,
@@ -191,7 +191,13 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               })}
             </Field>
           </Box>
-          <Stack direction="row" justifyContent="flex-end" spacing={2}>
+          <ErrorMessage name="grade" />
+          <NavigationFragment>
+            {isSubmitting && (
+              <Box display="flex" alignItems="center" mx={1}>
+                <UOLoader buttonSized />
+              </Box>
+            )}
             {hasAccessRights && (
               <Field
                 id="submitted"
@@ -243,7 +249,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                   : 'Submit'}
               </Button>
             )}
-          </Stack>
+          </NavigationFragment>
         </Form>
       )}
     </Formik>

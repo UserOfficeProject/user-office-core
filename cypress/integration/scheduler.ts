@@ -56,7 +56,10 @@ context('Scheduler tests', () => {
 
     cy.contains('Upcoming experiments').click();
 
-    cy.contains('No records to display');
+    cy.finishedLoading();
+
+    cy.contains(upcomingDraft.startsAt).should('not.exist');
+    cy.contains(upcomingDraft.endsAt).should('not.exist');
   });
 
   it('User should be able to see upcoming experiments in ACTIVE', () => {
