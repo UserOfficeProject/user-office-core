@@ -44,6 +44,7 @@ const createRabbitMQMessageBroker = () => {
     hostname: process.env.RABBITMQ_HOSTNAME,
     username: process.env.RABBITMQ_USERNAME,
     password: process.env.RABBITMQ_PASSWORD,
+    vhost: process.env.RABBITMQ_VIRTUAL_HOST ?? '/',
   });
 
   return messageBroker;

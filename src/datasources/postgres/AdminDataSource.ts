@@ -13,7 +13,8 @@ import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
-import { AdminDataSource, Entry } from '../AdminDataSource';
+import { AdminDataSource } from '../AdminDataSource';
+import { Entry } from './../../models/Entry';
 import { FeatureId } from './../../models/Feature';
 import { SettingsId } from './../../models/Settings';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
@@ -39,6 +40,17 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
+  async getCountry(id: number): Promise<Entry> {
+    return database
+      .select('*')
+      .from('countries')
+      .where('country_id', id)
+      .first()
+      .then(
+        (count: CountryRecord) => new Entry(count.country_id, count.country)
+      );
+  }
+
   async updateInstitution(
     institution: Institution
   ): Promise<Institution | null> {
@@ -46,6 +58,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .update({
         institution: institution.name,
         verified: institution.verified,
+        country_id: institution.country,
       })
       .from('institutions')
       .where('institution_id', institution.id)
@@ -58,6 +71,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return {
       id: institutionRecord.institution_id,
       name: institutionRecord.institution,
+      country: institutionRecord.country_id,
       verified: institutionRecord.verified,
     };
   }
@@ -68,6 +82,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     const [institutionRecord]: InstitutionRecord[] = await database
       .insert({
         institution: institution.name,
+        country_id: institution.country,
         verified: institution.verified,
       })
       .into('institutions')
@@ -80,6 +95,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return {
       id: institutionRecord.institution_id,
       name: institutionRecord.institution,
+      country: institutionRecord.country_id,
       verified: institutionRecord.verified,
     };
   }
@@ -100,6 +116,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return {
       id: institutionRecord.institution_id,
       name: institutionRecord.institution,
+      country: institutionRecord.country_id,
       verified: institutionRecord.verified,
     };
   }
@@ -168,6 +185,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           return {
             id: int.institution_id,
             name: int.institution,
+            country: int.country_id,
             verified: int.verified,
           };
         })
@@ -182,7 +200,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .first()
       .then(
         (int: InstitutionRecord) =>
-          new Institution(int.institution_id, int.institution, int.verified)
+          new Institution(
+            int.institution_id,
+            int.institution,
+            int.country_id,
+            int.verified
+          )
       );
   }
 

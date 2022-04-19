@@ -9,8 +9,9 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection, rejection } from '../../models/Rejection';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { TechnicalReviewResponseWrap } from '../types/CommonWrappers';
+import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { TechnicalReview } from '../types/TechnicalReview';
 import { wrapResponse } from '../wrapResponse';
 
@@ -41,20 +42,38 @@ export class SubmitTechnicalReviewInput implements Partial<TechnicalReview> {
   public files: string;
 }
 
+@InputType()
+export class SubmitTechnicalReviewsInput {
+  @Field(() => [SubmitTechnicalReviewInput])
+  public technicalReviews: SubmitTechnicalReviewInput[];
+}
+
 @Resolver()
 export class SubmitTechnicalReviewMutation {
-  @Mutation(() => TechnicalReviewResponseWrap)
-  submitTechnicalReview(
-    @Arg('submitTechnicalReviewInput')
-    submitTechnicalReviewInput: SubmitTechnicalReviewInput,
+  @Mutation(() => SuccessResponseWrap)
+  async submitTechnicalReviews(
+    @Arg('submitTechnicalReviewsInput')
+    submitTechnicalReviewsInput: SubmitTechnicalReviewsInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.review.setTechnicalReview(
+    const failedReviews = [];
+    for await (const technicalReview of submitTechnicalReviewsInput.technicalReviews) {
+      const submitResult = await context.mutations.review.submitTechnicalReview(
         context.user,
-        submitTechnicalReviewInput
-      ),
-      TechnicalReviewResponseWrap
+        technicalReview
+      );
+      if (isRejection(submitResult)) {
+        failedReviews.push(technicalReview);
+      }
+    }
+
+    return wrapResponse(
+      failedReviews.length > 0
+        ? Promise.resolve(
+            rejection('Failed to submit one or more technical reviews')
+          )
+        : Promise.resolve(true),
+      SuccessResponseWrap
     );
   }
 }

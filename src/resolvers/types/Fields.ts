@@ -13,19 +13,7 @@ import { ResolverContext } from '../../context';
 export class Fields {}
 
 @ObjectType()
-class Institutions {
-  @Field(() => Int)
-  id: number;
-
-  @Field()
-  value: string;
-
-  @Field()
-  verified: boolean;
-}
-
-@ObjectType()
-class Entry {
+export class Entry {
   @Field(() => Int)
   id: number;
 
