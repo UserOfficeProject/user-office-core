@@ -6,7 +6,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 export function useSEPProposalsByInstrument(
   instrumentId: number,
   sepId: number,
-  callId: number
+  callId?: number
 ): {
   loadingInstrumentProposals: boolean;
   instrumentProposalsData: SepProposal[];
@@ -26,6 +26,10 @@ export function useSEPProposalsByInstrument(
     setRefreshCounter(refreshCounter + 1);
 
   useEffect(() => {
+    if (!callId) {
+      return;
+    }
+
     let canceled = false;
     setLoadingInstrumentProposals(true);
     api()

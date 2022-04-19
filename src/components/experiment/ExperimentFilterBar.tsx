@@ -25,7 +25,7 @@ function ExperimentFilterBar() {
   return (
     <>
       <CallFilter
-        callId={urlQueryParams.call ?? undefined}
+        callId={urlQueryParams.call ?? null}
         calls={calls}
         isLoading={loadingCalls}
         shouldShowAll={true}

@@ -997,6 +997,14 @@ context('SEP meeting components tests', () => {
       cy.get('[data-cy="SEP-meeting-components-table"] tbody tr:first-child td')
         .eq(5)
         .should('have.text', '25');
+      cy.get('[data-cy="SEP-meeting-components-table"] thead').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
+      cy.get(
+        '[data-cy="SEP-meeting-components-table"] [data-cy="sep-instrument-proposals-table"] thead'
+      ).should('include.text', initialDBData.call.allocationTimeUnit);
     });
 
     it('Officer should be able to set SEP time allocation', () => {

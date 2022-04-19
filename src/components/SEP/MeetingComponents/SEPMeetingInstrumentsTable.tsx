@@ -2,11 +2,10 @@ import MaterialTable, { Options } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import { Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
-import { InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useInstrumentsBySEPData } from 'hooks/instrument/useInstrumentsBySEPData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -17,11 +16,11 @@ import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 type SEPMeetingInstrumentsTableProps = {
   sepId: number;
   Toolbar: (data: Options<JSX.Element>) => JSX.Element;
-  selectedCallId: number;
+  selectedCall?: Call;
   confirm: WithConfirmType;
 };
 
-const columns = [
+const instrumentTableColumns = [
   { title: 'Name', field: 'name' },
   { title: 'Short code', field: 'shortCode' },
   { title: 'Description', field: 'description' },
@@ -39,12 +38,12 @@ const columns = [
 
 const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
   sepId,
-  selectedCallId,
+  selectedCall,
   Toolbar,
   confirm,
 }) => {
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
-    useInstrumentsBySEPData(sepId, selectedCallId);
+    useInstrumentsBySEPData(sepId, selectedCall?.id);
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -52,6 +51,13 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     UserRole.SEP_SECRETARY,
   ]);
   const { enqueueSnackbar } = useSnackbar();
+  const columns = instrumentTableColumns.map((column) => ({
+    ...column,
+    title:
+      column.field === 'availabilityTime'
+        ? `${column.title} (${selectedCall?.allocationTimeUnit}s)`
+        : column.title,
+  }));
 
   const SEPInstrumentProposalsTableComponent = React.useCallback(
     ({ rowData }) => {
@@ -59,21 +65,25 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         <SEPInstrumentProposalsTable
           sepId={sepId}
           sepInstrument={rowData}
-          selectedCallId={selectedCallId}
+          selectedCall={selectedCall}
         />
       );
     },
-    [sepId, selectedCallId]
+    [sepId, selectedCall]
   );
 
   const submitInstrument = async (
     instrumentToSubmit: InstrumentWithAvailabilityTime
   ) => {
+    if (!selectedCall) {
+      return;
+    }
+
     if (instrumentToSubmit) {
       const response = await api().sepProposalsByInstrument({
         instrumentId: instrumentToSubmit.id,
         sepId: sepId,
-        callId: selectedCallId,
+        callId: selectedCall.id,
       });
       const allProposalsOnInstrumentHaveRankings =
         response.sepProposalsByInstrument?.every(
@@ -84,7 +94,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         const { submitInstrument } = await api(
           'Instrument submitted!'
         ).submitInstrument({
-          callId: selectedCallId,
+          callId: selectedCall.id,
           instrumentId: instrumentToSubmit.id,
           sepId: sepId,
         });
@@ -172,13 +182,6 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
       />
     </div>
   );
-};
-
-SEPMeetingInstrumentsTable.propTypes = {
-  sepId: PropTypes.number.isRequired,
-  selectedCallId: PropTypes.number.isRequired,
-  Toolbar: PropTypes.func.isRequired,
-  confirm: PropTypes.func.isRequired,
 };
 
 export default withConfirm(SEPMeetingInstrumentsTable);

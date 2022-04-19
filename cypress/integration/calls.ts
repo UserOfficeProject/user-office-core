@@ -501,6 +501,10 @@ context('Calls tests', () => {
       cy.notification({ variant: 'success', text: 'successfully' });
 
       cy.get('[data-cy="call-instrument-assignments-table"]')
+        .find('thead th')
+        .last()
+        .should('include.text', newCall.allocationTimeUnit);
+      cy.get('[data-cy="call-instrument-assignments-table"]')
         .find('tbody td')
         .last()
         .then((element) => {

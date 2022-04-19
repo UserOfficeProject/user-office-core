@@ -367,6 +367,14 @@ context('Instrument tests', () => {
 
       cy.closeModal();
 
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper').contains('Technical time allocation').click();
+      cy.get('body').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('include.text', initialDBData.call.allocationTimeUnit);
+
       cy.logout();
 
       cy.login(scientist2);
@@ -384,6 +392,10 @@ context('Instrument tests', () => {
       cy.get('[data-cy="save-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
+      cy.get('[data-cy="timeAllocation"] label').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
     });
 
     it('User Officer should be able to remove assigned scientist from instrument', () => {
