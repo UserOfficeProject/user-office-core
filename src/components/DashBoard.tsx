@@ -171,6 +171,9 @@ const Dashboard: React.FC = () => {
   const isSchedulerEnabled = featureContext.features.get(
     FeatureId.SCHEDULER
   )?.isEnabled;
+  const isInstrumentManagementEnabled = featureContext.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
@@ -321,12 +324,14 @@ const Dashboard: React.FC = () => {
             path="/SEPs"
             component={SEPsPage}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Instruments"
-            path="/Instruments"
-            component={InstrumentsPage}
-          />
+          {isInstrumentManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Instruments"
+              path="/Instruments"
+              component={InstrumentsPage}
+            />
+          )}
           <TitledRoute
             setHeader={setHeader}
             title="Institution"

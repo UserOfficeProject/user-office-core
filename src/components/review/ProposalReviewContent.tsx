@@ -223,9 +223,13 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
 
   return (
     <StyledPaper>
-      <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
-        {tabsContent}
-      </SimpleTabs>
+      {tabNames.length > 1 ? (
+        <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
+          {tabsContent}
+        </SimpleTabs>
+      ) : (
+        <>{tabsContent}</>
+      )}
     </StyledPaper>
   );
 };
