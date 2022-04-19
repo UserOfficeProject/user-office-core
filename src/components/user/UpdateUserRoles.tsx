@@ -31,7 +31,7 @@ export default function UpdateUserRoles(props: { id: number }) {
     };
 
     await api(
-      'Roles updated successfully! Any Logged in Users will still have old permissions until they log back in',
+      'Roles updated successfully! Any logged in users will still have old permissions until they log back in.',
       'warning'
     ).updateUserRoles(variables);
 
