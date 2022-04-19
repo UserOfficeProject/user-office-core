@@ -892,15 +892,21 @@ context('SEP meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
+      cy.finishedLoading();
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .contains(proposal1.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .last()
+        .contains(proposal2.title);
+
       cy.get('[data-cy="drag-icon"]').first().as('firstDragIcon');
       cy.get('[data-cy="drag-icon"]').last().as('secondDragIcon');
       cy.get('@firstDragIcon').trigger('dragstart');
 
       cy.get('@secondDragIcon').trigger('dragenter');
-
-      cy.get('.droppableAreaRow')
-        .should('exist')
-        .and('include.text', 'Drop here');
 
       cy.get('@secondDragIcon').trigger('dragend');
       cy.finishedLoading();
@@ -909,6 +915,14 @@ context('SEP meeting components tests', () => {
         variant: 'success',
         text: 'Reordering of proposals saved successfully',
       });
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .contains(proposal2.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .last()
+        .contains(proposal1.title);
     });
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
