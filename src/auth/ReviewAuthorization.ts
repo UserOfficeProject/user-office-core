@@ -2,7 +2,6 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { ReviewStatus } from '../models/Review';
 import { UserWithRole } from '../models/User';
 import { Review } from '../resolvers/types/Review';
 import { ProposalAuthorization } from './ProposalAuthorization';
@@ -79,22 +78,25 @@ export class ReviewAuthorization {
 
   async hasWriteRights(
     agent: UserWithRole | null,
-    review: Review
+    review: Review,
+    reviewAlreadySubmitted?: boolean
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    reviewId: number
+    reviewId: number,
+    reviewAlreadySubmitted?: boolean
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    reviewOrReviewId: Review | number
+    reviewOrReviewId: Review | number,
+    reviewAlreadySubmitted = false
   ): Promise<boolean> {
     const review = await this.resolveReview(reviewOrReviewId);
     if (!review) {
       return false;
     }
 
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
       return true;
     }
@@ -111,7 +113,7 @@ export class ReviewAuthorization {
       agent,
       review.proposalPk
     );
-    if (isReviewerOfProposal && review.status !== ReviewStatus.SUBMITTED) {
+    if (isReviewerOfProposal && !reviewAlreadySubmitted) {
       return true;
     }
 

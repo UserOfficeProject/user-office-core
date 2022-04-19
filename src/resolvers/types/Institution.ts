@@ -1,6 +1,16 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import {
+  Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
+} from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { Institution as InstitutionOrigin } from '../../models/Institution';
+import { Entry } from './Fields';
 
 @ObjectType()
 export class Institution implements Partial<InstitutionOrigin> {
@@ -12,4 +22,15 @@ export class Institution implements Partial<InstitutionOrigin> {
 
   @Field()
   verified: boolean;
+}
+
+@Resolver(() => Institution)
+export class InstitutionResolver {
+  @FieldResolver(() => Entry)
+  async country(
+    @Root() institution: InstitutionOrigin,
+    @Ctx() context: ResolverContext
+  ): Promise<Entry> {
+    return context.queries.admin.getCountry(institution.country);
+  }
 }

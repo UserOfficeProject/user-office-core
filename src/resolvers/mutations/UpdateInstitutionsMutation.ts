@@ -22,6 +22,9 @@ export class UpdateInstitutionsArgs {
 
   @Field(() => Boolean, { nullable: true })
   verified: boolean;
+
+  @Field(() => Int)
+  country: number;
 }
 
 @Resolver()

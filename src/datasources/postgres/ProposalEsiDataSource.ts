@@ -32,6 +32,10 @@ class PostgresProposalEsiDataSource implements ProposalEsiDataSource {
       .where('esi_id', esiId)
       .first();
 
+    if (!result) {
+      return null;
+    }
+
     return createEsiObject(result);
   }
 

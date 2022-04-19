@@ -36,18 +36,22 @@ export class SubmitProposalsReviewMutation {
     submitProposalsReviewInput: SubmitProposalsReviewInput,
     @Ctx() context: ResolverContext
   ) {
-    const results = await Promise.all(
-      submitProposalsReviewInput.proposals.map((proposal) => {
-        return context.mutations.review.submitProposalReview(
-          context.user,
-          proposal
-        );
-      })
-    );
+    const failedProposals = [];
+    for await (const proposal of submitProposalsReviewInput.proposals) {
+      const submitResult = await context.mutations.review.submitProposalReview(
+        context.user,
+        proposal
+      );
+      if (isRejection(submitResult)) {
+        failedProposals.push(proposal);
+      }
+    }
 
     return wrapResponse(
-      results.some((result) => isRejection(result))
-        ? Promise.resolve(rejection('REJECTED'))
+      failedProposals.length > 0
+        ? Promise.resolve(
+            rejection('Failed to submit one more proposal reviews')
+          )
         : Promise.resolve(true),
       SuccessResponseWrap
     );
