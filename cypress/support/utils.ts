@@ -40,7 +40,7 @@ const notification = ({
   variant,
   text,
 }: {
-  variant: 'success' | 'error' | 'info';
+  variant: 'success' | 'error' | 'info' | 'warning';
   text: string | RegExp;
 }) => {
   let notificationQuerySelector = '';
@@ -49,7 +49,6 @@ const notification = ({
     case 'error':
       notificationQuerySelector = '.snackbar-error #notistack-snackbar';
       break;
-
     default:
       notificationQuerySelector = '.snackbar-success #notistack-snackbar';
       break;

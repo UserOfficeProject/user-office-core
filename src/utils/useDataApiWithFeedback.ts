@@ -1,4 +1,4 @@
-import { useSnackbar } from 'notistack';
+import { useSnackbar, VariantType } from 'notistack';
 import { useCallback, useContext, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
@@ -18,7 +18,7 @@ function useDataApiWithFeedback() {
   const { handleLogout } = useContext(UserContext);
 
   const api = useCallback(
-    (successToastMessage?: string) =>
+    (toastMessage?: string, toastMessageVariant?: VariantType) =>
       new Proxy(dataApi(), {
         get(target, prop) {
           return async (args: never) => {
@@ -42,9 +42,9 @@ function useDataApiWithFeedback() {
                   autoHideDuration: 10000,
                 });
               } else {
-                successToastMessage &&
-                  enqueueSnackbar(successToastMessage, {
-                    variant: 'success',
+                toastMessage &&
+                  enqueueSnackbar(toastMessage, {
+                    variant: toastMessageVariant ?? 'success',
                     className: 'snackbar-success',
                     autoHideDuration: 10000,
                   });

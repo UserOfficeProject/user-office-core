@@ -15,7 +15,7 @@ declare global {
        *    cy.notification({ variant: 'error', text: 'failed'})
        */
       notification: (options: {
-        variant: 'success' | 'error' | 'info';
+        variant: 'success' | 'error' | 'info' | 'warning';
         text: string | RegExp;
       }) => void;
 

@@ -91,7 +91,7 @@ context('Personal information tests', () => {
 
     cy.contains('Update').click();
 
-    cy.notification({ variant: 'success', text: 'successfully' });
+    cy.notification({ variant: 'warning', text: 'successfully' });
 
     // wait before trying to get profile button otherwise page
     // might re-render and you could be trying to access element
