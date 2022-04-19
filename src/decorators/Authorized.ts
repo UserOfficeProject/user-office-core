@@ -1,8 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { AuthenticationError } from 'apollo-server-core';
-import { container } from 'tsyringe';
 
-import { UserAuthorization } from '../auth/UserAuthorization';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -19,7 +17,6 @@ const Authorized = (roles: Roles[] = []) => {
     }
   ) => {
     const originalMethod = descriptor.value;
-    const userAuthorization = container.resolve(UserAuthorization);
 
     descriptor.value = async function (...args) {
       const [agent] = args;
@@ -53,11 +50,9 @@ const Authorized = (roles: Roles[] = []) => {
         return await originalMethod?.apply(this, args);
       }
 
-      const hasAccessRights =
-        (await userAuthorization.hasRole(
-          agent,
-          agent.currentRole?.shortCode as string
-        )) && roles.some((role) => role === agent.currentRole?.shortCode);
+      const hasAccessRights = roles.some(
+        (role) => role === agent.currentRole?.shortCode
+      );
 
       if (hasAccessRights) {
         return await originalMethod?.apply(this, args);
