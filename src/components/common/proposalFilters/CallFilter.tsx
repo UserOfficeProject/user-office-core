@@ -28,7 +28,7 @@ type CallFilterProps = {
   isLoading?: boolean;
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
-  callId?: number;
+  callId: number | null;
 };
 
 const CallFilter: React.FC<CallFilterProps> = ({

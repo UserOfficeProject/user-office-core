@@ -2,6 +2,7 @@ import faker from 'faker';
 
 import {
   ProposalEndStatus,
+  ReviewStatus,
   TechnicalReviewStatus,
   UserRole,
 } from '../../src/generated/sdk';
@@ -71,12 +72,13 @@ const sep2 = {
 };
 
 const proposal1 = {
-  proposalTitle: faker.random.words(3),
-  proposalAbstract: faker.random.words(5),
+  title: faker.random.words(3),
+  abstract: faker.random.words(5),
 };
 
 const proposal2 = {
-  proposalTitle: faker.random.words(3),
+  title: faker.random.words(3),
+  abstract: faker.random.words(5),
 };
 
 const scientist = initialDBData.users.user1;
@@ -89,7 +91,8 @@ const instrument = {
 };
 
 let createdSepId: number;
-let createdProposalId: number;
+let createdProposalPk: number;
+let createdProposalId: string;
 
 function initializationBeforeTests() {
   cy.resetDB();
@@ -106,12 +109,13 @@ function initializationBeforeTests() {
   cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
     const createdProposal = result.createProposal.proposal;
     if (createdProposal) {
-      createdProposalId = createdProposal.primaryKey;
+      createdProposalPk = createdProposal.primaryKey;
+      createdProposalId = createdProposal.proposalId;
 
       cy.updateProposal({
         proposalPk: createdProposal.primaryKey,
-        title: proposal1.proposalTitle,
-        abstract: proposal1.proposalAbstract,
+        title: proposal1.title,
+        abstract: proposal1.abstract,
         proposerId: initialDBData.users.user1.id,
       });
 
@@ -119,7 +123,7 @@ function initializationBeforeTests() {
       cy.changeProposalsStatus({
         statusId: initialDBData.proposalStatuses.sepReview.id,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
     }
@@ -152,22 +156,22 @@ context('SEP reviews tests', () => {
 
       cy.get('[data-cy="sep-assignments-table"]').should(
         'not.contain.text',
-        proposal1.proposalTitle
+        proposal1.title
       );
 
       cy.contains('Proposals').click();
 
-      cy.contains(proposal1.proposalTitle)
-        .parent()
-        .find('[type="checkbox"]')
-        .check();
+      cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
 
       cy.get("[aria-label='Assign proposals to SEP']").first().click();
 
-      cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
-      cy.get('#selectedSEPId-input').first().click();
+      cy.get('[data-cy="sep-selection"] input').should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+      cy.get('[data-cy="sep-selection"]').click();
 
-      cy.get('[role="presentation"] .MuiList-root').contains(sep1.code).click();
+      cy.get('[data-cy="sep-selection-options"]').contains(sep1.code).click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -184,7 +188,7 @@ context('SEP reviews tests', () => {
 
       cy.get('[data-cy="sep-assignments-table"]').should(
         'contain.text',
-        proposal1.proposalTitle
+        proposal1.title
       );
     });
 
@@ -192,7 +196,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.login('officer');
@@ -202,7 +206,7 @@ context('SEP reviews tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains(proposal1.proposalTitle)
+      cy.contains(proposal1.title)
         .parent()
         .find('[aria-label="View Proposal"]')
         .click();
@@ -212,7 +216,7 @@ context('SEP reviews tests', () => {
       cy.get('[role="dialog"]').contains('Proposal information');
       cy.get('[role="dialog"]').contains('Technical review');
 
-      cy.get('[role="dialog"]').contains(proposal1.proposalTitle);
+      cy.get('[role="dialog"]').contains(proposal1.title);
       cy.get('[role="dialog"]').contains('Download PDF');
 
       cy.closeModal();
@@ -222,7 +226,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.login('officer');
@@ -239,7 +243,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.assignReviewersToSep({
@@ -285,7 +289,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.assignReviewersToSep({
@@ -295,7 +299,7 @@ context('SEP reviews tests', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
       });
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}`);
@@ -316,7 +320,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.assignReviewersToSep({
@@ -326,7 +330,7 @@ context('SEP reviews tests', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
       });
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}`);
@@ -378,7 +382,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.assignReviewersToSep({
@@ -388,7 +392,7 @@ context('SEP reviews tests', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
       });
       cy.login('officer');
       cy.visit('/ProposalPage');
@@ -417,7 +421,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.assignReviewersToSep({
@@ -465,7 +469,7 @@ context('SEP reviews tests', () => {
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
-      cy.contains(proposal1.proposalTitle)
+      cy.contains(proposal1.title)
         .parent()
         .find('[aria-label="View Proposal"]')
         .click();
@@ -475,7 +479,7 @@ context('SEP reviews tests', () => {
       cy.get('[role="dialog"]').contains('Proposal information');
       cy.get('[role="dialog"]').contains('Technical review');
 
-      cy.get('[role="dialog"]').contains(proposal1.proposalTitle);
+      cy.get('[role="dialog"]').contains(proposal1.title);
       cy.get('[role="dialog"]').contains('Download PDF');
     });
 
@@ -483,7 +487,7 @@ context('SEP reviews tests', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
       });
 
       cy.visit(`/SEPPage/${createdSepId}`);
@@ -514,7 +518,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.assignReviewersToSep({
@@ -559,7 +563,7 @@ context('SEP reviews tests', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
       });
 
       cy.visit(`/SEPPage/${createdSepId}`);
@@ -583,7 +587,7 @@ context('SEP reviews tests', () => {
       cy.assignProposalsToSep({
         sepId: createdSepId,
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
       });
       cy.assignReviewersToSep({
@@ -593,60 +597,119 @@ context('SEP reviews tests', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
       });
       cy.login(sepMembers.reviewer);
       cy.visit('/');
     });
 
     it('SEP Reviewer should be able to filter their reviews by status and bulk submit them', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal.proposal;
+        if (createdProposal) {
+          createdProposalPk = createdProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.assignProposalsToSep({
+            sepId: createdSepId,
+            proposals: [
+              { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+            ],
+          });
+          cy.assignReviewersToSep({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer.id],
+          });
+          cy.assignSepReviewersToProposal({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer.id],
+            proposalPk: createdProposalPk,
+          });
+
+          cy.getProposalReviews({
+            proposalPk: createdProposalPk,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              cy.updateReview({
+                reviewID: proposalReviews[0].id,
+                comment: faker.random.words(5),
+                grade: 2,
+                status: ReviewStatus.SUBMITTED,
+                sepID: createdSepId,
+              });
+            }
+          });
+        }
+      });
       cy.get('[data-cy="review-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Draft').click();
 
       cy.finishedLoading();
 
-      cy.contains(proposal1.proposalTitle);
+      cy.contains(proposal1.title);
 
       cy.get('[data-cy="review-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Submitted').click();
 
       cy.finishedLoading();
 
-      cy.contains('No records to display');
-      cy.contains(proposal1.proposalTitle).should('not.exist');
+      cy.contains(proposal2.title);
+      cy.contains(proposal1.title).should('not.exist');
 
       cy.get('[data-cy="review-status-filter"]').click();
       cy.get('[role="listbox"]').contains('All').click();
 
       cy.finishedLoading();
 
-      cy.contains(proposal1.proposalTitle).parent().contains('Draft');
+      cy.contains(proposal1.title).parent().contains('Draft');
 
-      cy.contains(proposal1.proposalTitle)
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+      cy.contains(proposal2.title)
         .parent()
         .find('input[type="checkbox"]')
         .check();
 
       cy.get('[data-cy="submit-proposal-reviews"]').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.contains(
+        `Please correct the grade and comment for the proposal(s) with ID: ${createdProposalId}`
+      ).should('exist');
 
-      cy.notification({
-        variant: 'error',
-        text: 'REJECTED',
-      });
+      cy.get('[data-cy="confirm-cancel"]').click();
 
-      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('[data-cy="grade-proposal"]').click();
-      cy.get('[role="listbox"] > [role="option"]').first().click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
       cy.get('[data-cy=submit-grade]').click();
       cy.get('[data-cy=confirm-ok]').click();
       cy.finishedLoading();
       cy.notification({ variant: 'success', text: 'Submitted' });
       cy.closeModal();
 
-      cy.contains(proposal1.proposalTitle).parent().contains('Submitted');
+      cy.contains(proposal1.title).parent().contains('Submitted');
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        text: 'Proposals review submitted successfully',
+        variant: 'success',
+      });
     });
   });
 });
@@ -659,7 +722,7 @@ context('SEP meeting components tests', () => {
     cy.assignProposalsToSep({
       sepId: createdSepId,
       proposals: [
-        { callId: initialDBData.call.id, primaryKey: createdProposalId },
+        { callId: initialDBData.call.id, primaryKey: createdProposalPk },
       ],
     });
     cy.assignReviewersToSep({
@@ -669,14 +732,14 @@ context('SEP meeting components tests', () => {
     cy.assignSepReviewersToProposal({
       sepId: createdSepId,
       memberIds: [sepMembers.reviewer.id],
-      proposalPk: createdProposalId,
+      proposalPk: createdProposalPk,
     });
     cy.updateUserRoles({
       id: scientist.id,
       roles: [initialDBData.roles.instrumentScientist],
     });
     cy.addProposalTechnicalReview({
-      proposalPk: createdProposalId,
+      proposalPk: createdProposalPk,
       status: TechnicalReviewStatus.FEASIBLE,
       timeAllocation: 25,
       submitted: true,
@@ -696,7 +759,7 @@ context('SEP meeting components tests', () => {
           proposals: [
             {
               callId: initialDBData.call.id,
-              primaryKey: createdProposalId,
+              primaryKey: createdProposalPk,
             },
           ],
         });
@@ -776,7 +839,7 @@ context('SEP meeting components tests', () => {
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
-            title: proposal2.proposalTitle,
+            title: proposal2.title,
             proposerId: initialDBData.users.user1.id,
           });
 
@@ -829,15 +892,21 @@ context('SEP meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
+      cy.finishedLoading();
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .contains(proposal1.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .last()
+        .contains(proposal2.title);
+
       cy.get('[data-cy="drag-icon"]').first().as('firstDragIcon');
       cy.get('[data-cy="drag-icon"]').last().as('secondDragIcon');
       cy.get('@firstDragIcon').trigger('dragstart');
 
       cy.get('@secondDragIcon').trigger('dragenter');
-
-      cy.get('.droppableAreaRow')
-        .should('exist')
-        .and('include.text', 'Drop here');
 
       cy.get('@secondDragIcon').trigger('dragend');
       cy.finishedLoading();
@@ -846,6 +915,14 @@ context('SEP meeting components tests', () => {
         variant: 'success',
         text: 'Reordering of proposals saved successfully',
       });
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .contains(proposal2.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .last()
+        .contains(proposal1.title);
     });
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
@@ -890,7 +967,7 @@ context('SEP meeting components tests', () => {
           if (createdProposal) {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
-              title: proposal2.proposalTitle,
+              title: proposal2.title,
             });
             cy.createSep({
               code: sep2.code,
@@ -934,6 +1011,14 @@ context('SEP meeting components tests', () => {
       cy.get('[data-cy="SEP-meeting-components-table"] tbody tr:first-child td')
         .eq(5)
         .should('have.text', '25');
+      cy.get('[data-cy="SEP-meeting-components-table"] thead').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
+      cy.get(
+        '[data-cy="SEP-meeting-components-table"] [data-cy="sep-instrument-proposals-table"] thead'
+      ).should('include.text', initialDBData.call.allocationTimeUnit);
     });
 
     it('Officer should be able to set SEP time allocation', () => {
@@ -1080,7 +1165,7 @@ context('SEP meeting components tests', () => {
     it('Officer should be able to edit SEP Meeting form after instrument is submitted', () => {
       cy.saveSepMeetingDecision({
         saveSepMeetingDecisionInput: {
-          proposalPk: createdProposalId,
+          proposalPk: createdProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
         },
@@ -1230,7 +1315,7 @@ context('SEP meeting components tests', () => {
     it('SEP Chair should not be able to edit SEP Meeting form after instrument is submitted', () => {
       cy.saveSepMeetingDecision({
         saveSepMeetingDecisionInput: {
-          proposalPk: createdProposalId,
+          proposalPk: createdProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
         },
@@ -1313,7 +1398,7 @@ context('SEP meeting components tests', () => {
     it('SEP Secretary should not be able to edit SEP Meeting form after instrument is submitted', () => {
       cy.saveSepMeetingDecision({
         saveSepMeetingDecisionInput: {
-          proposalPk: createdProposalId,
+          proposalPk: createdProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
         },
@@ -1381,13 +1466,26 @@ context('SEP meeting components tests', () => {
     it('SEP Reviewer should be able to give review', () => {
       cy.login(sepMembers.reviewer);
       cy.visit('/');
+      cy.finishedLoading();
       cy.get('[data-cy="grade-proposal-icon"]').click();
       cy.get('[data-cy=save-grade]').click();
-      cy.contains('comment is a required field');
-      cy.contains('grade is a required field');
-      cy.setTinyMceContent('comment', faker.lorem.words(3));
+      cy.get('[data-cy="grade-proposal"] input:invalid').should(
+        'have.length',
+        1
+      );
+      // NOTE: Testing native html required validation message.
+      cy.get('[data-cy="grade-proposal"] input').then(($input) => {
+        expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
+          'Please fill out this field.'
+        );
+      });
       cy.get('[data-cy="grade-proposal"]').click();
-      cy.get('[role="listbox"] > [role="option"]').first().click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
+      cy.get('[data-cy=save-grade]').click();
+      cy.contains('comment is a required field');
+      cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('[data-cy=save-grade]').click();
       cy.notification({ variant: 'success', text: 'Updated' });
     });

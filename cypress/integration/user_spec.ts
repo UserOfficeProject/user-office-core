@@ -40,7 +40,7 @@ context('User tests', () => {
       .should('have.value', password);
 
     // Personal details
-    cy.get('#user_title-input').click();
+    cy.get('[data-cy="title"]').click();
     cy.contains('Prof.').click();
     cy.get('[data-cy=firstname] input')
       .clear()
@@ -52,11 +52,11 @@ context('User tests', () => {
       .type(lastName)
       .should('have.value', lastName);
 
-    cy.get('#gender-input').click();
+    cy.get('[data-cy="gender"]').click();
 
     cy.contains('Male').click();
 
-    cy.get('#nationality-input').click();
+    cy.get('[data-cy="nationality"]').click();
 
     cy.contains('Swedish').click();
 
@@ -66,7 +66,7 @@ context('User tests', () => {
       .should('have.value', birthDateValue);
 
     //Organization details
-    cy.get('#organisation-input').click();
+    cy.get('[data-cy="organisation"]').click();
 
     cy.contains('Lund University').click();
 
@@ -165,7 +165,7 @@ context('User tests', () => {
       .should('have.value', password);
 
     // Personal details
-    cy.get('#user_title-input').click();
+    cy.get('[data-cy="title"]').click();
     cy.contains('Prof.').click();
     cy.get('[data-cy=firstname] input')
       .clear()
@@ -184,11 +184,11 @@ context('User tests', () => {
       .type(preferredName)
       .should('have.value', preferredName);
 
-    cy.get('#gender-input').click();
+    cy.get('[data-cy="gender"]').click();
 
     cy.contains('Male').click();
 
-    cy.get('#nationality-input').click();
+    cy.get('[data-cy="nationality"]').click();
 
     cy.contains('Swedish').click();
 
@@ -198,7 +198,7 @@ context('User tests', () => {
       .should('have.value', birthDateValue);
 
     //Organization details
-    cy.get('#organisation-input').click();
+    cy.get('[data-cy="organisation"]').click();
 
     cy.contains('Lund University').click();
 

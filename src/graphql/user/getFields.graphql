@@ -4,5 +4,9 @@ query getFields {
       id
       value
     }
+    countries {
+      id
+      value
+    }
   }
 }

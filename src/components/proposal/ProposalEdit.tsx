@@ -37,12 +37,12 @@ export default function ProposalEdit() {
                 }}
               />
             </>
-            <ProposalContainer proposal={proposalData} />
+            <ProposalContainer proposal={proposalData} elevation={0} />
           </SimpleTabs>
         </StyledPaper>
       </StyledContainer>
     );
   }
 
-  return <ProposalContainer proposal={proposalData} />;
+  return <ProposalContainer proposal={proposalData} elevation={0} />;
 }

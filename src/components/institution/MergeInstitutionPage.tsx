@@ -41,7 +41,9 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
   const institutionId = parseInt(institutionIdQueryParam); // param is string
 
   const { institutions, loadingInstitutions, setInstitutions } =
-    useInstitutionsData();
+    useInstitutionsData({
+      country: false,
+    });
 
   const [institutionFrom, setInstitutionFrom] =
     React.useState<Institution | null>(null);

@@ -78,7 +78,6 @@ context('Instrument tests', () => {
       cy.contains(instrument1.name);
       cy.contains(instrument1.shortCode);
       cy.contains(instrument1.description);
-      cy.contains(scientist1.lastName);
     });
 
     it('User Officer should be able to update Instrument', () => {
@@ -150,7 +149,7 @@ context('Instrument tests', () => {
 
   describe('Advanced instruments tests as user officer role', () => {
     let createdInstrumentId: number;
-    let createdProposalId: number;
+    let createdProposalPk: number;
 
     beforeEach(() => {
       cy.updateUserRoles({
@@ -170,10 +169,10 @@ context('Instrument tests', () => {
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
-          createdProposalId = result.createProposal.proposal.primaryKey;
+          createdProposalPk = result.createProposal.proposal.primaryKey;
 
           cy.updateProposal({
-            proposalPk: createdProposalId,
+            proposalPk: createdProposalPk,
             title: proposal1.title,
             abstract: proposal1.abstract,
           });
@@ -204,7 +203,7 @@ context('Instrument tests', () => {
 
       cy.get('#selectedInstrumentId-input').first().click();
 
-      cy.get("[id='menu-selectedInstrumentId'] li")
+      cy.get('[data-cy="instrument-selection-options"] li')
         .contains(instrument1.name)
         .click();
 
@@ -227,7 +226,14 @@ context('Instrument tests', () => {
 
       cy.contains('Loading...').should('not.exist');
 
-      cy.get('[data-cy="clear-selection"]').click();
+      cy.get('[data-cy="instrument-selection"] input').should(
+        'have.value',
+        instrument1.name
+      );
+
+      cy.get('[data-cy="instrument-selection"] input').click();
+
+      cy.get('[title="Clear"]').click();
 
       cy.get('[data-cy="remove-instrument-alert"]').should('exist');
 
@@ -272,7 +278,7 @@ context('Instrument tests', () => {
       });
       cy.assignProposalsToInstrument({
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
         instrumentId: createdInstrumentId,
       });
@@ -280,7 +286,7 @@ context('Instrument tests', () => {
       cy.login(scientist2);
 
       cy.addProposalTechnicalReview({
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
         reviewerId: scientist2.id,
         submitted: true,
         status: TechnicalReviewStatus.FEASIBLE,
@@ -314,20 +320,20 @@ context('Instrument tests', () => {
       });
       cy.assignProposalsToInstrument({
         proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
         instrumentId: createdInstrumentId,
       });
 
       cy.updateTechnicalReviewAssignee({
-        proposalPks: [createdProposalId],
+        proposalPks: [createdProposalPk],
         userId: scientist2.id,
       });
 
       cy.login(scientist2);
 
       cy.addProposalTechnicalReview({
-        proposalPk: createdProposalId,
+        proposalPk: createdProposalPk,
         reviewerId: scientist2.id,
         submitted: true,
         status: TechnicalReviewStatus.FEASIBLE,
@@ -361,6 +367,14 @@ context('Instrument tests', () => {
 
       cy.closeModal();
 
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper').contains('Technical time allocation').click();
+      cy.get('body').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('include.text', initialDBData.call.allocationTimeUnit);
+
       cy.logout();
 
       cy.login(scientist2);
@@ -378,6 +392,10 @@ context('Instrument tests', () => {
       cy.get('[data-cy="save-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
+      cy.get('[data-cy="timeAllocation"] label').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
     });
 
     it('User Officer should be able to remove assigned scientist from instrument', () => {
@@ -437,7 +455,8 @@ context('Instrument tests', () => {
 
   describe('Instruments tests as instrument scientist role', () => {
     let createdInstrumentId: number;
-    let createdProposalId: number;
+    let createdProposalPk: number;
+    let createdProposalId: string;
 
     beforeEach(() => {
       cy.updateUserRoles({
@@ -477,23 +496,24 @@ context('Instrument tests', () => {
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
-          createdProposalId = result.createProposal.proposal.primaryKey;
+          createdProposalPk = result.createProposal.proposal.primaryKey;
+          createdProposalId = result.createProposal.proposal.proposalId;
 
           cy.updateProposal({
-            proposalPk: createdProposalId,
+            proposalPk: createdProposalPk,
             title: proposal1.title,
             abstract: proposal1.abstract,
           });
 
           cy.assignProposalsToInstrument({
             proposals: [
-              { callId: initialDBData.call.id, primaryKey: createdProposalId },
+              { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
             instrumentId: createdInstrumentId,
           });
 
           cy.updateTechnicalReviewAssignee({
-            proposalPks: [createdProposalId],
+            proposalPks: [createdProposalPk],
             userId: scientist2.id,
           });
         }
@@ -563,17 +583,17 @@ context('Instrument tests', () => {
     it('Instrument scientist should be able to download multiple proposals as PDF', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
-          createdProposalId = result.createProposal.proposal.primaryKey;
+          createdProposalPk = result.createProposal.proposal.primaryKey;
 
           cy.updateProposal({
-            proposalPk: createdProposalId,
+            proposalPk: createdProposalPk,
             title: proposal2.title,
             abstract: proposal2.abstract,
           });
 
           cy.assignProposalsToInstrument({
             proposals: [
-              { callId: initialDBData.call.id, primaryKey: createdProposalId },
+              { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
             instrumentId: createdInstrumentId,
           });
@@ -727,6 +747,101 @@ context('Instrument tests', () => {
         .parent()
         .find('[data-cy="view-proposal-and-technical-review"]')
         .should('not.exist');
+    });
+
+    it('Technical review assignee should be able to bulk submit technical reviews and see warning if some required info is missing ', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          const createdProposal2Id = result.createProposal.proposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposal2Id,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstrument({
+            proposals: [
+              { callId: initialDBData.call.id, primaryKey: createdProposal2Id },
+            ],
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Id],
+            userId: scientist2.id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Id,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+          });
+        }
+      });
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(proposal2.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+
+      cy.get('[role="presentation"] [role="alert"] .MuiAlert-message')
+        .should('exist')
+        .and('include.text', createdProposalId);
+
+      cy.get('[data-cy="confirm-cancel"]').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .click();
+
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.get('[data-cy="technical-review-status-options"]')
+        .contains('Feasible')
+        .click();
+      cy.get('[data-cy="timeAllocation"] input').type('10');
+
+      cy.get('[data-cy="save-technical-review"]').click();
+
+      cy.notification({
+        text: 'Technical review updated successfully',
+        variant: 'success',
+      });
+
+      cy.closeModal();
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+
+      cy.get('[role="presentation"] [role="alert"] .MuiAlert-message').should(
+        'not.exist'
+      );
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        text: 'Proposals technical review submitted successfully',
+        variant: 'success',
+      });
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('exist');
+      cy.contains(proposal2.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('exist');
     });
   });
 });

@@ -79,6 +79,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   const formTeamAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (isPiOrCoProposer(user, event)) {
       if (
@@ -92,14 +93,16 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         }
       } else {
         buttonState = 'inactive';
+        stateReason =
+          'This action is disabled because proposal is not accepted or missing management decision';
       }
     } else {
       buttonState = 'invisible';
     }
 
     return createActionButton(
-      'Define who is coming',
-      <GroupIcon />,
+      `Define who is coming ${stateReason ? '(' + stateReason + ')' : ''}`,
+      <GroupIcon data-cy="define-visit-icon" />,
       buttonState,
       () => {
         openModal(
@@ -117,6 +120,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   const finishEsi = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (isPiOrCoProposer(user, event)) {
       if (
@@ -130,14 +134,16 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         }
       } else {
         buttonState = 'inactive';
+        stateReason =
+          'This action is disabled because proposal is not accepted or missing management decision';
       }
     } else {
       buttonState = 'invisible';
     }
 
     return createActionButton(
-      'Finish safety input form',
-      <EsiIcon />,
+      `Finish safety input form ${stateReason ? '(' + stateReason + ')' : ''}`,
+      <EsiIcon data-cy="finish-safety-input-form-icon" />,
       buttonState,
       () => {
         if (event?.esi) {
@@ -151,6 +157,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   const registerVisitAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (event.visit !== null) {
       const registration = event.visit.registrations.find(
@@ -167,11 +174,12 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       }
     } else {
       buttonState = 'inactive';
+      stateReason = 'This action is disabled because visit is not defined';
     }
 
     return createActionButton(
-      'Define your own visit',
-      <FlightTakeoffIcon />,
+      `Define your own visit ${stateReason ? '(' + stateReason + ')' : ''}`,
+      <FlightTakeoffIcon data-cy="register-visit-icon" />,
       buttonState,
       () => {
         openModal(
@@ -202,6 +210,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   const individualTrainingAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (event.visit !== null) {
       const registration = event.visit.registrations.find(
@@ -225,11 +234,14 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       }
     } else {
       buttonState = 'inactive';
+      stateReason = 'This action is disabled because visit is not defined';
     }
 
     return createActionButton(
-      'Finish individual training',
-      <SchoolIcon />,
+      `Finish individual training ${
+        stateReason ? '(' + stateReason + ')' : ''
+      }`,
+      <SchoolIcon data-cy="finish-training-icon" />,
       buttonState,
       () => {
         history.push('/training');
@@ -251,7 +263,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
     return createActionButton(
       'Declare shipment(s)',
-      <BoxIcon />,
+      <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
       () => {
         history.push(`/DeclareShipments/${event.id}`);
@@ -278,7 +290,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
     return createActionButton(
       'Provide feedback',
-      <FeedbackIcon />,
+      <FeedbackIcon data-cy="provide-feedback-icon" />,
       buttonState,
       () => {
         if (event?.feedback) {

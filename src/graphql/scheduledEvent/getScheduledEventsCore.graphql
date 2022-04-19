@@ -1,0 +1,35 @@
+query getScheduledEventsCore(
+    $filter: ScheduledEventsCoreFilter,
+    $first: Int,
+    $offset: Int
+) {
+    scheduledEventsCore(filter: $filter, first:$first, offset:$offset) {
+        ...scheduledEventCore
+        proposal {
+            ...proposal
+            proposer{
+                ...basicUserDetails
+            }
+            instrument {
+                ...instrument
+            }
+        }
+        esi {
+            ...esi
+        }
+        visit {
+            registrations {
+                ...visitRegistration
+                startsAt
+                endsAt
+                trainingStatus
+                user {
+                ...basicUserDetails
+                }
+            }
+            teamLead {
+            ...basicUserDetails
+            }
+      }
+    }
+}

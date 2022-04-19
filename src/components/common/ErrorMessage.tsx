@@ -11,8 +11,8 @@ function ErrorMessage(props: Pick<ErrorMessageProps, 'name'> & BoxProps) {
   const { name, ...boxProps } = props;
 
   return (
-    <Box color={'red'} {...boxProps}>
-      <FormikErrorMessage name={name} component={'span'} />
+    <Box color="error.main" fontSize="small" mt={0.5} {...boxProps}>
+      <FormikErrorMessage name={name} component="span" />
     </Box>
   );
 }

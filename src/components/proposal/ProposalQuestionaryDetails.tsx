@@ -12,10 +12,12 @@ interface ProposalQuestionaryDetailsProps extends QuestionaryDetailsProps {
 }
 
 function ProposalQuestionaryDetails(props: ProposalQuestionaryDetailsProps) {
-  const { proposalPk, ...restProps } = props;
+  const { proposalPk, questionaryId, additionalDetails } = props;
 
   return (
     <QuestionaryDetails
+      questionaryId={questionaryId}
+      additionalDetails={additionalDetails}
       answerRenderer={(answer) => {
         if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
           return (
@@ -32,7 +34,6 @@ function ProposalQuestionaryDetails(props: ProposalQuestionaryDetailsProps) {
           return null;
         }
       }}
-      {...restProps}
     />
   );
 }

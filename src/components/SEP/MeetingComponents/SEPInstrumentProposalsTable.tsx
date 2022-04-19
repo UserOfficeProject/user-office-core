@@ -6,7 +6,6 @@ import Tooltip from '@mui/material/Tooltip';
 import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
@@ -17,6 +16,7 @@ import {
   InstrumentWithAvailabilityTime,
   UserRole,
   SepMeetingDecision,
+  Call,
 } from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
@@ -37,6 +37,16 @@ type SepProposalWithAverageScoreAndAvailabilityZone = SepProposal & {
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles((theme) => ({
   root: {
+    '& table': {
+      backgroundColor: '#ddd',
+    },
+    '& tr': {
+      transition: 'all 200ms ease-out',
+      backgroundColor: '#fafafa',
+    },
+    '& tr td': {
+      whiteSpace: 'nowrap',
+    },
     '& tr:last-child td': {
       border: 'none',
     },
@@ -45,29 +55,30 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: '#fafafa',
     },
     '& .draggingRow': {
-      backgroundColor: `${theme.palette.warning.light} !important`,
+      visibility: 'hidden',
     },
-    '& .droppableAreaRow': {
-      height: '0px',
-      backgroundColor: theme.palette.grey[300],
-      transition: '0.1s',
-      textAlign: 'center',
-      color: theme.palette.grey[600],
-
-      '&.droppableAreaAnimate': {
-        height: '50px',
-      },
+    '& .shiftUp': {
+      transform: 'translateY(-50px)',
+    },
+    '& .shiftDown': {
+      transform: 'translateY(50px)',
     },
   },
   disabled: {
     color: theme.palette.text.disabled,
+  },
+  proposalTitle: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '200px',
   },
 }));
 
 type SEPInstrumentProposalsTableProps = {
   sepInstrument: InstrumentWithAvailabilityTime;
   sepId: number;
-  selectedCallId: number;
+  selectedCall?: Call;
 };
 
 const assignmentColumns = [
@@ -79,7 +90,7 @@ const assignmentColumns = [
   },
   {
     title: 'Title',
-    field: 'proposal.title',
+    field: 'proposalTitle',
   },
   {
     title: 'ID',
@@ -144,11 +155,16 @@ const assignmentColumns = [
     render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone): string =>
       rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
   },
+  {
+    title: 'Recommendation',
+    field: 'proposal.sepMeetingDecision.recommendation',
+    emptyValue: 'Unset',
+  },
 ];
 
 const SEPInstrumentProposalsTable: React.FC<
   SEPInstrumentProposalsTableProps
-> = ({ sepInstrument, sepId, selectedCallId }) => {
+> = ({ sepInstrument, sepId, selectedCall }) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     sepMeetingModal: NumberParam,
   });
@@ -157,13 +173,22 @@ const SEPInstrumentProposalsTable: React.FC<
     loadingInstrumentProposals,
     setInstrumentProposalsData,
     refreshInstrumentProposalsData,
-  } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCallId);
+  } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCall?.id);
   const classes = useStyles();
   const theme = useTheme();
   const isSEPReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [savingOrder, setSavingOrder] = useState(false);
+
+  // NOTE: This is needed for adding the allocation time unit information on the column title without causing some console warning on re-rendering.
+  const columns = assignmentColumns.map((column) => ({
+    ...column,
+    title:
+      column.field === 'timeAllocation'
+        ? `${column.title} (${selectedCall?.allocationTimeUnit}s)`
+        : column.title,
+  }));
 
   const DragState = {
     row: -1,
@@ -292,7 +317,7 @@ const SEPInstrumentProposalsTable: React.FC<
 
     return (
       <>
-        <Tooltip title="Drag proposals to reorder">
+        <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
           <IconButton
             style={{ cursor: 'grab' }}
             color="inherit"
@@ -425,39 +450,23 @@ const SEPInstrumentProposalsTable: React.FC<
     setSavingOrder(false);
   };
 
-  const createDroppableAreaRow = () => {
-    const doppableAreaRow = document.createElement('tr');
-    doppableAreaRow.className = 'droppableAreaRow';
-    // NOTE: Full width column is needed to set proper background
-    const doppableAreaColumn = document.createElement('td');
-    doppableAreaColumn.colSpan = assignmentColumns.length;
-    doppableAreaColumn.textContent = 'Drop here';
-    doppableAreaRow.appendChild(doppableAreaColumn);
-
-    return doppableAreaRow;
-  };
-
-  const insertDroppableAreaRowIntoTable = (
-    tableBodyElement: HTMLElement,
-    allTableRowElements: Element[],
-    droppableAreaRowElement: HTMLTableRowElement
+  const showDropArea = (
+    allRows: NodeListOf<HTMLTableRowElement>,
+    sourcePosition: number,
+    targetPosition: number
   ) => {
-    if (DragState.dropIndex === sortedProposalsWithAverageScore.length - 1) {
-      tableBodyElement.appendChild(droppableAreaRowElement);
-    } else if (
-      DragState.dropIndex === 0 ||
-      DragState.row === DragState.dropIndex + 1
-    ) {
-      tableBodyElement.insertBefore(
-        droppableAreaRowElement,
-        allTableRowElements[DragState.dropIndex]
-      );
-    } else {
-      tableBodyElement.insertBefore(
-        droppableAreaRowElement,
-        allTableRowElements[DragState.dropIndex + 1]
-      );
-    }
+    allRows.forEach((row, index) => {
+      row.classList.remove('shiftUp', 'shiftDown');
+      if (sourcePosition < targetPosition) {
+        if (index <= targetPosition && index >= sourcePosition) {
+          row.classList.add('shiftUp');
+        }
+      } else if (sourcePosition > targetPosition) {
+        if (index >= targetPosition && index <= sourcePosition) {
+          row.classList.add('shiftDown');
+        }
+      }
+    });
   };
 
   const handleOnRowDragStart = (
@@ -476,42 +485,17 @@ const SEPInstrumentProposalsTable: React.FC<
 
     const tableBodyElement = e.currentTarget.parentElement;
 
-    if (tableBodyElement && DragState.dropIndex !== tableDataId) {
-      const allTableRowElements = Array.from(tableBodyElement.children);
-
-      const droppableAreaSeparatorToRemove = allTableRowElements.find(
-        (element, index) => {
-          if (element.className.includes('droppableAreaRow')) {
-            allTableRowElements.splice(index, 1);
-
-            return element;
-          }
-        }
-      );
-
-      if (droppableAreaSeparatorToRemove) {
-        tableBodyElement.removeChild(droppableAreaSeparatorToRemove);
-      }
-
+    if (
+      tableBodyElement &&
+      DragState.dropIndex !== tableDataId &&
+      DragState.row !== tableDataId
+    ) {
       DragState.dropIndex = tableDataId;
 
-      if (DragState.row === DragState.dropIndex) {
-        return;
-      }
+      const allRows =
+        tableBodyElement.childNodes as NodeListOf<HTMLTableRowElement>;
 
-      const droppableAreaRowElement = createDroppableAreaRow();
-
-      insertDroppableAreaRowIntoTable(
-        tableBodyElement,
-        allTableRowElements,
-        droppableAreaRowElement
-      );
-
-      // NOTE: Add class with timeout to be able to animate.
-      setTimeout(
-        () => droppableAreaRowElement.classList.add('droppableAreaAnimate'),
-        100
-      );
+      showDropArea(allRows, DragState.row, DragState.dropIndex);
     }
   };
 
@@ -519,19 +503,6 @@ const SEPInstrumentProposalsTable: React.FC<
     e.currentTarget.classList.remove('draggingRow');
 
     if (DragState.dropIndex !== -1 && DragState.dropIndex !== DragState.row) {
-      const tableBodyElement = e.currentTarget.parentElement;
-
-      if (tableBodyElement) {
-        const allTableRowElements = Array.from(tableBodyElement.children);
-        const elToRemove = allTableRowElements.find((element) =>
-          element.className.includes('droppableAreaRow')
-        );
-
-        if (elToRemove) {
-          tableBodyElement.removeChild(elToRemove);
-        }
-      }
-
       await reOrderRow(DragState.row, DragState.dropIndex);
     }
     DragState.row = -1;
@@ -544,6 +515,16 @@ const SEPInstrumentProposalsTable: React.FC<
       id: proposal.proposalPk,
       rowActions: RowActionButtons(proposal),
       timeAllocation: ProposalTimeAllocationColumn(proposal),
+      proposalTitle: (
+        <Tooltip
+          className={classes.proposalTitle}
+          title={proposal.proposal.title}
+          enterDelay={1000}
+          enterNextDelay={1000}
+        >
+          <div>{proposal.proposal.title}</div>
+        </Tooltip>
+      ),
     }));
 
   /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
@@ -579,7 +560,7 @@ const SEPInstrumentProposalsTable: React.FC<
       />
       <MaterialTable
         icons={tableIcons}
-        columns={assignmentColumns}
+        columns={columns}
         title={'Assigned reviewers'}
         data={sortedProposalsWithAverageScoreAndId}
         isLoading={loadingInstrumentProposals || savingOrder}
@@ -599,12 +580,6 @@ const SEPInstrumentProposalsTable: React.FC<
       />
     </div>
   );
-};
-
-SEPInstrumentProposalsTable.propTypes = {
-  sepInstrument: PropTypes.any.isRequired,
-  sepId: PropTypes.number.isRequired,
-  selectedCallId: PropTypes.number.isRequired,
 };
 
 export default SEPInstrumentProposalsTable;

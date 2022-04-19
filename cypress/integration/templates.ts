@@ -885,7 +885,8 @@ context('Template tests', () => {
       cy.get('[data-cy=units]').contains('celsius');
       cy.get('[data-cy=units]').contains('kelvin');
 
-      cy.get('[data-cy="numberValueConstraint"]').contains(
+      cy.get('[data-cy="numberValueConstraint"] input').should(
+        'have.value',
         'Only positive numbers'
       );
 
@@ -1669,9 +1670,7 @@ context('Template tests', () => {
 
       cy.get('.MuiStep-root').contains('Review').click();
 
-      cy.finishedLoading();
-
-      cy.contains('proposal information', { matchCase: false });
+      cy.contains(proposal.abstract);
 
       cy.contains(fileName);
 

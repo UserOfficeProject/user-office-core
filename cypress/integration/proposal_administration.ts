@@ -50,13 +50,20 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=view-proposal]').click();
       cy.finishedLoading();
       cy.get('[role="dialog"]').contains('Admin').click();
-      cy.get('#finalStatus-input').should('exist');
+      cy.get('[data-cy="proposal-final-status"]').should('exist');
       cy.get('[role="dialog"]').contains('Logs').click();
       cy.get('[role="dialog"]').contains('Admin').click();
 
-      cy.get('#finalStatus-input').click();
+      cy.get('[data-cy="proposal-final-status"]').click();
 
-      cy.get('[data-value="ACCEPTED"]').click();
+      cy.get('[data-cy="proposal-final-status-options"] li')
+        .contains('Accepted')
+        .click();
+
+      cy.get('[data-cy="managementTimeAllocation"] label').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
 
       cy.get('[data-cy="managementTimeAllocation"] input')
         .clear()
@@ -115,6 +122,12 @@ context('Proposal administration tests', () => {
 
       cy.contains('Accepted');
       cy.contains('DRAFT');
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper').contains('Final time allocation').click();
+      cy.get('body').click();
+      cy.contains(proposalName1)
+        .parent()
+        .should('include.text', initialDBData.call.allocationTimeUnit);
     });
 
     it('Should show warning if proposal status is changing to SCHEDULING and proposal has no instrument', () => {

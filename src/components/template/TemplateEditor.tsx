@@ -256,7 +256,7 @@ export default function TemplateEditor() {
     ) : null;
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <TemplateMetadataEditor dispatch={dispatch} template={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}

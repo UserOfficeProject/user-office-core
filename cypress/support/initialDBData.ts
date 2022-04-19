@@ -1,4 +1,4 @@
-import { DataType } from '../../src/generated/sdk';
+import { AllocationTimeUnits, DataType } from '../../src/generated/sdk';
 
 // NOTE: Instruments, proposal and scheduled events are seeded only if resetDB(true).
 export default {
@@ -10,6 +10,7 @@ export default {
   call: {
     id: 1,
     shortCode: 'call 1',
+    allocationTimeUnit: AllocationTimeUnits.DAY,
   },
   template: {
     id: 1,
@@ -193,6 +194,7 @@ export default {
   proposalStatuses: {
     draft: {
       id: 1,
+      name: 'DRAFT',
     },
     feasibilityReview: {
       id: 2,
@@ -204,6 +206,7 @@ export default {
     },
     sepMeeting: {
       id: 12,
+      name: 'SEP Meeting',
     },
     editableSubmitted: {
       id: 14,

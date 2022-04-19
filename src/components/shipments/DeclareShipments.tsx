@@ -114,7 +114,7 @@ function DeclareShipments({
       <Typography variant="h6" component="h2" gutterBottom>
         Declare Shipments
       </Typography>
-      <Typography variant="body1">
+      <Typography component="div" variant="body1">
         Follow the steps below to declare your shipments:
         <ol style={{ margin: 0 }}>
           <li>Add all the shipments (one shipment per parcel)</li>
