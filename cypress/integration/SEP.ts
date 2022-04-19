@@ -892,15 +892,21 @@ context('SEP meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
+      cy.finishedLoading();
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .contains(proposal1.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .last()
+        .contains(proposal2.title);
+
       cy.get('[data-cy="drag-icon"]').first().as('firstDragIcon');
       cy.get('[data-cy="drag-icon"]').last().as('secondDragIcon');
       cy.get('@firstDragIcon').trigger('dragstart');
 
       cy.get('@secondDragIcon').trigger('dragenter');
-
-      cy.get('.droppableAreaRow')
-        .should('exist')
-        .and('include.text', 'Drop here');
 
       cy.get('@secondDragIcon').trigger('dragend');
       cy.finishedLoading();
@@ -909,6 +915,14 @@ context('SEP meeting components tests', () => {
         variant: 'success',
         text: 'Reordering of proposals saved successfully',
       });
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .contains(proposal2.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .last()
+        .contains(proposal1.title);
     });
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
@@ -997,6 +1011,14 @@ context('SEP meeting components tests', () => {
       cy.get('[data-cy="SEP-meeting-components-table"] tbody tr:first-child td')
         .eq(5)
         .should('have.text', '25');
+      cy.get('[data-cy="SEP-meeting-components-table"] thead').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
+      cy.get(
+        '[data-cy="SEP-meeting-components-table"] [data-cy="sep-instrument-proposals-table"] thead'
+      ).should('include.text', initialDBData.call.allocationTimeUnit);
     });
 
     it('Officer should be able to set SEP time allocation', () => {

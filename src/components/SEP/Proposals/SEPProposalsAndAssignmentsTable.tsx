@@ -7,7 +7,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import { DateTime } from 'luxon';
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
@@ -49,7 +48,7 @@ type SEPProposalsAndAssignmentsTableProps = {
   /** Toolbar component shown in the table */
   Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   /** Call id that we want to filter by */
-  selectedCallId: number;
+  selectedCallId: number | null;
 };
 
 const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
@@ -441,12 +440,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       </Grid>
     </React.Fragment>
   );
-};
-
-SEPProposalsAndAssignmentsTable.propTypes = {
-  sepId: PropTypes.number.isRequired,
-  selectedCallId: PropTypes.number.isRequired,
-  Toolbar: PropTypes.func.isRequired,
 };
 
 export default SEPProposalsAndAssignmentsTable;

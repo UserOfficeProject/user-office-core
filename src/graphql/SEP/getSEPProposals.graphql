@@ -1,4 +1,4 @@
-query getSEPProposals($sepId: Int!, $callId: Int!) {
+query getSEPProposals($sepId: Int!, $callId: Int) {
   sepProposals(sepId: $sepId, callId: $callId) {
     proposalPk
     dateAssigned

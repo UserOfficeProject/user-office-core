@@ -60,6 +60,11 @@ context('Proposal administration tests', () => {
         .contains('Accepted')
         .click();
 
+      cy.get('[data-cy="managementTimeAllocation"] label').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
+
       cy.get('[data-cy="managementTimeAllocation"] input')
         .clear()
         .type('-123')
@@ -117,6 +122,12 @@ context('Proposal administration tests', () => {
 
       cy.contains('Accepted');
       cy.contains('DRAFT');
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper').contains('Final time allocation').click();
+      cy.get('body').click();
+      cy.contains(proposalName1)
+        .parent()
+        .should('include.text', initialDBData.call.allocationTimeUnit);
     });
 
     it('Should show warning if proposal status is changing to SCHEDULING and proposal has no instrument', () => {
