@@ -50,7 +50,7 @@ export interface SEPDataSource {
     proposalPk: number,
     reviewerId: number | null
   ): Promise<SEPAssignment[]>;
-  getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]>;
+  getSEPProposals(sepId: number, callId: number | null): Promise<SEPProposal[]>;
   getSEPProposal(
     sepId: number,
     proposalPk: number
