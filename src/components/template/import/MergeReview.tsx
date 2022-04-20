@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, Typography } from '@mui/material';
 import produce from 'immer';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useHistory } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -60,6 +60,48 @@ export function MergeReview(props: MergeReviewProps) {
     []
   );
 
+  const onConflictResolvedSubTemplate = useCallback(
+    (
+      comparison: QuestionComparison,
+      resolutionStrategy: ConflictResolutionStrategy
+    ) => {
+      setState(
+        produce((draft) => {
+          const updateTemplate = draft.subTemplatesWithValidation?.find(
+            (template) =>
+              template.questionComparisons.find(
+                (curComparison) =>
+                  comparison.newQuestion.id === curComparison.newQuestion.id
+              )
+          );
+          const updateQuestion = updateTemplate?.questionComparisons.find(
+            (curComparison) =>
+              comparison.newQuestion.id === curComparison.newQuestion.id
+          );
+          if (updateQuestion) {
+            updateQuestion.conflictResolutionStrategy = resolutionStrategy;
+          }
+        })
+      );
+    },
+    []
+  );
+
+  useEffect(() => {
+    console.log(
+      state.subTemplatesWithValidation.map((template) => {
+        return template.questionComparisons.map((comparison) => {
+          const question = comparison.newQuestion;
+
+          return {
+            itemId: question.id,
+            strategy: comparison.conflictResolutionStrategy,
+          };
+        });
+      })
+    );
+  }, [state]);
+
   const handleImportClick = () =>
     api('Template imported successfully')
       .importTemplate({
@@ -72,6 +114,18 @@ export function MergeReview(props: MergeReviewProps) {
             strategy: comparison.conflictResolutionStrategy,
           };
         }),
+        subTemplatesConflictResolutions: state.subTemplatesWithValidation.map(
+          (template) => {
+            return template.questionComparisons.map((comparison) => {
+              const question = comparison.newQuestion;
+
+              return {
+                itemId: question.id,
+                strategy: comparison.conflictResolutionStrategy,
+              };
+            });
+          }
+        ),
       })
       .then((result) => {
         if (result.importTemplate.template) {
@@ -81,6 +135,63 @@ export function MergeReview(props: MergeReviewProps) {
         }
       });
 
+  const createConflictResolver = (
+    comparison: QuestionComparison,
+    onConflictResolved: (
+      comparison: QuestionComparison,
+      resolution: ConflictResolutionStrategy
+    ) => void
+  ) => (
+    <ConflictResolver<QuestionComparison>
+      key={comparison.newQuestion.id}
+      comparison={comparison}
+      onConflictResolved={onConflictResolved}
+      getStatus={(comparison) => comparison.status}
+      getItemId={(comparison) => comparison.newQuestion.id}
+      getItemTitle={(comparison) => comparison.newQuestion.question}
+      getDiffInfo={({ existingQuestion, newQuestion }) => {
+        return [
+          {
+            existingVal: existingQuestion?.naturalKey,
+            newVal: newQuestion?.naturalKey ?? '',
+            heading: 'Natural key',
+            isDifferent:
+              existingQuestion !== null &&
+              existingQuestion?.naturalKey !== newQuestion.naturalKey,
+          },
+          {
+            existingVal: existingQuestion?.question,
+            newVal: newQuestion?.question ?? '',
+            heading: 'Question',
+            isDifferent:
+              existingQuestion !== null &&
+              existingQuestion.question !== newQuestion.question,
+          },
+          {
+            existingVal: (
+              <pre>
+                {JSON.stringify(existingQuestion?.config, undefined, 4) || '-'}
+              </pre>
+            ),
+            newVal: (
+              <pre>{JSON.stringify(newQuestion?.config, undefined, 4)}</pre>
+            ),
+            heading: 'Config',
+            isDifferent:
+              existingQuestion !== null &&
+              deepEqual(existingQuestion?.config, newQuestion.config) === false,
+          },
+        ];
+      }}
+    />
+  );
+
+  const subTemplateCreateConflictResolver = (comparison: QuestionComparison) =>
+    createConflictResolver(comparison, onConflictResolvedSubTemplate);
+
+  const templateCreateConflictResolver = (comparison: QuestionComparison) =>
+    createConflictResolver(comparison, onConflictResolved);
+
   return (
     <>
       <Card>
@@ -89,52 +200,21 @@ export function MergeReview(props: MergeReviewProps) {
           <Typography variant="body2">Export date: {exportDate}</Typography>
         </CardContent>
       </Card>
-      {props.data.questionComparisons.map((comparison) => (
-        <ConflictResolver<QuestionComparison>
-          key={comparison.newQuestion.id}
-          comparison={comparison}
-          onConflictResolved={onConflictResolved}
-          getStatus={(comparison) => comparison.status}
-          getItemId={(comparison) => comparison.newQuestion.id}
-          getItemTitle={(comparison) => comparison.newQuestion.question}
-          getDiffInfo={({ existingQuestion, newQuestion }) => {
-            return [
-              {
-                existingVal: existingQuestion?.naturalKey,
-                newVal: newQuestion?.naturalKey ?? '',
-                heading: 'Natural key',
-                isDifferent:
-                  existingQuestion !== null &&
-                  existingQuestion?.naturalKey !== newQuestion.naturalKey,
-              },
-              {
-                existingVal: existingQuestion?.question,
-                newVal: newQuestion?.question ?? '',
-                heading: 'Question',
-                isDifferent:
-                  existingQuestion !== null &&
-                  existingQuestion.question !== newQuestion.question,
-              },
-              {
-                existingVal: (
-                  <pre>
-                    {JSON.stringify(existingQuestion?.config, undefined, 4) ||
-                      '-'}
-                  </pre>
-                ),
-                newVal: (
-                  <pre>{JSON.stringify(newQuestion?.config, undefined, 4)}</pre>
-                ),
-                heading: 'Config',
-                isDifferent:
-                  existingQuestion !== null &&
-                  deepEqual(existingQuestion?.config, newQuestion.config) ===
-                    false,
-              },
-            ];
-          }}
-        />
-      ))}
+      {props.data.questionComparisons.map(templateCreateConflictResolver)}
+      {props.data.subTemplatesWithValidation && (
+        <Card>
+          <CardContent>
+            <Typography variant="body2">
+              Sub Templates and Sample Questions:
+            </Typography>
+          </CardContent>
+        </Card>
+      )}
+      {props.data.subTemplatesWithValidation?.map((template) => {
+        return template.questionComparisons.map(
+          subTemplateCreateConflictResolver
+        );
+      })}
       <ActionButtonContainer>
         <Button variant="outlined" onClick={() => props.onBack?.()}>
           Back

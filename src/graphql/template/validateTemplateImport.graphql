@@ -1,5 +1,5 @@
 mutation validateTemplateImport($templateAsJson: String!) {
-  validateTemplateImport(templateAsJson:$templateAsJson) {
+  validateTemplateImport(templateAsJson: $templateAsJson) {
     validationResult {
       json
       version
@@ -7,20 +7,35 @@ mutation validateTemplateImport($templateAsJson: String!) {
       isValid
       errors
       questionComparisons {
-        existingQuestion
-        {
+        existingQuestion {
           ...question
         }
-        newQuestion
-        {
+        newQuestion {
           ...question
         }
         status
         conflictResolutionStrategy
       }
+      subTemplatesWithValidation {
+        json
+        version
+        exportDate
+        isValid
+        errors
+        questionComparisons {
+          existingQuestion {
+            ...question
+          }
+          newQuestion {
+            ...question
+          }
+          status
+          conflictResolutionStrategy
+        }
+      }
     }
     rejection {
-       ...rejection
+      ...rejection
     }
   }
 }
