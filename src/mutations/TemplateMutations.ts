@@ -123,10 +123,19 @@ export default class TemplateMutations {
         break;
     }
 
+    const activeTemplateTypes = [
+      TemplateGroupId.SHIPMENT,
+      TemplateGroupId.VISIT_REGISTRATION,
+      TemplateGroupId.FEEDBACK,
+    ];
+
     const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(
       args.groupId
     );
-    if (!currentActiveTemplateId) {
+    if (
+      !currentActiveTemplateId &&
+      activeTemplateTypes.includes(args.groupId)
+    ) {
       // if there is no active template, then mark newly created template as active
       await this.dataSource.setActiveTemplate({
         templateGroupId: args.groupId,
