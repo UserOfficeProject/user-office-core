@@ -156,7 +156,8 @@ export class TemplateImportWithValidation {
     public exportDate: Date,
     public isValid: boolean,
     public errors: string[],
-    public questionComparisons: QuestionComparison[]
+    public questionComparisons: QuestionComparison[],
+    public subTemplatesWithValidation: TemplateImportWithValidation[]
   ) {}
 }
 
@@ -166,6 +167,7 @@ export class TemplateExport {
     public exportDate: Date,
     public template: Template,
     public templateSteps: TemplateStep[],
-    public questions: Question[]
+    public questions: Question[],
+    public subTemplates: string[]
   ) {}
 }

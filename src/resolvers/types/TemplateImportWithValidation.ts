@@ -4,7 +4,7 @@ import { TemplateImportWithValidation as TemplateImportWithValidationOrigin } fr
 import { QuestionComparison } from './QuestionComparison';
 
 @ObjectType()
-export class TemplateImportWithValidation
+export class TemplateImportWithValidationWithoutSubTemplates
   implements Partial<TemplateImportWithValidationOrigin>
 {
   @Field(() => String)
@@ -24,4 +24,9 @@ export class TemplateImportWithValidation
 
   @Field(() => [QuestionComparison])
   public questionComparisons: QuestionComparison[];
+}
+@ObjectType()
+export class TemplateImportWithValidation extends TemplateImportWithValidationWithoutSubTemplates {
+  @Field(() => [TemplateImportWithValidationWithoutSubTemplates])
+  public subTemplatesWithValidation: TemplateImportWithValidationWithoutSubTemplates[];
 }

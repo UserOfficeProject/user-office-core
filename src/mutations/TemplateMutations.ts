@@ -481,12 +481,14 @@ export default class TemplateMutations {
   async importTemplate(
     agent: UserWithRole | null,
     templateAsJson: string,
-    conflictResolution: ConflictResolution[]
+    conflictResolution: ConflictResolution[],
+    subTemplatesConflictResolutions: ConflictResolution[][]
   ): Promise<Template | Rejection> {
     try {
       return await this.dataSource.importTemplate(
         templateAsJson,
-        conflictResolution
+        conflictResolution,
+        subTemplatesConflictResolutions
       );
     } catch (error) {
       return rejection(

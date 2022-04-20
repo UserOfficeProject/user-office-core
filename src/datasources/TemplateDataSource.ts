@@ -36,7 +36,8 @@ export interface TemplateDataSource {
   setActiveTemplate(args: SetActiveTemplateArgs): Promise<boolean>;
   importTemplate(
     templateAsJson: string,
-    conflictResolutions: ConflictResolution[]
+    conflictResolutions: ConflictResolution[],
+    subTemplatesConflictResolutions: ConflictResolution[][]
   ): Promise<Template>;
   // TemplateField
   createQuestion(

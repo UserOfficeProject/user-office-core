@@ -392,6 +392,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       exportDate: new Date(),
       json: '{}',
       version: '1.0.0',
+      subTemplatesWithValidation: [],
     };
   }
 }
