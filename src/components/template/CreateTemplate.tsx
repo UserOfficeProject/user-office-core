@@ -4,7 +4,7 @@ import { createTemplateValidationSchema } from '@user-office-software/duo-valida
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import { useSnackbar } from 'notistack';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -16,6 +16,7 @@ const CreateTemplate = (props: {
   const { onComplete, groupId } = props;
   const { enqueueSnackbar } = useSnackbar();
   const { api } = useDataApiWithFeedback();
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   return (
     <>
@@ -28,6 +29,7 @@ const CreateTemplate = (props: {
           description: '',
         }}
         onSubmit={async (values): Promise<void> => {
+          setButtonDisabled(true);
           const result = await api().createTemplate({ ...values, groupId });
           const {
             createTemplate: { template, rejection },
@@ -63,7 +65,12 @@ const CreateTemplate = (props: {
               minRows="3"
               data-cy="description"
             />
-            <Button type="submit" fullWidth data-cy="submit">
+            <Button
+              type="submit"
+              fullWidth
+              data-cy="submit"
+              disabled={buttonDisabled}
+            >
               Create
             </Button>
           </Form>
