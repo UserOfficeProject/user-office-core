@@ -1,5 +1,4 @@
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import MenuItem from '@mui/material/MenuItem';
 import { Field } from 'formik';
@@ -75,13 +74,13 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
 
           <TitledContainer label="Options">
             <FormControl fullWidth>
-              <InputLabel htmlFor="config.templateId">Template name</InputLabel>
               <Field
                 name="config.templateId"
                 id="config.templateId"
                 type="text"
                 component={Select}
                 data-cy="template-id"
+                label="Template name"
               >
                 {templates.length ? (
                   templates.map((template) => {
@@ -111,15 +110,13 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
 
             {features.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
               <FormControl fullWidth>
-                <InputLabel htmlFor="config.esiTemplateId">
-                  ESI template name
-                </InputLabel>
                 <Field
                   name="config.esiTemplateId"
                   id="config.esiTemplateId"
                   type="text"
                   component={Select}
                   data-cy="esi-template-id"
+                  label="ESI template name"
                 >
                   {esiTemplates.length ? (
                     esiTemplates.map((template) => {

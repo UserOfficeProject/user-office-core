@@ -1,5 +1,4 @@
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import MenuItem from '@mui/material/MenuItem';
 import { Field } from 'formik';
@@ -62,13 +61,13 @@ export const QuestionGenericTemplateForm: FC<QuestionFormProps> = (props) => {
 
           <TitledContainer label="Options">
             <FormControl fullWidth>
-              <InputLabel htmlFor="config.templateId">Template name</InputLabel>
               <Field
                 name="config.templateId"
                 id="config.templateId"
                 type="text"
                 component={Select}
                 data-cy="template-id"
+                label="Template name"
               >
                 {templates.length ? (
                   templates.map((template) => {
