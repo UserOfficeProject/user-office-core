@@ -54,8 +54,8 @@ import {
   TopicRecord,
 } from './records';
 
-const EXPORT_VERSION = '1.1.0';
-const MIN_SUPPORTED_VERSION = '1.1.0';
+const EXPORT_VERSION = '1.2.0';
+const MIN_SUPPORTED_VERSION = '1.2.0';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getTemplateCategories(): Promise<TemplateCategory[]> {
