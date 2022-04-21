@@ -35,6 +35,14 @@ export class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER;
   }
 
+  isApiToken(agent: UserWithRole | null) {
+    if (agent == null) {
+      return false;
+    }
+
+    return agent?.isApiAccessToken;
+  }
+
   async hasRole(agent: UserWithRole | null, role: string): Promise<boolean> {
     if (agent == null) {
       return false;
