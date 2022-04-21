@@ -5,7 +5,7 @@ const exportToken = process.env.EXPORT_TOKEN;
 const importToken = process.env.IMPORT_TOKEN;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const axiosProd = require('axios').create({
+const axiosDev = require('axios').create({
   headers: {
     common: {
       Authorization: importToken,
@@ -13,7 +13,7 @@ const axiosProd = require('axios').create({
   },
 });
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const axiosDev = require('axios').create({
+const axiosProd = require('axios').create({
   headers: {
     common: {
       Authorization: exportToken,
@@ -106,11 +106,14 @@ const importTemplate = `
 `;
 
 async function main() {
+  console.log(axiosDev.headers);
+
   const result = await axiosProd.post(grapqlExportUrl, {
     query: getTemplates,
   });
 
-  console.log('Templates to import: ' + result.data);
+  console.log('Templates to import: ');
+  console.log(result.data.data.templates);
 
   const templates = result.data.data.templates;
 
@@ -160,7 +163,8 @@ async function main() {
       },
     });
 
-    console.log('Template import result: ' + importTemplateResult.data.data);
+    console.log('Template import result:');
+    console.log(importTemplateResult.data.data);
   });
 }
 

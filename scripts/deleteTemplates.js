@@ -1,8 +1,8 @@
 const grapqlExportUrl = process.env.GRAPHQL_EXPORT_URL;
 const grapqlImportUrl = process.env.GRAPHQL_IMPORT_URL;
 
-const exportToken = processs.env.EXPORT_TOKEN;
-const importToken = processs.env.IMPORT_TOKEN;
+const exportToken = process.env.EXPORT_TOKEN;
+const importToken = process.env.IMPORT_TOKEN;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axiosProd = require('axios').create({
@@ -99,7 +99,8 @@ async function main() {
     query: getTemplates,
   });
 
-  console.log('Templates to delete: ' + templatesProd.data.data);
+  console.log('Templates to delete:');
+  console.log(templatesProd.data.data);
 
   const prodTemplatesProposal = templatesProd.data.data.templates.filter(
     (template) => template.groupId == 'PROPOSAL'
@@ -133,7 +134,8 @@ async function main() {
 
         const calls = callsResults.data.data.calls;
 
-        console.log('Calls to delete: ' + calls);
+        console.log('Calls to delete:');
+        console.log(calls);
 
         // Loop through calls
         await Promise.all(
@@ -143,9 +145,8 @@ async function main() {
               query: getProposals,
               varibales: { filter: { callId: call.id } },
             });
-            console.log(
-              'Proposals to delete: ' + proposalResults.data.data.proposals
-            );
+            console.log('Proposals to delete:');
+            console.log(proposalResults.data.data.proposals);
 
             const proposals = proposalResults.data.data.proposals.proposals;
 
@@ -159,10 +160,8 @@ async function main() {
                     query: deleteProposal(proposal.primaryKey),
                   }
                 );
-                console.log(
-                  'Proposal deletion rejection: ' +
-                    proposalDeleteResult.data.data
-                );
+                console.log('Proposal deletion rejection:');
+                console.log(proposalDeleteResult.data.data);
               })
             );
 
@@ -170,9 +169,8 @@ async function main() {
             const callDeleteResults = await axiosDev.post(grapqlImportUrl, {
               query: deleteCall(call.id),
             });
-            console.log(
-              'Call deletion rejection: ' + callDeleteResults.data.data
-            );
+            console.log('Call deletion rejection:');
+            console.log(callDeleteResults.data.data);
           })
         );
 
@@ -181,10 +179,8 @@ async function main() {
           query: deleteTemplate(devTemplate.templateId),
         });
 
-        console.log(
-          'Template deleted rejection: ' +
-            templateDeleteResults.data.data.deleteTemplate
-        );
+        console.log('Template deleted rejection:');
+        console.log(templateDeleteResults.data.data.deleteTemplate);
       }
     })
   );
@@ -201,10 +197,8 @@ async function main() {
       const templateDeleteResults = await axiosDev.post(grapqlImportUrl, {
         query: deleteTemplate(devTemplate.templateId),
       });
-      console.log(
-        'Sub template deleted result' +
-          templateDeleteResults.data.data.deleteTemplate
-      );
+      console.log('Sub template deleted result');
+      console.log(templateDeleteResults.data.data.deleteTemplate);
     }
   });
 }
