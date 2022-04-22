@@ -110,7 +110,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
       callId: selectedCallId,
       instrumentId: selectedInstrumentId,
       status: getFilterStatus(urlQueryParams.reviewStatus),
-      reviewer: ReviewerFilter.YOU,
+      reviewer: ReviewerFilter.ME,
     });
 
   useEffect(() => {

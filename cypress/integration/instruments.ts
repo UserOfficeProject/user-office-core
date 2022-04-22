@@ -1,6 +1,6 @@
 import faker from 'faker';
 
-import { TechnicalReviewStatus } from '../../src/generated/sdk';
+import { ReviewerFilter, TechnicalReviewStatus } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 const selectAllProposalsFilterStatus = () => {
@@ -580,6 +580,53 @@ context('Instrument tests', () => {
       // cy.contains(proposal1.title).should('exist');
     });
 
+    it('Instrument scientists should be able to filter only their own proposals', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          createdProposalPk = result.createProposal.proposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstrument({
+            proposals: [
+              { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+            ],
+            instrumentId: createdInstrumentId,
+          });
+        }
+      });
+      cy.contains('Proposals');
+
+      cy.get('[data-cy="reviewer-filter"] input').should(
+        'have.value',
+        ReviewerFilter.ME
+      );
+
+      selectAllProposalsFilterStatus();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.get('table.MuiTable-root').should('not.contain.text', proposal2.title);
+
+      cy.get('[data-cy="reviewer-filter"]').click();
+      cy.get(
+        `[property="reviewer-filter-options"] [data-value=${ReviewerFilter.ALL}]`
+      ).click();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .should('exist');
+      cy.contains(proposal2.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('exist');
+    });
+
     it('Instrument scientist should be able to download multiple proposals as PDF', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
@@ -603,11 +650,14 @@ context('Instrument tests', () => {
 
       selectAllProposalsFilterStatus();
 
-      cy.contains(proposal1.title);
-      cy.contains(proposal2.title);
-
       cy.finishedLoading();
 
+      cy.get('[data-cy="reviewer-filter"]').click();
+      cy.get(
+        `[property="reviewer-filter-options"] [data-value=${ReviewerFilter.ALL}]`
+      ).click();
+
+      cy.finishedLoading();
       cy.contains(proposal1.title)
         .parent()
         .find('input[type="checkbox"]')
@@ -617,25 +667,15 @@ context('Instrument tests', () => {
         .find('input[type="checkbox"]')
         .check();
 
-      cy.get('[aria-label="Download proposals"]').click();
+      cy.get('[data-cy="download-proposals"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         '2 selected items'
       );
-
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[data-cy="download-proposal"]')
-        .click();
-
-      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        proposal1.title
-      );
     });
 
-    it('Instrument scientist should be able to save and submit technical review on proposal where he is instrument scientist', () => {
+    it('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       cy.contains('Proposals');

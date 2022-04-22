@@ -75,7 +75,7 @@ export type QueryParameters = {
 let columns: Column<ProposalViewData>[] = [
   {
     title: 'Actions',
-    cellStyle: { padding: 0, minWidth: 152 },
+    cellStyle: { padding: 0 },
     sorting: false,
     removable: false,
     field: 'rowActionButtons',
@@ -251,58 +251,36 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   }, [proposalsData, urlQueryParams.selection]);
 
-  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const GetAppIconComponent = (): JSX.Element => (
+    <GetAppIcon data-cy="download-proposals" />
+  );
   const DeleteIcon = (): JSX.Element => <Delete />;
   const GroupWorkIcon = (): JSX.Element => <GroupWork />;
   const EmailIcon = (): JSX.Element => <Email />;
-  const ScienceIconComponent = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
-    }
-  ): JSX.Element => <ScienceIcon {...props} />;
-  const ChangeProposalStatusIcon = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
-    }
-  ): JSX.Element => <ListStatusIcon {...props} />;
+  const ScienceIconComponent = (): JSX.Element => (
+    <ScienceIcon data-cy="assign-remove-instrument" />
+  );
+  const ChangeProposalStatusIcon = (): JSX.Element => (
+    <ListStatusIcon data-cy="change-proposal-status" />
+  );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: ProposalViewData) => {
-    const iconButtonStyle = { padding: '7px' };
-
-    return (
-      <>
-        <Tooltip title="View proposal">
-          <IconButton
-            data-cy="view-proposal"
-            onClick={() => {
-              setUrlQueryParams({ reviewModal: rowData.primaryKey });
-            }}
-            style={iconButtonStyle}
-          >
-            <Visibility />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Download proposal as pdf">
-          <IconButton
-            data-cy="download-proposal"
-            onClick={() =>
-              downloadPDFProposal([rowData.primaryKey], rowData.title)
-            }
-            style={iconButtonStyle}
-          >
-            <GetAppIcon />
-          </IconButton>
-        </Tooltip>
-      </>
-    );
-  };
+  const RowActionButtons = (rowData: ProposalViewData) => (
+    <Tooltip title="View proposal">
+      <IconButton
+        data-cy="view-proposal"
+        onClick={() => {
+          setUrlQueryParams({ reviewModal: rowData.primaryKey });
+        }}
+      >
+        <Visibility />
+      </IconButton>
+    </Tooltip>
+  );
 
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
@@ -790,9 +768,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
           {
-            icon: ScienceIconComponent.bind(null, {
-              'data-cy': 'assign-remove-instrument',
-            }),
+            icon: ScienceIconComponent,
             tooltip: 'Assign/Remove instrument',
             onClick: () => {
               setOpenInstrumentAssignment(true);
@@ -800,9 +776,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
           {
-            icon: ChangeProposalStatusIcon.bind(null, {
-              'data-cy': 'change-proposal-status',
-            }),
+            icon: ChangeProposalStatusIcon,
             tooltip: 'Change proposal status',
             onClick: () => {
               setOpenChangeProposalStatus(true);

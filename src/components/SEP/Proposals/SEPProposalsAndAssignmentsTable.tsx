@@ -153,34 +153,28 @@ const SEPProposalsAndAssignmentsTable: React.FC<
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: SEPProposalType) => {
-    const iconButtonStyle = { padding: '7px' };
-
-    return (
-      <>
-        <Tooltip title="View proposal">
-          <IconButton
-            data-cy="view-proposal"
-            onClick={() => {
-              setUrlQueryParams({ reviewModal: rowData.proposalPk });
-            }}
-            style={iconButtonStyle}
-          >
-            <Visibility />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Assign SEP Member">
-          <IconButton
-            data-cy="assign-sep-member"
-            onClick={() => setProposalPk(rowData.proposalPk)}
-            style={iconButtonStyle}
-          >
-            <AssignmentInd />
-          </IconButton>
-        </Tooltip>
-      </>
-    );
-  };
+  const RowActionButtons = (rowData: SEPProposalType) => (
+    <>
+      <Tooltip title="View proposal">
+        <IconButton
+          data-cy="view-proposal"
+          onClick={() => {
+            setUrlQueryParams({ reviewModal: rowData.proposalPk });
+          }}
+        >
+          <Visibility />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Assign SEP Member">
+        <IconButton
+          data-cy="assign-sep-member"
+          onClick={() => setProposalPk(rowData.proposalPk)}
+        >
+          <AssignmentInd />
+        </IconButton>
+      </Tooltip>
+    </>
+  );
 
   const handleBulkDownloadClick = (
     event: React.MouseEventHandler<HTMLButtonElement>,

@@ -23,12 +23,16 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import ReviewerFilterComponent, {
+  defaultReviewerQueryFilter,
+} from 'components/review/ReviewerFilter';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeatureId,
   Proposal,
   ProposalsFilter,
+  ReviewerFilter,
   SubmitTechnicalReviewInput,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
@@ -49,6 +53,60 @@ import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
 
+const getFilterReviewer = (selected: string | ReviewerFilter) =>
+  selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
+
+let columns: Column<ProposalViewData>[] = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 120 },
+    sorting: false,
+    removable: false,
+    field: 'rowActionButtons',
+  },
+  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Title',
+    field: 'title',
+    ...{ width: 'auto' },
+  },
+  {
+    title: 'Time allocation',
+    render: (rowData) =>
+      `${rowData.technicalTimeAllocation ?? 0} (${
+        rowData.allocationTimeUnit
+      }s)`,
+    hidden: false,
+  },
+  {
+    title: 'Submitted',
+    field: 'submitted',
+    lookup: { true: 'Yes', false: 'No' },
+  },
+  { title: 'Status', field: 'statusName' },
+  {
+    title: 'Final Status',
+    field: 'finalStatus',
+    render: (rowData: ProposalViewData): string =>
+      rowData.finalStatus
+        ? getTranslation(rowData.finalStatus as ResourceId)
+        : '',
+    emptyValue: '-',
+  },
+  {
+    title: 'Call',
+    field: 'callShortCode',
+    emptyValue: '-',
+    hidden: true,
+  },
+  {
+    title: 'SEP',
+    field: 'sepCode',
+    emptyValue: '-',
+    hidden: true,
+  },
+];
+
 const ProposalTableInstrumentScientist: React.FC<{
   confirm: WithConfirmType;
 }> = ({ confirm }) => {
@@ -66,6 +124,7 @@ const ProposalTableInstrumentScientist: React.FC<{
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
+    reviewer: defaultReviewerQueryFilter,
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -73,6 +132,7 @@ const ProposalTableInstrumentScientist: React.FC<{
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
+    reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
@@ -84,6 +144,7 @@ const ProposalTableInstrumentScientist: React.FC<{
     instrumentId: proposalFilter.instrumentId,
     callId: proposalFilter.callId,
     questionFilter: proposalFilter.questionFilter,
+    reviewer: proposalFilter.reviewer,
   });
 
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
@@ -124,72 +185,6 @@ const ProposalTableInstrumentScientist: React.FC<{
   const isInstrumentManagementEnabled = featureContext.features.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-
-  let columns: Column<ProposalViewData>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      removable: false,
-      field: 'rowActionButtons',
-    },
-    { title: 'Proposal ID', field: 'proposalId' },
-    {
-      title: 'Title',
-      field: 'title',
-      ...{ width: 'auto' },
-    },
-    {
-      title: 'Time allocation',
-      render: (rowData) =>
-        `${rowData.technicalTimeAllocation ?? 0} (${
-          rowData.allocationTimeUnit
-        }s)`,
-      hidden: false,
-    },
-    ...(isTechnicalReviewEnabled
-      ? [
-          {
-            title: 'Technical status',
-            render: (rowData: ProposalViewData) => rowData.technicalStatus,
-          },
-        ]
-      : []),
-    {
-      title: 'Submitted',
-      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
-    },
-    { title: 'Status', field: 'statusName' },
-    {
-      title: 'Final Status',
-      field: 'finalStatus',
-      render: (rowData: ProposalViewData): string =>
-        rowData.finalStatus
-          ? getTranslation(rowData.finalStatus as ResourceId)
-          : '',
-    },
-    ...(isInstrumentManagementEnabled
-      ? [
-          {
-            title: 'Instrument',
-            field: 'instrumentName',
-            emptyValue: '-',
-          },
-        ]
-      : []),
-    {
-      title: 'Call',
-      field: 'callShortCode',
-      emptyValue: '-',
-      hidden: true,
-    },
-    {
-      title: 'SEP',
-      field: 'sepCode',
-      emptyValue: '-',
-      hidden: true,
-    },
-  ];
 
   const instrumentScientistProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
@@ -240,18 +235,6 @@ const ProposalTableInstrumentScientist: React.FC<{
             ) : (
               <Edit data-cy="edit-technical-review" />
             )}
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title="Download proposal as PDF">
-          <IconButton
-            data-cy="download-proposal"
-            onClick={() =>
-              downloadPDFProposal([rowData.primaryKey], rowData.title)
-            }
-            style={iconButtonStyle}
-          >
-            <GetAppIcon />
           </IconButton>
         </Tooltip>
       </>
@@ -336,7 +319,7 @@ const ProposalTableInstrumentScientist: React.FC<{
   };
 
   const handleBulkDownloadClick = (
-    event: React.MouseEventHandler<HTMLButtonElement>,
+    _: React.MouseEventHandler<HTMLButtonElement>,
     rowData: ProposalViewData | ProposalViewData[]
   ) => {
     if (!Array.isArray(rowData)) {
@@ -398,19 +381,40 @@ const ProposalTableInstrumentScientist: React.FC<{
     }));
   }
 
+  if (
+    isTechnicalReviewEnabled &&
+    !columns.find((column) => column.field === 'technicalStatus')
+  ) {
+    columns.push({
+      title: 'Technical status',
+      field: 'technicalStatus',
+      emptyValue: '-',
+    });
+  }
+
+  if (
+    isInstrumentManagementEnabled &&
+    !columns.find((column) => column.field === 'instrumentName')
+  ) {
+    columns.push({
+      title: 'Instrument',
+      field: 'instrumentName',
+      emptyValue: '-',
+    });
+  }
+
   columns = setSortDirectionOnSortColumn(
     columns,
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
 
-  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
-  const DoneAllIcon = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
-    }
-  ): JSX.Element => <DoneAll {...props} />;
+  const GetAppIconComponent = (): JSX.Element => (
+    <GetAppIcon data-cy="download-proposals" />
+  );
+  const DoneAllIcon = (): JSX.Element => (
+    <DoneAll data-cy="submit-proposal-reviews" />
+  );
 
   const proposalToReview = preselectedProposalsData.find(
     (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
@@ -464,6 +468,12 @@ const ProposalTableInstrumentScientist: React.FC<{
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>
+      <ReviewerFilterComponent
+        reviewer={urlQueryParams.reviewer}
+        onChange={(reviewer) =>
+          setProposalFilter({ ...proposalFilter, reviewer })
+        }
+      />
       <ProposalFilterBar
         calls={{ data: calls, isLoading: loadingCalls }}
         instruments={{ data: instruments, isLoading: loadingInstruments }}
@@ -508,9 +518,7 @@ const ProposalTableInstrumentScientist: React.FC<{
             position: 'toolbarOnSelect',
           },
           {
-            icon: DoneAllIcon.bind(null, {
-              'data-cy': 'submit-proposal-reviews',
-            }),
+            icon: DoneAllIcon,
             tooltip: 'Submit proposal reviews',
             onClick: handleBulkTechnicalReviewsSubmit,
             position: 'toolbarOnSelect',
