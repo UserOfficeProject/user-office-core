@@ -18,7 +18,7 @@ export enum ReviewStatus {
 }
 
 export enum ReviewerFilter {
-  YOU = 0,
+  ME = 0,
   ALL = 1,
 }
 

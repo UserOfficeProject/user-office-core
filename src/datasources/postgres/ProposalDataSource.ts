@@ -7,6 +7,7 @@ import { Event } from '../../events/event.enum';
 import { Proposal, ProposalPksWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { ReviewerFilter } from '../../models/Review';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import {
@@ -515,6 +516,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query
             .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('abstract', 'ilike', `%${filter.text}%`);
+        }
+        if (filter?.reviewer === ReviewerFilter.ME) {
+          query.where(
+            'proposal_table_view.technical_review_assignee',
+            scientistId
+          );
         }
         if (filter?.callId) {
           query.where('proposal_table_view.call_id', filter.callId);
