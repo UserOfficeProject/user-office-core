@@ -12,6 +12,10 @@ import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
+  if (event.isRejection) {
+    return;
+  }
+
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
@@ -20,10 +24,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
     Tokens.UserDataSource
   );
 
-  if (event.isRejection) {
-    return;
-  }
-
   switch (event.type) {
     /*
      * Send the PI and co-proposers an email when any proposal is submitted.
@@ -31,6 +31,23 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
      */
     case Event.PROPOSAL_SUBMITTED: {
       const emailsToSend: EmailSettings[] = [];
+
+      const call = await callDataSource.getCall(event.proposal.callId);
+
+      const isIsis = call?.shortCode?.toLowerCase().includes('isis');
+
+      const isRapidAccess =
+        isIsis && call?.shortCode?.toLowerCase().includes('rapid');
+
+      let piEmailTemplate: string;
+
+      if (isRapidAccess) {
+        piEmailTemplate = 'isis-rapid-proposal-submitted-pi';
+      } else if (isIsis) {
+        piEmailTemplate = 'isis-proposal-submitted-pi';
+      } else {
+        piEmailTemplate = 'clf-proposal-submitted-pi';
+      }
 
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
@@ -41,6 +58,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
       if (principalInvestigator) {
         const piEmail = piSubmissionEmail(
+          piEmailTemplate,
           event.proposal,
           principalInvestigator,
           participants
@@ -53,12 +71,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           { event }
         );
       }
-
-      const call = await callDataSource.getCall(event.proposal.callId);
-
-      const isIsis = call?.shortCode?.toLowerCase().includes('isis');
-      const isRapidAccess =
-        isIsis && call?.shortCode?.toLowerCase().includes('rapid');
 
       if (isRapidAccess) {
         const uoAddress = process.env.ISIS_UO_EMAIL;
@@ -103,12 +115,13 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 }
 
 const piSubmissionEmail = (
+  templateName: string,
   proposal: Proposal,
   pi: User,
   participants: User[]
 ): EmailSettings => ({
   content: {
-    template_id: 'proposal-submitted',
+    template_id: templateName,
   },
   substitution_data: {
     piPreferredname: pi.preferredname,
@@ -125,10 +138,10 @@ const piSubmissionEmail = (
   },
   recipients: [
     { address: pi.email },
-    ...participants.map((partipant) => {
+    ...participants.map((participant) => {
       return {
         address: {
-          email: partipant.email,
+          email: participant.email,
           header_to: pi.email,
         },
       };
