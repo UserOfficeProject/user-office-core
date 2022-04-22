@@ -1,5 +1,7 @@
 import { InputProps } from '@mui/material/Input';
-import MuiTextField, { TextFieldProps } from '@mui/material/TextField';
+import MuiTextField, {
+  TextFieldProps as MUITextFieldProps,
+} from '@mui/material/TextField';
 import { Field } from 'formik';
 import { Autocomplete } from 'formik-mui';
 import React from 'react';
@@ -14,6 +16,7 @@ type FormikUIAutocompleteProps = {
   noOptionsText?: string;
   required?: boolean;
   disabled?: boolean;
+  TextFieldProps?: MUITextFieldProps;
   InputProps?: Partial<InputProps> & { 'data-cy': string };
   'data-cy'?: string;
 };
@@ -27,6 +30,7 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
   required,
   disabled,
   InputProps,
+  TextFieldProps,
   ...props
 }) => {
   const options = items.map((item) => item.value);
@@ -44,9 +48,10 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
 
         return foundOption?.text || '';
       }}
-      renderInput={(params: TextFieldProps) => (
+      renderInput={(params: MUITextFieldProps) => (
         <MuiTextField
           {...params}
+          {...TextFieldProps}
           label={label}
           required={required}
           disabled={disabled}

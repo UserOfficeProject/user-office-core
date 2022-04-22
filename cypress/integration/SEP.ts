@@ -150,9 +150,7 @@ context('SEP reviews tests', () => {
   describe('User officer role', () => {
     it('Officer should be able to assign proposal to existing SEP', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.get('[data-cy="sep-assignments-table"]').should(
         'not.contain.text',
@@ -180,9 +178,7 @@ context('SEP reviews tests', () => {
         variant: 'success',
       });
 
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
@@ -200,15 +196,13 @@ context('SEP reviews tests', () => {
         ],
       });
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
         .parent()
-        .find('[aria-label="View Proposal"]')
+        .find('[data-cy="view-proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -230,9 +224,7 @@ context('SEP reviews tests', () => {
         ],
       });
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
@@ -251,13 +243,11 @@ context('SEP reviews tests', () => {
         memberIds: [sepMembers.reviewer.id],
       });
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Assign SEP Member']").first().click();
+      cy.get('[data-cy="assign-sep-member"]').first().click();
 
       cy.finishedLoading();
 
@@ -302,9 +292,8 @@ context('SEP reviews tests', () => {
         proposalPk: createdProposalPk,
       });
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
-      cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -333,9 +322,8 @@ context('SEP reviews tests', () => {
         proposalPk: createdProposalPk,
       });
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
-      cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -434,13 +422,11 @@ context('SEP reviews tests', () => {
     });
 
     it('SEP Chair should be able to assign SEP member to proposal in existing SEP', () => {
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Assign SEP Member']").first().click();
+      cy.get('[data-cy="assign-sep-member"]').first().click();
 
       cy.finishedLoading();
 
@@ -464,14 +450,13 @@ context('SEP reviews tests', () => {
     });
 
     it('SEP Chair should be able to see proposal details in modal inside proposals and assignments', () => {
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
-      cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
         .parent()
-        .find('[aria-label="View Proposal"]')
+        .find('[data-cy="view-proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -490,9 +475,8 @@ context('SEP reviews tests', () => {
         proposalPk: createdProposalPk,
       });
 
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
-      cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -530,13 +514,11 @@ context('SEP reviews tests', () => {
     });
 
     it('SEP Secretary should be able to assign SEP member to proposal in existing SEP', () => {
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Assign SEP Member']").first().click();
+      cy.get('[data-cy="assign-sep-member"]').first().click();
 
       cy.finishedLoading();
 
@@ -566,9 +548,8 @@ context('SEP reviews tests', () => {
         proposalPk: createdProposalPk,
       });
 
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
-      cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -776,9 +757,7 @@ context('SEP meeting components tests', () => {
   describe('User Officer role', () => {
     it('Officer should be able to assign proposal to instrument and instrument to call to see it in meeting components', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -807,9 +786,7 @@ context('SEP meeting components tests', () => {
 
     it('Officer should not be able to submit an instrument if all proposals are not submitted in SEP meetings', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -884,9 +861,7 @@ context('SEP meeting components tests', () => {
         }
       });
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -927,9 +902,7 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -941,9 +914,8 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to edit SEP Meeting form', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
-      cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -1002,9 +974,7 @@ context('SEP meeting components tests', () => {
       );
 
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -1023,9 +993,7 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to set SEP time allocation', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -1076,9 +1044,7 @@ context('SEP meeting components tests', () => {
 
     it('should use SEP time allocation (if set) when calculating if they fit in available time', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -1112,9 +1078,7 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to submit an instrument if all proposals SEP meetings are submitted in existing SEP', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -1176,9 +1140,8 @@ context('SEP meeting components tests', () => {
         sepId: createdSepId,
       });
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
-      cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
@@ -1194,9 +1157,7 @@ context('SEP meeting components tests', () => {
 
     it('Download SEP is working with dialog window showing up', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Meeting Components').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -1208,9 +1169,7 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
@@ -1248,19 +1207,26 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to remove assigned proposal from existing SEP', () => {
       cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
-      cy.contains('Loading...').should('not.exist');
 
-      cy.get('[aria-label="Remove assigned proposal"]').click();
-      cy.get('[aria-label="Save"]').click();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="remove-assigned-sep-proposal"]').click();
+
+      cy.get('[data-cy="confirmation-dialog"]')
+        .should('exist')
+        .and('contain.text', 'Remove SEP assignment');
+
+      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Assignment removed',
+        text: 'Assignment/s removed',
       });
 
       cy.closeNotification();
@@ -1282,6 +1248,72 @@ context('SEP meeting components tests', () => {
           expect(element.text()).to.be.equal('No records to display');
         });
     });
+
+    it('Officer should be able to download SEP proposal as pdf', () => {
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-sep-proposals"]').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        proposal1.title
+      );
+    });
+
+    it('Officer should be able to bulk download SEP proposals as pdf', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then(
+        (proposalResult) => {
+          const createdProposal = proposalResult.createProposal.proposal;
+          if (createdProposal) {
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: proposal2.title,
+            });
+            cy.createSep({
+              code: sep2.code,
+              description: sep2.description,
+              active: true,
+              numberRatingsRequired: 2,
+            }).then((sepResult) => {
+              if (sepResult.createSEP.sep) {
+                cy.assignProposalsToSep({
+                  sepId: sepResult.createSEP.sep.id,
+                  proposals: [
+                    {
+                      callId: initialDBData.call.id,
+                      primaryKey: createdProposal.primaryKey,
+                    },
+                  ],
+                });
+              }
+            });
+          }
+        }
+      );
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.get(
+        '[data-cy="sep-assignments-table"] [data-cy="select-all-table-rows"]'
+      ).click();
+
+      cy.get('[data-cy="download-sep-proposals"]').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        proposal1.title
+      );
+    });
   });
 
   describe('SEP Chair role', () => {
@@ -1298,9 +1330,8 @@ context('SEP meeting components tests', () => {
       cy.changeActiveRole(initialDBData.roles.sepChair);
     });
     it('SEP Chair should be able to edit SEP Meeting form', () => {
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
-      cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -1325,9 +1356,8 @@ context('SEP meeting components tests', () => {
         instrumentId: createdInstrumentId,
         sepId: createdSepId,
       });
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
-      cy.contains('Meeting Components').click();
       cy.finishedLoading();
       cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
 
@@ -1352,9 +1382,7 @@ context('SEP meeting components tests', () => {
     });
 
     it('SEP Chair should not be able to remove assigned proposal from existing SEP', () => {
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 
@@ -1381,9 +1409,8 @@ context('SEP meeting components tests', () => {
     });
 
     it('SEP Secretary should be able to edit SEP Meeting form', () => {
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
-      cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -1408,9 +1435,8 @@ context('SEP meeting components tests', () => {
         instrumentId: createdInstrumentId,
         sepId: createdSepId,
       });
-      cy.visit(`/SEPPage/${createdSepId}`);
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
-      cy.contains('Meeting Components').click();
       cy.finishedLoading();
       cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
 
@@ -1435,9 +1461,7 @@ context('SEP meeting components tests', () => {
     });
 
     it('SEP Secretary should not be able to remove assigned proposal from existing SEP', () => {
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
 

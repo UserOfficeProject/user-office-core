@@ -196,31 +196,23 @@ function SampleSafetyPage() {
   }, [api, selectedCallId]);
 
   const downloadPDFSample = useDownloadPDFSample();
-  const RowActionButtons = (rowData: SampleWithProposalData) => {
-    const iconButtonStyle = { padding: '7px' };
-
-    return (
-      <>
-        <Tooltip title="Review sample">
-          <IconButton
-            style={iconButtonStyle}
-            onClick={() => setSelectedSample(rowData)}
-          >
-            <VisibilityIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Download sample as pdf">
-          <IconButton
-            data-cy="download-sample"
-            onClick={() => downloadPDFSample([rowData.id], rowData.title)}
-            style={iconButtonStyle}
-          >
-            <GetAppIcon />
-          </IconButton>
-        </Tooltip>
-      </>
-    );
-  };
+  const RowActionButtons = (rowData: SampleWithProposalData) => (
+    <>
+      <Tooltip title="Review sample">
+        <IconButton onClick={() => setSelectedSample(rowData)}>
+          <VisibilityIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Download sample as pdf">
+        <IconButton
+          data-cy="download-sample"
+          onClick={() => downloadPDFSample([rowData.id], rowData.title)}
+        >
+          <GetAppIcon />
+        </IconButton>
+      </Tooltip>
+    </>
+  );
 
   const samplesWithRowActions = samples.map((sample) => ({
     ...sample,

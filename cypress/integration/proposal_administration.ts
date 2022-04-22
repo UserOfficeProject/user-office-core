@@ -231,11 +231,38 @@ context('Proposal administration tests', () => {
     });
 
     it('Download proposal is working with dialog window showing up', () => {
-      cy.get('[data-cy="download-proposal"]').first().click();
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalFixedName,
+            abstract: proposalName2,
+          });
+        }
+      });
+      cy.contains(proposalName1)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-proposals"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         proposalName1
+      );
+
+      cy.contains(proposalFixedName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-proposals"]').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        '2 selected items'
       );
     });
 

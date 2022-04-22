@@ -524,9 +524,10 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
-        .first()
-        .then((element) => expect(element.text()).to.contain('draft'));
+      cy.get('[data-cy="proposal-table"]')
+        .contains(proposalTitle)
+        .parent()
+        .contains('draft');
 
       cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
@@ -700,7 +701,7 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Assign SEP Member']").first().click();
+      cy.get('[data-cy="assign-sep-member"]').first().click();
 
       cy.finishedLoading();
 
