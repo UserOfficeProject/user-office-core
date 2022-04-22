@@ -12,6 +12,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { QuestionFilterCompareOperator } from '../../models/Questionary';
+import { ReviewerFilter } from '../../models/Review';
 import { DataType } from '../../models/Template';
 import { Proposal } from '../types/Proposal';
 
@@ -37,6 +38,9 @@ export class ProposalsFilter {
 
   @Field(() => [Int], { nullable: true })
   public questionaryIds?: number[];
+
+  @Field(() => ReviewerFilter, { nullable: true })
+  public reviewer?: ReviewerFilter;
 
   @Field(() => Int, { nullable: true })
   public callId?: number;
