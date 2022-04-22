@@ -1,11 +1,11 @@
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
-import MenuItem from '@mui/material/MenuItem';
 import { Field } from 'formik';
-import { Select, TextField } from 'formik-mui';
+import { TextField } from 'formik-mui';
 import { default as React, FC } from 'react';
 import * as Yup from 'yup';
 
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
@@ -29,6 +29,11 @@ export const QuestionTemplateRelationGenericTemplateForm: FC<
   if (!templates) {
     return null;
   }
+
+  const templateOptions = templates.map((template) => ({
+    value: template.templateId,
+    text: template.name,
+  }));
 
   return (
     <QuestionTemplateRelationFormShell
@@ -83,31 +88,15 @@ export const QuestionTemplateRelationGenericTemplateForm: FC<
 
           <TitledContainer label="Options">
             <FormControl fullWidth>
-              <Field
+              <FormikUIAutocomplete
                 name="config.templateId"
-                type="text"
-                component={Select}
-                data-cy="templateId"
-                defaultValue={''}
+                items={templateOptions}
                 label="Template name"
-              >
-                {templates.length ? (
-                  templates.map((template) => {
-                    return (
-                      <MenuItem
-                        value={template.templateId}
-                        key={template.templateId}
-                      >
-                        {template.name}
-                      </MenuItem>
-                    );
-                  })
-                ) : (
-                  <MenuItem value="noTemplates" key="noTemplates" disabled>
-                    No active templates
-                  </MenuItem>
-                )}
-              </Field>
+                noOptionsText="No Sub Templates available"
+                InputProps={{ 'data-cy': 'template-id' }}
+                TextFieldProps={{ margin: 'none' }}
+                required
+              />
               <Link href="/GenericTemplates/" target="blank">
                 View all templates
               </Link>

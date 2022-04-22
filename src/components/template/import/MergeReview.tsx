@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, Typography } from '@mui/material';
 import produce from 'immer';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -86,21 +86,6 @@ export function MergeReview(props: MergeReviewProps) {
     },
     []
   );
-
-  useEffect(() => {
-    console.log(
-      state.subTemplatesWithValidation.map((template) => {
-        return template.questionComparisons.map((comparison) => {
-          const question = comparison.newQuestion;
-
-          return {
-            itemId: question.id,
-            strategy: comparison.conflictResolutionStrategy,
-          };
-        });
-      })
-    );
-  }, [state]);
 
   const handleImportClick = () =>
     api('Template imported successfully')
