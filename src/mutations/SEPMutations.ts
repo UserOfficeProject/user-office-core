@@ -457,19 +457,23 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: ReorderSepMeetingDecisionProposalsInput
   ): Promise<SepMeetingDecision | Rejection> {
-    const allSepDecisions = await Promise.all(
-      args.proposals.map((proposal) => {
-        return this.dataSource.saveSepMeetingDecision(proposal);
-      })
-    );
-
-    if (allSepDecisions.length !== args.proposals.length) {
-      return rejection(
-        'Can not reorder SEP meeting decision proposals because could not find all proposals',
-        { args }
+    try {
+      const allSepDecisions = await Promise.all(
+        args.proposals.map((proposal) => {
+          return this.dataSource.saveSepMeetingDecision(proposal);
+        })
       );
-    }
 
-    return allSepDecisions[0];
+      if (allSepDecisions.length !== args.proposals.length) {
+        return rejection(
+          'Can not reorder SEP meeting decision proposals because could not find all proposals',
+          { args }
+        );
+      }
+
+      return allSepDecisions[0];
+    } catch (error) {
+      return rejection('Something went wrong', { args, error });
+    }
   }
 }

@@ -55,7 +55,7 @@ export default class SEPQueries {
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getSEPProposals(
     agent: UserWithRole | null,
-    { sepId, callId }: { sepId: number; callId: number }
+    { sepId, callId }: { sepId: number; callId: number | null }
   ) {
     if (
       this.userAuth.isUserOfficer(agent) ||
