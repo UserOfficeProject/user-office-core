@@ -111,7 +111,7 @@ const ProposalTechnicalReview = ({
     const shouldSubmit =
       method === 'submitTechnicalReviews' ||
       (isUserOfficer && values.submitted);
-    const successMessage = isUserOfficer
+    const toastSuccessMessage = isUserOfficer
       ? `Technical review updated successfully!`
       : `Technical review ${
           shouldSubmit ? 'submitted' : 'updated'
@@ -120,7 +120,7 @@ const ProposalTechnicalReview = ({
     let result;
 
     if (method === 'submitTechnicalReviews') {
-      result = await api(successMessage)[method]({
+      result = await api({ toastSuccessMessage })[method]({
         technicalReviews: [
           {
             proposalPk: proposal.primaryKey,
@@ -136,7 +136,7 @@ const ProposalTechnicalReview = ({
         ],
       });
     } else {
-      result = await api(successMessage)[method]({
+      result = await api({ toastSuccessMessage })[method]({
         proposalPk: proposal.primaryKey,
         timeAllocation: +values.timeAllocation,
         comment: values.comment,

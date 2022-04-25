@@ -167,9 +167,9 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
         });
 
         if (apiAccessToken) {
-          const data = await api(
-            'Api access token updated successfully!'
-          ).updateApiAccessToken({
+          const data = await api({
+            toastSuccessMessage: 'Api access token updated successfully!',
+          }).updateApiAccessToken({
             accessTokenId: apiAccessToken.id,
             name: values.name,
             accessPermissions: JSON.stringify(accessPermissions),
@@ -180,9 +180,9 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             close(data.updateApiAccessToken.apiAccessToken);
           }
         } else {
-          const data = await api(
-            'Api access token created successfully!'
-          ).createApiAccessToken({
+          const data = await api({
+            toastSuccessMessage: 'Api access token created successfully!',
+          }).createApiAccessToken({
             ...values,
             accessPermissions: JSON.stringify(accessPermissions),
           });

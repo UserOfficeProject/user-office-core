@@ -91,7 +91,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     const {
       assignChairOrSecretary: { rejection },
-    } = await api('SEP chair assigned successfully!').assignChairOrSecretary({
+    } = await api({
+      toastSuccessMessage: 'SEP chair assigned successfully!',
+    }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepId,
         roleId: UserRole.SEP_CHAIR,
@@ -122,9 +124,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     const {
       assignChairOrSecretary: { rejection },
-    } = await api(
-      'SEP secretary assigned successfully!'
-    ).assignChairOrSecretary({
+    } = await api({
+      toastSuccessMessage: 'SEP secretary assigned successfully!',
+    }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepId,
         roleId: UserRole.SEP_SECRETARY,
@@ -152,7 +154,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     const {
       assignReviewersToSEP: { rejection },
-    } = await api('SEP member assigned successfully!').assignReviewersToSEP({
+    } = await api({
+      toastSuccessMessage: 'SEP member assigned successfully!',
+    }).assignReviewersToSEP({
       memberIds: users.map((user) => user.id),
       sepId,
     });
@@ -174,7 +178,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   ): Promise<void> => {
     const {
       removeMemberFromSep: { rejection },
-    } = await api('SEP member removed successfully!').removeMemberFromSep({
+    } = await api({
+      toastSuccessMessage: 'SEP member removed successfully!',
+    }).removeMemberFromSep({
       memberId: user.id,
       sepId,
       roleId: user.roleId,

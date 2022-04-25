@@ -884,7 +884,10 @@ context('SEP meeting components tests', () => {
       cy.get('@secondDragIcon').trigger('dragenter');
 
       cy.get('@secondDragIcon').trigger('dragend');
-      cy.finishedLoading();
+
+      cy.get(
+        '[data-cy="sep-instrument-proposals-table"] [role="progressbar"]'
+      ).should('not.exist');
 
       cy.notification({
         variant: 'success',

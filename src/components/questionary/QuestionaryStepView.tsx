@@ -167,7 +167,9 @@ export default function QuestionaryStepView(props: {
       return false;
     }
 
-    const answerTopicResult = await api('Saved').answerTopic({
+    const answerTopicResult = await api({
+      toastSuccessMessage: 'Saved',
+    }).answerTopic({
       questionaryId: questionaryId,
       answers: prepareAnswers(activeFields),
       topicId: topicId,

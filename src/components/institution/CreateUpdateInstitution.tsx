@@ -60,9 +60,9 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
     name: string,
     country: number
   ) => {
-    const response = await api(
-      'Institution created successfully!'
-    ).createInstitution({
+    const response = await api({
+      toastSuccessMessage: 'Institution created successfully!',
+    }).createInstitution({
       name,
       country,
       verified,
@@ -82,9 +82,9 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
     country: number,
     name: string
   ) => {
-    const response = await api(
-      'Institution updated successfully!'
-    ).updateInstitution({
+    const response = await api({
+      toastSuccessMessage: 'Institution updated successfully!',
+    }).updateInstitution({
       id,
       name,
       verified,

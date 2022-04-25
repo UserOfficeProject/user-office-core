@@ -88,11 +88,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
       submitted: shouldSubmitMeetingDecision,
     };
 
-    const data = await api(
-      `SEP meeting decision ${
+    const data = await api({
+      toastSuccessMessage: `SEP meeting decision ${
         shouldSubmitMeetingDecision ? 'submitted' : 'saved'
-      } successfully!`
-    ).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
+      } successfully!`,
+    }).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
 
     const isError = !!data.saveSepMeetingDecision.rejection;
 

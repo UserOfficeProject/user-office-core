@@ -88,7 +88,9 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   const handleSubmit = async (values: GradeFormType) => {
     const {
       updateReview: { rejection, review: updatedReview },
-    } = await api(shouldSubmit ? 'Submitted' : 'Updated').updateReview({
+    } = await api({
+      toastSuccessMessage: shouldSubmit ? 'Submitted' : 'Updated',
+    }).updateReview({
       reviewID: review.id,
       grade: +values.grade,
       comment: values.comment ? values.comment : '',

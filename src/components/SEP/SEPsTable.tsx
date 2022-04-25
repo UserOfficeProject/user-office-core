@@ -69,7 +69,7 @@ const SEPsTable: React.FC = () => {
   const EditIcon = (): JSX.Element => <Edit />;
 
   const deleteSEP = async (id: number | string) => {
-    return await api('SEP deleted successfully')
+    return await api({ toastSuccessMessage: 'SEP deleted successfully' })
       .deleteSEP({
         id: id as number,
       })

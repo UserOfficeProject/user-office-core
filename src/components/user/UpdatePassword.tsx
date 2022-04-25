@@ -23,7 +23,10 @@ const useStyles = makeStyles({
 export default function UpdatePassword(props: { id: number }) {
   const { api } = useDataApiWithFeedback();
   const sendPasswordUpdate = (password: string) => {
-    return api('Updated Password').updatePassword({ id: props.id, password });
+    return api({ toastSuccessMessage: 'Updated Password' }).updatePassword({
+      id: props.id,
+      password,
+    });
   };
 
   const classes = useStyles();

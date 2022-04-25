@@ -45,7 +45,9 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
     <Formik
       initialValues={initialValues}
       onSubmit={async (newUnit): Promise<void> => {
-        const data = await api('Unit created successfully').createUnit(newUnit);
+        const data = await api({
+          toastSuccessMessage: 'Unit created successfully',
+        }).createUnit(newUnit);
         if (data.createUnit.unit) {
           close(data.createUnit.unit);
         }

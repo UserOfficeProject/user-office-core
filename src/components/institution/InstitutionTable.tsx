@@ -28,7 +28,9 @@ const InstitutionPage: React.FC = () => {
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const deleteInstitution = async (id: number | string) => {
-    return await api('Institution removed successfully!')
+    return await api({
+      toastSuccessMessage: 'Institution removed successfully!',
+    })
       .deleteInstitution({
         id: id as number,
       })

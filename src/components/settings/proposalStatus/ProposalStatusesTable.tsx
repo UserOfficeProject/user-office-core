@@ -52,7 +52,9 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
   );
 
   const deleteProposalStatus = async (id: number) => {
-    return await api('Proposal status deleted successfully')
+    return await api({
+      toastSuccessMessage: 'Proposal status deleted successfully',
+    })
       .deleteProposalStatus({
         id: id,
       })

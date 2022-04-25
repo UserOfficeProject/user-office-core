@@ -51,9 +51,9 @@ function SampleEvaluationDialog(props: {
           }
 
           const { id, safetyComment, safetyStatus } = values;
-          const result = await api(
-            `Review for '${sample?.title}' submitted`
-          ).updateSample({ sampleId: id, safetyComment, safetyStatus });
+          const result = await api({
+            toastSuccessMessage: `Review for '${sample?.title}' submitted`,
+          }).updateSample({ sampleId: id, safetyComment, safetyStatus });
 
           const updatedSample = result.updateSample.sample;
           onClose({ ...values, ...updatedSample } || null);

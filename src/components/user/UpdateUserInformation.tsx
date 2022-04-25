@@ -142,7 +142,9 @@ export default function UpdateUserInformation(props: { id: number }) {
   }
 
   const sendUserUpdate = (variables: UpdateUserMutationVariables) => {
-    return api('Updated Information').updateUser(variables);
+    return api({ toastSuccessMessage: 'Updated Information' }).updateUser(
+      variables
+    );
   };
 
   const isUserOfficer = currentRole === UserRole.USER_OFFICER;
@@ -150,7 +152,9 @@ export default function UpdateUserInformation(props: { id: number }) {
   const handleSetUserEmailVerified = async () => {
     const {
       setUserEmailVerified: { rejection },
-    } = await api('Email verified').setUserEmailVerified({ id: props.id });
+    } = await api({
+      toastSuccessMessage: 'Email verified',
+    }).setUserEmailVerified({ id: props.id });
 
     if (!rejection) {
       setUserData((userData) =>
@@ -167,7 +171,9 @@ export default function UpdateUserInformation(props: { id: number }) {
   const handleSetUserNotPlaceholder = async () => {
     const {
       setUserNotPlaceholder: { rejection },
-    } = await api('User is no longer placeholder').setUserNotPlaceholder({
+    } = await api({
+      toastSuccessMessage: 'User is no longer placeholder',
+    }).setUserNotPlaceholder({
       id: props.id,
     });
 

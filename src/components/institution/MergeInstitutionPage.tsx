@@ -136,7 +136,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
                   }
                   confirm(
                     () => {
-                      api('Institutions merged')
+                      api({ toastSuccessMessage: 'Institutions merged' })
                         .mergeInstitutions({
                           institutionIdFrom: institutionFrom.id,
                           institutionIdInto: institutionInto.id,

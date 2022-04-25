@@ -49,7 +49,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
       })}
       onSubmit={async (values): Promise<void> => {
         if (visit) {
-          api('Visit updated')
+          api({ toastSuccessMessage: 'Visit updated' })
             .updateVisit({
               visitId: visit.id,
               team: values.team.map((user) => user.id),
@@ -61,7 +61,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               }
             });
         } else {
-          api('Visit created')
+          api({ toastSuccessMessage: 'Visit created' })
             .createVisit({
               scheduledEventId: event.id,
               team: values.team?.map((user) => user.id),

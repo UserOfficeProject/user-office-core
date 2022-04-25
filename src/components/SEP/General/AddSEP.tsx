@@ -35,7 +35,9 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
         active: true,
       }}
       onSubmit={async (values): Promise<void> => {
-        const data = await api('SEP created successfully!').createSEP(values);
+        const data = await api({
+          toastSuccessMessage: 'SEP created successfully!',
+        }).createSEP(values);
 
         if (data.createSEP.rejection) {
           close(null);

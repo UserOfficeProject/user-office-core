@@ -69,9 +69,11 @@ function AssignTechnicalReview({
             if (selectedUser) {
               confirm(
                 () =>
-                  api(
-                    `Assigned to ${getFullUserName(userIdToUser(selectedUser))}`
-                  )
+                  api({
+                    toastSuccessMessage: `Assigned to ${getFullUserName(
+                      userIdToUser(selectedUser)
+                    )}`,
+                  })
                     .updateTechnicalReviewAssignee({
                       userId: selectedUser,
                       proposalPks: [proposal.primaryKey],

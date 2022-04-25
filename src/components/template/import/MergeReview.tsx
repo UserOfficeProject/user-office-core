@@ -61,7 +61,7 @@ export function MergeReview(props: MergeReviewProps) {
   );
 
   const handleImportClick = () =>
-    api('Template imported successfully')
+    api({ toastSuccessMessage: 'Template imported successfully' })
       .importTemplate({
         templateAsJson: json,
         conflictResolutions: state.questionComparisons.map((comparison) => {

@@ -72,7 +72,7 @@ export default function PageInputBox(props: {
         <Button
           className={classes.button}
           onClick={() =>
-            api('Updated Page').setPageContent({
+            api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
               id: props.pageName,
               text: content,
             })
