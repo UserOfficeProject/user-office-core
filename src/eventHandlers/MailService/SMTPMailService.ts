@@ -41,6 +41,12 @@ export class SMTPMailService extends MailService {
             }
           : {}),
       }),
+      juice: true,
+      juiceResources: {
+        webResources: {
+          relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
+        },
+      },
     });
   }
 
