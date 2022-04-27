@@ -3,7 +3,11 @@ import { useEffect, useState, SetStateAction } from 'react';
 import { Institution } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useInstitutionsData({ country = false }: { country: boolean }) {
+export function useInstitutionsData(
+  { country } = {
+    country: false,
+  }
+) {
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loadingInstitutions, setLoadingInstitutions] = useState(true);
 
@@ -46,7 +50,7 @@ export function useInstitutionsData({ country = false }: { country: boolean }) {
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, country]);
 
   return {
     loadingInstitutions,

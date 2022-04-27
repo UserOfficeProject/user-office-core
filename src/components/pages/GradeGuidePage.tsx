@@ -1,5 +1,7 @@
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import { Stack, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import parse from 'html-react-parser';
 import React from 'react';
 
@@ -26,7 +28,11 @@ const GradeGuidePage: React.FC = () => {
   );
 
   if (loadingPage) {
-    return <UOLoader />;
+    return (
+      <Box textAlign="center">
+        <UOLoader />
+      </Box>
+    );
   }
   const content = pageContent ? parse(pageContent) : noContents;
 

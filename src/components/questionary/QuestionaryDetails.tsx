@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box';
 import { TableProps } from '@mui/material/Table';
 import Typography from '@mui/material/Typography';
 import React, { FC } from 'react';
@@ -28,7 +29,11 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
   const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
 
   if (loadingQuestionary) {
-    return <UOLoader />;
+    return (
+      <Box textAlign="center">
+        <UOLoader />
+      </Box>
+    );
   }
 
   if (!questionary) {

@@ -1396,6 +1396,45 @@ context('Template tests', () => {
       cy.logout();
     });
 
+    it('File Upload max files should be required', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.contains(fileQuestion).click();
+
+      cy.get('[role="presentation"]').contains('image/*').click();
+
+      cy.get('body').type('{esc}');
+
+      cy.get('[data-cy="max_files"] input').clear().type('-1');
+
+      cy.contains('Update').click();
+
+      cy.get('[data-cy="max_files"] input').should('be.focused');
+      cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
+
+      cy.get('[data-cy="max_files"] input').clear();
+
+      cy.get('[data-cy="max_files"] input').should('be.focused');
+      cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
+
+      cy.get('[data-cy="max_files"] input').clear().type('1');
+
+      cy.contains('Update').click();
+
+      cy.get('[data-cy="question-relation-dialogue"]').should('not.exist');
+
+      cy.logout();
+    });
+
     it('Officer can delete proposal questions', () => {
       cy.login('officer');
       cy.visit('/');

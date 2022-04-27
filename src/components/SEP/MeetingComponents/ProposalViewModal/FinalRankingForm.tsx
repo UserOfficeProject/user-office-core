@@ -1,19 +1,20 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { saveSepMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { CheckboxWithLabel } from 'formik-mui';
+import { CheckboxWithLabel, Select } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
-import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
 import {
   Proposal,
@@ -24,6 +25,7 @@ import {
 } from 'generated/sdk';
 import { StyledPaper, StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles((theme) => ({
@@ -63,6 +65,13 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
       ProposalEndStatus.UNSET,
     submitted: proposalData.sepMeetingDecision?.submitted ?? false,
   };
+
+  const statusOptions: Option[] = [
+    { text: 'Unset', value: ProposalEndStatus.UNSET },
+    { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
+    { text: 'Reserved', value: ProposalEndStatus.RESERVED },
+    { text: 'Rejected', value: ProposalEndStatus.REJECTED },
+  ];
 
   const PromptIfDirty = () => {
     const formik = useFormikContext();
@@ -149,7 +158,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
             }
           }}
         >
-          {({ isSubmitting, setFieldValue }): JSX.Element => (
+          {({ isSubmitting, setFieldValue, values }): JSX.Element => (
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
@@ -192,21 +201,33 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
-                  <FormikUIAutocomplete
-                    name="recommendation"
-                    label="Recommendation"
-                    data-cy="proposalSepMeetingRecommendation"
-                    items={[
-                      { text: 'Unset', value: ProposalEndStatus.UNSET },
-                      { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
-                      { text: 'Reserved', value: ProposalEndStatus.RESERVED },
-                      { text: 'Rejected', value: ProposalEndStatus.REJECTED },
-                    ]}
-                    required
-                    disabled={
-                      !hasWriteAccess || shouldDisableForm(isSubmitting)
-                    }
-                  />
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel
+                      htmlFor="recommendation"
+                      shrink={!!values.recommendation}
+                      required
+                    >
+                      Recommendation
+                    </InputLabel>
+                    <Field
+                      name="recommendation"
+                      component={Select}
+                      data-cy="proposalSepMeetingRecommendation"
+                      disabled={
+                        !hasWriteAccess || shouldDisableForm(isSubmitting)
+                      }
+                      MenuProps={{
+                        'data-cy': 'proposalSepMeetingRecommendation-options',
+                      }}
+                      required
+                    >
+                      {statusOptions.map(({ value, text }) => (
+                        <MenuItem value={value} key={value}>
+                          {text}
+                        </MenuItem>
+                      ))}
+                    </Field>
+                  </FormControl>
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <InputLabel

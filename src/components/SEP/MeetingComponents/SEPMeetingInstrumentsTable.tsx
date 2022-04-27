@@ -31,8 +31,8 @@ const instrumentTableColumns = [
   },
   {
     title: 'Submitted',
-    render: (rowData: InstrumentWithAvailabilityTime) =>
-      rowData.submitted ? 'Yes' : 'No',
+    field: 'submitted',
+    lookup: { true: 'Yes', false: 'No' },
   },
 ];
 

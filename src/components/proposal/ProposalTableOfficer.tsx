@@ -112,7 +112,8 @@ let columns: Column<ProposalViewData>[] = [
   },
   {
     title: 'Submitted',
-    render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+    field: 'submitted',
+    lookup: { true: 'Yes', false: 'No' },
   },
   {
     title: 'Status',
@@ -132,7 +133,8 @@ let columns: Column<ProposalViewData>[] = [
   },
   {
     title: 'Notified',
-    render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
+    field: 'notified',
+    lookup: { true: 'Yes', false: 'No' },
   },
   {
     title: 'Instrument',

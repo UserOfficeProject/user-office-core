@@ -49,7 +49,7 @@ const InstitutionPage: React.FC = () => {
     {
       title: 'Verified',
       field: 'verified',
-      lookup: { true: 'true', false: 'false' },
+      lookup: { true: 'Yes', false: 'No' },
     },
   ];
 

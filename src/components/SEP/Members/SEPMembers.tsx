@@ -8,7 +8,6 @@ import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useState, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -23,19 +22,6 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
-
-const useStyles = makeStyles(() => ({
-  darkerDisabledTextField: {
-    '& .MuiInputBase-root.Mui-disabled': {
-      color: 'rgba(0, 0, 0, 0.7) !important',
-    },
-  },
-  defaultTextField: {
-    '& .MuiFormLabel-root': {
-      color: 'black',
-    },
-  },
-}));
 
 type BasicUserDetailsWithRole = BasicUserDetails & { roleId: UserRole };
 
@@ -70,7 +56,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
   const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
-  const classes = useStyles();
   const { loadingMembers, SEPReviewersData, setSEPReviewersData } =
     useSEPReviewersData(
       sepId,
@@ -265,13 +250,8 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               fullWidth
               data-cy="SEPChair"
               required
-              disabled
-              className={
-                sepData.sepChair
-                  ? classes.darkerDisabledTextField
-                  : classes.defaultTextField
-              } // original behaviour preserved but labels legible by default
               InputProps={{
+                readOnly: true,
                 endAdornment: isUserOfficer && (
                   <>
                     {sepData.sepChair && (
@@ -323,13 +303,8 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               fullWidth
               data-cy="SEPSecretary"
               required
-              disabled
-              className={
-                sepData.sepSecretary
-                  ? classes.darkerDisabledTextField
-                  : classes.defaultTextField
-              } // original behaviour preserved but labels legible by default
               InputProps={{
+                readOnly: true,
                 endAdornment: isUserOfficer && (
                   <>
                     {sepData.sepSecretary && (

@@ -29,7 +29,7 @@ const columns = [
   {
     title: 'Active',
     field: 'active',
-    render: (rowData: Sep): string => (rowData.active ? 'Yes' : 'No'),
+    lookup: { true: 'Yes', false: 'No' },
   },
 ];
 

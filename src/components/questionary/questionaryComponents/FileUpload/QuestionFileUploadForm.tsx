@@ -32,7 +32,10 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
         config: Yup.object({
           file_type: Yup.array().required().min(1, 'File type is required'),
           small_label: Yup.string(),
-          max_files: Yup.number(),
+          max_files: Yup.number().min(
+            0,
+            'Value must be grater than or equal to 0'
+          ),
         }),
       })}
     >
@@ -120,10 +123,13 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
               name="config.max_files"
               id="Max-number-Input"
               label="Max number of files"
-              type="text"
+              type="number"
               component={TextField}
               fullWidth
+              required
+              InputProps={{ inputProps: { min: 0 } }}
               data-cy="max_files"
+              helperText="Use 0 for unlimited files"
             />
           </TitledContainer>
         </>

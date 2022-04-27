@@ -194,12 +194,10 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
             </Field>
           </Box>
           <ErrorMessage name="grade" />
-          <NavigationFragment>
-            {isSubmitting && (
-              <Box display="flex" alignItems="center" mx={1}>
-                <UOLoader buttonSized />
-              </Box>
-            )}
+          <NavigationFragment isLoading={isSubmitting}>
+            <ButtonWithDialog label="Grading guide" disabled={isSubmitting}>
+              <GradeGuidePage />
+            </ButtonWithDialog>
             {hasAccessRights && (
               <Field
                 id="submitted"
@@ -213,9 +211,6 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                 data-cy="is-grade-submitted"
               />
             )}
-            <ButtonWithDialog label="Grading guide">
-              <GradeGuidePage />
-            </ButtonWithDialog>
             <Button
               data-cy="save-grade"
               disabled={isDisabled(isSubmitting)}
