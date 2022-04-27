@@ -35,7 +35,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [{ address: event.userlinkresponse.user.email }],
         })
         .then((res: any) => {
-          logger.logInfo('Emai send on for password reset:', {
+          logger.logInfo('Email send on for password reset:', {
             result: res,
             event,
           });
