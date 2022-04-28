@@ -9,9 +9,7 @@ export async function performApiRequest(requestData: string) {
 
   const response = await axios({
     method: 'post',
-    url: `${getEnvOrThrow(
-      'EAM_API_URL'
-    )}/infor/CustomerApi/EAMWS/EAMTESTAPI/EWSConnector`,
+    url: getEnvOrThrow('EAM_API_URL'),
     data: requestData,
     headers: {
       'Content-Type': 'text/xml',

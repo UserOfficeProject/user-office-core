@@ -39,7 +39,9 @@ export default class AdminMutations {
       logger.logWarn('Resetting database', {});
 
       const log = await this.dataSource.resetDB(includeSeeds);
-      container.resolve<() => void>(Tokens.ConfigureEnvironment)();
+      await container.resolve<() => Promise<void>>(
+        Tokens.ConfigureEnvironment
+      )();
 
       return log;
     } else {

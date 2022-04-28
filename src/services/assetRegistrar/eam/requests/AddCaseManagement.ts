@@ -14,7 +14,8 @@ const getRequest = (
   experimentStartDate: Date,
   experimentEndDate: Date,
   dateRequested: Date,
-  localContactEmail: string
+  localContactEmail: string,
+  location: string
 ) => `<?xml version="1.0" encoding="utf-8"?>
 <Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Header>
@@ -114,7 +115,7 @@ const getRequest = (
           </SCHEDULEDENDDATE>                 
         </TrackingDetails>		
         <StandardUserDefinedFields xmlns="http://schemas.datastream.net/MP_fields">         
-          <UDFCHAR03>Delivery Address</UDFCHAR03>
+          <UDFCHAR03>${location}</UDFCHAR03>
           <UDFCHAR04>${proposalId}</UDFCHAR04>
 		  <UDFCHAR05>Responsible Phone Number</UDFCHAR05>          
         </StandardUserDefinedFields>
