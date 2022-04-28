@@ -6,11 +6,11 @@ import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 export async function getToken() {
   const config: ModuleOptions = {
     client: {
-      id: 'infor~pAVcElz8D8rmSWLPp9TmHDwLTOpOo2f3OW-2DDpW5xg',
-      secret: getEnvOrThrow('EAM_AUTH_SECRET'),
+      id: getEnvOrThrow('EAM_AUTH_CLIENT_ID'),
+      secret: getEnvOrThrow('EAM_AUTH_CLIENT_SECRET'),
     },
     auth: {
-      tokenHost: getEnvOrThrow('EAM_AUTH_URL'),
+      tokenHost: getEnvOrThrow('EAM_AUTH_HOST'),
       tokenPath: 'InforIntSTS/connect/token',
     },
   };

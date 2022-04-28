@@ -1,5 +1,5 @@
 const date = new Date();
-const PART_CODE = 12413;
+
 /**
  * Add Asset Equipment
  * @param proposalTitle title of the proposal
@@ -10,6 +10,7 @@ const PART_CODE = 12413;
  * @returns the SOAP request
  */
 const getRequest = (
+  partCode: string,
   proposalId: string,
   proposalTitle: string,
   weightKilograms: number,
@@ -78,7 +79,7 @@ const getRequest = (
 				</COMMISSIONDATE>
 				<PartAssociation is_bylot="is_b1">
 					<PARTID xmlns="http://schemas.datastream.net/MP_fields">
-						<PARTCODE>${PART_CODE}</PARTCODE>
+						<PARTCODE>${partCode}</PARTCODE>
 						<ORGANIZATIONID entity="Equipment">
 							<ORGANIZATIONCODE>*</ORGANIZATIONCODE>
 						</ORGANIZATIONID>
