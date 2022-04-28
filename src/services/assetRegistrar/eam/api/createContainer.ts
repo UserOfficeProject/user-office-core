@@ -26,6 +26,7 @@ import {
 import { DataType } from '../../../../models/Template';
 import getRequest from '../requests/AddAssetEquipment';
 import { createAndLogError } from '../utils/createAndLogError';
+import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 import { performApiRequest } from '../utils/performApiRequest';
 import { InstrumentDataSource } from './../../../../datasources/InstrumentDataSource';
 
@@ -91,6 +92,8 @@ export async function createContainer(shipmentId: number) {
     Tokens.InstrumentDataSource
   );
 
+  const partCode = getEnvOrThrow('EAM_PART_CODE');
+
   const shipment = await shipmentDataSource.getShipment(shipmentId);
   if (!shipment) {
     throw createAndLogError('Shipment for container not found', {
@@ -127,6 +130,7 @@ export async function createContainer(shipmentId: number) {
   );
 
   const request = getRequest(
+    partCode,
     proposal.proposalId,
     proposal.title,
     weight,
