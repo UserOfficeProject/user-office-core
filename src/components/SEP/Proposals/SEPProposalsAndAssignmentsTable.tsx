@@ -22,6 +22,7 @@ import {
   ReviewWithNextProposalStatus,
   ProposalStatus,
   Review,
+  SettingsId,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -138,7 +139,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   const { api } = useDataApiWithFeedback();
   const [proposalPk, setProposalPk] = useState<null | number>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
-  const { toFormattedDateTime } = useFormattedDateTime();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,

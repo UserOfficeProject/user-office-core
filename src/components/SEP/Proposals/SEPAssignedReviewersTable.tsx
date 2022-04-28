@@ -12,7 +12,12 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
-import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
+import {
+  SepAssignment,
+  ReviewStatus,
+  UserRole,
+  SettingsId,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { SEPProposalType } from 'hooks/SEP/useSEPProposalsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -78,7 +83,9 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     UserRole.SEP_CHAIR,
     UserRole.SEP_SECRETARY,
   ]);
-  const { toFormattedDateTime } = useFormattedDateTime();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const isDraftStatus = (status?: ReviewStatus) =>
     status === ReviewStatus.DRAFT;
