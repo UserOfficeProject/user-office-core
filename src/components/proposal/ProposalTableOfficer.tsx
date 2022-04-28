@@ -250,7 +250,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       : []),
     {
       title: 'Submitted',
-      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+      field: 'submitted',
+      lookup: { true: 'Yes', false: 'No' },
     },
     {
       title: 'Status',
@@ -282,7 +283,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       : []),
     {
       title: 'Notified',
-      render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
+      field: 'notified',
+      lookup: { true: 'Yes', false: 'No' },
     },
     ...(isInstrumentManagementEnabled
       ? [

@@ -53,7 +53,6 @@ const useStyles = makeStyles((theme) => ({
       border: 'none',
     },
     '& .MuiPaper-root': {
-      padding: '0 40px',
       backgroundColor: '#fafafa',
     },
     '& .draggingRow': {
@@ -154,8 +153,8 @@ const assignmentColumns = [
   },
   {
     title: 'SEP meeting submitted',
-    render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone): string =>
-      rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
+    field: 'proposal.sepMeetingDecision.submitted',
+    lookup: { true: 'Yes', false: 'No', undefined: 'No' },
   },
   {
     title: 'Recommendation',

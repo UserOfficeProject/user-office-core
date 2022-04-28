@@ -1,7 +1,7 @@
 import Button, { ButtonProps } from '@mui/material/Button';
 import React, { Component } from 'react';
 
-import UOLoader from './UOLoader';
+// import UOLoader from './UOLoader';
 
 export class NavigButton extends Component<ButtonProps & { isBusy?: boolean }> {
   render() {
@@ -14,18 +14,6 @@ export class NavigButton extends Component<ButtonProps & { isBusy?: boolean }> {
           disabled={isBusy || disabled}
           style={{ opacity: isBusy ? 0.8 : 'inherit' }}
         />
-        {isBusy && (
-          <UOLoader
-            size={24}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: -12,
-              marginLeft: -12,
-            }}
-          />
-        )}
       </div>
     );
   }

@@ -73,9 +73,7 @@ export default function UpdateUserInformation(props: { id: number }) {
   });
   const { api } = useDataApiWithFeedback();
   const fieldsContent = useGetFields();
-  const { institutions, loadingInstitutions } = useInstitutionsData({
-    country: false,
-  });
+  const { institutions, loadingInstitutions } = useInstitutionsData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const classes = useStyles();
