@@ -11,7 +11,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
@@ -23,6 +23,7 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
   Proposal,
@@ -31,6 +32,7 @@ import {
   ProposalPkWithCallId,
   Sep,
   InstrumentFragment,
+  FeatureId,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -72,82 +74,6 @@ export type QueryParameters = {
   searchText?: string | undefined;
 };
 
-let columns: Column<ProposalViewData>[] = [
-  {
-    title: 'Actions',
-    cellStyle: { padding: 0 },
-    sorting: false,
-    removable: false,
-    field: 'rowActionButtons',
-  },
-  { title: 'Proposal ID', field: 'proposalId' },
-  {
-    title: 'Title',
-    field: 'title',
-    ...{ width: 'auto' },
-  },
-  {
-    title: 'Technical time allocation',
-    render: (rowData) =>
-      rowData.technicalTimeAllocation
-        ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
-        : '',
-    hidden: true,
-  },
-  {
-    title: 'Technical status',
-    field: 'technicalStatus',
-  },
-  {
-    title: 'Final time allocation',
-    render: (rowData) =>
-      rowData.managementTimeAllocation
-        ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
-        : '',
-    hidden: true,
-  },
-  {
-    title: 'Final Status',
-    field: 'finalStatus',
-  },
-  {
-    title: 'Submitted',
-    render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
-  },
-  {
-    title: 'Status',
-    field: 'statusName',
-  },
-  {
-    title: 'Deviation',
-    field: 'reviewDeviation',
-  },
-  {
-    title: 'Average Score',
-    field: 'reviewAverage',
-  },
-  {
-    title: 'Ranking',
-    field: 'rankOrder',
-  },
-  {
-    title: 'Notified',
-    render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
-  },
-  {
-    title: 'Instrument',
-    field: 'instrumentName',
-  },
-  {
-    title: 'Call',
-    field: 'callShortCode',
-  },
-  {
-    title: 'SEP',
-    field: 'sepCode',
-  },
-];
-
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   urlQueryParams,
@@ -174,6 +100,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
+  const featureContext = useContext(FeatureContext);
 
   const prefetchSize = 200;
   const [currentPage, setCurrentPage] = useState(0);
@@ -264,6 +191,120 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     <ListStatusIcon data-cy="change-proposal-status" />
   );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
+
+  const isTechnicalReviewEnabled = featureContext.features.get(
+    FeatureId.TECHNICAL_REVIEW
+  )?.isEnabled;
+  const isInstrumentManagementEnabled = featureContext.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+  const isSEPEnabled = featureContext.features.get(
+    FeatureId.SEP_REVIEW
+  )?.isEnabled;
+
+  let columns: Column<ProposalViewData>[] = [
+    {
+      title: 'Actions',
+      cellStyle: { padding: 0 },
+      sorting: false,
+      removable: false,
+      field: 'rowActionButtons',
+    },
+    { title: 'Proposal ID', field: 'proposalId' },
+    {
+      title: 'Title',
+      field: 'title',
+      ...{ width: 'auto' },
+    },
+    {
+      title: 'Technical time allocation',
+      render: (rowData) =>
+        rowData.technicalTimeAllocation
+          ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
+          : '',
+      hidden: true,
+    },
+    ...(isTechnicalReviewEnabled
+      ? [
+          {
+            title: 'Technical status',
+            field: 'technicalStatus',
+          },
+        ]
+      : []),
+    {
+      title: 'Final time allocation',
+      render: (rowData) =>
+        rowData.managementTimeAllocation
+          ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
+          : '',
+      hidden: true,
+    },
+    ...(isSEPEnabled
+      ? [
+          {
+            title: 'Final Status',
+            field: 'finalStatus',
+          },
+        ]
+      : []),
+    {
+      title: 'Submitted',
+      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+    },
+    {
+      title: 'Status',
+      field: 'statusName',
+    },
+    ...(isSEPEnabled
+      ? [
+          {
+            title: 'Deviation',
+            field: 'reviewDeviation',
+          },
+        ]
+      : []),
+    ...(isSEPEnabled
+      ? [
+          {
+            title: 'Average Score',
+            field: 'reviewAverage',
+          },
+        ]
+      : []),
+    ...(isSEPEnabled
+      ? [
+          {
+            title: 'Ranking',
+            field: 'rankOrder',
+          },
+        ]
+      : []),
+    {
+      title: 'Notified',
+      render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
+    },
+    ...(isInstrumentManagementEnabled
+      ? [
+          {
+            title: 'Instrument',
+            field: 'instrumentName',
+          },
+        ]
+      : []),
+    {
+      title: 'Call',
+      field: 'callShortCode',
+    },
+    ...(isSEPEnabled
+      ? [
+          {
+            title: 'SEP',
+            field: 'sepCode',
+          },
+        ]
+      : []),
+  ];
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -556,8 +597,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
-    PROPOSAL_MODAL_TAB_NAMES.REVIEWS,
+    ...(isTechnicalReviewEnabled
+      ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
+      : []),
+    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
     PROPOSAL_MODAL_TAB_NAMES.ADMIN,
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];

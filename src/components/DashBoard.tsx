@@ -174,6 +174,18 @@ const Dashboard: React.FC = () => {
   const isInstrumentManagementEnabled = featureContext.features.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
+  const isSEPEnabled = featureContext.features.get(
+    FeatureId.SEP_REVIEW
+  )?.isEnabled;
+  const isUserManagementEnabled = featureContext.features.get(
+    FeatureId.USER_MANAGEMENT
+  )?.isEnabled;
+  const isVisitManagementEnabled = featureContext.features.get(
+    FeatureId.VISIT_MANAGEMENT
+  )?.isEnabled;
+  const isSampleSafetyEnabled = featureContext.features.get(
+    FeatureId.SAMPLE_SAFETY
+  )?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
@@ -263,12 +275,14 @@ const Dashboard: React.FC = () => {
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Profile"
-            path="/ProfilePage/:id"
-            component={ProfilePage}
-          />
+          {isUserManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Profile"
+              path="/ProfilePage/:id"
+              component={ProfilePage}
+            />
+          )}
           {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
@@ -312,18 +326,22 @@ const Dashboard: React.FC = () => {
             path="/HelpPage"
             component={HelpPage}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="SEP"
-            path="/SEPPage/:id"
-            component={SEPPage}
-          />
-          <TitledRoute
-            setHeader={setHeader}
-            title="SEPs"
-            path="/SEPs"
-            component={SEPsPage}
-          />
+          {isSEPEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="SEP"
+              path="/SEPPage/:id"
+              component={SEPPage}
+            />
+          )}
+          {isSEPEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="SEPs"
+              path="/SEPs"
+              component={SEPsPage}
+            />
+          )}
           {isInstrumentManagementEnabled && (
             <TitledRoute
               setHeader={setHeader}
@@ -374,12 +392,14 @@ const Dashboard: React.FC = () => {
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Visits Template"
-            path="/VisitTemplates"
-            component={VisitTemplatesPage}
-          />
+          {isVisitManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Visits Template"
+              path="/VisitTemplates"
+              component={VisitTemplatesPage}
+            />
+          )}
           <TitledRoute
             setHeader={setHeader}
             title="Feedback Template"
@@ -430,15 +450,15 @@ const Dashboard: React.FC = () => {
               component={ProposalWorkflowEditor}
             />
           )}
-          {(isSampleSafetyReviewer || isUserOfficer) && (
-            <TitledRoute
-              setHeader={setHeader}
-              title="Samples Safety"
-              path="/SampleSafety"
-              component={SampleSafetyPage}
-            />
-          )}
-
+          {isSampleSafetyEnabled &&
+            (isSampleSafetyReviewer || isUserOfficer) && (
+              <TitledRoute
+                setHeader={setHeader}
+                title="Samples Safety"
+                path="/SampleSafety"
+                component={SampleSafetyPage}
+              />
+            )}
           {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
