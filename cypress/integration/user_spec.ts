@@ -96,6 +96,22 @@ context('User tests', () => {
     cy.contains('Sign in');
   });
 
+  it('Error message should be shown if confirm password does not match password', () => {
+    cy.get('[data-cy=password] input')
+      .type(password)
+      .should('have.value', password);
+
+    cy.get('[data-cy=confirmPassword] input')
+      .type(password + 'test')
+      .should('have.value', password + 'test');
+
+    cy.get('body').click();
+
+    cy.get('[data-cy=confirmPassword] .Mui-error')
+      .should('exist')
+      .and('include.text', 'Confirm password does not match password');
+  });
+
   it('A user should be able to login and out', () => {
     cy.createUser({
       user_title: faker.name.prefix(),

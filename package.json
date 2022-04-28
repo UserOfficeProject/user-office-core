@@ -30,7 +30,7 @@
     "@types/tinymce": "^4.6.5",
     "@types/yup": "^0.29.13",
     "@user-office-software/duo-localisation": "^1.2.0",
-    "@user-office-software/duo-validation": "^3.1.8",
+    "@user-office-software/duo-validation": "^3.1.9",
     "clsx": "^1.1.1",
     "formik": "^2.2.9",
     "formik-mui": "^4.0.0-alpha.3",
