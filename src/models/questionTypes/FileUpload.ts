@@ -180,7 +180,14 @@ const passesVirusScan = async (
     .then((clamAV) => clamAV.isInfected(path))
     .then((response) => {
       const isInfected = response.isInfected;
-      if (isInfected) {
+      if (isInfected === null) {
+        logger.logError('Clamscan was unable to virus scan file', {
+          response,
+          errorContext,
+        });
+
+        return true;
+      } else if (isInfected) {
         logger.logError('Infected file was uploaded', {
           response,
           errorContext,
