@@ -100,9 +100,9 @@ export const fileUploadDefinition: Question = {
  * Checks the file signature of a file and returns whether the file
  * is one of the accepted types specified in the question config.
  *
- * @param fileId The ID of the file to check
+ * @param path A valid path to the file to be scanned
  * @param field The question data containing the config
- * @param value All files in the question
+ * @param errorContext File details to be logged in the event of an error
  * @returns True if the file is identified as one of the accepted
  * types, or if the file cannot be retrieved. False is the file
  * cannot be identified, or is not one of the accepted types.
