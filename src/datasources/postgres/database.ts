@@ -18,7 +18,12 @@ const db = Knex({
 });
 
 db.on('query-error', function (error: any, obj: any) {
-  logger.logError('QUERY ERROR', { error, obj, QueryName: obj?.sql });
+  logger.logError('QUERY ERROR', {
+    message: error?.message,
+    error,
+    obj,
+    QueryName: obj?.sql,
+  });
 });
 
 if (process.env.DATABASE_LOG_QUERIES === '1') {
