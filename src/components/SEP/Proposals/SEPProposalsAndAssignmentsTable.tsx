@@ -64,7 +64,7 @@ const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
 const SEPProposalColumns = [
   {
     title: 'Actions',
-    cellStyle: { padding: 0 },
+    cellStyle: { padding: 0, minWidth: 80 },
     sorting: false,
     removable: false,
     field: 'rowActionButtons',

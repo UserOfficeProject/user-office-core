@@ -468,7 +468,7 @@ context('SEP reviews tests', () => {
       cy.get('[role="dialog"]').contains('Download PDF');
     });
 
-    it('SEP Chair should be able to read/write and un-submit reviews', () => {
+    it('SEP Chair should be able to read/write/submit non-submitted reviews', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
@@ -485,8 +485,21 @@ context('SEP reviews tests', () => {
         .parent()
         .find('[data-cy="grade-proposal-icon"]')
         .click();
-      cy.get('[data-cy="is-grade-submitted"]').should('exist');
+      cy.get('[data-cy="is-grade-submitted"]').should('not.exist');
       readWriteReview();
+
+      cy.contains(sepMembers.reviewer.lastName)
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
+
+      cy.get('[data-cy="submit-grade"]').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy="save-grade"]').should('be.disabled');
+      cy.get('[data-cy="submit-grade"]').should('be.disabled');
     });
   });
 
@@ -541,7 +554,7 @@ context('SEP reviews tests', () => {
       cy.contains(sepMembers.secretary.lastName);
     });
 
-    it('SEP Secretary should be able to read/write and un-submit reviews', () => {
+    it('SEP Secretary should be able to read/write non-submitted reviews', () => {
       cy.assignSepReviewersToProposal({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer.id],
@@ -558,8 +571,22 @@ context('SEP reviews tests', () => {
         .parent()
         .find('[data-cy="grade-proposal-icon"]')
         .click();
-      cy.get('[data-cy="is-grade-submitted"]').should('exist');
+      cy.get('[data-cy="is-grade-submitted"]').should('not.exist');
       readWriteReview();
+
+      cy.contains(sepMembers.reviewer.lastName)
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
+
+      cy.get('[data-cy="submit-grade"]').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="save-grade"]').should('be.disabled');
+      cy.get('[data-cy="submit-grade"]').should('be.disabled');
     });
   });
 
