@@ -65,12 +65,7 @@ export default class ReviewMutations {
       });
     }
 
-    const reviewAlreadySubmitted = review.status === ReviewStatus.SUBMITTED;
-    const hasWriteRights = await this.reviewAuth.hasWriteRights(
-      agent,
-      review,
-      reviewAlreadySubmitted
-    );
+    const hasWriteRights = await this.reviewAuth.hasWriteRights(agent, review);
 
     if (!hasWriteRights) {
       return rejection(
@@ -146,7 +141,14 @@ export default class ReviewMutations {
       );
     }
 
-    const hasWriteRights = await this.reviewAuth.hasWriteRights(agent, review);
+    // NOTE: This is added for bulk submit where reviewer should be able to submit even already submitted reviews.
+    const canSubmitAlreadySubmittedReview = true;
+
+    const hasWriteRights = await this.reviewAuth.hasWriteRights(
+      agent,
+      review,
+      canSubmitAlreadySubmittedReview
+    );
     if (!hasWriteRights) {
       return rejection(
         'Can not submit proposal review because of insufficient permissions',
