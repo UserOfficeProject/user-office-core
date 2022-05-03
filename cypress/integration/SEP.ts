@@ -930,6 +930,137 @@ context('SEP meeting components tests', () => {
         .contains(proposal1.title);
     });
 
+    it('Proposals in SEP meeting components should be ordered by standard deviation as second order parameter if there is no ranking', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal.proposal;
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal2.title,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 5,
+            submitted: true,
+            reviewerId: 0,
+          });
+
+          cy.assignProposalsToInstrument({
+            instrumentId: createdInstrumentId,
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: createdProposal.primaryKey,
+              },
+            ],
+          });
+
+          cy.assignProposalsToSep({
+            sepId: createdSepId,
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: createdProposal.primaryKey,
+              },
+            ],
+          });
+
+          cy.assignReviewersToSep({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer2.id],
+          });
+          cy.assignSepReviewersToProposal({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer2.id],
+            proposalPk: createdProposalPk,
+          });
+          cy.assignReviewersToSep({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer.id],
+          });
+          cy.assignSepReviewersToProposal({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer.id],
+            proposalPk: createdProposal.primaryKey,
+          });
+          cy.assignReviewersToSep({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer2.id],
+          });
+          cy.assignSepReviewersToProposal({
+            sepId: createdSepId,
+            memberIds: [sepMembers.reviewer2.id],
+            proposalPk: createdProposal.primaryKey,
+          });
+
+          // Manually changing the proposal status to be shown in the SEPs. -------->
+          cy.changeProposalsStatus({
+            statusId: initialDBData.proposalStatuses.sepReview.id,
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: createdProposal.primaryKey,
+              },
+            ],
+          });
+
+          cy.getProposalReviews({
+            proposalPk: createdProposalPk,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
+                  grade: index ? 2 : 4,
+                  status: ReviewStatus.SUBMITTED,
+                  sepID: createdSepId,
+                });
+              });
+            }
+          });
+
+          cy.getProposalReviews({
+            proposalPk: createdProposal.primaryKey,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
+                  grade: index ? 1 : 5,
+                  status: ReviewStatus.SUBMITTED,
+                  sepID: createdSepId,
+                });
+              });
+            }
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+
+      cy.finishedLoading();
+
+      // NOTE: Proposal with higher standard deviation but same average score should be shown first on initial sort
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .contains(proposal2.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .last()
+        .contains(proposal1.title);
+    });
+
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}?tab=3`);

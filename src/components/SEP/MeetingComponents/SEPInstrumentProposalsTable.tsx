@@ -33,6 +33,7 @@ import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalV
 
 type SepProposalWithAverageScoreAndAvailabilityZone = SepProposal & {
   proposalAverageScore: number | string;
+  proposalDeviation: number | string;
   isInAvailabilityZone: boolean;
 };
 
@@ -105,16 +106,7 @@ const assignmentColumns = [
   },
   {
     title: 'Deviation',
-    field: 'deviation',
-    render: (
-      rowData: SepProposalWithAverageScoreAndAvailabilityZone
-    ): string => {
-      const stdDeviation = standardDeviation(
-        getGradesFromReviews(rowData.proposal.reviews ?? [])
-      );
-
-      return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
-    },
+    field: 'proposalDeviation',
     customSort: (
       a: SepProposalWithAverageScoreAndAvailabilityZone,
       b: SepProposalWithAverageScoreAndAvailabilityZone
@@ -235,13 +227,29 @@ const SEPInstrumentProposalsTable: React.FC<
           const proposalAverageScore = average(
             getGradesFromReviews(proposalData.proposal.reviews ?? [])
           );
+          const proposalDeviation = standardDeviation(
+            getGradesFromReviews(proposalData.proposal.reviews ?? [])
+          );
 
           return {
             ...proposalData,
             proposalAverageScore: isNaN(proposalAverageScore)
               ? '-'
               : proposalAverageScore,
+            proposalDeviation: isNaN(proposalDeviation)
+              ? '-'
+              : proposalDeviation,
           };
+        })
+        .sort((a, b) => {
+          if (
+            typeof a.proposalDeviation === 'number' &&
+            typeof b.proposalDeviation === 'number'
+          ) {
+            return a.proposalDeviation < b.proposalDeviation ? 1 : -1;
+          } else {
+            return 1;
+          }
         })
         .sort((a, b) => {
           if (
