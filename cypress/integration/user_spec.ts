@@ -28,7 +28,9 @@ context('User tests', () => {
   });
 
   it('A user should be able to create a new account with mandatory fields only', () => {
-    const birthDateValue = birthDate.toFormat(initialDBData.formats.dateFormat);
+    const birthDateValue = birthDate.toFormat(
+      initialDBData.getFormats().dateFormat
+    );
     cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
@@ -159,7 +161,9 @@ context('User tests', () => {
 
     const middleName = faker.name.firstName();
     const preferredName = faker.name.firstName();
-    const birthDateValue = birthDate.toFormat(initialDBData.formats.dateFormat);
+    const birthDateValue = birthDate.toFormat(
+      initialDBData.getFormats().dateFormat
+    );
 
     //Organization detail
     const department = faker.commerce.department();

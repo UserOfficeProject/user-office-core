@@ -117,7 +117,7 @@ context('Units tests', () => {
       const fileName = 'units_export.json';
       const now = DateTime.now();
       const downloadFileName = `units_${now.toFormat(
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       )}.json`;
 
       cy.login('officer');

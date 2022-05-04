@@ -13,6 +13,9 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+// Import before:run hook that runs before each test suite
+import './beforeRunHook';
+
 // Import commands.js using ES2015 syntax:
 import './admin';
 import './call';

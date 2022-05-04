@@ -684,30 +684,30 @@ context('Template tests', () => {
     it('should render the Date field with default value and min max values when set', () => {
       let dateFieldId: string;
       const minDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       );
       const earlierThanMinDate = DateTime.fromFormat(
         minDate,
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       )
         .minus({ day: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
       const maxDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       );
       const laterThanMaxDate = DateTime.fromFormat(
         maxDate,
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       )
         .plus({ day: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
       const defaultDate = DateTime.now().toFormat(
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       );
 
       const tomorrowDate = DateTime.now()
         .plus({ day: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
 
       cy.login('officer');
       cy.visit('/');
@@ -1243,7 +1243,7 @@ context('Template tests', () => {
     it('User can create proposal with template', () => {
       const dateTimeFieldValue = DateTime.fromJSDate(
         faker.date.past()
-      ).toFormat(initialDBData.formats.dateTimeFormat);
+      ).toFormat(initialDBData.getFormats().dateTimeFormat);
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {

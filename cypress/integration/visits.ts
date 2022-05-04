@@ -154,10 +154,10 @@ context('visits tests', () => {
 
   it('Visitor should be able to register for a visit', () => {
     const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-      initialDBData.formats.dateFormat
+      initialDBData.getFormats().dateFormat
     );
     const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-      initialDBData.formats.dateFormat
+      initialDBData.getFormats().dateFormat
     );
 
     cy.createTemplate({
