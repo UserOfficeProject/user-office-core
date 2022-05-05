@@ -28,7 +28,9 @@ context('User tests', () => {
   });
 
   it('A user should be able to create a new account with mandatory fields only', () => {
-    const birthDateValue = birthDate.toFormat(initialDBData.formats.dateFormat);
+    const birthDateValue = birthDate.toFormat(
+      initialDBData.getFormats().dateFormat
+    );
     cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
@@ -96,6 +98,22 @@ context('User tests', () => {
     cy.contains('Sign in');
   });
 
+  it('Error message should be shown if confirm password does not match password', () => {
+    cy.get('[data-cy=password] input')
+      .type(password)
+      .should('have.value', password);
+
+    cy.get('[data-cy=confirmPassword] input')
+      .type(password + 'test')
+      .should('have.value', password + 'test');
+
+    cy.get('body').click();
+
+    cy.get('[data-cy=confirmPassword] .Mui-error')
+      .should('exist')
+      .and('include.text', 'Confirm password does not match password');
+  });
+
   it('A user should be able to login and out', () => {
     cy.createUser({
       user_title: faker.name.prefix(),
@@ -143,7 +161,9 @@ context('User tests', () => {
 
     const middleName = faker.name.firstName();
     const preferredName = faker.name.firstName();
-    const birthDateValue = birthDate.toFormat(initialDBData.formats.dateFormat);
+    const birthDateValue = birthDate.toFormat(
+      initialDBData.getFormats().dateFormat
+    );
 
     //Organization detail
     const department = faker.commerce.department();

@@ -22,6 +22,7 @@ import {
   ReviewWithNextProposalStatus,
   ProposalStatus,
   Review,
+  SettingsId,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -63,7 +64,7 @@ const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
 const SEPProposalColumns = [
   {
     title: 'Actions',
-    cellStyle: { padding: 0 },
+    cellStyle: { padding: 0, minWidth: 80 },
     sorting: false,
     removable: false,
     field: 'rowActionButtons',
@@ -138,7 +139,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   const { api } = useDataApiWithFeedback();
   const [proposalPk, setProposalPk] = useState<null | number>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
-  const { toFormattedDateTime } = useFormattedDateTime();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -193,7 +196,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   const removeProposalsFromSEP = async (
     proposalsToRemove: SEPProposalType[]
   ): Promise<void> => {
-    await api('Assignment/s removed').removeProposalsFromSep({
+    await api({
+      toastSuccessMessage: 'Assignment/s removed',
+    }).removeProposalsFromSep({
       proposalPks: proposalsToRemove.map(
         (proposalToRemove) => proposalToRemove.proposalPk
       ),
@@ -234,7 +239,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
 
     const {
       assignSepReviewersToProposal: { rejection },
-    } = await api('Members assigned').assignSepReviewersToProposal({
+    } = await api({
+      toastSuccessMessage: 'Members assigned',
+    }).assignSepReviewersToProposal({
       memberIds: assignedMembers.map(({ id }) => id),
       proposalPk: proposalPk,
       sepId,
@@ -353,7 +360,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
          * TODO(asztalos): merge `removeMemberFromSEPProposal` and `removeUserForReview` (same goes for creation)
          *                otherwise if one of them fails we may end up with an broken state
          */
-        await api('Reviewer removed').removeMemberFromSEPProposal({
+        await api({
+          toastSuccessMessage: 'Reviewer removed',
+        }).removeMemberFromSEPProposal({
           proposalPk,
           sepId,
           memberId: assignedReviewer.sepMemberUserId as number,

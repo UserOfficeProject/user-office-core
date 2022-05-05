@@ -684,30 +684,30 @@ context('Template tests', () => {
     it('should render the Date field with default value and min max values when set', () => {
       let dateFieldId: string;
       const minDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       );
       const earlierThanMinDate = DateTime.fromFormat(
         minDate,
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       )
         .minus({ day: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
       const maxDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       );
       const laterThanMaxDate = DateTime.fromFormat(
         maxDate,
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       )
         .plus({ day: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
       const defaultDate = DateTime.now().toFormat(
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       );
 
       const tomorrowDate = DateTime.now()
         .plus({ day: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
 
       cy.login('officer');
       cy.visit('/');
@@ -1255,7 +1255,7 @@ context('Template tests', () => {
     it('User can create proposal with template', () => {
       const dateTimeFieldValue = DateTime.fromJSDate(
         faker.date.past()
-      ).toFormat(initialDBData.formats.dateTimeFormat);
+      ).toFormat(initialDBData.getFormats().dateTimeFormat);
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
@@ -1404,6 +1404,45 @@ context('Template tests', () => {
       cy.contains(fileQuestion)
         .parent()
         .should('not.contain.text', 'field must have at least 1 items');
+
+      cy.logout();
+    });
+
+    it('File Upload max files should be required', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.contains(fileQuestion).click();
+
+      cy.get('[role="presentation"]').contains('image/*').click();
+
+      cy.get('body').type('{esc}');
+
+      cy.get('[data-cy="max_files"] input').clear().type('-1');
+
+      cy.contains('Update').click();
+
+      cy.get('[data-cy="max_files"] input').should('be.focused');
+      cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
+
+      cy.get('[data-cy="max_files"] input').clear();
+
+      cy.get('[data-cy="max_files"] input').should('be.focused');
+      cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
+
+      cy.get('[data-cy="max_files"] input').clear().type('1');
+
+      cy.contains('Update').click();
+
+      cy.get('[data-cy="question-relation-dialogue"]').should('not.exist');
 
       cy.logout();
     });

@@ -36,6 +36,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const [loadingSubmitMessage, setLoadingSubmitMessage] =
     useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitButtonMessage, setSubmitButtonMessage] = useState<string>(
     'I am aware that no further edits can be made after proposal submission.'
   );
@@ -109,10 +110,14 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   return (
     <>
       <ProposalQuestionaryReview data={proposal} />
-      <NavigationFragment disabled={proposal.status?.id === 0}>
+      <NavigationFragment
+        disabled={proposal.status?.id === 0}
+        isLoading={isSubmitting}
+      >
         <NavigButton
           onClick={() => dispatch({ type: 'BACK_CLICKED' })}
           disabled={state.stepIndex === 0}
+          isBusy={isSubmitting}
         >
           Back
         </NavigButton>
@@ -120,10 +125,13 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           onClick={() => {
             confirm(
               async () => {
+                setIsSubmitting(true);
                 const result = await api().submitProposal({
                   proposalPk: state.proposal.primaryKey,
                 });
                 if (!result.submitProposal.proposal) {
+                  setIsSubmitting(false);
+
                   return;
                 }
                 dispatch({
@@ -134,6 +142,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                   type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
                   itemWithQuestionary: result.submitProposal.proposal,
                 });
+                setIsSubmitting(false);
               },
               {
                 title: 'Please confirm',
@@ -142,6 +151,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             )();
           }}
           disabled={submitDisabled}
+          isBusy={isSubmitting}
           data-cy="button-submit-proposal"
         >
           {proposal.submitted ? '✔ Submitted' : 'Submit'}
@@ -150,7 +160,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           onClick={() =>
             downloadPDFProposal([proposal.primaryKey], proposal.title)
           }
-          disabled={!allStepsComplete}
+          disabled={!allStepsComplete || isSubmitting}
           color="secondary"
         >
           Download PDF

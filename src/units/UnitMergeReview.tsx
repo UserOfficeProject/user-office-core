@@ -60,7 +60,7 @@ export function UnitMergeReview(props: UnitMergeReviewProps) {
   );
 
   const handleImportClick = () =>
-    api('Units imported successfully')
+    api({ toastSuccessMessage: 'Units imported successfully' })
       .importUnits({
         json,
         conflictResolutions: state.unitComparisons.map(

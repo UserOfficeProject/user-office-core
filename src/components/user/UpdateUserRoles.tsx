@@ -30,10 +30,11 @@ export default function UpdateUserRoles(props: { id: number }) {
       roles: newRoles.map((role) => role.id),
     };
 
-    await api(
-      'Roles updated successfully! Any logged in users will still have old permissions until they log back in.',
-      'warning'
-    ).updateUserRoles(variables);
+    await api({
+      toastSuccessMessage:
+        'Roles updated successfully! Any logged in users will still have old permissions until they log back in.',
+      toastSuccessMessageVariant: 'warning',
+    }).updateUserRoles(variables);
 
     if (props.id === user.id) {
       setRenewTokenValue();

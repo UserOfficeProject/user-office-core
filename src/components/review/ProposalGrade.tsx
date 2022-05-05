@@ -53,11 +53,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const hasAccessRights = useCheckAccess([
-    UserRole.USER_OFFICER,
-    UserRole.SEP_CHAIR,
-    UserRole.SEP_SECRETARY,
-  ]);
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   if (!review) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -88,7 +84,9 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   const handleSubmit = async (values: GradeFormType) => {
     const {
       updateReview: { rejection, review: updatedReview },
-    } = await api(shouldSubmit ? 'Submitted' : 'Updated').updateReview({
+    } = await api({
+      toastSuccessMessage: shouldSubmit ? 'Submitted' : 'Updated',
+    }).updateReview({
       reviewID: review.id,
       grade: +values.grade,
       comment: values.comment ? values.comment : '',
@@ -192,12 +190,10 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
             </Field>
           </Box>
           <ErrorMessage name="grade" />
-          <NavigationFragment>
-            {isSubmitting && (
-              <Box display="flex" alignItems="center" mx={1}>
-                <UOLoader buttonSized />
-              </Box>
-            )}
+          <NavigationFragment isLoading={isSubmitting}>
+            <ButtonWithDialog label="Grading guide" disabled={isSubmitting}>
+              <GradeGuidePage />
+            </ButtonWithDialog>
             {hasAccessRights && (
               <Field
                 id="submitted"
@@ -211,22 +207,13 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                 data-cy="is-grade-submitted"
               />
             )}
-            <ButtonWithDialog label="Grading guide">
-              <GradeGuidePage />
-            </ButtonWithDialog>
             <Button
               data-cy="save-grade"
               disabled={isDisabled(isSubmitting)}
               color="secondary"
               type="submit"
               onClick={() => setShouldSubmit(false)}
-              startIcon={
-                isSubmitting && !shouldSubmit ? (
-                  <UOLoader buttonSized />
-                ) : (
-                  <Save />
-                )
-              }
+              startIcon={<Save />}
             >
               Save
             </Button>
@@ -236,13 +223,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                 disabled={isDisabled(isSubmitting)}
                 type="submit"
                 onClick={() => setShouldSubmit(true)}
-                startIcon={
-                  isSubmitting && shouldSubmit ? (
-                    <UOLoader buttonSized />
-                  ) : (
-                    <DoneAll />
-                  )
-                }
+                startIcon={<DoneAll />}
               >
                 {review.status === ReviewStatus.SUBMITTED
                   ? 'Submitted'

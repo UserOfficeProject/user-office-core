@@ -291,9 +291,9 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         reviewId: proposal.reviewId,
       }));
 
-      const result = await api(
-        `Proposal${shouldAddPluralLetter} review submitted successfully!`
-      ).submitProposalsReview({ proposals: submitProposalReviewsInput });
+      const result = await api({
+        toastSuccessMessage: `Proposal${shouldAddPluralLetter} review submitted successfully!`,
+      }).submitProposalsReview({ proposals: submitProposalReviewsInput });
 
       const isError = !!result.submitProposalsReview.rejection;
 

@@ -1,6 +1,8 @@
 import MaterialTable, { MTableBodyRow } from '@material-table/core';
 import DragHandle from '@mui/icons-material/DragHandle';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Visibility from '@mui/icons-material/Visibility';
+import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import makeStyles from '@mui/styles/makeStyles';
@@ -30,7 +32,8 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
 type SepProposalWithAverageScoreAndAvailabilityZone = SepProposal & {
-  proposalAverageScore: number;
+  proposalAverageScore: number | string;
+  proposalDeviation: number | string;
   isInAvailabilityZone: boolean;
 };
 
@@ -51,7 +54,6 @@ const useStyles = makeStyles((theme) => ({
       border: 'none',
     },
     '& .MuiPaper-root': {
-      padding: '0 40px',
       backgroundColor: '#fafafa',
     },
     '& .draggingRow': {
@@ -104,16 +106,7 @@ const assignmentColumns = [
   },
   {
     title: 'Deviation',
-    field: 'deviation',
-    render: (
-      rowData: SepProposalWithAverageScoreAndAvailabilityZone
-    ): string => {
-      const stdDeviation = standardDeviation(
-        getGradesFromReviews(rowData.proposal.reviews ?? [])
-      );
-
-      return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
-    },
+    field: 'proposalDeviation',
     customSort: (
       a: SepProposalWithAverageScoreAndAvailabilityZone,
       b: SepProposalWithAverageScoreAndAvailabilityZone
@@ -152,8 +145,8 @@ const assignmentColumns = [
   },
   {
     title: 'SEP meeting submitted',
-    render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone): string =>
-      rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
+    field: 'proposal.sepMeetingDecision.submitted',
+    lookup: { true: 'Yes', false: 'No', undefined: 'No' },
   },
   {
     title: 'Recommendation',
@@ -179,7 +172,6 @@ const SEPInstrumentProposalsTable: React.FC<
   const isSEPReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
-  const [savingOrder, setSavingOrder] = useState(false);
 
   // NOTE: This is needed for adding the allocation time unit information on the column title without causing some console warning on re-rendering.
   const columns = assignmentColumns.map((column) => ({
@@ -235,15 +227,40 @@ const SEPInstrumentProposalsTable: React.FC<
           const proposalAverageScore = average(
             getGradesFromReviews(proposalData.proposal.reviews ?? [])
           );
+          const proposalDeviation = standardDeviation(
+            getGradesFromReviews(proposalData.proposal.reviews ?? [])
+          );
 
           return {
             ...proposalData,
-            proposalAverageScore,
+            proposalAverageScore: isNaN(proposalAverageScore)
+              ? '-'
+              : proposalAverageScore,
+            proposalDeviation: isNaN(proposalDeviation)
+              ? '-'
+              : proposalDeviation,
           };
         })
-        .sort((a, b) =>
-          a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
-        )
+        .sort((a, b) => {
+          if (
+            typeof a.proposalDeviation === 'number' &&
+            typeof b.proposalDeviation === 'number'
+          ) {
+            return a.proposalDeviation < b.proposalDeviation ? 1 : -1;
+          } else {
+            return 1;
+          }
+        })
+        .sort((a, b) => {
+          if (
+            typeof a.proposalAverageScore === 'number' &&
+            typeof b.proposalAverageScore === 'number'
+          ) {
+            return a.proposalAverageScore > b.proposalAverageScore ? 1 : -1;
+          } else {
+            return -1;
+          }
+        })
         .sort(sortByRankOrder)
         .map((proposalData) => {
           const proposalAllocationTime =
@@ -277,9 +294,7 @@ const SEPInstrumentProposalsTable: React.FC<
   }, [instrumentProposalsData, sepInstrument.availabilityTime]);
 
   const ProposalTimeAllocationColumn = (
-    rowData: SepProposal & {
-      proposalAverageScore: number;
-    }
+    rowData: SepProposalWithAverageScoreAndAvailabilityZone
   ) => {
     const timeAllocation =
       rowData.proposal.technicalReview &&
@@ -420,7 +435,6 @@ const SEPInstrumentProposalsTable: React.FC<
   };
 
   const reOrderRow = async (fromIndex: number, toIndex: number) => {
-    setSavingOrder(true);
     const newTableData = reorderArray(
       { fromIndex, toIndex },
       sortedProposalsWithAverageScore
@@ -435,19 +449,29 @@ const SEPInstrumentProposalsTable: React.FC<
         rankOrder: item.proposal.sepMeetingDecision?.rankOrder,
       }));
 
-    const result = await api(
-      'Reordering of proposals saved successfully!'
-    ).reorderSepMeetingDecisionProposals({
+    setInstrumentProposalsData(tableDataWithRankingsUpdated);
+    const toastErrorMessageAction = (
+      <Button
+        color="inherit"
+        variant="text"
+        onClick={refreshInstrumentProposalsData}
+        startIcon={<RefreshIcon />}
+      >
+        Refresh
+      </Button>
+    );
+
+    await api({
+      toastSuccessMessage: 'Reordering of proposals saved successfully!',
+      toastErrorMessage:
+        'Something went wrong please use refresh button to update the table state',
+      // NOTE: Show error message with refresh button if there is an error.
+      toastErrorMessageAction,
+    }).reorderSepMeetingDecisionProposals({
       reorderSepMeetingDecisionProposalsInput: {
         proposals: reorderSepMeetingDecisionProposalsInput,
       },
     });
-
-    if (!result.reorderSepMeetingDecisionProposals.rejection) {
-      setInstrumentProposalsData(tableDataWithRankingsUpdated);
-    }
-
-    setSavingOrder(false);
   };
 
   const showDropArea = (
@@ -563,7 +587,7 @@ const SEPInstrumentProposalsTable: React.FC<
         columns={columns}
         title={'Assigned reviewers'}
         data={sortedProposalsWithAverageScoreAndId}
-        isLoading={loadingInstrumentProposals || savingOrder}
+        isLoading={loadingInstrumentProposals}
         components={{
           Row: RowDraggableComponent,
         }}

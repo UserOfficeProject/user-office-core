@@ -59,9 +59,9 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         }
 
         if (instrument) {
-          const data = await api(
-            'Instrument updated successfully!'
-          ).updateInstrument({
+          const data = await api({
+            toastSuccessMessage: 'Instrument updated successfully!',
+          }).updateInstrument({
             ...values,
             id: instrument.id,
           });
@@ -71,9 +71,9 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             close(data.updateInstrument.instrument);
           }
         } else {
-          const data = await api(
-            'Instrument created successfully!'
-          ).createInstrument(values);
+          const data = await api({
+            toastSuccessMessage: 'Instrument created successfully!',
+          }).createInstrument(values);
           if (data.createInstrument.rejection) {
             close(null);
           } else if (data.createInstrument.instrument) {

@@ -511,17 +511,17 @@ context('Proposal administration tests', () => {
 
       const DATE_BEFORE = DateTime.fromFormat(
         DATE_ANSWER,
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       )
         .minus({ days: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
 
       const DATE_AFTER = DateTime.fromFormat(
         DATE_ANSWER,
-        initialDBData.formats.dateFormat
+        initialDBData.getFormats().dateFormat
       )
         .plus({ days: 1 })
-        .toFormat(initialDBData.formats.dateFormat);
+        .toFormat(initialDBData.getFormats().dateFormat);
 
       cy.get('[data-cy=question-list]').click();
       cy.contains(questions.date.text).click();

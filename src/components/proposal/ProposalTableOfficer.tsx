@@ -112,7 +112,8 @@ let columns: Column<ProposalViewData>[] = [
   },
   {
     title: 'Submitted',
-    render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+    field: 'submitted',
+    lookup: { true: 'Yes', false: 'No' },
   },
   {
     title: 'Status',
@@ -132,7 +133,8 @@ let columns: Column<ProposalViewData>[] = [
   },
   {
     title: 'Notified',
-    render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
+    field: 'notified',
+    lookup: { true: 'Yes', false: 'No' },
   },
   {
     title: 'Instrument',
@@ -303,7 +305,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     selectedProposals.forEach(async (proposal) => {
       const {
         notifyProposal: { rejection },
-      } = await api('Notification sent successfully').notifyProposal({
+      } = await api({
+        toastSuccessMessage: 'Notification sent successfully',
+      }).notifyProposal({
         proposalPk: proposal.primaryKey,
       });
 
@@ -340,9 +344,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
     if (sep) {
-      const response = await api(
-        'Proposal/s assigned to the selected SEP successfully!'
-      ).assignProposalsToSep({
+      const response = await api({
+        toastSuccessMessage:
+          'Proposal/s assigned to the selected SEP successfully!',
+      }).assignProposalsToSep({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
@@ -375,9 +380,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         );
       }
     } else {
-      const result = await api(
-        'Proposal/s removed from the SEP successfully!'
-      ).removeProposalsFromSep({
+      const result = await api({
+        toastSuccessMessage: 'Proposal/s removed from the SEP successfully!',
+      }).removeProposalsFromSep({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
@@ -410,9 +415,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     instrument: InstrumentFragment | null
   ): Promise<void> => {
     if (instrument) {
-      const result = await api(
-        'Proposal/s assigned to the selected instrument successfully!'
-      ).assignProposalsToInstrument({
+      const result = await api({
+        toastSuccessMessage:
+          'Proposal/s assigned to the selected instrument successfully!',
+      }).assignProposalsToInstrument({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
@@ -439,9 +445,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         );
       }
     } else {
-      const result = await api(
-        'Proposal/s removed from the instrument successfully!'
-      ).removeProposalsFromInstrument({
+      const result = await api({
+        toastSuccessMessage:
+          'Proposal/s removed from the instrument successfully!',
+      }).removeProposalsFromInstrument({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
@@ -478,7 +485,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       (selectedProposal) => selectedProposal.primaryKey
     );
 
-    const result = await api('Proposal/s cloned successfully').cloneProposals({
+    const result = await api({
+      toastSuccessMessage: 'Proposal/s cloned successfully',
+    }).cloneProposals({
       callId: call.id,
       proposalsToClonePk,
     });
@@ -498,9 +507,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const changeStatusOnProposals = async (status: ProposalStatus) => {
     if (status?.id && selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
-      const result = await api(
-        `Proposal${shouldAddPluralLetter} status changed successfully!`
-      ).changeProposalsStatus({
+      const result = await api({
+        toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
+      }).changeProposalsStatus({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,

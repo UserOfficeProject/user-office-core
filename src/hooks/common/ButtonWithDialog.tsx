@@ -1,4 +1,3 @@
-import { Link } from '@mui/material';
 import Button from '@mui/material/Button';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
@@ -9,26 +8,32 @@ import InputDialog from 'components/common/InputDialog';
 interface ButtonWithDialogProps {
   children: JSX.Element;
   label: string;
+  disabled?: boolean;
 }
 
 const useStyles = makeStyles(() => ({
   container: {
     width: '500px',
   },
-  button: {
-    cursor: 'pointer',
-  },
 }));
 
-function ButtonWithDialog({ children, label }: ButtonWithDialogProps) {
+function ButtonWithDialog({
+  children,
+  label,
+  disabled = false,
+}: ButtonWithDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const classes = useStyles();
 
   return (
     <>
-      <Link onClick={() => setIsDialogOpen(true)} className={classes.button}>
+      <Button
+        variant="text"
+        onClick={() => setIsDialogOpen(true)}
+        disabled={disabled}
+      >
         {label}
-      </Link>
+      </Button>
       <InputDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <div className={classes.container}>
           {children}

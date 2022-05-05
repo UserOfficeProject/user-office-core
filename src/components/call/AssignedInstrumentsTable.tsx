@@ -89,9 +89,9 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   ];
 
   const removeAssignedInstrument = async (instrumentId: number) => {
-    const result = await api(
-      'Assigned instrument removed successfully!'
-    ).removeAssignedInstrumentFromCall({
+    const result = await api({
+      toastSuccessMessage: 'Assigned instrument removed successfully!',
+    }).removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,
     });
@@ -108,9 +108,9 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     id: number;
     availabilityTime: number | string;
   }) => {
-    const result = await api(
-      'Availability time set successfully!'
-    ).setInstrumentAvailabilityTime({
+    const result = await api({
+      toastSuccessMessage: 'Availability time set successfully!',
+    }).setInstrumentAvailabilityTime({
       callId: call.id,
       instrumentId: instrumentUpdatedData.id,
       availabilityTime: +instrumentUpdatedData.availabilityTime,

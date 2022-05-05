@@ -254,9 +254,9 @@ const ProposalTableInstrumentScientist: React.FC<{
           submitted: true,
         }));
 
-      const result = await api(
-        `Proposal${shouldAddPluralLetter} technical review submitted successfully!`
-      ).submitTechnicalReviews({
+      const result = await api({
+        toastSuccessMessage: `Proposal${shouldAddPluralLetter} technical review submitted successfully!`,
+      }).submitTechnicalReviews({
         technicalReviews: submittedTechnicalReviewsInput,
       });
 

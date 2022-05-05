@@ -117,18 +117,18 @@ context('Calls tests', () => {
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
       const shortCode = faker.random.alphaNumeric(15);
       const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.formats.dateTimeFormat
+        initialDBData.getFormats().dateTimeFormat
       );
       const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-        initialDBData.formats.dateTimeFormat
+        initialDBData.getFormats().dateTimeFormat
       );
 
       const invalidPastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.formats.dateFormat + ' HH'
+        initialDBData.getFormats().dateFormat + ' HH'
       ); // no minutes
       const invalidFutureDate = DateTime.fromJSDate(
         faker.date.future()
-      ).toFormat(initialDBData.formats.dateFormat + ' HH'); // no minutes
+      ).toFormat(initialDBData.getFormats().dateFormat + ' HH'); // no minutes
 
       cy.contains('Proposals');
 
@@ -224,7 +224,7 @@ context('Calls tests', () => {
         .plus({ days: 1 })
         .startOf('day')
         // TODO: Find a way how to access the settings format here and not hard coding it like this.
-        .toFormat(initialDBData.formats.dateTimeFormat)
+        .toFormat(initialDBData.getFormats().dateTimeFormat)
         .toString();
 
       cy.contains('Proposals');
@@ -262,10 +262,10 @@ context('Calls tests', () => {
         newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
       const callStartDate = startCall.toFormat(
-        initialDBData.formats.dateTimeFormat
+        initialDBData.getFormats().dateTimeFormat
       );
       const callEndDate = endCall.toFormat(
-        initialDBData.formats.dateTimeFormat
+        initialDBData.getFormats().dateTimeFormat
       );
       const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
@@ -324,10 +324,10 @@ context('Calls tests', () => {
     it('A user-officer should be able to edit a call', () => {
       const { shortCode, startDate, endDate } = updatedCall;
       const updatedCallStartDate = startDate.toFormat(
-        initialDBData.formats.dateTimeFormat
+        initialDBData.getFormats().dateTimeFormat
       );
       const updatedCallEndDate = endDate.toFormat(
-        initialDBData.formats.dateTimeFormat
+        initialDBData.getFormats().dateTimeFormat
       );
 
       const refNumFormat = '211{digits:5}';

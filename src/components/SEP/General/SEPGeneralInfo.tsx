@@ -36,7 +36,9 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   const sendSEPUpdate = async (values: Sep): Promise<void> => {
-    await api('SEP updated successfully!').updateSEP(values);
+    await api({ toastSuccessMessage: 'SEP updated successfully!' }).updateSEP(
+      values
+    );
     onSEPUpdate(values);
   };
 

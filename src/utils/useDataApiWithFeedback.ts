@@ -1,4 +1,4 @@
-import { useSnackbar, VariantType } from 'notistack';
+import { SnackbarAction, useSnackbar, VariantType } from 'notistack';
 import { useCallback, useContext, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
@@ -18,7 +18,12 @@ function useDataApiWithFeedback() {
   const { handleLogout } = useContext(UserContext);
 
   const api = useCallback(
-    (toastMessage?: string, toastMessageVariant?: VariantType) =>
+    (props?: {
+      toastSuccessMessage?: string;
+      toastErrorMessage?: string;
+      toastSuccessMessageVariant?: VariantType;
+      toastErrorMessageAction?: SnackbarAction;
+    }) =>
       new Proxy(dataApi(), {
         get(target, prop) {
           return async (args: never) => {
@@ -36,15 +41,16 @@ function useDataApiWithFeedback() {
                   reason =
                     'Your session has expired, you will need to log in again through the external homepage';
                 }
-                enqueueSnackbar(reason, {
+                enqueueSnackbar(props?.toastErrorMessage ?? reason, {
                   variant: 'error',
                   className: 'snackbar-error',
                   autoHideDuration: 10000,
+                  action: props?.toastErrorMessageAction,
                 });
               } else {
-                toastMessage &&
-                  enqueueSnackbar(toastMessage, {
-                    variant: toastMessageVariant ?? 'success',
+                props?.toastSuccessMessage &&
+                  enqueueSnackbar(props.toastSuccessMessage, {
+                    variant: props.toastSuccessMessageVariant ?? 'success',
                     className: 'snackbar-success',
                     autoHideDuration: 10000,
                   });

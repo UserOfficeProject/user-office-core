@@ -53,9 +53,9 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const removeAssignedScientist = async (scientistId: number) => {
-    const result = await api(
-      'Scientist removed from instrument!'
-    ).removeScientistFromInstrument({
+    const result = await api({
+      toastSuccessMessage: 'Scientist removed from instrument!',
+    }).removeScientistFromInstrument({
       scientistId,
       instrumentId: instrument.id,
     });

@@ -66,7 +66,7 @@ function QuestionsPage() {
   };
 
   const deleteQuestion = async (questionId: string | number) =>
-    api('Question deleted')
+    api({ toastSuccessMessage: 'Question deleted' })
       .deleteQuestion({ questionId: questionId as string })
       .then((result) => result.deleteQuestion.rejection === null);
 

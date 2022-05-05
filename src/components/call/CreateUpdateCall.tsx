@@ -120,17 +120,17 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         initialValues={initialValues}
         onSubmit={async (values) => {
           if (call) {
-            const data = await api('Call updated successfully!').updateCall(
-              values as UpdateCallInput
-            );
+            const data = await api({
+              toastSuccessMessage: 'Call updated successfully!',
+            }).updateCall(values as UpdateCallInput);
             closeModal(
               data.updateCall.rejection?.reason,
               data.updateCall.call as Call
             );
           } else {
-            const data = await api('Call created successfully!').createCall(
-              values as UpdateCallInput
-            );
+            const data = await api({
+              toastSuccessMessage: 'Call created successfully!',
+            }).createCall(values as UpdateCallInput);
 
             closeModal(
               data.createCall.rejection?.reason,

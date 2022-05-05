@@ -31,8 +31,8 @@ const instrumentTableColumns = [
   },
   {
     title: 'Submitted',
-    render: (rowData: InstrumentWithAvailabilityTime) =>
-      rowData.submitted ? 'Yes' : 'No',
+    field: 'submitted',
+    lookup: { true: 'Yes', false: 'No' },
   },
 ];
 
@@ -91,9 +91,9 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         );
 
       if (allProposalsOnInstrumentHaveRankings) {
-        const { submitInstrument } = await api(
-          'Instrument submitted!'
-        ).submitInstrument({
+        const { submitInstrument } = await api({
+          toastSuccessMessage: 'Instrument submitted!',
+        }).submitInstrument({
           callId: selectedCall.id,
           instrumentId: instrumentToSubmit.id,
           sepId: sepId,

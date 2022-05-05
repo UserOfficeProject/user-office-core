@@ -57,7 +57,9 @@ const RoleSelection: React.FC<{ onClose: FunctionType }> = ({ onClose }) => {
 
   const selectUserRole = async (role: Role) => {
     setLoading(true);
-    const result = await api('User role changed!').selectRole({
+    const result = await api({
+      toastSuccessMessage: 'User role changed!',
+    }).selectRole({
       token,
       selectedRoleId: role.id,
     });
