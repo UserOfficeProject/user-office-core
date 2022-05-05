@@ -354,6 +354,16 @@ export class UserDataSourceMock implements UserDataSource {
 
     return true;
   }
+  async checkInstrumentManagerToProposal(
+    scientsitId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    if (scientsitId === dummyUserNotOnProposalWithRole.id) {
+      return false;
+    }
+
+    return true;
+  }
 
   async create(firstname: string, lastname: string) {
     return dummyUser;

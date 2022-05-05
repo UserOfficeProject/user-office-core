@@ -61,7 +61,13 @@ export class TechnicalReviewAuthorization {
       agent,
       technicalreview.proposalPk
     );
-    if (isScientistToProposal) {
+    const isInstrumentManagerToProposal =
+      await this.proposalAuth.isInstrumentManagerToProposal(
+        agent,
+        technicalreview.proposalPk
+      );
+
+    if (isScientistToProposal || isInstrumentManagerToProposal) {
       return true;
     }
 
@@ -102,7 +108,7 @@ export class TechnicalReviewAuthorization {
         ? technicalreviewOrProposalPk
         : technicalreviewOrProposalPk.proposalPk;
 
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
       return true;
     }
@@ -111,7 +117,10 @@ export class TechnicalReviewAuthorization {
       agent,
       proposalPk
     );
-    if (isScientistToProposal) {
+    const isInstrumentManagerToProposal =
+      await this.proposalAuth.isInstrumentManagerToProposal(agent, proposalPk);
+
+    if (isScientistToProposal || isInstrumentManagerToProposal) {
       return true;
     }
 
