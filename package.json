@@ -20,7 +20,7 @@
     "@mui/lab": "^5.0.0-alpha.72",
     "@mui/material": "^5.5.0",
     "@mui/styles": "^5.5.0",
-    "@tinymce/tinymce-react": "^3.13.1",
+    "@tinymce/tinymce-react": "^3.14.0",
     "@types/react": "^17.0.39",
     "@types/mime": "^2.0.3",
     "@types/react-beautiful-dnd": "^13.1.2",
