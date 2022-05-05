@@ -14,7 +14,7 @@
     "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/typescript": "^2.4.8",
     "@graphql-codegen/typescript-graphql-request": "^4.4.0",
-    "@graphql-codegen/typescript-operations": "^2.2.3",
+    "@graphql-codegen/typescript-operations": "^2.3.5",
     "@material-table/core": "^0.2.26",
     "@mui/icons-material": "^5.5.0",
     "@mui/lab": "^5.0.0-alpha.72",
