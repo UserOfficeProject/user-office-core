@@ -1,7 +1,8 @@
 import MaterialTable from '@material-table/core';
 import React, { useMemo } from 'react';
 
-import { TemplateCategoryId } from 'generated/sdk';
+import CopyToClipboard from 'components/common/CopyToClipboard';
+import { ProposalFragment, TemplateCategoryId } from 'generated/sdk';
 import { useProposalsData } from 'hooks/proposal/useProposalsData';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { useShipments } from 'hooks/shipment/useShipments';
@@ -9,7 +10,14 @@ import { QuestionWithUsage } from 'hooks/template/useQuestions';
 import { tableIcons } from 'utils/materialIcons';
 
 const proposalListColumns = [
-  { title: 'ID', field: 'proposalId' },
+  {
+    title: 'ID',
+    render: (rowData: ProposalFragment) => (
+      <CopyToClipboard text={rowData.proposalId} position="right">
+        {rowData.proposalId}
+      </CopyToClipboard>
+    ),
+  },
   { title: 'Title', field: 'title' },
 ];
 
