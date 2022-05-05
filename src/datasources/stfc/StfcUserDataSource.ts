@@ -400,6 +400,16 @@ export class StfcUserDataSource implements UserDataSource {
     );
   }
 
+  async checkInstrumentManagerToProposal(
+    scientistId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    return await postgresUserDataSource.checkInstrumentManagerToProposal(
+      scientistId,
+      proposalPk
+    );
+  }
+
   async create(
     user_title: string | undefined,
     firstname: string,

@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 
 import { logger } from '@user-office-software/duo-logger';
 import { fileUploadQuestionValidationSchema } from '@user-office-software/duo-validation';
+import NodeClam from 'clamscan';
 import fileTypeInfo from 'magic-bytes.js';
 import { GuessedFile } from 'magic-bytes.js/dist/model/tree';
 import { container } from 'tsyringe';
@@ -21,16 +22,44 @@ export const fileUploadDefinition: Question = {
     if (!(await fileUploadQuestionValidationSchema(field).isValid(value))) {
       return false;
     }
+    const fileMutations = container.resolve(FileMutations);
 
-    const typeCheckResults: boolean[] = value.map(
-      async (file: { id: string }) => {
-        return await isValidFileType(file.id, field, value);
-      }
-    );
+    return await Promise.all(
+      // Map each file to a promise that returns a list of file check results
+      value.map((file: { id: string }) => {
+        const errorContext = {
+          question: field,
+          answer: value,
+          fileId: file.id,
+        };
 
-    return (await Promise.all(typeCheckResults)).every((check) => {
-      return check;
-    });
+        return fileMutations.prepare(file.id).then((path) => {
+          // Check the file id has a valid path
+          if (isRejection(path)) {
+            logger.logInfo(
+              'Could not retrieve file to validate file upload question',
+              errorContext
+            );
+
+            return Promise.resolve([true]); // Allow the file
+          } else {
+            // If it exists check the file type and run a virus scan
+            return Promise.all([
+              isValidFileType(path, field, errorContext),
+              passesVirusScan(path, errorContext),
+            ]).then((results: boolean[]) => {
+              fs.unlink(path);
+
+              return results;
+            });
+          }
+        });
+      })
+    )
+      // Convert the list of boolean lists to a flat list of booleans
+      .then((results) => results.flat())
+      // Return whether they're all true
+      .then((results) => results.every((check) => check));
   },
   createBlankConfig: (): FileUploadConfig => {
     const config = new FileUploadConfig();
@@ -71,37 +100,18 @@ export const fileUploadDefinition: Question = {
  * Checks the file signature of a file and returns whether the file
  * is one of the accepted types specified in the question config.
  *
- * @param fileId The ID of the file to check
+ * @param path A valid path to the file to be scanned
  * @param field The question data containing the config
- * @param value All files in the question
+ * @param errorContext File details to be logged in the event of an error
  * @returns True if the file is identified as one of the accepted
  * types, or if the file cannot be retrieved. False is the file
  * cannot be identified, or is not one of the accepted types.
  */
 const isValidFileType = async (
-  fileId: string,
+  path: string,
   field: QuestionTemplateRelation,
-  value: any
+  errorContext: any
 ): Promise<boolean> => {
-  const fileMutations = container.resolve(FileMutations);
-
-  const errorContext = {
-    question: field,
-    answer: value,
-    fileId: fileId,
-  };
-
-  const path = await fileMutations.prepare(fileId);
-
-  if (isRejection(path)) {
-    logger.logInfo(
-      'Could not retrieve file to validate file upload question',
-      errorContext
-    );
-
-    return true; // Allow the file
-  }
-
   let data: Buffer;
 
   try {
@@ -130,8 +140,6 @@ const isValidFileType = async (
 
   await getFileInfo(data);
 
-  fs.unlink(path);
-
   const config = field.config as FileUploadConfig;
 
   return possibleTypes.some((type) => {
@@ -141,4 +149,61 @@ const isValidFileType = async (
       config.file_type.includes(type) || config.file_type.includes(anySubtype)
     );
   });
+};
+
+/**
+ * Checks if a file is deemed to be free of malware by Clam AntiVirus.
+ *
+ * @param path A valid path to the file to be scanned
+ * @param errorContext File details to be logged in the event of an error
+ * @returns True if the file is passes the virus scan, or if the scan cannot be
+ * performed. False if Clam believes the file to be malicious.
+ */
+const passesVirusScan = async (
+  path: string,
+  errorContext: any
+): Promise<boolean> => {
+  const host = process.env.ANTIVIRUS_HOST;
+  const port = process.env.ANTIVIRUS_PORT;
+
+  if (host === undefined || port === undefined) {
+    return Promise.resolve(true);
+  }
+
+  return new NodeClam()
+    .init({
+      clamdscan: {
+        host,
+        port: parseInt(port),
+      },
+    })
+    .then((clamAV) => clamAV.isInfected(path))
+    .then((response) => {
+      const isInfected = response.isInfected;
+      if (isInfected === null) {
+        logger.logError('Clamscan was unable to virus scan file', {
+          response,
+          errorContext,
+        });
+
+        return true;
+      } else if (isInfected) {
+        logger.logError('Infected file was uploaded', {
+          response,
+          errorContext,
+        });
+      } else {
+        logger.logInfo('Virus scan complete', { response });
+      }
+
+      return !isInfected;
+    })
+    .catch((reason) => {
+      logger.logError('Unable to virus scan file', {
+        reason,
+        errorContext,
+      });
+
+      return true;
+    });
 };

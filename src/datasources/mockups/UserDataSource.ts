@@ -102,6 +102,11 @@ export const dummySEPChairWithRole: UserWithRole = {
   currentRole: { id: 4, title: 'SEP Chair', shortCode: 'sep_chair' },
 };
 
+export const dummySEPSecretaryWithRole: UserWithRole = {
+  ...dummyUser,
+  currentRole: { id: 5, title: 'SEP Secretary', shortCode: 'sep_secretary' },
+};
+
 export const dummySampleReviewer: UserWithRole = {
   ...dummyUser,
   currentRole: {
@@ -340,6 +345,16 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async checkScientistToProposal(
+    scientsitId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    if (scientsitId === dummyUserNotOnProposalWithRole.id) {
+      return false;
+    }
+
+    return true;
+  }
+  async checkInstrumentManagerToProposal(
     scientsitId: number,
     proposalPk: number
   ): Promise<boolean> {

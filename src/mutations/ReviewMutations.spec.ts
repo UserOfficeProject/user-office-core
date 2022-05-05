@@ -3,6 +3,8 @@ import { container } from 'tsyringe';
 
 import { dummyReviewWithNextProposalStatus } from '../datasources/mockups/ReviewDataSource';
 import {
+  dummySEPChairWithRole,
+  dummySEPSecretaryWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -33,6 +35,36 @@ test('A user can not submit a review on a proposal', () => {
       comment: 'Good proposal',
       grade: 9,
       status: ReviewStatus.DRAFT,
+      sepID: 1,
+    })
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update review because of insufficient permissions'
+  );
+});
+
+test('A SEP chair can not modify SEP review if it is submitted', () => {
+  return expect(
+    reviewMutations.updateReview(dummySEPChairWithRole, {
+      reviewID: 5,
+      comment: 'Good proposal test',
+      grade: 9,
+      status: ReviewStatus.SUBMITTED,
+      sepID: 1,
+    })
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update review because of insufficient permissions'
+  );
+});
+
+test('A SEP secretary can not modify SEP review if it is submitted', () => {
+  return expect(
+    reviewMutations.updateReview(dummySEPSecretaryWithRole, {
+      reviewID: 5,
+      comment: 'Good proposal test',
+      grade: 9,
+      status: ReviewStatus.SUBMITTED,
       sepID: 1,
     })
   ).resolves.toHaveProperty(

@@ -129,6 +129,18 @@ export class ProposalAuthorization {
       });
   }
 
+  async isInstrumentManagerToProposal(agent: User | null, proposalPk: number) {
+    if (agent == null || !agent.id) {
+      return false;
+    }
+
+    return this.userDataSource
+      .checkInstrumentManagerToProposal(agent.id, proposalPk)
+      .then((result) => {
+        return result;
+      });
+  }
+
   isVisitorOfProposal(
     agent: UserWithRole,
     proposalPk: number
@@ -176,6 +188,7 @@ export class ProposalAuthorization {
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
+      (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
       (await this.isVisitorOfProposal(agent, proposal.primaryKey))
     );

@@ -73,5 +73,9 @@ export interface UserDataSource {
     userId: number,
     proposalPk: number
   ): Promise<boolean>;
+  checkInstrumentManagerToProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
 }
