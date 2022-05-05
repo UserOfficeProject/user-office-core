@@ -2,9 +2,9 @@ import { Button, TextField, Autocomplete, Grid } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
-import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -27,27 +27,30 @@ function AssignTechnicalReview({
 }: AssignTechnicalReviewProps) {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const [selectedUser, setSelectedUser] = useState(
     proposal.technicalReviewAssignee
   );
-  const { usersData } = useUsersData({
-    userRole: UserRole.INSTRUMENT_SCIENTIST,
-  });
 
-  if (!usersData) {
-    return null;
+  const usersData = proposal.instrument?.scientists || [];
+  const beamlineManagerAlreadyExists = proposal.instrument?.scientists.find(
+    (scientist) => scientist.id === proposal.instrument?.beamlineManager.id
+  );
+
+  if (proposal.instrument?.beamlineManager && !beamlineManagerAlreadyExists) {
+    usersData.push(proposal.instrument?.beamlineManager);
   }
 
   const userIdToUser = (userId: number | null) =>
-    usersData.users.find((user) => user.id === userId);
+    usersData.find((user) => user.id === userId);
 
   return (
     <Grid container alignItems="center">
       <Grid item xs={3}>
         <Autocomplete
           id="user-list"
-          options={usersData.users}
+          options={usersData}
           renderInput={(params) => (
             <TextField {...params} label="Technical reviewer" margin="none" />
           )}
@@ -60,7 +63,8 @@ function AssignTechnicalReview({
           value={userIdToUser(selectedUser)}
           disableClearable
           data-cy="user-list"
-          disabled={proposal.technicalReview?.submitted}
+          disabled={!isUserOfficer && proposal.technicalReview?.submitted}
+          ListboxProps={{ title: 'user-list-options' }}
         />
       </Grid>
       <Grid item xs={1}>
@@ -98,22 +102,9 @@ function AssignTechnicalReview({
           variant="contained"
           color="primary"
           className={classes.submitButton}
-          disabled={proposal.technicalReview?.submitted}
+          disabled={!isUserOfficer && proposal.technicalReview?.submitted}
         >
           Assign
-        </Button>
-      </Grid>
-      <Grid item xs={1}>
-        <Button
-          onClick={() => {
-            onProposalUpdated(proposal);
-          }}
-          type="button"
-          variant="outlined"
-          color="primary"
-          className={classes.submitButton}
-        >
-          Cancel
         </Button>
       </Grid>
     </Grid>

@@ -1,8 +1,6 @@
-import { Button, Link, Paper, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
-import React, { Fragment, useContext, useState } from 'react';
+import Button from '@mui/material/Button';
+import React, { Fragment, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
@@ -22,13 +20,13 @@ import {
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
-import { ProposalData, useProposalData } from 'hooks/proposal/useProposalData';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
 import { StyledPaper } from 'styles/StyledComponents';
 
-import AssignTechnicalReview from './AssignTechnicalReview';
 import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
+import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 
 export enum PROPOSAL_MODAL_TAB_NAMES {
@@ -48,21 +46,6 @@ type ProposalReviewContentProps = {
   isInsideModal?: boolean;
 };
 
-const useStyles = makeStyles((theme) => ({
-  reassignContainer: {
-    padding: theme.spacing(2),
-    marginTop: 0,
-    marginBottom: theme.spacing(6),
-  },
-  showReassignLink: {
-    cursor: 'pointer',
-  },
-  reassignContainerDisabled: {
-    pointerEvents: 'none',
-    opacity: '0.5',
-  },
-}));
-
 const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   proposalPk,
   tabNames,
@@ -70,9 +53,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   sepId,
   isInsideModal,
 }) => {
-  const classes = useStyles();
   const { user } = useContext(UserContext);
-  const [showReassign, setShowReassign] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
   const { proposalData, setProposalData, loading } = useProposalData(
@@ -107,47 +88,13 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
     />
   );
 
-  const assignAnotherReviewerView = (proposal: ProposalData) => (
-    <Paper
-      elevation={1}
-      className={clsx(
-        classes.reassignContainer,
-        proposal.technicalReview?.submitted && classes.reassignContainerDisabled
-      )}
-    >
-      <Typography variant="h6" component="h2" gutterBottom>
-        Assign to someone else?
-      </Typography>
-      <p>
-        If you think there is a better candidate to do the review for the
-        proposal, you can re-assign it to someone else
-      </p>
-      <div>
-        {showReassign ? (
-          <AssignTechnicalReview
-            proposal={proposal}
-            onProposalUpdated={(updatedProposal) => {
-              setProposalData(updatedProposal);
-              setShowReassign(false);
-            }}
-          />
-        ) : (
-          <Link
-            onClick={() => setShowReassign(true)}
-            className={classes.showReassignLink}
-            data-cy="re-assign"
-          >
-            Re-assign...
-          </Link>
-        )}
-      </div>
-    </Paper>
-  );
-
   const TechnicalReviewTab =
     isUserOfficer || proposalData.technicalReviewAssignee === user.id ? (
       <>
-        {assignAnotherReviewerView(proposalData)}
+        <ProposalTechnicalReviewerAssignment
+          proposalData={proposalData}
+          setProposalData={setProposalData}
+        />
         <ProposalTechnicalReview
           proposal={proposalData as Proposal}
           data={proposalData.technicalReview}
