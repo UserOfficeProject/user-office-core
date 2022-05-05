@@ -34,6 +34,16 @@ query getProposal($primaryKey: Int!) {
       id
       name
       shortCode
+      beamlineManager {
+        id
+        firstname
+        lastname
+      }
+      scientists {
+        id
+        firstname
+        lastname
+      }
     }
     call {
       id

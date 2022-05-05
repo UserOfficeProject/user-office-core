@@ -1,13 +1,13 @@
 import Button from '@mui/material/Button';
-import MuiTextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Field, Form, Formik } from 'formik';
-import { Autocomplete, TextField } from 'formik-mui';
+import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as Yup from 'yup';
 
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
 import { Unit } from 'generated/sdk';
 import { useQuantities } from 'hooks/admin/useQuantities';
@@ -29,17 +29,22 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { quantities, loadingQuantities } = useQuantities();
 
-  const initialValues: Unit = unit
+  const initialValues = unit
     ? unit
     : {
         id: '',
         unit: '',
-        quantity: '',
+        quantity: null,
         symbol: '',
         siConversionFormula: '',
       };
 
   if (loadingQuantities) return <UOLoader />;
+
+  const quantityOptions = quantities.map((quantity) => ({
+    text: quantity.id,
+    value: quantity.id,
+  }));
 
   return (
     <Formik
@@ -47,7 +52,7 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
       onSubmit={async (newUnit): Promise<void> => {
         const data = await api({
           toastSuccessMessage: 'Unit created successfully',
-        }).createUnit(newUnit);
+        }).createUnit(newUnit as Unit);
         if (data.createUnit.unit) {
           close(data.createUnit.unit);
         }
@@ -89,24 +94,14 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
             disabled={isExecutingCall}
             required
           />
-          <Field
-            component={Autocomplete}
-            options={quantities.map((item) => item.id)}
-            noOptionsText="No items"
+          <FormikUIAutocomplete
             name="quantity"
             label="Quantity"
             loading={loadingQuantities}
-            fullWidth
+            noOptionsText="No templates"
+            items={quantityOptions}
+            InputProps={{ 'data-cy': 'unit-quantity' }}
             required
-            data-cy="unit-quantity"
-            renderInput={(params: TextFieldProps) => (
-              <MuiTextField
-                {...params}
-                label="Quantity"
-                placeholder="Quantity"
-                required
-              />
-            )}
           />
           <Field
             name="symbol"

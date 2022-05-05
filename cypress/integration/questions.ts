@@ -4,16 +4,11 @@ import { DataType, TemplateCategoryId } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('Questions tests', () => {
-  beforeEach(() => {
-    cy.resetDB(true);
-  });
-
   const textQuestion = faker.lorem.words(2);
   const samplesQuestion = initialDBData.questions.addSamples.text;
 
-  it('User officer search questions', () => {
-    cy.login('officer');
-    cy.visit('/');
+  beforeEach(() => {
+    cy.resetDB(true);
 
     cy.createQuestion({
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
@@ -26,6 +21,11 @@ context('Questions tests', () => {
         });
       }
     });
+  });
+
+  it('User officer search questions', () => {
+    cy.login('officer');
+    cy.visit('/');
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
@@ -80,28 +80,88 @@ context('Questions tests', () => {
       .should('exist');
   });
 
-  it('Officer can delete question', () => {
+  it('Officer can delete question with action button', () => {
     cy.login('officer');
     cy.visit('/');
 
-    cy.createQuestion({
-      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-      dataType: DataType.TEXT_INPUT,
-    }).then((questionResult) => {
-      if (questionResult.createQuestion.question) {
-        cy.updateQuestion({
-          id: questionResult.createQuestion.question.id,
-          question: textQuestion,
-        });
-      }
-    });
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    cy.get('[data-cy=search-input] input')
+      .clear()
+      .type(`${textQuestion}{enter}`);
+
+    cy.get('[data-cy=questions-table]').contains(textQuestion).should('exist');
+    cy.get('[data-cy=questions-table]')
+      .contains(textQuestion)
+      .closest('tr')
+      .find('[aria-label=Delete]')
+      .click();
+    cy.get('[aria-label=Save]').click();
+    cy.finishedLoading();
+    cy.contains(textQuestion).should('not.exist');
+  });
+
+  it('Officer can delete question from edit view', () => {
+    cy.login('officer');
+    cy.visit('/');
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.contains(textQuestion).should('exist');
-    cy.contains(textQuestion).closest('tr').find('[title=Delete]').click();
-    cy.get('[title=Save]').click();
+    cy.get('[data-cy=search-input] input')
+      .clear()
+      .type(`${textQuestion}{enter}`);
+
+    cy.get('[data-cy=questions-table]').contains(textQuestion).should('exist');
+    cy.get('[data-cy=questions-table]')
+      .contains(textQuestion)
+      .closest('tr')
+      .find('[aria-label=Edit]')
+      .click();
+
     cy.finishedLoading();
+
+    cy.get('[role=dialog]').get('[data-cy=delete]').click();
+
+    cy.get('[data-cy=confirm-ok]').click();
+
+    cy.finishedLoading();
+
     cy.contains(textQuestion).should('not.exist');
+  });
+
+  it('Officer can open template', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    cy.get('[data-cy=open-template-details-btn]').first().click();
+
+    cy.finishedLoading();
+
+    cy.get('[role=dialog]').contains(initialDBData.template.name).click();
+
+    cy.url().should('contain', '/QuestionaryEditor/');
+
+    cy.get('[data-cy=edit-metadata]').contains(initialDBData.template.name);
+  });
+
+  it('Officer can open proposal', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    cy.get('[data-cy=search-input] input')
+      .clear()
+      .type(`${initialDBData.questions.boolean.text}{enter}`);
+
+    cy.get('[data-cy=open-answer-details-btn]').first().click();
+
+    cy.get('[role=dialog]').contains(initialDBData.proposal.title).click();
+
+    cy.url().should('contain', 'Proposals?reviewModal=1');
+
+    cy.contains(`${initialDBData.proposal.title}`);
   });
 });
