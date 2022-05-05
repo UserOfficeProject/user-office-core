@@ -31,6 +31,7 @@ jobs:
           - name: Lint Action
             uses: wearerequired/lint-action@v2
             with:
+              auto_fix: true
               eslint: true
               prettier: true
       
