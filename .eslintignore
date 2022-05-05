@@ -12,3 +12,4 @@ coverage/*
 /src/datasources/stfc/UOWSSoapInterface.ts
 
 /dev-commands/*
+.github/workflows/
