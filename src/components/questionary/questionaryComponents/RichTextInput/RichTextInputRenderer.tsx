@@ -12,7 +12,7 @@ import {
 } from 'components/questionary/QuestionaryComponentRegistry';
 import stripHtml from 'utils/stripHtml';
 
-import { addElipsis } from '../../../../utils/addElipsis';
+import { truncateString } from '../../../../utils/truncateString';
 
 export const RichTextInputRendererComponent: React.FC<{
   id: string;
@@ -32,7 +32,7 @@ export const RichTextInputRendererComponent: React.FC<{
         data-cy={`${id}_open`}
         sx={{ cursor: 'pointer', ':hover': { textDecoration: 'underline' } }}
       >
-        {`${addElipsis(stripHtml(valueToRender), 100)}`}
+        {`${truncateString(stripHtml(valueToRender), 100)}`}
       </Typography>
 
       <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
