@@ -1,9 +1,9 @@
-import { Link, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Typography } from '@mui/material';
+import React from 'react';
 
-import StyledModal from 'components/common/StyledModal';
 import { SuperMaterialTable } from 'components/common/SuperMaterialTable';
 import { createQuestionForm } from 'components/questionary/QuestionaryComponentRegistry';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useCreatableQuestions } from 'hooks/template/useCreatableQuestions';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -24,12 +24,28 @@ const columns = [
     field: 'answerCountButton',
     customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
       a.answers.length - b.answers.length,
+    render: (rowData: QuestionWithUsage) => (
+      <ButtonWithDialog
+        label={rowData.answers.length.toString()}
+        data-cy="open-answer-details-btn"
+      >
+        <AnswerCountDetails question={rowData} />
+      </ButtonWithDialog>
+    ),
   },
   {
     title: '# Templates',
     field: 'templateCountButton',
     customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
       a.templates.length - b.templates.length,
+    render: (rowData: QuestionWithUsage) => (
+      <ButtonWithDialog
+        label={rowData.templates.length.toString()}
+        data-cy="open-template-details-btn"
+      >
+        <TemplateCountDetails question={rowData} />
+      </ButtonWithDialog>
+    ),
   },
 ];
 
@@ -38,16 +54,6 @@ function QuestionsPage() {
     useCreatableQuestions();
 
   const { api } = useDataApiWithFeedback();
-
-  const [
-    selectedTemplateCountDetailsQuestion,
-    setSelectedTemplateCountDetailsQuestion,
-  ] = useState<QuestionWithUsage | null>(null);
-
-  const [
-    selectedAnswerCountDetailsQuestion,
-    setSelectedAnswerCountDetailsQuestion,
-  ] = useState<QuestionWithUsage | null>(null);
 
   const createModal = (
     onUpdate: FunctionType<void, [QuestionWithUsage | null]>,
@@ -61,38 +67,20 @@ function QuestionsPage() {
         onDeleted: (q) => {
           setQuestions(questions.filter((q2) => q2.id !== q.id));
         },
+        closeMe: () => {
+          onUpdate(null);
+        },
       });
     }
   };
 
-  const deleteQuestion = async (questionId: string | number) =>
-    api({ toastSuccessMessage: 'Question deleted' })
-      .deleteQuestion({ questionId: questionId as string })
-      .then((result) => result.deleteQuestion.rejection === null);
+  const deleteQuestion = async (questionId: string | number) => {
+    const { deleteQuestion } = await api({
+      toastSuccessMessage: 'Question deleted',
+    }).deleteQuestion({ questionId: questionId as string });
 
-  const templateCountButton = (rowData: QuestionWithUsage) => (
-    <Link
-      onClick={() => setSelectedTemplateCountDetailsQuestion(rowData)}
-      style={{ cursor: 'pointer' }}
-    >
-      {rowData.templates.length}
-    </Link>
-  );
-
-  const answerCountButton = (rowData: QuestionWithUsage) => (
-    <Link
-      onClick={() => setSelectedAnswerCountDetailsQuestion(rowData)}
-      style={{ cursor: 'pointer' }}
-    >
-      {rowData.answers.length}
-    </Link>
-  );
-
-  const questionsWithButtons = questions.map((question) => ({
-    ...question,
-    answerCountButton: answerCountButton(question),
-    templateCountButton: templateCountButton(question),
-  }));
+    return deleteQuestion.rejection === null;
+  };
 
   return (
     <StyledContainer>
@@ -115,24 +103,12 @@ function QuestionsPage() {
             }
             columns={columns}
             isLoading={loadingQuestions}
-            data={questionsWithButtons}
+            data={questions}
             options={{ search: false }}
             hasAccess={{ create: false, update: true, remove: true }}
           />
         </div>
       </StyledPaper>
-      <StyledModal
-        onClose={() => setSelectedTemplateCountDetailsQuestion(null)}
-        open={selectedTemplateCountDetailsQuestion !== null}
-      >
-        <TemplateCountDetails question={selectedTemplateCountDetailsQuestion} />
-      </StyledModal>
-      <StyledModal
-        onClose={() => setSelectedAnswerCountDetailsQuestion(null)}
-        open={selectedAnswerCountDetailsQuestion !== null}
-      >
-        <AnswerCountDetails question={selectedAnswerCountDetailsQuestion} />
-      </StyledModal>
     </StyledContainer>
   );
 }
