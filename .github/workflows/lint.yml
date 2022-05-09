@@ -1,0 +1,35 @@
+name: Lint
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the develop branch
+on:
+  pull_request:
+    branches: [develop, master]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  run-linters:
+        name: Run linters
+        runs-on: ubuntu-latest
+
+        strategy:
+          matrix:
+            node-version: [16.x]
+
+        steps:
+          - name: Check out Git repository
+            uses: actions/checkout@v2
+
+          - name: Set up Node.js
+            uses: actions/setup-node@v1
+            with:
+              node-version: ${{ matrix.node-version }}
+
+          - name: Install Node.js dependencies
+            run: npm ci
+
+          - name: Lint Action
+            uses: wearerequired/lint-action@v2
+            with:
+              eslint: true
+              prettier: true
