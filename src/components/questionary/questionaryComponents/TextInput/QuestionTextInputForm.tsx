@@ -1,11 +1,10 @@
-import Box from '@material-ui/core/Box';
-import Collapse from '@material-ui/core/Collapse';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -43,7 +42,6 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
             label="Key"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -53,7 +51,6 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
             label="Question"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
@@ -61,10 +58,11 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              component={FormikUICustomCheckbox}
-              label="Is required"
-              margin="normal"
-              fullWidth
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
               data-cy="required"
             />
 
@@ -74,7 +72,6 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
               label="Min"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="min"
             />
@@ -85,7 +82,6 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
               label="Max"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max"
             />
@@ -97,7 +93,6 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
               label="Placeholder text"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="placeholder"
             />
@@ -108,10 +103,11 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
                 checked={
                   (formikProps.values.config as TextInputConfig).multiline
                 }
-                component={FormikUICustomCheckbox}
-                label="Multiple lines"
-                margin="normal"
-                fullWidth
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Multiple lines',
+                }}
                 data-cy="multiline"
               />
             </Box>
@@ -122,18 +118,22 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
                 checked={
                   (formikProps.values.config as TextInputConfig).isCounterHidden
                 }
-                component={FormikUICustomCheckbox}
-                label="Hide counter"
-                margin="normal"
-                fullWidth
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Hide counter',
+                }}
                 data-cy="multiline"
               />
             </Box>
 
             <Field
-              label="Enable rich text question"
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Enable rich text question',
+              }}
               name="config.isHtmlQuestion"
-              component={FormikUICustomCheckbox}
             />
             <Collapse
               in={(formikProps.values.config as TextInputConfig).isHtmlQuestion}
@@ -145,7 +145,6 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
                 name="config.htmlQuestion"
                 type="text"
                 component={FormikUICustomEditor}
-                margin="normal"
                 fullWidth
                 init={{
                   skin: false,

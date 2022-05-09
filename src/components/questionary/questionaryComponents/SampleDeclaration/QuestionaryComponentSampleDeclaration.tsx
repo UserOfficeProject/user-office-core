@@ -1,4 +1,5 @@
-import { makeStyles } from '@material-ui/core';
+import { Paper } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field, FieldProps, FormikProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
@@ -28,11 +29,15 @@ import {
 } from '../QuestionnairesList';
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   questionLabel: {
     opacity: 0.54,
     fontWeight: 400,
     fontSize: '1rem',
+  },
+  container: {
+    padding: '1rem',
+    marginTop: theme.spacing(1),
   },
 }));
 const sampleToListRow = (sample: SampleCore): QuestionnairesListRow => {
@@ -121,116 +126,118 @@ function QuestionaryComponentSampleDeclaration(
             });
 
         return (
-          <div>
+          <>
             <label className={classes.questionLabel}>
               {answer.question.question}
             </label>
-            <QuestionnairesList
-              addButtonLabel={config.addEntryButtonLabel}
-              data={field.value?.map(sampleToListRow) ?? []}
-              maxEntries={config.maxEntries || undefined}
-              onEditClick={(item) =>
-                api()
-                  .getSample({ sampleId: item.id })
-                  .then((response) => {
-                    if (response.sample) {
-                      setSelectedSample(response.sample);
-                    }
-                  })
-              }
-              onDeleteClick={(item) => {
-                confirm(() => deleteSample(item.id), {
-                  title: 'Delete Sample',
-                  description:
-                    'This action will delete the sample and all data associated with it',
-                })();
-              }}
-              onCloneClick={(item) => {
-                prompt((answer) => copySample(item.id, answer), {
-                  question: 'Title',
-                  prefilledAnswer: `Copy of ${item.label}`,
-                })();
-              }}
-              onAddNewClick={() => {
-                // TODO move this into a function like copySample
-                if (!state) {
-                  throw new Error(
-                    'Sample Declaration is missing proposal context'
-                  );
+            <Paper className={classes.container}>
+              <QuestionnairesList
+                addButtonLabel={config.addEntryButtonLabel}
+                data={field.value?.map(sampleToListRow) ?? []}
+                maxEntries={config.maxEntries || undefined}
+                onEditClick={(item) =>
+                  api()
+                    .getSample({ sampleId: item.id })
+                    .then((response) => {
+                      if (response.sample) {
+                        setSelectedSample(response.sample);
+                      }
+                    })
                 }
-
-                const proposalPk = state.proposal.primaryKey;
-                const questionId = props.answer.question.id;
-                if (proposalPk <= 0 || !questionId) {
-                  throw new Error(
-                    'Sample Declaration is missing proposal id and/or question id'
-                  );
-                }
-                const templateId = config.templateId;
-
-                if (!templateId) {
-                  throw new Error('Sample Declaration is missing templateId');
-                }
-
-                api()
-                  .getBlankQuestionarySteps({ templateId })
-                  .then((result) => {
-                    const blankSteps = result.blankQuestionarySteps;
-                    if (blankSteps) {
-                      const sampleStub = createSampleStub(
-                        templateId,
-                        blankSteps,
-                        proposalPk,
-                        questionId
-                      );
-                      setSelectedSample(sampleStub);
-                    }
-                  });
-              }}
-              {...props}
-            />
-
-            <ErrorMessage name={answerId} />
-
-            <StyledModal
-              onClose={() => setSelectedSample(null)}
-              open={selectedSample !== null}
-              data-cy="sample-declaration-modal"
-            >
-              {selectedSample ? (
-                <SampleDeclarationContainer
-                  sample={selectedSample}
-                  sampleUpdated={(updatedSample) => {
-                    const newValue = field.value.map((sample) =>
-                      sample.id === updatedSample.id ? updatedSample : sample
+                onDeleteClick={(item) => {
+                  confirm(() => deleteSample(item.id), {
+                    title: 'Delete Sample',
+                    description:
+                      'This action will delete the sample and all data associated with it',
+                  })();
+                }}
+                onCloneClick={(item) => {
+                  prompt((answer) => copySample(item.id, answer), {
+                    question: 'Title',
+                    prefilledAnswer: `Copy of ${item.label}`,
+                  })();
+                }}
+                onAddNewClick={() => {
+                  // TODO move this into a function like copySample
+                  if (!state) {
+                    throw new Error(
+                      'Sample Declaration is missing proposal context'
                     );
+                  }
 
-                    form.setFieldValue(answerId, newValue);
-                  }}
-                  sampleCreated={(newSample) => {
-                    form.setFieldValue(answerId, [...field.value, newSample]);
-                  }}
-                  sampleEditDone={() => {
-                    // refresh all samples
-                    api()
-                      .getSamplesWithQuestionaryStatus({
-                        filter: {
-                          questionId: answer.question.id,
-                          proposalPk: state.proposal.primaryKey,
-                        },
-                      })
-                      .then((result) => {
-                        form.setFieldValue(answerId, result.samples);
-                      });
+                  const proposalPk = state.proposal.primaryKey;
+                  const questionId = props.answer.question.id;
+                  if (proposalPk <= 0 || !questionId) {
+                    throw new Error(
+                      'Sample Declaration is missing proposal id and/or question id'
+                    );
+                  }
+                  const templateId = config.templateId;
 
-                    setSelectedSample(null);
-                  }}
-                ></SampleDeclarationContainer>
-              ) : (
-                <UOLoader />
-              )}
-            </StyledModal>
-          </div>
+                  if (!templateId) {
+                    throw new Error('Sample Declaration is missing templateId');
+                  }
+
+                  api()
+                    .getBlankQuestionarySteps({ templateId })
+                    .then((result) => {
+                      const blankSteps = result.blankQuestionarySteps;
+                      if (blankSteps) {
+                        const sampleStub = createSampleStub(
+                          templateId,
+                          blankSteps,
+                          proposalPk,
+                          questionId
+                        );
+                        setSelectedSample(sampleStub);
+                      }
+                    });
+                }}
+                {...props}
+              />
+
+              <ErrorMessage name={answerId} />
+
+              <StyledModal
+                onClose={() => setSelectedSample(null)}
+                open={selectedSample !== null}
+                data-cy="sample-declaration-modal"
+              >
+                {selectedSample ? (
+                  <SampleDeclarationContainer
+                    sample={selectedSample}
+                    sampleUpdated={(updatedSample) => {
+                      const newValue = field.value.map((sample) =>
+                        sample.id === updatedSample.id ? updatedSample : sample
+                      );
+
+                      form.setFieldValue(answerId, newValue);
+                    }}
+                    sampleCreated={(newSample) => {
+                      form.setFieldValue(answerId, [...field.value, newSample]);
+                    }}
+                    sampleEditDone={() => {
+                      // refresh all samples
+                      api()
+                        .getSamplesWithQuestionaryStatus({
+                          filter: {
+                            questionId: answer.question.id,
+                            proposalPk: state.proposal.primaryKey,
+                          },
+                        })
+                        .then((result) => {
+                          form.setFieldValue(answerId, result.samples);
+                        });
+
+                      setSelectedSample(null);
+                    }}
+                  ></SampleDeclarationContainer>
+                ) : (
+                  <UOLoader />
+                )}
+              </StyledModal>
+            </Paper>
+          </>
         );
       }}
     </Field>

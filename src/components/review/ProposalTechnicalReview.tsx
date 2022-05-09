@@ -1,18 +1,22 @@
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import InputLabel from '@material-ui/core/InputLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-material-ui';
-import React, { useContext, useState } from 'react';
+import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
+import React, { useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
-import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
+import {
+  FileIdWithCaptionAndFigure,
+  FileUploadComponent,
+} from 'components/common/FileUploadComponent';
 import { UserContext } from 'context/UserContextProvider';
 import {
   TechnicalReviewStatus,
@@ -20,9 +24,10 @@ import {
   UserRole,
   Proposal,
 } from 'generated/sdk';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
+import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles((theme) => ({
@@ -37,6 +42,7 @@ type TechnicalReviewFormType = {
   comment: string;
   publicComment: string;
   submitted: boolean;
+  files: string;
 };
 
 type ProposalTechnicalReviewProps = {
@@ -56,7 +62,15 @@ const ProposalTechnicalReview = ({
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const classes = useStyles();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const { user } = useContext(UserContext);
+  const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
+
+  useEffect(() => {
+    if (data?.files) {
+      setFileList(JSON.parse(data.files));
+    }
+  }, [data?.files]);
 
   const initialValues: TechnicalReviewFormType = {
     status: data?.status || '',
@@ -64,7 +78,20 @@ const ProposalTechnicalReview = ({
     comment: data?.comment || '',
     publicComment: data?.publicComment || '',
     submitted: data?.submitted || false,
+    files: data?.files || '',
   };
+
+  const statusOptions: Option[] = [
+    { text: 'Feasible', value: TechnicalReviewStatus.FEASIBLE },
+    {
+      text: 'Partially feasible',
+      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+    },
+    {
+      text: 'Unfeasible',
+      value: TechnicalReviewStatus.UNFEASIBLE,
+    },
+  ];
 
   const PromptIfDirty = () => {
     const formik = useFormikContext();
@@ -79,25 +106,47 @@ const ProposalTechnicalReview = ({
 
   const handleUpdateOrSubmit = async (
     values: TechnicalReviewFormType,
-    method: 'submitTechnicalReview' | 'addTechnicalReview'
+    method: 'submitTechnicalReviews' | 'addTechnicalReview'
   ) => {
     const shouldSubmit =
-      method === 'submitTechnicalReview' || (isUserOfficer && values.submitted);
-    const successMessage = isUserOfficer
+      method === 'submitTechnicalReviews' ||
+      (isUserOfficer && values.submitted);
+    const toastSuccessMessage = isUserOfficer
       ? `Technical review updated successfully!`
       : `Technical review ${
           shouldSubmit ? 'submitted' : 'updated'
         } successfully!`;
 
-    const result = await api(successMessage)[method]({
-      proposalPk: proposal.primaryKey,
-      timeAllocation: +values.timeAllocation,
-      comment: values.comment,
-      publicComment: values.publicComment,
-      status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
-      submitted: shouldSubmit,
-      reviewerId: user.id,
-    });
+    let result;
+
+    if (method === 'submitTechnicalReviews') {
+      result = await api({ toastSuccessMessage })[method]({
+        technicalReviews: [
+          {
+            proposalPk: proposal.primaryKey,
+            timeAllocation: +values.timeAllocation,
+            comment: values.comment,
+            publicComment: values.publicComment,
+            status:
+              TechnicalReviewStatus[values.status as TechnicalReviewStatus],
+            submitted: shouldSubmit,
+            reviewerId: user.id,
+            files: JSON.stringify(fileList),
+          },
+        ],
+      });
+    } else {
+      result = await api({ toastSuccessMessage })[method]({
+        proposalPk: proposal.primaryKey,
+        timeAllocation: +values.timeAllocation,
+        comment: values.comment,
+        publicComment: values.publicComment,
+        status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
+        submitted: shouldSubmit,
+        reviewerId: user.id,
+        files: JSON.stringify(fileList),
+      });
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(result as any)[method].error) {
@@ -133,7 +182,7 @@ const ProposalTechnicalReview = ({
             if (!isUserOfficer) {
               confirm(
                 async () => {
-                  await handleUpdateOrSubmit(values, 'submitTechnicalReview');
+                  await handleUpdateOrSubmit(values, 'submitTechnicalReviews');
                 },
                 {
                   title: 'Please confirm',
@@ -142,38 +191,42 @@ const ProposalTechnicalReview = ({
                 }
               )();
             } else {
-              await handleUpdateOrSubmit(values, 'submitTechnicalReview');
+              await handleUpdateOrSubmit(values, 'submitTechnicalReviews');
             }
           } else {
             await handleUpdateOrSubmit(values, 'addTechnicalReview');
           }
         }}
       >
-        {({ isSubmitting, setFieldValue }) => (
+        {({ isSubmitting, setFieldValue, values }) => (
           <Form>
             <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
-                <FormikDropdown
-                  name="status"
-                  label="Status"
-                  items={[
-                    { text: 'Feasible', value: TechnicalReviewStatus.FEASIBLE },
-                    {
-                      text: 'Partially feasible',
-                      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
-                    },
-                    {
-                      text: 'Unfeasible',
-                      value: TechnicalReviewStatus.UNFEASIBLE,
-                    },
-                  ]}
-                  disabled={shouldDisableForm(isSubmitting)}
-                  InputProps={{
-                    'data-cy': 'technical-review-status',
-                  }}
-                  required
-                />
+                <FormControl fullWidth margin="normal">
+                  <InputLabel
+                    htmlFor="status"
+                    shrink={!!values.status}
+                    required
+                  >
+                    Status
+                  </InputLabel>
+                  <Field
+                    name="status"
+                    type="text"
+                    component={Select}
+                    data-cy="technical-review-status"
+                    disabled={shouldDisableForm(isSubmitting)}
+                    MenuProps={{ 'data-cy': 'technical-review-status-options' }}
+                    required
+                  >
+                    {statusOptions.map(({ value, text }) => (
+                      <MenuItem value={value} key={value}>
+                        {text}
+                      </MenuItem>
+                    ))}
+                  </Field>
+                </FormControl>
               </Grid>
               <Grid item sm={6} xs={12}>
                 <Field
@@ -182,7 +235,6 @@ const ProposalTechnicalReview = ({
                   id="time-allocation-input"
                   type="number"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   autoComplete="off"
                   data-cy="timeAllocation"
@@ -190,48 +242,73 @@ const ProposalTechnicalReview = ({
                   required
                 />
               </Grid>
-              <Grid item xs={12}>
-                <InputLabel htmlFor="comment" shrink margin="dense">
-                  Internal comment
-                </InputLabel>
-                {/* NOTE: We are using Editor directly instead of FormikUICustomEditor with Formik Field component.
+              {(isUserOfficer || isInstrumentScientist) && (
+                <Grid item xs={12}>
+                  <InputLabel htmlFor="comment" shrink margin="dense">
+                    Internal comment
+                  </InputLabel>
+                  {/* NOTE: We are using Editor directly instead of FormikUICustomEditor with Formik Field component.
                     This is because FormikUICustomEditor is not updated properly when we set form field onEditorChange.
                     It works when we use onBlur on Editor but it is problematic to test that with Cypress,
                     because for some reason it is not firing the onBlur event and form is not updated.
                 */}
-                <Editor
-                  id="comment"
-                  initialValue={initialValues.comment}
-                  init={{
-                    skin: false,
-                    content_css: false,
-                    plugins: [
-                      'link',
-                      'preview',
-                      'code',
-                      'charmap',
-                      'wordcount',
-                    ],
-                    toolbar: 'bold italic',
-                    branding: false,
-                  }}
-                  onEditorChange={(content, editor) => {
-                    // NOTE: Remove \n (newline) characters to be able to compare because they are a bit problematic.
-                    const normalizedContent = content.replace(
-                      /(?:\r\n|\r|\n)/g,
-                      ''
-                    );
+                  <Editor
+                    id="comment"
+                    initialValue={initialValues.comment}
+                    init={{
+                      skin: false,
+                      content_css: false,
+                      plugins: [
+                        'link',
+                        'preview',
+                        'code',
+                        'charmap',
+                        'wordcount',
+                      ],
+                      toolbar: 'bold italic',
+                      branding: false,
+                    }}
+                    onEditorChange={(content, editor) => {
+                      const isStartContentDifferentThanCurrent =
+                        editor.startContent !==
+                        editor.contentDocument.body.innerHTML;
 
-                    if (
-                      normalizedContent !== editor.startContent ||
-                      editor.isDirty()
-                    ) {
-                      setFieldValue('comment', content);
+                      if (
+                        isStartContentDifferentThanCurrent ||
+                        editor.isDirty()
+                      ) {
+                        setFieldValue('comment', content);
+                      }
+                    }}
+                    disabled={shouldDisableForm(isSubmitting)}
+                  />
+                </Grid>
+              )}
+              {(isUserOfficer || isInstrumentScientist) && (
+                <Grid item xs={12}>
+                  <InputLabel htmlFor="comment" shrink margin="dense">
+                    Internal documents
+                  </InputLabel>
+                  <FileUploadComponent
+                    maxFiles={5}
+                    fileType={'.pdf'}
+                    onChange={(
+                      fileMetaDataList: FileIdWithCaptionAndFigure[]
+                    ) => {
+                      const newStateValue = fileMetaDataList.map((file) => ({
+                        ...file,
+                      }));
+                      setFileList(newStateValue);
+                      setFieldValue('pdfUpload', newStateValue);
+                    }}
+                    value={
+                      initialValues.files
+                        ? JSON.parse(initialValues.files) || []
+                        : []
                     }
-                  }}
-                  disabled={shouldDisableForm(isSubmitting)}
-                />
-              </Grid>
+                  />
+                </Grid>
+              )}
               <Grid item xs={12}>
                 <InputLabel htmlFor="publicComment" shrink margin="dense">
                   Comments for the review panel
@@ -253,14 +330,12 @@ const ProposalTechnicalReview = ({
                     branding: false,
                   }}
                   onEditorChange={(content, editor) => {
-                    // NOTE: Remove \n (newline) characters to be able to compare because they are a bit problematic.
-                    const normalizedContent = content.replace(
-                      /(?:\r\n|\r|\n)/g,
-                      ''
-                    );
+                    const isStartContentDifferentThanCurrent =
+                      editor.startContent !==
+                      editor.contentDocument.body.innerHTML;
 
                     if (
-                      normalizedContent !== editor.startContent ||
+                      isStartContentDifferentThanCurrent ||
                       editor.isDirty()
                     ) {
                       setFieldValue('publicComment', content);
@@ -269,16 +344,17 @@ const ProposalTechnicalReview = ({
                   disabled={shouldDisableForm(isSubmitting)}
                 />
               </Grid>
-
               <Grid item xs={12}>
-                <ButtonContainer>
+                <StyledButtonContainer>
                   {isUserOfficer && (
                     <Field
                       id="submitted"
                       name="submitted"
-                      component={FormikUICustomCheckbox}
-                      label="Submitted"
-                      color="primary"
+                      component={CheckboxWithLabel}
+                      type="checkbox"
+                      Label={{
+                        label: 'Submitted',
+                      }}
                       disabled={isSubmitting}
                       data-cy="is-review-submitted"
                     />
@@ -290,7 +366,6 @@ const ProposalTechnicalReview = ({
                     }
                     type="submit"
                     onClick={() => setShouldSubmit(false)}
-                    variant="contained"
                     color={isUserOfficer ? 'primary' : 'secondary'}
                     data-cy="save-technical-review"
                   >
@@ -302,14 +377,12 @@ const ProposalTechnicalReview = ({
                       type="submit"
                       className={classes.submitButton}
                       onClick={() => setShouldSubmit(true)}
-                      variant="contained"
-                      color="primary"
                       data-cy="submit-technical-review"
                     >
                       {data?.submitted ? 'Submitted' : 'Submit'}
                     </Button>
                   )}
-                </ButtonContainer>
+                </StyledButtonContainer>
               </Grid>
             </Grid>
           </Form>

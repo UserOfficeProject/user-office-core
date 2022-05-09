@@ -1,4 +1,4 @@
-import TextFieldsIcon from '@material-ui/icons/TextFields';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';

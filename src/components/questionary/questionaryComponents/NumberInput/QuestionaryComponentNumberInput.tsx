@@ -1,11 +1,12 @@
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormLabel from '@material-ui/core/FormLabel';
-import Grid from '@material-ui/core/Grid';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormLabel from '@mui/material/FormLabel';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useState } from 'react';
 
@@ -17,12 +18,9 @@ import isEventFromAutoComplete from 'utils/isEventFromAutoComplete';
 const useStyles = makeStyles((theme) => ({
   unitField: {
     paddingRight: theme.spacing(1),
-    alignSelf: 'flex-end',
   },
   singleUnit: {
     alignItems: 'flex-end',
-    display: 'flex',
-    height: '100%',
     fontSize: '1rem',
     padding: '0px 5px',
   },
@@ -70,38 +68,44 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
       return null;
     } else if (config.units?.length === 1) {
       return (
-        <span className={`${classes.singleUnit} MuiFormControl-marginNormal`}>
+        <FormControl className={`${classes.singleUnit}`} margin="dense">
           {stateValue.unit?.symbol}
-        </span>
+        </FormControl>
       );
     } else {
       return (
-        <Select
-          label="Unit"
-          value={stateValue.unit?.id ?? ''}
-          onChange={(e) => {
-            const newUnitId = e.target.value as string;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-            const unit = config.units?.find((u) => u.id === newUnitId)!;
-            const convertToSi = expressionToFunction(unit.siConversionFormula);
-            const newState = {
-              ...stateValue,
-              unit,
-              siValue: convertToSi(stateValue.value),
-            };
-            setStateValue(newState);
-            onComplete(newState);
-          }}
-          name={unitFieldId}
-          data-cy={unitFieldId}
-          className="MuiFormControl-marginDense"
-        >
-          {config.units?.map(({ id, unit, symbol }) => (
-            <MenuItem value={id} key={id}>
-              {`${symbol} (${unit})`}
-            </MenuItem>
-          ))}
-        </Select>
+        <FormControl margin="dense">
+          <InputLabel htmlFor={unitFieldId} shrink>
+            Unit
+          </InputLabel>
+          <Select
+            id={unitFieldId}
+            value={stateValue.unit?.id ?? ''}
+            onChange={(e) => {
+              const newUnitId = e.target.value as string;
+              // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+              const unit = config.units?.find((u) => u.id === newUnitId)!;
+              const convertToSi = expressionToFunction(
+                unit.siConversionFormula
+              );
+              const newState = {
+                ...stateValue,
+                unit,
+                siValue: convertToSi(stateValue.value),
+              };
+              setStateValue(newState);
+              onComplete(newState);
+            }}
+            name={unitFieldId}
+            data-cy={unitFieldId}
+          >
+            {config.units?.map(({ id, unit, symbol }) => (
+              <MenuItem value={id} key={id}>
+                {`${symbol} (${unit})`}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       );
     }
   };
@@ -113,7 +117,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
       margin="dense"
       fullWidth
     >
-      <Grid container>
+      <Grid container alignItems="flex-end">
         <Grid item xs={12}>
           <FormLabel>
             <>
@@ -129,7 +133,6 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
         </Grid>
         <Grid item xs={2} className={classes.unitField}>
           <TextField
-            label="Value"
             id={`${id}-value`}
             onChange={(event) => {
               const unit = stateValue.unit;
@@ -164,7 +167,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             error={isError}
           />
         </Grid>
-        <Grid item xs={10} className={classes.unitField}>
+        <Grid item xs={10}>
           {getUnits()}
         </Grid>
 

@@ -1,13 +1,15 @@
-import Badge from '@material-ui/core/Badge';
-import Box from '@material-ui/core/Box';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { ExitToApp } from '@material-ui/icons';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+import { ExitToApp } from '@mui/icons-material';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
+import Badge from '@mui/material/Badge';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import React, { useContext, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
@@ -30,6 +32,8 @@ const AccountActionButton: React.FC = () => {
     setAnchorEl(null);
   };
 
+  const handleModalClose = () => setShow(false);
+
   const handleOnLogout = () => {
     handleLogout();
   };
@@ -40,12 +44,19 @@ const AccountActionButton: React.FC = () => {
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
-        onClose={(): void => setShow(false)}
+        onClose={handleModalClose}
         style={{ backdropFilter: 'blur(6px)' }}
+        maxWidth="xs"
+        fullWidth
       >
         <DialogContent>
-          <RoleSelection />
+          <RoleSelection onClose={handleModalClose} />
         </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={handleModalClose}>
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
       <>
         <IconButton

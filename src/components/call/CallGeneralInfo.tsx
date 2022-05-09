@@ -1,4 +1,6 @@
-import LuxonUtils from '@date-io/luxon';
+import HelpIcon from '@mui/icons-material/Help';
+import DateAdapter from '@mui/lab/AdapterLuxon';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
   Button,
   createStyles,
@@ -16,27 +18,25 @@ import {
   TableRow,
   Theme,
   Typography,
-  withStyles,
-} from '@material-ui/core';
-import HelpIcon from '@material-ui/icons/Help';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+  useTheme,
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-material-ui';
-import { KeyboardDateTimePicker } from 'formik-material-ui-pickers';
-import React, { useContext, useEffect } from 'react';
+import { TextField } from 'formik-mui';
+import { DateTimePicker } from 'formik-mui-lab';
+import React, { useContext } from 'react';
 
-import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   AllocationTimeUnits,
   CreateCallMutationVariables,
   FeatureId,
   GetTemplatesQuery,
   ProposalWorkflow,
-  SettingsId,
   UpdateCallMutationVariables,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 const CallGeneralInfo: React.FC<{
   templates: GetTemplatesQuery['templates'];
@@ -52,13 +52,27 @@ const CallGeneralInfo: React.FC<{
   loadingTemplates,
 }) => {
   const { features } = useContext(FeatureContext);
+  const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
 
-  const settingsContext = useContext(SettingsContext);
+  const theme = useTheme();
 
-  const proposalWorkflowOptions = proposalWorkflows.map((proposalWorkflow) => ({
-    text: proposalWorkflow.name,
-    value: proposalWorkflow.id,
-  }));
+  const templateOptions =
+    templates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const esiTemplateOptions =
+    esiTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const proposalWorkflowOptions =
+    proposalWorkflows.map((proposalWorkflow) => ({
+      text: proposalWorkflow.name,
+      value: proposalWorkflow.id,
+    })) || [];
 
   const allocationTimeUnitOptions = Object.values(AllocationTimeUnits).map(
     (key) => ({
@@ -70,17 +84,7 @@ const CallGeneralInfo: React.FC<{
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
-  const { startCall, endCall } = formik.values;
-
-  useEffect(() => {
-    if (endCall && endCall < startCall) {
-      formik.setFieldValue('endCall', startCall);
-      /** NOTE: Set field untouched because if we try to update the endCall before startCall and then
-       *  set startCall after endCall it can show error message even though we update the endCall automatically.
-       */
-      formik.setFieldTouched('endCall', false);
-    }
-  }, [startCall, endCall, formik]);
+  const { startCall } = formik.values;
 
   function validateRefNumFormat(input: string) {
     let errorMessage;
@@ -131,9 +135,6 @@ const CallGeneralInfo: React.FC<{
     })
   )(TableRow);
 
-  const timezone =
-    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
-
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
   }
@@ -151,35 +152,52 @@ const CallGeneralInfo: React.FC<{
         id="short-code-input"
         type="text"
         component={TextField}
-        margin="normal"
         inputProps={{ maxLength: '20' }}
         fullWidth
         required
         data-cy="short-code"
       />
-      <MuiPickersUtilsProvider utils={LuxonUtils}>
+      <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
           name="startCall"
           label={`Start (${timezone})`}
           id="start-call-input"
-          format="yyyy-MM-dd HH:mm"
-          component={KeyboardDateTimePicker}
-          margin="normal"
-          fullWidth
+          inputFormat={dateTimeFormat}
+          mask={mask}
+          // NOTE: We need to have ampm set to false because otherwise the mask doesn't work properly and suggestion format when you type is not shown at all
+          ampm={false}
+          component={DateTimePicker}
+          inputProps={{ placeholder: dateTimeFormat }}
+          allowSameDateSelection
+          textField={{
+            fullWidth: true,
+            required: true,
+            'data-cy': 'start-date',
+          }}
+          // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
-          data-cy="start-date"
         />
         <Field
           name="endCall"
           label={`End (${timezone})`}
           id="end-call-input"
-          format="yyyy-MM-dd HH:mm"
-          component={KeyboardDateTimePicker}
-          margin="normal"
-          fullWidth
+          inputFormat={dateTimeFormat}
+          mask={mask}
+          ampm={false}
+          allowSameDateSelection
+          component={DateTimePicker}
+          inputProps={{ placeholder: dateTimeFormat }}
+          textField={{
+            fullWidth: true,
+            required: true,
+            'data-cy': 'end-date',
+          }}
+          // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
+          // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           minDate={startCall}
           required
-          data-cy="end-date"
         />
         <Field
           name="referenceNumberFormat"
@@ -198,7 +216,6 @@ const CallGeneralInfo: React.FC<{
                   onClose={handleClose}
                   aria-labelledby="customized-dialog-title"
                   open={open}
-                  color="primary"
                 >
                   <DialogContent dividers>
                     <Typography gutterBottom color="inherit" variant="body1">
@@ -247,7 +264,7 @@ const CallGeneralInfo: React.FC<{
                     </Typography>
                   </DialogContent>
                   <DialogActions>
-                    <Button autoFocus onClick={handleClose} color="primary">
+                    <Button autoFocus variant="text" onClick={handleClose}>
                       Close
                     </Button>
                   </DialogActions>
@@ -255,58 +272,46 @@ const CallGeneralInfo: React.FC<{
               </InputAdornment>
             ),
           }}
-          margin="normal"
           fullWidth
           data-cy="reference-number-format"
         />
-      </MuiPickersUtilsProvider>
-      <FormikDropdown
+      </LocalizationProvider>
+
+      <FormikUIAutocomplete
         name="templateId"
         label="Call template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={
-          templates?.map((template) => ({
-            text: template.name,
-            value: template.templateId,
-          })) || []
-        }
+        items={templateOptions}
         InputProps={{ 'data-cy': 'call-template' }}
         required
       />
       {features.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
-        <FormikDropdown
+        <FormikUIAutocomplete
           name="esiTemplateId"
           label="ESI template"
           loading={loadingTemplates}
           noOptionsText="No templates"
-          items={
-            esiTemplates?.map((template) => ({
-              text: template.name,
-              value: template.templateId,
-            })) || []
-          }
+          items={esiTemplateOptions}
           InputProps={{ 'data-cy': 'call-esi-template' }}
           required
         />
       )}
-
-      <FormikDropdown
+      <FormikUIAutocomplete
         name="proposalWorkflowId"
         label="Proposal workflow"
         loading={loadingProposalWorkflows}
         noOptionsText="No proposal workflows"
-        items={proposalWorkflows.length > 0 ? proposalWorkflowOptions : []}
+        items={proposalWorkflowOptions}
         InputProps={{
           'data-cy': 'call-workflow',
         }}
         required
       />
-
-      <FormikDropdown
+      <FormikUIAutocomplete
         name="allocationTimeUnit"
         label="Allocation time unit"
-        items={allocationTimeUnitOptions as Option[]}
+        items={allocationTimeUnitOptions}
         InputProps={{ 'data-cy': 'allocation-time-unit' }}
       />
       <Field
@@ -315,7 +320,6 @@ const CallGeneralInfo: React.FC<{
         id="title-input"
         type="text"
         component={TextField}
-        margin="normal"
         fullWidth
         inputProps={{ maxLength: '100' }}
         data-cy="title"
@@ -326,7 +330,6 @@ const CallGeneralInfo: React.FC<{
         id="description-input"
         type="text"
         component={TextField}
-        margin="normal"
         multiline
         fullWidth
         data-cy="description"

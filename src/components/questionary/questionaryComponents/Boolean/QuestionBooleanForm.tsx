@@ -1,9 +1,8 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
@@ -31,7 +30,6 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
             label="Key"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
             id="boolean-key-input"
@@ -41,7 +39,6 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
             label="Question"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
             id="boolean-question-input"
@@ -50,10 +47,11 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              component={FormikUICustomCheckbox}
-              label="User must check it to continue"
-              margin="normal"
-              fullWidth
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'User must check it to continue',
+              }}
               data-cy="required"
             />
           </TitledContainer>

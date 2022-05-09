@@ -4,6 +4,9 @@ mutation mergeInstitutions($institutionIdFrom: Int!, $institutionIdInto: Int!, $
       id
       verified
       name
+      country {
+        ...country
+      }
     }
     rejection {
       ...rejection

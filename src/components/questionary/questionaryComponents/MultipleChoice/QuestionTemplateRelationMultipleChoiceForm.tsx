@@ -1,10 +1,13 @@
-import { FormControlLabel } from '@material-ui/core';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
-import { Checkbox } from 'formik-material-ui';
-import React, { ChangeEvent, FC, useState } from 'react';
+import { Checkbox, Select } from 'formik-mui';
+import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 
-import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -14,12 +17,19 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
+const columns = [{ title: 'Answer', field: 'answer' }];
+
 export const QuestionTemplateRelationMultipleChoiceForm: FC<
   QuestionTemplateRelationFormProps
 > = (props) => {
   const config = props.questionRel.config as SelectionFromOptionsConfig;
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
+
+  const availableVariantOptions = [
+    { label: 'Radio', value: 'radio' },
+    { label: 'Dropdown', value: 'dropdown' },
+  ];
 
   return (
     <QuestionTemplateRelationFormShell
@@ -42,7 +52,6 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
                 <Field
                   name="config.required"
                   component={Checkbox}
-                  margin="normal"
                   type="checkbox"
                   inputProps={{ 'data-cy': 'required' }}
                 />
@@ -52,25 +61,37 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
           </TitledContainer>
 
           <TitledContainer label="Options">
-            <FormikDropdown
-              name="config.variant"
-              label="Variant"
-              items={[
-                { text: 'Radio', value: 'radio' },
-                { text: 'Dropdown', value: 'dropdown' },
-              ]}
-              data-cy="variant"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setShowIsMultipleSelectCheckbox(e.target.value === 'dropdown');
-              }}
-            />
+            <FormControl fullWidth>
+              <InputLabel htmlFor="config.variant" shrink>
+                Variant
+              </InputLabel>
+              <Field
+                id="config.variant"
+                name="config.variant"
+                type="text"
+                component={Select}
+                data-cy="variant"
+                onChange={(e: SelectChangeEvent) => {
+                  setShowIsMultipleSelectCheckbox(
+                    e.target.value === 'dropdown'
+                  );
+                }}
+              >
+                {availableVariantOptions.map(({ value, label }) => {
+                  return (
+                    <MenuItem value={value} key={value}>
+                      {label}
+                    </MenuItem>
+                  );
+                })}
+              </Field>
+            </FormControl>
             {showIsMultipleSelectCheckbox && (
               <FormControlLabel
                 control={
                   <Field
                     name="config.isMultipleSelect"
                     component={Checkbox}
-                    margin="normal"
                     type="checkbox"
                     inputProps={{ 'data-cy': 'is-multiple-select' }}
                   />
@@ -85,7 +106,7 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
               title=""
               name="config.options"
               component={FormikUICustomTable}
-              columns={[{ title: 'Answer', field: 'answer' }]}
+              columns={columns}
               dataTransforms={{
                 toTable: (options: string[]) => {
                   return options.map((option) => {
@@ -96,7 +117,6 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
                   return rows.map((row) => row.answer);
                 },
               }}
-              margin="normal"
               fullWidth
               data-cy="options"
             />

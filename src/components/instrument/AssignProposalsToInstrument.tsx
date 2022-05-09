@@ -1,14 +1,14 @@
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import FormikDropdown from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
@@ -46,8 +46,8 @@ const AssignProposalsToInstrument: React.FC<
 
   const selectedProposalsInstrument =
     allSelectedProposalsHaveSameInstrument && instrumentIds[0]
-      ? instrumentIds[0].toString()
-      : '';
+      ? instrumentIds[0]
+      : undefined;
 
   return (
     <Container
@@ -61,7 +61,7 @@ const AssignProposalsToInstrument: React.FC<
         }}
         onSubmit={async (values): Promise<void> => {
           const selectedInstrument = instruments.find(
-            (instrument) => instrument.id === +values.selectedInstrumentId
+            (instrument) => instrument.id === values.selectedInstrumentId
           );
 
           await assignProposalsToInstrument(selectedInstrument || null);
@@ -80,17 +80,17 @@ const AssignProposalsToInstrument: React.FC<
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <FormikDropdown
+                <FormikUIAutocomplete
                   name="selectedInstrumentId"
                   label="Select instrument"
                   loading={loadingInstruments}
                   items={instruments.map((instrument) => ({
-                    value: instrument.id.toString(),
+                    value: instrument.id,
                     text: instrument.name,
                   }))}
                   disabled={isSubmitting}
                   noOptionsText="No instruments"
-                  isClearable
+                  data-cy="instrument-selection"
                 />
               </Grid>
             </Grid>
@@ -103,8 +103,6 @@ const AssignProposalsToInstrument: React.FC<
             <Button
               type="submit"
               fullWidth
-              variant="contained"
-              color="primary"
               className={classes.submit}
               disabled={isSubmitting || loadingInstruments}
               data-cy="submit-assign-remove-instrument"

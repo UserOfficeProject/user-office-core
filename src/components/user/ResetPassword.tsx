@@ -1,19 +1,19 @@
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { userPasswordFieldValidationSchema } from '@user-office-software/duo-validation/lib/User';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
-import { FormWrapper } from 'styles/StyledComponents';
+import { StyledFormWrapper } from 'styles/StyledComponents';
 
 import PhotoInSide from './PhotoInSide';
 
@@ -79,7 +79,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
       >
         <Form className={classes.form}>
           <CssBaseline />
-          <FormWrapper margin={[8, 4]}>
+          <StyledFormWrapper margin={[8, 4]}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -92,7 +92,6 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
               id="password-input"
               type="password"
               component={TextField}
-              margin="normal"
               helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
               autoComplete="new-password"
               fullWidth
@@ -104,7 +103,6 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
               type="password"
               component={TextField}
               autoComplete="new-password"
-              margin="normal"
               fullWidth
             />
             {passwordReset && (
@@ -117,13 +115,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
                 This link has expired, please reset password again
               </p>
             )}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
+            <Button type="submit" fullWidth className={classes.submit}>
               Set password
             </Button>
             <Grid container>
@@ -131,7 +123,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
                 <Link to="/SignIn/">Back to Sign In? Sign In</Link>
               </Grid>
             </Grid>
-          </FormWrapper>
+          </StyledFormWrapper>
         </Form>
       </Formik>
     </PhotoInSide>

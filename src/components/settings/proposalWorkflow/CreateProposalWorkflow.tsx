@@ -1,9 +1,9 @@
-import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { createProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -37,9 +37,9 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        const data = await api(
-          'Proposal workflow created successfully'
-        ).createProposalWorkflow(values);
+        const data = await api({
+          toastSuccessMessage: 'Proposal workflow created successfully',
+        }).createProposalWorkflow(values);
         if (data.createProposalWorkflow.rejection) {
           close(null);
         } else if (data.createProposalWorkflow.proposalWorkflow) {
@@ -59,7 +59,6 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
             label="Name"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="name"
             disabled={isExecutingCall}
@@ -70,11 +69,10 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
             label="Description"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             multiline
-            rowsMax="16"
-            rows="3"
+            maxRows="16"
+            minRows="3"
             data-cy="description"
             disabled={isExecutingCall}
           />
@@ -82,8 +80,6 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
           <Button
             type="submit"
             fullWidth
-            variant="contained"
-            color="primary"
             className={classes.submit}
             data-cy="submit"
             disabled={isExecutingCall}

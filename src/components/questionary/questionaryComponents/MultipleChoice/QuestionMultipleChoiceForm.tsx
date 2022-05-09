@@ -1,10 +1,13 @@
-import { FormControlLabel } from '@material-ui/core';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
-import { Checkbox, TextField } from 'formik-material-ui';
-import React, { ChangeEvent, FC, useState } from 'react';
+import { Checkbox, Select, TextField } from 'formik-mui';
+import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 
-import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -13,6 +16,8 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
+const columns = [{ title: 'Answer', field: 'answer' }];
+
 export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
   const field = props.question;
   const config = field.config as SelectionFromOptionsConfig;
@@ -20,6 +25,11 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
+
+  const availableVariantOptions = [
+    { label: 'Radio', value: 'radio' },
+    { label: 'Dropdown', value: 'dropdown' },
+  ];
 
   return (
     <QuestionFormShell
@@ -41,7 +51,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
             id="Key-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -51,7 +60,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
             label="Question"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
@@ -63,7 +71,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
                   name="config.required"
                   component={Checkbox}
                   type="checkbox"
-                  margin="normal"
                   inputProps={{ 'data-cy': 'required' }}
                 />
               }
@@ -72,18 +79,31 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
           </TitledContainer>
 
           <TitledContainer label="Options">
-            <FormikDropdown
-              name="config.variant"
-              label="Variant"
-              items={[
-                { text: 'Radio', value: 'radio' },
-                { text: 'Dropdown', value: 'dropdown' },
-              ]}
-              data-cy="variant"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setShowIsMultipleSelectCheckbox(e.target.value === 'dropdown');
-              }}
-            />
+            <FormControl fullWidth>
+              <InputLabel htmlFor="config.variant" shrink>
+                Variant
+              </InputLabel>
+              <Field
+                id="config.variant"
+                name="config.variant"
+                type="text"
+                component={Select}
+                data-cy="variant"
+                onChange={(e: SelectChangeEvent) => {
+                  setShowIsMultipleSelectCheckbox(
+                    e.target.value === 'dropdown'
+                  );
+                }}
+              >
+                {availableVariantOptions.map(({ value, label }) => {
+                  return (
+                    <MenuItem value={value} key={value}>
+                      {label}
+                    </MenuItem>
+                  );
+                })}
+              </Field>
+            </FormControl>
 
             {showIsMultipleSelectCheckbox && (
               <FormControlLabel
@@ -91,7 +111,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
                   <Field
                     name="config.isMultipleSelect"
                     component={Checkbox}
-                    margin="normal"
                     type="checkbox"
                     inputProps={{ 'data-cy': 'is-multiple-select' }}
                   />
@@ -106,7 +125,7 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
               title=""
               name="config.options"
               component={FormikUICustomTable}
-              columns={[{ title: 'Answer', field: 'answer' }]}
+              columns={columns}
               dataTransforms={{
                 toTable: (options: string[]) => {
                   return options.map((option) => {
@@ -117,7 +136,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
                   return rows.map((row) => row.answer);
                 },
               }}
-              margin="normal"
               fullWidth
               data-cy="options"
             />

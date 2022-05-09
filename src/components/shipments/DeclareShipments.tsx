@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, Divider, Typography } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Dialog, DialogContent, Typography, Alert, Stack } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -29,10 +29,26 @@ const shipmentToListRow = (
   };
 };
 
+const useStyles = makeStyles((theme) => ({
+  questionLabel: {
+    opacity: 0.54,
+    fontWeight: 400,
+    fontSize: '1rem',
+  },
+  container: {
+    padding: '1rem',
+    marginTop: theme.spacing(1),
+  },
+  alert: {
+    margin: `${theme.spacing(2)}px 0`,
+  },
+}));
+
 function DeclareShipments({
   scheduledEventId,
   confirm,
 }: DeclareShipmentsProps) {
+  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -84,6 +100,14 @@ function DeclareShipments({
     })();
   };
 
+  const onEditClicked = (item: QuestionnairesListRow): Promise<void> =>
+    api()
+      .getShipment({ shipmentId: item.id })
+      .then(({ shipment }) => {
+        setSelectedShipment(shipment);
+        setIsModalOpen(true);
+      });
+
   const onAddClicked = () => {
     setIsModalOpen(true);
   };
@@ -91,47 +115,34 @@ function DeclareShipments({
   const hasLocalContact = scheduledEvent.localContactId !== null;
 
   return (
-    <>
-      <Typography
-        variant="h4"
-        style={{ marginBottom: '12px', textAlign: 'center' }}
-      >
+    <Stack spacing={4}>
+      <Typography variant="h6" component="h2">
         Declare Shipments
       </Typography>
-      <Typography>
+      <Typography variant="body1">
         Follow the steps below to declare your shipments:
-        <ol style={{ margin: 0, paddingBottom: '22px' }}>
+        <ol style={{ margin: 0 }}>
           <li>Add all the shipments (one shipment per parcel)</li>
           <li>Download labels</li>
           <li>Post the shipment</li>
         </ol>
       </Typography>
       {!hasLocalContact && (
-        <Alert severity="warning">
+        <Alert severity="warning" className={classes.alert}>
           Shipment declarations are not possible until the local contact has
           been assigned to your scheduled event
         </Alert>
       )}
+
+      <Typography variant="h6">My shipment list</Typography>
       <QuestionnairesList
         addButtonLabel="Add Shipment"
         data={shipments.map(shipmentToListRow) ?? []}
-        onEditClick={(item) =>
-          api()
-            .getShipment({ shipmentId: item.id })
-            .then(({ shipment }) => {
-              setSelectedShipment(shipment);
-              setIsModalOpen(true);
-            })
-        }
+        onEditClick={onEditClicked}
         onDeleteClick={onDeleteClicked}
         onAddNewClick={hasLocalContact ? onAddClicked : undefined}
         style={{ maxWidth: '100%' }}
       />
-      <Divider style={{ margin: '12px 0' }} />
-      <Typography variant="body1" align="right">
-        {`${shipments.length} shipment(s)`}
-      </Typography>
-
       <Dialog
         aria-labelledby="shipment-declaration"
         aria-describedby="shipment-declaration-description"
@@ -152,7 +163,7 @@ function DeclareShipments({
           />
         </DialogContent>
       </Dialog>
-    </>
+    </Stack>
   );
 }
 

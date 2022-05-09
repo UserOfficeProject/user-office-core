@@ -1,11 +1,10 @@
-import Box from '@material-ui/core/Box';
-import Collapse from '@material-ui/core/Collapse';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -41,10 +40,11 @@ export const QuestionTemplateRelationTextInputForm: FC<
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              component={FormikUICustomCheckbox}
-              label="Is required"
-              margin="normal"
-              fullWidth
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
               data-cy="required"
             />
 
@@ -54,7 +54,6 @@ export const QuestionTemplateRelationTextInputForm: FC<
               id="Min-input"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="min"
             />
@@ -65,7 +64,6 @@ export const QuestionTemplateRelationTextInputForm: FC<
               id="Max-input"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max"
             />
@@ -77,7 +75,6 @@ export const QuestionTemplateRelationTextInputForm: FC<
               id="Placeholder-input"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="placeholder"
             />
@@ -87,9 +84,11 @@ export const QuestionTemplateRelationTextInputForm: FC<
                 checked={
                   (formikProps.values.config as TextInputConfig).multiline
                 }
-                component={FormikUICustomCheckbox}
-                label="Multiple lines"
-                margin="normal"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Multiple lines',
+                }}
                 data-cy="multiline"
               />
             </Box>
@@ -100,17 +99,22 @@ export const QuestionTemplateRelationTextInputForm: FC<
                 checked={
                   (formikProps.values.config as TextInputConfig).isCounterHidden
                 }
-                component={FormikUICustomCheckbox}
-                label="Hide counter"
-                margin="normal"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Hide counter',
+                }}
                 data-cy="multiline"
               />
             </Box>
 
             <Field
-              label="Enable rich text question"
               name="config.isHtmlQuestion"
-              component={FormikUICustomCheckbox}
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Enable rich text question',
+              }}
             />
             <Collapse
               in={(formikProps.values.config as TextInputConfig).isHtmlQuestion}
@@ -122,7 +126,6 @@ export const QuestionTemplateRelationTextInputForm: FC<
                 name="config.htmlQuestion"
                 type="text"
                 component={FormikUICustomEditor}
-                margin="normal"
                 fullWidth
                 init={{
                   skin: false,

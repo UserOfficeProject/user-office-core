@@ -1,19 +1,20 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import InputLabel from '@material-ui/core/InputLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { saveSepMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
+import { CheckboxWithLabel, Select } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
-import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import UOLoader from 'components/common/UOLoader';
 import {
   Proposal,
@@ -22,8 +23,9 @@ import {
   SepMeetingDecision,
   UserRole,
 } from 'generated/sdk';
-import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
+import { StyledPaper, StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,6 +66,13 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
     submitted: proposalData.sepMeetingDecision?.submitted ?? false,
   };
 
+  const statusOptions: Option[] = [
+    { text: 'Unset', value: ProposalEndStatus.UNSET },
+    { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
+    { text: 'Reserved', value: ProposalEndStatus.RESERVED },
+    { text: 'Rejected', value: ProposalEndStatus.REJECTED },
+  ];
+
   const PromptIfDirty = () => {
     const formik = useFormikContext();
 
@@ -88,11 +97,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
       submitted: shouldSubmitMeetingDecision,
     };
 
-    const data = await api(
-      `SEP meeting decision ${
+    const data = await api({
+      toastSuccessMessage: `SEP meeting decision ${
         shouldSubmitMeetingDecision ? 'submitted' : 'saved'
-      } successfully!`
-    ).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
+      } successfully!`,
+    }).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
 
     const isError = !!data.saveSepMeetingDecision.rejection;
 
@@ -149,7 +158,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
             }
           }}
         >
-          {({ isSubmitting, setFieldValue }): JSX.Element => (
+          {({ isSubmitting, setFieldValue, values }): JSX.Element => (
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
@@ -177,13 +186,12 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       branding: false,
                     }}
                     onEditorChange={(content, editor) => {
-                      const normalizedContent = content.replace(
-                        /(?:\r\n|\r|\n)/g,
-                        ''
-                      );
+                      const isStartContentDifferentThanCurrent =
+                        editor.startContent !==
+                        editor.contentDocument.body.innerHTML;
 
                       if (
-                        normalizedContent !== editor.startContent ||
+                        isStartContentDifferentThanCurrent ||
                         editor.isDirty()
                       ) {
                         setFieldValue('commentForUser', content);
@@ -193,21 +201,33 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
-                  <FormikDropdown
-                    name="recommendation"
-                    label="Recommendation"
-                    data-cy="proposalSepMeetingRecommendation"
-                    items={[
-                      { text: 'Unset', value: ProposalEndStatus.UNSET },
-                      { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
-                      { text: 'Reserved', value: ProposalEndStatus.RESERVED },
-                      { text: 'Rejected', value: ProposalEndStatus.REJECTED },
-                    ]}
-                    required
-                    disabled={
-                      !hasWriteAccess || shouldDisableForm(isSubmitting)
-                    }
-                  />
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel
+                      htmlFor="recommendation"
+                      shrink={!!values.recommendation}
+                      required
+                    >
+                      Recommendation
+                    </InputLabel>
+                    <Field
+                      name="recommendation"
+                      component={Select}
+                      data-cy="proposalSepMeetingRecommendation"
+                      disabled={
+                        !hasWriteAccess || shouldDisableForm(isSubmitting)
+                      }
+                      MenuProps={{
+                        'data-cy': 'proposalSepMeetingRecommendation-options',
+                      }}
+                      required
+                    >
+                      {statusOptions.map(({ value, text }) => (
+                        <MenuItem value={value} key={value}>
+                          {text}
+                        </MenuItem>
+                      ))}
+                    </Field>
+                  </FormControl>
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <InputLabel
@@ -234,13 +254,12 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       branding: false,
                     }}
                     onEditorChange={(content, editor) => {
-                      const normalizedContent = content.replace(
-                        /(?:\r\n|\r|\n)/g,
-                        ''
-                      );
+                      const isStartContentDifferentThanCurrent =
+                        editor.startContent !==
+                        editor.contentDocument.body.innerHTML;
 
                       if (
-                        normalizedContent !== editor.startContent ||
+                        isStartContentDifferentThanCurrent ||
                         editor.isDirty()
                       ) {
                         setFieldValue('commentForManagement', content);
@@ -250,7 +269,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
-                  <ButtonContainer style={{ margin: '2rem 0 0' }}>
+                  <StyledButtonContainer style={{ margin: '2rem 0 0' }}>
                     {hasWriteAccess && (
                       <>
                         {isSubmitting && (
@@ -266,16 +285,17 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                           <Field
                             id="submitted"
                             name="submitted"
-                            component={FormikUICustomCheckbox}
-                            label="Submitted"
-                            color="primary"
+                            component={CheckboxWithLabel}
+                            type="checkbox"
+                            Label={{
+                              label: 'Submitted',
+                            }}
                             disabled={isSubmitting}
                             data-cy="is-sep-meeting-submitted"
                           />
                         )}
                         <Button
                           type="submit"
-                          variant="contained"
                           onClick={() => {
                             setShouldClose(false);
                             setShouldSubmit(false);
@@ -289,7 +309,6 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                         </Button>
                         <Button
                           type="submit"
-                          variant="contained"
                           onClick={() => {
                             setShouldClose(true);
                             setShouldSubmit(false);
@@ -304,12 +323,10 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                         {!isUserOfficer && (
                           <Button
                             type="submit"
-                            variant="contained"
                             onClick={() => {
                               setShouldClose(false);
                               setShouldSubmit(true);
                             }}
-                            color={'primary'}
                             className={classes.button}
                             data-cy="submitSepMeeting"
                             disabled={shouldDisableForm(isSubmitting)}
@@ -319,7 +336,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                         )}
                       </>
                     )}
-                  </ButtonContainer>
+                  </StyledButtonContainer>
                 </Grid>
               </Grid>
             </Form>

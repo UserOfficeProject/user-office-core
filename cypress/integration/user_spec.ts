@@ -1,4 +1,7 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
+
+import initialDBData from '../support/initialDBData';
 
 context('User tests', () => {
   // Login details
@@ -8,10 +11,7 @@ context('User tests', () => {
   const firstName = faker.name.firstName();
   const lastName = faker.name.lastName();
 
-  const birthDate = faker.date
-    .past(80, '2002-01-01')
-    .toISOString()
-    .slice(0, 10);
+  const birthDate = DateTime.fromJSDate(faker.date.past(80, '2002-01-01'));
 
   //Organization detail
   const department = faker.commerce.department();
@@ -23,11 +23,14 @@ context('User tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
+
     cy.visit('/SignUp?code=WRMVXa');
   });
 
   it('A user should be able to create a new account with mandatory fields only', () => {
+    const birthDateValue = birthDate.toFormat(
+      initialDBData.getFormats().dateFormat
+    );
     cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
@@ -39,7 +42,7 @@ context('User tests', () => {
       .should('have.value', password);
 
     // Personal details
-    cy.get('#user_title-input').click();
+    cy.get('[data-cy="title"]').click();
     cy.contains('Prof.').click();
     cy.get('[data-cy=firstname] input')
       .clear()
@@ -51,20 +54,21 @@ context('User tests', () => {
       .type(lastName)
       .should('have.value', lastName);
 
-    cy.get('#gender-input').click();
+    cy.get('[data-cy="gender"]').click();
 
     cy.contains('Male').click();
 
-    cy.get('#nationality-input').click();
+    cy.get('[data-cy="nationality"]').click();
 
     cy.contains('Swedish').click();
 
     cy.get('[data-cy=birthdate] input')
-      .type(birthDate)
-      .should('have.value', birthDate);
+      .clear()
+      .type(birthDateValue)
+      .should('have.value', birthDateValue);
 
     //Organization details
-    cy.get('#organisation-input').click();
+    cy.get('[data-cy="organisation"]').click();
 
     cy.contains('Lund University').click();
 
@@ -92,6 +96,22 @@ context('User tests', () => {
     cy.contains('Click here for sign in').click();
     //Check redirect to Sign in page
     cy.contains('Sign in');
+  });
+
+  it('Error message should be shown if confirm password does not match password', () => {
+    cy.get('[data-cy=password] input')
+      .type(password)
+      .should('have.value', password);
+
+    cy.get('[data-cy=confirmPassword] input')
+      .type(password + 'test')
+      .should('have.value', password + 'test');
+
+    cy.get('body').click();
+
+    cy.get('[data-cy=confirmPassword] .Mui-error')
+      .should('exist')
+      .and('include.text', 'Confirm password does not match password');
   });
 
   it('A user should be able to login and out', () => {
@@ -141,10 +161,9 @@ context('User tests', () => {
 
     const middleName = faker.name.firstName();
     const preferredName = faker.name.firstName();
-    const birthDate = faker.date
-      .past(80, '2002-01-01')
-      .toISOString()
-      .slice(0, 10);
+    const birthDateValue = birthDate.toFormat(
+      initialDBData.getFormats().dateFormat
+    );
 
     //Organization detail
     const department = faker.commerce.department();
@@ -166,7 +185,7 @@ context('User tests', () => {
       .should('have.value', password);
 
     // Personal details
-    cy.get('#user_title-input').click();
+    cy.get('[data-cy="title"]').click();
     cy.contains('Prof.').click();
     cy.get('[data-cy=firstname] input')
       .clear()
@@ -185,20 +204,21 @@ context('User tests', () => {
       .type(preferredName)
       .should('have.value', preferredName);
 
-    cy.get('#gender-input').click();
+    cy.get('[data-cy="gender"]').click();
 
     cy.contains('Male').click();
 
-    cy.get('#nationality-input').click();
+    cy.get('[data-cy="nationality"]').click();
 
     cy.contains('Swedish').click();
 
     cy.get('[data-cy=birthdate] input')
-      .type(birthDate)
-      .should('have.value', birthDate);
+      .clear()
+      .type(birthDateValue)
+      .should('have.value', birthDateValue);
 
     //Organization details
-    cy.get('#organisation-input').click();
+    cy.get('[data-cy="organisation"]').click();
 
     cy.contains('Lund University').click();
 

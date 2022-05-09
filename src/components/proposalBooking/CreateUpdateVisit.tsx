@@ -1,11 +1,11 @@
-import { Button, Typography } from '@material-ui/core';
+import { Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import ErrorMessage from 'components/common/ErrorMessage';
-import FormikDropdown from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import Participants from 'components/proposal/ProposalParticipants';
 import { BasicUserDetails } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -24,7 +24,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user) || [],
-    teamLeadUserId: visit?.teamLead.id,
+    teamLeadUserId: visit?.teamLead.id || null,
   };
 
   return (
@@ -36,6 +36,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
           .required('Please add visitors')
           .min(1, 'Please add visitors'),
         teamLeadUserId: Yup.number()
+          .typeError('Please select the team lead')
           .required('Please select the team lead')
           .test({
             message: 'Team lead must be one of the visitors',
@@ -48,7 +49,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
       })}
       onSubmit={async (values): Promise<void> => {
         if (visit) {
-          api('Visit updated')
+          api({ toastSuccessMessage: 'Visit updated' })
             .updateVisit({
               visitId: visit.id,
               team: values.team.map((user) => user.id),
@@ -60,7 +61,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               }
             });
         } else {
-          api('Visit created')
+          api({ toastSuccessMessage: 'Visit created' })
             .createVisit({
               scheduledEventId: event.id,
               team: values.team?.map((user) => user.id),
@@ -88,7 +89,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
           />
           <ErrorMessage name="team" />
 
-          <FormikDropdown
+          <FormikUIAutocomplete
             items={values.team.map((user) => ({
               text: getFullUserName(user),
               value: user.id,
@@ -97,15 +98,15 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
             name="teamLeadUserId"
             InputProps={{
               'data-cy': 'team-lead-user-dropdown',
+              margin: 'dense',
             }}
-            margin="dense"
           />
+          <ErrorMessage name="teamLeadUserId" />
 
           <ActionButtonContainer>
             <Button
               disabled={isSubmitting}
               variant="text"
-              color="primary"
               onClick={() => close(event)}
             >
               Close
@@ -113,9 +114,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
             <Button
               disabled={isSubmitting}
               type="submit"
-              variant="contained"
-              color="primary"
-              data-cy="create-visit-button"
+              data-cy="create-update-visit-button"
             >
               {visit ? 'Update' : 'Create'}
             </Button>

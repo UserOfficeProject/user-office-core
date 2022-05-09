@@ -1,5 +1,5 @@
-import Grid from '@material-ui/core/Grid';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@mui/material/Grid';
+import LinearProgress from '@mui/material/LinearProgress';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'generated/sdk';
 import { usePersistProposalWorkflowEditorModel } from 'hooks/settings/usePersistProposalWorkflowEditorModel';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { FunctionType } from 'utils/utilTypes';
 
 import ProposalStatusPicker from './ProposalStatusPicker';
@@ -216,7 +216,7 @@ const ProposalWorkflowEditor: React.FC = () => {
 
   const dataLoaded = !isLoading && !loadingProposalStatuses && state.id;
 
-  const getContainerStyle = () => {
+  const getContainerStyle = (): React.CSSProperties => {
     return !dataLoaded
       ? {
           pointerEvents: 'none',
@@ -230,7 +230,7 @@ const ProposalWorkflowEditor: React.FC = () => {
   const progressJsx = !dataLoaded ? <LinearProgress /> : null;
 
   return (
-    <ContentContainer>
+    <StyledContainer>
       <ProposalWorkflowMetadataEditor
         dispatch={dispatch}
         proposalWorkflow={state}
@@ -255,7 +255,7 @@ const ProposalWorkflowEditor: React.FC = () => {
           </Grid>
         </DragDropContext>
       </StyledPaper>
-    </ContentContainer>
+    </StyledContainer>
   );
 };
 

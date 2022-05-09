@@ -1,10 +1,10 @@
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import makeStyles from '@material-ui/styles/makeStyles';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { userPasswordFieldValidationSchema } from '@user-office-software/duo-validation/lib/User';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React from 'react';
 
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -23,7 +23,10 @@ const useStyles = makeStyles({
 export default function UpdatePassword(props: { id: number }) {
   const { api } = useDataApiWithFeedback();
   const sendPasswordUpdate = (password: string) => {
-    return api('Updated Password').updatePassword({ id: props.id, password });
+    return api({ toastSuccessMessage: 'Updated Password' }).updatePassword({
+      id: props.id,
+      password,
+    });
   };
 
   const classes = useStyles();
@@ -53,8 +56,8 @@ export default function UpdatePassword(props: { id: number }) {
                   id="password-input"
                   type="password"
                   component={TextField}
-                  margin="normal"
                   fullWidth
+                  required
                   autoComplete="new-password"
                   data-cy="password"
                   helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
@@ -67,8 +70,8 @@ export default function UpdatePassword(props: { id: number }) {
                   id="confirm-password-input"
                   type="password"
                   component={TextField}
-                  margin="normal"
                   fullWidth
+                  required
                   autoComplete="new-password"
                   data-cy="confirmPassword"
                 />
@@ -78,8 +81,6 @@ export default function UpdatePassword(props: { id: number }) {
               <Button
                 disabled={isSubmitting}
                 type="submit"
-                variant="contained"
-                color="primary"
                 className={classes.button}
               >
                 Change Password

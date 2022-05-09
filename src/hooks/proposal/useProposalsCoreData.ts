@@ -8,14 +8,19 @@ import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, ProposalView, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useProposalsCoreData(filter: ProposalsFilter) {
+import { QueryParameters } from '../../components/proposal/ProposalTableOfficer';
+
+export function useProposalsCoreData(
+  filter: ProposalsFilter,
+  queryParameters?: QueryParameters
+) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalViewData[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const { currentRole } = useContext(UserContext);
-
   const {
+    reviewer,
     callId,
     instrumentId,
     proposalStatusId,
@@ -33,6 +38,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
       api()
         .getInstrumentScientistProposals({
           filter: {
+            reviewer,
             callId,
             instrumentId,
             proposalStatusId,
@@ -83,6 +89,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
             }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
             text,
           },
+          ...queryParameters,
         })
         .then((data) => {
           if (unmounted) {
@@ -91,7 +98,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
 
           if (data.proposalsView) {
             setProposalsData(
-              data.proposalsView.map((proposal) => {
+              data.proposalsView.proposalViews.map((proposal) => {
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
@@ -104,6 +111,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
                 } as ProposalViewData;
               })
             );
+            setTotalCount(data.proposalsView.totalCount);
           }
           setLoading(false);
 
@@ -113,6 +121,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
         });
     }
   }, [
+    reviewer,
     callId,
     instrumentId,
     proposalStatusId,
@@ -121,6 +130,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
     questionFilter,
     api,
     currentRole,
+    queryParameters,
   ]);
 
   return { loading, proposalsData, setProposalsData, totalCount };

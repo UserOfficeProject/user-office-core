@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   AllocationTimeUnits,
@@ -27,14 +28,13 @@ context('GenericTemplates tests', () => {
     description: faker.random.words(5),
   };
 
-  const currentDayStart = new Date();
-  currentDayStart.setHours(0, 0, 0, 0);
+  const currentDayStart = DateTime.now().startOf('day');
 
   const updatedCall = {
     id: initialDBData.call.id,
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 10),
-    endCall: faker.date.future().toISOString().slice(0, 10),
+    startCall: DateTime.fromJSDate(faker.date.past()),
+    endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -56,7 +56,6 @@ context('GenericTemplates tests', () => {
 
   beforeEach(() => {
     cy.resetDB(true);
-    cy.viewport(1920, 1080);
   });
 
   const createTemplateAndAllQuestions = () => {
@@ -261,7 +260,10 @@ context('GenericTemplates tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(proposalTemplateName).parent().find('[title="Edit"]').click();
+      cy.contains(proposalTemplateName)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
 
       cy.finishedLoading();
 
@@ -434,7 +436,7 @@ context('GenericTemplates tests', () => {
         .find('input[type="checkbox"]')
         .click();
 
-      cy.get('[title="Clone proposals to call"]').click();
+      cy.get('[aria-label="Clone proposals to call"]').click();
 
       cy.get('#selectedCallId-input').click();
       cy.get('[role="presentation"]').contains(updatedCall.shortCode).click();
@@ -448,7 +450,7 @@ context('GenericTemplates tests', () => {
 
       cy.contains(`Copy of ${proposalTitle[1]}`)
         .parent()
-        .find('[title="View proposal"]')
+        .find('[aria-label="View proposal"]')
         .click();
 
       cy.contains('Edit proposal').click();
@@ -556,7 +558,7 @@ context('GenericTemplates tests', () => {
 
       cy.get("input[type='checkbox']").first().click();
 
-      cy.get("[title='Delete proposals']").first().click();
+      cy.get("[aria-label='Delete proposals']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 

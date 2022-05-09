@@ -1,12 +1,12 @@
-import { Grid, Link, Typography } from '@material-ui/core';
-import React, { useState } from 'react';
+import { Typography } from '@mui/material';
+import React from 'react';
 
-import StyledModal from 'components/common/StyledModal';
 import { SuperMaterialTable } from 'components/common/SuperMaterialTable';
 import { createQuestionForm } from 'components/questionary/QuestionaryComponentRegistry';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useCreatableQuestions } from 'hooks/template/useCreatableQuestions';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -15,21 +15,45 @@ import AnswerCountDetails from './AnswerCountDetails';
 import QuestionsTableFilter from './QuestionsTableFilter';
 import TemplateCountDetails from './TemplateCountDetails';
 
+const columns = [
+  { title: 'Question', field: 'question' },
+  { title: 'Key', field: 'naturalKey' },
+  { title: 'Category', field: 'categoryId' },
+  {
+    title: '# Answers',
+    field: 'answerCountButton',
+    customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
+      a.answers.length - b.answers.length,
+    render: (rowData: QuestionWithUsage) => (
+      <ButtonWithDialog
+        label={rowData.answers.length.toString()}
+        data-cy="open-answer-details-btn"
+      >
+        <AnswerCountDetails question={rowData} />
+      </ButtonWithDialog>
+    ),
+  },
+  {
+    title: '# Templates',
+    field: 'templateCountButton',
+    customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
+      a.templates.length - b.templates.length,
+    render: (rowData: QuestionWithUsage) => (
+      <ButtonWithDialog
+        label={rowData.templates.length.toString()}
+        data-cy="open-template-details-btn"
+      >
+        <TemplateCountDetails question={rowData} />
+      </ButtonWithDialog>
+    ),
+  },
+];
+
 function QuestionsPage() {
   const { questions, setQuestions, setQuestionsFilter, loadingQuestions } =
     useCreatableQuestions();
 
   const { api } = useDataApiWithFeedback();
-
-  const [
-    selectedTemplateCountDetailsQuestion,
-    setSelectedTemplateCountDetailsQuestion,
-  ] = useState<QuestionWithUsage | null>(null);
-
-  const [
-    selectedAnswerCountDetailsQuestion,
-    setSelectedAnswerCountDetailsQuestion,
-  ] = useState<QuestionWithUsage | null>(null);
 
   const createModal = (
     onUpdate: FunctionType<void, [QuestionWithUsage | null]>,
@@ -43,95 +67,49 @@ function QuestionsPage() {
         onDeleted: (q) => {
           setQuestions(questions.filter((q2) => q2.id !== q.id));
         },
+        closeMe: () => {
+          onUpdate(null);
+        },
       });
     }
   };
 
-  const deleteQuestion = async (questionId: string | number) =>
-    api('Question deleted')
-      .deleteQuestion({ questionId: questionId as string })
-      .then((result) => result.deleteQuestion.rejection === null);
+  const deleteQuestion = async (questionId: string | number) => {
+    const { deleteQuestion } = await api({
+      toastSuccessMessage: 'Question deleted',
+    }).deleteQuestion({ questionId: questionId as string });
 
-  const templateCountButton = (rowData: QuestionWithUsage) => (
-    <Link
-      onClick={() => setSelectedTemplateCountDetailsQuestion(rowData)}
-      style={{ cursor: 'pointer' }}
-    >
-      {rowData.templates.length}
-    </Link>
-  );
-
-  const answerCountButton = (rowData: QuestionWithUsage) => (
-    <Link
-      onClick={() => setSelectedAnswerCountDetailsQuestion(rowData)}
-      style={{ cursor: 'pointer' }}
-    >
-      {rowData.answers.length}
-    </Link>
-  );
-
-  const columns = [
-    { title: 'Question', field: 'question' },
-    { title: 'Key', field: 'naturalKey' },
-    { title: 'Category', field: 'categoryId' },
-    {
-      title: '# Answers',
-      render: answerCountButton,
-      customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
-        a.answers.length - b.answers.length,
-    },
-    {
-      title: '# Templates',
-      render: templateCountButton,
-      customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
-        a.templates.length - b.templates.length,
-    },
-  ];
+    return deleteQuestion.rejection === null;
+  };
 
   return (
-    <ContentContainer>
-      <Grid container>
-        <Grid item xs={12}>
-          <StyledPaper>
-            <QuestionsTableFilter
-              onChange={(filter) => {
-                setQuestionsFilter(filter);
-              }}
-            />
-            <div data-cy="questions-table">
-              <SuperMaterialTable
-                createModal={createModal}
-                delete={deleteQuestion}
-                setData={setQuestions}
-                icons={tableIcons}
-                title={
-                  <Typography variant="h6" component="h2">
-                    Questions
-                  </Typography>
-                }
-                columns={columns}
-                isLoading={loadingQuestions}
-                data={questions}
-                options={{ search: false }}
-                hasAccess={{ create: false, update: true, remove: true }}
-              />
-            </div>
-          </StyledPaper>
-        </Grid>
-      </Grid>
-      <StyledModal
-        onClose={() => setSelectedTemplateCountDetailsQuestion(null)}
-        open={selectedTemplateCountDetailsQuestion !== null}
-      >
-        <TemplateCountDetails question={selectedTemplateCountDetailsQuestion} />
-      </StyledModal>
-      <StyledModal
-        onClose={() => setSelectedAnswerCountDetailsQuestion(null)}
-        open={selectedAnswerCountDetailsQuestion !== null}
-      >
-        <AnswerCountDetails question={selectedAnswerCountDetailsQuestion} />
-      </StyledModal>
-    </ContentContainer>
+    <StyledContainer>
+      <StyledPaper>
+        <QuestionsTableFilter
+          onChange={(filter) => {
+            setQuestionsFilter(filter);
+          }}
+        />
+        <div data-cy="questions-table">
+          <SuperMaterialTable
+            createModal={createModal}
+            delete={deleteQuestion}
+            setData={setQuestions}
+            icons={tableIcons}
+            title={
+              <Typography variant="h6" component="h2">
+                Questions
+              </Typography>
+            }
+            columns={columns}
+            isLoading={loadingQuestions}
+            data={questions}
+            options={{ search: false }}
+            hasAccess={{ create: false, update: true, remove: true }}
+          />
+        </div>
+      </StyledPaper>
+    </StyledContainer>
   );
 }
 

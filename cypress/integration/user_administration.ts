@@ -16,7 +16,7 @@ context('User administration tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
+
     cy.login('officer');
     cy.visit('/');
   });
@@ -26,7 +26,7 @@ context('User administration tests', () => {
 
     cy.contains(placeholderUser.firstName)
       .parent()
-      .find("[title='Edit user']")
+      .find("[aria-label='Edit user']")
       .click();
 
     cy.contains('Email not verified');
@@ -56,7 +56,7 @@ context('User administration tests', () => {
 
     cy.contains(placeholderUser.firstName)
       .parent()
-      .find("[title='Edit user']")
+      .find("[aria-label='Edit user']")
       .click();
 
     cy.contains('Placeholder user');
@@ -84,7 +84,7 @@ context('User administration tests', () => {
   it('Should be able administer user information', () => {
     cy.contains('People').click();
 
-    cy.get("[title='Edit user']").first().click();
+    cy.get("[aria-label='Edit user']").first().click();
 
     cy.get("[name='firstname']").clear().type(newFirstName);
 
@@ -153,7 +153,7 @@ context('User administration tests', () => {
     cy.get('[data-cy="co-proposers"]')
       .contains(userLastName)
       .parent()
-      .find('[title="Edit user"]')
+      .find('[aria-label="Edit user"]')
       .click();
 
     cy.finishedLoading();
@@ -187,7 +187,7 @@ context('User administration tests', () => {
     cy.get('[data-cy="co-proposers"]')
       .contains(reviewerLastName)
       .parent()
-      .find('[title="Edit user"]')
+      .find('[aria-label="Edit user"]')
       .click();
 
     cy.finishedLoading();
@@ -207,10 +207,10 @@ context('User administration tests', () => {
     cy.contains('People').click();
     cy.contains(placeholderUser.firstName)
       .parent()
-      .find("[title='Delete']")
+      .find("[aria-label='Delete']")
       .click();
 
-    cy.get("[data-cy=co-proposers] [title='Save']").click();
+    cy.get("[data-cy=co-proposers] [aria-label='Save']").click();
 
     cy.notification({ variant: 'success', text: 'User removed successfully' });
   });

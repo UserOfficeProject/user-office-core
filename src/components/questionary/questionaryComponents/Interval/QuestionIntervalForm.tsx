@@ -1,11 +1,10 @@
-import { TextField as MaterialTextField } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
+import Autocomplete from '@mui/lab/Autocomplete';
+import MaterialTextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
@@ -48,7 +47,6 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
             id="Key-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -58,7 +56,6 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
             id="Question-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
@@ -69,7 +66,6 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
             id="Small-label-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'small-label' }}
           />
@@ -77,10 +73,11 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              component={FormikUICustomCheckbox}
-              label="Check to make this field mandatory"
-              margin="normal"
-              fullWidth
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
               InputProps={{ 'data-cy': 'required' }}
             />
 
@@ -91,7 +88,7 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
                 `${symbol} (${unit}) - ${quantity}`
               }
               renderInput={(params) => (
-                <MaterialTextField {...params} label="Units" />
+                <MaterialTextField {...params} label="Units" margin="none" />
               )}
               onChange={(_event, newValue) => {
                 setSelectedUnits(newValue);

@@ -1,8 +1,7 @@
 import MaterialTable from '@material-table/core';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import RateReviewIcon from '@material-ui/icons/RateReview';
-import Visibility from '@material-ui/icons/Visibility';
-import dateformat from 'dateformat';
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import Visibility from '@mui/icons-material/Visibility';
+import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
@@ -13,7 +12,13 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
-import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
+import {
+  SepAssignment,
+  ReviewStatus,
+  UserRole,
+  SettingsId,
+} from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { SEPProposalType } from 'hooks/SEP/useSEPProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -50,9 +55,7 @@ const assignmentColumns = [
   },
   {
     title: 'Date assigned',
-    field: 'dateAssigned',
-    render: (rowData: SepAssignment): string =>
-      dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+    field: 'dateAssignedFormatted',
   },
   { title: 'Review status', field: 'review.status' },
   {
@@ -80,6 +83,9 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     UserRole.SEP_CHAIR,
     UserRole.SEP_SECRETARY,
   ]);
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const isDraftStatus = (status?: ReviewStatus) =>
     status === ReviewStatus.DRAFT;
@@ -90,6 +96,14 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     PROPOSAL_MODAL_TAB_NAMES.GRADE,
   ];
 
+  const SEPAssignmentsWithIdAndFormattedDate = (
+    sepProposal.assignments as SepAssignment[]
+  ).map((sepAssignment) =>
+    Object.assign(sepAssignment, {
+      id: sepAssignment.sepMemberUserId,
+      dateAssignedFormatted: toFormattedDateTime(sepAssignment.dateAssigned),
+    })
+  );
   const proposalReviewModalShouldOpen =
     !!urlQueryParams.reviewerModal &&
     currentAssignment?.proposalPk === sepProposal.proposalPk;
@@ -126,10 +140,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         icons={tableIcons}
         columns={assignmentColumns}
         title={'Assigned reviewers'}
-        data={(sepProposal.assignments as SepAssignment[]).map(
-          (sepAssignment) =>
-            Object.assign(sepAssignment, { id: sepAssignment.sepMemberUserId })
-        )}
+        data={SEPAssignmentsWithIdAndFormattedDate}
         editable={editableTableRow}
         actions={[
           (rowData) => ({

@@ -1,6 +1,5 @@
-import { Typography } from '@material-ui/core';
-import { DateTime } from 'luxon';
-import React, { useContext, useState } from 'react';
+import { Typography } from '@mui/material';
+import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -10,13 +9,8 @@ import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { SettingsContext } from 'context/SettingsContextProvider';
-import {
-  Call,
-  InstrumentWithAvailabilityTime,
-  SettingsId,
-  UserRole,
-} from 'generated/sdk';
+import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -38,7 +32,9 @@ const getFilterStatus = (callStatus: string | CallStatus) =>
 
 const CallsTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
-  const settingsContext = useContext(SettingsContext);
+  const { timezone, toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
   >(null);
@@ -67,31 +63,21 @@ const CallsTable: React.FC = () => {
     }));
   };
 
-  const timezone =
-    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
-
+  // NOTE: Here we keep the columns inside the component just because of the timezone shown in the title
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
     {
       title: `Start Date (${timezone})`,
-      field: 'startCall',
-      render: (rowData: Call): string =>
-        DateTime.fromISO(rowData.startCall, {
-          zone: timezone,
-        }).toFormat('dd-MMM-yyyy HH:mm'),
+      field: 'formattedStartCall',
     },
     {
       title: `End Date (${timezone})`,
-      field: 'endCall',
-      render: (rowData: Call): string =>
-        DateTime.fromISO(rowData.endCall, {
-          zone: timezone,
-        }).toFormat('dd-MMM-yyyy HH:mm'),
+      field: 'formattedEndCall',
     },
     {
       title: 'Reference number format',
       field: 'referenceNumberFormat',
-      render: (rowData: Call): string => rowData.referenceNumberFormat || '',
+      emptyValue: '-',
     },
     {
       title: 'Proposal Workflow',
@@ -135,7 +121,7 @@ const CallsTable: React.FC = () => {
   };
 
   const deleteCall = async (id: number | string) => {
-    return await api('Call deleted successfully')
+    return await api({ toastSuccessMessage: 'Call deleted successfully' })
       .deleteCall({
         id: id as number,
       })
@@ -226,6 +212,12 @@ const CallsTable: React.FC = () => {
     />
   );
 
+  const callsWithFormattedData = calls.map((call) => ({
+    ...call,
+    formattedStartCall: toFormattedDateTime(call.startCall),
+    formattedEndCall: toFormattedDateTime(call.endCall),
+  }));
+
   return (
     <div data-cy="calls-table">
       <CallStatusFilter
@@ -266,7 +258,7 @@ const CallsTable: React.FC = () => {
           </Typography>
         }
         columns={columns}
-        data={calls}
+        data={callsWithFormattedData}
         isLoading={loadingCalls}
         detailPanel={[
           {

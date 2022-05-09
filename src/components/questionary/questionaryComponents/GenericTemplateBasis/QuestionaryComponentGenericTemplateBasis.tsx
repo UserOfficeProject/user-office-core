@@ -1,5 +1,5 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { ChangeEvent, useContext, useState } from 'react';
 
 import withPreventSubmit from 'components/common/withPreventSubmit';

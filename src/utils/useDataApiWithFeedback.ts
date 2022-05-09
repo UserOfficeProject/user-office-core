@@ -1,9 +1,11 @@
-import { useSnackbar } from 'notistack';
+import { SnackbarAction, useSnackbar, VariantType } from 'notistack';
 import { useCallback, useContext, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { Rejection } from 'generated/sdk';
+import { Rejection, getSdk } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+
+type KeyOfSdk = keyof ReturnType<typeof getSdk>;
 
 const isMutationResult = (result: Record<string, unknown>) => {
   return result.hasOwnProperty('rejection');
@@ -16,15 +18,20 @@ function useDataApiWithFeedback() {
   const { handleLogout } = useContext(UserContext);
 
   const api = useCallback(
-    (successToastMessage?: string) =>
+    (props?: {
+      toastSuccessMessage?: string;
+      toastErrorMessage?: string;
+      toastSuccessMessageVariant?: VariantType;
+      toastErrorMessageAction?: SnackbarAction;
+    }) =>
       new Proxy(dataApi(), {
         get(target, prop) {
-          return async (args: unknown) => {
+          return async (args: never) => {
             setIsExecutingCall(true);
 
-            // @ts-expect-error TODO: Resolve this when there is some time for better investigation in the types.
-            const serverResponse = await target[prop](args);
-            const result = serverResponse[prop];
+            const serverResponse = await target[prop as KeyOfSdk](args);
+            const result: { [prop: string]: unknown; rejection: unknown } =
+              serverResponse[prop as keyof typeof serverResponse];
 
             if (result && isMutationResult(result)) {
               if (result.rejection) {
@@ -34,15 +41,16 @@ function useDataApiWithFeedback() {
                   reason =
                     'Your session has expired, you will need to log in again through the external homepage';
                 }
-                enqueueSnackbar(reason, {
+                enqueueSnackbar(props?.toastErrorMessage ?? reason, {
                   variant: 'error',
                   className: 'snackbar-error',
                   autoHideDuration: 10000,
+                  action: props?.toastErrorMessageAction,
                 });
               } else {
-                successToastMessage &&
-                  enqueueSnackbar(successToastMessage, {
-                    variant: 'success',
+                props?.toastSuccessMessage &&
+                  enqueueSnackbar(props.toastSuccessMessage, {
+                    variant: props.toastSuccessMessageVariant ?? 'success',
                     className: 'snackbar-success',
                     autoHideDuration: 10000,
                   });

@@ -1,6 +1,6 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
+import { Typography } from '@mui/material';
+import Button from '@mui/material/Button';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -48,9 +48,9 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   }) as Instrument[];
 
   const onAssignButtonClick = async () => {
-    const assignInstrumentToCallResult = await api(
-      'Instrument/s assigned successfully!'
-    ).assignInstrumentsToCall({
+    const assignInstrumentToCallResult = await api({
+      toastSuccessMessage: 'Instrument/s assigned successfully!',
+    }).assignInstrumentsToCall({
       callId,
       instrumentIds: selectedInstruments.map(
         (instrumentToAssign) => instrumentToAssign.id
@@ -94,8 +94,6 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
       <ActionButtonContainer>
         <Button
           type="button"
-          variant="contained"
-          color="primary"
           onClick={() => onAssignButtonClick()}
           disabled={selectedInstruments.length === 0 || isExecutingCall}
           data-cy="assign-instrument-to-call"

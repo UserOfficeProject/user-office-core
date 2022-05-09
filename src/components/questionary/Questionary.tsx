@@ -1,5 +1,6 @@
-import { makeStyles, Step, Stepper, Typography } from '@material-ui/core';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { Step, Stepper, Typography } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useRef, useEffect } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -23,6 +24,7 @@ function Questionary({ title, info }: QuestionaryProps) {
   const useStyles = makeStyles((theme) => ({
     stepper: {
       margin: theme.spacing(3, 0),
+      padding: theme.spacing(0, 1),
       overflowX: 'auto',
       '&::-webkit-scrollbar': {
         webkitAppearance: 'none',
@@ -83,7 +85,7 @@ function Questionary({ title, info }: QuestionaryProps) {
           );
 
           return (
-            <Step key={index}>
+            <Step key={index} completed={stepMetadata.isCompleted}>
               <QuestionaryStepButton
                 onClick={async () => {
                   dispatch({
@@ -91,7 +93,6 @@ function Questionary({ title, info }: QuestionaryProps) {
                     stepIndex: index,
                   });
                 }}
-                completed={stepMetadata.isCompleted}
                 readonly={stepMetadata.isReadonly && !isUserOfficer}
               >
                 <span>{stepMetadata.title}</span>

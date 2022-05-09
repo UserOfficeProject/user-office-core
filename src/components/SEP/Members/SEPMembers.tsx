@@ -1,14 +1,13 @@
 import MaterialTable from '@material-table/core';
-import { Button } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
-import Clear from '@material-ui/icons/Clear';
-import Person from '@material-ui/icons/Person';
-import PersonAdd from '@material-ui/icons/PersonAdd';
+import Clear from '@mui/icons-material/Clear';
+import Person from '@mui/icons-material/Person';
+import PersonAdd from '@mui/icons-material/PersonAdd';
+import { Button } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import React, { useState, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -24,19 +23,6 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-const useStyles = makeStyles(() => ({
-  darkerDisabledTextField: {
-    '& .MuiInputBase-root.Mui-disabled': {
-      color: 'rgba(0, 0, 0, 0.7) !important',
-    },
-  },
-  defaultTextField: {
-    '& .MuiFormLabel-root': {
-      color: 'black',
-    },
-  },
-}));
-
 type BasicUserDetailsWithRole = BasicUserDetails & { roleId: UserRole };
 
 type SEPMembersProps = {
@@ -46,6 +32,18 @@ type SEPMembersProps = {
   onSEPUpdate: (sep: Sep) => void;
   confirm: WithConfirmType;
 };
+
+const columns = [
+  { title: 'Name', field: 'user.firstname' },
+  {
+    title: 'Surname',
+    field: 'user.lastname',
+  },
+  {
+    title: 'Organization',
+    field: 'user.organisation',
+  },
+];
 
 const SEPMembers: React.FC<SEPMembersProps> = ({
   data: sepData,
@@ -58,7 +56,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
   const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
-  const classes = useStyles();
   const { loadingMembers, SEPReviewersData, setSEPReviewersData } =
     useSEPReviewersData(
       sepId,
@@ -72,18 +69,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   ]);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const columns = [
-    { title: 'Name', field: 'user.firstname' },
-    {
-      title: 'Surname',
-      field: 'user.lastname',
-    },
-    {
-      title: 'Organization',
-      field: 'user.organisation',
-    },
-  ];
-
   const sendSEPChairUpdate = async (
     value: BasicUserDetails[]
   ): Promise<void> => {
@@ -91,7 +76,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     const {
       assignChairOrSecretary: { rejection },
-    } = await api('SEP chair assigned successfully!').assignChairOrSecretary({
+    } = await api({
+      toastSuccessMessage: 'SEP chair assigned successfully!',
+    }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepId,
         roleId: UserRole.SEP_CHAIR,
@@ -122,9 +109,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     const {
       assignChairOrSecretary: { rejection },
-    } = await api(
-      'SEP secretary assigned successfully!'
-    ).assignChairOrSecretary({
+    } = await api({
+      toastSuccessMessage: 'SEP secretary assigned successfully!',
+    }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepId,
         roleId: UserRole.SEP_SECRETARY,
@@ -152,7 +139,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     const {
       assignReviewersToSEP: { rejection },
-    } = await api('SEP member assigned successfully!').assignReviewersToSEP({
+    } = await api({
+      toastSuccessMessage: 'SEP member assigned successfully!',
+    }).assignReviewersToSEP({
       memberIds: users.map((user) => user.id),
       sepId,
     });
@@ -174,7 +163,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   ): Promise<void> => {
     const {
       removeMemberFromSep: { rejection },
-    } = await api('SEP member removed successfully!').removeMemberFromSep({
+    } = await api({
+      toastSuccessMessage: 'SEP member removed successfully!',
+    }).removeMemberFromSep({
       memberId: user.id,
       sepId,
       roleId: user.roleId,
@@ -204,12 +195,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
   const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
 
-  const alreadySelectedMembers = (SEPReviewersData ?? []).map(
-    ({ userId }) => userId
-  );
+  const alreadySelectedMembers = SEPReviewersData.map(({ userId }) => userId);
 
   sepData.sepChair && alreadySelectedMembers.push(sepData.sepChair.id);
   sepData.sepSecretary && alreadySelectedMembers.push(sepData.sepSecretary.id);
+
+  const SEPReviewersDataWithId = SEPReviewersData.map((sepReviewer) =>
+    Object.assign(sepReviewer, { id: sepReviewer.userId })
+  );
 
   return (
     <>
@@ -257,13 +250,8 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               fullWidth
               data-cy="SEPChair"
               required
-              disabled
-              className={
-                sepData.sepChair
-                  ? classes.darkerDisabledTextField
-                  : classes.defaultTextField
-              } // original behaviour preserved but labels legible by default
               InputProps={{
+                readOnly: true,
                 endAdornment: isUserOfficer && (
                   <>
                     {sepData.sepChair && (
@@ -315,13 +303,8 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               fullWidth
               data-cy="SEPSecretary"
               required
-              disabled
-              className={
-                sepData.sepSecretary
-                  ? classes.darkerDisabledTextField
-                  : classes.defaultTextField
-              } // original behaviour preserved but labels legible by default
               InputProps={{
+                readOnly: true,
                 endAdornment: isUserOfficer && (
                   <>
                     {sepData.sepSecretary && (
@@ -373,9 +356,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                 </Typography>
               }
               columns={columns}
-              data={(SEPReviewersData ?? []).map((sepReviewer) =>
-                Object.assign(sepReviewer, { id: sepReviewer.userId })
-              )}
+              data={SEPReviewersDataWithId}
               editable={
                 hasAccessRights
                   ? {
@@ -402,7 +383,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                   variant="outlined"
                   onClick={() => setOpen(true)}
                   data-cy="add-participant-button"
-                  color="primary"
                   startIcon={<AddPersonIcon />}
                 >
                   Add reviewers

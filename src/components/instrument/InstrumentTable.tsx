@@ -1,5 +1,5 @@
-import { Typography } from '@material-ui/core';
-import AssignmentInd from '@material-ui/icons/AssignmentInd';
+import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import { Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -21,6 +21,17 @@ import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 
+const columns = [
+  { title: 'Name', field: 'name' },
+  { title: 'Short code', field: 'shortCode' },
+  { title: 'Description', field: 'description' },
+  {
+    title: 'Scientists',
+    field: 'scientists.length',
+    emptyValue: '-',
+  },
+];
+
 const InstrumentTable: React.FC = () => {
   const {
     loadingInstruments,
@@ -28,16 +39,6 @@ const InstrumentTable: React.FC = () => {
     setInstrumentsWithLoading: setInstruments,
   } = useInstrumentsData();
 
-  const columns = [
-    { title: 'Name', field: 'name' },
-    { title: 'Short code', field: 'shortCode' },
-    { title: 'Description', field: 'description' },
-    {
-      title: 'Scientists',
-      field: 'scientists.length',
-      emptyValue: '-',
-    },
-  ];
   const { api } = useDataApiWithFeedback();
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
@@ -47,7 +48,9 @@ const InstrumentTable: React.FC = () => {
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
-    return await api('Instrument removed successfully!')
+    return await api({
+      toastSuccessMessage: 'Instrument removed successfully!',
+    })
       .deleteInstrument({
         id: instrumentDeletedId as number,
       })
@@ -63,9 +66,9 @@ const InstrumentTable: React.FC = () => {
   const assignScientistsToInstrument = async (
     scientists: BasicUserDetails[]
   ) => {
-    const assignScientistToInstrumentResult = await api(
-      'Scientist assigned to instrument successfully!'
-    ).assignScientistsToInstrument({
+    const assignScientistToInstrumentResult = await api({
+      toastSuccessMessage: 'Scientist assigned to instrument successfully!',
+    }).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,
       scientistIds: scientists.map((scientist) => scientist.id),
     });

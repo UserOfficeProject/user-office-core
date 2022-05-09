@@ -1,10 +1,37 @@
-import { DataType } from '../../src/generated/sdk';
+import {
+  AllocationTimeUnits,
+  DataType,
+  Settings,
+  SettingsId,
+} from '../../src/generated/sdk';
 
 // NOTE: Instruments, proposal and scheduled events are seeded only if resetDB(true).
 export default {
+  // NOTE: To be able to use this cy.getAndStoreAppSettings() should be called in the beforeEach section.
+  getFormats: () => {
+    const settings = window.localStorage.getItem('settings');
+
+    let settingsMap = new Map<SettingsId, string>();
+
+    if (settings) {
+      settingsMap = new Map(
+        JSON.parse(settings).map((setting: Settings) => [
+          setting.id,
+          setting.settingsValue,
+        ])
+      );
+    }
+
+    const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT) || 'dd-MM-yyyy';
+    const dateTimeFormat =
+      settingsMap.get(SettingsId.DATE_TIME_FORMAT) || 'dd-MM-yyyy HH:mm';
+
+    return { dateFormat, dateTimeFormat };
+  },
   call: {
     id: 1,
     shortCode: 'call 1',
+    allocationTimeUnit: AllocationTimeUnits.DAY,
   },
   template: {
     id: 1,
@@ -72,7 +99,7 @@ export default {
         value: true,
       },
       date: {
-        value: '2030-01-01',
+        value: '01-01-2030',
       },
       embellishment: {
         value: '<h1>Embellishment value<h1>',
@@ -188,6 +215,7 @@ export default {
   proposalStatuses: {
     draft: {
       id: 1,
+      name: 'DRAFT',
     },
     feasibilityReview: {
       id: 2,
@@ -199,6 +227,7 @@ export default {
     },
     sepMeeting: {
       id: 12,
+      name: 'SEP Meeting',
     },
     editableSubmitted: {
       id: 14,
@@ -207,20 +236,20 @@ export default {
   scheduledEvents: {
     upcoming: {
       id: 996,
-      startsAt: '2023-01-07 10:00',
-      endsAt: '2023-01-07 11:00',
+      startsAt: '07-01-2023 10:00',
+      endsAt: '07-01-2023 11:00',
     },
     upcomingDraft: {
-      startsAt: '2023-01-07 12:00',
-      endsAt: '2023-01-07 13:00',
+      startsAt: '07-01-2023 12:00',
+      endsAt: '07-01-2023 13:00',
     },
     ended: {
-      startsAt: '2020-01-07 10:00',
-      endsAt: '2020-01-07 11:00',
+      startsAt: '07-01-2020 10:00',
+      endsAt: '07-01-2020 11:00',
     },
     completed: {
-      startsAt: '2023-02-07 12:00',
-      endsAt: '2023-02-07 13:00',
+      startsAt: '07-02-2023 12:00',
+      endsAt: '07-02-2023 13:00',
     },
   },
 };

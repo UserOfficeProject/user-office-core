@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -15,6 +15,8 @@ import { FunctionType } from 'utils/utilTypes';
 
 import CreateUpdateApiAccessToken from './CreateUpdateApiAccessToken';
 
+const columns = [{ title: 'Name', field: 'name' }];
+
 const ApiAccessTokensTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
   const {
@@ -24,7 +26,6 @@ const ApiAccessTokensTable: React.FC = () => {
   } = useApiAccessTokensData();
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
-  const columns = [{ title: 'Name', field: 'name' }];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const createModal = (
@@ -46,7 +47,9 @@ const ApiAccessTokensTable: React.FC = () => {
   );
 
   const deleteApiAccessToken = async (id: string | number) => {
-    return await api('Api access token deleted successfully')
+    return await api({
+      toastSuccessMessage: 'Api access token deleted successfully',
+    })
       .deleteApiAccessToken({
         accessTokenId: id as string,
       })

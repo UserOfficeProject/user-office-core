@@ -1,18 +1,18 @@
-import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import NavigateNext from '@material-ui/icons/NavigateNext';
-import dateformat from 'dateformat';
+import NavigateNext from '@mui/icons-material/NavigateNext';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import ListItemText from '@mui/material/ListItemText';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
 
 import { Call } from 'generated/sdk';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { timeRemaining } from 'utils/Time';
 
 const useStyles = makeStyles(() => ({
@@ -31,19 +31,16 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
 }) => {
   const history = useHistory();
   const classes = useStyles();
+  const { toFormattedDateTime } = useFormattedDateTime();
 
   const handleSelect = (callId: number, templateId: number | null) => {
     const url = `/ProposalCreate/${callId}/${templateId}`;
     history.push(url);
   };
 
-  const formatDate = (date: Date) => {
-    return dateformat(new Date(date), 'dd-mmm-yyyy HH:MM');
-  };
-
   return (
-    <ContentContainer>
-      <StyledPaper margin={[0]}>
+    <StyledContainer>
+      <StyledPaper>
         <Typography variant="h6" component="h2" gutterBottom>
           Select a call
         </Typography>
@@ -74,20 +71,17 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
               >
                 <ListItemText
                   primary={header}
+                  secondaryTypographyProps={{ component: 'div' }}
                   secondary={
-                    <Fragment>
-                      <Typography component="div" className={classes.date}>
-                        {`Application deadline: ${formatDate(
+                    <>
+                      <Typography component="p" className={classes.date}>
+                        {`Application deadline: ${toFormattedDateTime(
                           call.endCall
                         )} ${timeRemainingText}`}
                       </Typography>
-                      <Typography component="div">
-                        {call.description}
-                      </Typography>
-                      <Typography component="div">
-                        {call.cycleComment}
-                      </Typography>
-                    </Fragment>
+                      <Typography component="p">{call.description}</Typography>
+                      <Typography component="p">{call.cycleComment}</Typography>
+                    </>
                   }
                 />
                 <ListItemSecondaryAction>
@@ -104,7 +98,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
           })}
         </List>
       </StyledPaper>
-    </ContentContainer>
+    </StyledContainer>
   );
 };
 

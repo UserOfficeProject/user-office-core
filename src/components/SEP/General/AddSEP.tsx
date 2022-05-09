@@ -1,10 +1,10 @@
-import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { createSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
 import { Field, Form, Formik } from 'formik';
-import { Checkbox, TextField } from 'formik-material-ui';
+import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -35,7 +35,9 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
         active: true,
       }}
       onSubmit={async (values): Promise<void> => {
-        const data = await api('SEP created successfully!').createSEP(values);
+        const data = await api({
+          toastSuccessMessage: 'SEP created successfully!',
+        }).createSEP(values);
 
         if (data.createSEP.rejection) {
           close(null);
@@ -57,7 +59,6 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             label="Code"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="code"
             disabled={isExecutingCall}
@@ -68,11 +69,10 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             label="Description"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             multiline
-            rowsMax="16"
-            rows="3"
+            maxRows="16"
+            minRows="3"
             data-cy="description"
             disabled={isExecutingCall}
           />
@@ -83,7 +83,6 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             label="Number of ratings required"
             type="number"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="numberRatingsRequired"
             disabled={isExecutingCall}
@@ -95,7 +94,6 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
                 id="active"
                 name="active"
                 component={Checkbox}
-                color="primary"
                 type="checkbox"
                 inputProps={{ 'aria-label': 'primary checkbox' }}
                 data-cy="sepActive"
@@ -107,8 +105,6 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
           <Button
             type="submit"
             fullWidth
-            variant="contained"
-            color="primary"
             className={classes.submit}
             data-cy="submit"
             disabled={isExecutingCall}

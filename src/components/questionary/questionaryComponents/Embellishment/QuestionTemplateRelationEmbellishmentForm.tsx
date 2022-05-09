@@ -1,9 +1,8 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -32,7 +31,6 @@ export const QuestionTemplateRelationEmbellishmentForm: FC<
             name="config.html"
             type="text"
             component={FormikUICustomEditor}
-            margin="normal"
             fullWidth
             init={{
               skin: false,
@@ -50,17 +48,17 @@ export const QuestionTemplateRelationEmbellishmentForm: FC<
             id="plain-description-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="plain"
           />
 
           <Field
             name="config.omitFromPdf"
-            component={FormikUICustomCheckbox}
-            label="Omit from PDF"
-            margin="normal"
-            fullWidth
+            component={CheckboxWithLabel}
+            type="checkbox"
+            Label={{
+              label: 'Omit from PDF',
+            }}
             data-cy="omit"
           />
 

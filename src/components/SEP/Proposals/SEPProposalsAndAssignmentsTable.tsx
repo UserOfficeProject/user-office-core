@@ -1,13 +1,13 @@
-import MaterialTable, { Options } from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import Grid from '@material-ui/core/Grid';
-import AssignmentInd from '@material-ui/icons/AssignmentInd';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import Visibility from '@material-ui/icons/Visibility';
-import dateformat from 'dateformat';
-import PropTypes from 'prop-types';
+import MaterialTable, { Action, Options } from '@material-table/core';
+import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import Visibility from '@mui/icons-material/Visibility';
+import { IconButton, Tooltip, Typography } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import Grid from '@mui/material/Grid';
+import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
@@ -22,7 +22,9 @@ import {
   ReviewWithNextProposalStatus,
   ProposalStatus,
   Review,
+  SettingsId,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
   useSEPProposalsData,
@@ -36,6 +38,7 @@ import {
   standardDeviation,
 } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import AssignSEPMemberToProposal, {
   SepAssignedMember,
@@ -48,7 +51,9 @@ type SEPProposalsAndAssignmentsTableProps = {
   /** Toolbar component shown in the table */
   Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   /** Call id that we want to filter by */
-  selectedCallId: number;
+  selectedCallId: number | null;
+  /** Confirmation function that comes from withConfirm HOC */
+  confirm: WithConfirmType;
 };
 
 const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
@@ -57,6 +62,13 @@ const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
     .filter((review): review is Review => !!review);
 
 const SEPProposalColumns = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 80 },
+    sorting: false,
+    removable: false,
+    field: 'rowActionButtons',
+  },
   { title: 'ID', field: 'proposal.proposalId' },
   {
     title: 'Title',
@@ -68,9 +80,7 @@ const SEPProposalColumns = [
   },
   {
     title: 'Date assigned',
-    field: 'dateAssigned',
-    render: (rowData: SEPProposalType): string =>
-      dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+    field: 'dateAssignedFormatted',
   },
   {
     title: 'Reviewers',
@@ -120,7 +130,7 @@ const SEPProposalColumns = [
 
 const SEPProposalsAndAssignmentsTable: React.FC<
   SEPProposalsAndAssignmentsTableProps
-> = ({ sepId, selectedCallId, Toolbar }) => {
+> = ({ sepId, selectedCallId, Toolbar, confirm }) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     reviewModal: NumberParam,
   });
@@ -129,6 +139,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   const { api } = useDataApiWithFeedback();
   const [proposalPk, setProposalPk] = useState<null | number>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -139,20 +152,80 @@ const SEPProposalsAndAssignmentsTable: React.FC<
     UserRole.USER_OFFICER,
   ]);
 
-  const removeProposalFromSEP = async (
-    proposalToRemove: SEPProposalType
+  /**
+   * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
+   * and selection flag is true they are not working properly.
+   */
+  const RowActionButtons = (rowData: SEPProposalType) => (
+    <>
+      <Tooltip title="View proposal">
+        <IconButton
+          data-cy="view-proposal"
+          onClick={() => {
+            setUrlQueryParams({ reviewModal: rowData.proposalPk });
+          }}
+        >
+          <Visibility />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Assign SEP Member">
+        <IconButton
+          data-cy="assign-sep-member"
+          onClick={() => setProposalPk(rowData.proposalPk)}
+        >
+          <AssignmentInd />
+        </IconButton>
+      </Tooltip>
+    </>
+  );
+
+  const handleBulkDownloadClick = (
+    event: React.MouseEventHandler<HTMLButtonElement>,
+    rowData: SEPProposalType | SEPProposalType[]
+  ) => {
+    if (!Array.isArray(rowData)) {
+      return;
+    }
+
+    downloadPDFProposal(
+      rowData.map((row) => row.proposalPk),
+      rowData[0].proposal.title
+    );
+  };
+
+  const removeProposalsFromSEP = async (
+    proposalsToRemove: SEPProposalType[]
   ): Promise<void> => {
-    await api('Assignment removed').removeProposalsFromSep({
-      proposalPks: [proposalToRemove.proposalPk],
+    await api({
+      toastSuccessMessage: 'Assignment/s removed',
+    }).removeProposalsFromSep({
+      proposalPks: proposalsToRemove.map(
+        (proposalToRemove) => proposalToRemove.proposalPk
+      ),
       sepId,
     });
 
     setSEPProposalsData((sepProposalData) =>
-      sepProposalData.filter(
-        (proposalItem) =>
-          proposalItem.proposalPk !== proposalToRemove.proposalPk
+      sepProposalData.filter((proposalItem) =>
+        proposalsToRemove.every(
+          (proposalToRemove) =>
+            proposalToRemove.proposalPk !== proposalItem.proposalPk
+        )
       )
     );
+  };
+
+  const handleBulkRemoveProposalsFromSEP = async (
+    _: React.MouseEventHandler<HTMLButtonElement>,
+    proposalsToRemove: SEPProposalType | SEPProposalType[]
+  ): Promise<void> => {
+    if (!Array.isArray(proposalsToRemove)) {
+      return;
+    }
+    confirm(() => removeProposalsFromSEP(proposalsToRemove), {
+      title: 'Remove SEP assignment/s',
+      description: `Are you sure you want to remove the selected proposal/s from this SEP?`,
+    })();
   };
 
   const assignMemberToSEPProposal = async (
@@ -166,7 +239,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
 
     const {
       assignSepReviewersToProposal: { rejection },
-    } = await api('Members assigned').assignSepReviewersToProposal({
+    } = await api({
+      toastSuccessMessage: 'Members assigned',
+    }).assignSepReviewersToProposal({
       memberIds: assignedMembers.map(({ id }) => id),
       proposalPk: proposalPk,
       sepId,
@@ -189,9 +264,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
         if (proposalItem.proposalPk === proposalPk) {
           const newAssignments: SEPProposalAssignmentType[] = [
             ...(proposalItem.assignments ?? []),
-            ...assignedMembers.map(({ role, ...user }) => ({
+            ...assignedMembers.map(({ role = null, ...user }) => ({
               sepMemberUserId: user.id,
-              dateAssigned: Date.now(),
+              dateAssigned: DateTime.now(),
               user,
               role,
               review:
@@ -212,9 +287,21 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   };
 
   const initialValues: SEPProposalType[] = SEPProposalsData;
-  const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
-  const ViewIcon = (): JSX.Element => <Visibility />;
-  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const tableActions: Action<SEPProposalType>[] = [];
+  hasRightToAssignReviewers &&
+    tableActions.push({
+      icon: () => <GetAppIcon data-cy="download-sep-proposals" />,
+      tooltip: 'Download proposals',
+      onClick: handleBulkDownloadClick,
+      position: 'toolbarOnSelect',
+    });
+  hasRightToRemoveAssignedProposal &&
+    tableActions.push({
+      icon: () => <DeleteOutline data-cy="remove-assigned-sep-proposal" />,
+      tooltip: 'Remove assigned proposal',
+      onClick: handleBulkRemoveProposalsFromSEP,
+      position: 'toolbarOnSelect',
+    });
 
   const proposalAssignments = initialValues.find(
     (assignment) => assignment.proposalPk === proposalPk
@@ -273,7 +360,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<
          * TODO(asztalos): merge `removeMemberFromSEPProposal` and `removeUserForReview` (same goes for creation)
          *                otherwise if one of them fails we may end up with an broken state
          */
-        await api('Reviewer removed').removeMemberFromSEPProposal({
+        await api({
+          toastSuccessMessage: 'Reviewer removed',
+        }).removeMemberFromSEPProposal({
           proposalPk,
           sepId,
           memberId: assignedReviewer.sepMemberUserId as number,
@@ -325,8 +414,16 @@ const SEPProposalsAndAssignmentsTable: React.FC<
     [setSEPProposalsData, sepId, api]
   );
 
+  const SEPProposalsWitIdAndFormattedDate = initialValues.map((sepProposal) =>
+    Object.assign(sepProposal, {
+      id: sepProposal.proposalPk,
+      rowActionButtons: RowActionButtons(sepProposal),
+      dateAssignedFormatted: toFormattedDateTime(sepProposal.dateAssigned),
+    })
+  );
+
   return (
-    <React.Fragment>
+    <>
       <ProposalReviewModal
         title="SEP - Proposal View"
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
@@ -375,9 +472,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
                 SEP Proposals
               </Typography>
             }
-            data={initialValues.map((sepProposal) =>
-              Object.assign(sepProposal, { id: sepProposal.proposalPk })
-            )}
+            data={SEPProposalsWitIdAndFormattedDate}
             isLoading={loadingSEPProposals}
             localization={{
               toolbar: {
@@ -390,58 +485,22 @@ const SEPProposalsAndAssignmentsTable: React.FC<
                 render: ReviewersTable,
               },
             ]}
-            actions={
-              hasRightToAssignReviewers
-                ? [
-                    (rowData) => ({
-                      icon: AssignmentIndIcon,
-                      onClick: () => setProposalPk(rowData.proposalPk),
-                      tooltip: 'Assign SEP Member',
-                    }),
-                    (rowData) => ({
-                      icon: ViewIcon,
-                      onClick: () =>
-                        setUrlQueryParams({
-                          reviewModal: rowData.proposalPk,
-                        }),
-                      tooltip: 'View Proposal',
-                    }),
-                    {
-                      icon: GetAppIconComponent,
-                      tooltip: 'Download proposal',
-                      onClick: (rowData) => {
-                        downloadPDFProposal(
-                          [rowData.proposalPk],
-                          rowData.title
-                        );
-                      },
-                    },
-                  ]
-                : []
-            }
-            editable={
-              hasRightToRemoveAssignedProposal
-                ? {
-                    deleteTooltip: () => 'Remove assigned proposal',
-                    onRowDelete: (rowData: SEPProposalType): Promise<void> =>
-                      removeProposalFromSEP(rowData),
-                  }
-                : {}
-            }
+            actions={tableActions}
             options={{
               search: true,
+              selection: true,
+              headerSelectionProps: {
+                inputProps: {
+                  'aria-label': 'Select all rows',
+                  'data-cy': 'select-all-table-rows',
+                },
+              },
             }}
           />
         </Grid>
       </Grid>
-    </React.Fragment>
+    </>
   );
 };
 
-SEPProposalsAndAssignmentsTable.propTypes = {
-  sepId: PropTypes.number.isRequired,
-  selectedCallId: PropTypes.number.isRequired,
-  Toolbar: PropTypes.func.isRequired,
-};
-
-export default SEPProposalsAndAssignmentsTable;
+export default withConfirm(SEPProposalsAndAssignmentsTable);

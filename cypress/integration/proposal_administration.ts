@@ -4,8 +4,6 @@ import { DateTime } from 'luxon';
 import initialDBData from '../support/initialDBData';
 
 context('Proposal administration tests', () => {
-  const DATE_FORMAT = 'yyyy-MM-dd';
-
   const proposalName1 = faker.lorem.words(3);
   const proposalName2 = faker.lorem.words(3);
   const proposalFixedName = '0000. Alphabetically first title';
@@ -19,7 +17,6 @@ context('Proposal administration tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   describe('Proposal administration advanced search filter tests', () => {
@@ -53,13 +50,20 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=view-proposal]').click();
       cy.finishedLoading();
       cy.get('[role="dialog"]').contains('Admin').click();
-      cy.get('#finalStatus-input').should('exist');
+      cy.get('[data-cy="proposal-final-status"]').should('exist');
       cy.get('[role="dialog"]').contains('Logs').click();
       cy.get('[role="dialog"]').contains('Admin').click();
 
-      cy.get('#finalStatus-input').click();
+      cy.get('[data-cy="proposal-final-status"]').click();
 
-      cy.get('[data-value="ACCEPTED"]').click();
+      cy.get('[data-cy="proposal-final-status-options"] li')
+        .contains('Accepted')
+        .click();
+
+      cy.get('[data-cy="managementTimeAllocation"] label').should(
+        'include.text',
+        initialDBData.call.allocationTimeUnit
+      );
 
       cy.get('[data-cy="managementTimeAllocation"] input')
         .clear()
@@ -118,6 +122,12 @@ context('Proposal administration tests', () => {
 
       cy.contains('Accepted');
       cy.contains('DRAFT');
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper').contains('Final time allocation').click();
+      cy.get('body').click();
+      cy.contains(proposalName1)
+        .parent()
+        .should('include.text', initialDBData.call.allocationTimeUnit);
     });
 
     it('Should show warning if proposal status is changing to SCHEDULING and proposal has no instrument', () => {
@@ -192,7 +202,7 @@ context('Proposal administration tests', () => {
 
       cy.contains(proposalName1)
         .parent()
-        .get('[title="Edit proposal"]')
+        .get('[aria-label="Edit proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -221,11 +231,38 @@ context('Proposal administration tests', () => {
     });
 
     it('Download proposal is working with dialog window showing up', () => {
-      cy.get('[data-cy="download-proposal"]').first().click();
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalFixedName,
+            abstract: proposalName2,
+          });
+        }
+      });
+      cy.contains(proposalName1)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-proposals"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         proposalName1
+      );
+
+      cy.contains(proposalFixedName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-proposals"]').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        '2 selected items'
       );
     });
 
@@ -295,7 +332,9 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .dblclick();
+        .click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
         officerProposalsTableAsTextAfterSort = element.text();
@@ -315,7 +354,7 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .should('have.attr', 'aria-sort', 'Descendant');
+        .should('have.attr', 'aria-sort', 'Ascendant');
 
       cy.contains('Calls').click();
 
@@ -351,13 +390,14 @@ context('Proposal administration tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
-      cy.contains('Title').dblclick();
       cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.contains('Title').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
 
       cy.get('table tbody tr input[type="checkbox"]').first().click();
 
-      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
     });
 
     it('User officer should see Reviews tab before doing the Admin(management decision)', () => {
@@ -469,13 +509,19 @@ context('Proposal administration tests', () => {
 
       const DATE_ANSWER = answers.proposal.date.value;
 
-      const DATE_BEFORE = DateTime.fromFormat(DATE_ANSWER, DATE_FORMAT)
+      const DATE_BEFORE = DateTime.fromFormat(
+        DATE_ANSWER,
+        initialDBData.getFormats().dateFormat
+      )
         .minus({ days: 1 })
-        .toFormat(DATE_FORMAT);
+        .toFormat(initialDBData.getFormats().dateFormat);
 
-      const DATE_AFTER = DateTime.fromFormat(DATE_ANSWER, DATE_FORMAT)
+      const DATE_AFTER = DateTime.fromFormat(
+        DATE_ANSWER,
+        initialDBData.getFormats().dateFormat
+      )
         .plus({ days: 1 })
-        .toFormat(DATE_FORMAT);
+        .toFormat(initialDBData.getFormats().dateFormat);
 
       cy.get('[data-cy=question-list]').click();
       cy.contains(questions.date.text).click();

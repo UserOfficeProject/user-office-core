@@ -1,10 +1,10 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import dateformat from 'dateformat';
+import { Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import { EventLog } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -27,8 +27,7 @@ const columns = [
   },
   {
     title: 'Changed on',
-    render: (rowData: EventLog): string =>
-      dateformat(new Date(rowData.eventTStamp), 'dd-mmm-yyyy HH:MM:ss'),
+    field: 'changedOnFormatted',
   },
   { title: 'Event type', field: 'eventType' },
 ];
@@ -41,6 +40,12 @@ const EventLogList: React.FC<EventLogListProps> = ({
     eventType,
     changedObjectId.toString()
   );
+  const { toFormattedDateTime } = useFormattedDateTime();
+
+  const eventLogsDataWithFormattedDates = eventLogsData.map((eventLog) => ({
+    ...eventLog,
+    changedOnFormatted: toFormattedDateTime(eventLog.eventTStamp),
+  }));
 
   return (
     <div data-cy="event-logs-table">
@@ -52,7 +57,7 @@ const EventLogList: React.FC<EventLogListProps> = ({
           </Typography>
         }
         columns={columns}
-        data={eventLogsData}
+        data={eventLogsDataWithFormattedDates}
         isLoading={loading}
         options={{
           search: true,

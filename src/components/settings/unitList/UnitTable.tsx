@@ -1,7 +1,7 @@
-import { Button, Typography } from '@material-ui/core';
-import PublishIcon from '@material-ui/icons/Publish';
-import ShareIcon from '@material-ui/icons/Share';
-import { DateTime } from 'luxon';
+import PublishIcon from '@mui/icons-material/Publish';
+import ShareIcon from '@mui/icons-material/Share';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useHistory } from 'react-router';
 import { useQueryParams } from 'use-query-params';
@@ -11,7 +11,8 @@ import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { UserRole, Unit } from 'generated/sdk';
+import { UserRole, Unit, SettingsId } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { downloadBlob } from 'utils/downloadBlob';
 import { tableIcons } from 'utils/materialIcons';
@@ -20,15 +21,19 @@ import { FunctionType } from 'utils/utilTypes';
 
 import CreateUnit from './CreateUnit';
 
+const columns = [
+  { title: 'Quantity', field: 'quantity' },
+  { title: 'Symbol', field: 'symbol' },
+  { title: 'Unit', field: 'unit' },
+];
+
 const UnitTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
   const history = useHistory();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
-  const columns = [
-    { title: 'Quantity', field: 'quantity' },
-    { title: 'Symbol', field: 'symbol' },
-    { title: 'Unit', field: 'unit' },
-  ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
@@ -42,7 +47,7 @@ const UnitTable: React.FC = () => {
   );
 
   const deleteUnit = async (id: string | number) => {
-    return await api('Unit deleted successfully')
+    return await api({ toastSuccessMessage: 'Unit deleted successfully' })
       .deleteUnit({ id: id as string })
       .then((resp) => resp.deleteUnit.rejection === null);
   };
@@ -78,8 +83,6 @@ const UnitTable: React.FC = () => {
             <Button
               startIcon={<PublishIcon />}
               type="button"
-              variant="contained"
-              color="primary"
               onClick={() => {
                 history.push('/ImportUnits');
               }}
@@ -90,8 +93,6 @@ const UnitTable: React.FC = () => {
             <Button
               startIcon={<ShareIcon />}
               type="button"
-              variant="contained"
-              color="primary"
               onClick={() => {
                 api()
                   .getUnitsAsJson()
@@ -103,10 +104,7 @@ const UnitTable: React.FC = () => {
                     const blob = new Blob([result.unitsAsJson], {
                       type: 'application/json;charset=utf8',
                     });
-                    downloadBlob(
-                      blob,
-                      `units_${DateTime.now().toFormat('yyyy-LLL-dd')}.json`
-                    );
+                    downloadBlob(blob, `units_${toFormattedDateTime()}.json`);
                   });
               }}
               data-cy="export-units-button"

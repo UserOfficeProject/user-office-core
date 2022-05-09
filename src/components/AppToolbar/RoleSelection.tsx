@@ -1,5 +1,5 @@
 import MaterialTable from '@material-table/core';
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 
@@ -8,8 +8,17 @@ import { Role } from 'generated/sdk';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
-const RoleSelection: React.FC = () => {
+const columns = [
+  {
+    title: 'Action',
+    field: 'roleAction',
+  },
+  { title: 'Role', field: 'title' },
+];
+
+const RoleSelection: React.FC<{ onClose: FunctionType }> = ({ onClose }) => {
   const { currentRole, token, handleNewToken } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
@@ -48,7 +57,9 @@ const RoleSelection: React.FC = () => {
 
   const selectUserRole = async (role: Role) => {
     setLoading(true);
-    const result = await api('User role changed!').selectRole({
+    const result = await api({
+      toastSuccessMessage: 'User role changed!',
+    }).selectRole({
       token,
       selectedRoleId: role.id,
     });
@@ -58,6 +69,8 @@ const RoleSelection: React.FC = () => {
 
       setTimeout(() => {
         handleNewToken(result.selectRole.token);
+
+        onClose();
       }, 500);
     }
   };
@@ -65,22 +78,25 @@ const RoleSelection: React.FC = () => {
   const RoleAction = (rowData: Role) => (
     <>
       {rowData.shortCode.toUpperCase() === currentRole?.valueOf() ? (
-        <Button disabled>In Use</Button>
+        <Button variant="text" disabled>
+          In Use
+        </Button>
       ) : (
-        <Button disabled={loading} onClick={() => selectUserRole(rowData)}>
+        <Button
+          variant="text"
+          disabled={loading}
+          onClick={() => selectUserRole(rowData)}
+        >
           Use
         </Button>
       )}
     </>
   );
 
-  const columns = [
-    { title: 'Role', field: 'title' },
-    {
-      title: 'Action',
-      render: RoleAction,
-    },
-  ];
+  const rolesWithRoleAction = roles.map((role) => ({
+    ...role,
+    roleAction: RoleAction(role),
+  }));
 
   return (
     <div data-cy="role-selection-table">
@@ -88,7 +104,7 @@ const RoleSelection: React.FC = () => {
         icons={tableIcons}
         title="User roles"
         columns={columns}
-        data={roles}
+        data={rolesWithRoleAction}
         isLoading={loading}
         options={{
           search: false,

@@ -1,9 +1,8 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { EmbellishmentConfig } from 'generated/sdk';
@@ -34,7 +33,6 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             id="naturalKey-Input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -43,7 +41,6 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             id="HTML-Input"
             type="text"
             component={FormikUICustomEditor}
-            margin="normal"
             fullWidth
             init={{
               skin: false,
@@ -61,7 +58,6 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             label="Plain description"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="plain"
           />
@@ -72,10 +68,11 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             checked={
               (formikProps.values.config as EmbellishmentConfig).omitFromPdf
             }
-            component={FormikUICustomCheckbox}
-            label="Omit from PDF"
-            margin="normal"
-            fullWidth
+            component={CheckboxWithLabel}
+            type="checkbox"
+            Label={{
+              label: 'Omit from PDF',
+            }}
             data-cy="omit"
           />
         </>

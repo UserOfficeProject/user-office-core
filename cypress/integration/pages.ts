@@ -3,7 +3,6 @@ import faker from 'faker';
 context('Page tests', () => {
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   const faqContents = faker.random.words(2);

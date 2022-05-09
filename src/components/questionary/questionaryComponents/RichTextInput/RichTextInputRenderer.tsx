@@ -1,23 +1,18 @@
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import IconButton from '@material-ui/core/IconButton';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import VisibilityIcon from '@material-ui/icons/Visibility';
+import { Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import React, { useState } from 'react';
 
 import {
   AnswerRenderer,
   QuestionRenderer,
 } from 'components/questionary/QuestionaryComponentRegistry';
+import stripHtml from 'utils/stripHtml';
 
-const useStyles = makeStyles(() => ({
-  visibilityIconAligned: {
-    marginLeft: '-12px',
-  },
-}));
+import { truncateString } from '../../../../utils/truncateString';
 
 export const RichTextInputRendererComponent: React.FC<{
   id: string;
@@ -25,20 +20,21 @@ export const RichTextInputRendererComponent: React.FC<{
   valueToRender: string;
 }> = ({ id, title, valueToRender }) => {
   const [open, setOpen] = useState(false);
-  const classes = useStyles();
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   return (
     <span>
-      <IconButton
+      <Typography
+        variant="body1"
         onClick={handleClickOpen}
         data-cy={`${id}_open`}
-        className={classes.visibilityIconAligned}
+        sx={{ cursor: 'pointer', ':hover': { textDecoration: 'underline' } }}
       >
-        <VisibilityIcon />
-      </IconButton>
+        {`${truncateString(stripHtml(valueToRender), 100)}`}
+      </Typography>
+
       <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
         <DialogTitle>{title}</DialogTitle>
 
@@ -51,7 +47,7 @@ export const RichTextInputRendererComponent: React.FC<{
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose} variant="text">
             Close
           </Button>
         </DialogActions>

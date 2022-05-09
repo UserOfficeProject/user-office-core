@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Typography } from '@material-ui/core';
+import { PaperProps, Typography } from '@mui/material';
 import { default as React, useState } from 'react';
 
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import Questionary from 'components/questionary/Questionary';
 import {
   QuestionaryContext,
@@ -16,17 +17,21 @@ import {
   QuestionarySubmissionModel,
 } from 'models/questionary/QuestionarySubmissionState';
 import useEventHandlers from 'models/questionary/useEventHandlers';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 export interface ProposalContextType extends QuestionaryContextType {
   state: ProposalSubmissionState | null;
 }
 
-export default function ProposalContainer(props: {
+interface ProposalContainerProps {
   proposal: ProposalWithQuestionary;
   proposalUpdated?: (proposal: ProposalWithQuestionary) => void;
-}) {
-  const [initialState] = useState(new ProposalSubmissionState(props.proposal));
+  elevation?: PaperProps['elevation'];
+}
+export default function ProposalContainer(props: ProposalContainerProps) {
+  const { proposal, proposalUpdated, elevation } = props;
+
+  const [initialState] = useState(new ProposalSubmissionState(proposal));
 
   const eventHandlers = useEventHandlers(TemplateGroupId.PROPOSAL);
 
@@ -34,7 +39,7 @@ export default function ProposalContainer(props: {
     (state: ProposalSubmissionState, action: Event) => {
       switch (action.type) {
         case 'ITEM_WITH_QUESTIONARY_MODIFIED':
-          props.proposalUpdated?.({
+          proposalUpdated?.({
             ...state.proposal,
             ...action.itemWithQuestionary,
           });
@@ -52,26 +57,40 @@ export default function ProposalContainer(props: {
 
   const { submitted, proposalId } = state.proposal;
 
-  let info: JSX.Element | string = proposalId || 'DRAFT';
+  let info: JSX.Element | string =
+    (
+      <CopyToClipboard
+        text={proposalId}
+        successMessage={`'${proposalId}' copied to clipboard`}
+      >
+        {proposalId ? `Proposal ID: ${proposalId}` : ''}
+      </CopyToClipboard>
+    ) || 'DRAFT';
 
   if (!submitted && hasReferenceNumberFormat && proposalId) {
     info = (
       <Typography>
-        {proposalId} <br /> <small>Pre-submission reference</small>
+        <CopyToClipboard
+          text={proposalId}
+          successMessage={`'${proposalId}' copied to clipboard`}
+        >
+          {proposalId}
+        </CopyToClipboard>{' '}
+        <br /> <small>Pre-submission reference</small>
       </Typography>
     );
   }
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <ContentContainer maxWidth="md">
-        <StyledPaper>
+      <StyledContainer>
+        <StyledPaper elevation={elevation}>
           <Questionary
             title={state.proposal.title || 'New Proposal'}
             info={info}
           />
         </StyledPaper>
-      </ContentContainer>
+      </StyledContainer>
     </QuestionaryContext.Provider>
   );
 }

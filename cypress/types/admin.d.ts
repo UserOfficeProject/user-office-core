@@ -1,3 +1,5 @@
+import { GetSettingsQuery, PrepareDbMutation } from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -9,7 +11,16 @@ declare global {
        * @example
        *    cy.resetDB()
        */
-      resetDB: (includeSeeds?: boolean) => void;
+      resetDB: (includeSeeds?: boolean) => Cypress.Chainable<PrepareDbMutation>;
+      /**
+       * Gets app settings and stores in the localStorage to be used inside tests.
+       *
+       * @returns {typeof getAndStoreAppSettings}
+       * @memberof Chainable
+       * @example
+       *    cy.getAndStoreAppSettings()
+       */
+      getAndStoreAppSettings: () => Cypress.Chainable<GetSettingsQuery>;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -21,12 +21,16 @@ const InstitutionPage: React.FC = () => {
     loadingInstitutions,
     institutions,
     setInstitutionsWithLoading: setInstitutions,
-  } = useInstitutionsData();
+  } = useInstitutionsData({
+    country: true,
+  });
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const deleteInstitution = async (id: number | string) => {
-    return await api('Institution removed successfully!')
+    return await api({
+      toastSuccessMessage: 'Institution removed successfully!',
+    })
       .deleteInstitution({
         id: id as number,
       })
@@ -41,10 +45,11 @@ const InstitutionPage: React.FC = () => {
 
   const columns = [
     { title: 'Name', field: 'name' },
+    { title: 'Country', field: 'country.value' },
     {
       title: 'Verified',
       field: 'verified',
-      lookup: { true: 'true', false: 'false' },
+      lookup: { true: 'Yes', false: 'No' },
     },
   ];
 

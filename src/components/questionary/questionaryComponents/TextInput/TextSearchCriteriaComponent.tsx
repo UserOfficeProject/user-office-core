@@ -5,7 +5,7 @@ import {
   MenuItem,
   Select,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useState } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
@@ -24,7 +24,7 @@ function TextSearchCriteriaComponent({
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
-        <FormControl style={{ width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel shrink id="comparator">
             Operator
           </InputLabel>
@@ -52,6 +52,7 @@ function TextSearchCriteriaComponent({
           name="value"
           label="Value"
           value={value}
+          margin="none"
           fullWidth
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => onChange(comparator, value)}

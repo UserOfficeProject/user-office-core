@@ -16,8 +16,6 @@ export type Scalars = {
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
   IntStringDateBoolArray: any;
-  /** DateTime without timezone in 'yyyy-MM-DD HH:mm:ss' format */
-  TzLessDateTime: string;
   _Any: any;
 };
 
@@ -38,6 +36,7 @@ export type AddStatusChangingEventsToConnectionInput = {
 
 export type AddTechnicalReviewInput = {
   comment?: InputMaybe<Scalars['String']>;
+  files?: InputMaybe<Scalars['String']>;
   proposalPk: Scalars['Int'];
   publicComment?: InputMaybe<Scalars['String']>;
   reviewerId?: InputMaybe<Scalars['Int']>;
@@ -313,10 +312,12 @@ export enum EvaluatorOperator {
 }
 
 export enum Event {
+  CALL_CREATED = 'CALL_CREATED',
   CALL_ENDED = 'CALL_ENDED',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
   EMAIL_INVITE = 'EMAIL_INVITE',
+  INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
   PROPOSAL_ALL_SEP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_SEP_REVIEWERS_SELECTED',
   PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
@@ -405,9 +406,15 @@ export enum FeatureId {
   EMAIL_INVITE = 'EMAIL_INVITE',
   EMAIL_SEARCH = 'EMAIL_SEARCH',
   EXTERNAL_AUTH = 'EXTERNAL_AUTH',
+  INSTRUMENT_MANAGEMENT = 'INSTRUMENT_MANAGEMENT',
   RISK_ASSESSMENT = 'RISK_ASSESSMENT',
+  SAMPLE_SAFETY = 'SAMPLE_SAFETY',
   SCHEDULER = 'SCHEDULER',
-  SHIPPING = 'SHIPPING'
+  SEP_REVIEW = 'SEP_REVIEW',
+  SHIPPING = 'SHIPPING',
+  TECHNICAL_REVIEW = 'TECHNICAL_REVIEW',
+  USER_MANAGEMENT = 'USER_MANAGEMENT',
+  VISIT_MANAGEMENT = 'VISIT_MANAGEMENT'
 }
 
 export type Feedback = {
@@ -535,6 +542,7 @@ export type IndexWithGroupId = {
 };
 
 export type Institution = {
+  country: Entry;
   id: Scalars['Int'];
   name: Scalars['String'];
   verified: Scalars['Boolean'];
@@ -702,7 +710,7 @@ export type Mutation = {
   submitProposal: ProposalResponseWrap;
   submitProposalsReview: SuccessResponseWrap;
   submitShipment: ShipmentResponseWrap;
-  submitTechnicalReview: TechnicalReviewResponseWrap;
+  submitTechnicalReviews: SuccessResponseWrap;
   token: TokenResponseWrap;
   updateAnswer: UpdateAnswerResponseWrap;
   updateApiAccessToken: ApiAccessTokenResponseWrap;
@@ -900,6 +908,7 @@ export type MutationCreateGenericTemplateArgs = {
 
 
 export type MutationCreateInstitutionArgs = {
+  country: Scalars['Int'];
   name: Scalars['String'];
   verified: Scalars['Boolean'];
 };
@@ -1001,7 +1010,7 @@ export type MutationCreateUnitArgs = {
 
 
 export type MutationCreateUserArgs = {
-  birthdate: Scalars['String'];
+  birthdate: Scalars['DateTime'];
   department: Scalars['String'];
   email: Scalars['String'];
   firstname: Scalars['String'];
@@ -1346,8 +1355,8 @@ export type MutationSubmitShipmentArgs = {
 };
 
 
-export type MutationSubmitTechnicalReviewArgs = {
-  submitTechnicalReviewInput: SubmitTechnicalReviewInput;
+export type MutationSubmitTechnicalReviewsArgs = {
+  submitTechnicalReviewsInput: SubmitTechnicalReviewsInput;
 };
 
 
@@ -1392,6 +1401,7 @@ export type MutationUpdateGenericTemplateArgs = {
 
 
 export type MutationUpdateInstitutionArgs = {
+  country: Scalars['Int'];
   id: Scalars['Int'];
   name?: InputMaybe<Scalars['String']>;
   verified?: InputMaybe<Scalars['Boolean']>;
@@ -1531,7 +1541,7 @@ export type MutationUpdateTopicArgs = {
 
 
 export type MutationUpdateUserArgs = {
-  birthdate?: InputMaybe<Scalars['String']>;
+  birthdate?: InputMaybe<Scalars['DateTime']>;
   department?: InputMaybe<Scalars['String']>;
   email?: InputMaybe<Scalars['String']>;
   firstname?: InputMaybe<Scalars['String']>;
@@ -1631,8 +1641,10 @@ export type Page = {
 export enum PageName {
   COOKIEPAGE = 'COOKIEPAGE',
   FOOTERCONTENT = 'FOOTERCONTENT',
+  GRADEGUIDEPAGE = 'GRADEGUIDEPAGE',
   HELPPAGE = 'HELPPAGE',
   HOMEPAGE = 'HOMEPAGE',
+  LOGINHELPPAGE = 'LOGINHELPPAGE',
   PRIVACYPAGE = 'PRIVACYPAGE',
   REVIEWPAGE = 'REVIEWPAGE'
 }
@@ -1714,8 +1726,8 @@ export type ProposalBookingFilter = {
 
 export type ProposalBookingScheduledEventFilterCore = {
   bookingType?: InputMaybe<ScheduledEventBookingType>;
-  endsAfter?: InputMaybe<Scalars['TzLessDateTime']>;
-  endsBefore?: InputMaybe<Scalars['TzLessDateTime']>;
+  endsAfter?: InputMaybe<Scalars['DateTime']>;
+  endsBefore?: InputMaybe<Scalars['DateTime']>;
   status?: InputMaybe<Array<ProposalBookingStatusCore>>;
 };
 
@@ -1875,6 +1887,8 @@ export type ProposalsFilter = {
   proposalStatusId?: InputMaybe<Scalars['Int']>;
   questionFilter?: InputMaybe<QuestionFilterInput>;
   questionaryIds?: InputMaybe<Array<Scalars['Int']>>;
+  referenceNumbers?: InputMaybe<Array<Scalars['String']>>;
+  reviewer?: InputMaybe<ReviewerFilter>;
   shortCodes?: InputMaybe<Array<Scalars['String']>>;
   text?: InputMaybe<Scalars['String']>;
 };
@@ -1887,6 +1901,11 @@ export type ProposalsQueryResult = {
 export type ProposalsResponseWrap = {
   proposals: Maybe<Array<Proposal>>;
   rejection: Maybe<Rejection>;
+};
+
+export type ProposalsViewQueryResult = {
+  proposalViews: Array<ProposalView>;
+  totalCount: Scalars['Int'];
 };
 
 export type ProposalsViewResult = {
@@ -1951,7 +1970,7 @@ export type Query = {
   proposalWorkflow: Maybe<ProposalWorkflow>;
   proposalWorkflows: Maybe<Array<ProposalWorkflow>>;
   proposals: Maybe<ProposalsQueryResult>;
-  proposalsView: Maybe<Array<ProposalView>>;
+  proposalsView: Maybe<ProposalsViewQueryResult>;
   quantities: Array<Quantity>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
   questionary: Maybe<Questionary>;
@@ -1963,7 +1982,7 @@ export type Query = {
   samples: Maybe<Array<Sample>>;
   samplesByCallId: Maybe<Array<Sample>>;
   scheduledEventCore: Maybe<ScheduledEventCore>;
-  scheduledEventsCore: Maybe<Array<ScheduledEventCore>>;
+  scheduledEventsCore: Array<ScheduledEventCore>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepReviewer>>;
   sepProposal: Maybe<SepProposal>;
@@ -2185,6 +2204,11 @@ export type QueryProposalsArgs = {
 
 export type QueryProposalsViewArgs = {
   filter?: InputMaybe<ProposalsFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  searchText?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<Scalars['String']>;
+  sortField?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -2200,7 +2224,6 @@ export type QueryQuestionsArgs = {
 
 export type QueryReviewArgs = {
   reviewId: Scalars['Int'];
-  sepId?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -2231,8 +2254,9 @@ export type QueryScheduledEventCoreArgs = {
 
 
 export type QueryScheduledEventsCoreArgs = {
-  endsAfter?: InputMaybe<Scalars['TzLessDateTime']>;
-  endsBefore?: InputMaybe<Scalars['TzLessDateTime']>;
+  filter?: InputMaybe<ScheduledEventsCoreFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -2253,7 +2277,7 @@ export type QuerySepProposalArgs = {
 
 
 export type QuerySepProposalsArgs = {
-  callId: Scalars['Int'];
+  callId?: InputMaybe<Scalars['Int']>;
   sepId: Scalars['Int'];
 };
 
@@ -2480,7 +2504,7 @@ export type ReviewWithNextStatusResponseWrap = {
 
 export enum ReviewerFilter {
   ALL = 'ALL',
-  YOU = 'YOU'
+  ME = 'ME'
 }
 
 export type RichTextInputConfig = {
@@ -2641,18 +2665,29 @@ export enum ScheduledEventBookingType {
 
 export type ScheduledEventCore = {
   bookingType: ScheduledEventBookingType;
-  endsAt: Scalars['TzLessDateTime'];
+  endsAt: Scalars['DateTime'];
   esi: Maybe<ExperimentSafetyInput>;
   feedback: Maybe<Feedback>;
   feedbackRequests: Array<FeedbackRequest>;
   id: Scalars['Int'];
   localContact: Maybe<BasicUserDetails>;
   localContactId: Maybe<Scalars['Int']>;
+  proposal: Proposal;
   proposalPk: Maybe<Scalars['Int']>;
   shipments: Array<Shipment>;
-  startsAt: Scalars['TzLessDateTime'];
+  startsAt: Scalars['DateTime'];
   status: ProposalBookingStatusCore;
   visit: Maybe<Visit>;
+};
+
+export type ScheduledEventsCoreFilter = {
+  callId?: InputMaybe<Scalars['Int']>;
+  endsAfter?: InputMaybe<Scalars['DateTime']>;
+  endsBefore?: InputMaybe<Scalars['DateTime']>;
+  instrumentId?: InputMaybe<Scalars['Int']>;
+  overlaps?: InputMaybe<TimeSpan>;
+  startsAfter?: InputMaybe<Scalars['DateTime']>;
+  startsBefore?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type SelectionFromOptionsConfig = {
@@ -2686,6 +2721,8 @@ export type Settings = {
 };
 
 export enum SettingsId {
+  DATE_FORMAT = 'DATE_FORMAT',
+  DATE_TIME_FORMAT = 'DATE_TIME_FORMAT',
   EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL',
   FEEDBACK_EXHAUST_DAYS = 'FEEDBACK_EXHAUST_DAYS',
   FEEDBACK_FREQUENCY_DAYS = 'FEEDBACK_FREQUENCY_DAYS',
@@ -2772,12 +2809,17 @@ export type SubmitProposalsReviewInput = {
 
 export type SubmitTechnicalReviewInput = {
   comment?: InputMaybe<Scalars['String']>;
+  files?: InputMaybe<Scalars['String']>;
   proposalPk: Scalars['Int'];
   publicComment?: InputMaybe<Scalars['String']>;
   reviewerId: Scalars['Int'];
   status?: InputMaybe<TechnicalReviewStatus>;
   submitted: Scalars['Boolean'];
   timeAllocation?: InputMaybe<Scalars['Int']>;
+};
+
+export type SubmitTechnicalReviewsInput = {
+  technicalReviews: Array<SubmitTechnicalReviewInput>;
 };
 
 export type SuccessResponseWrap = {
@@ -2787,6 +2829,7 @@ export type SuccessResponseWrap = {
 
 export type TechnicalReview = {
   comment: Maybe<Scalars['String']>;
+  files: Maybe<Scalars['String']>;
   id: Scalars['Int'];
   proposal: Maybe<Proposal>;
   proposalPk: Scalars['Int'];
@@ -2895,6 +2938,11 @@ export type TextInputConfig = {
   tooltip: Scalars['String'];
 };
 
+export type TimeSpan = {
+  from?: InputMaybe<Scalars['DateTime']>;
+  to?: InputMaybe<Scalars['DateTime']>;
+};
+
 export type TokenPayloadUnion = AuthJwtApiTokenPayload | AuthJwtPayload;
 
 export type TokenResponseWrap = {
@@ -2914,6 +2962,12 @@ export type Topic = {
   templateId: Scalars['Int'];
   title: Scalars['String'];
 };
+
+export enum TrainingStatus {
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+  NONE = 'NONE'
+}
 
 export type Unit = {
   id: Scalars['String'];
@@ -3009,7 +3063,7 @@ export type UpdateProposalWorkflowInput = {
 };
 
 export type User = {
-  birthdate: Scalars['String'];
+  birthdate: Scalars['DateTime'];
   created: Scalars['String'];
   department: Scalars['String'];
   email: Scalars['String'];
@@ -3103,6 +3157,7 @@ export type VisitRegistration = {
   registrationQuestionaryId: Maybe<Scalars['Int']>;
   startsAt: Maybe<Scalars['DateTime']>;
   trainingExpiryDate: Maybe<Scalars['DateTime']>;
+  trainingStatus: TrainingStatus;
   user: BasicUserDetails;
   userId: Scalars['Int'];
   visitId: Scalars['Int'];
@@ -3221,11 +3276,11 @@ export type GetSepProposalQueryVariables = Exact<{
 }>;
 
 
-export type GetSepProposalQuery = { sepProposal: { proposalPk: number, sepId: number, sepTimeAllocation: number | null, instrumentSubmitted: boolean, proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, questionary: { questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, reviewer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, instrument: { id: number, name: string, shortCode: string } | null, call: { id: number, shortCode: string, allocationTimeUnit: AllocationTimeUnits } | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null } } | null };
+export type GetSepProposalQuery = { sepProposal: { proposalPk: number, sepId: number, sepTimeAllocation: number | null, instrumentSubmitted: boolean, proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, questionary: { questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, files: string | null, reviewer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, instrument: { id: number, name: string, shortCode: string } | null, call: { id: number, shortCode: string, allocationTimeUnit: AllocationTimeUnits } | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null } } | null };
 
 export type GetSepProposalsQueryVariables = Exact<{
   sepId: Scalars['Int'];
-  callId: Scalars['Int'];
+  callId?: InputMaybe<Scalars['Int']>;
 }>;
 
 
@@ -3322,6 +3377,8 @@ export type AddClientLogMutationVariables = Exact<{
 
 export type AddClientLogMutation = { addClientLog: { isSuccess: boolean | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
+export type CountryFragment = { id: number, value: string };
+
 export type CreateApiAccessTokenMutationVariables = Exact<{
   name: Scalars['String'];
   accessPermissions: Scalars['String'];
@@ -3332,11 +3389,12 @@ export type CreateApiAccessTokenMutation = { createApiAccessToken: { rejection: 
 
 export type CreateInstitutionMutationVariables = Exact<{
   name: Scalars['String'];
+  country: Scalars['Int'];
   verified: Scalars['Boolean'];
 }>;
 
 
-export type CreateInstitutionMutation = { createInstitution: { institution: { id: number, name: string, verified: boolean } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+export type CreateInstitutionMutation = { createInstitution: { institution: { id: number, name: string, verified: boolean, country: { id: number, value: string } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type DeleteApiAccessTokenMutationVariables = Exact<{
   accessTokenId: Scalars['String'];
@@ -3376,6 +3434,13 @@ export type GetInstitutionsQueryVariables = Exact<{
 
 export type GetInstitutionsQuery = { institutions: Array<{ id: number, name: string, verified: boolean }> | null };
 
+export type GetInstitutionsWithCountryQueryVariables = Exact<{
+  filter?: InputMaybe<InstitutionsFilter>;
+}>;
+
+
+export type GetInstitutionsWithCountryQuery = { institutions: Array<{ id: number, name: string, verified: boolean, country: { id: number, value: string } }> | null };
+
 export type GetPageContentQueryVariables = Exact<{
   id: PageName;
 }>;
@@ -3400,7 +3465,7 @@ export type MergeInstitutionsMutationVariables = Exact<{
 }>;
 
 
-export type MergeInstitutionsMutation = { mergeInstitutions: { institution: { id: number, verified: boolean, name: string } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+export type MergeInstitutionsMutation = { mergeInstitutions: { institution: { id: number, verified: boolean, name: string, country: { id: number, value: string } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type PrepareDbMutationVariables = Exact<{
   includeSeeds: Scalars['Boolean'];
@@ -3431,11 +3496,12 @@ export type UpdateApiAccessTokenMutation = { updateApiAccessToken: { rejection: 
 export type UpdateInstitutionMutationVariables = Exact<{
   id: Scalars['Int'];
   name: Scalars['String'];
+  country: Scalars['Int'];
   verified: Scalars['Boolean'];
 }>;
 
 
-export type UpdateInstitutionMutation = { updateInstitution: { institution: { id: number, verified: boolean, name: string } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+export type UpdateInstitutionMutation = { updateInstitution: { institution: { id: number, verified: boolean, name: string, country: { id: number, value: string } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type AssignInstrumentsToCallMutationVariables = Exact<{
   instrumentIds: Array<Scalars['Int']> | Scalars['Int'];
@@ -3768,7 +3834,7 @@ export type CloneProposalsMutationVariables = Exact<{
 }>;
 
 
-export type CloneProposalsMutation = { cloneProposals: { proposals: Array<{ primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, instrument: { id: number, name: string, shortCode: string } | null, call: { id: number, shortCode: string, isActive: boolean, referenceNumberFormat: string | null } | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null }> | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+export type CloneProposalsMutation = { cloneProposals: { proposals: Array<{ primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, files: string | null } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, instrument: { id: number, name: string, shortCode: string } | null, call: { id: number, shortCode: string, isActive: boolean, referenceNumberFormat: string | null } | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null }> | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type CreateProposalMutationVariables = Exact<{
   callId: Scalars['Int'];
@@ -3784,7 +3850,7 @@ export type DeleteProposalMutationVariables = Exact<{
 
 export type DeleteProposalMutation = { deleteProposal: { rejection: { reason: string, context: string | null, exception: string | null } | null, proposal: { primaryKey: number } | null } };
 
-export type CoreTechnicalReviewFragment = { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean };
+export type CoreTechnicalReviewFragment = { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, files: string | null };
 
 export type ProposalFragment = { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null };
 
@@ -3795,7 +3861,7 @@ export type GetInstrumentScientistProposalsQueryVariables = Exact<{
 }>;
 
 
-export type GetInstrumentScientistProposalsQuery = { instrumentScientistProposals: { totalCount: number, proposals: Array<{ primaryKey: number, proposalId: string, title: string, submitted: boolean, finalStatus: ProposalEndStatus | null, technicalReviewAssignee: number | null, technicalStatus: TechnicalReviewStatus | null, statusName: string, technicalReviewSubmitted: number | null, instrumentId: number | null, instrumentName: string | null, allocationTimeUnit: AllocationTimeUnits, callShortCode: string | null, sepCode: string | null }> } | null };
+export type GetInstrumentScientistProposalsQuery = { instrumentScientistProposals: { totalCount: number, proposals: Array<{ primaryKey: number, proposalId: string, title: string, submitted: boolean, finalStatus: ProposalEndStatus | null, technicalReviewAssignee: number | null, technicalStatus: TechnicalReviewStatus | null, technicalTimeAllocation: number | null, statusName: string, technicalReviewSubmitted: number | null, instrumentId: number | null, instrumentName: string | null, allocationTimeUnit: AllocationTimeUnits, callShortCode: string | null, sepCode: string | null }> } | null };
 
 export type GetMyProposalsQueryVariables = Exact<{
   filter?: InputMaybe<UserProposalsFilter>;
@@ -3809,21 +3875,26 @@ export type GetProposalQueryVariables = Exact<{
 }>;
 
 
-export type GetProposalQuery = { proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, reviewer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, instrument: { id: number, name: string, shortCode: string } | null, call: { id: number, shortCode: string, isActive: boolean, allocationTimeUnit: AllocationTimeUnits, referenceNumberFormat: string | null } | null, sep: { id: number, code: string } | null, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string, questionary: { isCompleted: boolean } }> | null, genericTemplates: Array<{ id: number, title: string, creatorId: number, questionaryId: number, created: any, proposalPk: number, questionId: string, questionary: { isCompleted: boolean } }> | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null } | null };
+export type GetProposalQuery = { proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, files: string | null, reviewer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, instrument: { id: number, name: string, shortCode: string, beamlineManager: { id: number, firstname: string, lastname: string }, scientists: Array<{ id: number, firstname: string, lastname: string }> } | null, call: { id: number, shortCode: string, isActive: boolean, allocationTimeUnit: AllocationTimeUnits, referenceNumberFormat: string | null } | null, sep: { id: number, code: string } | null, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string, questionary: { isCompleted: boolean } }> | null, genericTemplates: Array<{ id: number, title: string, creatorId: number, questionaryId: number, created: any, proposalPk: number, questionId: string, questionary: { isCompleted: boolean } }> | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null } | null };
 
 export type GetProposalsQueryVariables = Exact<{
   filter?: InputMaybe<ProposalsFilter>;
 }>;
 
 
-export type GetProposalsQuery = { proposals: { totalCount: number, proposals: Array<{ primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, reviewer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, instrument: { id: number, name: string } | null, call: { id: number, shortCode: string } | null, sep: { id: number, code: string } | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null }> } | null };
+export type GetProposalsQuery = { proposals: { totalCount: number, proposals: Array<{ primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, reviews: Array<{ id: number, grade: number | null, comment: string | null, status: ReviewStatus, userID: number, sepID: number, reviewer: { firstname: string, lastname: string, id: number } | null }> | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, technicalReview: { id: number, comment: string | null, publicComment: string | null, timeAllocation: number | null, status: TechnicalReviewStatus | null, proposalPk: number, submitted: boolean, files: string | null, reviewer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, instrument: { id: number, name: string } | null, call: { id: number, shortCode: string } | null, sep: { id: number, code: string } | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null }> } | null };
 
 export type GetProposalsCoreQueryVariables = Exact<{
   filter?: InputMaybe<ProposalsFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  sortField?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<Scalars['String']>;
+  searchText?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type GetProposalsCoreQuery = { proposalsView: Array<{ primaryKey: number, title: string, statusId: number, statusName: string, statusDescription: string, proposalId: string, rankOrder: number | null, finalStatus: ProposalEndStatus | null, notified: boolean, managementTimeAllocation: number | null, technicalTimeAllocation: number | null, technicalStatus: TechnicalReviewStatus | null, instrumentName: string | null, callShortCode: string | null, sepCode: string | null, sepId: number | null, reviewAverage: number | null, reviewDeviation: number | null, instrumentId: number | null, callId: number, submitted: boolean, allocationTimeUnit: AllocationTimeUnits }> | null };
+export type GetProposalsCoreQuery = { proposalsView: { totalCount: number, proposalViews: Array<{ primaryKey: number, title: string, statusId: number, statusName: string, statusDescription: string, proposalId: string, rankOrder: number | null, finalStatus: ProposalEndStatus | null, notified: boolean, managementTimeAllocation: number | null, technicalTimeAllocation: number | null, technicalStatus: TechnicalReviewStatus | null, instrumentName: string | null, callShortCode: string | null, sepCode: string | null, sepId: number | null, reviewAverage: number | null, reviewDeviation: number | null, instrumentId: number | null, callId: number, submitted: boolean, allocationTimeUnit: AllocationTimeUnits }> } | null };
 
 export type NotifyProposalMutationVariables = Exact<{
   proposalPk: Scalars['Int'];
@@ -3851,13 +3922,13 @@ export type UpdateProposalMutationVariables = Exact<{
 export type UpdateProposalMutation = { updateProposal: { proposal: { primaryKey: number, title: string, abstract: string, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }> } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type GetUserProposalBookingsWithEventsQueryVariables = Exact<{
-  endsAfter?: InputMaybe<Scalars['TzLessDateTime']>;
+  endsAfter?: InputMaybe<Scalars['DateTime']>;
   status?: InputMaybe<Array<ProposalBookingStatusCore> | ProposalBookingStatusCore>;
   instrumentId?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type GetUserProposalBookingsWithEventsQuery = { me: { proposals: Array<{ primaryKey: number, title: string, proposalId: string, finalStatus: ProposalEndStatus | null, managementDecisionSubmitted: boolean, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, proposalBookingCore: { scheduledEvents: Array<{ id: number, startsAt: string, endsAt: string, bookingType: ScheduledEventBookingType, status: ProposalBookingStatusCore, visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null, startsAt: any | null, endsAt: any | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } }> } | null, esi: { id: number, creatorId: number, questionaryId: number, isSubmitted: boolean, created: any } | null, feedback: { id: number, scheduledEventId: number, status: FeedbackStatus, questionaryId: number, creatorId: number } | null, shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, proposal: { proposalId: string } }>, localContact: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null }> } | null, visits: Array<{ id: number, proposalPk: number, status: VisitStatus, creatorId: number }> | null, instrument: { id: number, name: string } | null }> } | null };
+export type GetUserProposalBookingsWithEventsQuery = { me: { proposals: Array<{ primaryKey: number, title: string, proposalId: string, finalStatus: ProposalEndStatus | null, managementDecisionSubmitted: boolean, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }>, proposalBookingCore: { scheduledEvents: Array<{ id: number, startsAt: any, endsAt: any, bookingType: ScheduledEventBookingType, status: ProposalBookingStatusCore, visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null, startsAt: any | null, endsAt: any | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } }> } | null, esi: { id: number, creatorId: number, questionaryId: number, isSubmitted: boolean, created: any } | null, feedback: { id: number, scheduledEventId: number, status: FeedbackStatus, questionaryId: number, creatorId: number } | null, shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, proposal: { proposalId: string } }>, localContact: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null }> } | null, visits: Array<{ id: number, proposalPk: number, status: VisitStatus, creatorId: number }> | null, instrument: { id: number, name: string } | null }> } | null };
 
 export type AnswerTopicMutationVariables = Exact<{
   questionaryId: Scalars['Int'];
@@ -3918,6 +3989,7 @@ export type AddTechnicalReviewMutationVariables = Exact<{
   status?: InputMaybe<TechnicalReviewStatus>;
   submitted: Scalars['Boolean'];
   reviewerId: Scalars['Int'];
+  files?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -3951,7 +4023,6 @@ export type GetProposalReviewsQuery = { proposalReviews: Array<{ id: number, use
 
 export type GetReviewQueryVariables = Exact<{
   reviewId: Scalars['Int'];
-  sepId?: InputMaybe<Scalars['Int']>;
 }>;
 
 
@@ -3972,18 +4043,12 @@ export type SubmitProposalsReviewMutationVariables = Exact<{
 
 export type SubmitProposalsReviewMutation = { submitProposalsReview: { isSuccess: boolean | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
-export type SubmitTechnicalReviewMutationVariables = Exact<{
-  proposalPk: Scalars['Int'];
-  timeAllocation?: InputMaybe<Scalars['Int']>;
-  comment?: InputMaybe<Scalars['String']>;
-  publicComment?: InputMaybe<Scalars['String']>;
-  status?: InputMaybe<TechnicalReviewStatus>;
-  submitted: Scalars['Boolean'];
-  reviewerId: Scalars['Int'];
+export type SubmitTechnicalReviewsMutationVariables = Exact<{
+  technicalReviews: Array<SubmitTechnicalReviewInput> | SubmitTechnicalReviewInput;
 }>;
 
 
-export type SubmitTechnicalReviewMutation = { submitTechnicalReview: { rejection: { reason: string, context: string | null, exception: string | null } | null, technicalReview: { id: number } | null } };
+export type SubmitTechnicalReviewsMutation = { submitTechnicalReviews: { isSuccess: boolean | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type UpdateReviewMutationVariables = Exact<{
   reviewID: Scalars['Int'];
@@ -4117,14 +4182,23 @@ export type UpdateSampleMutationVariables = Exact<{
 
 export type UpdateSampleMutation = { updateSample: { sample: { id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
-export type ScheduledEventCoreFragment = { id: number, proposalPk: number | null, bookingType: ScheduledEventBookingType, startsAt: string, endsAt: string, status: ProposalBookingStatusCore, localContactId: number | null };
+export type ScheduledEventCoreFragment = { id: number, proposalPk: number | null, bookingType: ScheduledEventBookingType, startsAt: any, endsAt: any, status: ProposalBookingStatusCore, localContactId: number | null };
 
 export type GetScheduledEventCoreQueryVariables = Exact<{
   scheduledEventId: Scalars['Int'];
 }>;
 
 
-export type GetScheduledEventCoreQuery = { scheduledEventCore: { id: number, proposalPk: number | null, bookingType: ScheduledEventBookingType, startsAt: string, endsAt: string, status: ProposalBookingStatusCore, localContactId: number | null } | null };
+export type GetScheduledEventCoreQuery = { scheduledEventCore: { id: number, proposalPk: number | null, bookingType: ScheduledEventBookingType, startsAt: any, endsAt: any, status: ProposalBookingStatusCore, localContactId: number | null } | null };
+
+export type GetScheduledEventsCoreQueryVariables = Exact<{
+  filter?: InputMaybe<ScheduledEventsCoreFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type GetScheduledEventsCoreQuery = { scheduledEventsCore: Array<{ id: number, proposalPk: number | null, bookingType: ScheduledEventBookingType, startsAt: any, endsAt: any, status: ProposalBookingStatusCore, localContactId: number | null, proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, instrument: { id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }> } | null, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null } | null }, esi: { id: number, creatorId: number, questionaryId: number, isSubmitted: boolean, created: any } | null, visit: { registrations: Array<{ startsAt: any | null, endsAt: any | null, trainingStatus: TrainingStatus, userId: number, visitId: number, registrationQuestionaryId: number | null, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } }>, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } } | null }> };
 
 export type AddProposalWorkflowStatusMutationVariables = Exact<{
   proposalWorkflowId: Scalars['Int'];
@@ -4618,7 +4692,7 @@ export type CreateUserMutationVariables = Exact<{
   refreshToken: Scalars['String'];
   gender: Scalars['String'];
   nationality: Scalars['Int'];
-  birthdate: Scalars['String'];
+  birthdate: Scalars['DateTime'];
   organisation: Scalars['Int'];
   department: Scalars['String'];
   position: Scalars['String'];
@@ -4675,7 +4749,7 @@ export type GetBasicUserDetailsByEmailQuery = { basicUserDetailsByEmail: { id: n
 export type GetFieldsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFieldsQuery = { getFields: { nationalities: Array<{ id: number, value: string }> } | null };
+export type GetFieldsQuery = { getFields: { nationalities: Array<{ id: number, value: string }>, countries: Array<{ id: number, value: string }> } | null };
 
 export type GetMyRolesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4725,12 +4799,12 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { user: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: string, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, orcid: string, emailVerified: boolean, placeholder: boolean } | null };
+export type GetUserQuery = { user: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: any, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, orcid: string, emailVerified: boolean, placeholder: boolean } | null };
 
 export type GetUserMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserMeQuery = { me: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: string, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, orcid: string, emailVerified: boolean, placeholder: boolean } | null };
+export type GetUserMeQuery = { me: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: any, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, orcid: string, emailVerified: boolean, placeholder: boolean } | null };
 
 export type GetUserProposalsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4824,7 +4898,7 @@ export type UpdateUserMutationVariables = Exact<{
   preferredname?: InputMaybe<Scalars['String']>;
   gender: Scalars['String'];
   nationality: Scalars['Int'];
-  birthdate: Scalars['String'];
+  birthdate: Scalars['DateTime'];
   organisation: Scalars['Int'];
   department: Scalars['String'];
   position: Scalars['String'];
@@ -4921,6 +4995,12 @@ export type UpdateVisitRegistrationMutationVariables = Exact<{
 
 export type UpdateVisitRegistrationMutation = { updateVisitRegistration: { registration: { userId: number, visitId: number, registrationQuestionaryId: number | null, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null, startsAt: any | null, endsAt: any | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
+export const CountryFragmentDoc = gql`
+    fragment country on Entry {
+  id
+  value
+}
+    `;
 export const RejectionFragmentDoc = gql`
     fragment rejection on Rejection {
   reason
@@ -5038,6 +5118,7 @@ export const CoreTechnicalReviewFragmentDoc = gql`
   status
   proposalPk
   submitted
+  files
 }
     `;
 export const ProposalStatusFragmentDoc = gql`
@@ -5667,7 +5748,7 @@ ${BasicUserDetailsFragmentDoc}
 ${QuestionaryFragmentDoc}
 ${CoreTechnicalReviewFragmentDoc}`;
 export const GetSepProposalsDocument = gql`
-    query getSEPProposals($sepId: Int!, $callId: Int!) {
+    query getSEPProposals($sepId: Int!, $callId: Int) {
   sepProposals(sepId: $sepId, callId: $callId) {
     proposalPk
     dateAssigned
@@ -5904,11 +5985,14 @@ export const CreateApiAccessTokenDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const CreateInstitutionDocument = gql`
-    mutation createInstitution($name: String!, $verified: Boolean!) {
-  createInstitution(name: $name, verified: $verified) {
+    mutation createInstitution($name: String!, $country: Int!, $verified: Boolean!) {
+  createInstitution(name: $name, country: $country, verified: $verified) {
     institution {
       id
       name
+      country {
+        ...country
+      }
       verified
     }
     rejection {
@@ -5916,7 +6000,8 @@ export const CreateInstitutionDocument = gql`
     }
   }
 }
-    ${RejectionFragmentDoc}`;
+    ${CountryFragmentDoc}
+${RejectionFragmentDoc}`;
 export const DeleteApiAccessTokenDocument = gql`
     mutation deleteApiAccessToken($accessTokenId: String!) {
   deleteApiAccessToken(deleteApiAccessTokenInput: {accessTokenId: $accessTokenId}) {
@@ -5976,6 +6061,18 @@ export const GetInstitutionsDocument = gql`
   }
 }
     `;
+export const GetInstitutionsWithCountryDocument = gql`
+    query getInstitutionsWithCountry($filter: InstitutionsFilter) {
+  institutions(filter: $filter) {
+    id
+    name
+    verified
+    country {
+      ...country
+    }
+  }
+}
+    ${CountryFragmentDoc}`;
 export const GetPageContentDocument = gql`
     query getPageContent($id: PageName!) {
   getPageContent(id: $id)
@@ -6008,13 +6105,17 @@ export const MergeInstitutionsDocument = gql`
       id
       verified
       name
+      country {
+        ...country
+      }
     }
     rejection {
       ...rejection
     }
   }
 }
-    ${RejectionFragmentDoc}`;
+    ${CountryFragmentDoc}
+${RejectionFragmentDoc}`;
 export const PrepareDbDocument = gql`
     mutation prepareDB($includeSeeds: Boolean!) {
   prepareDB(includeSeeds: $includeSeeds) {
@@ -6056,19 +6157,23 @@ export const UpdateApiAccessTokenDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateInstitutionDocument = gql`
-    mutation updateInstitution($id: Int!, $name: String!, $verified: Boolean!) {
-  updateInstitution(id: $id, name: $name, verified: $verified) {
+    mutation updateInstitution($id: Int!, $name: String!, $country: Int!, $verified: Boolean!) {
+  updateInstitution(id: $id, name: $name, country: $country, verified: $verified) {
     institution {
       id
       verified
       name
+      country {
+        ...country
+      }
     }
     rejection {
       ...rejection
     }
   }
 }
-    ${RejectionFragmentDoc}`;
+    ${CountryFragmentDoc}
+${RejectionFragmentDoc}`;
 export const AssignInstrumentsToCallDocument = gql`
     mutation assignInstrumentsToCall($instrumentIds: [Int!]!, $callId: Int!) {
   assignInstrumentsToCall(
@@ -6720,6 +6825,7 @@ export const GetInstrumentScientistProposalsDocument = gql`
       finalStatus
       technicalReviewAssignee
       technicalStatus
+      technicalTimeAllocation
       statusName
       technicalReviewSubmitted
       instrumentId
@@ -6779,6 +6885,16 @@ export const GetProposalDocument = gql`
       id
       name
       shortCode
+      beamlineManager {
+        id
+        firstname
+        lastname
+      }
+      scientists {
+        id
+        firstname
+        lastname
+      }
     }
     call {
       id
@@ -6861,30 +6977,40 @@ export const GetProposalsDocument = gql`
 ${BasicUserDetailsFragmentDoc}
 ${CoreTechnicalReviewFragmentDoc}`;
 export const GetProposalsCoreDocument = gql`
-    query getProposalsCore($filter: ProposalsFilter) {
-  proposalsView(filter: $filter) {
-    primaryKey
-    title
-    statusId
-    statusName
-    statusDescription
-    proposalId
-    rankOrder
-    finalStatus
-    notified
-    managementTimeAllocation
-    technicalTimeAllocation
-    technicalStatus
-    instrumentName
-    callShortCode
-    sepCode
-    sepId
-    reviewAverage
-    reviewDeviation
-    instrumentId
-    callId
-    submitted
-    allocationTimeUnit
+    query getProposalsCore($filter: ProposalsFilter, $first: Int, $offset: Int, $sortField: String, $sortDirection: String, $searchText: String) {
+  proposalsView(
+    filter: $filter
+    first: $first
+    offset: $offset
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
+  ) {
+    proposalViews {
+      primaryKey
+      title
+      statusId
+      statusName
+      statusDescription
+      proposalId
+      rankOrder
+      finalStatus
+      notified
+      managementTimeAllocation
+      technicalTimeAllocation
+      technicalStatus
+      instrumentName
+      callShortCode
+      sepCode
+      sepId
+      reviewAverage
+      reviewDeviation
+      instrumentId
+      callId
+      submitted
+      allocationTimeUnit
+    }
+    totalCount
   }
 }
     `;
@@ -6941,7 +7067,7 @@ export const UpdateProposalDocument = gql`
     ${BasicUserDetailsFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const GetUserProposalBookingsWithEventsDocument = gql`
-    query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatusCore!], $instrumentId: Int) {
+    query getUserProposalBookingsWithEvents($endsAfter: DateTime, $status: [ProposalBookingStatusCore!], $instrumentId: Int) {
   me {
     proposals(filter: {instrumentId: $instrumentId}) {
       primaryKey
@@ -7070,9 +7196,9 @@ export const GetQuestionaryDocument = gql`
 }
     ${QuestionaryFragmentDoc}`;
 export const AddTechnicalReviewDocument = gql`
-    mutation addTechnicalReview($proposalPk: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!, $reviewerId: Int!) {
+    mutation addTechnicalReview($proposalPk: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!, $reviewerId: Int!, $files: String) {
   addTechnicalReview(
-    addTechnicalReviewInput: {proposalPk: $proposalPk, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted, reviewerId: $reviewerId}
+    addTechnicalReviewInput: {proposalPk: $proposalPk, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted, reviewerId: $reviewerId, files: $files}
   ) {
     rejection {
       ...rejection
@@ -7121,8 +7247,8 @@ export const GetProposalReviewsDocument = gql`
 }
     `;
 export const GetReviewDocument = gql`
-    query getReview($reviewId: Int!, $sepId: Int) {
-  review(reviewId: $reviewId, sepId: $sepId) {
+    query getReview($reviewId: Int!) {
+  review(reviewId: $reviewId) {
     ...coreReview
     proposal {
       primaryKey
@@ -7158,17 +7284,15 @@ export const SubmitProposalsReviewDocument = gql`
   }
 }
     ${RejectionFragmentDoc}`;
-export const SubmitTechnicalReviewDocument = gql`
-    mutation submitTechnicalReview($proposalPk: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!, $reviewerId: Int!) {
-  submitTechnicalReview(
-    submitTechnicalReviewInput: {proposalPk: $proposalPk, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted, reviewerId: $reviewerId}
+export const SubmitTechnicalReviewsDocument = gql`
+    mutation submitTechnicalReviews($technicalReviews: [SubmitTechnicalReviewInput!]!) {
+  submitTechnicalReviews(
+    submitTechnicalReviewsInput: {technicalReviews: $technicalReviews}
   ) {
     rejection {
       ...rejection
     }
-    technicalReview {
-      id
-    }
+    isSuccess
   }
 }
     ${RejectionFragmentDoc}`;
@@ -7460,6 +7584,44 @@ export const GetScheduledEventCoreDocument = gql`
   }
 }
     ${ScheduledEventCoreFragmentDoc}`;
+export const GetScheduledEventsCoreDocument = gql`
+    query getScheduledEventsCore($filter: ScheduledEventsCoreFilter, $first: Int, $offset: Int) {
+  scheduledEventsCore(filter: $filter, first: $first, offset: $offset) {
+    ...scheduledEventCore
+    proposal {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      instrument {
+        ...instrument
+      }
+    }
+    esi {
+      ...esi
+    }
+    visit {
+      registrations {
+        ...visitRegistration
+        startsAt
+        endsAt
+        trainingStatus
+        user {
+          ...basicUserDetails
+        }
+      }
+      teamLead {
+        ...basicUserDetails
+      }
+    }
+  }
+}
+    ${ScheduledEventCoreFragmentDoc}
+${ProposalFragmentDoc}
+${BasicUserDetailsFragmentDoc}
+${InstrumentFragmentDoc}
+${EsiFragmentDoc}
+${VisitRegistrationFragmentDoc}`;
 export const AddProposalWorkflowStatusDocument = gql`
     mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int) {
   addProposalWorkflowStatus(
@@ -8252,7 +8414,7 @@ export const CheckTokenDocument = gql`
 }
     `;
 export const CreateUserDocument = gql`
-    mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
+    mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: DateTime!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
   createUser(
     user_title: $user_title
     firstname: $firstname
@@ -8338,6 +8500,10 @@ export const GetFieldsDocument = gql`
     query getFields {
   getFields {
     nationalities {
+      id
+      value
+    }
+    countries {
       id
       value
     }
@@ -8598,7 +8764,7 @@ export const UpdatePasswordDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateUserDocument = gql`
-    mutation updateUser($id: Int!, $user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $preferredname: String, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
+    mutation updateUser($id: Int!, $user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $preferredname: String, $gender: String!, $nationality: Int!, $birthdate: DateTime!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
   updateUser(
     id: $id
     user_title: $user_title
@@ -8835,633 +9001,639 @@ ${BasicUserDetailsFragmentDoc}
 ${QuestionaryFragmentDoc}
 ${RejectionFragmentDoc}`;
 
-export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
+export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
 
-const defaultWrapper: SdkFunctionWrapper = (action, _operationName) => action();
+const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationType) => action();
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
     assignProposalsToSep(variables: AssignProposalsToSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssignProposalsToSepMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AssignProposalsToSepMutation>(AssignProposalsToSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignProposalsToSep');
+      return withWrapper((wrappedRequestHeaders) => client.request<AssignProposalsToSepMutation>(AssignProposalsToSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignProposalsToSep', 'mutation');
     },
     assignReviewersToSEP(variables: AssignReviewersToSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssignReviewersToSepMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AssignReviewersToSepMutation>(AssignReviewersToSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignReviewersToSEP');
+      return withWrapper((wrappedRequestHeaders) => client.request<AssignReviewersToSepMutation>(AssignReviewersToSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignReviewersToSEP', 'mutation');
     },
     assignChairOrSecretary(variables: AssignChairOrSecretaryMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssignChairOrSecretaryMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AssignChairOrSecretaryMutation>(AssignChairOrSecretaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignChairOrSecretary');
+      return withWrapper((wrappedRequestHeaders) => client.request<AssignChairOrSecretaryMutation>(AssignChairOrSecretaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignChairOrSecretary', 'mutation');
     },
     assignSepReviewersToProposal(variables: AssignSepReviewersToProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssignSepReviewersToProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AssignSepReviewersToProposalMutation>(AssignSepReviewersToProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignSepReviewersToProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<AssignSepReviewersToProposalMutation>(AssignSepReviewersToProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignSepReviewersToProposal', 'mutation');
     },
     createSEP(variables: CreateSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateSepMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateSepMutation>(CreateSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createSEP');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateSepMutation>(CreateSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createSEP', 'mutation');
     },
     deleteSEP(variables: DeleteSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteSepMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteSepMutation>(DeleteSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteSEP');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteSepMutation>(DeleteSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteSEP', 'mutation');
     },
     getInstrumentsBySEP(variables: GetInstrumentsBySepQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstrumentsBySepQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetInstrumentsBySepQuery>(GetInstrumentsBySepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstrumentsBySEP');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetInstrumentsBySepQuery>(GetInstrumentsBySepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstrumentsBySEP', 'query');
     },
     getUserSeps(variables?: GetUserSepsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserSepsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserSepsQuery>(GetUserSepsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserSeps');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserSepsQuery>(GetUserSepsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserSeps', 'query');
     },
     getSEP(variables: GetSepQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSepQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSepQuery>(GetSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEP');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSepQuery>(GetSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEP', 'query');
     },
     getSEPMembers(variables: GetSepMembersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSepMembersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSepMembersQuery>(GetSepMembersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPMembers');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSepMembersQuery>(GetSepMembersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPMembers', 'query');
     },
     getSEPProposal(variables: GetSepProposalQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSepProposalQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSepProposalQuery>(GetSepProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSepProposalQuery>(GetSepProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPProposal', 'query');
     },
     getSEPProposals(variables: GetSepProposalsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSepProposalsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSepProposalsQuery>(GetSepProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPProposals');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSepProposalsQuery>(GetSepProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPProposals', 'query');
     },
     sepProposalsByInstrument(variables: SepProposalsByInstrumentQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SepProposalsByInstrumentQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SepProposalsByInstrumentQuery>(SepProposalsByInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'sepProposalsByInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<SepProposalsByInstrumentQuery>(SepProposalsByInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'sepProposalsByInstrument', 'query');
     },
     getSEPReviewers(variables: GetSepReviewersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSepReviewersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSepReviewersQuery>(GetSepReviewersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPReviewers');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSepReviewersQuery>(GetSepReviewersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPReviewers', 'query');
     },
     getSEPs(variables: GetSePsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSePsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSePsQuery>(GetSePsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPs');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSePsQuery>(GetSePsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPs', 'query');
     },
     removeProposalsFromSep(variables: RemoveProposalsFromSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveProposalsFromSepMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveProposalsFromSepMutation>(RemoveProposalsFromSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeProposalsFromSep');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveProposalsFromSepMutation>(RemoveProposalsFromSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeProposalsFromSep', 'mutation');
     },
     removeMemberFromSep(variables: RemoveMemberFromSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveMemberFromSepMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveMemberFromSepMutation>(RemoveMemberFromSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeMemberFromSep');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveMemberFromSepMutation>(RemoveMemberFromSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeMemberFromSep', 'mutation');
     },
     removeMemberFromSEPProposal(variables: RemoveMemberFromSepProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveMemberFromSepProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveMemberFromSepProposalMutation>(RemoveMemberFromSepProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeMemberFromSEPProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveMemberFromSepProposalMutation>(RemoveMemberFromSepProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeMemberFromSEPProposal', 'mutation');
     },
     reorderSepMeetingDecisionProposals(variables: ReorderSepMeetingDecisionProposalsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ReorderSepMeetingDecisionProposalsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ReorderSepMeetingDecisionProposalsMutation>(ReorderSepMeetingDecisionProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'reorderSepMeetingDecisionProposals');
+      return withWrapper((wrappedRequestHeaders) => client.request<ReorderSepMeetingDecisionProposalsMutation>(ReorderSepMeetingDecisionProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'reorderSepMeetingDecisionProposals', 'mutation');
     },
     saveSepMeetingDecision(variables: SaveSepMeetingDecisionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SaveSepMeetingDecisionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SaveSepMeetingDecisionMutation>(SaveSepMeetingDecisionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'saveSepMeetingDecision');
+      return withWrapper((wrappedRequestHeaders) => client.request<SaveSepMeetingDecisionMutation>(SaveSepMeetingDecisionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'saveSepMeetingDecision', 'mutation');
     },
     updateSEP(variables: UpdateSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateSepMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSepMutation>(UpdateSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSEP');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSepMutation>(UpdateSepDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSEP', 'mutation');
     },
     updateSEPTimeAllocation(variables: UpdateSepTimeAllocationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateSepTimeAllocationMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSepTimeAllocationMutation>(UpdateSepTimeAllocationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSEPTimeAllocation');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSepTimeAllocationMutation>(UpdateSepTimeAllocationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSEPTimeAllocation', 'mutation');
     },
     addClientLog(variables: AddClientLogMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddClientLogMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AddClientLogMutation>(AddClientLogDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addClientLog');
+      return withWrapper((wrappedRequestHeaders) => client.request<AddClientLogMutation>(AddClientLogDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addClientLog', 'mutation');
     },
     createApiAccessToken(variables: CreateApiAccessTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateApiAccessTokenMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateApiAccessTokenMutation>(CreateApiAccessTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createApiAccessToken');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateApiAccessTokenMutation>(CreateApiAccessTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createApiAccessToken', 'mutation');
     },
     createInstitution(variables: CreateInstitutionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateInstitutionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateInstitutionMutation>(CreateInstitutionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createInstitution');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateInstitutionMutation>(CreateInstitutionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createInstitution', 'mutation');
     },
     deleteApiAccessToken(variables: DeleteApiAccessTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteApiAccessTokenMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteApiAccessTokenMutation>(DeleteApiAccessTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteApiAccessToken');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteApiAccessTokenMutation>(DeleteApiAccessTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteApiAccessToken', 'mutation');
     },
     deleteInstitution(variables: DeleteInstitutionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteInstitutionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteInstitutionMutation>(DeleteInstitutionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteInstitution');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteInstitutionMutation>(DeleteInstitutionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteInstitution', 'mutation');
     },
     getAllApiAccessTokensAndPermissions(variables?: GetAllApiAccessTokensAndPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAllApiAccessTokensAndPermissionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAllApiAccessTokensAndPermissionsQuery>(GetAllApiAccessTokensAndPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAllApiAccessTokensAndPermissions');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAllApiAccessTokensAndPermissionsQuery>(GetAllApiAccessTokensAndPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAllApiAccessTokensAndPermissions', 'query');
     },
     getAllQueriesAndMutations(variables?: GetAllQueriesAndMutationsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAllQueriesAndMutationsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAllQueriesAndMutationsQuery>(GetAllQueriesAndMutationsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAllQueriesAndMutations');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAllQueriesAndMutationsQuery>(GetAllQueriesAndMutationsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAllQueriesAndMutations', 'query');
     },
     getFeatures(variables?: GetFeaturesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetFeaturesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetFeaturesQuery>(GetFeaturesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFeatures');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetFeaturesQuery>(GetFeaturesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFeatures', 'query');
     },
     getInstitutions(variables?: GetInstitutionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstitutionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetInstitutionsQuery>(GetInstitutionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstitutions');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetInstitutionsQuery>(GetInstitutionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstitutions', 'query');
+    },
+    getInstitutionsWithCountry(variables?: GetInstitutionsWithCountryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstitutionsWithCountryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetInstitutionsWithCountryQuery>(GetInstitutionsWithCountryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstitutionsWithCountry', 'query');
     },
     getPageContent(variables: GetPageContentQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPageContentQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetPageContentQuery>(GetPageContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPageContent');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetPageContentQuery>(GetPageContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPageContent', 'query');
     },
     getQuantities(variables?: GetQuantitiesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetQuantitiesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetQuantitiesQuery>(GetQuantitiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getQuantities');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetQuantitiesQuery>(GetQuantitiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getQuantities', 'query');
     },
     getSettings(variables?: GetSettingsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSettingsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSettingsQuery>(GetSettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSettings');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSettingsQuery>(GetSettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSettings', 'query');
     },
     mergeInstitutions(variables: MergeInstitutionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MergeInstitutionsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<MergeInstitutionsMutation>(MergeInstitutionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'mergeInstitutions');
+      return withWrapper((wrappedRequestHeaders) => client.request<MergeInstitutionsMutation>(MergeInstitutionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'mergeInstitutions', 'mutation');
     },
     prepareDB(variables: PrepareDbMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<PrepareDbMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PrepareDbMutation>(PrepareDbDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'prepareDB');
+      return withWrapper((wrappedRequestHeaders) => client.request<PrepareDbMutation>(PrepareDbDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'prepareDB', 'mutation');
     },
     setPageContent(variables: SetPageContentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetPageContentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetPageContentMutation>(SetPageContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setPageContent');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetPageContentMutation>(SetPageContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setPageContent', 'mutation');
     },
     updateApiAccessToken(variables: UpdateApiAccessTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateApiAccessTokenMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateApiAccessTokenMutation>(UpdateApiAccessTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateApiAccessToken');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateApiAccessTokenMutation>(UpdateApiAccessTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateApiAccessToken', 'mutation');
     },
     updateInstitution(variables: UpdateInstitutionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateInstitutionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateInstitutionMutation>(UpdateInstitutionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateInstitution');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateInstitutionMutation>(UpdateInstitutionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateInstitution', 'mutation');
     },
     assignInstrumentsToCall(variables: AssignInstrumentsToCallMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssignInstrumentsToCallMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AssignInstrumentsToCallMutation>(AssignInstrumentsToCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignInstrumentsToCall');
+      return withWrapper((wrappedRequestHeaders) => client.request<AssignInstrumentsToCallMutation>(AssignInstrumentsToCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignInstrumentsToCall', 'mutation');
     },
     createCall(variables: CreateCallMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateCallMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateCallMutation>(CreateCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createCall');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateCallMutation>(CreateCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createCall', 'mutation');
     },
     deleteCall(variables: DeleteCallMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteCallMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteCallMutation>(DeleteCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteCall');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteCallMutation>(DeleteCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteCall', 'mutation');
     },
     getCall(variables: GetCallQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetCallQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetCallQuery>(GetCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCall');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetCallQuery>(GetCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCall', 'query');
     },
     getCalls(variables?: GetCallsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetCallsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetCallsQuery>(GetCallsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCalls');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetCallsQuery>(GetCallsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCalls', 'query');
     },
     getCallsByInstrumentScientist(variables: GetCallsByInstrumentScientistQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetCallsByInstrumentScientistQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetCallsByInstrumentScientistQuery>(GetCallsByInstrumentScientistDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCallsByInstrumentScientist');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetCallsByInstrumentScientistQuery>(GetCallsByInstrumentScientistDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCallsByInstrumentScientist', 'query');
     },
     removeAssignedInstrumentFromCall(variables: RemoveAssignedInstrumentFromCallMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveAssignedInstrumentFromCallMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveAssignedInstrumentFromCallMutation>(RemoveAssignedInstrumentFromCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeAssignedInstrumentFromCall');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveAssignedInstrumentFromCallMutation>(RemoveAssignedInstrumentFromCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeAssignedInstrumentFromCall', 'mutation');
     },
     updateCall(variables: UpdateCallMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateCallMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateCallMutation>(UpdateCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateCall');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateCallMutation>(UpdateCallDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateCall', 'mutation');
     },
     createEsi(variables: CreateEsiMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateEsiMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateEsiMutation>(CreateEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateEsiMutation>(CreateEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createEsi', 'mutation');
     },
     getEsi(variables: GetEsiQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEsiQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetEsiQuery>(GetEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetEsiQuery>(GetEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEsi', 'query');
     },
     updateEsi(variables: UpdateEsiMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateEsiMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateEsiMutation>(UpdateEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateEsiMutation>(UpdateEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateEsi', 'mutation');
     },
     getEventLogs(variables: GetEventLogsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEventLogsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetEventLogsQuery>(GetEventLogsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEventLogs');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetEventLogsQuery>(GetEventLogsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEventLogs', 'query');
     },
     createFeedback(variables: CreateFeedbackMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateFeedbackMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateFeedbackMutation>(CreateFeedbackDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createFeedback');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateFeedbackMutation>(CreateFeedbackDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createFeedback', 'mutation');
     },
     getFeedback(variables: GetFeedbackQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetFeedbackQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetFeedbackQuery>(GetFeedbackDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFeedback');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetFeedbackQuery>(GetFeedbackDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFeedback', 'query');
     },
     updateFeedback(variables: UpdateFeedbackMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateFeedbackMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateFeedbackMutation>(UpdateFeedbackDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateFeedback');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateFeedbackMutation>(UpdateFeedbackDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateFeedback', 'mutation');
     },
     cloneGenericTemplate(variables: CloneGenericTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CloneGenericTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CloneGenericTemplateMutation>(CloneGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneGenericTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<CloneGenericTemplateMutation>(CloneGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneGenericTemplate', 'mutation');
     },
     createGenericTemplate(variables: CreateGenericTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateGenericTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateGenericTemplateMutation>(CreateGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createGenericTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateGenericTemplateMutation>(CreateGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createGenericTemplate', 'mutation');
     },
     deleteGenericTemplate(variables: DeleteGenericTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteGenericTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteGenericTemplateMutation>(DeleteGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteGenericTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteGenericTemplateMutation>(DeleteGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteGenericTemplate', 'mutation');
     },
     getGenericTemplate(variables: GetGenericTemplateQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetGenericTemplateQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetGenericTemplateQuery>(GetGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getGenericTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetGenericTemplateQuery>(GetGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getGenericTemplate', 'query');
     },
     getGenericTemplatesWithProposalData(variables?: GetGenericTemplatesWithProposalDataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetGenericTemplatesWithProposalDataQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetGenericTemplatesWithProposalDataQuery>(GetGenericTemplatesWithProposalDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getGenericTemplatesWithProposalData');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetGenericTemplatesWithProposalDataQuery>(GetGenericTemplatesWithProposalDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getGenericTemplatesWithProposalData', 'query');
     },
     getGenericTemplatesWithQuestionaryStatus(variables?: GetGenericTemplatesWithQuestionaryStatusQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetGenericTemplatesWithQuestionaryStatusQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetGenericTemplatesWithQuestionaryStatusQuery>(GetGenericTemplatesWithQuestionaryStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getGenericTemplatesWithQuestionaryStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetGenericTemplatesWithQuestionaryStatusQuery>(GetGenericTemplatesWithQuestionaryStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getGenericTemplatesWithQuestionaryStatus', 'query');
     },
     updateGenericTemplate(variables: UpdateGenericTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateGenericTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateGenericTemplateMutation>(UpdateGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateGenericTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateGenericTemplateMutation>(UpdateGenericTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateGenericTemplate', 'mutation');
     },
     assignProposalsToInstrument(variables: AssignProposalsToInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssignProposalsToInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AssignProposalsToInstrumentMutation>(AssignProposalsToInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignProposalsToInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<AssignProposalsToInstrumentMutation>(AssignProposalsToInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignProposalsToInstrument', 'mutation');
     },
     assignScientistsToInstrument(variables: AssignScientistsToInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssignScientistsToInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AssignScientistsToInstrumentMutation>(AssignScientistsToInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignScientistsToInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<AssignScientistsToInstrumentMutation>(AssignScientistsToInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'assignScientistsToInstrument', 'mutation');
     },
     createInstrument(variables: CreateInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateInstrumentMutation>(CreateInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateInstrumentMutation>(CreateInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createInstrument', 'mutation');
     },
     deleteInstrument(variables: DeleteInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteInstrumentMutation>(DeleteInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteInstrumentMutation>(DeleteInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteInstrument', 'mutation');
     },
     getInstruments(variables?: GetInstrumentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstrumentsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetInstrumentsQuery>(GetInstrumentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstruments');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetInstrumentsQuery>(GetInstrumentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstruments', 'query');
     },
     getUserInstruments(variables?: GetUserInstrumentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserInstrumentsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserInstrumentsQuery>(GetUserInstrumentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserInstruments');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserInstrumentsQuery>(GetUserInstrumentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserInstruments', 'query');
     },
     removeProposalsFromInstrument(variables: RemoveProposalsFromInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveProposalsFromInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveProposalsFromInstrumentMutation>(RemoveProposalsFromInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeProposalsFromInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveProposalsFromInstrumentMutation>(RemoveProposalsFromInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeProposalsFromInstrument', 'mutation');
     },
     removeScientistFromInstrument(variables: RemoveScientistFromInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveScientistFromInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveScientistFromInstrumentMutation>(RemoveScientistFromInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeScientistFromInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveScientistFromInstrumentMutation>(RemoveScientistFromInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeScientistFromInstrument', 'mutation');
     },
     setInstrumentAvailabilityTime(variables: SetInstrumentAvailabilityTimeMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetInstrumentAvailabilityTimeMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetInstrumentAvailabilityTimeMutation>(SetInstrumentAvailabilityTimeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setInstrumentAvailabilityTime');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetInstrumentAvailabilityTimeMutation>(SetInstrumentAvailabilityTimeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setInstrumentAvailabilityTime', 'mutation');
     },
     submitInstrument(variables: SubmitInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SubmitInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SubmitInstrumentMutation>(SubmitInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<SubmitInstrumentMutation>(SubmitInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitInstrument', 'mutation');
     },
     updateInstrument(variables: UpdateInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateInstrumentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateInstrumentMutation>(UpdateInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateInstrument');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateInstrumentMutation>(UpdateInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateInstrument', 'mutation');
     },
     administrationProposal(variables: AdministrationProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AdministrationProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AdministrationProposalMutation>(AdministrationProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'administrationProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<AdministrationProposalMutation>(AdministrationProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'administrationProposal', 'mutation');
     },
     changeProposalsStatus(variables: ChangeProposalsStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChangeProposalsStatusMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ChangeProposalsStatusMutation>(ChangeProposalsStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'changeProposalsStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<ChangeProposalsStatusMutation>(ChangeProposalsStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'changeProposalsStatus', 'mutation');
     },
     cloneProposals(variables: CloneProposalsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CloneProposalsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CloneProposalsMutation>(CloneProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneProposals');
+      return withWrapper((wrappedRequestHeaders) => client.request<CloneProposalsMutation>(CloneProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneProposals', 'mutation');
     },
     createProposal(variables: CreateProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateProposalMutation>(CreateProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateProposalMutation>(CreateProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProposal', 'mutation');
     },
     deleteProposal(variables: DeleteProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalMutation>(DeleteProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalMutation>(DeleteProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposal', 'mutation');
     },
     getInstrumentScientistProposals(variables?: GetInstrumentScientistProposalsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstrumentScientistProposalsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetInstrumentScientistProposalsQuery>(GetInstrumentScientistProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstrumentScientistProposals');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetInstrumentScientistProposalsQuery>(GetInstrumentScientistProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstrumentScientistProposals', 'query');
     },
     getMyProposals(variables?: GetMyProposalsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMyProposalsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetMyProposalsQuery>(GetMyProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyProposals');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetMyProposalsQuery>(GetMyProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyProposals', 'query');
     },
     getProposal(variables: GetProposalQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalQuery>(GetProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalQuery>(GetProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposal', 'query');
     },
     getProposals(variables?: GetProposalsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalsQuery>(GetProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposals');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalsQuery>(GetProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposals', 'query');
     },
     getProposalsCore(variables?: GetProposalsCoreQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalsCoreQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalsCoreQuery>(GetProposalsCoreDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalsCore');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalsCoreQuery>(GetProposalsCoreDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalsCore', 'query');
     },
     notifyProposal(variables: NotifyProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NotifyProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NotifyProposalMutation>(NotifyProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'notifyProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<NotifyProposalMutation>(NotifyProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'notifyProposal', 'mutation');
     },
     submitProposal(variables: SubmitProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SubmitProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SubmitProposalMutation>(SubmitProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<SubmitProposalMutation>(SubmitProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitProposal', 'mutation');
     },
     updateProposal(variables: UpdateProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProposalMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalMutation>(UpdateProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposal');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalMutation>(UpdateProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposal', 'mutation');
     },
     getUserProposalBookingsWithEvents(variables?: GetUserProposalBookingsWithEventsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserProposalBookingsWithEventsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserProposalBookingsWithEventsQuery>(GetUserProposalBookingsWithEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserProposalBookingsWithEvents');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserProposalBookingsWithEventsQuery>(GetUserProposalBookingsWithEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserProposalBookingsWithEvents', 'query');
     },
     answerTopic(variables: AnswerTopicMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AnswerTopicMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AnswerTopicMutation>(AnswerTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'answerTopic');
+      return withWrapper((wrappedRequestHeaders) => client.request<AnswerTopicMutation>(AnswerTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'answerTopic', 'mutation');
     },
     createQuestionary(variables: CreateQuestionaryMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateQuestionaryMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateQuestionaryMutation>(CreateQuestionaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createQuestionary');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateQuestionaryMutation>(CreateQuestionaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createQuestionary', 'mutation');
     },
     getBlankQuestionary(variables: GetBlankQuestionaryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetBlankQuestionaryQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetBlankQuestionaryQuery>(GetBlankQuestionaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBlankQuestionary');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetBlankQuestionaryQuery>(GetBlankQuestionaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBlankQuestionary', 'query');
     },
     getBlankQuestionarySteps(variables: GetBlankQuestionaryStepsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetBlankQuestionaryStepsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetBlankQuestionaryStepsQuery>(GetBlankQuestionaryStepsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBlankQuestionarySteps');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetBlankQuestionaryStepsQuery>(GetBlankQuestionaryStepsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBlankQuestionarySteps', 'query');
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetFileMetadataQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetFileMetadataQuery>(GetFileMetadataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFileMetadata');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetFileMetadataQuery>(GetFileMetadataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFileMetadata', 'query');
     },
     getQuestionary(variables: GetQuestionaryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetQuestionaryQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetQuestionaryQuery>(GetQuestionaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getQuestionary');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetQuestionaryQuery>(GetQuestionaryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getQuestionary', 'query');
     },
     addTechnicalReview(variables: AddTechnicalReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddTechnicalReviewMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AddTechnicalReviewMutation>(AddTechnicalReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addTechnicalReview');
+      return withWrapper((wrappedRequestHeaders) => client.request<AddTechnicalReviewMutation>(AddTechnicalReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addTechnicalReview', 'mutation');
     },
     addUserForReview(variables: AddUserForReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddUserForReviewMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AddUserForReviewMutation>(AddUserForReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addUserForReview');
+      return withWrapper((wrappedRequestHeaders) => client.request<AddUserForReviewMutation>(AddUserForReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addUserForReview', 'mutation');
     },
     updateTechnicalReviewAssignee(variables: UpdateTechnicalReviewAssigneeMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTechnicalReviewAssigneeMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTechnicalReviewAssigneeMutation>(UpdateTechnicalReviewAssigneeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTechnicalReviewAssignee');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTechnicalReviewAssigneeMutation>(UpdateTechnicalReviewAssigneeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTechnicalReviewAssignee', 'mutation');
     },
     getProposalReviews(variables: GetProposalReviewsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalReviewsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalReviewsQuery>(GetProposalReviewsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalReviews');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalReviewsQuery>(GetProposalReviewsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalReviews', 'query');
     },
     getReview(variables: GetReviewQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetReviewQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetReviewQuery>(GetReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getReview');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetReviewQuery>(GetReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getReview', 'query');
     },
     removeUserForReview(variables: RemoveUserForReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveUserForReviewMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveUserForReviewMutation>(RemoveUserForReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeUserForReview');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveUserForReviewMutation>(RemoveUserForReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeUserForReview', 'mutation');
     },
     submitProposalsReview(variables: SubmitProposalsReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SubmitProposalsReviewMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SubmitProposalsReviewMutation>(SubmitProposalsReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitProposalsReview');
+      return withWrapper((wrappedRequestHeaders) => client.request<SubmitProposalsReviewMutation>(SubmitProposalsReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitProposalsReview', 'mutation');
     },
-    submitTechnicalReview(variables: SubmitTechnicalReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SubmitTechnicalReviewMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SubmitTechnicalReviewMutation>(SubmitTechnicalReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitTechnicalReview');
+    submitTechnicalReviews(variables: SubmitTechnicalReviewsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SubmitTechnicalReviewsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SubmitTechnicalReviewsMutation>(SubmitTechnicalReviewsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitTechnicalReviews', 'mutation');
     },
     updateReview(variables: UpdateReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateReviewMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateReviewMutation>(UpdateReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateReview');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateReviewMutation>(UpdateReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateReview', 'mutation');
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UserWithReviewsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UserWithReviewsQuery>(UserWithReviewsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'userWithReviews');
+      return withWrapper((wrappedRequestHeaders) => client.request<UserWithReviewsQuery>(UserWithReviewsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'userWithReviews', 'query');
     },
     cloneSampleEsi(variables: CloneSampleEsiMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CloneSampleEsiMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CloneSampleEsiMutation>(CloneSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneSampleEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<CloneSampleEsiMutation>(CloneSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneSampleEsi', 'mutation');
     },
     createSampleEsi(variables: CreateSampleEsiMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateSampleEsiMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateSampleEsiMutation>(CreateSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createSampleEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateSampleEsiMutation>(CreateSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createSampleEsi', 'mutation');
     },
     deleteSampleEsi(variables: DeleteSampleEsiMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteSampleEsiMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteSampleEsiMutation>(DeleteSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteSampleEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteSampleEsiMutation>(DeleteSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteSampleEsi', 'mutation');
     },
     getSampleEsi(variables: GetSampleEsiQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSampleEsiQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSampleEsiQuery>(GetSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSampleEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSampleEsiQuery>(GetSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSampleEsi', 'query');
     },
     updateSampleEsi(variables: UpdateSampleEsiMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateSampleEsiMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSampleEsiMutation>(UpdateSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSampleEsi');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSampleEsiMutation>(UpdateSampleEsiDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSampleEsi', 'mutation');
     },
     cloneSample(variables: CloneSampleMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CloneSampleMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CloneSampleMutation>(CloneSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneSample');
+      return withWrapper((wrappedRequestHeaders) => client.request<CloneSampleMutation>(CloneSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneSample', 'mutation');
     },
     createSample(variables: CreateSampleMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateSampleMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateSampleMutation>(CreateSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createSample');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateSampleMutation>(CreateSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createSample', 'mutation');
     },
     deleteSample(variables: DeleteSampleMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteSampleMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteSampleMutation>(DeleteSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteSample');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteSampleMutation>(DeleteSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteSample', 'mutation');
     },
     getSample(variables: GetSampleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSampleQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSampleQuery>(GetSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSample');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSampleQuery>(GetSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSample', 'query');
     },
     getSamplesByCallId(variables: GetSamplesByCallIdQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSamplesByCallIdQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSamplesByCallIdQuery>(GetSamplesByCallIdDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSamplesByCallId');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSamplesByCallIdQuery>(GetSamplesByCallIdDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSamplesByCallId', 'query');
     },
     getSamplesWithProposalData(variables?: GetSamplesWithProposalDataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSamplesWithProposalDataQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSamplesWithProposalDataQuery>(GetSamplesWithProposalDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSamplesWithProposalData');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSamplesWithProposalDataQuery>(GetSamplesWithProposalDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSamplesWithProposalData', 'query');
     },
     getSamplesWithQuestionaryStatus(variables?: GetSamplesWithQuestionaryStatusQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSamplesWithQuestionaryStatusQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSamplesWithQuestionaryStatusQuery>(GetSamplesWithQuestionaryStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSamplesWithQuestionaryStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSamplesWithQuestionaryStatusQuery>(GetSamplesWithQuestionaryStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSamplesWithQuestionaryStatus', 'query');
     },
     updateSample(variables: UpdateSampleMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateSampleMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSampleMutation>(UpdateSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSample');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSampleMutation>(UpdateSampleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSample', 'mutation');
     },
     getScheduledEventCore(variables: GetScheduledEventCoreQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetScheduledEventCoreQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetScheduledEventCoreQuery>(GetScheduledEventCoreDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getScheduledEventCore');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetScheduledEventCoreQuery>(GetScheduledEventCoreDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getScheduledEventCore', 'query');
+    },
+    getScheduledEventsCore(variables?: GetScheduledEventsCoreQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetScheduledEventsCoreQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetScheduledEventsCoreQuery>(GetScheduledEventsCoreDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getScheduledEventsCore', 'query');
     },
     addProposalWorkflowStatus(variables: AddProposalWorkflowStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddProposalWorkflowStatusMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AddProposalWorkflowStatusMutation>(AddProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addProposalWorkflowStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<AddProposalWorkflowStatusMutation>(AddProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addProposalWorkflowStatus', 'mutation');
     },
     addStatusChangingEventsToConnection(variables: AddStatusChangingEventsToConnectionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddStatusChangingEventsToConnectionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AddStatusChangingEventsToConnectionMutation>(AddStatusChangingEventsToConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addStatusChangingEventsToConnection');
+      return withWrapper((wrappedRequestHeaders) => client.request<AddStatusChangingEventsToConnectionMutation>(AddStatusChangingEventsToConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addStatusChangingEventsToConnection', 'mutation');
     },
     createProposalStatus(variables: CreateProposalStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateProposalStatusMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateProposalStatusMutation>(CreateProposalStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProposalStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateProposalStatusMutation>(CreateProposalStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProposalStatus', 'mutation');
     },
     createProposalWorkflow(variables: CreateProposalWorkflowMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateProposalWorkflowMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateProposalWorkflowMutation>(CreateProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProposalWorkflow');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateProposalWorkflowMutation>(CreateProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProposalWorkflow', 'mutation');
     },
     deleteProposalStatus(variables: DeleteProposalStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteProposalStatusMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalStatusMutation>(DeleteProposalStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposalStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalStatusMutation>(DeleteProposalStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposalStatus', 'mutation');
     },
     deleteProposalWorkflow(variables: DeleteProposalWorkflowMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteProposalWorkflowMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalWorkflowMutation>(DeleteProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposalWorkflow');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalWorkflowMutation>(DeleteProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposalWorkflow', 'mutation');
     },
     deleteProposalWorkflowStatus(variables: DeleteProposalWorkflowStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteProposalWorkflowStatusMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalWorkflowStatusMutation>(DeleteProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposalWorkflowStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProposalWorkflowStatusMutation>(DeleteProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProposalWorkflowStatus', 'mutation');
     },
     getProposalEvents(variables?: GetProposalEventsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalEventsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalEventsQuery>(GetProposalEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalEvents');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalEventsQuery>(GetProposalEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalEvents', 'query');
     },
     getProposalStatuses(variables?: GetProposalStatusesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalStatusesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalStatusesQuery>(GetProposalStatusesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalStatuses');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalStatusesQuery>(GetProposalStatusesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalStatuses', 'query');
     },
     getProposalWorkflow(variables: GetProposalWorkflowQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalWorkflowQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalWorkflowQuery>(GetProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalWorkflow');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalWorkflowQuery>(GetProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalWorkflow', 'query');
     },
     getProposalWorkflows(variables?: GetProposalWorkflowsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalWorkflowsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalWorkflowsQuery>(GetProposalWorkflowsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalWorkflows');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalWorkflowsQuery>(GetProposalWorkflowsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalWorkflows', 'query');
     },
     moveProposalWorkflowStatus(variables: MoveProposalWorkflowStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MoveProposalWorkflowStatusMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<MoveProposalWorkflowStatusMutation>(MoveProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'moveProposalWorkflowStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<MoveProposalWorkflowStatusMutation>(MoveProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'moveProposalWorkflowStatus', 'mutation');
     },
     updateProposalStatus(variables: UpdateProposalStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProposalStatusMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalStatusMutation>(UpdateProposalStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposalStatus');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalStatusMutation>(UpdateProposalStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposalStatus', 'mutation');
     },
     updateProposalWorkflow(variables: UpdateProposalWorkflowMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProposalWorkflowMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalWorkflowMutation>(UpdateProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposalWorkflow');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalWorkflowMutation>(UpdateProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposalWorkflow', 'mutation');
     },
     addSamplesToShipment(variables: AddSamplesToShipmentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddSamplesToShipmentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AddSamplesToShipmentMutation>(AddSamplesToShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addSamplesToShipment');
+      return withWrapper((wrappedRequestHeaders) => client.request<AddSamplesToShipmentMutation>(AddSamplesToShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addSamplesToShipment', 'mutation');
     },
     createShipment(variables: CreateShipmentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateShipmentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateShipmentMutation>(CreateShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createShipment');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateShipmentMutation>(CreateShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createShipment', 'mutation');
     },
     deleteShipment(variables: DeleteShipmentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteShipmentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteShipmentMutation>(DeleteShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteShipment');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteShipmentMutation>(DeleteShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteShipment', 'mutation');
     },
     getMyShipments(variables?: GetMyShipmentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMyShipmentsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetMyShipmentsQuery>(GetMyShipmentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyShipments');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetMyShipmentsQuery>(GetMyShipmentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyShipments', 'query');
     },
     getShipment(variables: GetShipmentQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetShipmentQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetShipmentQuery>(GetShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getShipment');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetShipmentQuery>(GetShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getShipment', 'query');
     },
     getShipments(variables?: GetShipmentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetShipmentsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetShipmentsQuery>(GetShipmentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getShipments');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetShipmentsQuery>(GetShipmentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getShipments', 'query');
     },
     setActiveTemplate(variables: SetActiveTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetActiveTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetActiveTemplateMutation>(SetActiveTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setActiveTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetActiveTemplateMutation>(SetActiveTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setActiveTemplate', 'mutation');
     },
     submitShipment(variables: SubmitShipmentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SubmitShipmentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SubmitShipmentMutation>(SubmitShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitShipment');
+      return withWrapper((wrappedRequestHeaders) => client.request<SubmitShipmentMutation>(SubmitShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitShipment', 'mutation');
     },
     updateShipment(variables: UpdateShipmentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateShipmentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateShipmentMutation>(UpdateShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateShipment');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateShipmentMutation>(UpdateShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateShipment', 'mutation');
     },
     importTemplate(variables: ImportTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ImportTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ImportTemplateMutation>(ImportTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'importTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<ImportTemplateMutation>(ImportTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'importTemplate', 'mutation');
     },
     cloneTemplate(variables: CloneTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CloneTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CloneTemplateMutation>(CloneTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<CloneTemplateMutation>(CloneTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'cloneTemplate', 'mutation');
     },
     createQuestion(variables: CreateQuestionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateQuestionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateQuestionMutation>(CreateQuestionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createQuestion');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateQuestionMutation>(CreateQuestionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createQuestion', 'mutation');
     },
     createQuestionTemplateRelation(variables: CreateQuestionTemplateRelationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateQuestionTemplateRelationMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateQuestionTemplateRelationMutation>(CreateQuestionTemplateRelationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createQuestionTemplateRelation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateQuestionTemplateRelationMutation>(CreateQuestionTemplateRelationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createQuestionTemplateRelation', 'mutation');
     },
     createTemplate(variables: CreateTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateTemplateMutation>(CreateTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateTemplateMutation>(CreateTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTemplate', 'mutation');
     },
     createTopic(variables: CreateTopicMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateTopicMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateTopicMutation>(CreateTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTopic');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateTopicMutation>(CreateTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTopic', 'mutation');
     },
     deleteQuestion(variables: DeleteQuestionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteQuestionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteQuestionMutation>(DeleteQuestionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteQuestion');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteQuestionMutation>(DeleteQuestionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteQuestion', 'mutation');
     },
     deleteQuestionTemplateRelation(variables: DeleteQuestionTemplateRelationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteQuestionTemplateRelationMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteQuestionTemplateRelationMutation>(DeleteQuestionTemplateRelationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteQuestionTemplateRelation');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteQuestionTemplateRelationMutation>(DeleteQuestionTemplateRelationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteQuestionTemplateRelation', 'mutation');
     },
     deleteTemplate(variables: DeleteTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTemplateMutation>(DeleteTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTemplateMutation>(DeleteTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTemplate', 'mutation');
     },
     deleteTopic(variables: DeleteTopicMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteTopicMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTopicMutation>(DeleteTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTopic');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTopicMutation>(DeleteTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTopic', 'mutation');
     },
     getActiveTemplateId(variables: GetActiveTemplateIdQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetActiveTemplateIdQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetActiveTemplateIdQuery>(GetActiveTemplateIdDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getActiveTemplateId');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetActiveTemplateIdQuery>(GetActiveTemplateIdDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getActiveTemplateId', 'query');
     },
     getIsNaturalKeyPresent(variables: GetIsNaturalKeyPresentQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetIsNaturalKeyPresentQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetIsNaturalKeyPresentQuery>(GetIsNaturalKeyPresentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getIsNaturalKeyPresent');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetIsNaturalKeyPresentQuery>(GetIsNaturalKeyPresentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getIsNaturalKeyPresent', 'query');
     },
     getProposalTemplates(variables?: GetProposalTemplatesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProposalTemplatesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalTemplatesQuery>(GetProposalTemplatesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalTemplates');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProposalTemplatesQuery>(GetProposalTemplatesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposalTemplates', 'query');
     },
     getQuestions(variables?: GetQuestionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetQuestionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetQuestionsQuery>(GetQuestionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getQuestions');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetQuestionsQuery>(GetQuestionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getQuestions', 'query');
     },
     getTemplate(variables: GetTemplateQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTemplateQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateQuery>(GetTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateQuery>(GetTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplate', 'query');
     },
     getTemplateCategories(variables?: GetTemplateCategoriesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTemplateCategoriesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateCategoriesQuery>(GetTemplateCategoriesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplateCategories');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateCategoriesQuery>(GetTemplateCategoriesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplateCategories', 'query');
     },
     getTemplateExport(variables: GetTemplateExportQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTemplateExportQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateExportQuery>(GetTemplateExportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplateExport');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateExportQuery>(GetTemplateExportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplateExport', 'query');
     },
     getTemplates(variables?: GetTemplatesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTemplatesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplatesQuery>(GetTemplatesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplates');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplatesQuery>(GetTemplatesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplates', 'query');
     },
     updateQuestion(variables: UpdateQuestionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateQuestionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateQuestionMutation>(UpdateQuestionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateQuestion');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateQuestionMutation>(UpdateQuestionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateQuestion', 'mutation');
     },
     updateQuestionTemplateRelation(variables: UpdateQuestionTemplateRelationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateQuestionTemplateRelationMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateQuestionTemplateRelationMutation>(UpdateQuestionTemplateRelationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateQuestionTemplateRelation');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateQuestionTemplateRelationMutation>(UpdateQuestionTemplateRelationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateQuestionTemplateRelation', 'mutation');
     },
     updateQuestionTemplateRelationSettings(variables: UpdateQuestionTemplateRelationSettingsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateQuestionTemplateRelationSettingsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateQuestionTemplateRelationSettingsMutation>(UpdateQuestionTemplateRelationSettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateQuestionTemplateRelationSettings');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateQuestionTemplateRelationSettingsMutation>(UpdateQuestionTemplateRelationSettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateQuestionTemplateRelationSettings', 'mutation');
     },
     updateTemplate(variables: UpdateTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTemplateMutation>(UpdateTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTemplate');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTemplateMutation>(UpdateTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTemplate', 'mutation');
     },
     updateTopic(variables: UpdateTopicMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTopicMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTopicMutation>(UpdateTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTopic');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTopicMutation>(UpdateTopicDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTopic', 'mutation');
     },
     validateTemplateImport(variables: ValidateTemplateImportMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ValidateTemplateImportMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ValidateTemplateImportMutation>(ValidateTemplateImportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'validateTemplateImport');
+      return withWrapper((wrappedRequestHeaders) => client.request<ValidateTemplateImportMutation>(ValidateTemplateImportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'validateTemplateImport', 'mutation');
     },
     createUnit(variables: CreateUnitMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateUnitMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateUnitMutation>(CreateUnitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUnit');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateUnitMutation>(CreateUnitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUnit', 'mutation');
     },
     deleteUnit(variables: DeleteUnitMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteUnitMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUnitMutation>(DeleteUnitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteUnit');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUnitMutation>(DeleteUnitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteUnit', 'mutation');
     },
     getUnits(variables?: GetUnitsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUnitsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUnitsQuery>(GetUnitsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUnits');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUnitsQuery>(GetUnitsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUnits', 'query');
     },
     getUnitsAsJson(variables?: GetUnitsAsJsonQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUnitsAsJsonQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUnitsAsJsonQuery>(GetUnitsAsJsonDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUnitsAsJson');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUnitsAsJsonQuery>(GetUnitsAsJsonDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUnitsAsJson', 'query');
     },
     importUnits(variables: ImportUnitsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ImportUnitsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ImportUnitsMutation>(ImportUnitsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'importUnits');
+      return withWrapper((wrappedRequestHeaders) => client.request<ImportUnitsMutation>(ImportUnitsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'importUnits', 'mutation');
     },
     validateUnitsImport(variables: ValidateUnitsImportMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ValidateUnitsImportMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ValidateUnitsImportMutation>(ValidateUnitsImportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'validateUnitsImport');
+      return withWrapper((wrappedRequestHeaders) => client.request<ValidateUnitsImportMutation>(ValidateUnitsImportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'validateUnitsImport', 'mutation');
     },
     checkToken(variables: CheckTokenQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CheckTokenQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CheckTokenQuery>(CheckTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'checkToken');
+      return withWrapper((wrappedRequestHeaders) => client.request<CheckTokenQuery>(CheckTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'checkToken', 'query');
     },
     createUser(variables: CreateUserMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateUserMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateUserMutation>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUser');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateUserMutation>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUser', 'mutation');
     },
     createUserByEmailInvite(variables: CreateUserByEmailInviteMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateUserByEmailInviteMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateUserByEmailInviteMutation>(CreateUserByEmailInviteDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUserByEmailInvite');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateUserByEmailInviteMutation>(CreateUserByEmailInviteDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUserByEmailInvite', 'mutation');
     },
     deleteUser(variables: DeleteUserMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteUserMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUserMutation>(DeleteUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteUser');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUserMutation>(DeleteUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteUser', 'mutation');
     },
     externalTokenLogin(variables: ExternalTokenLoginMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExternalTokenLoginMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExternalTokenLoginMutation>(ExternalTokenLoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'externalTokenLogin');
+      return withWrapper((wrappedRequestHeaders) => client.request<ExternalTokenLoginMutation>(ExternalTokenLoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'externalTokenLogin', 'mutation');
     },
     getBasicUserDetails(variables: GetBasicUserDetailsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetBasicUserDetailsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetBasicUserDetailsQuery>(GetBasicUserDetailsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBasicUserDetails');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetBasicUserDetailsQuery>(GetBasicUserDetailsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBasicUserDetails', 'query');
     },
     getBasicUserDetailsByEmail(variables: GetBasicUserDetailsByEmailQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetBasicUserDetailsByEmailQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetBasicUserDetailsByEmailQuery>(GetBasicUserDetailsByEmailDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBasicUserDetailsByEmail');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetBasicUserDetailsByEmailQuery>(GetBasicUserDetailsByEmailDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBasicUserDetailsByEmail', 'query');
     },
     getFields(variables?: GetFieldsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetFieldsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetFieldsQuery>(GetFieldsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFields');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetFieldsQuery>(GetFieldsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFields', 'query');
     },
     getMyRoles(variables?: GetMyRolesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMyRolesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetMyRolesQuery>(GetMyRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyRoles');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetMyRolesQuery>(GetMyRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyRoles', 'query');
     },
     getOrcIDInformation(variables: GetOrcIdInformationQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetOrcIdInformationQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetOrcIdInformationQuery>(GetOrcIdInformationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getOrcIDInformation');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetOrcIdInformationQuery>(GetOrcIdInformationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getOrcIDInformation', 'query');
     },
     getPreviousCollaborators(variables: GetPreviousCollaboratorsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPreviousCollaboratorsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetPreviousCollaboratorsQuery>(GetPreviousCollaboratorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPreviousCollaborators');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetPreviousCollaboratorsQuery>(GetPreviousCollaboratorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPreviousCollaborators', 'query');
     },
     getRoles(variables?: GetRolesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetRolesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetRolesQuery>(GetRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getRoles');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetRolesQuery>(GetRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getRoles', 'query');
     },
     getToken(variables: GetTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTokenMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTokenMutation>(GetTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getToken');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTokenMutation>(GetTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getToken', 'mutation');
     },
     getTokenForUser(variables: GetTokenForUserMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTokenForUserMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTokenForUserMutation>(GetTokenForUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTokenForUser');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTokenForUserMutation>(GetTokenForUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTokenForUser', 'mutation');
     },
     getUser(variables: GetUserQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserQuery>(GetUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUser');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserQuery>(GetUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUser', 'query');
     },
     getUserMe(variables?: GetUserMeQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserMeQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserMeQuery>(GetUserMeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserMe');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserMeQuery>(GetUserMeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserMe', 'query');
     },
     getUserProposals(variables?: GetUserProposalsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserProposalsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserProposalsQuery>(GetUserProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserProposals');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserProposalsQuery>(GetUserProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserProposals', 'query');
     },
     getUserWithRoles(variables: GetUserWithRolesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserWithRolesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserWithRolesQuery>(GetUserWithRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserWithRoles');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserWithRolesQuery>(GetUserWithRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserWithRoles', 'query');
     },
     getUsers(variables?: GetUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUsersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUsersQuery>(GetUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUsers');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUsersQuery>(GetUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUsers', 'query');
     },
     login(variables: LoginMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LoginMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<LoginMutation>(LoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'login');
+      return withWrapper((wrappedRequestHeaders) => client.request<LoginMutation>(LoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'login', 'mutation');
     },
     logout(variables: LogoutMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LogoutMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<LogoutMutation>(LogoutDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'logout');
+      return withWrapper((wrappedRequestHeaders) => client.request<LogoutMutation>(LogoutDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'logout', 'mutation');
     },
     resetPassword(variables: ResetPasswordMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ResetPasswordMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ResetPasswordMutation>(ResetPasswordDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'resetPassword');
+      return withWrapper((wrappedRequestHeaders) => client.request<ResetPasswordMutation>(ResetPasswordDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'resetPassword', 'mutation');
     },
     resetPasswordEmail(variables: ResetPasswordEmailMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ResetPasswordEmailMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ResetPasswordEmailMutation>(ResetPasswordEmailDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'resetPasswordEmail');
+      return withWrapper((wrappedRequestHeaders) => client.request<ResetPasswordEmailMutation>(ResetPasswordEmailDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'resetPasswordEmail', 'mutation');
     },
     selectRole(variables: SelectRoleMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SelectRoleMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SelectRoleMutation>(SelectRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'selectRole');
+      return withWrapper((wrappedRequestHeaders) => client.request<SelectRoleMutation>(SelectRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'selectRole', 'mutation');
     },
     setUserEmailVerified(variables: SetUserEmailVerifiedMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserEmailVerifiedMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetUserEmailVerifiedMutation>(SetUserEmailVerifiedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserEmailVerified');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetUserEmailVerifiedMutation>(SetUserEmailVerifiedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserEmailVerified', 'mutation');
     },
     setUserNotPlaceholder(variables: SetUserNotPlaceholderMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserNotPlaceholderMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetUserNotPlaceholderMutation>(SetUserNotPlaceholderDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserNotPlaceholder');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetUserNotPlaceholderMutation>(SetUserNotPlaceholderDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserNotPlaceholder', 'mutation');
     },
     updatePassword(variables: UpdatePasswordMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdatePasswordMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdatePasswordMutation>(UpdatePasswordDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updatePassword');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdatePasswordMutation>(UpdatePasswordDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updatePassword', 'mutation');
     },
     updateUser(variables: UpdateUserMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateUserMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateUserMutation>(UpdateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateUser');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateUserMutation>(UpdateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateUser', 'mutation');
     },
     updateUserRoles(variables: UpdateUserRolesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateUserRolesMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateUserRolesMutation>(UpdateUserRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateUserRoles');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateUserRolesMutation>(UpdateUserRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateUserRoles', 'mutation');
     },
     verifyEmail(variables: VerifyEmailMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<VerifyEmailMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<VerifyEmailMutation>(VerifyEmailDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'verifyEmail');
+      return withWrapper((wrappedRequestHeaders) => client.request<VerifyEmailMutation>(VerifyEmailDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'verifyEmail', 'mutation');
     },
     createVisit(variables: CreateVisitMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateVisitMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateVisitMutation>(CreateVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createVisit');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateVisitMutation>(CreateVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createVisit', 'mutation');
     },
     deleteVisit(variables: DeleteVisitMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteVisitMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteVisitMutation>(DeleteVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteVisit');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteVisitMutation>(DeleteVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteVisit', 'mutation');
     },
     getVisit(variables: GetVisitQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetVisitQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetVisitQuery>(GetVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getVisit');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetVisitQuery>(GetVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getVisit', 'query');
     },
     getVisits(variables?: GetVisitsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetVisitsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetVisitsQuery>(GetVisitsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getVisits');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetVisitsQuery>(GetVisitsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getVisits', 'query');
     },
     updateVisit(variables: UpdateVisitMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateVisitMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateVisitMutation>(UpdateVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateVisit');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateVisitMutation>(UpdateVisitDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateVisit', 'mutation');
     },
     createVisitRegistration(variables: CreateVisitRegistrationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateVisitRegistrationMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateVisitRegistrationMutation>(CreateVisitRegistrationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createVisitRegistration');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateVisitRegistrationMutation>(CreateVisitRegistrationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createVisitRegistration', 'mutation');
     },
     getVisitRegistration(variables: GetVisitRegistrationQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetVisitRegistrationQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetVisitRegistrationQuery>(GetVisitRegistrationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getVisitRegistration');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetVisitRegistrationQuery>(GetVisitRegistrationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getVisitRegistration', 'query');
     },
     updateVisitRegistration(variables: UpdateVisitRegistrationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateVisitRegistrationMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateVisitRegistrationMutation>(UpdateVisitRegistrationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateVisitRegistration');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateVisitRegistrationMutation>(UpdateVisitRegistrationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateVisitRegistration', 'mutation');
     }
   };
 }

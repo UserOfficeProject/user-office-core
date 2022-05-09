@@ -1,6 +1,1 @@
-export type StepType =
-  | 'QuestionaryStep'
-  | 'ProposalReview'
-  | 'ShipmentReview'
-  | 'VisitReview'
-  | 'SampleEsiReview';
+export type StepType = 'QuestionaryStep' | 'ReviewStep';

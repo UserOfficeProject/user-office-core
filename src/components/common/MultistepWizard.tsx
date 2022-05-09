@@ -1,10 +1,8 @@
-import Button from '@material-ui/core/Button';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Stepper from '@material-ui/core/Stepper';
-import { Theme } from '@material-ui/core/styles';
-import createStyles from '@material-ui/core/styles/createStyles';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Button from '@mui/material/Button';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Stepper from '@mui/material/Stepper';
+import makeStyles from '@mui/styles/makeStyles';
 import {
   Form,
   Formik,
@@ -18,32 +16,30 @@ import * as Yup from 'yup';
 import { ActionButtonContainer } from './ActionButtonContainer';
 import UOLoader from './UOLoader';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-    },
-    button: {
-      marginRight: theme.spacing(1),
-    },
-    instructions: {
-      marginTop: theme.spacing(1),
-      marginBottom: theme.spacing(1),
-    },
-    stepper: {
-      padding: '20px 0 0',
-      flexWrap: 'wrap',
-    },
-    formErrors: {
-      color: theme.palette.error.main,
-      marginBottom: '10px',
-    },
-    step: {
-      cursor: 'pointer',
-      padding: theme.spacing(1),
-    },
-  })
-);
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+  },
+  button: {
+    marginRight: theme.spacing(1),
+  },
+  instructions: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  stepper: {
+    padding: '20px 0 0',
+    flexWrap: 'wrap',
+  },
+  formErrors: {
+    color: theme.palette.error.main,
+    marginBottom: '10px',
+  },
+  step: {
+    cursor: 'pointer',
+    padding: theme.spacing(1),
+  },
+}));
 
 interface WizardProps
   extends Pick<
@@ -134,13 +130,12 @@ export const Wizard: React.FC<WizardProps> = ({
               onClick={() => previous(formik.values)}
               fullWidth
               className={classes.button}
+              variant="text"
             >
               Back
             </Button>
             <Button
               key={`step-button-${stepNumber}`}
-              variant="contained"
-              color="primary"
               data-cy={isLastStep ? 'submit' : 'next-step'}
               type="submit"
               fullWidth

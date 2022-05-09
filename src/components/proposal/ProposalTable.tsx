@@ -1,12 +1,12 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Edit from '@material-ui/icons/Edit';
-import FileCopy from '@material-ui/icons/FileCopy';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import Visibility from '@material-ui/icons/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Edit from '@mui/icons-material/Edit';
+import FileCopy from '@mui/icons-material/FileCopy';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import Visibility from '@mui/icons-material/Visibility';
+import { Typography } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
@@ -39,6 +39,18 @@ type ProposalTableProps = {
   confirm: WithConfirmType;
 };
 
+const columns = [
+  { title: 'Proposal ID', field: 'proposalId' },
+  { title: 'Title', field: 'title' },
+  { title: 'Status', field: 'publicStatus' },
+  {
+    title: 'Call',
+    field: 'call.shortCode',
+    emptyValue: '-',
+  },
+  { title: 'Created', field: 'created' },
+];
+
 const ProposalTable = ({
   title,
   search,
@@ -58,25 +70,24 @@ const ProposalTable = ({
     'primaryKey' | 'questionary'
   > | null>(null);
 
+  // TODO: This api call here should be replaced with a hook for getting user proposals.
   useEffect(() => {
+    let unmounted = false;
+
     searchQuery().then((data) => {
+      if (unmounted) {
+        return;
+      }
+
       if (data) {
         setPartialProposalsData(data.data);
       }
     });
-  }, [searchQuery]);
 
-  const columns = [
-    { title: 'Proposal ID', field: 'proposalId' },
-    { title: 'Title', field: 'title' },
-    { title: 'Status', field: 'publicStatus' },
-    {
-      title: 'Call',
-      field: 'call.shortCode',
-      emptyValue: '-',
-    },
-    { title: 'Created', field: 'created' },
-  ];
+    return () => {
+      unmounted = true;
+    };
+  }, [searchQuery]);
 
   const [editProposalPk, setEditProposalPk] = useState(0);
 
@@ -99,7 +110,9 @@ const ProposalTable = ({
       return;
     }
 
-    const result = await api('Proposal cloned successfully').cloneProposals({
+    const result = await api({
+      toastSuccessMessage: 'Proposal cloned successfully',
+    }).cloneProposals({
       callId: call.id,
       proposalsToClonePk: [proposalToClone.primaryKey],
     });

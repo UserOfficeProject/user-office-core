@@ -1,16 +1,11 @@
-import dateformat from 'dateformat';
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import { UpdateUserMutationVariables, User } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('Event log tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
   beforeEach(() => {
-    cy.viewport(1920, 1080);
     cy.resetDB();
   });
 
@@ -56,7 +51,9 @@ context('Event log tests', () => {
     it('If user uptates his info, officer should be able to see the event logs for that update', () => {
       const newFirstName = faker.name.firstName();
       // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
-      const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH');
+      const updateProfileDate = DateTime.now().toFormat(
+        initialDBData.getFormats().dateFormat + ' HH'
+      );
       const loggedInUser = window.localStorage.getItem('user');
 
       if (!loggedInUser) {
@@ -79,7 +76,7 @@ context('Event log tests', () => {
 
       cy.contains(loggedInUserParsed.lastname)
         .parent()
-        .find('button[title="Edit user"]')
+        .find('button[aria-label="Edit user"]')
         .click();
 
       cy.get("[name='firstname']").should('have.value', newFirstName);

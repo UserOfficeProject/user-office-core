@@ -1,6 +1,7 @@
 import path from 'path';
 
 import faker, { lorem } from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   DataType,
@@ -191,20 +192,20 @@ context('Template tests', () => {
           id: createdQuestion.id,
           question: numberQuestion,
           config: `{"units":[
-                            {
-                              "id": "celsius",
-                              "unit": "celsius",
-                              "symbol": "c",
-                              "quantity": "thermodynamic temperature",
-                              "siConversionFormula": "x + 273.15"
-                            },
-                            {
-                                "id": "kelvin",
-                                "unit": "kelvin",
-                                "symbol": "k",
-                                "quantity": "thermodynamic temperature",
-                                "siConversionFormula": "x"
-                            }
+            {
+              "id": "celsius",
+              "unit": "celsius",
+              "symbol": "c",
+              "quantity": "thermodynamic temperature",
+              "siConversionFormula": "x + 273.15"
+            },
+            {
+                "id": "kelvin",
+                "unit": "kelvin",
+                "symbol": "k",
+                "quantity": "thermodynamic temperature",
+                "siConversionFormula": "x"
+            }
           ]}`,
         });
 
@@ -353,7 +354,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -496,14 +497,14 @@ context('Template tests', () => {
 
       cy.contains(multipleChoiceQuestion.answers[1])
         .parent()
-        .find('[title=Up]')
+        .find('[aria-label=Up]')
         .click();
 
       cy.get('[index=0]').contains(multipleChoiceQuestion.answers[1]);
 
       cy.contains(multipleChoiceQuestion.answers[1])
         .parent()
-        .find('[title=Down]')
+        .find('[aria-label=Down]')
         .click();
 
       cy.contains('Save').click();
@@ -596,7 +597,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -622,7 +623,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Clone']")
+        .find("[aria-label='Clone']")
         .first()
         .click();
 
@@ -640,7 +641,7 @@ context('Template tests', () => {
 
       cy.contains(`Copy of ${initialDBData.template.name}`)
         .parent()
-        .find("[title='Delete']")
+        .find("[aria-label='Delete']")
         .first()
         .click();
 
@@ -657,7 +658,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Archive']")
+        .find("[aria-label='Archive']")
         .first()
         .click();
 
@@ -673,7 +674,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Unarchive']")
+        .find("[aria-label='Unarchive']")
         .first()
         .click();
 
@@ -682,6 +683,31 @@ context('Template tests', () => {
 
     it('should render the Date field with default value and min max values when set', () => {
       let dateFieldId: string;
+      const minDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const earlierThanMinDate = DateTime.fromFormat(
+        minDate,
+        initialDBData.getFormats().dateFormat
+      )
+        .minus({ day: 1 })
+        .toFormat(initialDBData.getFormats().dateFormat);
+      const maxDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const laterThanMaxDate = DateTime.fromFormat(
+        maxDate,
+        initialDBData.getFormats().dateFormat
+      )
+        .plus({ day: 1 })
+        .toFormat(initialDBData.getFormats().dateFormat);
+      const defaultDate = DateTime.now().toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+
+      const tomorrowDate = DateTime.now()
+        .plus({ day: 1 })
+        .toFormat(initialDBData.getFormats().dateFormat);
 
       cy.login('officer');
       cy.visit('/');
@@ -690,7 +716,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -706,9 +732,9 @@ context('Template tests', () => {
 
       cy.get('[data-cy=question]').clear().type(dateQuestion.title);
 
-      cy.get('[data-cy="minDate"] input').type('2020-01-01');
-      cy.get('[data-cy="maxDate"] input').type('2020-01-31');
-      cy.get('[data-cy="defaultDate"] input').type('2020-01-10');
+      cy.get('[data-cy="minDate"] input').type(minDate);
+      cy.get('[data-cy="maxDate"] input').type(maxDate);
+      cy.get('[data-cy="defaultDate"] input').type(defaultDate);
 
       cy.contains('Save').click();
 
@@ -728,16 +754,13 @@ context('Template tests', () => {
 
       cy.contains(dateQuestion.title).click();
 
-      cy.get('[data-cy="minDate"] input').should('have.value', '2020-01-01');
-      cy.get('[data-cy="maxDate"] input').should('have.value', '2020-01-31');
-      cy.get('[data-cy="defaultDate"] input').should(
-        'have.value',
-        '2020-01-10'
-      );
+      cy.get('[data-cy="minDate"] input').should('have.value', minDate);
+      cy.get('[data-cy="maxDate"] input').should('have.value', maxDate);
+      cy.get('[data-cy="defaultDate"] input').should('have.value', defaultDate);
 
-      cy.get('[data-cy="minDate"] input').clear().type('2021-01-01');
-      cy.get('[data-cy="maxDate"] input').clear().type('2021-01-31');
-      cy.get('[data-cy="defaultDate"] input').clear().type('2021-01-10');
+      cy.get('[data-cy="minDate"] input').clear().type(minDate);
+      cy.get('[data-cy="maxDate"] input').clear().type(maxDate);
+      cy.get('[data-cy="defaultDate"] input').clear().type(defaultDate);
 
       cy.contains('Update').click();
 
@@ -752,17 +775,17 @@ context('Template tests', () => {
       cy.get('body').then(() => {
         cy.get(`[data-cy="${dateFieldId}.value"] input`).as('dateField');
 
-        cy.get('@dateField').should('have.value', '2021-01-10');
+        cy.get('@dateField').should('have.value', defaultDate);
 
-        cy.get('@dateField').clear().type('2020-01-01');
+        cy.get('@dateField').clear().type(earlierThanMinDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no earlier than');
 
-        cy.get('@dateField').clear().type('2022-01-01');
+        cy.get('@dateField').clear().type(laterThanMaxDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no latter than');
 
-        cy.get('@dateField').clear().type('2021-01-15');
+        cy.get('@dateField').clear().type(tomorrowDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no').should('not.exist');
       });
@@ -779,7 +802,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -795,11 +818,11 @@ context('Template tests', () => {
 
       cy.get('[data-cy=question]').clear().type(numberQuestion2.title);
 
-      cy.get('[data-cy=units]').find('[title=Open]').click();
+      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
 
       cy.contains('celsius').click();
 
-      cy.get('[data-cy=units]').find('[title=Open]').click();
+      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
 
       cy.contains('kelvin').click();
 
@@ -829,11 +852,11 @@ context('Template tests', () => {
 
       cy.get('[data-cy=question]').clear().type(numberQuestion3.title);
 
-      cy.get('[data-cy=units]').find('[title=Open]').click();
+      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
 
       cy.contains('celsius').click();
 
-      cy.get('[data-cy=units]').find('[title=Open]').click();
+      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
 
       cy.contains('kelvin').click();
 
@@ -862,7 +885,8 @@ context('Template tests', () => {
       cy.get('[data-cy=units]').contains('celsius');
       cy.get('[data-cy=units]').contains('kelvin');
 
-      cy.get('[data-cy="numberValueConstraint"]').contains(
+      cy.get('[data-cy="numberValueConstraint"] input').should(
+        'have.value',
         'Only positive numbers'
       );
 
@@ -920,7 +944,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -961,7 +985,7 @@ context('Template tests', () => {
 
       cy.contains(proposal.title)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('save and continue', { matchCase: false }).click();
@@ -1011,7 +1035,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -1192,7 +1216,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .closest('TR')
-        .find('[title="Export"]')
+        .find('[aria-label="Export"]')
         .click();
 
       cy.fixture('template_export.json').then((expectedExport) => {
@@ -1217,6 +1241,9 @@ context('Template tests', () => {
     });
 
     it('User can create proposal with template', () => {
+      const dateTimeFieldValue = DateTime.fromJSDate(
+        faker.date.past()
+      ).toFormat(initialDBData.getFormats().dateTimeFormat);
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
@@ -1233,7 +1260,7 @@ context('Template tests', () => {
 
       cy.contains(proposal.title)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('save and continue', { matchCase: false }).click();
@@ -1251,7 +1278,7 @@ context('Template tests', () => {
       cy.contains('15').click();
       cy.get(`[data-cy='${timeId}.value'] input`)
         .clear()
-        .type('2022-02-20 20:00');
+        .type(dateTimeFieldValue);
 
       cy.get(`#${multipleChoiceId}`).click();
       cy.contains(multipleChoiceQuestion.answers[0]).click();
@@ -1292,7 +1319,7 @@ context('Template tests', () => {
       cy.contains(multipleChoiceQuestion.answers[0]);
       cy.contains(multipleChoiceQuestion.answers[1]).should('not.exist');
       cy.contains(multipleChoiceQuestion.answers[2]);
-      cy.contains('20-Feb-2022 20:00');
+      cy.contains(dateTimeFieldValue);
 
       cy.contains(richTextInputQuestion.title);
       cy.get(`[data-cy="${richTextInputId}_open"]`).click();
@@ -1315,7 +1342,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -1369,6 +1396,45 @@ context('Template tests', () => {
       cy.logout();
     });
 
+    it('File Upload max files should be required', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.contains(fileQuestion).click();
+
+      cy.get('[role="presentation"]').contains('image/*').click();
+
+      cy.get('body').type('{esc}');
+
+      cy.get('[data-cy="max_files"] input').clear().type('-1');
+
+      cy.contains('Update').click();
+
+      cy.get('[data-cy="max_files"] input').should('be.focused');
+      cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
+
+      cy.get('[data-cy="max_files"] input').clear();
+
+      cy.get('[data-cy="max_files"] input').should('be.focused');
+      cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
+
+      cy.get('[data-cy="max_files"] input').clear().type('1');
+
+      cy.contains('Update').click();
+
+      cy.get('[data-cy="question-relation-dialogue"]').should('not.exist');
+
+      cy.logout();
+    });
+
     it('Officer can delete proposal questions', () => {
       cy.login('officer');
       cy.visit('/');
@@ -1377,7 +1443,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -1413,7 +1479,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -1452,7 +1518,7 @@ context('Template tests', () => {
 
       cy.contains(proposal.title)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('save and continue', { matchCase: false }).click();
@@ -1508,7 +1574,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.get('[title="Edit"]').last().click();
+      cy.get('[aria-label="Edit"]').last().click();
 
       cy.contains(textQuestion.title).click();
 
@@ -1537,7 +1603,7 @@ context('Template tests', () => {
 
       cy.contains(proposal.title)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('save and continue', { matchCase: false }).click();
@@ -1571,7 +1637,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -1606,7 +1672,7 @@ context('Template tests', () => {
 
       cy.contains(proposal.title)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
       cy.finishedLoading();
 
@@ -1630,7 +1696,7 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.get('[title="Add image caption"]').click();
+      cy.get('[aria-label="Add image caption"]').click();
 
       cy.get('[data-cy="image-figure"] input').type('Fig_test');
       cy.get('[data-cy="image-caption"] input').type('Test caption');
@@ -1643,9 +1709,7 @@ context('Template tests', () => {
 
       cy.get('.MuiStep-root').contains('Review').click();
 
-      cy.finishedLoading();
-
-      cy.contains('proposal information', { matchCase: false });
+      cy.contains(proposal.abstract);
 
       cy.contains(fileName);
 
@@ -1677,7 +1741,7 @@ context('Template tests', () => {
 
       cy.contains(initialDBData.template.name)
         .parent()
-        .find("[title='Edit']")
+        .find("[aria-label='Edit']")
         .first()
         .click();
 
@@ -1691,8 +1755,6 @@ context('Template tests', () => {
       cy.get('[data-cy=title] input').type('title');
 
       cy.get('[data-cy=abstract] textarea').first().type('abstract');
-
-      cy.contains('Save and continue').click();
 
       cy.contains(fileQuestion);
     });

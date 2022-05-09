@@ -3,7 +3,6 @@ import faker from 'faker';
 context('Institution tests', () => {
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   it('User should not be able to see Institutions page', () => {
@@ -26,6 +25,8 @@ context('Institution tests', () => {
     cy.contains('Institutions').click();
     cy.contains('Create').click();
     cy.get('#name').type(name);
+    cy.get('#country-input').click();
+    cy.contains('Sweden').click();
     cy.get('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'successfully' });
@@ -33,7 +34,7 @@ context('Institution tests', () => {
     cy.get('[data-cy="institutions-table"]').as('institutionsTable');
 
     cy.get('@institutionsTable')
-      .find('span[title="Last Page"] > button')
+      .find('span[aria-label="Last Page"] > button')
       .as('lastPageButtonElement');
 
     cy.get('@lastPageButtonElement').click({ force: true });
@@ -57,9 +58,11 @@ context('Institution tests', () => {
     cy.visit('/');
 
     cy.contains('Institutions').click();
-    cy.get('[title="Edit"]').first().click();
+    cy.get('[aria-label="Edit"]').first().click();
     cy.get('#name').clear();
     cy.get('#name').type(name);
+    cy.get('#country-input').click();
+    cy.contains('Great Britain').click();
     cy.get('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'successfully' });
@@ -75,9 +78,9 @@ context('Institution tests', () => {
 
     cy.contains('Institutions').click();
 
-    cy.get('[title="Delete"]').last().click();
+    cy.get('[aria-label="Delete"]').last().click();
 
-    cy.get('[title="Save"]').click();
+    cy.get('[aria-label="Save"]').click();
 
     cy.contains('Institution removed successfully!');
   });
@@ -99,9 +102,9 @@ context('Institution tests', () => {
 
     cy.contains('Institutions').click();
 
-    cy.contains(institutionA).closest('TR').find('[title="Edit"]').click();
+    cy.contains(institutionA).closest('TR').find('[aria-label="Edit"]').click();
 
-    cy.get('[title="Merge with existing institution"]').click();
+    cy.get('[aria-label="Merge with existing institution"]').click();
 
     cy.get('[data-cy="merge-institutions"]').should('be.disabled');
 

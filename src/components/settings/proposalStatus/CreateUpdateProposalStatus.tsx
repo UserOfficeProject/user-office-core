@@ -1,12 +1,12 @@
-import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
 } from '@user-office-software/duo-validation/lib/ProposalStatuses';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -50,9 +50,9 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
         if (proposalStatus) {
-          const data = await api(
-            'Proposal status updated successfully'
-          ).updateProposalStatus({
+          const data = await api({
+            toastSuccessMessage: 'Proposal status updated successfully',
+          }).updateProposalStatus({
             id: proposalStatus.id,
             ...values,
           });
@@ -62,9 +62,9 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             close(data.updateProposalStatus.proposalStatus);
           }
         } else {
-          const data = await api(
-            'Proposal status created successfully'
-          ).createProposalStatus(values);
+          const data = await api({
+            toastSuccessMessage: 'Proposal status created successfully',
+          }).createProposalStatus(values);
           if (data.createProposalStatus.rejection) {
             close(null);
           } else if (data.createProposalStatus.proposalStatus) {
@@ -92,7 +92,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             className={
               !!initialValues.shortCode ? classes.darkerDisabledTextField : ''
             }
-            margin="normal"
             fullWidth
             data-cy="shortCode"
             required
@@ -104,7 +103,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             label="Name"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="name"
             disabled={isExecutingCall}
@@ -116,11 +114,10 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             label="Description"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             multiline
-            rowsMax="16"
-            rows="3"
+            maxRows="16"
+            minRows="3"
             data-cy="description"
             disabled={isExecutingCall}
             required
@@ -129,8 +126,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
           <Button
             type="submit"
             fullWidth
-            variant="contained"
-            color="primary"
             className={classes.submit}
             data-cy="submit"
             disabled={isExecutingCall}

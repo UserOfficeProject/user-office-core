@@ -1,6 +1,6 @@
 import MaterialTable, { MaterialTableProps } from '@material-table/core';
-import Button from '@material-ui/core/Button';
-import Edit from '@material-ui/icons/Edit';
+import Edit from '@mui/icons-material/Edit';
+import Button from '@mui/material/Button';
 import React, { SetStateAction, useState } from 'react';
 import {
   DecodedValueMap,
@@ -23,6 +23,7 @@ export type UrlQueryParamsType = {
   selection: QueryParamConfig<(string | null | never)[]>;
   sortColumn: QueryParamConfig<number | null | undefined>;
   sortDirection: QueryParamConfig<string | null | undefined>;
+  sortField?: QueryParamConfig<string | null | undefined>;
 };
 
 export const DefaultQueryParams = {
@@ -30,12 +31,13 @@ export const DefaultQueryParams = {
   sortDirection: StringParam,
   search: StringParam,
   selection: withDefault(DelimitedArrayParam, []),
+  sortField: StringParam,
 };
 
 export type SortDirectionType = 'asc' | 'desc' | undefined;
 
 interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
-  createModal: (
+  createModal?: (
     onUpdate: (
       object: RowData | null,
       shouldCloseAfterUpdate?: boolean
@@ -184,7 +186,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
           setEditObject(null);
         }}
       >
-        {createModal(onUpdated, onCreated, editObject)}
+        {createModal?.(onUpdated, onCreated, editObject)}
       </InputDialog>
       <MaterialTable
         {...props}
@@ -243,13 +245,11 @@ export function SuperMaterialTable<Entry extends EntryID>({
             });
         }}
       />
-      {hasAccess.create && (
+      {hasAccess.create && createModal && (
         <ActionButtonContainer>
           {extraActionButtons && extraActionButtons}
           <Button
             type="button"
-            variant="contained"
-            color="primary"
             onClick={() => setShow(true)}
             data-cy="create-new-entry"
           >

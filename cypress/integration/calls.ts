@@ -13,15 +13,14 @@ context('Calls tests', () => {
   const esiTemplateName = faker.lorem.words(2);
   let workflowId: number;
 
-  const currentDayStart = new Date();
-  currentDayStart.setHours(0, 0, 0, 0);
-  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
-  const twoDaysAgo = new Date(new Date().setDate(new Date().getDate() - 2));
+  const currentDayStart = DateTime.now().startOf('day');
+  const yesterday = currentDayStart.plus({ days: -1 });
+  const twoDaysAgo = currentDayStart.plus({ days: -2 });
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
-    endCall: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
+    startCall: DateTime.fromJSDate(faker.date.past()),
+    endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -40,8 +39,8 @@ context('Calls tests', () => {
 
   const newInactiveCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: twoDaysAgo.toISOString(),
-    endCall: yesterday.toISOString(),
+    startCall: twoDaysAgo.toISO(),
+    endCall: yesterday.toISO(),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -58,8 +57,8 @@ context('Calls tests', () => {
 
   const updatedCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startDate: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
-    endDate: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
+    startDate: DateTime.fromJSDate(faker.date.past()),
+    endDate: DateTime.fromJSDate(faker.date.future()),
   };
 
   const proposalWorkflow = {
@@ -75,7 +74,6 @@ context('Calls tests', () => {
   };
 
   beforeEach(() => {
-    cy.viewport(1920, 1080);
     cy.resetDB();
     cy.createTemplate({
       groupId: TemplateGroupId.PROPOSAL_ESI,
@@ -97,7 +95,7 @@ context('Calls tests', () => {
     });
   });
 
-  // TODO: Maybe this should be moved to another file called permiisons because its testing more call permissions than calls.
+  // TODO: Maybe this should be moved to another file called permissions because its testing more call permissions than calls.
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
     cy.visit('/');
@@ -118,18 +116,19 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = faker.date
-        .past()
-        .toISOString()
-        .slice(0, 16)
-        .replace('T', ' ');
-      const endDate = faker.date
-        .future()
-        .toISOString()
-        .slice(0, 16)
-        .replace('T', ' ');
-      const invalidPastDate = faker.date.past().toISOString().slice(0, 10); // no time
-      const invalidFutureDate = faker.date.future().toISOString().slice(0, 10); // no time
+      const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
+      const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
+
+      const invalidPastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+        initialDBData.getFormats().dateFormat + ' HH'
+      ); // no minutes
+      const invalidFutureDate = DateTime.fromJSDate(
+        faker.date.future()
+      ).toFormat(initialDBData.getFormats().dateFormat + ' HH'); // no minutes
 
       cy.contains('Proposals');
 
@@ -152,10 +151,11 @@ context('Calls tests', () => {
 
       cy.contains('Invalid Date');
 
+      // NOTE: Luxon adapter still doesn't work well with newest MUI lab version to support placeholder text (https://github.com/mui/material-ui/issues/29851)
       cy.get('[data-cy=start-date] input')
         .clear()
         .type(invalidPastDate)
-        .should('have.value', invalidPastDate + ' __:__');
+        .should('have.value', invalidPastDate + ':');
 
       cy.contains('Invalid Date');
 
@@ -164,10 +164,11 @@ context('Calls tests', () => {
         .type(startDate)
         .should('have.value', startDate);
 
+      // NOTE: Luxon adapter still doesn't work well with newest MUI lab version to support placeholder text (https://github.com/mui/material-ui/issues/29851)
       cy.get('[data-cy=end-date] input')
         .clear()
         .type(invalidFutureDate)
-        .should('have.value', invalidFutureDate + ' __:__');
+        .should('have.value', invalidFutureDate + ':');
 
       cy.get('[data-cy=end-date] input')
         .clear()
@@ -214,8 +215,17 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able to create a call with end dates before start dates', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = '2021-02-25 00:01';
-      const endDate = '2021-02-25 00:00';
+      const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
+      const today = DateTime.fromJSDate(todayJsDate); // set date to specific date to easier test the validation
+      cy.clock(todayJsDate);
+
+      const yesterday = today.minus({ days: 1 }).day;
+      const tomorrow = today
+        .plus({ days: 1 })
+        .startOf('day')
+        // TODO: Find a way how to access the settings format here and not hard coding it like this.
+        .toFormat(initialDBData.getFormats().dateTimeFormat)
+        .toString();
 
       cy.contains('Proposals');
 
@@ -227,34 +237,23 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
-      cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(startDate)
-        .should('have.value', startDate);
+      cy.get('[data-cy=end-date]').find('[data-testid="CalendarIcon"]').click();
 
-      cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(endDate)
-        .should('not.have.value', endDate)
-        .should('have.value', startDate);
-
-      cy.get('[data-cy="end-date"] .MuiInputAdornment-root button').click();
-
-      cy.get('.MuiPickersBasePicker-pickerView .MuiPickersDay-day')
-        .contains('24')
+      cy.get('[role="dialog"] .MuiCalendarPicker-root .MuiPickersDay-root')
+        .contains(yesterday)
         .closest('button')
-        .should('have.class', 'MuiPickersDay-dayDisabled');
+        .should('be.disabled');
 
-      cy.get('.MuiDialogActions-root button').contains('OK').click();
+      cy.get('[data-cy=start-date] input').click();
 
       cy.get('[data-cy=start-date] input')
         .clear()
-        .type('2021-02-27 00:02')
-        .should('have.value', '2021-02-27 00:02');
+        .type(tomorrow)
+        .should('have.value', tomorrow);
 
-      cy.get('[data-cy=end-date] input').should(
-        'have.value',
-        '2021-02-27 00:02'
+      cy.get('[data-cy=end-date]').should(
+        'include.text',
+        'End call date can not be before start call date'
       );
     });
 
@@ -262,12 +261,12 @@ context('Calls tests', () => {
       const { shortCode, startCall, endCall, templateName, esiTemplateName } =
         newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callStartDate =
-        startCall ||
-        faker.date.past().toISOString().slice(0, 16).replace('T', ' ');
-      const callEndDate =
-        endCall ||
-        faker.date.future().toISOString().slice(0, 16).replace('T', ' ');
+      const callStartDate = startCall.toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
+      const callEndDate = endCall.toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
       const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
@@ -324,6 +323,12 @@ context('Calls tests', () => {
 
     it('A user-officer should be able to edit a call', () => {
       const { shortCode, startDate, endDate } = updatedCall;
+      const updatedCallStartDate = startDate.toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
+      const updatedCallEndDate = endDate.toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
 
       const refNumFormat = '211{digits:5}';
 
@@ -337,7 +342,10 @@ context('Calls tests', () => {
 
       cy.contains('Calls').click();
 
-      cy.contains(newCall.shortCode).parent().find('[title="Edit"]').click();
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
 
       cy.get('[data-cy=short-code] input')
         .clear()
@@ -346,13 +354,13 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=start-date] input')
         .clear()
-        .type(startDate)
-        .should('have.value', startDate);
+        .type(updatedCallStartDate)
+        .should('have.value', updatedCallStartDate);
 
       cy.get('[data-cy=end-date] input')
         .clear()
-        .type(endDate)
-        .should('have.value', endDate);
+        .type(updatedCallEndDate)
+        .should('have.value', updatedCallEndDate);
 
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,
@@ -413,7 +421,7 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[title="Assign Instrument"]')
+        .find('[aria-label="Assign Instrument"]')
         .click();
 
       cy.contains(instrumentAssignedToCall.shortCode)
@@ -427,7 +435,7 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[title="Show Instruments"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.get('[data-cy="call-instrument-assignments-table"]').contains(
@@ -445,20 +453,20 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[title="Show Instruments"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.get('[data-cy="call-instrument-assignments-table"]')
         .contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[title="Edit"]')
+        .find('[aria-label="Edit"]')
         .click();
 
       cy.get('[data-cy="availability-time"]').type('-10');
 
       cy.contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[title="Save"]')
+        .find('[aria-label="Save"]')
         .click();
 
       cy.notification({ variant: 'error', text: 'must be positive number' });
@@ -474,24 +482,28 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[title="Show Instruments"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.get('[data-cy="call-instrument-assignments-table"]')
         .contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[title="Edit"]')
+        .find('[aria-label="Edit"]')
         .click();
 
       cy.get('[data-cy="availability-time"]').type('10');
 
       cy.contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[title="Save"]')
+        .find('[aria-label="Save"]')
         .click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
+      cy.get('[data-cy="call-instrument-assignments-table"]')
+        .find('thead th')
+        .last()
+        .should('include.text', newCall.allocationTimeUnit);
       cy.get('[data-cy="call-instrument-assignments-table"]')
         .find('tbody td')
         .last()
@@ -509,16 +521,18 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[title="Show Instruments"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.get('[data-cy="call-instrument-assignments-table"]')
         .contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[title="Delete"]')
+        .find('[aria-label="Delete"]')
         .click();
 
-      cy.get('[data-cy="call-instrument-assignments-table"] [title="Save"]')
+      cy.get(
+        '[data-cy="call-instrument-assignments-table"] [aria-label="Save"]'
+      )
         .first()
         .click();
 
@@ -550,10 +564,9 @@ context('Calls tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
-        'have.length',
-        2
-      );
+      cy.get(
+        '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
+      ).should('have.length', 2);
       cy.contains(newCall.shortCode);
 
       cy.get('[data-cy="call-status-filter"]').click();
@@ -561,10 +574,9 @@ context('Calls tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
-        'have.length',
-        1
-      );
+      cy.get(
+        '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
+      ).should('have.length', 1);
       cy.contains(newCall.shortCode).should('not.exist');
       cy.contains(newInactiveCall.shortCode);
 
@@ -573,10 +585,9 @@ context('Calls tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
-        'have.length',
-        3
-      );
+      cy.get(
+        '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
+      ).should('have.length', 3);
       cy.contains(newCall.shortCode);
       cy.contains(newInactiveCall.shortCode);
     });
@@ -587,9 +598,12 @@ context('Calls tests', () => {
       cy.get('[data-cy="call-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Active').click();
 
-      cy.contains(newCall.shortCode).parent().find('[title="Delete"]').click();
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',
@@ -616,67 +630,87 @@ context('Calls tests', () => {
     cy.updateCall({
       id: initialDBData.call.id,
       ...newCall,
+      shortCode: initialDBData.call.shortCode,
       endCall: DateTime.now().plus({ days: 31, hours: 1 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.contains('New Proposal').click();
 
-      cy.contains('remaining').should('not.exist');
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('remaining')
+        .should('not.exist');
     });
 
     cy.updateCall({
       id: initialDBData.call.id,
       ...newCall,
+      shortCode: initialDBData.call.shortCode,
       endCall: DateTime.now().plus({ days: 30, hours: 1 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
 
-      cy.contains('30 days remaining');
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('30 days remaining');
     });
 
     cy.updateCall({
       id: initialDBData.call.id,
       ...newCall,
+      shortCode: initialDBData.call.shortCode,
       endCall: DateTime.now().plus({ days: 1, hours: 1 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
 
-      cy.contains('1 day remaining');
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('1 day remaining');
     });
 
     cy.updateCall({
       id: initialDBData.call.id,
       ...newCall,
+      shortCode: initialDBData.call.shortCode,
       endCall: DateTime.now().plus({ hours: 7, minutes: 30 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
 
-      cy.contains('7 hours remaining');
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('7 hours remaining');
     });
 
     cy.updateCall({
       id: initialDBData.call.id,
       ...newCall,
+      shortCode: initialDBData.call.shortCode,
       endCall: DateTime.now().plus({ minutes: 1, seconds: 30 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
 
-      cy.contains('1 minute remaining');
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('1 minute remaining');
     });
 
     cy.updateCall({
       id: initialDBData.call.id,
       ...newCall,
+      shortCode: initialDBData.call.shortCode,
       endCall: DateTime.now().plus({ seconds: 59 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
 
-      cy.contains('remaining').should('not.exist');
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('remaining')
+        .should('not.exist');
     });
   });
 });

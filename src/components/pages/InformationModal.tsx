@@ -1,10 +1,10 @@
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import withStyles from '@material-ui/core/styles/withStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import MuiDialogActions from '@mui/material/DialogActions';
+import MuiDialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import parse from 'html-react-parser';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -59,11 +59,12 @@ const InformationDialog: React.FC<InformationDialogProps> = (props) => {
   }
 
   return (
-    <div>
+    <>
       <Button
         className={classes.buttonLink}
         onClick={handleClickOpen}
         style={props.linkStyle}
+        variant="text"
       >
         {props.linkText}
       </Button>
@@ -76,12 +77,12 @@ const InformationDialog: React.FC<InformationDialogProps> = (props) => {
           <Typography gutterBottom>{parse(props.text)}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose} color="primary">
+          <Button autoFocus onClick={handleClose} variant="text">
             Close
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

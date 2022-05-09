@@ -1,9 +1,10 @@
 import MaterialTable, { Column } from '@material-table/core';
-import { Dialog, DialogContent } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
+import { Dialog, DialogContent } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 import { ReactNode } from 'react';
 
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import {
   ProposalScheduledEvent,
@@ -11,11 +12,25 @@ import {
 } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
-import {
-  parseTzLessDateTime,
-  TZ_LESS_DATE_TIME_LOW_PREC_FORMAT,
-} from 'utils/Time';
 import { getFullUserName } from 'utils/user';
+
+const columns: Column<ProposalScheduledEvent>[] = [
+  { title: 'Proposal title', field: 'proposal.title' },
+  { title: 'Proposal ID', field: 'proposal.proposalId' },
+  { title: 'Instrument', field: 'instrument.name' },
+  {
+    title: 'Local contact',
+    render: (rowData) => getFullUserName(rowData.localContact),
+  },
+  {
+    title: 'Starts at',
+    field: 'startsAtFormatted',
+  },
+  {
+    title: 'Ends at',
+    field: 'endsAtFormatted',
+  },
+];
 
 export default function UserUpcomingExperimentsTable() {
   const { loading, proposalScheduledEvents, setProposalScheduledEvents } =
@@ -23,6 +38,9 @@ export default function UserUpcomingExperimentsTable() {
       onlyUpcoming: true,
       notDraft: true,
     });
+  const { toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 
@@ -46,41 +64,23 @@ export default function UserUpcomingExperimentsTable() {
     },
   });
 
-  const columns: Column<ProposalScheduledEvent>[] = [
-    { title: 'Proposal title', field: 'proposal.title' },
-    { title: 'Proposal ID', field: 'proposal.proposalId' },
-    { title: 'Instrument', field: 'instrument.name' },
-    {
-      title: 'Local contact',
-      render: (rowData) => getFullUserName(rowData.localContact),
-    },
-    {
-      title: 'Starts at',
-      field: 'startsAt',
-      render: (rowData) =>
-        parseTzLessDateTime(rowData.startsAt).format(
-          TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-        ),
-    },
-    {
-      title: 'Ends at',
-      field: 'endsAt',
-      render: (rowData) =>
-        parseTzLessDateTime(rowData.endsAt).format(
-          TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-        ),
-    },
-  ];
-
   // if there are no upcoming experiments
   // just hide the whole table altogether
   if (proposalScheduledEvents.length === 0) {
     return null;
   }
 
+  const proposalScheduledEventsWithFormattedDates = proposalScheduledEvents.map(
+    (event) => ({
+      ...event,
+      startsAtFormatted: toFormattedDateTime(event.startsAt),
+      endsAtFormatted: toFormattedDateTime(event.endsAt),
+    })
+  );
+
   return (
     <Grid item xs={12} data-cy="upcoming-experiments">
-      <StyledPaper margin={[0]}>
+      <StyledPaper>
         <MaterialTable
           actions={[
             formTeamAction,
@@ -94,7 +94,7 @@ export default function UserUpcomingExperimentsTable() {
           title="Upcoming experiments"
           isLoading={loading}
           columns={columns}
-          data={proposalScheduledEvents}
+          data={proposalScheduledEventsWithFormattedDates}
           options={{
             search: false,
             padding: 'dense',

@@ -1,0 +1,4 @@
+fragment country on Entry {
+    id
+    value
+}

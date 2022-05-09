@@ -1,19 +1,19 @@
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
-import FormikDropdown from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { Call } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 
 const callSelectModalOnProposalsCloneValidationSchema = yup.object().shape({
-  selectedCallId: yup.string().required('You must select active call'),
+  selectedCallId: yup.number().required('You must select active call'),
 });
 
 const useStyles = makeStyles((theme) => ({
@@ -45,11 +45,11 @@ const CallSelectModalOnProposalsClone: React.FC<
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
-          selectedCallId: '',
+          selectedCallId: undefined,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedCall = calls.find(
-            (call) => call.id === +values.selectedCallId
+            (call) => call.id === values.selectedCallId
           );
 
           if (!selectedCall) {
@@ -75,23 +75,22 @@ const CallSelectModalOnProposalsClone: React.FC<
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <FormikDropdown
+                <FormikUIAutocomplete
                   name="selectedCallId"
                   label="Select call"
                   items={calls.map((call) => ({
-                    value: call.id.toString(),
+                    value: call.id,
                     text: call.shortCode,
                   }))}
                   loading={loadingCalls}
                   required
+                  data-cy="call-selection"
                 />
               </Grid>
             </Grid>
             <Button
               type="submit"
               fullWidth
-              variant="contained"
-              color="primary"
               className={classes.submit}
               disabled={isSubmitting}
               data-cy="submit"
