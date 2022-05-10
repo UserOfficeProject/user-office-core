@@ -11,6 +11,7 @@ import {
 } from 'components/questionary/QuestionaryComponentRegistry';
 import { Question } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -28,82 +29,91 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const QuestionFormShell = (
-  props: QuestionFormProps & {
-    validationSchema: unknown;
-  }
-) => {
-  const classes = useStyles();
-  const { api } = useDataApiWithFeedback();
-  const definition = getQuestionaryComponentDefinition(props.question.dataType);
+interface QuestionFormShellProps extends QuestionFormProps {
+  validationSchema: unknown;
+  confirm: WithConfirmType;
+}
 
-  const submitHandler = async (values: Question): Promise<void> => {
-    api()
-      .updateQuestion({
+export const QuestionFormShell = withConfirm(
+  (props: QuestionFormShellProps) => {
+    const { question, validationSchema, confirm, children } = props;
+    const { onUpdated, onDeleted, closeMe } = props;
+
+    const classes = useStyles();
+    const { api } = useDataApiWithFeedback();
+    const definition = getQuestionaryComponentDefinition(question.dataType);
+
+    const submitHandler = async (values: Question): Promise<void> => {
+      const { updateQuestion } = await api().updateQuestion({
         id: values.id,
         naturalKey: values.naturalKey,
         question: values.question,
         config: values.config ? JSON.stringify(values.config) : undefined,
-      })
-      .then((data) => {
-        if (data.updateQuestion.question) {
-          props.onUpdated?.({
-            ...props.question,
-            ...data.updateQuestion.question,
+      });
+
+      if (updateQuestion.question) {
+        onUpdated?.({
+          ...question,
+          ...updateQuestion.question,
+        });
+        closeMe?.();
+      }
+    };
+
+    const deleteHandler = () =>
+      confirm(
+        async () => {
+          const { deleteQuestion } = await api().deleteQuestion({
+            questionId: question.id,
           });
-          props.closeMe?.();
+          if (deleteQuestion.question) {
+            onDeleted?.(deleteQuestion.question);
+            closeMe?.();
+          }
+        },
+        {
+          title: 'Delete question',
+          description: 'Are you sure you want to delete this question?',
         }
-      });
-  };
+      )();
 
-  const deleteHandler = () =>
-    api()
-      .deleteQuestion({
-        questionId: props.question.id,
-      })
-      .then((data) => {
-        if (data.deleteQuestion.question) {
-          props.onDeleted?.(data.deleteQuestion.question);
-          props.closeMe?.();
-        }
-      });
+    return (
+      <div className={classes.container}>
+        <Typography variant="h4" component="h1" className={classes.heading}>
+          {definition.icon}
+          {definition.name}
+        </Typography>
+        <Formik
+          initialValues={question}
+          onSubmit={submitHandler}
+          validationSchema={validationSchema}
+        >
+          {(formikProps) => (
+            <Form style={{ flexGrow: 1 }}>
+              {children?.(formikProps)}
 
-  return (
-    <div className={classes.container}>
-      <Typography variant="h4" component="h1" className={classes.heading}>
-        {definition.icon}
-        {definition.name}
-      </Typography>
-      <Formik
-        initialValues={props.question}
-        onSubmit={submitHandler}
-        validationSchema={props.validationSchema}
-      >
-        {(formikProps) => (
-          <Form style={{ flexGrow: 1 }}>
-            {props.children?.(formikProps)}
-
-            <ActionButtonContainer>
-              <Button
-                type="button"
-                variant="outlined"
-                data-cy="delete"
-                onClick={deleteHandler}
-                disabled={definition.creatable === false}
-              >
-                Delete
-              </Button>
-              <Button
-                type="submit"
-                data-cy="submit"
-                disabled={!formikProps.isValid}
-              >
-                Save
-              </Button>
-            </ActionButtonContainer>
-          </Form>
-        )}
-      </Formik>
-    </div>
-  );
-};
+              <ActionButtonContainer>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  data-cy="delete"
+                  onClick={deleteHandler}
+                  disabled={definition.creatable === false}
+                >
+                  Delete
+                </Button>
+                <Button
+                  type="submit"
+                  data-cy="submit"
+                  disabled={!formikProps.isValid}
+                >
+                  Save
+                </Button>
+              </ActionButtonContainer>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    );
+  }
+);

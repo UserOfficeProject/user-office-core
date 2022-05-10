@@ -14,7 +14,9 @@ query getInstrumentScientistProposals(
       title
       submitted
       finalStatus
-      technicalReviewAssignee
+      technicalReviewAssigneeId
+      technicalReviewAssigneeFirstName
+      technicalReviewAssigneeLastName
       technicalStatus
       technicalTimeAllocation
       statusName

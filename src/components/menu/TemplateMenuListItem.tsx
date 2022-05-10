@@ -78,6 +78,9 @@ export function TemplateMenuListItem() {
   const isRiskAssessmentFeatureEnabled = !!context.features.get(
     FeatureId.RISK_ASSESSMENT
   )?.isEnabled;
+  const isVisitManagementEnabled = !!context.features.get(
+    FeatureId.VISIT_MANAGEMENT
+  )?.isEnabled;
   function toggleExpand() {
     setIsExpanded(!isExpanded);
   }
@@ -140,14 +143,16 @@ export function TemplateMenuListItem() {
             </ListItem>
           </Tooltip>
         )}
-        <Tooltip title="Visit registration">
-          <ListItem component={NavLink} to="/VisitTemplates" button>
-            <ListItemIcon>
-              <FlightTakeoffIcon />
-            </ListItemIcon>
-            <ListItemText primary="Visit registration" />
-          </ListItem>
-        </Tooltip>
+        {isVisitManagementEnabled && (
+          <Tooltip title="Visit registration">
+            <ListItem component={NavLink} to="/VisitTemplates" button>
+              <ListItemIcon>
+                <FlightTakeoffIcon />
+              </ListItemIcon>
+              <ListItemText primary="Visit registration" />
+            </ListItem>
+          </Tooltip>
+        )}
 
         {isRiskAssessmentFeatureEnabled && <EsiTemplatesMenuListItem />}
 

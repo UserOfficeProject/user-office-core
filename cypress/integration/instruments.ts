@@ -156,6 +156,10 @@ context('Instrument tests', () => {
         id: scientist2.id,
         roles: [initialDBData.roles.instrumentScientist],
       });
+      cy.updateUserRoles({
+        id: scientist1.id,
+        roles: [initialDBData.roles.instrumentScientist],
+      });
 
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument.instrument) {
@@ -396,6 +400,59 @@ context('Instrument tests', () => {
         'include.text',
         initialDBData.call.allocationTimeUnit
       );
+    });
+
+    it('User Officer should be able to see proposal instrument scientist and re-assign technical reviewer', () => {
+      const numberOfScientistsAndManagerAssignedToCreatedInstrument = 2;
+      cy.assignScientistsToInstrument({
+        instrumentId: createdInstrumentId,
+        scientistIds: [scientist2.id],
+      });
+      cy.assignProposalsToInstrument({
+        proposals: [
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+        ],
+        instrumentId: createdInstrumentId,
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains('Proposals');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.get('[data-cy="user-list"] input').should(
+        'have.value',
+        `${scientist1.firstName} ${scientist1.lastName}`
+      );
+
+      cy.get('[data-cy="user-list"]').click();
+
+      cy.get('[title="user-list-options"] li').should(
+        'have.length',
+        numberOfScientistsAndManagerAssignedToCreatedInstrument
+      );
+      cy.get('[title="user-list-options"]')
+        .contains(scientist2.firstName)
+        .click();
+
+      cy.get('[data-cy="re-assign-submit"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: `Assigned to ${scientist2.firstName} ${scientist2.lastName}`,
+      });
+
+      cy.closeModal();
+      // TODO: Extend here when technical reviewer is added to the table.
     });
 
     it('User Officer should be able to remove assigned scientist from instrument', () => {

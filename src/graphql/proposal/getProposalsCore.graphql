@@ -1,20 +1,20 @@
-query getProposalsCore($filter: ProposalsFilter,
-  $first: Int,
-  $offset: Int,
-  $sortField: String,
-  $sortDirection: String,
-  $searchText: String,
-
+query getProposalsCore(
+  $filter: ProposalsFilter
+  $first: Int
+  $offset: Int
+  $sortField: String
+  $sortDirection: String
+  $searchText: String
 ) {
-  proposalsView(filter: $filter,
-    first: $first,
-    offset: $offset,
-    sortField: $sortField,
-    sortDirection: $sortDirection,
-    searchText: $searchText,
-
+  proposalsView(
+    filter: $filter
+    first: $first
+    offset: $offset
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
   ) {
-    proposalViews{
+    proposalViews {
       primaryKey
       title
       statusId
@@ -26,6 +26,9 @@ query getProposalsCore($filter: ProposalsFilter,
       notified
       managementTimeAllocation
       technicalTimeAllocation
+      technicalReviewAssigneeId
+      technicalReviewAssigneeFirstName
+      technicalReviewAssigneeLastName
       technicalStatus
       instrumentName
       callShortCode
