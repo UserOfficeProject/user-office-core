@@ -117,6 +117,12 @@ export class TechnicalReviewResponseWrap extends ResponseWrapBase {
   @Field(() => TechnicalReview, { nullable: true })
   public technicalReview: TechnicalReview;
 }
+@ObjectType()
+export class TechnicalReviewsResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => [TechnicalReview], { nullable: true })
+  public technicalReviews: TechnicalReview[];
+}
 
 @ObjectType()
 export class TemplateResponseWrap extends ResponseWrapBase {

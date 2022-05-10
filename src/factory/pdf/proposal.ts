@@ -39,7 +39,7 @@ type ProposalPDFData = {
 };
 
 const getTechnicalReviewHumanReadableStatus = (
-  status: TechnicalReviewStatus
+  status: TechnicalReviewStatus | null
 ): string => {
   switch (status) {
     case TechnicalReviewStatus.FEASIBLE:

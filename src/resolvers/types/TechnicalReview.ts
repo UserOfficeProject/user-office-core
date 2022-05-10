@@ -25,16 +25,16 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
   public proposalPk: number;
 
   @Field(() => String, { nullable: true })
-  public comment: string;
+  public comment: string | null;
 
   @Field(() => String, { nullable: true })
-  public publicComment: string;
+  public publicComment: string | null;
 
   @Field(() => Int, { nullable: true })
-  public timeAllocation: number;
+  public timeAllocation: number | null;
 
   @Field(() => TechnicalReviewStatus, { nullable: true })
-  public status: TechnicalReviewStatus;
+  public status: TechnicalReviewStatus | null;
 
   @Field(() => Boolean)
   public submitted: boolean;
@@ -43,7 +43,10 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
   public reviewerId: number;
 
   @Field(() => String, { nullable: true })
-  public files: string;
+  public files: string | null;
+
+  @Field(() => Int, { nullable: true })
+  public technicalReviewAssigneeId: number | null;
 }
 
 @Resolver(() => TechnicalReview)
@@ -68,5 +71,18 @@ export class TechnicalReviewResolver {
       context.user,
       technicalReview.reviewerId
     );
+  }
+
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
+  async technicalReviewAssignee(
+    @Root() technicalReview: TechnicalReview,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails | null> {
+    return technicalReview.technicalReviewAssigneeId
+      ? context.queries.user.getBasic(
+          context.user,
+          technicalReview.technicalReviewAssigneeId
+        )
+      : null;
   }
 }

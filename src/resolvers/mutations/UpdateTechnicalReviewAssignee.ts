@@ -9,21 +9,21 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalsResponseWrap } from '../types/CommonWrappers';
+import { TechnicalReviewsResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class UpdateTechnicalReviewAssigneeInput {
-  @Field(() => Int!)
+  @Field(() => Int)
   public userId: number;
 
-  @Field(() => [Int!]!)
+  @Field(() => [Int])
   public proposalPks: number[];
 }
 
 @Resolver()
 export class UpdateTechnicalReviewAssigneeMutation {
-  @Mutation(() => ProposalsResponseWrap)
+  @Mutation(() => TechnicalReviewsResponseWrap)
   async updateTechnicalReviewAssignee(
     @Args() args: UpdateTechnicalReviewAssigneeInput,
     @Ctx() context: ResolverContext
@@ -33,7 +33,7 @@ export class UpdateTechnicalReviewAssigneeMutation {
         context.user,
         args
       ),
-      ProposalsResponseWrap
+      TechnicalReviewsResponseWrap
     );
   }
 }
