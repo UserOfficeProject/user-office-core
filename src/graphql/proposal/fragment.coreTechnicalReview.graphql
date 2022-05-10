@@ -7,4 +7,10 @@ fragment coreTechnicalReview on TechnicalReview {
   proposalPk
   submitted
   files
+  technicalReviewAssigneeId
+  technicalReviewAssignee {
+    id
+    firstname
+    lastname
+  }
 }

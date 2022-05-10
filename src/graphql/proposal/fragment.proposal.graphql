@@ -19,7 +19,6 @@ fragment proposal on Proposal {
   submitted
   managementTimeAllocation
   managementDecisionSubmitted
-  technicalReviewAssignee
   sepMeetingDecision {
     ...sepMeetingDecision
   }

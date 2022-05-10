@@ -47,14 +47,14 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         name: '',
         shortCode: '',
         description: '',
-        managerUserId: undefined,
+        managerUserId: null,
       };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        if (values.managerUserId === undefined) {
+        if (values.managerUserId === null) {
           return;
         }
 
@@ -101,6 +101,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             fullWidth
             data-cy="name"
             disabled={isExecutingCall}
+            required
           />
           <Field
             name="shortCode"
@@ -111,6 +112,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             fullWidth
             data-cy="shortCode"
             disabled={isExecutingCall}
+            required
           />
           <Field
             id="description"
@@ -124,6 +126,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             minRows="3"
             data-cy="description"
             disabled={isExecutingCall}
+            required
           />
 
           <FormikUIAutocomplete

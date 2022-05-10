@@ -1,7 +1,7 @@
 mutation updateTechnicalReviewAssignee($proposalPks: [Int!]!, $userId: Int!) {
   updateTechnicalReviewAssignee(proposalPks: $proposalPks, userId: $userId) {
-    proposals {
-      ...proposal
+    technicalReviews {
+      ...coreTechnicalReview
     }
     rejection {
       ...rejection
