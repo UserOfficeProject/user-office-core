@@ -142,10 +142,17 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const isSchedulerEnabled = context.features.get(
     FeatureId.SCHEDULER
   )?.isEnabled;
-
   const isInstrumentManagementEnabled = context.features.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
+  const isSEPEnabled = context.features.get(FeatureId.SEP_REVIEW)?.isEnabled;
+  const isUserManagementEnabled = context.features.get(
+    FeatureId.USER_MANAGEMENT
+  )?.isEnabled;
+  const isSampleSafetyEnabled = context.features.get(
+    FeatureId.SAMPLE_SAFETY
+  )?.isEnabled;
+
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
   const user = (
@@ -229,14 +236,16 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Calls" />
         </ListItem>
       </Tooltip>
-      <Tooltip title="People">
-        <ListItem component={NavLink} to="/People" button>
-          <ListItemIcon>
-            <People />
-          </ListItemIcon>
-          <ListItemText primary="People" />
-        </ListItem>
-      </Tooltip>
+      {isUserManagementEnabled && (
+        <Tooltip title="People">
+          <ListItem component={NavLink} to="/People" button>
+            <ListItemIcon>
+              <People />
+            </ListItemIcon>
+            <ListItemText primary="People" />
+          </ListItem>
+        </Tooltip>
+      )}
       {isInstrumentManagementEnabled && (
         <Tooltip title="Instruments">
           <ListItem component={NavLink} to="/Instruments" button>
@@ -247,14 +256,16 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           </ListItem>
         </Tooltip>
       )}
-      <Tooltip title="Scientific evaluation panels">
-        <ListItem component={NavLink} to="/SEPs" button>
-          <ListItemIcon>
-            <GroupWorkIcon />
-          </ListItemIcon>
-          <ListItemText primary="SEPs" />
-        </ListItem>
-      </Tooltip>
+      {isSEPEnabled && (
+        <Tooltip title="Scientific evaluation panels">
+          <ListItem component={NavLink} to="/SEPs" button>
+            <ListItemIcon>
+              <GroupWorkIcon />
+            </ListItemIcon>
+            <ListItemText primary="SEPs" />
+          </ListItem>
+        </Tooltip>
+      )}
       <Tooltip title="Pages">
         <ListItem component={NavLink} to="/PageEditor" button>
           <ListItemIcon>
@@ -263,14 +274,16 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Pages" />
         </ListItem>
       </Tooltip>
-      <Tooltip title="Institutions">
-        <ListItem component={NavLink} to="/Institutions" button>
-          <ListItemIcon>
-            <AccountBalanceIcon />
-          </ListItemIcon>
-          <ListItemText primary="Institutions" />
-        </ListItem>
-      </Tooltip>
+      {isUserManagementEnabled && (
+        <Tooltip title="Institutions">
+          <ListItem component={NavLink} to="/Institutions" button>
+            <ListItemIcon>
+              <AccountBalanceIcon />
+            </ListItemIcon>
+            <ListItemText primary="Institutions" />
+          </ListItem>
+        </Tooltip>
+      )}
       <TemplateMenuListItem />
       <Tooltip title="Questions">
         <ListItem component={NavLink} to="/Questions" button>
@@ -280,7 +293,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Questions" />
         </ListItem>
       </Tooltip>
-      <SamplesMenuListItem />
+      {isSampleSafetyEnabled && <SamplesMenuListItem />}
       <SettingsMenuListItem />
     </div>
   );

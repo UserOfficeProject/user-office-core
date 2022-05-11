@@ -1,4 +1,5 @@
 import MaterialTable from '@material-table/core';
+import Link from '@mui/material/Link';
 import React, { useMemo } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -18,7 +19,17 @@ const proposalListColumns = [
       </CopyToClipboard>
     ),
   },
-  { title: 'Title', field: 'title' },
+  {
+    title: 'Proposal title',
+    render: (rowData: ProposalFragment) => (
+      <Link
+        title={rowData.title}
+        href={`Proposals?reviewModal=${rowData.primaryKey}`}
+      >
+        {rowData.title}
+      </Link>
+    ),
+  },
 ];
 
 function ProposalList({ question }: { question: QuestionWithUsage }) {
@@ -45,8 +56,7 @@ function ProposalList({ question }: { question: QuestionWithUsage }) {
 }
 
 const sampleListColumns = [
-  { title: 'id', field: 'id' },
-  { title: 'Title', field: 'title' },
+  { title: 'Sample title', field: 'title' },
   { title: 'Created', field: 'created' },
   { title: 'Safety status', field: 'safetyStatus' },
 ];
@@ -71,8 +81,10 @@ function SampleList({ question }: { question: QuestionWithUsage }) {
 }
 
 const shipmentListColumns = [
-  { title: 'ID', field: 'id' },
-  { title: 'Title', field: 'title' },
+  {
+    title: 'Shipment title',
+    field: 'title',
+  },
   { title: 'Status', field: 'status' },
 ];
 

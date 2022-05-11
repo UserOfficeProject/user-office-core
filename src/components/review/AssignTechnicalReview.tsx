@@ -30,7 +30,7 @@ function AssignTechnicalReview({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const [selectedUser, setSelectedUser] = useState(
-    proposal.technicalReviewAssignee
+    proposal.technicalReview?.technicalReviewAssigneeId
   );
 
   const usersData = proposal.instrument?.scientists || [];
@@ -42,7 +42,7 @@ function AssignTechnicalReview({
     usersData.push(proposal.instrument?.beamlineManager);
   }
 
-  const userIdToUser = (userId: number | null) =>
+  const userIdToUser = (userId?: number | null) =>
     usersData.find((user) => user.id === userId);
 
   return (
@@ -85,7 +85,13 @@ function AssignTechnicalReview({
                     .then((result) => {
                       onProposalUpdated({
                         ...proposal,
-                        ...result.updateTechnicalReviewAssignee.proposals?.[0],
+                        technicalReview: proposal.technicalReview
+                          ? {
+                              ...proposal.technicalReview,
+                              ...result.updateTechnicalReviewAssignee
+                                .technicalReviews?.[0],
+                            }
+                          : null,
                       });
                     }),
                 {
@@ -93,6 +99,9 @@ function AssignTechnicalReview({
                   description: `You are about to set ${getFullUserName(
                     userIdToUser(selectedUser)
                   )} as a technical reviewer for this proposal. Are you sure?`,
+                  alertText: proposal.technicalReview?.submitted
+                    ? "The technical review is already submitted and re-assigning it to another person won't change anything. Better option is to un-submit first and then re-assign."
+                    : '',
                 }
               )();
             }

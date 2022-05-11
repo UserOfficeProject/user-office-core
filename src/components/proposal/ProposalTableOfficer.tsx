@@ -11,7 +11,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
@@ -23,6 +23,7 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
   Proposal,
@@ -31,6 +32,7 @@ import {
   ProposalPkWithCallId,
   Sep,
   InstrumentFragment,
+  FeatureId,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -95,20 +97,12 @@ let columns: Column<ProposalViewData>[] = [
     hidden: true,
   },
   {
-    title: 'Technical status',
-    field: 'technicalStatus',
-  },
-  {
     title: 'Final time allocation',
     render: (rowData) =>
       rowData.managementTimeAllocation
         ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
         : '',
     hidden: true,
-  },
-  {
-    title: 'Final Status',
-    field: 'finalStatus',
   },
   {
     title: 'Submitted',
@@ -120,35 +114,74 @@ let columns: Column<ProposalViewData>[] = [
     field: 'statusName',
   },
   {
-    title: 'Deviation',
-    field: 'reviewDeviation',
-  },
-  {
-    title: 'Average Score',
-    field: 'reviewAverage',
-  },
-  {
-    title: 'Ranking',
-    field: 'rankOrder',
-  },
-  {
     title: 'Notified',
     field: 'notified',
     lookup: { true: 'Yes', false: 'No' },
   },
   {
-    title: 'Instrument',
-    field: 'instrumentName',
-  },
-  {
     title: 'Call',
     field: 'callShortCode',
   },
-  {
-    title: 'SEP',
-    field: 'sepCode',
-  },
 ];
+
+const addTechnicalReviewColumns = () => {
+  if (!columns.find((column) => column.field === 'technicalStatus')) {
+    columns.push({
+      title: 'Technical status',
+      field: 'technicalStatus',
+      emptyValue: '-',
+    });
+  }
+  if (!columns.find((column) => column.field === 'assignedTechnicalReviewer')) {
+    columns.push({
+      title: 'Assigned technical reviewer',
+      field: 'assignedTechnicalReviewer',
+      emptyValue: '-',
+    });
+  }
+};
+
+const addSEPReviewColumns = () => {
+  if (!columns.find((column) => column.field === 'finalStatus')) {
+    columns.push({
+      title: 'Final Status',
+      field: 'finalStatus',
+    });
+  }
+  if (!columns.find((column) => column.field === 'reviewDeviation')) {
+    columns.push({
+      title: 'Deviation',
+      field: 'reviewDeviation',
+    });
+  }
+  if (!columns.find((column) => column.field === 'reviewAverage')) {
+    columns.push({
+      title: 'Average Score',
+      field: 'reviewAverage',
+    });
+  }
+  if (!columns.find((column) => column.field === 'rankOrder')) {
+    columns.push({
+      title: 'Ranking',
+      field: 'rankOrder',
+    });
+  }
+  if (!columns.find((column) => column.field === 'sepCode')) {
+    columns.push({
+      title: 'SEP',
+      field: 'sepCode',
+    });
+  }
+};
+
+const addInstrumentManagementColumns = () => {
+  if (!columns.find((column) => column.field === 'instrumentName')) {
+    columns.push({
+      title: 'Instrument',
+      field: 'instrumentName',
+    });
+  }
+};
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
@@ -176,6 +209,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
+  const featureContext = useContext(FeatureContext);
 
   const prefetchSize = 200;
   const [currentPage, setCurrentPage] = useState(0);
@@ -267,6 +301,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
+  const isTechnicalReviewEnabled = featureContext.features.get(
+    FeatureId.TECHNICAL_REVIEW
+  )?.isEnabled;
+  const isInstrumentManagementEnabled = featureContext.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+  const isSEPEnabled = featureContext.features.get(
+    FeatureId.SEP_REVIEW
+  )?.isEnabled;
+
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -283,6 +327,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       </IconButton>
     </Tooltip>
   );
+
+  if (isTechnicalReviewEnabled) {
+    addTechnicalReviewColumns();
+  }
+
+  if (isInstrumentManagementEnabled) {
+    addInstrumentManagementColumns();
+  }
+
+  if (isSEPEnabled) {
+    addSEPReviewColumns();
+  }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
@@ -558,8 +614,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
-    PROPOSAL_MODAL_TAB_NAMES.REVIEWS,
+    ...(isTechnicalReviewEnabled
+      ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
+      : []),
+    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
     PROPOSAL_MODAL_TAB_NAMES.ADMIN,
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
@@ -572,6 +630,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
+      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+        : '-',
     })
   );
 

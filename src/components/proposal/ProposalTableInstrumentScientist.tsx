@@ -79,6 +79,13 @@ let columns: Column<ProposalViewData>[] = [
     hidden: false,
   },
   {
+    title: 'Assigned technical reviewer',
+    render: (rowData) =>
+      rowData.technicalReviewAssigneeId
+        ? `${rowData.technicalReviewAssigneeFirstName} ${rowData.technicalReviewAssigneeLastName}`
+        : '-',
+  },
+  {
     title: 'Submitted',
     field: 'submitted',
     lookup: { true: 'Yes', false: 'No' },
@@ -200,7 +207,7 @@ const ProposalTableInstrumentScientist: React.FC<{
   const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
-      rowData.technicalReviewAssignee === user.id;
+      rowData.technicalReviewAssigneeId === user.id;
 
     const showView =
       rowData.technicalReviewSubmitted ||
@@ -250,7 +257,7 @@ const ProposalTableInstrumentScientist: React.FC<{
       const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
         selectedProposals.map((proposal) => ({
           proposalPk: proposal.primaryKey,
-          reviewerId: proposal.technicalReviewAssignee || user.id,
+          reviewerId: proposal.technicalReviewAssigneeId || user.id,
           submitted: true,
         }));
 
@@ -443,8 +450,15 @@ const ProposalTableInstrumentScientist: React.FC<{
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...proposal,
-                  technicalReviewAssignee:
-                    updatedProposal.technicalReviewAssignee,
+                  technicalReviewAssigneeId:
+                    updatedProposal.technicalReview
+                      ?.technicalReviewAssigneeId || null,
+                  technicalReviewAssigneeFirstName:
+                    updatedProposal.technicalReview?.technicalReviewAssignee
+                      ?.firstname || null,
+                  technicalReviewAssigneeLastName:
+                    updatedProposal.technicalReview?.technicalReviewAssignee
+                      ?.lastname || null,
                   technicalReviewSubmitted: updatedProposal.technicalReview
                     ?.submitted
                     ? 1

@@ -89,12 +89,15 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   );
 
   const TechnicalReviewTab =
-    isUserOfficer || proposalData.technicalReviewAssignee === user.id ? (
+    isUserOfficer ||
+    proposalData.technicalReview?.technicalReviewAssigneeId === user.id ? (
       <>
-        <ProposalTechnicalReviewerAssignment
-          proposalData={proposalData}
-          setProposalData={setProposalData}
-        />
+        {!!proposalData.instrument && (
+          <ProposalTechnicalReviewerAssignment
+            proposalData={proposalData}
+            setProposalData={setProposalData}
+          />
+        )}
         <ProposalTechnicalReview
           proposal={proposalData as Proposal}
           data={proposalData.technicalReview}
