@@ -19,16 +19,16 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
   public proposalPk: number;
 
   @Field(() => String, { nullable: true })
-  public comment: string;
+  public comment: string | null;
 
   @Field(() => String, { nullable: true })
-  public publicComment: string;
+  public publicComment: string | null;
 
   @Field(() => Int, { nullable: true })
-  public timeAllocation: number;
+  public timeAllocation: number | null;
 
   @Field(() => TechnicalReviewStatus, { nullable: true })
-  public status: TechnicalReviewStatus;
+  public status: TechnicalReviewStatus | null;
 
   @Field(() => Boolean, { nullable: true })
   public submitted: boolean;
@@ -37,7 +37,7 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
   public reviewerId: number;
 
   @Field(() => String, { nullable: true })
-  public files: string;
+  public files: string | null;
 }
 
 @Resolver()

@@ -544,6 +544,7 @@ export default class ProposalMutations {
         ? sourceProposal.proposerId
         : agent!.id;
 
+      // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
         title: `Copy of ${clonedProposal.title}`,
@@ -563,7 +564,6 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
-        technicalReviewAssignee: clonedProposal.technicalReviewAssignee,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(

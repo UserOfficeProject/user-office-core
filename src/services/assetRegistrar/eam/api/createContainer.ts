@@ -26,6 +26,7 @@ import {
 import { DataType } from '../../../../models/Template';
 import getRequest from '../requests/AddAssetEquipment';
 import { createAndLogError } from '../utils/createAndLogError';
+import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 import { performApiRequest } from '../utils/performApiRequest';
 import { InstrumentDataSource } from './../../../../datasources/InstrumentDataSource';
 
@@ -66,7 +67,7 @@ async function getAnswer(
     case DataType.BOOLEAN:
       return answerBasic?.answer.value;
     case DataType.NUMBER_INPUT:
-      return answerBasic?.answer.value.value;
+      return answerBasic?.answer.value.siValue;
     case DataType.TEXT_INPUT:
       return answerBasic?.answer.value;
     default:
@@ -90,6 +91,8 @@ export async function createContainer(shipmentId: number) {
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
+
+  const partCode = getEnvOrThrow('EAM_PART_CODE');
 
   const shipment = await shipmentDataSource.getShipment(shipmentId);
   if (!shipment) {
@@ -127,6 +130,7 @@ export async function createContainer(shipmentId: number) {
   );
 
   const request = getRequest(
+    partCode,
     proposal.proposalId,
     proposal.title,
     weight,

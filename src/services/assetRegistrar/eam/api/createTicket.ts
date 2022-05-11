@@ -60,7 +60,8 @@ export async function createTicket(shipmentId: number, containerId: string) {
     scheduledEvent.startsAt,
     scheduledEvent.endsAt,
     scheduledEvent.startsAt, // This is not correct, but we need a design decision to fix this
-    localContact?.email ?? 'not set'
+    localContact?.email ?? 'not set',
+    'DEMAX'
   );
 
   await performApiRequest(request);

@@ -77,6 +77,9 @@ export class UpdateUserArgs {
 
   @Field(() => String, { nullable: true })
   public otherOrganisation?: string;
+
+  @Field(() => Int, { nullable: true })
+  public organizationCountry?: number;
 }
 
 @ArgsType()

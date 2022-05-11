@@ -11,6 +11,7 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
@@ -385,19 +386,20 @@ export default class PostgresUserDataSource implements UserDataSource {
     return createUserObject(user[0]);
   }
 
-  async getUsers(
-    filter?: string,
-    first?: number,
-    offset?: number,
-    userRole?: UserRole,
-    subtractUsers?: [number],
-    order = 'desc'
-  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+  async getUsers({
+    filter,
+    first,
+    offset,
+    userRole,
+    subtractUsers,
+    orderBy,
+    orderDirection = 'desc',
+  }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { organisation: 'i.institution_id' })
-      .orderBy('users.user_id', order)
+      .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
@@ -421,6 +423,13 @@ export default class PostgresUserDataSource implements UserDataSource {
         if (subtractUsers) {
           query.whereNotIn('users.user_id', subtractUsers);
         }
+        if (orderBy) {
+          if (orderBy === 'organisation') {
+            query.orderBy('institution', orderDirection);
+          } else {
+            query.orderBy(orderBy, orderDirection);
+          }
+        }
       })
       .then((usersRecord: UserRecord[]) => {
         const users = usersRecord.map((user) => createBasicUserObject(user));
@@ -441,7 +450,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     if (userId == -1) {
-      return this.getUsers(filter, first, offset, userRole, subtractUsers);
+      return this.getUsers({ filter, first, offset, userRole, subtractUsers });
     }
 
     const lastCollaborators = await this.getMostRecentCollaborators(userId);
@@ -604,11 +613,16 @@ export default class PostgresUserDataSource implements UserDataSource {
         users.map((user) => createBasicUserObject(user))
       );
   }
-  async createOrganisation(name: string, verified: boolean): Promise<number> {
+  async createOrganisation(
+    name: string,
+    verified: boolean,
+    countryId: number | null = null
+  ): Promise<number> {
     const [institutionId]: number[] = await database
       .insert({
         institution: name,
         verified,
+        country_id: countryId,
       })
       .into('institutions')
       .returning('institution_id');
@@ -628,6 +642,25 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .join('instrument_has_proposals as ihp', {
         'ihp.instrument_id': 'ihs.instrument_id',
+      })
+      .where('ihp.proposal_pk', proposalPk)
+      .first();
+
+    return !!proposal;
+  }
+
+  async checkInstrumentManagerToProposal(
+    scientistId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const proposal = await database
+      .select('*')
+      .from('proposals as p')
+      .join('instruments as i', {
+        'i.manager_user_id': scientistId,
+      })
+      .join('instrument_has_proposals as ihp', {
+        'ihp.instrument_id': 'i.instrument_id',
       })
       .where('ihp.proposal_pk', proposalPk)
       .first();

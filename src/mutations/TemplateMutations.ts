@@ -484,10 +484,23 @@ export default class TemplateMutations {
     conflictResolution: ConflictResolution[]
   ): Promise<Template | Rejection> {
     try {
-      return await this.dataSource.importTemplate(
+      const template = await this.dataSource.importTemplate(
         templateAsJson,
         conflictResolution
       );
+
+      const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(
+        template.groupId
+      );
+      if (!currentActiveTemplateId) {
+        // if there is no active template, then mark newly created template as active
+        await this.dataSource.setActiveTemplate({
+          templateGroupId: template.groupId,
+          templateId: template.templateId,
+        });
+      }
+
+      return template;
     } catch (error) {
       return rejection(
         'Could not import template',

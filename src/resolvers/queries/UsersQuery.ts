@@ -39,6 +39,12 @@ export class UsersArgs {
 
   @Field(() => [Int], { nullable: 'itemsAndList' })
   subtractUsers?: [number];
+
+  @Field(() => String, { nullable: true })
+  orderBy?: string;
+
+  @Field(() => String, { nullable: true })
+  orderDirection?: string;
 }
 
 @ArgsType()
@@ -50,18 +56,8 @@ export class PreviousCollaboratorsArgs extends UsersArgs {
 @Resolver()
 export class UsersQuery {
   @Query(() => UserQueryResult, { nullable: true })
-  users(
-    @Args() { filter, first, offset, userRole, subtractUsers }: UsersArgs,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.queries.user.getAll(
-      context.user,
-      filter,
-      first,
-      offset,
-      userRole,
-      subtractUsers
-    );
+  users(@Args() args: UsersArgs, @Ctx() context: ResolverContext) {
+    return context.queries.user.getAll(context.user, args);
   }
 
   @Query(() => UserQueryResult, { nullable: true })

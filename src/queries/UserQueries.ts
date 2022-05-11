@@ -18,6 +18,7 @@ import {
   UserRole,
   AuthJwtApiTokenPayload,
 } from '../models/User';
+import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
@@ -184,21 +185,8 @@ export default class UserQueries {
   }
 
   @Authorized()
-  async getAll(
-    agent: UserWithRole | null,
-    filter?: string,
-    first?: number,
-    offset?: number,
-    userRole?: UserRole,
-    subtractUsers?: [number]
-  ) {
-    const userData = await this.dataSource.getUsers(
-      filter,
-      first,
-      offset,
-      userRole,
-      subtractUsers
-    );
+  async getAll(agent: UserWithRole | null, args: UsersArgs) {
+    const userData = await this.dataSource.getUsers(args);
 
     const returnableUserIds = await this.userAuth.listReadableUsers(
       agent,

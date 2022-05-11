@@ -20,7 +20,7 @@ export const dummyApiAccessToken = new Permissions(
 export const dummyApiAccessTokens = [dummyApiAccessToken];
 
 export class AdminDataSourceMock implements AdminDataSource {
-  getCountry(id: number): Promise<Entry> {
+  getCountry(id: number): Promise<Entry | null> {
     throw new Error('Method not implemented.');
   }
 

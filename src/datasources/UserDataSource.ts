@@ -2,6 +2,7 @@ import { Role, Roles } from '../models/Role';
 import { User, BasicUserDetails, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UsersArgs } from '../resolvers/queries/UsersQuery';
 
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
@@ -23,11 +24,7 @@ export interface UserDataSource {
   getPasswordByEmail(email: string): Promise<string | null>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
-    filter?: string,
-    first?: number,
-    offset?: number,
-    userRole?: UserRole,
-    subtractUsers?: [number]
+    args: UsersArgs
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getPreviousCollaborators(
     user_id: number,
@@ -62,7 +59,11 @@ export interface UserDataSource {
     telephone_alt: string | undefined
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
-  createOrganisation(name: string, verified: boolean): Promise<number>;
+  createOrganisation(
+    name: string,
+    verified: boolean,
+    countryId?: number
+  ): Promise<number>;
   update(user: User): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
   setUserPassword(id: number, password: string): Promise<BasicUserDetails>;
@@ -70,6 +71,10 @@ export interface UserDataSource {
   setUserEmailVerified(id: number): Promise<User | null>;
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean>;
+  checkInstrumentManagerToProposal(
     userId: number,
     proposalPk: number
   ): Promise<boolean>;
