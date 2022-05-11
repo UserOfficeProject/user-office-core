@@ -46,8 +46,7 @@ export class Proposal {
     public submitted: boolean,
     public referenceNumberSequence: number,
     public managementTimeAllocation: number,
-    public managementDecisionSubmitted: boolean,
-    public technicalReviewAssignee: number | null
+    public managementDecisionSubmitted: boolean
   ) {}
 }
 

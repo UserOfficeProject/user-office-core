@@ -12,7 +12,7 @@ type RowObj = {
   propTitle?: string;
   principalInv: string;
   instrAvailTime?: number;
-  techReviewTimeAllocation?: number;
+  techReviewTimeAllocation?: number | null;
   sepTimeAllocation: number | null;
   propReviewAvgScore?: number;
   propSEPRankOrder: number | null;

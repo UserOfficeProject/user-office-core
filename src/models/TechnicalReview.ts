@@ -2,13 +2,14 @@ export class TechnicalReview {
   constructor(
     public id: number,
     public proposalPk: number,
-    public comment: string,
-    public publicComment: string,
-    public timeAllocation: number,
-    public status: TechnicalReviewStatus,
+    public comment: string | null,
+    public publicComment: string | null,
+    public timeAllocation: number | null,
+    public status: TechnicalReviewStatus | null,
     public submitted: boolean,
     public reviewerId: number,
-    public files: string
+    public files: string | null,
+    public technicalReviewAssigneeId: number | null
   ) {}
 }
 

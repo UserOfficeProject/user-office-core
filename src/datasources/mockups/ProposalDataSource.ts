@@ -9,6 +9,10 @@ import {
 import { ProposalView } from '../../models/ProposalView';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import {
+  TechnicalReview,
+  TechnicalReviewStatus,
+} from '../../models/TechnicalReview';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import {
   ProposalBookingFilter,
@@ -55,8 +59,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
     values?.managementTimeAllocation || 0,
-    values?.managementDecisionSubmitted || false,
-    values?.technicalReviewAssignee || null
+    values?.managementDecisionSubmitted || false
   );
 };
 
@@ -81,6 +84,19 @@ const dummyScheduledEventCore = new ScheduledEventCore(
   1
 );
 
+export const dummyProposalTechnicalReview = new TechnicalReview(
+  1,
+  1,
+  'Test comment',
+  'Test public comment',
+  10,
+  TechnicalReviewStatus.FEASIBLE,
+  true,
+  1,
+  '',
+  1
+);
+
 export class ProposalDataSourceMock implements ProposalDataSource {
   proposalsUpdated: Proposal[];
   constructor() {
@@ -89,8 +105,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
-  ): Promise<Proposal[]> {
-    return allProposals;
+  ): Promise<TechnicalReview[]> {
+    return [dummyProposalTechnicalReview];
   }
 
   async getProposalsFromView(
@@ -134,6 +150,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       1,
+      'Carl',
+      'Carlsson',
       1,
       false,
       'instrument',

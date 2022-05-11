@@ -52,7 +52,7 @@ export class TechnicalReviewAuthorization {
       return false;
     }
 
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
       return true;
     }

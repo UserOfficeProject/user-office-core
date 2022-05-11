@@ -3,6 +3,7 @@ import { Call } from '../models/Call';
 import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import {
   ProposalBookingFilter,
@@ -53,7 +54,7 @@ export interface ProposalDataSource {
   ): Promise<Proposal>;
   updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
-  ): Promise<Proposal[]>;
+  ): Promise<TechnicalReview[]>;
   setProposalUsers(proposalPk: number, users: number[]): Promise<void>;
   submitProposal(
     primaryKey: number,
