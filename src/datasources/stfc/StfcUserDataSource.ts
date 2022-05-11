@@ -3,6 +3,7 @@ import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
@@ -283,13 +284,12 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.ensureDummyUserExists(userId);
   }
 
-  async getUsers(
-    filter?: string,
-    first?: number,
-    offset?: number,
-    userRole?: number,
-    subtractUsers?: [number]
-  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+  async getUsers({
+    filter,
+    first,
+    offset,
+    subtractUsers,
+  }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     let userDetails: BasicUserDetails[] = [];
     let finalTotalCount = 0;
 
@@ -306,14 +306,14 @@ export class StfcUserDataSource implements UserDataSource {
 
       finalTotalCount = userDetails.length;
     } else {
-      const { users, totalCount } = await postgresUserDataSource.getUsers(
-        undefined,
-        first,
-        offset,
-        undefined,
-        subtractUsers,
-        'asc'
-      );
+      const { users, totalCount } = await postgresUserDataSource.getUsers({
+        filter: undefined,
+        first: first,
+        offset: offset,
+        userRole: undefined,
+        subtractUsers: subtractUsers,
+        orderDirection: 'asc',
+      });
 
       finalTotalCount = totalCount;
 
