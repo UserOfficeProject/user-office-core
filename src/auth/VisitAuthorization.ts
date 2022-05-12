@@ -12,14 +12,14 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class VisitAuthorization {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.VisitDataSource)
-    private visitDataSource: VisitDataSource
+    private visitDataSource: VisitDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveVisit(

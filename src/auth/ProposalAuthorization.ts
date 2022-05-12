@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -15,7 +15,6 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class ProposalAuthorization {
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
@@ -30,7 +29,8 @@ export class ProposalAuthorization {
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveProposal(
