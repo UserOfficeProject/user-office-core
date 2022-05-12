@@ -10,13 +10,13 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class EsiAuthorization {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.ScheduledEventDataSource)
     private scheduledEventDataSource: ScheduledEventDataSource,
     @inject(Tokens.ProposalEsiDataSource)
-    private esiDataSource: ProposalEsiDataSource
+    private esiDataSource: ProposalEsiDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   getScheduledEvent = async (scheduledEventId: number) =>

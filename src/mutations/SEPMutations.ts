@@ -44,7 +44,6 @@ import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
 @injectable()
 export default class SEPMutations {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.SEPDataSource)
@@ -56,7 +55,8 @@ export default class SEPMutations {
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createSEPValidationSchema)

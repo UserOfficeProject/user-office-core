@@ -10,10 +10,10 @@ import { UserAuthorization } from './UserAuthorization';
 @injectable()
 export class TechnicalReviewAuthorization {
   private proposalAuth = container.resolve(ProposalAuthorization);
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ReviewDataSource)
-    private reviewDataSource: ReviewDataSource
+    private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveTechnicalReview(

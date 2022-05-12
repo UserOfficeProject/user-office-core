@@ -16,12 +16,10 @@ import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
 import { CloneUtils } from '../utils/CloneUtils';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { UserAuthorization } from './../auth/UserAuthorization';
-import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { CloneSampleInput } from './../resolvers/mutations/CloneSampleMutation';
 
 @injectable()
 export default class SampleMutations {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
   private sampleAuth = container.resolve(SampleAuthorization);
   private cloneUtils = container.resolve(CloneUtils);
@@ -34,8 +32,7 @@ export default class SampleMutations {
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()

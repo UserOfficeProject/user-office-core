@@ -36,12 +36,10 @@ import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutatio
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
-import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
   private cloneUtils = container.resolve(CloneUtils);
   constructor(
@@ -58,8 +56,7 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)

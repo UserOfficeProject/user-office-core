@@ -26,7 +26,7 @@ export const Tokens = {
   SystemDataSource: Symbol('SystemDataSource'),
   TemplateDataSource: Symbol('TemplateDataSource'),
   UnitDataSource: Symbol('UnitDataSource'),
+  UserAuthorization: Symbol('UserAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
-  UserAuthorization: Symbol('UserAuthorization'),
 };

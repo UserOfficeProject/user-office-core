@@ -3,7 +3,6 @@ import { container, inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { UserWithRole } from '../models/User';
-import { ScheduledEventDataSource } from './../datasources/ScheduledEventDataSource';
 import { Shipment } from './../resolvers/types/Shipment';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
@@ -11,12 +10,10 @@ import { UserAuthorization } from './UserAuthorization';
 @injectable()
 export class ShipmentAuthorization {
   private proposalAuth = container.resolve(ProposalAuthorization);
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ShipmentDataSource)
     private shipmentDataSource: ShipmentDataSource,
-    @inject(Tokens.ScheduledEventDataSource)
-    private scheduledEventDataSource: ScheduledEventDataSource
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveShipment(
