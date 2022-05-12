@@ -9,8 +9,16 @@ import { useDataApi } from 'hooks/common/useDataApi';
 export function useUsersData(
   usersFilter: GetUsersQueryVariables & { refreshData?: boolean }
 ) {
-  const { filter, offset, first, subtractUsers, userRole, refreshData } =
-    usersFilter;
+  const {
+    filter,
+    offset,
+    first,
+    subtractUsers,
+    userRole,
+    refreshData,
+    orderBy,
+    orderDirection,
+  } = usersFilter;
   const [usersData, setUsersData] = useState<{
     totalCount: number;
     users: Array<BasicUserDetailsFragment>;
@@ -32,6 +40,8 @@ export function useUsersData(
         subtractUsers,
         first,
         userRole,
+        orderBy,
+        orderDirection,
       })
       .then((data) => {
         if (unmounted) {
@@ -45,7 +55,17 @@ export function useUsersData(
     return () => {
       unmounted = true;
     };
-  }, [filter, offset, subtractUsers, first, userRole, api, refreshData]);
+  }, [
+    filter,
+    offset,
+    subtractUsers,
+    first,
+    orderBy,
+    orderDirection,
+    userRole,
+    api,
+    refreshData,
+  ]);
 
   return { loadingUsersData, usersData, setUsersData };
 }

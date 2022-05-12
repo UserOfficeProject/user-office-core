@@ -18,6 +18,7 @@ mutation createUser(
   $telephone: String!
   $telephone_alt: String
   $otherOrganisation: String
+  $organizationCountry: Int
 ) {
   createUser(
     user_title: $user_title
@@ -39,6 +40,7 @@ mutation createUser(
     telephone: $telephone
     telephone_alt: $telephone_alt
     otherOrganisation: $otherOrganisation
+    organizationCountry: $organizationCountry
   ) {
     user {
       id
