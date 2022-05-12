@@ -23,6 +23,7 @@ import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
   createSkipListeningHandler,
@@ -65,6 +66,8 @@ mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapClass(Tokens.MailService, SkipSendMailService);
+
+mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));

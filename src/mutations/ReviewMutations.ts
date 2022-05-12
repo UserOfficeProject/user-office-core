@@ -36,14 +36,14 @@ import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
 export default class ReviewMutations {
   private technicalReviewAuth = container.resolve(TechnicalReviewAuthorization);
   private reviewAuth = container.resolve(ReviewAuthorization);
-  private userAuth = container.resolve(UserAuthorization);
 
   constructor(
     @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @EventBus(Event.PROPOSAL_SEP_REVIEW_UPDATED)

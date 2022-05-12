@@ -6,11 +6,9 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Sample } from './../resolvers/types/Sample';
 import { ProposalAuthorization } from './ProposalAuthorization';
-import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class SampleAuthorization {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(

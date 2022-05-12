@@ -7,6 +7,7 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 
 export const basicDummyUser = new BasicUserDetails(
@@ -195,7 +196,11 @@ export class UserDataSourceMock implements UserDataSource {
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
   }
-  async createOrganisation(name: string, verified: boolean): Promise<number> {
+  async createOrganisation(
+    name: string,
+    verified: boolean,
+    countryId?: number
+  ): Promise<number> {
     return 1;
   }
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
@@ -318,9 +323,7 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async getUsers(
-    filter?: string,
-    first?: number,
-    offset?: number
+    args: UsersArgs
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return {
       totalCount: 2,

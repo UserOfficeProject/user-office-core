@@ -27,11 +27,11 @@ statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 
 @injectable()
 export default class ProposalQueries {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
-    @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource
+    @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()

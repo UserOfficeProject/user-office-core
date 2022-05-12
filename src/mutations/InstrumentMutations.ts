@@ -8,7 +8,7 @@ import {
   setAvailabilityTimeOnInstrumentValidationSchema,
   submitInstrumentValidationSchema,
 } from '@user-office-software/duo-validation';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -40,13 +40,14 @@ import { sortByRankOrAverageScore } from '../utils/mathFunctions';
 import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
 export default class InstrumentMutations {
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.InstrumentDataSource)
     private dataSource: InstrumentDataSource,
     @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
+
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource
   ) {}

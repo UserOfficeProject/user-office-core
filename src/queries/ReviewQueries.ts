@@ -3,7 +3,6 @@ import { container, inject, injectable } from 'tsyringe';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { ReviewAuthorization } from '../auth/ReviewAuthorization';
 import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorization';
-import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
@@ -14,7 +13,6 @@ import { UserWithRole } from '../models/User';
 
 @injectable()
 export default class ReviewQueries {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
   private reviewAuth = container.resolve(ReviewAuthorization);
   private technicalReviewAuth = container.resolve(TechnicalReviewAuthorization);

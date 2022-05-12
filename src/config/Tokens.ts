@@ -5,6 +5,7 @@ export const Tokens = {
   CallDataSource: Symbol('CallDataSource'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
+  EmailEventHandler: Symbol('EmailEventHandler'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
   FeedbackDataSource: Symbol('FeedbackDataSource'),
   FileDataSource: Symbol('FileDataSource'),
@@ -26,7 +27,7 @@ export const Tokens = {
   SystemDataSource: Symbol('SystemDataSource'),
   TemplateDataSource: Symbol('TemplateDataSource'),
   UnitDataSource: Symbol('UnitDataSource'),
+  UserAuthorization: Symbol('UserAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
-  UserAuthorization: Symbol('UserAuthorization'),
 };

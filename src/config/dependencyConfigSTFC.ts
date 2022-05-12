@@ -24,6 +24,7 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import { StfcCallDataSource } from '../datasources/stfc/StfcCallDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
+import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
   createListenToRabbitMQHandler,
@@ -62,6 +63,8 @@ mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
+
+mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());

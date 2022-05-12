@@ -40,14 +40,14 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
-  async getCountry(id: number): Promise<Entry> {
+  async getCountry(id: number): Promise<Entry | null> {
     return database
       .select('*')
       .from('countries')
       .where('country_id', id)
       .first()
-      .then(
-        (count: CountryRecord) => new Entry(count.country_id, count.country)
+      .then((country: CountryRecord) =>
+        country ? new Entry(country.country_id, country.country) : null
       );
   }
 

@@ -17,7 +17,6 @@ import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 @injectable()
 export default class ProposalEsiMutations {
   private proposalAuth = container.resolve(ProposalAuthorization);
-  private userAuth = container.resolve(UserAuthorization);
 
   constructor(
     @inject(Tokens.ProposalEsiDataSource)
@@ -29,7 +28,8 @@ export default class ProposalEsiMutations {
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.CallDataSource)
-    private callDataSource: CallDataSource
+    private callDataSource: CallDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
