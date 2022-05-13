@@ -43,9 +43,9 @@ type BasicUserDetailsWithTableData = (BasicUserDetails & {
   tableData?: { checked: boolean };
 })[];
 
-type PeopleTableProps<
-  T extends BasicUserDetails = BasicUserDetails & { role?: Maybe<Role> }
-> = {
+type BasicUserDetailsWithRole = BasicUserDetails & { role?: Maybe<Role> };
+
+type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   selection: boolean;
   isLoading?: boolean;
   title?: string;
@@ -158,6 +158,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     offset: 0,
     first: 10,
     filter: '',
+    orderBy: '',
+    orderDirection: '',
     subtractUsers: props.selectedUsers ? props.selectedUsers : [],
     userRole: props.userRole ? props.userRole : null,
     refreshData: false,
@@ -273,6 +275,72 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     );
   }
 
+  const handleColumnSelectionChange = (
+    selectedItems: BasicUserDetailsWithRole[],
+    selectedItem: BasicUserDetailsWithRole | undefined
+  ) => {
+    // when the user wants to (un)select all items
+    // `selectedItem` will be undefined
+    if (!selectedItem) {
+      // first clear the current page because if any row was unselected
+      // the (un)select all option will select every rows
+      // which would result in duplicates
+      setSelectedParticipants((selectedParticipants) =>
+        selectedParticipants.filter(({ id }) => !currentPageIds.includes(id))
+      );
+
+      if (selectedItems.length > 0) {
+        setSelectedParticipants((selectedParticipants) => [
+          ...selectedParticipants,
+          ...(selectedItems.map((selectedItem) => ({
+            id: selectedItem.id,
+            firstname: selectedItem.firstname,
+            lastname: selectedItem.lastname,
+            organisation: selectedItem.organisation,
+          })) as BasicUserDetails[]),
+        ]);
+      }
+
+      return;
+    }
+
+    setSelectedParticipants((selectedParticipants) =>
+      (
+        selectedItem as BasicUserDetails & {
+          tableData: { checked: boolean };
+        }
+      ).tableData.checked
+        ? ([
+            ...selectedParticipants,
+            {
+              id: selectedItem.id,
+              firstname: selectedItem.firstname,
+              lastname: selectedItem.lastname,
+              organisation: selectedItem.organisation,
+            },
+          ] as BasicUserDetails[])
+        : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
+    );
+  };
+
+  const handleColumnOrderChange = (
+    orderedColumnId: number,
+    orderDirection: 'desc' | 'asc'
+  ) => {
+    if (
+      columns[orderedColumnId] &&
+      query.first &&
+      query.first < usersData.totalCount
+    ) {
+      setQuery((queryParams) => ({
+        ...queryParams,
+        orderBy:
+          orderedColumnId >= 0 ? columns[orderedColumnId].field : undefined,
+        orderDirection: orderDirection ? orderDirection : undefined,
+      }));
+    }
+  };
+
   const usersTableData = getUsersTableData(
     props.data || usersData?.users,
     selectedParticipants,
@@ -384,54 +452,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           }
           page={currentPage}
           columns={props.columns ?? columns}
-          onSelectionChange={(selectedItems, selectedItem) => {
-            // when the user wants to (un)select all items
-            // `selectedItem` will be undefined
-            if (!selectedItem) {
-              // first clear the current page because if any row was unselected
-              // the (un)select all option will select every rows
-              // which would result in duplicates
-              setSelectedParticipants((selectedParticipants) =>
-                selectedParticipants.filter(
-                  ({ id }) => !currentPageIds.includes(id)
-                )
-              );
-
-              if (selectedItems.length > 0) {
-                setSelectedParticipants((selectedParticipants) => [
-                  ...selectedParticipants,
-                  ...(selectedItems.map((selectedItem) => ({
-                    id: selectedItem.id,
-                    firstname: selectedItem.firstname,
-                    lastname: selectedItem.lastname,
-                    organisation: selectedItem.organisation,
-                  })) as BasicUserDetails[]),
-                ]);
-              }
-
-              return;
-            }
-
-            setSelectedParticipants((selectedParticipants) =>
-              (
-                selectedItem as BasicUserDetails & {
-                  tableData: { checked: boolean };
-                }
-              ).tableData.checked
-                ? ([
-                    ...selectedParticipants,
-                    {
-                      id: selectedItem.id,
-                      firstname: selectedItem.firstname,
-                      lastname: selectedItem.lastname,
-                      organisation: selectedItem.organisation,
-                    },
-                  ] as BasicUserDetails[])
-                : selectedParticipants.filter(
-                    ({ id }) => id !== selectedItem.id
-                  )
-            );
-          }}
+          onSelectionChange={handleColumnSelectionChange}
+          onOrderChange={handleColumnOrderChange}
           data={usersTableData.users}
           totalCount={usersTableData.totalCount + invitedUsers.length}
           isLoading={loading || loadingUsersData}

@@ -261,12 +261,11 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     orderedColumnId: number,
     orderDirection: 'desc' | 'asc'
   ) => {
-    setUrlQueryParams &&
-      setUrlQueryParams((params) => ({
-        ...params,
-        sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-        sortDirection: orderDirection ? orderDirection : undefined,
-      }));
+    setUrlQueryParams((params) => ({
+      ...params,
+      sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+      sortDirection: orderDirection ? orderDirection : undefined,
+    }));
   };
 
   const handleBulkDownLoadClick = (
