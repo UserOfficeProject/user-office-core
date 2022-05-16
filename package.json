@@ -37,7 +37,7 @@
     "formik-mui-lab": "^1.0.0-alpha.3",
     "graphql": "^15.8.0",
     "graphql-request": "^3.7.0",
-    "html-react-parser": "^1.4.11",
+    "html-react-parser": "^1.4.12",
     "immer": "^9.0.7",
     "jwt-decode": "^3.1.2",
     "luxon": "^2.3.2",
