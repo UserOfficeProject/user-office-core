@@ -26,11 +26,11 @@ export class Institution implements Partial<InstitutionOrigin> {
 
 @Resolver(() => Institution)
 export class InstitutionResolver {
-  @FieldResolver(() => Entry)
+  @FieldResolver(() => Entry, { nullable: true })
   async country(
     @Root() institution: InstitutionOrigin,
     @Ctx() context: ResolverContext
-  ): Promise<Entry> {
+  ): Promise<Entry | null> {
     return context.queries.admin.getCountry(institution.country);
   }
 }

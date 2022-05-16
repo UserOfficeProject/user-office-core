@@ -4,6 +4,7 @@ import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalR
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
+import { dummyProposalTechnicalReview } from './ProposalDataSource';
 
 export const dummyReview = new Review(4, 10, 1, 'Good proposal', 9, 0, 1);
 export const dummySubmittedReview = new Review(
@@ -21,8 +22,10 @@ export const dummyReviewWithNextProposalStatus =
 export const dummyReviewBad = new Review(1, 9, 1, 'bad proposal', 1, 0, 1);
 
 export class ReviewDataSourceMock implements ReviewDataSource {
-  getTechnicalReview(proposalPk: number): Promise<TechnicalReview | null> {
-    throw new Error('Method not implemented.');
+  async getTechnicalReview(
+    proposalPk: number
+  ): Promise<TechnicalReview | null> {
+    return dummyProposalTechnicalReview;
   }
   setTechnicalReview(
     args: AddTechnicalReviewInput,

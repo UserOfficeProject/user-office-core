@@ -10,10 +10,10 @@ import { UserAuthorization } from './UserAuthorization';
 @injectable()
 export class TechnicalReviewAuthorization {
   private proposalAuth = container.resolve(ProposalAuthorization);
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ReviewDataSource)
-    private reviewDataSource: ReviewDataSource
+    private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveTechnicalReview(
@@ -52,7 +52,7 @@ export class TechnicalReviewAuthorization {
       return false;
     }
 
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
       return true;
     }
@@ -61,7 +61,13 @@ export class TechnicalReviewAuthorization {
       agent,
       technicalreview.proposalPk
     );
-    if (isScientistToProposal) {
+    const isInstrumentManagerToProposal =
+      await this.proposalAuth.isInstrumentManagerToProposal(
+        agent,
+        technicalreview.proposalPk
+      );
+
+    if (isScientistToProposal || isInstrumentManagerToProposal) {
       return true;
     }
 
@@ -102,7 +108,7 @@ export class TechnicalReviewAuthorization {
         ? technicalreviewOrProposalPk
         : technicalreviewOrProposalPk.proposalPk;
 
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
       return true;
     }
@@ -111,7 +117,10 @@ export class TechnicalReviewAuthorization {
       agent,
       proposalPk
     );
-    if (isScientistToProposal) {
+    const isInstrumentManagerToProposal =
+      await this.proposalAuth.isInstrumentManagerToProposal(agent, proposalPk);
+
+    if (isScientistToProposal || isInstrumentManagerToProposal) {
       return true;
     }
 

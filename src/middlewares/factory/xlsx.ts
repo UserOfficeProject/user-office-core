@@ -1,6 +1,8 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
-import baseContext from '../../buildContext';
+import { UserAuthorization } from '../../auth/UserAuthorization';
+import { Tokens } from '../../config/Tokens';
 import callFactoryService, {
   DownloadType,
   XLSXType,
@@ -34,7 +36,9 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       .map((n: string) => parseInt(n))
       .filter((id: number) => !isNaN(id));
 
-    const userAuthorization = baseContext.userAuthorization;
+    const userAuthorization = container.resolve<UserAuthorization>(
+      Tokens.UserAuthorization
+    );
 
     if (!userAuthorization.isUserOfficer(userWithRole)) {
       throw new Error('User has insufficient rights');

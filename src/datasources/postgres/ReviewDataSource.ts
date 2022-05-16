@@ -6,7 +6,11 @@ import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTech
 import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
-import { ReviewRecord, TechnicalReviewRecord } from './records';
+import {
+  createTechnicalReviewObject,
+  ReviewRecord,
+  TechnicalReviewRecord,
+} from './records';
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
   private createReviewObject(review: ReviewRecord) {
@@ -18,20 +22,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       review.grade,
       review.status,
       review.sep_id
-    );
-  }
-
-  private createTechnicalReviewObject(technicalReview: TechnicalReviewRecord) {
-    return new TechnicalReview(
-      technicalReview.technical_review_id,
-      technicalReview.proposal_pk,
-      technicalReview.comment,
-      technicalReview.public_comment,
-      technicalReview.time_allocation,
-      technicalReview.status,
-      technicalReview.submitted,
-      technicalReview.reviewer_id,
-      JSON.stringify(technicalReview.files)
     );
   }
 
@@ -66,7 +56,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         .where('proposal_pk', proposalPk)
         .returning('*')
         .then((records: TechnicalReviewRecord[]) =>
-          this.createTechnicalReviewObject(records[0])
+          createTechnicalReviewObject(records[0])
         );
     }
 
@@ -84,7 +74,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .returning('*')
       .into('technical_review')
       .then((records: TechnicalReviewRecord[]) =>
-        this.createTechnicalReviewObject(records[0])
+        createTechnicalReviewObject(records[0])
       );
   }
 
@@ -99,7 +89,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           return null;
         }
 
-        return this.createTechnicalReviewObject(review);
+        return createTechnicalReviewObject(review);
       });
   }
 

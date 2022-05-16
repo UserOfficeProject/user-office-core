@@ -13,14 +13,14 @@ import { UserAuthorization } from '../UserAuthorization';
 export class GenericTemplateQuestionaryAuthorizer
   implements QuestionaryAuthorizer
 {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.GenericTemplateDataSource)
-    private genericTemplateDataSource: GenericTemplateDataSource
+    private genericTemplateDataSource: GenericTemplateDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);

@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -10,10 +10,11 @@ import { UserWithRole } from '../models/User';
 
 @injectable()
 export default class InstrumentQueries {
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.InstrumentDataSource)
-    public dataSource: InstrumentDataSource
+    public dataSource: InstrumentDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
   ) {}
 
   private isUserOfficer(agent: UserWithRole | null) {

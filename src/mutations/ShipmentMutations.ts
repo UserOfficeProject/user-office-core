@@ -25,7 +25,6 @@ import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
 export default class ShipmentMutations {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
   private sampleAuth = container.resolve(SampleAuthorization);
   private shipmentAuth = container.resolve(ShipmentAuthorization);
@@ -40,7 +39,9 @@ export default class ShipmentMutations {
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.AssetRegistrar)
-    private assetRegistrarService: AssetRegistrar
+    private assetRegistrarService: AssetRegistrar,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
   ) {}
 
   @Authorized()

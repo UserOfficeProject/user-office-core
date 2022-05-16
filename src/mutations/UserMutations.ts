@@ -188,7 +188,8 @@ export default class UserMutations {
     if (args.otherOrganisation) {
       organisationId = await this.dataSource.createOrganisation(
         args.otherOrganisation,
-        false
+        false,
+        args.organizationCountry
       );
     }
 
@@ -320,7 +321,8 @@ export default class UserMutations {
     if (args.otherOrganisation) {
       organisationId = await this.dataSource.createOrganisation(
         args.otherOrganisation,
-        false
+        false,
+        args.organizationCountry
       );
     }
 

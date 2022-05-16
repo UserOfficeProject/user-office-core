@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -15,7 +15,6 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class ProposalAuthorization {
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
@@ -30,7 +29,8 @@ export class ProposalAuthorization {
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveProposal(
@@ -129,6 +129,18 @@ export class ProposalAuthorization {
       });
   }
 
+  async isInstrumentManagerToProposal(agent: User | null, proposalPk: number) {
+    if (agent == null || !agent.id) {
+      return false;
+    }
+
+    return this.userDataSource
+      .checkInstrumentManagerToProposal(agent.id, proposalPk)
+      .then((result) => {
+        return result;
+      });
+  }
+
   isVisitorOfProposal(
     agent: UserWithRole,
     proposalPk: number
@@ -176,6 +188,7 @@ export class ProposalAuthorization {
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
+      (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
       (await this.isVisitorOfProposal(agent, proposal.primaryKey))
     );
