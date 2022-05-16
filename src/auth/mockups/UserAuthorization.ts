@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { dummyUser } from '../../datasources/mockups/UserDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { SEPDataSource } from '../../datasources/SEPDataSource';
@@ -17,9 +18,17 @@ export class UserAuthorizationMock extends UserAuthorization {
     @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource)
     protected proposalDataSource: ProposalDataSource,
-    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource
+    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource,
+    @inject(Tokens.InstrumentDataSource)
+    protected instrumentDataSoucre: InstrumentDataSource
   ) {
-    super(userDataSource, sepDataSource, proposalDataSource, visitDataSource);
+    super(
+      userDataSource,
+      sepDataSource,
+      proposalDataSource,
+      visitDataSource,
+      instrumentDataSoucre
+    );
   }
 
   async externalTokenLogin(token: string): Promise<User | null> {

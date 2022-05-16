@@ -28,7 +28,7 @@ const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
   'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
 };
 
-type stfcRole = {
+export type stfcRole = {
   name: string;
 };
 

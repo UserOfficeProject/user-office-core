@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -16,7 +17,9 @@ export class UserAuthorization {
     @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource)
     protected proposalDataSource: ProposalDataSource,
-    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource
+    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource,
+    @inject(Tokens.InstrumentDataSource)
+    protected instrumentDataSource: InstrumentDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
