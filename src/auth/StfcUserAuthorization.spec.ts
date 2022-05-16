@@ -52,7 +52,7 @@ beforeEach(() => {
 test('When an invalid external token is supplied, no user is found', async () => {
   return expect(
     userAuthorization.externalTokenLogin('invalid')
-  ).rejects.toMatch(
+  ).rejects.toThrow(
     'Failed to fetch user details for STFC external authentication'
   );
 });

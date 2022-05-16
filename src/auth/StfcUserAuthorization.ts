@@ -5,7 +5,10 @@ import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
-import { stfcRole } from '../datasources/stfc/StfcUserDataSource';
+import {
+  StfcBasicPersonDetails,
+  stfcRole,
+} from '../datasources/stfc/StfcUserDataSource';
 import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
@@ -154,8 +157,8 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
   }
 
-  async externalTokenLogin(token: string): Promise<User> {
-    const stfcUser = await client
+  async externalTokenLogin(token: string): Promise<User | null> {
+    const stfcUser: StfcBasicPersonDetails | null = await client
       .getPersonDetailsFromSessionId(token)
       .then((rawStfcUser) => rawStfcUser.return)
       .catch((error) => {
@@ -166,8 +169,16 @@ export class StfcUserAuthorization extends UserAuthorization {
           token: token,
         });
 
-        throw rethrowMessage;
+        throw new Error(rethrowMessage);
       });
+
+    if (!stfcUser) {
+      logger.logInfo('No user found for STFC external authentication', {
+        externalToken: token,
+      });
+
+      return null;
+    }
 
     // Create dummy user if one does not exist in the proposals DB.
     // This is needed to satisfy the FOREIGN_KEY constraints
