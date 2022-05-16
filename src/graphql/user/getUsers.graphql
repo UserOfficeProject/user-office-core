@@ -4,6 +4,8 @@ query getUsers(
   $offset: Int
   $userRole: UserRole
   $subtractUsers: [Int!]
+  $orderBy: String
+  $orderDirection: String
 ) {
   users(
     filter: $filter
@@ -11,6 +13,8 @@ query getUsers(
     offset: $offset
     userRole: $userRole
     subtractUsers: $subtractUsers
+    orderBy: $orderBy
+    orderDirection: $orderDirection
   ) {
     users {
       ...basicUserDetails

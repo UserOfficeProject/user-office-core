@@ -155,6 +155,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
 
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
+  const [countriesList, setCountriesList] = useState<Option[]>([]);
   const { handleLogin, token } = useContext(UserContext);
 
   const [orcidError, setOrcidError] = useState(false);
@@ -204,28 +205,30 @@ const SignUp: React.FC<SignUpProps> = (props) => {
 
   const initialValues: Omit<
     CreateUserMutationVariables,
-    'gender' | 'nationality' | 'organisation'
+    'gender' | 'nationality' | 'organisation' | 'organizationCountry'
   > & {
     gender: Maybe<string>;
     othergender: string;
     organisation: Maybe<number>;
+    organizationCountry: Maybe<number>;
     nationality: Maybe<number>;
     confirmPassword: string;
     privacy_agreement: boolean;
     cookie_policy: boolean;
   } = {
-    user_title: null,
+    user_title: '',
     firstname: firstname as string,
     middlename: '',
     lastname: lastname as string,
     password: '',
     confirmPassword: '',
     preferredname: '',
-    gender: null,
+    gender: '',
     othergender: '',
     nationality: null,
     birthdate: userMaxBirthDate,
     organisation: null,
+    organizationCountry: null,
     department: '',
     position: '',
     email: (email as string) || '',
@@ -264,6 +267,14 @@ const SignUp: React.FC<SignUpProps> = (props) => {
     setNationalitiesList(
       fieldsContent.nationalities.map((nationality) => {
         return { text: nationality.value, value: nationality.id };
+      })
+    );
+  }
+
+  if (!countriesList.length) {
+    setCountriesList(
+      fieldsContent.countries.map((country) => {
+        return { text: country.value, value: country.id };
       })
     );
   }
@@ -614,6 +625,39 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     4. Organisation details
                   </Typography>
                   <CardContent>
+                    <FormikUIAutocomplete
+                      name="organisation"
+                      label="Organisation"
+                      items={institutionsList}
+                      disabled={!orcData}
+                      noOptionsText="No items"
+                      data-cy="organisation"
+                      required
+                    />
+                    {values.organisation && +values.organisation === 1 && (
+                      <>
+                        <Field
+                          name="otherOrganisation"
+                          label="Please specify organisation"
+                          id="organisation-input"
+                          type="text"
+                          component={TextField}
+                          fullWidth
+                          data-cy="otherOrganisation"
+                          required
+                          disabled={!orcData}
+                        />
+                        <FormikUIAutocomplete
+                          name="organizationCountry"
+                          label="Please specify organization country"
+                          items={countriesList}
+                          data-cy="organizationCountry"
+                          required
+                          loading={!fieldsContent}
+                          noOptionsText="No countries"
+                        />
+                      </>
+                    )}
                     <Field
                       name="position"
                       label="Position"
@@ -636,28 +680,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       required
                       disabled={!orcData}
                     />
-                    <FormikUIAutocomplete
-                      name="organisation"
-                      label="Organisation"
-                      items={institutionsList}
-                      disabled={!orcData}
-                      noOptionsText="No items"
-                      data-cy="organisation"
-                      required
-                    />
-                    {values.organisation && +values.organisation === 1 && (
-                      <Field
-                        name="otherOrganisation"
-                        label="Please specify organisation"
-                        id="organisation-input"
-                        type="text"
-                        component={TextField}
-                        fullWidth
-                        data-cy="otherOrganisation"
-                        required
-                        disabled={!orcData}
-                      />
-                    )}
                   </CardContent>
                 </Card>
 

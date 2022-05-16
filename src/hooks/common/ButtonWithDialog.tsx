@@ -1,11 +1,11 @@
-import Button from '@mui/material/Button';
+import Button, { ButtonProps } from '@mui/material/Button';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 
-interface ButtonWithDialogProps {
+interface ButtonWithDialogProps extends ButtonProps {
   children: JSX.Element;
   label: string;
   disabled?: boolean;
@@ -17,21 +17,14 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function ButtonWithDialog({
-  children,
-  label,
-  disabled = false,
-}: ButtonWithDialogProps) {
+function ButtonWithDialog(props: ButtonWithDialogProps) {
+  const { children, label, ...rest } = props;
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const classes = useStyles();
 
   return (
     <>
-      <Button
-        variant="text"
-        onClick={() => setIsDialogOpen(true)}
-        disabled={disabled}
-      >
+      <Button variant="text" onClick={() => setIsDialogOpen(true)} {...rest}>
         {label}
       </Button>
       <InputDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
