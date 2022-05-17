@@ -1,12 +1,12 @@
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateImportWithValidationWrap } from '../types/CommonWrappers';
+import { TemplateValidationWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
 export class ValidateTemplateImportMutation {
-  @Mutation(() => TemplateImportWithValidationWrap)
+  @Mutation(() => TemplateValidationWrap)
   validateTemplateImport(
     @Arg('templateAsJson')
     templateAsJson: string,
@@ -17,7 +17,7 @@ export class ValidateTemplateImportMutation {
         context.user,
         templateAsJson
       ),
-      TemplateImportWithValidationWrap
+      TemplateValidationWrap
     );
   }
 }

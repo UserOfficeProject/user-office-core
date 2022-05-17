@@ -42,6 +42,7 @@ import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutatio
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import { ConflictResolution } from '../resolvers/types/ConflictResolution';
+import { TemplateExport } from './../models/Template';
 @injectable()
 export default class TemplateMutations {
   constructor(
@@ -470,13 +471,26 @@ export default class TemplateMutations {
       });
   }
 
+  convertStringToTemplateExport = (string: string): TemplateExport => {
+    const object: TemplateExport = JSON.parse(string);
+    object.metadata.exportDate = new Date(object.metadata.exportDate);
+
+    return object;
+  };
+
   @Authorized([Roles.USER_OFFICER])
   async validateTemplateImport(
     agent: UserWithRole | null,
     templateAsJson: string
   ) {
     try {
-      return await this.dataSource.validateTemplateImport(templateAsJson);
+      const templateExport = this.convertStringToTemplateExport(templateAsJson);
+
+      const validation = await this.dataSource.validateTemplateExport(
+        templateExport
+      );
+
+      return validation;
     } catch (error) {
       return rejection(
         `Could not validate template import. ${error}`,
@@ -494,8 +508,11 @@ export default class TemplateMutations {
     subTemplatesConflictResolutions: ConflictResolution[][]
   ): Promise<Template | Rejection> {
     try {
+      const templateExport: TemplateExport =
+        this.convertStringToTemplateExport(templateAsJson);
+
       const template = await this.dataSource.importTemplate(
-        templateAsJson,
+        templateExport,
         conflictResolution,
         subTemplatesConflictResolutions
       );
