@@ -4,34 +4,8 @@ mutation validateTemplateImport($templateAsJson: String!) {
       json
       version
       exportDate
-      isValid
-      errors
-      questionComparisons {
-        existingQuestion {
-          ...question
-        }
-        newQuestion {
-          ...question
-        }
-        status
-        conflictResolutionStrategy
-      }
-      subTemplatesWithValidation {
-        json
-        version
-        exportDate
-        isValid
-        errors
-        questionComparisons {
-          existingQuestion {
-            ...question
-          }
-          newQuestion {
-            ...question
-          }
-          status
-          conflictResolutionStrategy
-        }
+      validationData {
+        ...templateValidationData
       }
     }
     rejection {

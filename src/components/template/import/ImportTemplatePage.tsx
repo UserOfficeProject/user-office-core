@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import Container from '@mui/material/Container';
 import React from 'react';
 
-import { TemplateImportWithValidation } from 'generated/sdk';
+import { TemplateValidation } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -22,7 +22,7 @@ export const getFileContents = async (file: File): Promise<string> => {
 export default function ImportTemplatePage() {
   const { api } = useDataApiWithFeedback();
   const [validationResult, setValidationResult] =
-    React.useState<TemplateImportWithValidation | null>(null);
+    React.useState<TemplateValidation | null>(null);
 
   return (
     <Container>
@@ -32,7 +32,7 @@ export default function ImportTemplatePage() {
         </Typography>
         {validationResult ? (
           <MergeReview
-            data={validationResult}
+            templateImport={validationResult}
             onBack={() => setValidationResult(null)}
           />
         ) : (
@@ -43,7 +43,7 @@ export default function ImportTemplatePage() {
                 .then(({ validateTemplateImport }) => {
                   const result = validateTemplateImport.validationResult;
                   if (result) {
-                    setValidationResult(result);
+                    setValidationResult(result as TemplateValidation);
                   }
                 });
             }}
