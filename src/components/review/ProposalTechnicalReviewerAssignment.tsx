@@ -52,8 +52,9 @@ const ProposalTechnicalReviewerAssignment: React.FC<
         If you think there is a better candidate to do the review for the
         proposal, you can re-assign it to someone else
       </p>
-      <div>
-        {proposalData.technicalReviewAssignee !== null || showReassign ? (
+      <>
+        {proposalData.technicalReview?.technicalReviewAssigneeId !== null ||
+        showReassign ? (
           <AssignTechnicalReview
             proposal={proposalData}
             onProposalUpdated={(updatedProposal) => {
@@ -69,7 +70,7 @@ const ProposalTechnicalReviewerAssignment: React.FC<
             Re-assign...
           </Button>
         )}
-      </div>
+      </>
     </Paper>
   );
 };

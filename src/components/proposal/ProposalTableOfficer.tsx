@@ -74,6 +74,115 @@ export type QueryParameters = {
   searchText?: string | undefined;
 };
 
+let columns: Column<ProposalViewData>[] = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0 },
+    sorting: false,
+    removable: false,
+    field: 'rowActionButtons',
+  },
+  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Title',
+    field: 'title',
+    ...{ width: 'auto' },
+  },
+  {
+    title: 'Technical time allocation',
+    render: (rowData) =>
+      rowData.technicalTimeAllocation
+        ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
+        : '',
+    hidden: true,
+  },
+  {
+    title: 'Final time allocation',
+    render: (rowData) =>
+      rowData.managementTimeAllocation
+        ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
+        : '',
+    hidden: true,
+  },
+  {
+    title: 'Submitted',
+    field: 'submitted',
+    lookup: { true: 'Yes', false: 'No' },
+  },
+  {
+    title: 'Status',
+    field: 'statusName',
+  },
+  {
+    title: 'Notified',
+    field: 'notified',
+    lookup: { true: 'Yes', false: 'No' },
+  },
+  {
+    title: 'Call',
+    field: 'callShortCode',
+  },
+];
+
+const addTechnicalReviewColumns = () => {
+  if (!columns.find((column) => column.field === 'technicalStatus')) {
+    columns.push({
+      title: 'Technical status',
+      field: 'technicalStatus',
+      emptyValue: '-',
+    });
+  }
+  if (!columns.find((column) => column.field === 'assignedTechnicalReviewer')) {
+    columns.push({
+      title: 'Assigned technical reviewer',
+      field: 'assignedTechnicalReviewer',
+      emptyValue: '-',
+    });
+  }
+};
+
+const addSEPReviewColumns = () => {
+  if (!columns.find((column) => column.field === 'finalStatus')) {
+    columns.push({
+      title: 'Final Status',
+      field: 'finalStatus',
+    });
+  }
+  if (!columns.find((column) => column.field === 'reviewDeviation')) {
+    columns.push({
+      title: 'Deviation',
+      field: 'reviewDeviation',
+    });
+  }
+  if (!columns.find((column) => column.field === 'reviewAverage')) {
+    columns.push({
+      title: 'Average Score',
+      field: 'reviewAverage',
+    });
+  }
+  if (!columns.find((column) => column.field === 'rankOrder')) {
+    columns.push({
+      title: 'Ranking',
+      field: 'rankOrder',
+    });
+  }
+  if (!columns.find((column) => column.field === 'sepCode')) {
+    columns.push({
+      title: 'SEP',
+      field: 'sepCode',
+    });
+  }
+};
+
+const addInstrumentManagementColumns = () => {
+  if (!columns.find((column) => column.field === 'instrumentName')) {
+    columns.push({
+      title: 'Instrument',
+      field: 'instrumentName',
+    });
+  }
+};
+
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   urlQueryParams,
@@ -202,112 +311,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     FeatureId.SEP_REVIEW
   )?.isEnabled;
 
-  let columns: Column<ProposalViewData>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0 },
-      sorting: false,
-      removable: false,
-      field: 'rowActionButtons',
-    },
-    { title: 'Proposal ID', field: 'proposalId' },
-    {
-      title: 'Title',
-      field: 'title',
-      ...{ width: 'auto' },
-    },
-    {
-      title: 'Technical time allocation',
-      render: (rowData) =>
-        rowData.technicalTimeAllocation
-          ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
-          : '',
-      hidden: true,
-    },
-    ...(isTechnicalReviewEnabled
-      ? [
-          {
-            title: 'Technical status',
-            field: 'technicalStatus',
-          },
-        ]
-      : []),
-    {
-      title: 'Final time allocation',
-      render: (rowData) =>
-        rowData.managementTimeAllocation
-          ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
-          : '',
-      hidden: true,
-    },
-    ...(isSEPEnabled
-      ? [
-          {
-            title: 'Final Status',
-            field: 'finalStatus',
-          },
-        ]
-      : []),
-    {
-      title: 'Submitted',
-      field: 'submitted',
-      lookup: { true: 'Yes', false: 'No' },
-    },
-    {
-      title: 'Status',
-      field: 'statusName',
-    },
-    ...(isSEPEnabled
-      ? [
-          {
-            title: 'Deviation',
-            field: 'reviewDeviation',
-          },
-        ]
-      : []),
-    ...(isSEPEnabled
-      ? [
-          {
-            title: 'Average Score',
-            field: 'reviewAverage',
-          },
-        ]
-      : []),
-    ...(isSEPEnabled
-      ? [
-          {
-            title: 'Ranking',
-            field: 'rankOrder',
-          },
-        ]
-      : []),
-    {
-      title: 'Notified',
-      field: 'notified',
-      lookup: { true: 'Yes', false: 'No' },
-    },
-    ...(isInstrumentManagementEnabled
-      ? [
-          {
-            title: 'Instrument',
-            field: 'instrumentName',
-          },
-        ]
-      : []),
-    {
-      title: 'Call',
-      field: 'callShortCode',
-    },
-    ...(isSEPEnabled
-      ? [
-          {
-            title: 'SEP',
-            field: 'sepCode',
-          },
-        ]
-      : []),
-  ];
-
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -324,6 +327,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       </IconButton>
     </Tooltip>
   );
+
+  if (isTechnicalReviewEnabled) {
+    addTechnicalReviewColumns();
+  }
+
+  if (isInstrumentManagementEnabled) {
+    addInstrumentManagementColumns();
+  }
+
+  if (isSEPEnabled) {
+    addSEPReviewColumns();
+  }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
@@ -615,6 +630,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
+      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+        : '-',
     })
   );
 

@@ -9,6 +9,7 @@ import Chip from '@mui/material/Chip';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import Link from '@mui/material/Link';
 import MenuItem from '@mui/material/MenuItem';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
@@ -42,8 +43,8 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '25px',
     marginLeft: '10px',
   },
-  orcIdLabel: {
-    marginBottom: theme.spacing(1),
+  orcidLink: {
+    marginTop: theme.spacing(3),
   },
   orcidIconSmall: {
     verticalAlign: 'middle',
@@ -76,35 +77,37 @@ export default function UpdateUserInformation(props: { id: number }) {
   const { institutions, loadingInstitutions } = useInstitutionsData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
+  const [countriesList, setCountriesList] = useState<Option[]>([]);
   const classes = useStyles();
 
   // NOTE: User should be older than 18 years.
   const userMaxBirthDate = DateTime.now().minus({ years: 18 });
 
-  if (loadingInstitutions || !fieldsContent || !userData) {
+  if (!userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
 
   const initialValues = {
     username: userData.username,
     firstname: userData.firstname,
-    middlename: userData.middlename,
+    middlename: userData.middlename || '',
     lastname: userData.lastname,
-    preferredname: userData.preferredname,
+    preferredname: userData.preferredname || '',
     gender:
       userData.gender !== 'male' && userData.gender !== 'female'
         ? 'other'
         : userData.gender,
     othergender: userData.gender,
-    nationality: userData.nationality || '',
+    nationality: userData.nationality,
     birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
     organisation: userData.organisation,
+    organizationCountry: 0,
     department: userData.department,
     position: userData.position,
     oldEmail: userData.email,
     email: userData.email,
     telephone: userData.telephone,
-    telephone_alt: userData.telephone_alt,
+    telephone_alt: userData.telephone_alt || '',
     user_title: userData.user_title,
     orcid: userData.orcid,
   };
@@ -123,7 +126,7 @@ export default function UpdateUserInformation(props: { id: number }) {
     { text: 'Other', value: 'other' },
   ];
 
-  if (!institutionsList.length) {
+  if (!institutionsList.length && institutions.length) {
     setInstitutionsList(
       institutions.map((institution) => {
         return { text: institution.name, value: institution.id };
@@ -131,10 +134,18 @@ export default function UpdateUserInformation(props: { id: number }) {
     );
   }
 
-  if (!nationalitiesList.length) {
+  if (!nationalitiesList.length && fieldsContent) {
     setNationalitiesList(
       fieldsContent.nationalities.map((nationality) => {
         return { text: nationality.value, value: nationality.id };
+      })
+    );
+  }
+
+  if (!countriesList.length && fieldsContent) {
+    setCountriesList(
+      fieldsContent.countries.map((country) => {
+        return { text: country.value, value: country.id };
       })
     );
   }
@@ -188,220 +199,228 @@ export default function UpdateUserInformation(props: { id: number }) {
   };
 
   return (
-    <React.Fragment>
-      <Formik
-        validateOnChange={false}
-        initialValues={initialValues}
-        onSubmit={async (values, actions): Promise<void> => {
-          const newValues = {
-            id: props.id,
-            ...values,
-            nationality: +(values.nationality as number),
-            organisation: +values.organisation,
-            gender:
-              values.gender === 'other' ? values.othergender : values.gender,
-          } as UpdateUserMutationVariables;
+    <Formik
+      validateOnChange={false}
+      initialValues={initialValues}
+      onSubmit={async (values, actions): Promise<void> => {
+        const newValues = {
+          id: props.id,
+          ...values,
+          nationality: +(values.nationality as number),
+          organisation: +values.organisation,
+          organizationCountry:
+            +values.organisation === 1 ? +values.organizationCountry : null,
+          gender:
+            values.gender === 'other' ? values.othergender : values.gender,
+        } as UpdateUserMutationVariables;
 
-          await sendUserUpdate({
-            ...newValues,
-          });
-          actions.setFieldValue('oldEmail', values.email);
-        }}
-        validationSchema={updateUserValidationSchema}
-      >
-        {({ isSubmitting, values }) => (
-          <Form>
-            <Typography variant="h6" component="h2" gutterBottom>
-              User Information
-              <Box className={classes.chipSpace}>
-                {!userData.emailVerified && (
-                  <Chip
-                    color="primary"
-                    deleteIcon={<DoneIcon data-cy="btn-verify-email" />}
-                    onDelete={
-                      isUserOfficer ? handleSetUserEmailVerified : undefined
-                    }
-                    icon={<AlternateEmailIcon />}
-                    size="small"
-                    label="Email not verified"
-                  />
-                )}
-                {userData.placeholder && (
-                  <Chip
-                    color="primary"
-                    deleteIcon={
-                      <DoneIcon data-cy="btn-set-user-not-placeholder" />
-                    }
-                    onDelete={
-                      isUserOfficer ? handleSetUserNotPlaceholder : undefined
-                    }
-                    icon={<AccountCircleIcon />}
-                    size="small"
-                    label="Placeholder user"
-                  />
-                )}
-              </Box>
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <LocalizationProvider dateAdapter={DateAdapter}>
-                  <FormControl fullWidth>
-                    <InputLabel
-                      htmlFor="user_title"
-                      shrink={!!values.user_title}
-                      required
-                    >
-                      Title
-                    </InputLabel>
-                    <Field
-                      name="user_title"
-                      component={Select}
-                      data-cy="title"
-                      required
-                    >
-                      {userTitleOptions.map(({ value, text }) => (
-                        <MenuItem value={value} key={value}>
-                          {text}
-                        </MenuItem>
-                      ))}
-                    </Field>
-                  </FormControl>
-                  <Field
-                    name="firstname"
-                    label="Firstname"
-                    id="firstname-input"
-                    type="text"
-                    component={TextField}
-                    fullWidth
-                    data-cy="firstname"
-                  />
-                  <Field
-                    name="middlename"
-                    label="Middle name"
-                    id="middlename-input"
-                    type="text"
-                    component={TextField}
-                    fullWidth
-                    data-cy="middlename"
-                  />
-                  <Field
-                    name="lastname"
-                    label="Lastname"
-                    id="lastname-input"
-                    type="text"
-                    component={TextField}
-                    fullWidth
-                    data-cy="lastname"
-                  />
-                  <Field
-                    name="preferredname"
-                    label="Preferred name"
-                    id="preferredname-input"
-                    type="text"
-                    component={TextField}
-                    fullWidth
-                    data-cy="preferredname"
-                  />
-                  <FormControl fullWidth>
-                    <InputLabel
-                      htmlFor="user_title"
-                      shrink={!!values.gender}
-                      required
-                    >
-                      Gender
-                    </InputLabel>
-                    <Field
-                      id="gender"
-                      name="gender"
-                      type="text"
-                      component={Select}
-                      data-cy="gender"
-                      required
-                    >
-                      {genderOptions.map(({ value, text }) => {
-                        return (
-                          <MenuItem value={value} key={value}>
-                            {text}
-                          </MenuItem>
-                        );
-                      })}
-                    </Field>
-                  </FormControl>
-                  {values.gender === 'other' && (
-                    <Field
-                      name="othergender"
-                      label="Please specify gender"
-                      id="othergender-input"
-                      type="text"
-                      component={TextField}
-                      fullWidth
-                      data-cy="othergender"
-                      required
-                    />
-                  )}
-                  <FormikUIAutocomplete
-                    name="nationality"
-                    label="Nationality"
-                    items={nationalitiesList}
-                    data-cy="nationality"
-                  />
-
-                  <Field
-                    name="birthdate"
-                    label="Birthdate"
-                    id="birthdate-input"
-                    inputFormat={format}
-                    mask={mask}
-                    inputProps={{ placeholder: format }}
-                    component={DatePicker}
-                    textField={{
-                      fullWidth: true,
-                      'data-cy': 'birthdate',
-                    }}
-                    maxDate={userMaxBirthDate}
-                    desktopModeMediaQuery={theme.breakpoints.up('sm')}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={6}>
-                <div className={classes.orcIdContainer}>
-                  <InputLabel shrink className={classes.orcIdLabel}>
-                    ORCID iD{' '}
-                    <img
-                      className={classes.orcidIconSmall}
-                      src={orcid}
-                      alt="ORCID iD icon"
-                    />
-                  </InputLabel>
-                  <a
-                    href={'https://orcid.org/' + values.orcid}
-                    target="_blank"
-                    rel="noreferrer noopener"
+        await sendUserUpdate({
+          ...newValues,
+        });
+        actions.setFieldValue('oldEmail', values.email);
+      }}
+      validationSchema={updateUserValidationSchema}
+    >
+      {({ isSubmitting, values }) => (
+        <Form>
+          <Typography variant="h6" component="h2" gutterBottom>
+            User Information
+            <Box className={classes.chipSpace}>
+              {!userData.emailVerified && (
+                <Chip
+                  color="primary"
+                  deleteIcon={<DoneIcon data-cy="btn-verify-email" />}
+                  onDelete={
+                    isUserOfficer ? handleSetUserEmailVerified : undefined
+                  }
+                  icon={<AlternateEmailIcon />}
+                  size="small"
+                  label="Email not verified"
+                />
+              )}
+              {userData.placeholder && (
+                <Chip
+                  color="primary"
+                  deleteIcon={
+                    <DoneIcon data-cy="btn-set-user-not-placeholder" />
+                  }
+                  onDelete={
+                    isUserOfficer ? handleSetUserNotPlaceholder : undefined
+                  }
+                  icon={<AccountCircleIcon />}
+                  size="small"
+                  label="Placeholder user"
+                />
+              )}
+            </Box>
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={6}>
+              <LocalizationProvider dateAdapter={DateAdapter}>
+                <FormControl fullWidth margin="normal">
+                  <InputLabel
+                    htmlFor="user_title"
+                    shrink={!!values.user_title}
+                    required
                   >
-                    https://orcid.org/{values.orcid}
-                  </a>
-                </div>
+                    Title
+                  </InputLabel>
+                  <Field
+                    name="user_title"
+                    component={Select}
+                    data-cy="title"
+                    required
+                  >
+                    {userTitleOptions.map(({ value, text }) => (
+                      <MenuItem value={value} key={value}>
+                        {text}
+                      </MenuItem>
+                    ))}
+                  </Field>
+                </FormControl>
                 <Field
-                  name="username"
-                  label="Username"
-                  id="username-input"
+                  name="firstname"
+                  label="Firstname"
+                  id="firstname-input"
                   type="text"
                   component={TextField}
                   fullWidth
-                  autoComplete="off"
-                  data-cy="username"
-                  disabled={true}
+                  data-cy="firstname"
                 />
+                <Field
+                  name="middlename"
+                  label="Middle name"
+                  id="middlename-input"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  data-cy="middlename"
+                />
+                <Field
+                  name="lastname"
+                  label="Lastname"
+                  id="lastname-input"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  data-cy="lastname"
+                />
+                <Field
+                  name="preferredname"
+                  label="Preferred name"
+                  id="preferredname-input"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  data-cy="preferredname"
+                />
+                <FormControl fullWidth margin="normal">
+                  <InputLabel
+                    htmlFor="gender"
+                    shrink={!!values.gender}
+                    required
+                  >
+                    Gender
+                  </InputLabel>
+                  <Field
+                    id="gender"
+                    name="gender"
+                    type="text"
+                    component={Select}
+                    data-cy="gender"
+                    required
+                  >
+                    {genderOptions.map(({ value, text }) => {
+                      return (
+                        <MenuItem value={value} key={value}>
+                          {text}
+                        </MenuItem>
+                      );
+                    })}
+                  </Field>
+                </FormControl>
+                {values.gender === 'other' && (
+                  <Field
+                    name="othergender"
+                    label="Please specify gender"
+                    id="othergender-input"
+                    type="text"
+                    component={TextField}
+                    fullWidth
+                    data-cy="othergender"
+                    required
+                  />
+                )}
                 <FormikUIAutocomplete
-                  name="organisation"
-                  label="Organisation"
-                  items={institutionsList}
-                  data-cy="organisation"
+                  name="nationality"
+                  label="Nationality"
+                  items={nationalitiesList}
+                  data-cy="nationality"
+                  required
+                  loading={!fieldsContent}
+                  noOptionsText="No nationalities"
                 />
-                {+values.organisation === 1 && (
+
+                <Field
+                  name="birthdate"
+                  label="Birthdate"
+                  id="birthdate-input"
+                  inputFormat={format}
+                  mask={mask}
+                  inputProps={{ placeholder: format }}
+                  component={DatePicker}
+                  textField={{
+                    fullWidth: true,
+                    'data-cy': 'birthdate',
+                  }}
+                  maxDate={userMaxBirthDate}
+                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth margin="normal">
+                <InputLabel shrink>
+                  ORCID iD{' '}
+                  <img
+                    className={classes.orcidIconSmall}
+                    src={orcid}
+                    alt="ORCID iD icon"
+                  />
+                </InputLabel>
+                <Link
+                  href={'https://orcid.org/' + values.orcid}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className={classes.orcidLink}
+                >
+                  https://orcid.org/{values.orcid}
+                </Link>
+              </FormControl>
+              <Field
+                name="username"
+                label="Username"
+                id="username-input"
+                type="text"
+                component={TextField}
+                fullWidth
+                autoComplete="off"
+                data-cy="username"
+                disabled={true}
+              />
+              <FormikUIAutocomplete
+                name="organisation"
+                label="Organization"
+                items={institutionsList}
+                data-cy="organisation"
+                loading={loadingInstitutions}
+                noOptionsText="No organizations"
+              />
+              {+values.organisation === 1 && (
+                <>
                   <Field
                     name="otherOrganisation"
-                    label="Please specify organisation"
+                    label="Please specify organization"
                     id="organisation-input"
                     type="text"
                     component={TextField}
@@ -410,66 +429,78 @@ export default function UpdateUserInformation(props: { id: number }) {
                     data-cy="otherOrganisation"
                     required
                   />
-                )}
-                <Field
-                  name="department"
-                  label="Department"
-                  id="department-input"
-                  type="text"
-                  component={TextField}
-                  fullWidth
-                  data-cy="department"
-                />
-                <Field
-                  name="position"
-                  label="Position"
-                  id="position-input"
-                  type="text"
-                  component={TextField}
-                  fullWidth
-                  data-cy="position"
-                />
-                <Field
-                  name="email"
-                  label="E-mail"
-                  id="email-input"
-                  type="email"
-                  component={TextField}
-                  fullWidth
-                  data-cy="email"
-                />
-                <Field
-                  name="telephone"
-                  label="Telephone"
-                  id="telephone-input"
-                  type="text"
-                  component={TextField}
-                  fullWidth
-                  data-cy="telephone"
-                />
-                <Field
-                  name="telephone_alt"
-                  label="Telephone Alt."
-                  id="telephone-alt-input"
-                  type="text"
-                  component={TextField}
-                  fullWidth
-                  data-cy="telephone-alt"
-                />
-              </Grid>
+                  <FormikUIAutocomplete
+                    name="organizationCountry"
+                    label="Please specify organization country"
+                    items={countriesList}
+                    data-cy="organizationCountry"
+                    required
+                    loading={!fieldsContent}
+                    noOptionsText="No countries"
+                  />
+                </>
+              )}
+              <Field
+                name="department"
+                label="Department"
+                id="department-input"
+                type="text"
+                component={TextField}
+                fullWidth
+                data-cy="department"
+                required
+              />
+              <Field
+                name="position"
+                label="Position"
+                id="position-input"
+                type="text"
+                component={TextField}
+                fullWidth
+                data-cy="position"
+                required
+              />
+              <Field
+                name="email"
+                label="E-mail"
+                id="email-input"
+                type="email"
+                component={TextField}
+                fullWidth
+                data-cy="email"
+              />
+              <Field
+                name="telephone"
+                label="Telephone"
+                id="telephone-input"
+                type="text"
+                component={TextField}
+                fullWidth
+                data-cy="telephone"
+                required
+              />
+              <Field
+                name="telephone_alt"
+                label="Telephone Alt."
+                id="telephone-alt-input"
+                type="text"
+                component={TextField}
+                fullWidth
+                data-cy="telephone-alt"
+              />
             </Grid>
-            <StyledButtonContainer>
-              <Button
-                disabled={isSubmitting}
-                type="submit"
-                className={classes.button}
-              >
-                Update Profile
-              </Button>
-            </StyledButtonContainer>
-          </Form>
-        )}
-      </Formik>
-    </React.Fragment>
+          </Grid>
+          <StyledButtonContainer>
+            <Button
+              disabled={isSubmitting}
+              type="submit"
+              className={classes.button}
+            >
+              Update Profile
+            </Button>
+          </StyledButtonContainer>
+        </Form>
+      )}
+    </Formik>
   );
 }

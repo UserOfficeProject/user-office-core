@@ -34,7 +34,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
   const initialValues = institution
     ? {
         name: institution.name,
-        country: institution.country.id,
+        country: institution.country?.id,
         verified: institution.verified,
       }
     : {
@@ -106,13 +106,13 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
           ? await updateInstitution(
               institution.id,
               values.verified,
-              values.country,
+              values.country as number,
               values.name
             )
           : await createInstitution(
               values.verified,
               values.name,
-              values.country
+              values.country as number
             );
       }}
       validationSchema={Yup.object().shape({
