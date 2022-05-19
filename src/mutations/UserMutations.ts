@@ -408,11 +408,38 @@ export default class UserMutations {
   }
 
   @ValidateArgs(getTokenForUserValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async getTokenForUser(
     agent: UserWithRole | null,
     { userId }: { userId: number }
   ): Promise<string | Rejection> {
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isImpersonatedUser = typeof agent?.impersonatingUserId === 'number';
+    const shouldImpersonateUser = agent?.impersonatingUserId !== userId;
+
+    // NOTE: This is checking if person trying to impersonate user is not user officer then reject.
+    if (!isImpersonatedUser && !isUserOfficer) {
+      return rejection(
+        'Can not impersonate user because of insufficient permissions',
+        { userId }
+      );
+    }
+
+    if (isImpersonatedUser && isUserOfficer && shouldImpersonateUser) {
+      return rejection(
+        'Can not impersonate user with already impersonated user',
+        { userId }
+      );
+    }
+
+    // NOTE: This is checking if person trying to impersonate another user is not the impersonating user then reject also.
+    if (isImpersonatedUser && shouldImpersonateUser) {
+      return rejection(
+        'Can not impersonate user because of insufficient permissions',
+        { userId }
+      );
+    }
+
     const user = await this.dataSource.getUser(userId);
 
     if (!user) {
@@ -427,6 +454,8 @@ export default class UserMutations {
       user,
       roles,
       currentRole: roles[0],
+      impersonatingUserId:
+        isUserOfficer && shouldImpersonateUser ? agent?.id : undefined,
     });
 
     return token;
@@ -514,6 +543,7 @@ export default class UserMutations {
         roles: decoded.roles,
         currentRole,
         externalToken: decoded.externalToken,
+        impersonatingUserId: decoded.impersonatingUserId,
       });
 
       return tokenWithRole;
