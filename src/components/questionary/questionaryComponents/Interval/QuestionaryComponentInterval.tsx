@@ -67,7 +67,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
       return <Field type="hidden" value="" name={unitFieldId} />;
     } else if (config.units?.length === 1) {
       return (
-        <FormControl className={`${classes.singleUnit}`} margin="normal">
+        <FormControl className={`${classes.singleUnit}`} margin="dense">
           {stateValue.unit?.symbol}
         </FormControl>
       );

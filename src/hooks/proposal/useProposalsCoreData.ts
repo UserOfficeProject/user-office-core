@@ -20,6 +20,7 @@ export function useProposalsCoreData(
   const [loading, setLoading] = useState(true);
   const { currentRole } = useContext(UserContext);
   const {
+    reviewer,
     callId,
     instrumentId,
     proposalStatusId,
@@ -37,6 +38,7 @@ export function useProposalsCoreData(
       api()
         .getInstrumentScientistProposals({
           filter: {
+            reviewer,
             callId,
             instrumentId,
             proposalStatusId,
@@ -119,6 +121,7 @@ export function useProposalsCoreData(
         });
     }
   }, [
+    reviewer,
     callId,
     instrumentId,
     proposalStatusId,

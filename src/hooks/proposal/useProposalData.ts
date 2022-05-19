@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { GetProposalQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
+export type ProposalData = NonNullable<GetProposalQuery['proposal']>;
+
 export function useProposalData(primaryKey: number | null | undefined) {
   const [proposalData, setProposalData] = useState<ProposalData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,5 +35,3 @@ export function useProposalData(primaryKey: number | null | undefined) {
 
   return { loading, proposalData, setProposalData };
 }
-
-export type ProposalData = NonNullable<GetProposalQuery['proposal']>;

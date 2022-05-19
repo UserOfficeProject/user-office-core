@@ -121,7 +121,7 @@ const CallsTable: React.FC = () => {
   };
 
   const deleteCall = async (id: number | string) => {
-    return await api('Call deleted successfully')
+    return await api({ toastSuccessMessage: 'Call deleted successfully' })
       .deleteCall({
         id: id as number,
       })

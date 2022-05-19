@@ -138,7 +138,9 @@ const SEPMeetingProposalViewModal: React.FC<
                         meetingSubmitted(data);
                       }}
                     />
-                    <ProposalDetails proposal={proposalData} />
+                    <ExternalReviews
+                      reviews={proposalData.reviews as Review[]}
+                    />
                     <TechnicalReviewInfo
                       hasWriteAccess={finalHasWriteAccess}
                       technicalReview={
@@ -154,9 +156,7 @@ const SEPMeetingProposalViewModal: React.FC<
                       proposal={proposalData}
                       sepId={sepId}
                     />
-                    <ExternalReviews
-                      reviews={proposalData.reviews as Review[]}
-                    />
+                    <ProposalDetails proposal={proposalData} />
                   </>
                 )}
               </div>

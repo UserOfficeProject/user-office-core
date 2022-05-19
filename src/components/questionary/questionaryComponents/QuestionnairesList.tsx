@@ -60,7 +60,7 @@ export function QuestionnairesList({
   const isListEmpty = data.length === 0;
 
   return (
-    <div>
+    <>
       {isListEmpty ? (
         <div className={classes.emptyList}>The list is empty</div>
       ) : (
@@ -101,6 +101,6 @@ export function QuestionnairesList({
           </Button>
         </StyledButtonContainer>
       </Box>
-    </div>
+    </>
   );
 }

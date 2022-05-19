@@ -48,9 +48,9 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   }) as Instrument[];
 
   const onAssignButtonClick = async () => {
-    const assignInstrumentToCallResult = await api(
-      'Instrument/s assigned successfully!'
-    ).assignInstrumentsToCall({
+    const assignInstrumentToCallResult = await api({
+      toastSuccessMessage: 'Instrument/s assigned successfully!',
+    }).assignInstrumentsToCall({
       callId,
       instrumentIds: selectedInstruments.map(
         (instrumentToAssign) => instrumentToAssign.id

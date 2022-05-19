@@ -113,7 +113,7 @@ const TemplatesTable = ({
       ) => {
         confirm(
           () => {
-            api('Template archived successfully')
+            api({ toastSuccessMessage: 'Template archived successfully' })
               .updateTemplate({
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: true,

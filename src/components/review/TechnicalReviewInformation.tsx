@@ -44,7 +44,7 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
             </TableCell>
           </TableRow>
           {isInstrumentScientist && (
-            <TableRow key="comment">
+            <TableRow key="internalComment">
               <TableCell>Internal Comment</TableCell>
               <TableCell
                 dangerouslySetInnerHTML={{
@@ -53,7 +53,7 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
               />
             </TableRow>
           )}
-          <TableRow key="comment">
+          <TableRow key="publicComment">
             <TableCell>Comment</TableCell>
             <TableCell
               dangerouslySetInnerHTML={{
@@ -70,6 +70,12 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
           <TableRow key="reviewer">
             <TableCell>Reviewer</TableCell>
             <TableCell>{getFullUserName(props.data.reviewer)}</TableCell>
+          </TableRow>
+          <TableRow key="assignee">
+            <TableCell>Technical review assignee</TableCell>
+            <TableCell>
+              {getFullUserName(props.data.technicalReviewAssignee)}
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>

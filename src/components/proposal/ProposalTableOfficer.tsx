@@ -11,7 +11,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
@@ -23,6 +23,7 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
   Proposal,
@@ -31,6 +32,7 @@ import {
   ProposalPkWithCallId,
   Sep,
   InstrumentFragment,
+  FeatureId,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -75,7 +77,7 @@ export type QueryParameters = {
 let columns: Column<ProposalViewData>[] = [
   {
     title: 'Actions',
-    cellStyle: { padding: 0, minWidth: 152 },
+    cellStyle: { padding: 0 },
     sorting: false,
     removable: false,
     field: 'rowActionButtons',
@@ -95,10 +97,6 @@ let columns: Column<ProposalViewData>[] = [
     hidden: true,
   },
   {
-    title: 'Technical status',
-    field: 'technicalStatus',
-  },
-  {
     title: 'Final time allocation',
     render: (rowData) =>
       rowData.managementTimeAllocation
@@ -107,46 +105,83 @@ let columns: Column<ProposalViewData>[] = [
     hidden: true,
   },
   {
-    title: 'Final Status',
-    field: 'finalStatus',
-  },
-  {
     title: 'Submitted',
-    render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+    field: 'submitted',
+    lookup: { true: 'Yes', false: 'No' },
   },
   {
     title: 'Status',
     field: 'statusName',
   },
   {
-    title: 'Deviation',
-    field: 'reviewDeviation',
-  },
-  {
-    title: 'Average Score',
-    field: 'reviewAverage',
-  },
-  {
-    title: 'Ranking',
-    field: 'rankOrder',
-  },
-  {
     title: 'Notified',
-    render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
-  },
-  {
-    title: 'Instrument',
-    field: 'instrumentName',
+    field: 'notified',
+    lookup: { true: 'Yes', false: 'No' },
   },
   {
     title: 'Call',
     field: 'callShortCode',
   },
-  {
-    title: 'SEP',
-    field: 'sepCode',
-  },
 ];
+
+const addTechnicalReviewColumns = () => {
+  if (!columns.find((column) => column.field === 'technicalStatus')) {
+    columns.push({
+      title: 'Technical status',
+      field: 'technicalStatus',
+      emptyValue: '-',
+    });
+  }
+  if (!columns.find((column) => column.field === 'assignedTechnicalReviewer')) {
+    columns.push({
+      title: 'Assigned technical reviewer',
+      field: 'assignedTechnicalReviewer',
+      emptyValue: '-',
+    });
+  }
+};
+
+const addSEPReviewColumns = () => {
+  if (!columns.find((column) => column.field === 'finalStatus')) {
+    columns.push({
+      title: 'Final Status',
+      field: 'finalStatus',
+    });
+  }
+  if (!columns.find((column) => column.field === 'reviewDeviation')) {
+    columns.push({
+      title: 'Deviation',
+      field: 'reviewDeviation',
+    });
+  }
+  if (!columns.find((column) => column.field === 'reviewAverage')) {
+    columns.push({
+      title: 'Average Score',
+      field: 'reviewAverage',
+    });
+  }
+  if (!columns.find((column) => column.field === 'rankOrder')) {
+    columns.push({
+      title: 'Ranking',
+      field: 'rankOrder',
+    });
+  }
+  if (!columns.find((column) => column.field === 'sepCode')) {
+    columns.push({
+      title: 'SEP',
+      field: 'sepCode',
+    });
+  }
+};
+
+const addInstrumentManagementColumns = () => {
+  if (!columns.find((column) => column.field === 'instrumentName')) {
+    columns.push({
+      title: 'Instrument',
+      field: 'instrumentName',
+    });
+  }
+};
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
@@ -174,6 +209,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
+  const featureContext = useContext(FeatureContext);
 
   const prefetchSize = 200;
   const [currentPage, setCurrentPage] = useState(0);
@@ -251,58 +287,58 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   }, [proposalsData, urlQueryParams.selection]);
 
-  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const GetAppIconComponent = (): JSX.Element => (
+    <GetAppIcon data-cy="download-proposals" />
+  );
   const DeleteIcon = (): JSX.Element => <Delete />;
   const GroupWorkIcon = (): JSX.Element => <GroupWork />;
   const EmailIcon = (): JSX.Element => <Email />;
-  const ScienceIconComponent = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
-    }
-  ): JSX.Element => <ScienceIcon {...props} />;
-  const ChangeProposalStatusIcon = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
-    }
-  ): JSX.Element => <ListStatusIcon {...props} />;
+  const ScienceIconComponent = (): JSX.Element => (
+    <ScienceIcon data-cy="assign-remove-instrument" />
+  );
+  const ChangeProposalStatusIcon = (): JSX.Element => (
+    <ListStatusIcon data-cy="change-proposal-status" />
+  );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
+
+  const isTechnicalReviewEnabled = featureContext.features.get(
+    FeatureId.TECHNICAL_REVIEW
+  )?.isEnabled;
+  const isInstrumentManagementEnabled = featureContext.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+  const isSEPEnabled = featureContext.features.get(
+    FeatureId.SEP_REVIEW
+  )?.isEnabled;
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: ProposalViewData) => {
-    const iconButtonStyle = { padding: '7px' };
+  const RowActionButtons = (rowData: ProposalViewData) => (
+    <Tooltip title="View proposal">
+      <IconButton
+        data-cy="view-proposal"
+        onClick={() => {
+          setUrlQueryParams({ reviewModal: rowData.primaryKey });
+        }}
+      >
+        <Visibility />
+      </IconButton>
+    </Tooltip>
+  );
 
-    return (
-      <>
-        <Tooltip title="View proposal">
-          <IconButton
-            data-cy="view-proposal"
-            onClick={() => {
-              setUrlQueryParams({ reviewModal: rowData.primaryKey });
-            }}
-            style={iconButtonStyle}
-          >
-            <Visibility />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Download proposal as pdf">
-          <IconButton
-            data-cy="download-proposal"
-            onClick={() =>
-              downloadPDFProposal([rowData.primaryKey], rowData.title)
-            }
-            style={iconButtonStyle}
-          >
-            <GetAppIcon />
-          </IconButton>
-        </Tooltip>
-      </>
-    );
-  };
+  if (isTechnicalReviewEnabled) {
+    addTechnicalReviewColumns();
+  }
+
+  if (isInstrumentManagementEnabled) {
+    addInstrumentManagementColumns();
+  }
+
+  if (isSEPEnabled) {
+    addSEPReviewColumns();
+  }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
@@ -325,7 +361,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     selectedProposals.forEach(async (proposal) => {
       const {
         notifyProposal: { rejection },
-      } = await api('Notification sent successfully').notifyProposal({
+      } = await api({
+        toastSuccessMessage: 'Notification sent successfully',
+      }).notifyProposal({
         proposalPk: proposal.primaryKey,
       });
 
@@ -362,9 +400,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
     if (sep) {
-      const response = await api(
-        'Proposal/s assigned to the selected SEP successfully!'
-      ).assignProposalsToSep({
+      const response = await api({
+        toastSuccessMessage:
+          'Proposal/s assigned to the selected SEP successfully!',
+      }).assignProposalsToSep({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
@@ -397,9 +436,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         );
       }
     } else {
-      const result = await api(
-        'Proposal/s removed from the SEP successfully!'
-      ).removeProposalsFromSep({
+      const result = await api({
+        toastSuccessMessage: 'Proposal/s removed from the SEP successfully!',
+      }).removeProposalsFromSep({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
@@ -432,9 +471,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     instrument: InstrumentFragment | null
   ): Promise<void> => {
     if (instrument) {
-      const result = await api(
-        'Proposal/s assigned to the selected instrument successfully!'
-      ).assignProposalsToInstrument({
+      const result = await api({
+        toastSuccessMessage:
+          'Proposal/s assigned to the selected instrument successfully!',
+      }).assignProposalsToInstrument({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
@@ -461,9 +501,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         );
       }
     } else {
-      const result = await api(
-        'Proposal/s removed from the instrument successfully!'
-      ).removeProposalsFromInstrument({
+      const result = await api({
+        toastSuccessMessage:
+          'Proposal/s removed from the instrument successfully!',
+      }).removeProposalsFromInstrument({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
@@ -500,7 +541,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       (selectedProposal) => selectedProposal.primaryKey
     );
 
-    const result = await api('Proposal/s cloned successfully').cloneProposals({
+    const result = await api({
+      toastSuccessMessage: 'Proposal/s cloned successfully',
+    }).cloneProposals({
       callId: call.id,
       proposalsToClonePk,
     });
@@ -520,9 +563,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const changeStatusOnProposals = async (status: ProposalStatus) => {
     if (status?.id && selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
-      const result = await api(
-        `Proposal${shouldAddPluralLetter} status changed successfully!`
-      ).changeProposalsStatus({
+      const result = await api({
+        toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
+      }).changeProposalsStatus({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
@@ -571,8 +614,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
-    PROPOSAL_MODAL_TAB_NAMES.REVIEWS,
+    ...(isTechnicalReviewEnabled
+      ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
+      : []),
+    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
     PROPOSAL_MODAL_TAB_NAMES.ADMIN,
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
@@ -585,6 +630,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
+      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+        : '-',
     })
   );
 
@@ -790,9 +838,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
           {
-            icon: ScienceIconComponent.bind(null, {
-              'data-cy': 'assign-remove-instrument',
-            }),
+            icon: ScienceIconComponent,
             tooltip: 'Assign/Remove instrument',
             onClick: () => {
               setOpenInstrumentAssignment(true);
@@ -800,9 +846,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
           {
-            icon: ChangeProposalStatusIcon.bind(null, {
-              'data-cy': 'change-proposal-status',
-            }),
+            icon: ChangeProposalStatusIcon,
             tooltip: 'Change proposal status',
             onClick: () => {
               setOpenChangeProposalStatus(true);

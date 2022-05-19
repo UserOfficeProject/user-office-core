@@ -42,7 +42,7 @@ const CreateTemplate = (props: {
         }}
         validationSchema={createTemplateValidationSchema}
       >
-        {() => (
+        {({ isSubmitting }) => (
           <Form>
             <Field
               id="name-field"
@@ -63,7 +63,12 @@ const CreateTemplate = (props: {
               minRows="3"
               data-cy="description"
             />
-            <Button type="submit" fullWidth data-cy="submit">
+            <Button
+              type="submit"
+              fullWidth
+              data-cy="submit"
+              disabled={isSubmitting}
+            >
               Create
             </Button>
           </Form>

@@ -11,6 +11,10 @@ import {
   AssignSepReviewersToProposalMutation,
   SaveSepMeetingDecisionMutationVariables,
   SaveSepMeetingDecisionMutation,
+  UpdateReviewMutationVariables,
+  UpdateReviewMutation,
+  GetProposalReviewsQueryVariables,
+  GetProposalReviewsQuery,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -75,6 +79,30 @@ declare global {
       assignSepReviewersToProposal: (
         assignSepReviewersToProposalInput: AssignSepReviewersToProposalMutationVariables
       ) => Cypress.Chainable<AssignSepReviewersToProposalMutation>;
+
+      /**
+       * Update proposal SEP review.
+       *
+       * @returns {typeof updateReview}
+       * @memberof Chainable
+       * @example
+       *    cy.updateReview(updateReviewInput: UpdateReviewMutationVariables)
+       */
+      updateReview: (
+        updateReviewInput: UpdateReviewMutationVariables
+      ) => Cypress.Chainable<UpdateReviewMutation>;
+
+      /**
+       * Get all proposal SEP reviews.
+       *
+       * @returns {typeof getProposalReviews}
+       * @memberof Chainable
+       * @example
+       *    cy.getProposalReviews(getProposalReviewsVariables: GetProposalReviewsQueryVariables)
+       */
+      getProposalReviews: (
+        getProposalReviewsVariables: GetProposalReviewsQueryVariables
+      ) => Cypress.Chainable<GetProposalReviewsQuery>;
 
       /**
        * Save SEP meeting decision for proposal.

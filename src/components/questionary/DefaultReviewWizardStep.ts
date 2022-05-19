@@ -5,28 +5,25 @@ import {
 import { StepType } from 'models/questionary/StepType';
 
 export class DefaultReviewWizardStep implements WizardStep {
-  public type: StepType = 'VisitReview';
+  public type: StepType = 'ReviewStep';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public payload?: any;
 
   constructor(
-    private isReviewStepCompleted: {
-      (state: QuestionarySubmissionState): boolean;
-    }
+    private isReviewStepCompleted: (
+      state: QuestionarySubmissionState
+    ) => boolean
   ) {}
 
   getMetadata(state: QuestionarySubmissionState) {
-    const lastProposalStep =
+    const lastStep =
       state.questionary.steps[state.questionary.steps.length - 1];
-    const hasLastProposalStep = lastProposalStep !== undefined;
-
-    const isReadOnly =
-      hasLastProposalStep && lastProposalStep.isCompleted === false;
+    const isLastStepCompleted = lastStep.isCompleted;
 
     return {
       title: 'Review',
       isCompleted: this.isReviewStepCompleted(state),
-      isReadonly: isReadOnly,
+      isReadonly: isLastStepCompleted === false,
     };
   }
 }

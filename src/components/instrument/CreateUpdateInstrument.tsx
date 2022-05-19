@@ -10,7 +10,7 @@ import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import FormikDropdown from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
 import { InstrumentFragment, UserRole } from 'generated/sdk';
 import { useUsersData } from 'hooks/user/useUsersData';
@@ -47,19 +47,23 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         name: '',
         shortCode: '',
         description: '',
-        managerUserId: -1,
+        managerUserId: null,
       };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
+        if (values.managerUserId === null) {
+          return;
+        }
+
         if (instrument) {
-          const data = await api(
-            'Instrument updated successfully!'
-          ).updateInstrument({
-            id: instrument.id,
+          const data = await api({
+            toastSuccessMessage: 'Instrument updated successfully!',
+          }).updateInstrument({
             ...values,
+            id: instrument.id,
           });
           if (data.updateInstrument.rejection) {
             close(null);
@@ -67,9 +71,9 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             close(data.updateInstrument.instrument);
           }
         } else {
-          const data = await api(
-            'Instrument created successfully!'
-          ).createInstrument(values);
+          const data = await api({
+            toastSuccessMessage: 'Instrument created successfully!',
+          }).createInstrument(values);
           if (data.createInstrument.rejection) {
             close(null);
           } else if (data.createInstrument.instrument) {
@@ -97,6 +101,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             fullWidth
             data-cy="name"
             disabled={isExecutingCall}
+            required
           />
           <Field
             name="shortCode"
@@ -107,6 +112,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             fullWidth
             data-cy="shortCode"
             disabled={isExecutingCall}
+            required
           />
           <Field
             id="description"
@@ -120,9 +126,10 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             minRows="3"
             data-cy="description"
             disabled={isExecutingCall}
+            required
           />
 
-          <FormikDropdown
+          <FormikUIAutocomplete
             name="managerUserId"
             label="Beamline manager"
             noOptionsText="No one"
@@ -133,6 +140,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             InputProps={{
               'data-cy': 'beamline-manager',
             }}
+            required
           />
 
           <Button

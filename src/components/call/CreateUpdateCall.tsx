@@ -5,16 +5,14 @@ import {
 } from '@user-office-software/duo-validation/lib/Call';
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
-  FeatureId,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
@@ -32,7 +30,6 @@ type CreateUpdateCallProps = {
 
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
-  const { features } = useContext(FeatureContext);
   const { timezone } = useFormattedDateTime();
 
   const { templates: proposalTemplates } = useActiveTemplates(
@@ -54,16 +51,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     .setZone(timezone || undefined)
     .endOf('day');
 
-  /**
-   * NOTE: This is needed because the ESI template field is hidden under feature flag.
-   * If we set the default value to 'undefined' on the initial values then
-   * Material-UI fires a console warning that value provided is out of range.
-   */
-  const initialEsiTemplateId = features.get(FeatureId.RISK_ASSESSMENT)
-    ?.isEnabled
-    ? ''
-    : undefined;
-
   const getDateTimeFromISO = (value: string) =>
     DateTime.fromISO(value, {
       zone: timezone || undefined,
@@ -78,9 +65,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         ...call,
         title: call.title || '',
         description: call.description || '',
-        templateId: call.templateId || '',
-        esiTemplateId: call.esiTemplateId || initialEsiTemplateId,
-        proposalWorkflowId: call.proposalWorkflowId || '',
+        templateId: call.templateId,
+        esiTemplateId: call.esiTemplateId,
+        proposalWorkflowId: call.proposalWorkflowId,
         referenceNumberFormat: call.referenceNumberFormat || '',
         startCall: getDateTimeFromISO(call.startCall),
         endCall: getDateTimeFromISO(call.endCall),
@@ -109,9 +96,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         endCycle: currentDayEnd,
         cycleComment: '',
         surveyComment: '',
-        proposalWorkflowId: '',
-        templateId: '',
-        esiTemplateId: initialEsiTemplateId,
+        proposalWorkflowId: null,
+        templateId: null,
+        esiTemplateId: null,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
@@ -133,17 +120,17 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         initialValues={initialValues}
         onSubmit={async (values) => {
           if (call) {
-            const data = await api('Call updated successfully!').updateCall(
-              values as UpdateCallInput
-            );
+            const data = await api({
+              toastSuccessMessage: 'Call updated successfully!',
+            }).updateCall(values as UpdateCallInput);
             closeModal(
               data.updateCall.rejection?.reason,
               data.updateCall.call as Call
             );
           } else {
-            const data = await api('Call created successfully!').createCall(
-              values as UpdateCallInput
-            );
+            const data = await api({
+              toastSuccessMessage: 'Call created successfully!',
+            }).createCall(values as UpdateCallInput);
 
             closeModal(
               data.createCall.rejection?.reason,

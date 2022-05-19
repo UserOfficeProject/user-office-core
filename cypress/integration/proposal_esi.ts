@@ -9,8 +9,7 @@ const existingProposalId = initialDBData.proposal.id;
 const acceptedStatusId = 1;
 const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
-const proposalTitle = initialDBData.proposal.title;
-const proposalEsiButtonTitle = 'Finish safety input form';
+const proposalEsiIconCyTag = 'finish-safety-input-form-icon';
 
 const sampleTitle = /My sample title/i;
 const newSampleTitle = faker.lorem.words(2);
@@ -41,21 +40,21 @@ context('visits tests', () => {
     cy.login(PI);
     cy.visit('/');
 
-    cy.testActionButton(proposalEsiButtonTitle, 'active');
+    cy.testActionButton(proposalEsiIconCyTag, 'active');
   });
 
   it('Co-proposer should see ESI button ', () => {
     cy.login(coProposer);
     cy.visit('/');
 
-    cy.testActionButton(proposalEsiButtonTitle, 'active');
+    cy.testActionButton(proposalEsiIconCyTag, 'active');
   });
 
   it('Visitor should not see ESI button', () => {
     cy.login(visitor);
     cy.visit('/');
 
-    cy.testActionButton(proposalEsiButtonTitle, 'invisible');
+    cy.testActionButton(proposalEsiIconCyTag, 'invisible');
   });
 
   it('Should be able to complete ESI', () => {
@@ -63,9 +62,10 @@ context('visits tests', () => {
     cy.visit('/');
 
     cy.get('[data-cy=upcoming-experiments]')
-      .contains(proposalTitle)
-      .closest('TR')
-      .find(`[aria-label='${proposalEsiButtonTitle}']`)
+      .contains(initialDBData.scheduledEvents.upcoming.startsAt)
+      .closest('tr')
+      .find(`[data-cy='${proposalEsiIconCyTag}']`)
+      .closest('button')
       .click();
     cy.get('[data-cy=sample-esi-list]')
       .contains(sampleTitle)
@@ -181,6 +181,6 @@ context('visits tests', () => {
     cy.login(coProposer);
     cy.visit('/');
 
-    cy.testActionButton(proposalEsiButtonTitle, 'completed');
+    cy.testActionButton(proposalEsiIconCyTag, 'completed');
   });
 });

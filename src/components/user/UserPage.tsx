@@ -7,7 +7,6 @@ import SimpleTabs from 'components/common/TabPanel';
 import EventLogList from 'components/eventLog/EventLogList';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import { Impersonate } from './Impersonate';
 import UpdatePassword from './UpdatePassword';
 import UpdateUserInformation from './UpdateUserInformation';
 import UpdateUserRoles from './UpdateUserRoles';
@@ -33,13 +32,11 @@ function UserPage(props: { match: { params: { id: string } } }) {
       <StyledPaper cy-data="user-page">
         <SimpleTabs tabNames={['General', 'Settings', 'Logs']}>
           <UpdateUserInformation id={userId} />
-          <React.Fragment>
+          <>
             <UpdatePassword id={userId} />
             <Divider className={classes.divider} />
             <UpdateUserRoles id={userId} />
-            <Divider className={classes.divider} />
-            <Impersonate id={userId} />
-          </React.Fragment>
+          </>
           <EventLogList
             eventType="USER | EMAIL_INVITE"
             changedObjectId={userId}

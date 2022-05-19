@@ -5,7 +5,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useInstrumentsBySEPData(
   sepId: number,
-  callId: number
+  callId?: number
 ): {
   loadingInstruments: boolean;
   instrumentsData: InstrumentWithAvailabilityTime[];
@@ -21,6 +21,10 @@ export function useInstrumentsBySEPData(
   const api = useDataApi();
 
   useEffect(() => {
+    if (!callId) {
+      return;
+    }
+
     let unmounted = false;
 
     setLoadingInstruments(true);

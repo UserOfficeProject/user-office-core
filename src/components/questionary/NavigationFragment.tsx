@@ -1,44 +1,28 @@
-import makeStyles from '@mui/styles/makeStyles';
-import React, { Fragment } from 'react';
+import { Stack } from '@mui/material';
+import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-const useStyles = makeStyles({
-  buttons: {
-    marginTop: '15px',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    '& > *': {
-      margin: '25px 5px 0 10px',
-      '&:first-child': {
-        marginLeft: '0',
-      },
-      '&:last-child': {
-        marginRight: '0',
-      },
-    },
-  },
-});
 
 const NavigationFragment = (props: {
   isLoading?: boolean;
   disabled?: boolean;
   children?: React.ReactNode;
 }): JSX.Element | null => {
-  const classes = useStyles();
-
   if (props.disabled) {
     return null;
   }
 
   return (
-    <div className={classes.buttons}>
-      {props.isLoading ? (
-        <UOLoader size="2em" />
-      ) : (
-        <Fragment>{props.children}</Fragment>
-      )}
-    </div>
+    <Stack
+      direction="row"
+      justifyContent="flex-end"
+      marginTop={3}
+      spacing={1}
+      alignItems="center"
+    >
+      {props.isLoading && <UOLoader size="2em" />}
+      <>{props.children}</>
+    </Stack>
   );
 };
 

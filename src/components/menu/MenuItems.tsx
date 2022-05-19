@@ -20,8 +20,11 @@ import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
+import { encodeDate } from 'use-query-params';
 
 import Tooltip from 'components/common/MenuTooltip';
+import { getRelativeDatesFromToday } from 'components/experiment/DateFilter';
+import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, UserRole } from 'generated/sdk';
 
@@ -139,6 +142,18 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const isSchedulerEnabled = context.features.get(
     FeatureId.SCHEDULER
   )?.isEnabled;
+  const isInstrumentManagementEnabled = context.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+  const isSEPEnabled = context.features.get(FeatureId.SEP_REVIEW)?.isEnabled;
+  const isUserManagementEnabled = context.features.get(
+    FeatureId.USER_MANAGEMENT
+  )?.isEnabled;
+  const isSampleSafetyEnabled = context.features.get(
+    FeatureId.SAMPLE_SAFETY
+  )?.isEnabled;
+
+  const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
   const user = (
     <div data-cy="user-menu-items">
@@ -199,6 +214,20 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Proposals" />
         </ListItem>
       </Tooltip>
+      {isSchedulerEnabled && (
+        <Tooltip title="Experiments">
+          <ListItem
+            component={NavLink}
+            to={`/ExperimentPage?from=${encodeDate(from)}&to=${encodeDate(to)}`}
+            button
+          >
+            <ListItemIcon>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText primary="Experiments" />
+          </ListItem>
+        </Tooltip>
+      )}
       <Tooltip title="Calls">
         <ListItem component={NavLink} to="/Calls" button>
           <ListItemIcon>
@@ -207,30 +236,36 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Calls" />
         </ListItem>
       </Tooltip>
-      <Tooltip title="People">
-        <ListItem component={NavLink} to="/People" button>
-          <ListItemIcon>
-            <People />
-          </ListItemIcon>
-          <ListItemText primary="People" />
-        </ListItem>
-      </Tooltip>
-      <Tooltip title="Instruments">
-        <ListItem component={NavLink} to="/Instruments" button>
-          <ListItemIcon>
-            <ScienceIcon />
-          </ListItemIcon>
-          <ListItemText primary="Instruments" />
-        </ListItem>
-      </Tooltip>
-      <Tooltip title="Scientific evaluation panels">
-        <ListItem component={NavLink} to="/SEPs" button>
-          <ListItemIcon>
-            <GroupWorkIcon />
-          </ListItemIcon>
-          <ListItemText primary="SEPs" />
-        </ListItem>
-      </Tooltip>
+      {isUserManagementEnabled && (
+        <Tooltip title="People">
+          <ListItem component={NavLink} to="/People" button>
+            <ListItemIcon>
+              <People />
+            </ListItemIcon>
+            <ListItemText primary="People" />
+          </ListItem>
+        </Tooltip>
+      )}
+      {isInstrumentManagementEnabled && (
+        <Tooltip title="Instruments">
+          <ListItem component={NavLink} to="/Instruments" button>
+            <ListItemIcon>
+              <ScienceIcon />
+            </ListItemIcon>
+            <ListItemText primary="Instruments" />
+          </ListItem>
+        </Tooltip>
+      )}
+      {isSEPEnabled && (
+        <Tooltip title="Scientific evaluation panels">
+          <ListItem component={NavLink} to="/SEPs" button>
+            <ListItemIcon>
+              <GroupWorkIcon />
+            </ListItemIcon>
+            <ListItemText primary="SEPs" />
+          </ListItem>
+        </Tooltip>
+      )}
       <Tooltip title="Pages">
         <ListItem component={NavLink} to="/PageEditor" button>
           <ListItemIcon>
@@ -239,14 +274,16 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Pages" />
         </ListItem>
       </Tooltip>
-      <Tooltip title="Institutions">
-        <ListItem component={NavLink} to="/Institutions" button>
-          <ListItemIcon>
-            <AccountBalanceIcon />
-          </ListItemIcon>
-          <ListItemText primary="Institutions" />
-        </ListItem>
-      </Tooltip>
+      {isUserManagementEnabled && (
+        <Tooltip title="Institutions">
+          <ListItem component={NavLink} to="/Institutions" button>
+            <ListItemIcon>
+              <AccountBalanceIcon />
+            </ListItemIcon>
+            <ListItemText primary="Institutions" />
+          </ListItem>
+        </Tooltip>
+      )}
       <TemplateMenuListItem />
       <Tooltip title="Questions">
         <ListItem component={NavLink} to="/Questions" button>
@@ -256,7 +293,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Questions" />
         </ListItem>
       </Tooltip>
-      <SamplesMenuListItem />
+      {isSampleSafetyEnabled && <SamplesMenuListItem />}
       <SettingsMenuListItem />
     </div>
   );
@@ -299,12 +336,14 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/Instruments" button>
-        <ListItemIcon>
-          <GroupWorkIcon />
-        </ListItemIcon>
-        <ListItemText primary="Instruments" />
-      </ListItem>
+      {isInstrumentManagementEnabled && (
+        <ListItem component={NavLink} to="/Instruments" button>
+          <ListItemIcon>
+            <GroupWorkIcon />
+          </ListItemIcon>
+          <ListItemText primary="Instruments" />
+        </ListItem>
+      )}
       {isSchedulerEnabled && (
         <ListItem component={NavLink} to="/UpcomingExperimentTimes" button>
           <ListItemIcon>

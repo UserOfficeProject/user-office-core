@@ -23,6 +23,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
+import ExperimentPage from './experiment/ExperimentPage';
 import CreateFeedbackPage from './feedback/CreateFeedbackPage';
 import UpdateFeedbackPage from './feedback/UpdateFeedbackPage';
 import InstitutionPage from './institution/InstitutionPage';
@@ -170,6 +171,21 @@ const Dashboard: React.FC = () => {
   const isSchedulerEnabled = featureContext.features.get(
     FeatureId.SCHEDULER
   )?.isEnabled;
+  const isInstrumentManagementEnabled = featureContext.features.get(
+    FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+  const isSEPEnabled = featureContext.features.get(
+    FeatureId.SEP_REVIEW
+  )?.isEnabled;
+  const isUserManagementEnabled = featureContext.features.get(
+    FeatureId.USER_MANAGEMENT
+  )?.isEnabled;
+  const isVisitManagementEnabled = featureContext.features.get(
+    FeatureId.VISIT_MANAGEMENT
+  )?.isEnabled;
+  const isSampleSafetyEnabled = featureContext.features.get(
+    FeatureId.SAMPLE_SAFETY
+  )?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
@@ -259,12 +275,14 @@ const Dashboard: React.FC = () => {
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Profile"
-            path="/ProfilePage/:id"
-            component={ProfilePage}
-          />
+          {isUserManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Profile"
+              path="/ProfilePage/:id"
+              component={ProfilePage}
+            />
+          )}
           {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
@@ -280,6 +298,14 @@ const Dashboard: React.FC = () => {
             path="/Proposals"
             component={ProposalPage}
           />
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Experiments"
+              path="/ExperimentPage"
+              component={ExperimentPage}
+            />
+          )}
           <TitledRoute
             setHeader={setHeader}
             title="Page Editor"
@@ -300,24 +326,30 @@ const Dashboard: React.FC = () => {
             path="/HelpPage"
             component={HelpPage}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="SEP"
-            path="/SEPPage/:id"
-            component={SEPPage}
-          />
-          <TitledRoute
-            setHeader={setHeader}
-            title="SEPs"
-            path="/SEPs"
-            component={SEPsPage}
-          />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Instruments"
-            path="/Instruments"
-            component={InstrumentsPage}
-          />
+          {isSEPEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="SEP"
+              path="/SEPPage/:id"
+              component={SEPPage}
+            />
+          )}
+          {isSEPEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="SEPs"
+              path="/SEPs"
+              component={SEPsPage}
+            />
+          )}
+          {isInstrumentManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Instruments"
+              path="/Instruments"
+              component={InstrumentsPage}
+            />
+          )}
           <TitledRoute
             setHeader={setHeader}
             title="Institution"
@@ -360,12 +392,14 @@ const Dashboard: React.FC = () => {
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Visits Template"
-            path="/VisitTemplates"
-            component={VisitTemplatesPage}
-          />
+          {isVisitManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Visits Template"
+              path="/VisitTemplates"
+              component={VisitTemplatesPage}
+            />
+          )}
           <TitledRoute
             setHeader={setHeader}
             title="Feedback Template"
@@ -416,15 +450,15 @@ const Dashboard: React.FC = () => {
               component={ProposalWorkflowEditor}
             />
           )}
-          {(isSampleSafetyReviewer || isUserOfficer) && (
-            <TitledRoute
-              setHeader={setHeader}
-              title="Samples Safety"
-              path="/SampleSafety"
-              component={SampleSafetyPage}
-            />
-          )}
-
+          {isSampleSafetyEnabled &&
+            (isSampleSafetyReviewer || isUserOfficer) && (
+              <TitledRoute
+                setHeader={setHeader}
+                title="Samples Safety"
+                path="/SampleSafety"
+                component={SampleSafetyPage}
+              />
+            )}
           {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}

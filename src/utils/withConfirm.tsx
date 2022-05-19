@@ -76,6 +76,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
           {...dialogProps}
           open={!!onConfirm}
           onClose={handleCancel}
+          data-cy="confirmation-dialog"
         >
           {title && (
             <DialogTitle className={classes.title}>{title}</DialogTitle>
@@ -89,6 +90,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
           <DialogActions>
             <Button
               variant="text"
+              color="error"
               onClick={handleCancel}
               data-cy="confirm-cancel"
             >
@@ -97,6 +99,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
             <Button
               onClick={handleConfirm}
               data-cy="confirm-ok"
+              variant="text"
               disabled={!!alertText}
             >
               {confirmationText}

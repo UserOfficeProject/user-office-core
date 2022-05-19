@@ -38,6 +38,9 @@ context('Personal information tests', () => {
 
     cy.get("[name='otherOrganisation']").clear().type(otherOrg);
 
+    cy.get('[data-cy="organizationCountry"] input').click();
+    cy.get('[data-cy="organizationCountry-options"]').first().click();
+
     cy.contains('Update Profile').click();
 
     cy.notification({ variant: 'success', text: 'Updated Information' });
@@ -91,7 +94,7 @@ context('Personal information tests', () => {
 
     cy.contains('Update').click();
 
-    cy.notification({ variant: 'success', text: 'successfully' });
+    cy.notification({ variant: 'warning', text: 'successfully' });
 
     // wait before trying to get profile button otherwise page
     // might re-render and you could be trying to access element

@@ -26,7 +26,7 @@ import { TextField } from 'formik-mui';
 import { DateTimePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 
-import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   AllocationTimeUnits,
@@ -56,10 +56,23 @@ const CallGeneralInfo: React.FC<{
 
   const theme = useTheme();
 
-  const proposalWorkflowOptions = proposalWorkflows.map((proposalWorkflow) => ({
-    text: proposalWorkflow.name,
-    value: proposalWorkflow.id,
-  }));
+  const templateOptions =
+    templates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const esiTemplateOptions =
+    esiTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const proposalWorkflowOptions =
+    proposalWorkflows.map((proposalWorkflow) => ({
+      text: proposalWorkflow.name,
+      value: proposalWorkflow.id,
+    })) || [];
 
   const allocationTimeUnitOptions = Object.values(AllocationTimeUnits).map(
     (key) => ({
@@ -263,53 +276,42 @@ const CallGeneralInfo: React.FC<{
           data-cy="reference-number-format"
         />
       </LocalizationProvider>
-      <FormikDropdown
+
+      <FormikUIAutocomplete
         name="templateId"
         label="Call template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={
-          templates?.map((template) => ({
-            text: template.name,
-            value: template.templateId,
-          })) || []
-        }
+        items={templateOptions}
         InputProps={{ 'data-cy': 'call-template' }}
         required
       />
       {features.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
-        <FormikDropdown
+        <FormikUIAutocomplete
           name="esiTemplateId"
           label="ESI template"
           loading={loadingTemplates}
           noOptionsText="No templates"
-          items={
-            esiTemplates?.map((template) => ({
-              text: template.name,
-              value: template.templateId,
-            })) || []
-          }
+          items={esiTemplateOptions}
           InputProps={{ 'data-cy': 'call-esi-template' }}
           required
         />
       )}
-
-      <FormikDropdown
+      <FormikUIAutocomplete
         name="proposalWorkflowId"
         label="Proposal workflow"
         loading={loadingProposalWorkflows}
         noOptionsText="No proposal workflows"
-        items={proposalWorkflows.length > 0 ? proposalWorkflowOptions : []}
+        items={proposalWorkflowOptions}
         InputProps={{
           'data-cy': 'call-workflow',
         }}
         required
       />
-
-      <FormikDropdown
+      <FormikUIAutocomplete
         name="allocationTimeUnit"
         label="Allocation time unit"
-        items={allocationTimeUnitOptions as Option[]}
+        items={allocationTimeUnitOptions}
         InputProps={{ 'data-cy': 'allocation-time-unit' }}
       />
       <Field

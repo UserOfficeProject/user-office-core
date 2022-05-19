@@ -1,18 +1,30 @@
 import MaterialTable from '@material-table/core';
+import { Link } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { GetTemplatesQuery } from 'generated/sdk';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
 import { useTemplates } from 'hooks/template/useTemplates';
 import { tableIcons } from 'utils/materialIcons';
 
+type TemplateTableRowType = NonNullable<GetTemplatesQuery['templates']>[0];
 interface TemplateCountDetailsProps {
   question: QuestionWithUsage | null;
 }
 
-// NOTE: Keeping columns outside of the component is better to avoid console warning(https://github.com/material-table-core/core/issues/286)
 const columns = [
-  { title: 'ID', field: 'templateId' },
-  { title: 'Name', field: 'name' },
+  {
+    title: 'Name',
+    field: 'name',
+    render: (rowData: TemplateTableRowType) => (
+      <Link
+        title={rowData.name}
+        href={`/QuestionaryEditor/${rowData.templateId}`}
+      >
+        {rowData.name}
+      </Link>
+    ),
+  },
   { title: 'Description', field: 'description' },
   { title: 'Is Archived', field: 'isArchived' },
 ];
@@ -27,9 +39,11 @@ function TemplateCountDetails({ question }: TemplateCountDetailsProps) {
     return null;
   }
 
-  const templatesWithId = templates.map((template) =>
-    Object.assign(template, { id: template.templateId })
-  );
+  // fix for MaterialTable requiring rows to have an 'id' property
+  const templatesWithId = templates.map((template) => ({
+    id: template.templateId,
+    ...template,
+  }));
 
   return (
     <MaterialTable

@@ -48,7 +48,9 @@ const InstrumentTable: React.FC = () => {
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
-    return await api('Instrument removed successfully!')
+    return await api({
+      toastSuccessMessage: 'Instrument removed successfully!',
+    })
       .deleteInstrument({
         id: instrumentDeletedId as number,
       })
@@ -64,9 +66,9 @@ const InstrumentTable: React.FC = () => {
   const assignScientistsToInstrument = async (
     scientists: BasicUserDetails[]
   ) => {
-    const assignScientistToInstrumentResult = await api(
-      'Scientist assigned to instrument successfully!'
-    ).assignScientistsToInstrument({
+    const assignScientistToInstrumentResult = await api({
+      toastSuccessMessage: 'Scientist assigned to instrument successfully!',
+    }).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,
       scientistIds: scientists.map((scientist) => scientist.id),
     });

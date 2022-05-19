@@ -15,7 +15,7 @@ declare global {
        *    cy.notification({ variant: 'error', text: 'failed'})
        */
       notification: (options: {
-        variant: 'success' | 'error' | 'info';
+        variant: 'success' | 'error' | 'info' | 'warning';
         text: string | RegExp;
       }) => void;
 
@@ -91,10 +91,16 @@ declare global {
        * @returns {typeof getTinyMceContent}
        * @memberof Chainable
        * @example
-       *    cy.testActionButton('Define your own visit', 'completed')
+       *    cy.testActionButton('define-visit-icon', 'completed')
        */
       testActionButton: (
-        title: string,
+        iconCyTag:
+          | 'define-visit-icon'
+          | 'register-visit-icon'
+          | 'finish-training-icon'
+          | 'declare-shipment-icon'
+          | 'finish-safety-input-form-icon'
+          | 'provide-feedback-icon',
         state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
       ) => void;
 

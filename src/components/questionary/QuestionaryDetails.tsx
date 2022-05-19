@@ -1,32 +1,16 @@
-import Table, { TableProps } from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
+import Box from '@mui/material/Box';
+import { TableProps } from '@mui/material/Table';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { FC } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Answer, DataType, Question } from 'generated/sdk';
+import { Answer, DataType } from 'generated/sdk';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
-import {
-  areDependenciesSatisfied,
-  getAllFields,
-} from 'models/questionary/QuestionaryFunctions';
+import { areDependenciesSatisfied } from 'models/questionary/QuestionaryFunctions';
 
+import { AnswersTable } from './AnswersTable';
 import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
-
-const useStyles = makeStyles(() => ({
-  label: {
-    paddingLeft: 0,
-  },
-  value: {
-    width: '35%',
-  },
-  break: {
-    wordBreak: 'break-word',
-  },
-}));
+import { StepView } from './StepView';
 
 export interface TableRowData {
   label: JSX.Element | string | null;
@@ -40,88 +24,80 @@ export interface QuestionaryDetailsProps extends TableProps<FC<unknown>> {
 }
 
 function QuestionaryDetails(props: QuestionaryDetailsProps) {
-  const {
-    answerRenderer,
-    questionaryId,
-    additionalDetails,
-    title,
-    ...restProps
-  } = props;
+  const { answerRenderer, questionaryId, additionalDetails, title } = props;
 
   const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
-  const classes = useStyles();
 
   if (loadingQuestionary) {
-    return <UOLoader />;
+    return (
+      <Box textAlign="center">
+        <UOLoader />
+      </Box>
+    );
   }
 
   if (!questionary) {
     return <span>Failed to load questionary details</span>;
   }
 
-  const allQuestions = getAllFields(questionary.steps) as Answer[];
-  const displayableQuestions = allQuestions.filter((field) => {
-    const definition = getQuestionaryComponentDefinition(
-      field.question.dataType
-    );
+  const steps = questionary.steps.map((step, index) => {
+    const displayableQuestions = step.fields.filter((field) => {
+      const definition = getQuestionaryComponentDefinition(
+        field.question.dataType
+      );
+
+      return (
+        (!definition.readonly ||
+          field.question.dataType === DataType.SAMPLE_DECLARATION ||
+          field.question.dataType === DataType.GENERIC_TEMPLATE) &&
+        areDependenciesSatisfied(questionary.steps, field.question.id)
+      );
+    });
+
+    const rows = displayableQuestions
+      .map((answer) => {
+        const renderers = getQuestionaryComponentDefinition(
+          answer.question.dataType
+        ).renderers;
+
+        if (!renderers) {
+          return null;
+        }
+
+        const questionElem = renderers.questionRenderer(answer.question);
+        const answerElem =
+          answerRenderer?.(answer) || renderers.answerRenderer(answer);
+
+        const row: TableRowData = {
+          label: questionElem,
+          value: answerElem,
+        };
+
+        return row;
+      })
+      .filter((row) => row !== null) as TableRowData[];
+
+    if (index === 0 && additionalDetails !== undefined) {
+      rows.unshift(...additionalDetails);
+    }
+
+    const stepContent = <AnswersTable rows={rows} />;
 
     return (
-      (!definition.readonly ||
-        field.question.dataType === DataType.SAMPLE_DECLARATION ||
-        field.question.dataType === DataType.GENERIC_TEMPLATE) &&
-      areDependenciesSatisfied(questionary.steps, field.question.id)
+      <StepView
+        title={step.topic.title}
+        content={stepContent}
+        key={step.topic.id}
+      />
     );
   });
 
-  const createTableRow = (key: string, rowData: TableRowData) => (
-    <TableRow key={key}>
-      <TableCell className={classes.label}>{rowData.label}</TableCell>
-      <TableCell className={classes.value}>{rowData.value}</TableCell>
-    </TableRow>
-  );
-
   return (
     <>
-      {title && (
-        <Typography variant="h6" component="h2" gutterBottom>
-          {title}
-        </Typography>
-      )}
-      <Table className={classes.break} size="small" {...restProps}>
-        <TableBody>
-          {/* Additional details */}
-          {additionalDetails?.map((row, index) =>
-            createTableRow(`additional-detail-${index}`, row)
-          )}
-
-          {/* questionary details */}
-          {displayableQuestions.map((answer) => {
-            const renderers = getQuestionaryComponentDefinition(
-              answer.question.dataType
-            ).renderers;
-
-            if (!renderers) {
-              return null;
-            }
-
-            const questionElem = React.createElement<Question>(
-              renderers.questionRenderer,
-              answer.question
-            );
-            const answerElem =
-              answerRenderer?.(answer) ||
-              React.createElement<Answer>(renderers.answerRenderer, answer);
-
-            return createTableRow(
-              `answer-${answer.answerId}-${answer.question.id}`,
-              {
-                label: questionElem,
-                value: answerElem,
-              }
-            );
-          })}
-        </TableBody>
-      </Table>
+      <Typography variant="h6" component="h2" gutterBottom>
+        {title}
+      </Typography>
+      {steps}
     </>
   );
 }

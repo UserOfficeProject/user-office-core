@@ -14,7 +14,7 @@ export type SEPProposalAssignmentType = Unpacked<
 
 export function useSEPProposalsData(
   sepId: number,
-  callId: number
+  callId: number | null
 ): {
   loadingSEPProposals: boolean;
   SEPProposalsData: SEPProposalType[];

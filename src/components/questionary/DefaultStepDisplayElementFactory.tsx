@@ -19,10 +19,7 @@ export class DefaultStepDisplayElementFactory
             topicId={wizardStep.payload.topicId}
           />
         );
-      case 'VisitReview':
-      case 'ShipmentReview':
-      case 'ProposalReview':
-      case 'SampleEsiReview':
+      case 'ReviewStep':
         return React.createElement(this.reviewStep);
 
       default:

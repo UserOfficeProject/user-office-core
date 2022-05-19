@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent } from 'react';
 
 import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
@@ -14,6 +14,7 @@ const useStyles = makeStyles(() => ({
   root: {
     '& tr:last-child td': {
       border: 'none',
+      textAlign: 'left',
     },
     '& .MuiPaper-root': {
       padding: '0 40px',
@@ -53,15 +54,15 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     <TextField
       type="number"
       data-cy="availability-time"
+      placeholder={`Availability time (${call.allocationTimeUnit}s)`}
       value={value || ''}
       onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
       required
+      fullWidth
     />
   );
 
-  const [assignmentColumns] = useState<
-    Column<InstrumentWithAvailabilityTime>[]
-  >([
+  const assignmentColumns: Column<InstrumentWithAvailabilityTime>[] = [
     {
       title: 'Name',
       field: 'name',
@@ -78,19 +79,19 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       editable: 'never',
     },
     {
-      title: 'Time available',
+      title: `Availability time (${call.allocationTimeUnit}s)`,
       field: 'availabilityTime',
       editable: 'onUpdate',
       type: 'numeric',
       emptyValue: '-',
       editComponent: availabilityTimeInput,
     },
-  ]);
+  ];
 
   const removeAssignedInstrument = async (instrumentId: number) => {
-    const result = await api(
-      'Assigned instrument removed successfully!'
-    ).removeAssignedInstrumentFromCall({
+    const result = await api({
+      toastSuccessMessage: 'Assigned instrument removed successfully!',
+    }).removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,
     });
@@ -107,9 +108,9 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     id: number;
     availabilityTime: number | string;
   }) => {
-    const result = await api(
-      'Availability time set successfully!'
-    ).setInstrumentAvailabilityTime({
+    const result = await api({
+      toastSuccessMessage: 'Availability time set successfully!',
+    }).setInstrumentAvailabilityTime({
       callId: call.id,
       instrumentId: instrumentUpdatedData.id,
       availabilityTime: +instrumentUpdatedData.availabilityTime,

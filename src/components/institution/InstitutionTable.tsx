@@ -14,15 +14,6 @@ import { FunctionType } from 'utils/utilTypes';
 
 import CreateUpdateInstitution from './CreateUpdateInstitution';
 
-const columns = [
-  { title: 'Name', field: 'name' },
-  {
-    title: 'Verified',
-    field: 'verified',
-    lookup: { true: 'true', false: 'false' },
-  },
-];
-
 const InstitutionPage: React.FC = () => {
   const { api } = useDataApiWithFeedback();
 
@@ -30,12 +21,16 @@ const InstitutionPage: React.FC = () => {
     loadingInstitutions,
     institutions,
     setInstitutionsWithLoading: setInstitutions,
-  } = useInstitutionsData();
+  } = useInstitutionsData({
+    country: true,
+  });
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const deleteInstitution = async (id: number | string) => {
-    return await api('Institution removed successfully!')
+    return await api({
+      toastSuccessMessage: 'Institution removed successfully!',
+    })
       .deleteInstitution({
         id: id as number,
       })
@@ -47,6 +42,16 @@ const InstitutionPage: React.FC = () => {
         }
       });
   };
+
+  const columns = [
+    { title: 'Name', field: 'name' },
+    { title: 'Country', field: 'country.value' },
+    {
+      title: 'Verified',
+      field: 'verified',
+      lookup: { true: 'Yes', false: 'No' },
+    },
+  ];
 
   const createModal = (
     onUpdate: FunctionType<void, [Institution | null]>,

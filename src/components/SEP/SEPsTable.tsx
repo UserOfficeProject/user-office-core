@@ -29,7 +29,7 @@ const columns = [
   {
     title: 'Active',
     field: 'active',
-    render: (rowData: Sep): string => (rowData.active ? 'Yes' : 'No'),
+    lookup: { true: 'Yes', false: 'No' },
   },
 ];
 
@@ -69,7 +69,7 @@ const SEPsTable: React.FC = () => {
   const EditIcon = (): JSX.Element => <Edit />;
 
   const deleteSEP = async (id: number | string) => {
-    return await api('SEP deleted successfully')
+    return await api({ toastSuccessMessage: 'SEP deleted successfully' })
       .deleteSEP({
         id: id as number,
       })

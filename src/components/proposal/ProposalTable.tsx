@@ -110,7 +110,9 @@ const ProposalTable = ({
       return;
     }
 
-    const result = await api('Proposal cloned successfully').cloneProposals({
+    const result = await api({
+      toastSuccessMessage: 'Proposal cloned successfully',
+    }).cloneProposals({
       callId: call.id,
       proposalsToClonePk: [proposalToClone.primaryKey],
     });

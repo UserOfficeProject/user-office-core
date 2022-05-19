@@ -19,7 +19,9 @@ export function usePersistProposalWorkflowEditorModel() {
     name: string,
     description: string
   ) => {
-    return api('Proposal workflow updated successfully!')
+    return api({
+      toastSuccessMessage: 'Proposal workflow updated successfully!',
+    })
       .updateProposalWorkflow({
         id,
         name,
@@ -52,7 +54,7 @@ export function usePersistProposalWorkflowEditorModel() {
       nextProposalStatusId: number,
       prevProposalStatusId: number
     ) => {
-      return api('Workflow status added successfully')
+      return api({ toastSuccessMessage: 'Workflow status added successfully' })
         .addProposalWorkflowStatus({
           proposalWorkflowId,
           sortOrder,
@@ -70,7 +72,9 @@ export function usePersistProposalWorkflowEditorModel() {
       to: IndexWithGroupId,
       proposalWorkflowId: number
     ) => {
-      return api('Workflow statuses reordered successfully')
+      return api({
+        toastSuccessMessage: 'Workflow statuses reordered successfully',
+      })
         .moveProposalWorkflowStatus({
           from,
           to,
@@ -84,7 +88,9 @@ export function usePersistProposalWorkflowEditorModel() {
       proposalWorkflowId: number,
       sortOrder: number
     ) => {
-      return api('Workflow status removed successfully')
+      return api({
+        toastSuccessMessage: 'Workflow status removed successfully',
+      })
         .deleteProposalWorkflowStatus({
           proposalStatusId,
           proposalWorkflowId,
@@ -97,7 +103,9 @@ export function usePersistProposalWorkflowEditorModel() {
       proposalWorkflowConnectionId: number,
       statusChangingEvents: string[]
     ) => {
-      return api('Status changing events added successfully!')
+      return api({
+        toastSuccessMessage: 'Status changing events added successfully!',
+      })
         .addStatusChangingEventsToConnection({
           proposalWorkflowConnectionId,
           statusChangingEvents,

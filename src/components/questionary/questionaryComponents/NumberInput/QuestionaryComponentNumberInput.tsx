@@ -68,7 +68,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
       return null;
     } else if (config.units?.length === 1) {
       return (
-        <FormControl className={`${classes.singleUnit}`} margin="normal">
+        <FormControl className={`${classes.singleUnit}`} margin="dense">
           {stateValue.unit?.symbol}
         </FormControl>
       );
@@ -162,7 +162,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             data-natural-key={naturalKey}
             type="number"
             name={valueFieldId}
-            margin="none"
+            margin="dense"
             fullWidth
             error={isError}
           />

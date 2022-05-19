@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, Typography, Alert, Paper } from '@mui/material';
+import { Dialog, DialogContent, Typography, Alert, Stack } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
@@ -41,9 +41,6 @@ const useStyles = makeStyles((theme) => ({
   },
   alert: {
     margin: `${theme.spacing(2)}px 0`,
-  },
-  paper: {
-    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
   },
 }));
 
@@ -103,6 +100,14 @@ function DeclareShipments({
     })();
   };
 
+  const onEditClicked = (item: QuestionnairesListRow): Promise<void> =>
+    api()
+      .getShipment({ shipmentId: item.id })
+      .then(({ shipment }) => {
+        setSelectedShipment(shipment);
+        setIsModalOpen(true);
+      });
+
   const onAddClicked = () => {
     setIsModalOpen(true);
   };
@@ -110,8 +115,8 @@ function DeclareShipments({
   const hasLocalContact = scheduledEvent.localContactId !== null;
 
   return (
-    <>
-      <Typography variant="h6" component="h2" gutterBottom>
+    <Stack spacing={4}>
+      <Typography variant="h6" component="h2">
         Declare Shipments
       </Typography>
       <Typography variant="body1">
@@ -129,26 +134,15 @@ function DeclareShipments({
         </Alert>
       )}
 
-      <Paper className={classes.paper}>
-        <Typography variant="h6" gutterBottom>
-          Your shipment list
-        </Typography>
-        <QuestionnairesList
-          addButtonLabel="Add Shipment"
-          data={shipments.map(shipmentToListRow) ?? []}
-          onEditClick={(item) =>
-            api()
-              .getShipment({ shipmentId: item.id })
-              .then(({ shipment }) => {
-                setSelectedShipment(shipment);
-                setIsModalOpen(true);
-              })
-          }
-          onDeleteClick={onDeleteClicked}
-          onAddNewClick={hasLocalContact ? onAddClicked : undefined}
-          style={{ maxWidth: '100%' }}
-        />
-      </Paper>
+      <Typography variant="h6">My shipment list</Typography>
+      <QuestionnairesList
+        addButtonLabel="Add Shipment"
+        data={shipments.map(shipmentToListRow) ?? []}
+        onEditClick={onEditClicked}
+        onDeleteClick={onDeleteClicked}
+        onAddNewClick={hasLocalContact ? onAddClicked : undefined}
+        style={{ maxWidth: '100%' }}
+      />
       <Dialog
         aria-labelledby="shipment-declaration"
         aria-describedby="shipment-declaration-description"
@@ -169,7 +163,7 @@ function DeclareShipments({
           />
         </DialogContent>
       </Dialog>
-    </>
+    </Stack>
   );
 }
 

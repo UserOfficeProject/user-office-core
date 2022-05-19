@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -14,22 +13,9 @@ import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryRevi
 import { UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
-
-const useStyles = makeStyles(() => ({
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  button: {
-    marginTop: ({ proposal }: { proposal: ProposalWithQuestionary }) =>
-      proposal.status?.id === 0 ? '40px' : 'auto',
-    marginLeft: '10px',
-  },
-}));
 
 type ProposalSummaryProps = {
   confirm: WithConfirmType;
@@ -50,6 +36,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const [loadingSubmitMessage, setLoadingSubmitMessage] =
     useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitButtonMessage, setSubmitButtonMessage] = useState<string>(
     'I am aware that no further edits can be made after proposal submission.'
   );
@@ -62,8 +49,6 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     proposal.questionary &&
     proposal.questionary.steps.every((step) => step.isCompleted);
 
-  const classes = useStyles({ proposal });
-
   const submitDisabled =
     (!isUserOfficer && !isCallActive) || // disallow submit for non user officers if the call ended
     !allStepsComplete ||
@@ -72,7 +57,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   // Show a different submit confirmation if
   // EDITABLE_SUBMITTED is an upcoming status
   useEffect(() => {
-    async function initialiseSubmissionMessage() {
+    async function initializeSubmissionMessage() {
       if (!proposal.callId || submitDisabled) {
         setLoadingSubmitMessage(false);
 
@@ -115,7 +100,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
       }
       setLoadingSubmitMessage(false);
     }
-    initialiseSubmissionMessage();
+    initializeSubmissionMessage();
   }, [api, proposal.callId, proposal.status, submitDisabled]);
 
   if (loadingSubmitMessage) {
@@ -125,56 +110,62 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   return (
     <>
       <ProposalQuestionaryReview data={proposal} />
-      <div className={classes.buttons}>
-        <NavigationFragment disabled={proposal.status?.id === 0}>
-          <NavigButton
-            onClick={() => dispatch({ type: 'BACK_CLICKED' })}
-            disabled={state.stepIndex === 0}
-          >
-            Back
-          </NavigButton>
-          <NavigButton
-            onClick={() => {
-              confirm(
-                async () => {
-                  const result = await api().submitProposal({
-                    proposalPk: state.proposal.primaryKey,
-                  });
-                  if (!result.submitProposal.proposal) {
-                    return;
-                  }
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                    itemWithQuestionary: result.submitProposal.proposal,
-                  });
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                    itemWithQuestionary: result.submitProposal.proposal,
-                  });
-                },
-                {
-                  title: 'Please confirm',
-                  description: submitButtonMessage,
+      <NavigationFragment
+        disabled={proposal.status?.id === 0}
+        isLoading={isSubmitting}
+      >
+        <NavigButton
+          onClick={() => dispatch({ type: 'BACK_CLICKED' })}
+          disabled={state.stepIndex === 0}
+          isBusy={isSubmitting}
+        >
+          Back
+        </NavigButton>
+        <NavigButton
+          onClick={() => {
+            confirm(
+              async () => {
+                setIsSubmitting(true);
+                const result = await api().submitProposal({
+                  proposalPk: state.proposal.primaryKey,
+                });
+                if (!result.submitProposal.proposal) {
+                  setIsSubmitting(false);
+
+                  return;
                 }
-              )();
-            }}
-            disabled={submitDisabled}
-            data-cy="button-submit-proposal"
-          >
-            {proposal.submitted ? '✔ Submitted' : 'Submit'}
-          </NavigButton>
-          <Button
-            onClick={() =>
-              downloadPDFProposal([proposal.primaryKey], proposal.title)
-            }
-            disabled={!allStepsComplete}
-            className={classes.button}
-            color="secondary"
-          >
-            Download PDF
-          </Button>
-        </NavigationFragment>
-      </div>
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: result.submitProposal.proposal,
+                });
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                  itemWithQuestionary: result.submitProposal.proposal,
+                });
+                setIsSubmitting(false);
+              },
+              {
+                title: 'Please confirm',
+                description: submitButtonMessage,
+              }
+            )();
+          }}
+          disabled={submitDisabled}
+          isBusy={isSubmitting}
+          data-cy="button-submit-proposal"
+        >
+          {proposal.submitted ? '✔ Submitted' : 'Submit'}
+        </NavigButton>
+        <Button
+          onClick={() =>
+            downloadPDFProposal([proposal.primaryKey], proposal.title)
+          }
+          disabled={!allStepsComplete || isSubmitting}
+          color="secondary"
+        >
+          Download PDF
+        </Button>
+      </NavigationFragment>
     </>
   );
 }

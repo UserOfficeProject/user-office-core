@@ -1,6 +1,7 @@
 import { MTableToolbar, Options } from '@material-table/core';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
+import { NumberParam, useQueryParams, withDefault } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -16,7 +17,10 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   sepId,
 }) => {
   const { loadingCalls, calls } = useCallsData();
-  const [selectedCallId, setSelectedCallId] = useState<number>(0);
+  // NOTE: Default null means load all calls if nothing is selected
+  const [query] = useQueryParams({
+    call: withDefault(NumberParam, null),
+  });
 
   const Toolbar = (data: Options<JSX.Element>): JSX.Element => (
     <>
@@ -24,9 +28,8 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
       <CallFilter
         calls={calls}
         isLoading={loadingCalls}
-        onChange={setSelectedCallId}
         shouldShowAll={true}
-        callId={selectedCallId}
+        callId={query.call}
       />
     </>
   );
@@ -34,7 +37,7 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   return (
     <SEPProposalsAndAssignmentsTable
       sepId={sepId}
-      selectedCallId={selectedCallId}
+      selectedCallId={query.call}
       Toolbar={Toolbar}
     />
   );
