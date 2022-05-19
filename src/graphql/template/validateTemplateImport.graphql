@@ -1,26 +1,15 @@
 mutation validateTemplateImport($templateAsJson: String!) {
-  validateTemplateImport(templateAsJson:$templateAsJson) {
+  validateTemplateImport(templateAsJson: $templateAsJson) {
     validationResult {
       json
       version
       exportDate
-      isValid
-      errors
-      questionComparisons {
-        existingQuestion
-        {
-          ...question
-        }
-        newQuestion
-        {
-          ...question
-        }
-        status
-        conflictResolutionStrategy
+      validationData {
+        ...templateValidationData
       }
     }
     rejection {
-       ...rejection
+      ...rejection
     }
   }
 }
