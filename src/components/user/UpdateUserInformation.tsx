@@ -1,6 +1,7 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import DoneIcon from '@mui/icons-material/Done';
+import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import Box from '@mui/material/Box';
@@ -11,6 +12,7 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
@@ -22,6 +24,7 @@ import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import ImpersonateButton from 'components/common/ImpersonateButton';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -34,16 +37,14 @@ import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useGetFields } from 'hooks/user/useGetFields';
 import { useUserData } from 'hooks/user/useUserData';
 import orcid from 'images/orcid.png';
-import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';
 
 const useStyles = makeStyles((theme) => ({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
+  orcIdLabel: {
+    marginBottom: theme.spacing(1),
   },
-  orcidLink: {
+  orcIdLink: {
     marginTop: theme.spacing(3),
   },
   orcidIconSmall: {
@@ -67,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UpdateUserInformation(props: { id: number }) {
   const theme = useTheme();
-  const { currentRole } = useContext(UserContext);
+  const { currentRole, user } = useContext(UserContext);
   const { userData, setUserData } = useUserData(props);
   const { format, mask } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
@@ -392,7 +393,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                   href={'https://orcid.org/' + values.orcid}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className={classes.orcidLink}
+                  className={classes.orcIdLink}
                 >
                   https://orcid.org/{values.orcid}
                 </Link>
@@ -490,15 +491,24 @@ export default function UpdateUserInformation(props: { id: number }) {
               />
             </Grid>
           </Grid>
-          <StyledButtonContainer>
-            <Button
-              disabled={isSubmitting}
-              type="submit"
-              className={classes.button}
-            >
+          <Stack
+            direction="row"
+            justifyContent="flex-end"
+            spacing={2}
+            marginTop={2}
+          >
+            {props.id !== user.id && (
+              <ImpersonateButton
+                userId={props.id}
+                startIcon={<SwitchAccountOutlinedIcon />}
+              >
+                Connect as this user...
+              </ImpersonateButton>
+            )}
+            <Button disabled={isSubmitting} type="submit">
               Update Profile
             </Button>
-          </StyledButtonContainer>
+          </Stack>
         </Form>
       )}
     </Formik>

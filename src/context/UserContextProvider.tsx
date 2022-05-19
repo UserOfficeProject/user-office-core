@@ -14,6 +14,7 @@ interface UserContextData {
   token: string;
   roles: Role[];
   currentRole: UserRole | null;
+  impersonatingUserId: number | undefined;
   handleLogin: React.Dispatch<string | null | undefined>;
   handleNewToken: React.Dispatch<string | null | undefined>;
   handleLogout: () => void;
@@ -24,6 +25,7 @@ interface DecodedTokenData
   extends Pick<UserContextData, 'user' | 'token' | 'roles'> {
   exp: number;
   currentRole: Role;
+  impersonatingUserId: number | undefined;
 }
 
 enum ActionType {
@@ -39,6 +41,7 @@ const initUserData: UserContextData = {
   token: '',
   roles: [],
   currentRole: null,
+  impersonatingUserId: undefined,
   handleLogin: (value) => value,
   handleNewToken: (value) => value,
   handleLogout: () => null,
@@ -67,10 +70,12 @@ const checkLocalStorage = (
           currentRole: localStorage.currentRole,
           token: localStorage.token,
           expToken: decoded.exp,
+          impersonatingUserId: decoded.impersonatingUserId,
         },
       });
     } else {
       localStorage.removeItem('token');
+      localStorage.removeItem('impersonatingUserId');
     }
   }
 };
@@ -89,9 +94,10 @@ const reducer = (
         roles: action.payload.roles,
         token: action.payload.token,
         expToken: action.payload.expToken,
+        impersonatingUserId: action.payload.impersonatingUserId,
       };
     case ActionType.LOGINUSER: {
-      const { user, exp, roles } = jwtDecode(
+      const { user, exp, roles, impersonatingUserId } = jwtDecode(
         action.payload
       ) as DecodedTokenData;
       localStorage.user = JSON.stringify(user);
@@ -99,6 +105,7 @@ const reducer = (
       localStorage.expToken = exp;
 
       localStorage.currentRole = roles[0].shortCode.toUpperCase();
+      localStorage.impersonatingUserId = impersonatingUserId;
 
       return {
         ...state,
@@ -107,6 +114,7 @@ const reducer = (
         expToken: exp,
         roles: roles,
         currentRole: roles[0].shortCode.toUpperCase(),
+        impersonatingUserId: impersonatingUserId,
       };
     }
     case ActionType.SETTOKEN: {
@@ -137,6 +145,7 @@ const reducer = (
       localStorage.removeItem('currentRole');
       localStorage.removeItem('user');
       localStorage.removeItem('expToken');
+      localStorage.removeItem('impersonatingUserId');
 
       return {
         ...initUserData,
@@ -156,6 +165,7 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
   useEffect(() => {
     const hostname = window.location.hostname;
 
+    // NOTE: Cookies are used for scheduler authorization.
     setCookie('token', state.token, {
       path: '/',
       secure: false,
