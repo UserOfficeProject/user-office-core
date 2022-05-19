@@ -16,7 +16,7 @@ const createProposalWorkflow = (
   const api = getE2EApi();
   const request = api.createProposalWorkflow(createProposalWorkflowInput);
 
-  return cy.wrap(request);
+  return cy.wrap(request, { timeout: 1500000 });
 };
 
 const createProposalStatus = (

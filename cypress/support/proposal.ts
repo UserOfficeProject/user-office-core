@@ -24,7 +24,7 @@ const createProposal = (
   const api = getE2EApi();
   const request = api.createProposal(createProposalInput);
 
-  return cy.wrap(request);
+  return cy.wrap(request, { timeout: 1500000 });
 };
 
 const updateProposal = (
@@ -33,7 +33,7 @@ const updateProposal = (
   const api = getE2EApi();
   const request = api.updateProposal(updateProposalInput);
 
-  return cy.wrap(request);
+  return cy.wrap(request, { timeout: 1500000 });
 };
 
 const submitProposal = (

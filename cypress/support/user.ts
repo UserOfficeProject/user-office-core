@@ -13,6 +13,7 @@ import {
   UpdateUserRolesMutationVariables,
   User,
 } from '../../src/generated/sdk';
+//import initialDBData from '../support/initialDBData';
 import { getE2EApi } from './utils';
 
 type DecodedTokenData = {
@@ -26,7 +27,7 @@ const testCredentialStoreStfc = {
     externalToken: '64d742c9-ed6c-489f-adca-45df1ef27911',
   },
   officer: {
-    externalToken: '0c8e51ae-9d62-448b-b71c-e4c5552681b1',
+    externalToken: 'f11b0927-8cbd-4277-b86b-877baa4f7a21',
     //sessionID's depending on role maybe??
   },
   user2: {
@@ -55,6 +56,35 @@ const testCredentialStore = {
     password: 'Test1234!',
   },
 };
+
+function changeActiveRole(selectedRoleId: number) {
+  const token = window.localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('No logged in user');
+  }
+
+  const api = getE2EApi();
+  const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
+    if (!resp.selectRole.token) {
+      return;
+    }
+
+    const { currentRole, user, exp } = jwtDecode(
+      resp.selectRole.token
+    ) as DecodedTokenData;
+
+    window.localStorage.setItem('token', resp.selectRole.token);
+    window.localStorage.setItem(
+      'currentRole',
+      currentRole.shortCode.toUpperCase()
+    );
+    window.localStorage.setItem('expToken', `${exp}`);
+    window.localStorage.setItem('user', JSON.stringify(user));
+  });
+
+  cy.wrap(request);
+}
 
 const externalTokenLogin = (
   roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
@@ -87,7 +117,7 @@ const externalTokenLogin = (
     return resp;
   });
 
-  return cy.wrap(request);
+  return cy.wrap(request, { timeout: 1500000 });
 };
 
 const login = (
@@ -104,7 +134,9 @@ const login = (
       : roleOrCredentials;
 
   if (Cypress.env('STFC') === true) {
-    externalTokenLogin(roleOrCredentials as 'user' | 'officer'); //fix this to be dynamic how? how to know if officer or instr sci
+    externalTokenLogin(roleOrCredentials as 'user' | 'officer').then(() =>
+      changeActiveRole(roleOrCredentials === 'user' ? 1 : 2)
+    );
   }
 
   const api = getE2EApi();
@@ -173,34 +205,34 @@ function updateUserRoles(
   cy.wrap(request);
 }
 
-function changeActiveRole(selectedRoleId: number) {
-  const token = window.localStorage.getItem('token');
+// function changeActiveRole(selectedRoleId: number) {
+//   const token = window.localStorage.getItem('token');
 
-  if (!token) {
-    throw new Error('No logged in user');
-  }
+//   if (!token) {
+//     throw new Error('No logged in user');
+//   }
 
-  const api = getE2EApi();
-  const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
-    if (!resp.selectRole.token) {
-      return;
-    }
+//   const api = getE2EApi();
+//   const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
+//     if (!resp.selectRole.token) {
+//       return;
+//     }
 
-    const { currentRole, user, exp } = jwtDecode(
-      resp.selectRole.token
-    ) as DecodedTokenData;
+//     const { currentRole, user, exp } = jwtDecode(
+//       resp.selectRole.token
+//     ) as DecodedTokenData;
 
-    window.localStorage.setItem('token', resp.selectRole.token);
-    window.localStorage.setItem(
-      'currentRole',
-      currentRole.shortCode.toUpperCase()
-    );
-    window.localStorage.setItem('expToken', `${exp}`);
-    window.localStorage.setItem('user', JSON.stringify(user));
-  });
+//     window.localStorage.setItem('token', resp.selectRole.token);
+//     window.localStorage.setItem(
+//       'currentRole',
+//       currentRole.shortCode.toUpperCase()
+//     );
+//     window.localStorage.setItem('expToken', `${exp}`);
+//     window.localStorage.setItem('user', JSON.stringify(user));
+//   });
 
-  cy.wrap(request);
-}
+//   cy.wrap(request);
+// }
 
 Cypress.Commands.add('login', login);
 Cypress.Commands.add('externalTokenLogin', externalTokenLogin);
