@@ -351,7 +351,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
         if (filter?.instrumentId) {
           query.where(
-            'proposal_table_view.instrument_id',
+            'proposal_table_view.proposal_instrument',
             filter?.instrumentId
           );
         }
@@ -501,22 +501,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         database.raw('count(*) OVER() AS full_count'),
       ])
       .from('proposal_table_view')
-      .join('instruments', function () {
-        this.on({
-          'instruments.instrument_id':
-            'proposal_table_view.proposal_instrument_id',
-        }).orOn({
-          'instruments.instrument_id': 'proposal_table_view.call_instrument_id',
-        });
+      .join('instruments', {
+        'instruments.instrument_id': 'proposal_table_view.proposal_instrument',
       })
-      .leftJoin('instrument_has_scientists', function () {
-        this.on({
-          'instrument_has_scientists.instrument_id':
-            'proposal_table_view.proposal_instrument_id',
-        }).orOn({
-          'instrument_has_scientists.instrument_id':
-            'proposal_table_view.call_instrument_id',
-        });
+      .leftJoin('instrument_has_scientists', {
+        'instrument_has_scientists.instrument_id':
+          'proposal_table_view.proposal_instrument',
       })
       .where(function () {
         this.where('instrument_has_scientists.user_id', scientistId).orWhere(
