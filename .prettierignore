@@ -5,3 +5,4 @@ src/generated/
 .github/workflows/
 README.md
 .vscode/
+cypress/fixtures/
