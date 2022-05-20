@@ -10,7 +10,7 @@ import {
   TemplateCategoryId,
   TemplateGroup,
   TemplateGroupId,
-  TemplateImportWithValidation,
+  TemplateValidation,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -24,6 +24,10 @@ import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { SampleDeclarationConfig } from '../../resolvers/types/FieldConfig';
 import { TemplateDataSource } from '../TemplateDataSource';
+import {
+  TemplateExport,
+  TemplateValidationData,
+} from './../../models/Template';
 import {
   dummyQuestionFactory,
   dummyQuestionTemplateRelationFactory,
@@ -127,12 +131,23 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   constructor() {
     this.init();
   }
-  importTemplate(templateAsJson: string): Promise<Template> {
+  importTemplate(templateExport: TemplateExport): Promise<Template> {
     throw new Error('Method not implemented.');
   }
 
-  async getTemplateAsJson(templateId: number): Promise<string> {
-    return JSON.stringify(dummyProposalTemplate);
+  async getTemplateExport(templateId: number): Promise<TemplateExport> {
+    return {
+      metadata: {
+        version: '1.0.0',
+        exportDate: new Date(),
+      },
+      data: {
+        template: dummyProposalTemplate,
+        templateSteps: [],
+        questions: [],
+        subTemplates: [],
+      },
+    };
   }
 
   async getGroup(groupId: TemplateGroupId): Promise<TemplateGroup> {
@@ -382,16 +397,14 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     );
   }
 
-  async validateTemplateImport(
-    json: string
-  ): Promise<TemplateImportWithValidation> {
-    return {
-      isValid: true,
-      errors: [],
-      questionComparisons: [],
-      exportDate: new Date(),
-      json: '{}',
-      version: '1.0.0',
-    };
+  async validateTemplateExport(
+    templateExport: TemplateExport
+  ): Promise<TemplateValidation> {
+    return new TemplateValidation(
+      '{}',
+      '1.0.0',
+      new Date(),
+      new TemplateValidationData(true, [], [], [])
+    );
   }
 }
