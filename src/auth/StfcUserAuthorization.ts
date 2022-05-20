@@ -18,14 +18,15 @@ import { UserAuthorization } from './UserAuthorization';
 
 const client = new UOWSSoapClient(process.env.EXTERNAL_AUTH_SERVICE_URL);
 
-const stfcInstrumentScientistRolesToInstrument: Record<string, string> = {
-  'ISIS Instrument Scientist': 'ISIS',
-  'CLF Artemis FAP Secretary': 'ARTEMIS',
-  'CLF Artemis Link Scientist': 'ARTEMIS',
-  'CLF HPL FAP Secretary': 'HPL',
-  'CLF HPL Link Scientist': 'HPL',
-  'CLF LSF FAP Secretary': 'LSF',
-  'CLF LSF Link Scientist': 'LSF',
+const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
+  'User Officer': ['ISIS', 'ARTEMIS', 'HPL', 'LSF'],
+  'ISIS Instrument Scientist': ['ISIS'],
+  'CLF Artemis FAP Secretary': ['ARTEMIS'],
+  'CLF Artemis Link Scientist': ['ARTEMIS'],
+  'CLF HPL FAP Secretary': ['HPL'],
+  'CLF HPL Link Scientist': ['HPL'],
+  'CLF LSF FAP Secretary': ['LSF'],
+  'CLF LSF Link Scientist': ['LSF'],
 };
 
 @injectable()
@@ -203,7 +204,13 @@ export class StfcUserAuthorization extends UserAuthorization {
     )?.return;
 
     if (stfcRoles) {
-      const requiredInstruments = this.getRequiredInstrumentForRole(stfcRoles);
+      // The UOWS sometimes returns duplicate roles. We remove them here
+      const uniqueRoles = stfcRoles.filter(
+        (role, index) =>
+          stfcRoles.findIndex((r) => r.name == role.name) !== index
+      );
+      const requiredInstruments =
+        this.getRequiredInstrumentForRole(uniqueRoles);
       const currentUserInstruments =
         await this.instrumentDataSource.getUserInstruments(userNumber);
       this.autoAssignRemoveInstruments(
