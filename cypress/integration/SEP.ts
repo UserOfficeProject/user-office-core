@@ -61,6 +61,10 @@ function editFinalRankingForm() {
   });
 }
 
+const instrumentAvailabilityTime = 20;
+const firstProposalTimeAllocation = 25;
+const secondProposalTimeAllocation = 5;
+
 const sep1 = {
   code: faker.lorem.word(10),
   description: faker.random.words(8),
@@ -749,7 +753,7 @@ context('SEP meeting components tests', () => {
     cy.addProposalTechnicalReview({
       proposalPk: createdProposalPk,
       status: TechnicalReviewStatus.FEASIBLE,
-      timeAllocation: 25,
+      timeAllocation: firstProposalTimeAllocation,
       submitted: true,
       reviewerId: 0,
     });
@@ -775,7 +779,7 @@ context('SEP meeting components tests', () => {
         cy.setInstrumentAvailabilityTime({
           callId: initialDBData.call.id,
           instrumentId: createdInstrumentId,
-          availabilityTime: 20,
+          availabilityTime: instrumentAvailabilityTime,
         });
       }
     });
@@ -850,7 +854,7 @@ context('SEP meeting components tests', () => {
           cy.addProposalTechnicalReview({
             proposalPk: createdProposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
-            timeAllocation: 5,
+            timeAllocation: secondProposalTimeAllocation,
             submitted: true,
             reviewerId: 0,
           });
@@ -924,6 +928,16 @@ context('SEP meeting components tests', () => {
       cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
         .first()
         .contains(proposal2.title);
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .should(
+          'have.attr',
+          'unallocated-time-information',
+          `Unallocated time: ${
+            instrumentAvailabilityTime - secondProposalTimeAllocation
+          } ${initialDBData.call.allocationTimeUnit}s`
+        );
 
       cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
         .last()
@@ -1141,7 +1155,7 @@ context('SEP meeting components tests', () => {
 
       cy.get('[data-cy="SEP-meeting-components-table"] tbody tr:first-child td')
         .eq(5)
-        .should('have.text', '25');
+        .should('have.text', firstProposalTimeAllocation);
       cy.get('[data-cy="SEP-meeting-components-table"] thead').should(
         'include.text',
         initialDBData.call.allocationTimeUnit
@@ -1204,6 +1218,7 @@ context('SEP meeting components tests', () => {
     });
 
     it('should use SEP time allocation (if set) when calculating if they fit in available time', () => {
+      const newSepTimeAllocation = 15;
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
@@ -1214,6 +1229,10 @@ context('SEP meeting components tests', () => {
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
       ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+
+      cy.get(
+        '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
+      ).should('have.attr', 'unallocated-time-information', '');
 
       cy.get('[aria-label="View proposal details"]').click();
 
@@ -1235,6 +1254,16 @@ context('SEP meeting components tests', () => {
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
       ).should('not.have.css', 'background-color', 'rgb(246, 104, 94)');
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr:last-child')
+        .first()
+        .should(
+          'have.attr',
+          'unallocated-time-information',
+          `Unallocated time: ${
+            instrumentAvailabilityTime - newSepTimeAllocation
+          } ${initialDBData.call.allocationTimeUnit}s`
+        );
     });
 
     it('Officer should be able to submit an instrument if all proposals SEP meetings are submitted in existing SEP', () => {
