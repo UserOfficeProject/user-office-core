@@ -1,0 +1,14 @@
+fragment templateValidationData on TemplateValidationData {
+  isValid
+  errors
+  questionComparisons {
+    ...questionComparison
+  }
+  subTemplateValidationData {
+    isValid
+    errors
+    questionComparisons {
+      ...questionComparison
+    }
+  }
+}

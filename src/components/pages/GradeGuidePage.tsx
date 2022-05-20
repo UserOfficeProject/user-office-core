@@ -14,7 +14,7 @@ const GradeGuidePage: React.FC = () => {
   const [loadingPage, pageContent] = useGetPageContent(PageName.GRADEGUIDEPAGE);
 
   const noContents = (
-    <Stack alignItems={'center'}>
+    <Stack alignItems="center">
       <MenuBookIcon
         sx={(theme) => ({
           width: '100px',

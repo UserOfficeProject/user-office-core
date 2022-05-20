@@ -1226,10 +1226,15 @@ context('Template tests', () => {
           path.join(downloadsFolder, `${initialDBData.template.name}.json`)
         ).then((actualExport) => {
           // remove date from the export, because it is not deterministic
-          delete expectedExport.exportDate;
-          delete actualExport.exportDate;
+          delete expectedExport.metadata.exportDate;
+          delete actualExport.metadata.exportDate;
+
+          const exportSubtemplates = expectedExport.data.subTemplates[0];
+          const importSubtemplates = actualExport.data.subTemplates[0];
 
           expect(expectedExport).to.deep.equal(actualExport);
+
+          expect(exportSubtemplates).to.deep.equal(importSubtemplates);
         });
       });
     });

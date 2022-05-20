@@ -15,7 +15,7 @@
     "@graphql-codegen/typescript": "^2.4.8",
     "@graphql-codegen/typescript-graphql-request": "^4.4.5",
     "@graphql-codegen/typescript-operations": "^2.3.5",
-    "@material-table/core": "^0.2.32",
+    "@material-table/core": "^0.2.33",
     "@mui/icons-material": "^5.5.0",
     "@mui/lab": "^5.0.0-alpha.72",
     "@mui/material": "^5.5.0",
@@ -52,7 +52,7 @@
     "react-router": "^5.3.1",
     "react-router-dom": "^5.3.1",
     "react-scripts": "^5.0.1",
-    "tinymce": "^5.10.3",
+    "tinymce": "^5.10.4",
     "typescript": "^4.6.3",
     "use-query-params": "^1.2.3",
     "yup": "^0.32.11"
