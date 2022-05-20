@@ -1,5 +1,13 @@
-mutation importTemplate($templateAsJson: String!, $conflictResolutions: [ConflictResolution!]!) {
-  importTemplate(templateAsJson: $templateAsJson, conflictResolutions: $conflictResolutions) {
+mutation importTemplate(
+  $templateAsJson: String!
+  $conflictResolutions: [ConflictResolution!]!
+  $subTemplatesConflictResolutions: [[ConflictResolution!]!]!
+) {
+  importTemplate(
+    templateAsJson: $templateAsJson
+    conflictResolutions: $conflictResolutions
+    subTemplatesConflictResolutions: $subTemplatesConflictResolutions
+  ) {
     template {
       ...template
     }
