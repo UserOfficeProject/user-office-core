@@ -276,6 +276,10 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async getByOrcID(orcID: string): Promise<User | null> {
+    if (!orcID) {
+      return null;
+    }
+
     return database
       .select()
       .from('users')

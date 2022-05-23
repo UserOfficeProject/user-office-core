@@ -280,7 +280,10 @@ export default class ProposalMutations {
       });
     }
 
-    if (!this.userAuth.isUserOfficer(agent)) {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.userAuth.isApiToken(agent)
+    ) {
       if (
         proposal.submitted ||
         !this.proposalAuth.isPrincipalInvestigatorOfProposal(agent, proposal)

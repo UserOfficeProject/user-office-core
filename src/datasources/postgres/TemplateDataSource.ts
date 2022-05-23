@@ -12,10 +12,13 @@ import {
   TemplateCategory,
   TemplateExport,
   TemplateGroupId,
-  TemplateImportWithValidation,
+  TemplateValidation,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
+  TemplateExportData,
+  TemplateExportMetadata,
+  TemplateValidationData,
 } from '../../models/Template';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
@@ -26,6 +29,10 @@ import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMuta
 import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { ConflictResolution } from '../../resolvers/types/ConflictResolution';
+import {
+  SampleDeclarationConfig,
+  SubTemplateConfig,
+} from '../../resolvers/types/FieldConfig';
 import { deepEqual } from '../../utils/json';
 import { isBelowVersion, isAboveVersion } from '../../utils/version';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -50,8 +57,8 @@ import {
   TopicRecord,
 } from './records';
 
-const EXPORT_VERSION = '1.1.0';
-const MIN_SUPPORTED_VERSION = '1.1.0';
+const EXPORT_VERSION = '1.2.0';
+const MIN_SUPPORTED_VERSION = '1.2.0';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getTemplateCategories(): Promise<TemplateCategory[]> {
@@ -186,89 +193,107 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async getTemplateAsJson(templateId: number): Promise<string> {
-    const EXPORT_DATE = new Date();
+  async getSubtemplatesForQuestions(questions: Question[]) {
+    const subTemplates: TemplateExportData[] = [];
+    for await (const question of questions) {
+      switch (question.dataType) {
+        case DataType.GENERIC_TEMPLATE:
+        case DataType.SAMPLE_DECLARATION:
+          const config = question.config as
+            | SubTemplateConfig
+            | SampleDeclarationConfig;
 
+          if (typeof config.templateId !== 'number') {
+            throw new Error(
+              `getTemplateAsJson expected number got ${typeof config.templateId}`
+            );
+          }
+
+          const subTemplate = await this.getTemplateExportData(
+            config.templateId
+          );
+          subTemplates.push(subTemplate);
+
+          break;
+      }
+    }
+
+    return subTemplates;
+  }
+
+  async getTemplateExportData(templateId: number): Promise<TemplateExportData> {
     const template = await this.getTemplate(templateId);
     const templateSteps = await this.getTemplateSteps(templateId);
     const questions = await this.getQuestionsInTemplate(templateId);
+    const subTemplates = await this.getSubtemplatesForQuestions(questions);
 
-    if (!template || !templateSteps || !questions) {
+    if (!template || !templateSteps || !questions || !subTemplates) {
       throw new Error(`Template does not exist. ID: ${templateId}`);
     }
 
-    const object: TemplateExport = {
-      version: EXPORT_VERSION,
-      exportDate: EXPORT_DATE,
+    const data = new TemplateExportData(
       template,
       templateSteps,
       questions,
-    };
+      subTemplates
+    );
 
-    return JSON.stringify(object);
+    return data;
+  }
+  async getTemplateExport(templateId: number): Promise<TemplateExport> {
+    const EXPORT_DATE = new Date();
+
+    const templateExportData = await this.getTemplateExportData(templateId);
+
+    const templateExport: TemplateExport = new TemplateExport(
+      new TemplateExportMetadata(EXPORT_VERSION, EXPORT_DATE),
+      templateExportData
+    );
+
+    return templateExport;
   }
 
   isCriticalConflict = (questionA: Question, questionB: Question) =>
     questionA.dataType !== questionB.dataType ||
     questionA.categoryId !== questionB.categoryId;
 
-  convertStringToTemplateExport = (string: string): TemplateExport => {
-    const object = JSON.parse(string);
-    object.exportDate = new Date(object.exportDate);
-
-    return object;
-  };
-
-  async validateTemplateImport(
-    json: string
-  ): Promise<TemplateImportWithValidation> {
-    const templateExport = this.convertStringToTemplateExport(json);
+  async validateTemplateExportData(
+    data: TemplateExportData
+  ): Promise<TemplateValidationData> {
     const errors: string[] = [];
     const questionComparisons: QuestionComparison[] = [];
 
-    if (isBelowVersion(templateExport.version, MIN_SUPPORTED_VERSION)) {
-      throw new Error(
-        `Template version ${templateExport.version} is below the minimum supported version ${MIN_SUPPORTED_VERSION}.`
-      );
-    }
-
-    if (isAboveVersion(templateExport.version, EXPORT_VERSION)) {
-      throw new Error(
-        `Template version ${templateExport.version} is above the current supported version ${EXPORT_VERSION}.`
-      );
-    }
-
-    if (!templateExport.template) {
+    if (!data.template) {
       throw new Error('Template field is missing');
     }
 
-    if (!templateExport.templateSteps) {
+    if (!data.templateSteps) {
       throw new Error('TemplateSteps field is missing');
     }
 
-    if (!templateExport.questions) {
+    if (!data.questions) {
       throw new Error('Questions field is missing');
     }
 
-    if (!templateExport.template.name) {
+    if (!data.template.name) {
       throw new Error('Template.name field is missing');
     }
 
-    if (!templateExport.template.description) {
+    if (!data.template.description) {
       throw new Error('Template.description field is missing');
     }
 
-    if (!templateExport.template.groupId) {
+    if (!data.template.groupId) {
       throw new Error('Template.group field is missing');
     }
 
-    const questionIds = templateExport.questions.map((question) => question.id);
+    const questionIds = data.questions.map((question) => question.id);
 
     const existingQuestions = await this.getQuestions({
       questionIds,
     });
 
-    const newQuestions = templateExport.questions.map(
+    const newQuestions = data.questions.map(
       (question) =>
         new Question(
           question.categoryId,
@@ -317,14 +342,41 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       }
     }
 
-    return {
-      json: json,
-      version: templateExport.version,
-      exportDate: templateExport.exportDate,
-      errors: errors,
-      questionComparisons: questionComparisons,
-      isValid: errors.length === 0,
-    };
+    const validatedSubTemplates = await Promise.all(
+      data.subTemplates.map(async (template) => {
+        return await this.validateTemplateExportData(template);
+      })
+    );
+
+    return new TemplateValidationData(
+      errors.length === 0,
+      errors,
+      questionComparisons,
+      validatedSubTemplates
+    );
+  }
+
+  async validateTemplateExport(templateExport: TemplateExport) {
+    const { metadata, data } = templateExport;
+    if (isBelowVersion(metadata.version, MIN_SUPPORTED_VERSION)) {
+      throw new Error(
+        `Template version ${metadata.version} is below the minimum supported version ${MIN_SUPPORTED_VERSION}.`
+      );
+    }
+
+    if (isAboveVersion(metadata.version, EXPORT_VERSION)) {
+      throw new Error(
+        `Template version ${metadata.version} is above the current supported version ${EXPORT_VERSION}.`
+      );
+    }
+    const dataValidation = await this.validateTemplateExportData(data);
+
+    return new TemplateValidation(
+      JSON.stringify(templateExport),
+      metadata.version,
+      metadata.exportDate,
+      dataValidation
+    );
   }
 
   async getQuestionsDependencies(
@@ -1022,16 +1074,71 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async importTemplate(
-    templateAsJson: string,
-    conflictResolutions: ConflictResolution[]
+    templateExport: TemplateExport,
+    conflictResolutions: ConflictResolution[],
+    subTemplatesConflictResolutions?: ConflictResolution[][]
+  ) {
+    return this.importTemplateData(
+      templateExport.data,
+      conflictResolutions,
+      subTemplatesConflictResolutions
+    );
+  }
+
+  async importTemplateData(
+    templateExport: TemplateExportData,
+    conflictResolutions: ConflictResolution[],
+    subTemplatesConflictResolutions?: ConflictResolution[][]
   ): Promise<Template> {
-    let templateObj: TemplateExport;
-    try {
-      templateObj = JSON.parse(templateAsJson);
-    } catch (e) {
-      throw new Error('Could not parse template');
+    const { template, questions, templateSteps, subTemplates } = templateExport;
+
+    const importedSubTemplatesMap: { oldId: number; newId: number }[] = [];
+
+    // Get mapping of old subtemplate ids to new subtemplate ids
+    for (let i = 0; i < subTemplates.length; i++) {
+      importedSubTemplatesMap.push({
+        oldId: subTemplates[i].template.templateId,
+        newId: (
+          await this.importTemplateData(
+            subTemplates[i],
+            (subTemplatesConflictResolutions as ConflictResolution[][])[i]
+          )
+        ).templateId,
+      });
     }
-    const { template, questions, templateSteps } = templateObj;
+
+    importedSubTemplatesMap.forEach((subTemplate) => {
+      // Update the subtemplate id in the questions
+      questions.map((question) => {
+        if (
+          (question.dataType == DataType.GENERIC_TEMPLATE ||
+            question.dataType == DataType.SAMPLE_DECLARATION) &&
+          (question.config as SubTemplateConfig | SubTemplateConfig)
+            .templateId == subTemplate.oldId
+        ) {
+          (
+            question.config as SubTemplateConfig | SubTemplateConfig
+          ).templateId = subTemplate.newId;
+        }
+      });
+      // Update the subtemplates ids in the template steps
+      templateSteps.map((step) => {
+        step.fields.map((field) => {
+          if (
+            (field.question.dataType == DataType.GENERIC_TEMPLATE ||
+              field.question.dataType == DataType.SAMPLE_DECLARATION) &&
+            (field.question.config as SubTemplateConfig | SubTemplateConfig)
+              .templateId == subTemplate.oldId
+          ) {
+            (field.config as SubTemplateConfig | SubTemplateConfig).templateId =
+              subTemplate.newId;
+            (
+              field.question.config as SubTemplateConfig | SubTemplateConfig
+            ).templateId = subTemplate.newId;
+          }
+        });
+      });
+    });
 
     await Promise.all(
       questions.map(async (question) => {

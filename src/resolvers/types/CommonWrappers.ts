@@ -34,7 +34,7 @@ import { Shipment } from './Shipment';
 import { StatusChangingEvent } from './StatusChangingEvent';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
-import { TemplateImportWithValidation } from './TemplateImportWithValidation';
+import { TemplateValidation } from './TemplateValidation';
 import { Topic } from './Topic';
 import { Unit } from './Unit';
 import { UnitsImportWithValidation } from './UnitsImportWithValidation';
@@ -370,10 +370,10 @@ export class FeedbackResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class TemplateImportWithValidationWrap extends ResponseWrapBase {
+export class TemplateValidationWrap extends ResponseWrapBase {
   @Response()
-  @Field(() => TemplateImportWithValidation, { nullable: true })
-  public validationResult: TemplateImportWithValidation;
+  @Field(() => TemplateValidation, { nullable: true })
+  public validationResult: TemplateValidation;
 }
 
 @ObjectType()

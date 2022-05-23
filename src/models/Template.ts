@@ -149,23 +149,41 @@ export class QuestionComparison {
     public conflictResolutionStrategy: ConflictResolutionStrategy
   ) {}
 }
-export class TemplateImportWithValidation {
+
+export class TemplateValidationData {
+  constructor(
+    public isValid: boolean,
+    public errors: string[],
+    public questionComparisons: QuestionComparison[],
+    public subTemplateValidationData: TemplateValidationData[]
+  ) {}
+}
+
+export class TemplateValidation {
   constructor(
     public json: string,
     public version: string,
     public exportDate: Date,
-    public isValid: boolean,
-    public errors: string[],
-    public questionComparisons: QuestionComparison[]
+    public validationData: TemplateValidationData
+  ) {}
+}
+
+export class TemplateExportMetadata {
+  constructor(public version: string, public exportDate: Date) {}
+}
+
+export class TemplateExportData {
+  constructor(
+    public template: Template,
+    public templateSteps: TemplateStep[],
+    public questions: Question[],
+    public subTemplates: TemplateExportData[]
   ) {}
 }
 
 export class TemplateExport {
   constructor(
-    public version: string,
-    public exportDate: Date,
-    public template: Template,
-    public templateSteps: TemplateStep[],
-    public questions: Question[]
+    public metadata: TemplateExportMetadata,
+    public data: TemplateExportData
   ) {}
 }
