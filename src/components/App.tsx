@@ -23,6 +23,7 @@ import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
+import { getPingAuthTokenFromCallbackUrl } from '../utils/getPingAuthTokenFromCallbackUrl';
 import DashBoard from './DashBoard';
 import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
@@ -57,7 +58,13 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (isExternalAuthEnabled && externalAuthLoginUrl) {
+              const pingAccessToken = getPingAuthTokenFromCallbackUrl();
+
+              if (pingAccessToken !== null) {
+                window.location.href = `/external-auth?token=${pingAccessToken}`;
+
+                return <p>Redirecting to auth page...</p>;
+              } else if (isExternalAuthEnabled && externalAuthLoginUrl) {
                 window.location.href = externalAuthLoginUrl;
 
                 return <p>Redirecting to external sign-in page...</p>;
@@ -88,6 +95,7 @@ const Routes: React.FC<RouteProps> = () => {
       <div className="App">
         <Switch>
           <Route path="/external-auth/:sessionId" component={ExternalAuth} />
+          <Route path="/external-auth/:token" component={ExternalAuth} />
           <Route path="/external-auth/" component={ExternalAuth} />
           <PrivateRoute path="/" component={DashBoard} />
         </Switch>
