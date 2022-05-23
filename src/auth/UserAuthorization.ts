@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { inject, injectable } from 'tsyringe';
+import { inject } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -9,8 +9,7 @@ import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
 
-@injectable()
-export class UserAuthorization {
+export abstract class UserAuthorization {
   constructor(
     @inject(Tokens.UserDataSource) protected userDataSource: UserDataSource,
     @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
@@ -100,10 +99,6 @@ export class UserAuthorization {
     return sep !== null;
   }
 
-  async isExternalTokenValid(externalToken: string): Promise<boolean> {
-    return true;
-  }
-
   async listReadableUsers(
     agent: UserWithRole | null,
     ids: number[]
@@ -150,11 +145,9 @@ export class UserAuthorization {
     return readableUsers.includes(id);
   }
 
-  async externalTokenLogin(token: string): Promise<User | null> {
-    return null;
-  }
+  abstract externalTokenLogin(token: string): Promise<User | null>;
 
-  async logout(token: string): Promise<void> {
-    return;
-  }
+  abstract logout(token: string): Promise<void>;
+
+  abstract isExternalTokenValid(externalToken: string): Promise<boolean>;
 }

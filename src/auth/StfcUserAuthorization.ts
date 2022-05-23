@@ -23,7 +23,6 @@ export class StfcUserAuthorization extends UserAuthorization {
   ) {
     super(userDataSource, sepDataSource, proposalDataSource, visitDataSource);
   }
-
   async externalTokenLogin(token: string): Promise<User> {
     const stfcUser = await client
       .getPersonDetailsFromSessionId(token)

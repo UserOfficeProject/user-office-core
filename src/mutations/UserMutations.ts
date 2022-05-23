@@ -480,22 +480,22 @@ export default class UserMutations {
 
   async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
     try {
-      const dummyUser = await this.userAuth.externalTokenLogin(externalToken);
+      const user = await this.userAuth.externalTokenLogin(externalToken);
 
-      if (!dummyUser) {
+      if (!user) {
         return rejection('User not found', { externalToken });
       }
 
-      const roles = await this.dataSource.getUserRoles(dummyUser?.id);
+      const roles = await this.dataSource.getUserRoles(user.id);
 
-      const proposalsToken = signToken<AuthJwtPayload>({
-        user: dummyUser,
+      const uosToken = signToken<AuthJwtPayload>({
+        user: user,
         roles,
-        currentRole: roles[0], // User role
+        currentRole: roles[0],
         externalToken: externalToken,
       });
 
-      return proposalsToken;
+      return uosToken;
     } catch (error) {
       return rejection(
         'Error occurred during external authentication',
