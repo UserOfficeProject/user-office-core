@@ -7,6 +7,7 @@ import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { Feature } from './Feature';
 import { Feedback } from './Feedback';
 import { FeedbackRequest } from './FeedbackRequest';
 import { GenericTemplate } from './GenericTemplate';
@@ -276,6 +277,13 @@ export class ProposalStatusResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ProposalStatus, { nullable: true })
   public proposalStatus: ProposalStatus;
+}
+
+@ObjectType()
+export class FeaturesResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => [Feature], { nullable: true })
+  public features: Feature[];
 }
 
 @ObjectType()

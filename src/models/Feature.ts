@@ -20,3 +20,8 @@ export enum FeatureId {
   VISIT_MANAGEMENT = 'VISIT_MANAGEMENT',
   SAMPLE_SAFETY = 'SAMPLE_SAFETY',
 }
+
+export enum FeatureUpdateAction {
+  ENABLE = 'ENABLE',
+  DISABLE = 'DISABLE',
+}
