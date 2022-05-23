@@ -165,10 +165,10 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     refreshData: false,
   });
   const featureContext = useContext(FeatureContext);
-  const isEmailInviteEnabled = !!featureContext.features.get(
+  const isEmailInviteEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
-  const isEmailSearchEnabled = !!featureContext.features.get(
+  const isEmailSearchEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
 
