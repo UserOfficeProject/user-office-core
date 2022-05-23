@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Instrument,
   InstrumentHasProposals,
@@ -37,6 +38,26 @@ export const dummyInstrumentHasProposals = new InstrumentHasProposals(
 );
 
 export class InstrumentDataSourceMock implements InstrumentDataSource {
+  async assignScientistToInstruments(
+    scientistId: number,
+    instrumentIds: number[]
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async removeScientistFromInstruments(
+    scientistId: number,
+    instrumentIds: number[]
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async getInstrumentsByNames(
+    instrumentNames: string[]
+  ): Promise<Instrument[]> {
+    return [dummyInstrument];
+  }
+
   async isProposalInstrumentSubmitted(proposalPk: number): Promise<boolean> {
     return false;
   }

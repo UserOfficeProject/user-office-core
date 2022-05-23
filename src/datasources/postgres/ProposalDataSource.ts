@@ -351,7 +351,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
         if (filter?.instrumentId) {
           query.where(
-            'proposal_table_view.instrument_id',
+            'proposal_table_view.proposal_instrument_id',
             filter?.instrumentId
           );
         }
@@ -502,11 +502,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       ])
       .from('proposal_table_view')
       .join('instruments', {
-        'instruments.instrument_id': 'proposal_table_view.instrument_id',
+        'instruments.instrument_id':
+          'proposal_table_view.proposal_instrument_id',
       })
       .leftJoin('instrument_has_scientists', {
         'instrument_has_scientists.instrument_id':
-          'proposal_table_view.instrument_id',
+          'proposal_table_view.proposal_instrument_id',
       })
       .where(function () {
         this.where('instrument_has_scientists.user_id', scientistId).orWhere(

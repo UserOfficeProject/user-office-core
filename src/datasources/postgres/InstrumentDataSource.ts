@@ -80,6 +80,18 @@ export default class PostgresInstrumentDataSource
       );
   }
 
+  async getInstrumentsByNames(
+    instrumentNames: string[]
+  ): Promise<Instrument[]> {
+    return database
+      .select()
+      .from('instruments')
+      .whereIn('name', instrumentNames)
+      .then((results: InstrumentRecord[]) =>
+        results.map(this.createInstrumentObject)
+      );
+  }
+
   async getInstruments(
     first?: number,
     offset?: number
@@ -432,6 +444,31 @@ export default class PostgresInstrumentDataSource
     } else {
       return false;
     }
+  }
+
+  async assignScientistToInstruments(
+    scientistId: number,
+    instrumentIds: number[]
+  ): Promise<boolean> {
+    const dataToInsert = instrumentIds.map((instrumentId) => ({
+      instrument_id: instrumentId,
+      user_id: scientistId,
+    }));
+
+    return database('instrument_has_scientists')
+      .insert(dataToInsert)
+      .then((result) => result.length === instrumentIds.length);
+  }
+
+  async removeScientistFromInstruments(
+    scientistId: number,
+    instrumentIds: number[]
+  ): Promise<boolean> {
+    return database('instrument_has_scientists')
+      .whereIn('instrument_id', instrumentIds)
+      .andWhere('user_id', scientistId)
+      .del()
+      .then((result) => result === instrumentIds.length);
   }
 
   async getInstrumentScientists(
