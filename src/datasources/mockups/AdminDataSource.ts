@@ -1,11 +1,12 @@
 import { Page } from '../../models/Admin';
 import { Entry } from '../../models/Entry';
-import { Feature, FeatureId } from '../../models/Feature';
+import { Feature, FeatureId, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
 import { Settings, SettingsId } from '../../models/Settings';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
+import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 
@@ -18,6 +19,12 @@ export const dummyApiAccessToken = new Permissions(
 );
 
 export const dummyApiAccessTokens = [dummyApiAccessToken];
+
+export const dummyFeature = new Feature(
+  FeatureId.SHIPPING,
+  false,
+  'Shipping feature'
+);
 
 export class AdminDataSourceMock implements AdminDataSource {
   getCountry(id: number): Promise<Entry | null> {
@@ -38,6 +45,14 @@ export class AdminDataSourceMock implements AdminDataSource {
     value: boolean
   ): Promise<FeatureId[]> {
     return features;
+  }
+  async updateFeatures(
+    updatedFeaturesInput: UpdateFeaturesInput
+  ): Promise<Feature[]> {
+    const shouldEnable =
+      updatedFeaturesInput.action === FeatureUpdateAction.ENABLE;
+
+    return [{ ...dummyFeature, isEnabled: shouldEnable }];
   }
 
   async getInstitutionUsers(
