@@ -2,3 +2,7 @@ package-lock.json
 .next
 node_modules/
 src/generated/
+.github/workflows/
+README.md
+.vscode/
+cypress/fixtures/

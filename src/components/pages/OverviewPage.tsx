@@ -18,8 +18,8 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   const [loadingContent, pageContent] = useGetPageContent(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
   );
-  const { features } = useContext(FeatureContext);
-  const isSchedulerEnabled = features.get(FeatureId.SCHEDULER)?.isEnabled;
+  const { featuresMap } = useContext(FeatureContext);
+  const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
 
   let roleBasedOverView = (
     <PaperContainer>

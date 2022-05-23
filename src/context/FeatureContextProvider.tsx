@@ -5,7 +5,9 @@ import { Feature, FeatureId } from 'generated/sdk';
 import { useFeatures } from 'hooks/admin/useFeatures';
 
 interface FeatureContextData {
-  readonly features: Map<FeatureId, Feature>;
+  readonly featuresMap: Map<FeatureId, Feature>;
+  readonly features: Feature[];
+  readonly setFeatures: React.Dispatch<React.SetStateAction<Feature[]>>;
 }
 
 const useStyles = makeStyles({
@@ -19,14 +21,16 @@ const useStyles = makeStyles({
 });
 
 const initialFeatureData: FeatureContextData = {
-  features: new Map<FeatureId, Feature>(),
+  featuresMap: new Map<FeatureId, Feature>(),
+  features: [],
+  setFeatures: () => {},
 };
 
 export const FeatureContext =
   React.createContext<FeatureContextData>(initialFeatureData);
 
 export const FeatureContextProvider: React.FC = (props) => {
-  const { features, loadingFeatures } = useFeatures();
+  const { features, loadingFeatures, setFeatures } = useFeatures();
   const classes = useStyles();
 
   if (loadingFeatures) {
@@ -44,7 +48,7 @@ export const FeatureContextProvider: React.FC = (props) => {
   }, new Map<FeatureId, Feature>());
 
   return (
-    <FeatureContext.Provider value={{ features: featuresMap }}>
+    <FeatureContext.Provider value={{ featuresMap, features, setFeatures }}>
       {props.children}
     </FeatureContext.Provider>
   );

@@ -1,4 +1,7 @@
-import MaterialTable, { MTableBodyRow } from '@material-table/core';
+import MaterialTable, {
+  MaterialTableProps,
+  MTableBodyRow,
+} from '@material-table/core';
 import DragHandle from '@mui/icons-material/DragHandle';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Visibility from '@mui/icons-material/Visibility';
@@ -35,6 +38,7 @@ type SepProposalWithAverageScoreAndAvailabilityZone = SepProposal & {
   proposalAverageScore: number | string;
   proposalDeviation: number | string;
   isInAvailabilityZone: boolean;
+  tableData?: { index: number; id: number };
 };
 
 // NOTE: Some custom styles for row expand table.
@@ -42,6 +46,22 @@ const useStyles = makeStyles((theme) => ({
   root: {
     '& table': {
       backgroundColor: '#ddd',
+    },
+    '& .lastRowInAvailabilityZone:not(.draggingRow)': {
+      position: 'relative',
+      borderBottom: '23px solid white',
+
+      '&::after': {
+        content: 'attr(unallocated-time-information)',
+        position: 'absolute',
+        bottom: -34,
+        left: 0,
+        zIndex: 2,
+        background: 'rgba(0,0,0, .2)',
+        width: '100%',
+        padding: '2px 12px',
+        fontSize: 'small',
+      },
     },
     '& tr': {
       transition: 'all 200ms ease-out',
@@ -495,16 +515,22 @@ const SEPInstrumentProposalsTable: React.FC<
 
   const handleOnRowDragStart = (
     e: DragEvent<HTMLTableRowElement>,
-    tableDataId: number
+    tableDataId?: number
   ) => {
-    e.currentTarget.classList.add('draggingRow');
-    DragState.row = tableDataId;
+    if (tableDataId !== undefined) {
+      e.currentTarget.classList.add('draggingRow');
+      DragState.row = tableDataId;
+    }
   };
 
   const handleOnRowDragEnter = (
     e: DragEvent<HTMLTableRowElement>,
-    tableDataId: number
+    tableDataId?: number
   ) => {
+    if (tableDataId === undefined) {
+      return;
+    }
+
     e.preventDefault();
 
     const tableBodyElement = e.currentTarget.parentElement;
@@ -551,24 +577,72 @@ const SEPInstrumentProposalsTable: React.FC<
       ),
     }));
 
+  const getAllocatedTimeSumToIndex = (lastRowIndex: number) => {
+    let allocatedTimeSum = 0;
+    for (let index = 0; index <= lastRowIndex; index++) {
+      const element = sortedProposalsWithAverageScore[index];
+
+      const proposalTimeAllocation =
+        typeof element.sepTimeAllocation === 'number'
+          ? element.sepTimeAllocation
+          : element.proposal.technicalReview?.timeAllocation || 0;
+
+      allocatedTimeSum = allocatedTimeSum + proposalTimeAllocation;
+    }
+
+    return allocatedTimeSum;
+  };
+
   /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
    * Here is some useful article (https://medium.com/@deepakkadarivel/drag-and-drop-dnd-for-mobile-browsers-fc9bcd1ad3c5)
    * And example https://github.com/deepakkadarivel/DnDWithTouch/blob/master/main.js
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const RowDraggableComponent = (props: any) => (
-    <MTableBodyRow
-      {...props}
-      draggable="true"
-      onDragStart={(e: DragEvent<HTMLTableRowElement>) =>
-        handleOnRowDragStart(e, props.data.tableData.id)
+  const RowDraggableComponent = (
+    props: MaterialTableProps<SepProposalWithAverageScoreAndAvailabilityZone>
+  ) => {
+    let allocatedTime = 0;
+
+    // NOTE: This is the best way for now to avoid using any type and use the right type.
+    const rowData =
+      props.data as unknown as SepProposalWithAverageScoreAndAvailabilityZone;
+
+    const isLastAvailabilityZoneRow =
+      rowData.isInAvailabilityZone &&
+      rowData.tableData &&
+      !sortedProposalsWithAverageScoreAndId[rowData?.tableData.index + 1]
+        ?.isInAvailabilityZone;
+
+    if (isLastAvailabilityZoneRow) {
+      const lastRowIndex = rowData.tableData?.index;
+      if (lastRowIndex !== undefined) {
+        allocatedTime = getAllocatedTimeSumToIndex(lastRowIndex);
       }
-      onDragEnter={(e: DragEvent<HTMLTableRowElement>) =>
-        handleOnRowDragEnter(e, props.data.tableData.id)
-      }
-      onDragEnd={handleOnRowDragEnd}
-    />
-  );
+    }
+
+    const unallocatedTimeInformation = isLastAvailabilityZoneRow
+      ? `Unallocated time: ${
+          sepInstrument.availabilityTime
+            ? sepInstrument.availabilityTime - allocatedTime
+            : '-'
+        } ${selectedCall?.allocationTimeUnit}s`
+      : '';
+
+    return (
+      <MTableBodyRow
+        {...props}
+        unallocated-time-information={unallocatedTimeInformation}
+        className={isLastAvailabilityZoneRow ? 'lastRowInAvailabilityZone' : ''}
+        draggable
+        onDragStart={(e: DragEvent<HTMLTableRowElement>) =>
+          handleOnRowDragStart(e, rowData.tableData?.id)
+        }
+        onDragEnter={(e: DragEvent<HTMLTableRowElement>) =>
+          handleOnRowDragEnter(e, rowData.tableData?.id)
+        }
+        onDragEnd={handleOnRowDragEnd}
+      />
+    );
+  };
 
   return (
     <div className={classes.root} data-cy="sep-instrument-proposals-table">

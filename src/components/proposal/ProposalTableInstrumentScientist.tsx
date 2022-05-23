@@ -5,10 +5,6 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import {
-  getTranslation,
-  ResourceId,
-} from '@user-office-software/duo-localisation';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import React, { useContext, useState, useEffect } from 'react';
 import {
@@ -44,7 +40,11 @@ import {
   useProposalsCoreData,
 } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
+import {
+  addColumns,
+  removeColumns,
+  setSortDirectionOnSortColumn,
+} from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -71,47 +71,44 @@ let columns: Column<ProposalViewData>[] = [
     ...{ width: 'auto' },
   },
   {
-    title: 'Time allocation',
-    render: (rowData) =>
-      `${rowData.technicalTimeAllocation ?? 0} (${
-        rowData.allocationTimeUnit
-      }s)`,
-    hidden: false,
-  },
-  {
-    title: 'Assigned technical reviewer',
-    render: (rowData) =>
-      rowData.technicalReviewAssigneeId
-        ? `${rowData.technicalReviewAssigneeFirstName} ${rowData.technicalReviewAssigneeLastName}`
-        : '-',
-  },
-  {
     title: 'Submitted',
     field: 'submitted',
     lookup: { true: 'Yes', false: 'No' },
   },
   { title: 'Status', field: 'statusName' },
   {
-    title: 'Final Status',
-    field: 'finalStatus',
-    render: (rowData: ProposalViewData): string =>
-      rowData.finalStatus
-        ? getTranslation(rowData.finalStatus as ResourceId)
-        : '',
-    emptyValue: '-',
-  },
-  {
     title: 'Call',
     field: 'callShortCode',
     emptyValue: '-',
     hidden: true,
   },
+];
+
+const technicalReviewColumns: Column<ProposalViewData>[] = [
   {
-    title: 'SEP',
-    field: 'sepCode',
+    title: 'Technical status',
+    field: 'technicalStatus',
     emptyValue: '-',
-    hidden: true,
   },
+  {
+    title: 'Technical time allocation',
+    field: 'technicalTimeAllocationRendered',
+    emptyValue: '-',
+  },
+  {
+    title: 'Assigned technical reviewer',
+    field: 'assignedTechnicalReviewer',
+    emptyValue: '-',
+  },
+];
+
+const instrumentManagementColumns = [
+  { title: 'Instrument', field: 'instrumentName', emptyValue: '-' },
+];
+
+const SEPReviewColumns = [
+  { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
+  { title: 'SEP', field: 'sepCode', emptyValue: '-', hidden: true },
 ];
 
 const ProposalTableInstrumentScientist: React.FC<{
@@ -185,12 +182,16 @@ const ProposalTableInstrumentScientist: React.FC<{
     Column<ProposalViewData>[] | null
   >('proposalColumnsInstrumentScientist', null);
 
-  const isTechnicalReviewEnabled = featureContext.features.get(
+  const isTechnicalReviewEnabled = featureContext.featuresMap.get(
     FeatureId.TECHNICAL_REVIEW
   )?.isEnabled;
 
-  const isInstrumentManagementEnabled = featureContext.features.get(
+  const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
+  )?.isEnabled;
+
+  const isSEPEnabled = featureContext.featuresMap.get(
+    FeatureId.SEP_REVIEW
   )?.isEnabled;
 
   const instrumentScientistProposalReviewTabs = [
@@ -384,26 +385,22 @@ const ProposalTableInstrumentScientist: React.FC<{
     }));
   }
 
-  if (
-    isTechnicalReviewEnabled &&
-    !columns.find((column) => column.field === 'technicalStatus')
-  ) {
-    columns.push({
-      title: 'Technical status',
-      field: 'technicalStatus',
-      emptyValue: '-',
-    });
+  if (isTechnicalReviewEnabled) {
+    addColumns(columns, technicalReviewColumns);
+  } else {
+    removeColumns(columns, technicalReviewColumns);
   }
 
-  if (
-    isInstrumentManagementEnabled &&
-    !columns.find((column) => column.field === 'instrumentName')
-  ) {
-    columns.push({
-      title: 'Instrument',
-      field: 'instrumentName',
-      emptyValue: '-',
-    });
+  if (isInstrumentManagementEnabled) {
+    addColumns(columns, instrumentManagementColumns);
+  } else {
+    removeColumns(columns, instrumentManagementColumns);
+  }
+
+  if (isSEPEnabled) {
+    addColumns(columns, SEPReviewColumns);
+  } else {
+    removeColumns(columns, SEPReviewColumns);
   }
 
   columns = setSortDirectionOnSortColumn(
@@ -432,6 +429,12 @@ const ProposalTableInstrumentScientist: React.FC<{
       Object.assign(proposal, {
         id: proposal.primaryKey,
         rowActionButtons: RowActionButtons(proposal),
+        assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+          ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+          : '-',
+        technicalTimeAllocationRendered: proposal.technicalTimeAllocation
+          ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
+          : '-',
       })
   );
 

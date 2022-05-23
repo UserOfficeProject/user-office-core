@@ -6,6 +6,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 export function useFeatures(): {
   loadingFeatures: boolean;
   features: Feature[];
+  setFeatures: React.Dispatch<React.SetStateAction<Feature[]>>;
 } {
   const [features, setFeatures] = useState<Feature[]>([]);
   const [loadingFeatures, setLoadingFeatures] = useState(true);
@@ -36,5 +37,5 @@ export function useFeatures(): {
     };
   }, [api]);
 
-  return { loadingFeatures, features };
+  return { loadingFeatures, features, setFeatures };
 }
