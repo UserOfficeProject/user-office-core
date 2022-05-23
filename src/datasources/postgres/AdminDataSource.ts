@@ -5,13 +5,14 @@ import { logger } from '@user-office-software/duo-logger';
 import { injectable } from 'tsyringe';
 
 import { Page } from '../../models/Admin';
-import { Feature } from '../../models/Feature';
+import { Feature, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
 import { Settings } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
+import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 import { Entry } from './../../models/Entry';
@@ -139,6 +140,22 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .whereIn('feature_id', features);
 
     return features;
+  }
+
+  async updateFeatures(
+    updatedFeaturesInput: UpdateFeaturesInput
+  ): Promise<Feature[]> {
+    const shouldEnable =
+      updatedFeaturesInput.action === FeatureUpdateAction.ENABLE;
+
+    const featureRecords: FeatureRecord[] = await database('features')
+      .update({ is_enabled: shouldEnable })
+      .whereIn('feature_id', updatedFeaturesInput.featureIds)
+      .returning('*');
+
+    return featureRecords.map((featureRecord) =>
+      createFeatureObject(featureRecord)
+    );
   }
 
   async setPageText(id: number, content: string): Promise<Page> {

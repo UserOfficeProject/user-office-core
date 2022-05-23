@@ -10,6 +10,7 @@ import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
+import { Feature } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -18,6 +19,7 @@ import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAcces
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
+import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 import { generateUniqueId } from '../utils/helperFunctions';
@@ -210,5 +212,19 @@ export default class AdminMutations {
     }
 
     return updatedInstitution;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async updateFeatures(
+    agent: UserWithRole | null,
+    args: UpdateFeaturesInput
+  ): Promise<Feature[] | Rejection> {
+    const updatedFeatures = await this.dataSource.updateFeatures(args);
+
+    if (!updatedFeatures) {
+      return rejection('Could not update features', { agent, args });
+    }
+
+    return updatedFeatures;
   }
 }

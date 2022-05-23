@@ -7,6 +7,7 @@ import { Settings, SettingsId } from '../models/Settings';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
+import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
@@ -27,6 +28,7 @@ export interface AdminDataSource {
   applyPatches(): Promise<string>;
   getFeatures(): Promise<Feature[]>;
   setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
+  updateFeatures(updatedFeaturesInput: UpdateFeaturesInput): Promise<Feature[]>;
   getSettings(): Promise<Settings[]>;
   getSetting(id: SettingsId): Promise<Settings>;
   createApiAccessToken(

@@ -40,13 +40,7 @@ export class StfcUserAuthorization extends UserAuthorization {
     @inject(Tokens.InstrumentDataSource)
     protected instrumentDataSource: InstrumentDataSource
   ) {
-    super(
-      userDataSource,
-      sepDataSource,
-      proposalDataSource,
-      visitDataSource,
-      instrumentDataSource
-    );
+    super(userDataSource, sepDataSource, proposalDataSource, visitDataSource);
   }
 
   getRequiredInstrumentForRole(roles: stfcRole[]) {
