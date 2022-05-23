@@ -157,7 +157,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   });
 
   const featureContext = useContext(FeatureContext);
-  const isEmailInviteEnabled = !!featureContext.features.get(
+  const isEmailInviteEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
   const { prevColabUsers, loadingUsersData } = usePrevColabs(query);

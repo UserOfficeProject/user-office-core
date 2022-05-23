@@ -42,7 +42,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   const Component = component; // JSX Elements have to be uppercase.
 
   const featureContext = useContext(FeatureContext);
-  const isExternalAuthEnabled = !!featureContext.features.get(
+  const isExternalAuthEnabled = !!featureContext.featuresMap.get(
     FeatureId.EXTERNAL_AUTH
   )?.isEnabled;
 
@@ -87,8 +87,9 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
 
 const Routes: React.FC<RouteProps> = () => {
   const featureContext = useContext(FeatureContext);
-  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
-    ?.isEnabled;
+  const EXTERNAL_AUTH = !!featureContext.featuresMap.get(
+    FeatureId.EXTERNAL_AUTH
+  )?.isEnabled;
 
   if (EXTERNAL_AUTH) {
     return (

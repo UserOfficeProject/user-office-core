@@ -51,7 +51,7 @@ const CallGeneralInfo: React.FC<{
   esiTemplates,
   loadingTemplates,
 }) => {
-  const { features } = useContext(FeatureContext);
+  const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
 
   const theme = useTheme();
@@ -286,7 +286,7 @@ const CallGeneralInfo: React.FC<{
         InputProps={{ 'data-cy': 'call-template' }}
         required
       />
-      {features.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+      {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
         <FormikUIAutocomplete
           name="esiTemplateId"
           label="ESI template"

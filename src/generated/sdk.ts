@@ -417,6 +417,16 @@ export enum FeatureId {
   VISIT_MANAGEMENT = 'VISIT_MANAGEMENT'
 }
 
+export enum FeatureUpdateAction {
+  DISABLE = 'DISABLE',
+  ENABLE = 'ENABLE'
+}
+
+export type FeaturesResponseWrap = {
+  features: Maybe<Array<Feature>>;
+  rejection: Maybe<Rejection>;
+};
+
 export type Feedback = {
   createdAt: Scalars['DateTime'];
   creatorId: Scalars['Int'];
@@ -716,6 +726,7 @@ export type Mutation = {
   updateApiAccessToken: ApiAccessTokenResponseWrap;
   updateCall: CallResponseWrap;
   updateEsi: EsiResponseWrap;
+  updateFeatures: FeaturesResponseWrap;
   updateFeedback: FeedbackResponseWrap;
   updateGenericTemplate: GenericTemplateResponseWrap;
   updateInstitution: InstitutionResponseWrap;
@@ -1386,6 +1397,11 @@ export type MutationUpdateCallArgs = {
 export type MutationUpdateEsiArgs = {
   esiId: Scalars['Int'];
   isSubmitted?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type MutationUpdateFeaturesArgs = {
+  updatedFeaturesInput: UpdateFeaturesInput;
 };
 
 
@@ -3068,6 +3084,11 @@ export type UpdateCallInput = {
   title?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateFeaturesInput = {
+  action: FeatureUpdateAction;
+  featureIds: Array<FeatureId>;
+};
+
 export type UpdateProposalStatusInput = {
   description: Scalars['String'];
   id: Scalars['Int'];
@@ -4313,6 +4334,14 @@ export type MoveProposalWorkflowStatusMutationVariables = Exact<{
 
 
 export type MoveProposalWorkflowStatusMutation = { moveProposalWorkflowStatus: { rejection: { reason: string, context: string | null, exception: string | null } | null } };
+
+export type UpdateFeaturesMutationVariables = Exact<{
+  featureIds: Array<FeatureId> | FeatureId;
+  action: FeatureUpdateAction;
+}>;
+
+
+export type UpdateFeaturesMutation = { updateFeatures: { features: Array<{ id: FeatureId, isEnabled: boolean, description: string }> | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type UpdateProposalStatusMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -7876,6 +7905,20 @@ export const MoveProposalWorkflowStatusDocument = gql`
   }
 }
     ${RejectionFragmentDoc}`;
+export const UpdateFeaturesDocument = gql`
+    mutation updateFeatures($featureIds: [FeatureId!]!, $action: FeatureUpdateAction!) {
+  updateFeatures(updatedFeaturesInput: {featureIds: $featureIds, action: $action}) {
+    features {
+      id
+      isEnabled
+      description
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
 export const UpdateProposalStatusDocument = gql`
     mutation updateProposalStatus($id: Int!, $shortCode: String!, $name: String!, $description: String!) {
   updateProposalStatus(
@@ -9460,6 +9503,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     moveProposalWorkflowStatus(variables: MoveProposalWorkflowStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MoveProposalWorkflowStatusMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<MoveProposalWorkflowStatusMutation>(MoveProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'moveProposalWorkflowStatus', 'mutation');
+    },
+    updateFeatures(variables: UpdateFeaturesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateFeaturesMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateFeaturesMutation>(UpdateFeaturesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateFeatures', 'mutation');
     },
     updateProposalStatus(variables: UpdateProposalStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProposalStatusMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalStatusMutation>(UpdateProposalStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposalStatus', 'mutation');

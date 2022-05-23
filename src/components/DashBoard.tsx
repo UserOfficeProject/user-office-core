@@ -46,6 +46,7 @@ import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ApiAccessTokensPage from './settings/apiAccessTokens/ApiAccessTokensPage';
+import FeaturesPage from './settings/features/FeaturesPage';
 import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
@@ -168,22 +169,22 @@ const Dashboard: React.FC = () => {
   ]);
 
   const featureContext = useContext(FeatureContext);
-  const isSchedulerEnabled = featureContext.features.get(
+  const isSchedulerEnabled = featureContext.featuresMap.get(
     FeatureId.SCHEDULER
   )?.isEnabled;
-  const isInstrumentManagementEnabled = featureContext.features.get(
+  const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-  const isSEPEnabled = featureContext.features.get(
+  const isSEPEnabled = featureContext.featuresMap.get(
     FeatureId.SEP_REVIEW
   )?.isEnabled;
-  const isUserManagementEnabled = featureContext.features.get(
+  const isUserManagementEnabled = featureContext.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isVisitManagementEnabled = featureContext.features.get(
+  const isVisitManagementEnabled = featureContext.featuresMap.get(
     FeatureId.VISIT_MANAGEMENT
   )?.isEnabled;
-  const isSampleSafetyEnabled = featureContext.features.get(
+  const isSampleSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
 
@@ -465,6 +466,14 @@ const Dashboard: React.FC = () => {
               title="Api Access Tokens"
               path="/ApiAccessTokens"
               component={ApiAccessTokensPage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Features"
+              path="/Features"
+              component={FeaturesPage}
             />
           )}
           {isSchedulerEnabled && (
