@@ -58,7 +58,7 @@ const CopyToClipboard = (props: CopyToClipboardProps) => {
   };
 
   return (
-    <div
+    <span
       className={classes.container}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
@@ -73,7 +73,7 @@ const CopyToClipboard = (props: CopyToClipboardProps) => {
           [classes.positionLeft]: position === 'left',
         })}
       />
-    </div>
+    </span>
   );
 };
 

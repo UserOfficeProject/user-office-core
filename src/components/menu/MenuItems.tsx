@@ -12,6 +12,7 @@ import NoteAdd from '@mui/icons-material/NoteAdd';
 import People from '@mui/icons-material/People';
 import Settings from '@mui/icons-material/Settings';
 import SettingsApplications from '@mui/icons-material/SettingsApplications';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import VpnKey from '@mui/icons-material/VpnKey';
 import Collapse from '@mui/material/Collapse';
 import ListItem from '@mui/material/ListItem';
@@ -116,6 +117,14 @@ const SettingsMenuListItem = () => {
             <ListItemText primary="API access tokens" />
           </ListItem>
         </Tooltip>
+        <Tooltip title="Features">
+          <ListItem component={NavLink} to="/Features" button>
+            <ListItemIcon>
+              <ViewModuleIcon />
+            </ListItemIcon>
+            <ListItemText primary="Features" />
+          </ListItem>
+        </Tooltip>
       </Collapse>
     </>
   );
@@ -139,17 +148,17 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const multipleCalls = callsData.length > 1;
   const context = useContext(FeatureContext);
 
-  const isSchedulerEnabled = context.features.get(
+  const isSchedulerEnabled = context.featuresMap.get(
     FeatureId.SCHEDULER
   )?.isEnabled;
-  const isInstrumentManagementEnabled = context.features.get(
+  const isInstrumentManagementEnabled = context.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-  const isSEPEnabled = context.features.get(FeatureId.SEP_REVIEW)?.isEnabled;
-  const isUserManagementEnabled = context.features.get(
+  const isSEPEnabled = context.featuresMap.get(FeatureId.SEP_REVIEW)?.isEnabled;
+  const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isSampleSafetyEnabled = context.features.get(
+  const isSampleSafetyEnabled = context.featuresMap.get(
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
 

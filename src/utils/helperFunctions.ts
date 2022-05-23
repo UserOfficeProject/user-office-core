@@ -93,3 +93,30 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
 
 export const capitalize = (s: string) =>
   s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();
+
+export const addColumns = <T extends object>(
+  columns: Column<T>[],
+  columnsToAdd: Column<T>[]
+) => {
+  columnsToAdd.forEach((columnToAdd) => {
+    if (!columns.find((column) => column.field === columnToAdd.field)) {
+      columns.push({
+        ...columnToAdd,
+      });
+    }
+  });
+};
+
+export const removeColumns = <T extends object>(
+  columns: Column<T>[],
+  columnsToRemove: Column<T>[]
+) => {
+  columnsToRemove.forEach((columnToRemove) => {
+    const columnIndex = columns.findIndex(
+      (column) => column.field === columnToRemove.field
+    );
+    if (columnIndex !== -1) {
+      columns.splice(columnIndex, 1);
+    }
+  });
+};

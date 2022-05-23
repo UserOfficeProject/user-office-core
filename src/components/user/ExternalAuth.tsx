@@ -1,31 +1,22 @@
-import PropTypes from 'prop-types';
-import queryString from 'query-string';
 import React, { useContext, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { StringParam, useQueryParams } from 'use-query-params';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 
-const ExternalAuthPropTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      sessionId: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+const ExternalAuthQueryParams = {
+  sessionid: StringParam,
+  token: StringParam,
 };
 
-type ExternalAuthProps = PropTypes.InferProps<typeof ExternalAuthPropTypes>;
+function ExternalAuth() {
+  const [urlQueryParams] = useQueryParams(ExternalAuthQueryParams);
+  const externalToken = urlQueryParams.sessionid ?? urlQueryParams.token;
 
-const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   const { token, handleLogin } = useContext(UserContext);
   const unauthorizedApi = useUnauthorizedApi();
-  const { search } = useLocation();
-  const values = queryString.parse(search);
-  const sessionId = !!values.sessionid
-    ? values.sessionid.toString()
-    : match.params.sessionId;
 
   const isFirstRun = useRef<boolean>(true);
 
@@ -40,10 +31,12 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
     }
     isFirstRun.current = false;
 
+    if (!externalToken) {
+      return;
+    }
+
     unauthorizedApi()
-      .externalTokenLogin({
-        externalToken: sessionId,
-      })
+      .externalTokenLogin({ externalToken })
       .then((token) => {
         if (token.externalTokenLogin && !token.externalTokenLogin.rejection) {
           handleLogin(token.externalTokenLogin.token);
@@ -54,11 +47,15 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
           }
         }
       });
-  }, [token, handleLogin, sessionId, unauthorizedApi, externalAuthLoginUrl]);
+  }, [
+    token,
+    handleLogin,
+    externalToken,
+    unauthorizedApi,
+    externalAuthLoginUrl,
+  ]);
 
   return <p>Logging in with external service...</p>;
-};
-
-ExternalAuth.propTypes = ExternalAuthPropTypes;
+}
 
 export default ExternalAuth;

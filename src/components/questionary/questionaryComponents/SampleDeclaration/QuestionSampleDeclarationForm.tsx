@@ -23,7 +23,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
   const field = props.question;
   const config = field.config as SampleDeclarationConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const { features } = useContext(FeatureContext);
+  const { featuresMap } = useContext(FeatureContext);
   const { templates } = useActiveTemplates(
     TemplateGroupId.SAMPLE,
     config.templateId
@@ -112,7 +112,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
               </Link>
             </FormControl>
 
-            {features.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+            {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
               <FormikUIAutocomplete
                 name="config.esiTemplateId"
                 label="ESI template name"
