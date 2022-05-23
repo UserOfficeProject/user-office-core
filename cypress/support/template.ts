@@ -60,7 +60,7 @@ function createTemplate(
   const api = getE2EApi();
   const request = api.createTemplate(createTemplateInput);
 
-  return cy.wrap(request, { timeout: 1500000 });
+  return cy.wrap(request);
 }
 
 function cloneTemplate(

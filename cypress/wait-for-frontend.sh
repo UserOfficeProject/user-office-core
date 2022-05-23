@@ -1,7 +1,6 @@
 #!/bin/sh
 # wait-for-postgres.sh
 
-nohup node cypress/mockserver.js &
 set -e
 
 host="$1"

@@ -13,7 +13,6 @@ import {
   UpdateUserRolesMutationVariables,
   User,
 } from '../../src/generated/sdk';
-//import initialDBData from '../support/initialDBData';
 import { getE2EApi } from './utils';
 
 type DecodedTokenData = {
@@ -28,13 +27,6 @@ const testCredentialStoreStfc = {
   },
   officer: {
     externalToken: 'f11b0927-8cbd-4277-b86b-877baa4f7a21',
-    //sessionID's depending on role maybe??
-  },
-  user2: {
-    externalToken: 'ben@inbox.com',
-  },
-  placeholderUser: {
-    externalToken: 'unverified-user@example.com',
   },
 };
 
@@ -87,9 +79,8 @@ function changeActiveRole(selectedRoleId: number) {
 }
 
 const externalTokenLogin = (
-  roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
-  // | { email: string; password: string }
-): Cypress.Chainable<ExternalTokenLoginMutation> => {
+  roleOrCredentials: 'user' | 'officer'
+): Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation> => {
   const credentials =
     typeof roleOrCredentials === 'string'
       ? testCredentialStoreStfc[roleOrCredentials]
@@ -105,7 +96,6 @@ const externalTokenLogin = (
       resp.externalTokenLogin.token
     ) as DecodedTokenData;
 
-    //const currentRole = {}
     window.localStorage.setItem('token', resp.externalTokenLogin.token);
     window.localStorage.setItem(
       'currentRole',
@@ -117,7 +107,7 @@ const externalTokenLogin = (
     return resp;
   });
 
-  return cy.wrap(request, { timeout: 1500000 });
+  return cy.wrap(request);
 };
 
 const login = (
@@ -127,16 +117,16 @@ const login = (
     | 'user2'
     | 'placeholderUser'
     | { email: string; password: string }
-): Cypress.Chainable<LoginMutation> => {
+): Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation> => {
   const credentials =
     typeof roleOrCredentials === 'string'
       ? testCredentialStore[roleOrCredentials]
       : roleOrCredentials;
 
   if (Cypress.env('STFC') === true) {
-    externalTokenLogin(roleOrCredentials as 'user' | 'officer').then(() =>
-      changeActiveRole(roleOrCredentials === 'user' ? 1 : 2)
-    );
+    return externalTokenLogin(roleOrCredentials as 'user' | 'officer')
+      .then(() => changeActiveRole(roleOrCredentials === 'user' ? 1 : 2))
+      .then(() => {});
   }
 
   const api = getE2EApi();
@@ -204,35 +194,6 @@ function updateUserRoles(
 
   cy.wrap(request);
 }
-
-// function changeActiveRole(selectedRoleId: number) {
-//   const token = window.localStorage.getItem('token');
-
-//   if (!token) {
-//     throw new Error('No logged in user');
-//   }
-
-//   const api = getE2EApi();
-//   const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
-//     if (!resp.selectRole.token) {
-//       return;
-//     }
-
-//     const { currentRole, user, exp } = jwtDecode(
-//       resp.selectRole.token
-//     ) as DecodedTokenData;
-
-//     window.localStorage.setItem('token', resp.selectRole.token);
-//     window.localStorage.setItem(
-//       'currentRole',
-//       currentRole.shortCode.toUpperCase()
-//     );
-//     window.localStorage.setItem('expToken', `${exp}`);
-//     window.localStorage.setItem('user', JSON.stringify(user));
-//   });
-
-//   cy.wrap(request);
-// }
 
 Cypress.Commands.add('login', login);
 Cypress.Commands.add('externalTokenLogin', externalTokenLogin);
