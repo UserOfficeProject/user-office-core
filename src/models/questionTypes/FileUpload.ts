@@ -33,7 +33,7 @@ export const fileUploadDefinition: Question = {
           fileId: file.id,
         };
 
-        return fileMutations.prepare(file.id).then((path) => {
+        return fileMutations.prepare(file.id).then(async (path) => {
           // Check the file id has a valid path
           if (isRejection(path)) {
             logger.logInfo(
@@ -41,17 +41,25 @@ export const fileUploadDefinition: Question = {
               errorContext
             );
 
-            return Promise.resolve([true]); // Allow the file
+            return Promise.resolve(true); // Allow the file
           } else {
-            // If it exists check the file type and run a virus scan
-            return Promise.all([
-              isValidFileType(path, field, errorContext),
-              passesVirusScan(path, errorContext),
-            ]).then((results: boolean[]) => {
+            if (!(await passesVirusScan(path, errorContext))) {
               fs.unlink(path);
 
-              return results;
-            });
+              return false;
+            }
+
+            const posFileTypes = await identifyFileType(path, errorContext);
+
+            if (!(await isValidFileType(posFileTypes, field))) {
+              fs.unlink(path);
+
+              return false;
+            }
+
+            fs.unlink(path);
+
+            return true;
           }
         });
       })
@@ -97,32 +105,32 @@ export const fileUploadDefinition: Question = {
 };
 
 /**
- * Checks the file signature of a file and returns whether the file
- * is one of the accepted types specified in the question config.
+ * Checks the file signature of a file and returns the identified file types.
  *
- * @param path A valid path to the file to be scanned
- * @param field The question data containing the config
+ * @param path The path to the file
  * @param errorContext File details to be logged in the event of an error
- * @returns True if the file is identified as one of the accepted
- * types, or if the file cannot be retrieved. False is the file
- * cannot be identified, or is not one of the accepted types.
+ * @returns A string array of all possible file and mime types identified from
+ * the file's signature. An empty array if there was a problem reading the file
+ * or no file types could be identified.
  */
-const isValidFileType = async (
+const identifyFileType = async (
   path: string,
-  field: QuestionTemplateRelation,
   errorContext: any
-): Promise<boolean> => {
+): Promise<string[]> => {
   let data: Buffer;
 
   try {
     data = await fs.readFile(path);
   } catch (error) {
-    logger.logInfo('Could not read file to validate file upload question', {
-      error: error,
-      ...errorContext,
-    });
+    logger.logInfo(
+      'Could not read file to identify file upload question type',
+      {
+        error: error,
+        ...errorContext,
+      }
+    );
 
-    return true; // Allow the file
+    return [];
   }
 
   const possibleTypes: string[] = [];
@@ -140,9 +148,24 @@ const isValidFileType = async (
 
   await getFileInfo(data);
 
+  return possibleTypes;
+};
+
+/**
+ * Checks if the identified file types of a file is one of the allowed file types.
+ *
+ * @param identifiedFileTypes The identified file types from the file's signature
+ * @param field The question data containing the config
+ * @returns True if the required file type in the question configuration
+ * is one of the file types identified from the file's signature. False if not.
+ */
+const isValidFileType = async (
+  identifiedFileTypes: string[],
+  field: QuestionTemplateRelation
+): Promise<boolean> => {
   const config = field.config as FileUploadConfig;
 
-  return possibleTypes.some((type) => {
+  return identifiedFileTypes.some((type) => {
     const anySubtype = type.split('/')[0]?.concat('/*'); // e.g. 'image/*'
 
     return (
