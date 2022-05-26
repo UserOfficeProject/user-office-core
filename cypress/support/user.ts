@@ -23,10 +23,10 @@ type DecodedTokenData = {
 
 const testCredentialStoreStfc = {
   user: {
-    externalToken: '64d742c9-ed6c-489f-adca-45df1ef27911',
+    externalToken: 'user',
   },
   officer: {
-    externalToken: 'f11b0927-8cbd-4277-b86b-877baa4f7a21',
+    externalToken: 'officer',
   },
 };
 
