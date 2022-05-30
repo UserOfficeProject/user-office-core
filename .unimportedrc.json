@@ -13,29 +13,11 @@
   "ignoreUnused": [],
   "ignoreUnresolved": [],
   "aliases": {
-    "hooks/*": [
-        "./hooks",
-        "./hooks/*"
-    ],
-    "components/*": [
-        "./components",
-        "./components/*"
-    ],
-    "models/*": [
-      "./models",
-      "./models/*"
-  ],
-  "utils/*": [
-    "./utils",
-    "./utils/*"
-],
-"context/*": [
-  "./context",
-  "./context/*"
-],
-"styles/*": [
-  "./styles",
-  "./styles/*"
-]
-}
+    "hooks/*": ["./hooks", "./hooks/*"],
+    "components/*": ["./components", "./components/*"],
+    "models/*": ["./models", "./models/*"],
+    "utils/*": ["./utils", "./utils/*"],
+    "context/*": ["./context", "./context/*"],
+    "styles/*": ["./styles", "./styles/*"]
+  }
 }
