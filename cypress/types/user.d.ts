@@ -1,5 +1,6 @@
 import {
   LoginMutation,
+  ExternalTokenLoginMutation,
   UpdateUserRolesMutationVariables,
   UpdateUserMutationVariables,
   UpdateUserMutation,
@@ -27,7 +28,19 @@ declare global {
           | 'user2'
           | 'placeholderUser'
           | { email: string; password: string }
-      ) => Cypress.Chainable<LoginMutation>;
+      ) => Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation>;
+
+      /**
+       * Logs in user with provided credentials
+       *
+       * @returns {typeof login}
+       * @memberof Chainable
+       * @example
+       *    cy.login('user')
+       */
+      externalTokenLogin: (
+        roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
+      ) => Cypress.Chainable<ExternalTokenLoginMutation | LoginMutation>;
 
       /**
        * Logs user out

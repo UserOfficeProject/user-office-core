@@ -3,6 +3,7 @@ import jwtDecode from 'jwt-decode';
 import {
   CreateUserMutation,
   CreateUserMutationVariables,
+  ExternalTokenLoginMutation,
   LoginMutation,
   Role,
   SetUserEmailVerifiedMutation,
@@ -18,6 +19,21 @@ type DecodedTokenData = {
   user: User;
   currentRole: Role;
   exp: number;
+};
+
+const testCredentialStoreStfc = {
+  user: {
+    externalToken: 'user',
+  },
+  officer: {
+    externalToken: 'officer',
+  },
+  user2: {
+    externalToken: 'user',
+  },
+  placeholderUser: {
+    externalToken: 'user',
+  },
 };
 
 const testCredentialStore = {
@@ -39,6 +55,64 @@ const testCredentialStore = {
   },
 };
 
+function changeActiveRole(selectedRoleId: number) {
+  const token = window.localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('No logged in user');
+  }
+
+  const api = getE2EApi();
+  const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
+    if (!resp.selectRole.token) {
+      return;
+    }
+
+    const { currentRole, user, exp } = jwtDecode(
+      resp.selectRole.token
+    ) as DecodedTokenData;
+
+    window.localStorage.setItem('token', resp.selectRole.token);
+    window.localStorage.setItem(
+      'currentRole',
+      currentRole.shortCode.toUpperCase()
+    );
+    window.localStorage.setItem('expToken', `${exp}`);
+    window.localStorage.setItem('user', JSON.stringify(user));
+  });
+
+  cy.wrap(request);
+}
+
+const externalTokenLogin = (
+  roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
+): Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation> => {
+  const credentials = testCredentialStoreStfc[roleOrCredentials];
+
+  const api = getE2EApi();
+  const request = api.externalTokenLogin(credentials).then((resp) => {
+    if (!resp.externalTokenLogin.token) {
+      return resp;
+    }
+
+    const { user, exp } = jwtDecode(
+      resp.externalTokenLogin.token
+    ) as DecodedTokenData;
+
+    window.localStorage.setItem('token', resp.externalTokenLogin.token);
+    window.localStorage.setItem(
+      'currentRole',
+      roleOrCredentials === 'officer' ? 'USER_OFFICER' : 'USER'
+    );
+    window.localStorage.setItem('expToken', `${exp}`);
+    window.localStorage.setItem('user', JSON.stringify(user));
+
+    return resp;
+  });
+
+  return cy.wrap(request);
+};
+
 const login = (
   roleOrCredentials:
     | 'user'
@@ -46,11 +120,21 @@ const login = (
     | 'user2'
     | 'placeholderUser'
     | { email: string; password: string }
-): Cypress.Chainable<LoginMutation> => {
+): Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation> => {
   const credentials =
     typeof roleOrCredentials === 'string'
       ? testCredentialStore[roleOrCredentials]
       : roleOrCredentials;
+
+  if (Cypress.env('STFC') === true) {
+    if (typeof roleOrCredentials !== 'string') {
+      throw new Error('Role not authorised to login');
+    }
+
+    return externalTokenLogin(roleOrCredentials).then(() =>
+      changeActiveRole(roleOrCredentials === 'user' ? 1 : 2)
+    );
+  }
 
   const api = getE2EApi();
   const request = api.login(credentials).then((resp) => {
@@ -118,36 +202,8 @@ function updateUserRoles(
   cy.wrap(request);
 }
 
-function changeActiveRole(selectedRoleId: number) {
-  const token = window.localStorage.getItem('token');
-
-  if (!token) {
-    throw new Error('No logged in user');
-  }
-
-  const api = getE2EApi();
-  const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
-    if (!resp.selectRole.token) {
-      return;
-    }
-
-    const { currentRole, user, exp } = jwtDecode(
-      resp.selectRole.token
-    ) as DecodedTokenData;
-
-    window.localStorage.setItem('token', resp.selectRole.token);
-    window.localStorage.setItem(
-      'currentRole',
-      currentRole.shortCode.toUpperCase()
-    );
-    window.localStorage.setItem('expToken', `${exp}`);
-    window.localStorage.setItem('user', JSON.stringify(user));
-  });
-
-  cy.wrap(request);
-}
-
 Cypress.Commands.add('login', login);
+Cypress.Commands.add('externalTokenLogin', externalTokenLogin);
 
 Cypress.Commands.add('logout', logout);
 Cypress.Commands.add('createUser', createUser);
