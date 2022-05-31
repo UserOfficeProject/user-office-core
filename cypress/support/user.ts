@@ -28,6 +28,12 @@ const testCredentialStoreStfc = {
   officer: {
     externalToken: 'officer',
   },
+  user2: {
+    externalToken: 'user',
+  },
+  placeholderUser: {
+    externalToken: 'user',
+  },
 };
 
 const testCredentialStore = {
@@ -79,12 +85,9 @@ function changeActiveRole(selectedRoleId: number) {
 }
 
 const externalTokenLogin = (
-  roleOrCredentials: 'user' | 'officer'
+  roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
 ): Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation> => {
-  const credentials =
-    typeof roleOrCredentials === 'string'
-      ? testCredentialStoreStfc[roleOrCredentials]
-      : roleOrCredentials;
+  const credentials = testCredentialStoreStfc[roleOrCredentials];
 
   const api = getE2EApi();
   const request = api.externalTokenLogin(credentials).then((resp) => {
@@ -124,9 +127,13 @@ const login = (
       : roleOrCredentials;
 
   if (Cypress.env('STFC') === true) {
-    return externalTokenLogin(roleOrCredentials as 'user' | 'officer')
-      .then(() => changeActiveRole(roleOrCredentials === 'user' ? 1 : 2))
-      .then(() => {});
+    if (typeof roleOrCredentials !== 'string') {
+      throw new Error('Role not authorised to login');
+    }
+
+    return externalTokenLogin(roleOrCredentials).then(() =>
+      changeActiveRole(roleOrCredentials === 'user' ? 1 : 2)
+    );
   }
 
   const api = getE2EApi();

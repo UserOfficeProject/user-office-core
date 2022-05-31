@@ -39,7 +39,7 @@ declare global {
        *    cy.login('user')
        */
       externalTokenLogin: (
-        roleOrCredentials: 'user' | 'officer'
+        roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
       ) => Cypress.Chainable<ExternalTokenLoginMutation | LoginMutation>;
 
       /**
