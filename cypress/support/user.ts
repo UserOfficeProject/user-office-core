@@ -102,7 +102,7 @@ const externalTokenLogin = (
     window.localStorage.setItem('token', resp.externalTokenLogin.token);
     window.localStorage.setItem(
       'currentRole',
-      roleOrCredentials === 'user' ? 'USER' : 'USER_OFFICER'
+      roleOrCredentials === 'officer' ? 'USER_OFFICER' : 'USER'
     );
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
