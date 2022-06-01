@@ -5,5 +5,6 @@
   "baseUrl": "http://proxy:80",
   "screenshotsFolder": "/tmp/screenshots",
   "retries": 1,
-  "scrollBehavior": "center"
+  "scrollBehavior": "center",
+  "chromeWebSecurity": false
 }
