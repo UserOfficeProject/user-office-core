@@ -273,7 +273,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       throw new Error('Template.name field is missing');
     }
 
-    if (!data.template.description) {
+    if (data.template.description == null) {
       throw new Error('Template.description field is missing');
     }
 
