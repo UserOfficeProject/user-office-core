@@ -2,23 +2,25 @@ import { logger } from '@user-office-software/duo-logger';
 
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
+  ComparisonStatus,
+  ConflictResolutionStrategy,
   DataType,
   FieldDependency,
   Question,
   QuestionComparison,
-  ComparisonStatus,
   QuestionTemplateRelation,
   Template,
   TemplateCategory,
+  TemplateCategoryId,
   TemplateExport,
-  TemplateGroupId,
-  TemplateValidation,
-  TemplatesHasQuestions,
-  TemplateStep,
-  Topic,
   TemplateExportData,
   TemplateExportMetadata,
+  TemplateGroupId,
+  TemplatesHasQuestions,
+  TemplateStep,
+  TemplateValidation,
   TemplateValidationData,
+  Topic,
 } from '../../models/Template';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
@@ -34,12 +36,8 @@ import {
   SubTemplateConfig,
 } from '../../resolvers/types/FieldConfig';
 import { deepEqual } from '../../utils/json';
-import { isBelowVersion, isAboveVersion } from '../../utils/version';
+import { isAboveVersion, isBelowVersion } from '../../utils/version';
 import { TemplateDataSource } from '../TemplateDataSource';
-import {
-  TemplateCategoryId,
-  ConflictResolutionStrategy,
-} from './../../models/Template';
 import database from './database';
 import {
   createProposalTemplateObject,
@@ -231,26 +229,22 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       throw new Error(`Template does not exist. ID: ${templateId}`);
     }
 
-    const data = new TemplateExportData(
+    return new TemplateExportData(
       template,
       templateSteps,
       questions,
       subTemplates
     );
-
-    return data;
   }
   async getTemplateExport(templateId: number): Promise<TemplateExport> {
     const EXPORT_DATE = new Date();
 
     const templateExportData = await this.getTemplateExportData(templateId);
 
-    const templateExport: TemplateExport = new TemplateExport(
+    return new TemplateExport(
       new TemplateExportMetadata(EXPORT_VERSION, EXPORT_DATE),
       templateExportData
     );
-
-    return templateExport;
   }
 
   isCriticalConflict = (questionA: Question, questionB: Question) =>
@@ -279,7 +273,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       throw new Error('Template.name field is missing');
     }
 
-    if (!data.template.description) {
+    if (data.template.description == null) {
       throw new Error('Template.description field is missing');
     }
 
@@ -1113,12 +1107,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         if (
           (question.dataType == DataType.GENERIC_TEMPLATE ||
             question.dataType == DataType.SAMPLE_DECLARATION) &&
-          (question.config as SubTemplateConfig | SubTemplateConfig)
-            .templateId == subTemplate.oldId
+          (question.config as SubTemplateConfig).templateId == subTemplate.oldId
         ) {
-          (
-            question.config as SubTemplateConfig | SubTemplateConfig
-          ).templateId = subTemplate.newId;
+          (question.config as SubTemplateConfig).templateId = subTemplate.newId;
         }
       });
       // Update the subtemplates ids in the template steps
@@ -1127,14 +1118,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           if (
             (field.question.dataType == DataType.GENERIC_TEMPLATE ||
               field.question.dataType == DataType.SAMPLE_DECLARATION) &&
-            (field.question.config as SubTemplateConfig | SubTemplateConfig)
-              .templateId == subTemplate.oldId
+            (field.question.config as SubTemplateConfig).templateId ==
+              subTemplate.oldId
           ) {
-            (field.config as SubTemplateConfig | SubTemplateConfig).templateId =
+            (field.config as SubTemplateConfig).templateId = subTemplate.newId;
+            (field.question.config as SubTemplateConfig).templateId =
               subTemplate.newId;
-            (
-              field.question.config as SubTemplateConfig | SubTemplateConfig
-            ).templateId = subTemplate.newId;
           }
         });
       });
