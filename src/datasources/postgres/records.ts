@@ -111,15 +111,13 @@ export interface ProposalViewRecord {
   readonly technical_review_assignee_id: number;
   readonly technical_review_assignee_firstname: string;
   readonly technical_review_assignee_lastname: string;
+  readonly instrument_name: string;
   readonly call_short_code: string;
   readonly sep_id: number;
   readonly sep_code: string;
   readonly average: number;
   readonly deviation: number;
-  readonly proposal_instrument_name: string;
-  readonly proposal_instrument_id: number;
-  readonly call_instrument_name: string;
-  readonly call_instrument_id: number;
+  readonly instrument_id: number;
   readonly call_id: number;
   readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
@@ -689,17 +687,13 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_review_assignee_lastname,
     proposal.technical_review_status,
     proposal.technical_review_submitted,
-    proposal.proposal_instrument_name
-      ? proposal.proposal_instrument_name
-      : proposal.call_instrument_name,
+    proposal.instrument_name,
     proposal.call_short_code,
     proposal.sep_code,
     proposal.sep_id,
     proposal.average,
     proposal.deviation,
-    proposal.proposal_instrument_id
-      ? proposal.proposal_instrument_id
-      : proposal.call_instrument_id,
+    proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
     proposal.submitted

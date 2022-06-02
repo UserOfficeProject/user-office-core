@@ -19,25 +19,31 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     const result = database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select([
+        'proposal_table_view.*',
+        'instruments.name AS call_instrument_name',
+        'instruments.instrument_id AS call_instrument_id',
+        database.raw('count(*) OVER() AS full_count'),
+      ])
       .from('proposal_table_view')
-      .join('instruments', function () {
-        this.on({
-          'instruments.instrument_id':
-            'proposal_table_view.proposal_instrument_id',
-        }).orOn({
-          'instruments.instrument_id': 'proposal_table_view.call_instrument_id',
-        });
-      })
-      .leftJoin('instrument_has_scientists', function () {
-        this.on({
-          'instrument_has_scientists.instrument_id':
-            'proposal_table_view.proposal_instrument_id',
-        }).orOn({
-          'instrument_has_scientists.instrument_id':
-            'proposal_table_view.call_instrument_id',
-        });
-      })
+      .join(
+        'call_has_instruments',
+        'call_has_instruments.call_id',
+        '=',
+        'proposal_table_view.call_id'
+      )
+      .join(
+        'instruments',
+        'instruments.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
+      .join(
+        'instrument_has_scientists',
+        'instrument_has_scientists.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
       .where(function () {
         this.where('instrument_has_scientists.user_id', scientistId).orWhere(
           'instruments.manager_user_id',
@@ -95,16 +101,27 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.offset(offset);
         }
       })
-      .then((proposals: ProposalViewRecord[]) => {
-        const props = proposals.map((proposal) =>
-          createProposalViewObject(proposal)
-        );
+      .then(
+        (
+          proposals: (ProposalViewRecord & {
+            call_instrument_id: number;
+            call_instrument_name: string;
+          })[]
+        ) => {
+          const props = proposals.map((proposal) => {
+            const prop = createProposalViewObject(proposal);
+            prop.instrumentId = proposal.call_instrument_id;
+            prop.instrumentName = proposal.call_instrument_name;
 
-        return {
-          totalCount: proposals[0] ? proposals[0].full_count : 0,
-          proposals: props,
-        };
-      });
+            return prop;
+          });
+
+          return {
+            totalCount: proposals[0] ? proposals[0].full_count : 0,
+            proposals: props,
+          };
+        }
+      );
 
     return result;
   }
