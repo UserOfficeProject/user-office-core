@@ -6,6 +6,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 export function useSettings(): {
   loadingSettings: boolean;
   settings: Settings[];
+  setSettings: React.Dispatch<React.SetStateAction<Settings[]>>;
 } {
   const [settings, setSettings] = useState<Settings[]>([]);
   const [loadingSettings, setLoadingSettings] = useState(true);
@@ -36,5 +37,5 @@ export function useSettings(): {
     };
   }, [api]);
 
-  return { loadingSettings, settings };
+  return { loadingSettings, settings, setSettings };
 }

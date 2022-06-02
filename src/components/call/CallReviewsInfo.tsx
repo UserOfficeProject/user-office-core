@@ -15,8 +15,8 @@ import {
 
 const CallReviewAndNotification: React.FC = () => {
   const theme = useTheme();
-  const { settings } = useContext(SettingsContext);
-  const dateFormat = settings.get(SettingsId.DATE_FORMAT)?.settingsValue;
+  const { settingsMap } = useContext(SettingsContext);
+  const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
   const mask = dateFormat?.replace(/[a-zA-Z]/g, '_');
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables

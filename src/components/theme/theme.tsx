@@ -18,50 +18,50 @@ declare module '@mui/styles/defaultTheme' {
 }
 
 const ThemeWrapper: React.FC = (props) => {
-  const { settings } = useContext(SettingsContext);
+  const { settingsMap } = useContext(SettingsContext);
   const defaultTheme = useTheme();
 
   const palette = {
     primary: {
       dark:
-        settings?.get(SettingsId.PALETTE_PRIMARY_DARK)?.settingsValue ||
+        settingsMap?.get(SettingsId.PALETTE_PRIMARY_DARK)?.settingsValue ||
         defaultTheme.palette.primary.dark,
       main:
-        settings.get(SettingsId.PALETTE_PRIMARY_MAIN)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_PRIMARY_MAIN)?.settingsValue ||
         defaultTheme.palette.primary.main,
       light:
-        settings.get(SettingsId.PALETTE_PRIMARY_LIGHT)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_PRIMARY_LIGHT)?.settingsValue ||
         defaultTheme.palette.primary.light,
     },
     secondary: {
       dark:
-        settings.get(SettingsId.PALETTE_SECONDARY_DARK)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_SECONDARY_DARK)?.settingsValue ||
         defaultTheme.palette.secondary.dark,
       main:
-        settings.get(SettingsId.PALETTE_SECONDARY_MAIN)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_SECONDARY_MAIN)?.settingsValue ||
         defaultTheme.palette.secondary.main,
       light:
-        settings.get(SettingsId.PALETTE_SECONDARY_LIGHT)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_SECONDARY_LIGHT)?.settingsValue ||
         defaultTheme.palette.secondary.light,
     },
     error: {
       main:
-        settings.get(SettingsId.PALETTE_ERROR_MAIN)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_ERROR_MAIN)?.settingsValue ||
         defaultTheme.palette.error.main,
     },
     success: {
       main:
-        settings.get(SettingsId.PALETTE_SUCCESS_MAIN)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_SUCCESS_MAIN)?.settingsValue ||
         defaultTheme.palette.success.main,
     },
     warning: {
       main:
-        settings.get(SettingsId.PALETTE_WARNING_MAIN)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_WARNING_MAIN)?.settingsValue ||
         defaultTheme.palette.warning.main,
     },
     info: {
       main:
-        settings.get(SettingsId.PALETTE_INFO_MAIN)?.settingsValue ||
+        settingsMap.get(SettingsId.PALETTE_INFO_MAIN)?.settingsValue ||
         defaultTheme.palette.info.main,
     },
     // NOTE: This was previous default background on the body. Now it is white and that's why we are overwriting it.
@@ -105,7 +105,7 @@ const ThemeWrapper: React.FC = (props) => {
 
   const updateCssPalette = useCallback(
     async function () {
-      settings.forEach((setting) => {
+      settingsMap.forEach((setting) => {
         if (setting.id.startsWith('PALETTE')) {
           document.documentElement.style.setProperty(
             '--' + setting.id,
@@ -114,7 +114,7 @@ const ThemeWrapper: React.FC = (props) => {
         }
       });
     },
-    [settings]
+    [settingsMap]
   );
 
   useEffect(() => {

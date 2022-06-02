@@ -743,6 +743,7 @@ export type Mutation = {
   updateSEPTimeAllocation: SepProposalResponseWrap;
   updateSample: SampleResponseWrap;
   updateSampleEsi: SampleEsiResponseWrap;
+  updateSettings: SettingsResponseWrap;
   updateShipment: ShipmentResponseWrap;
   updateTechnicalReviewAssignee: TechnicalReviewsResponseWrap;
   updateTemplate: TemplateResponseWrap;
@@ -1523,6 +1524,11 @@ export type MutationUpdateSampleEsiArgs = {
   esiId: Scalars['Int'];
   isSubmitted?: InputMaybe<Scalars['Boolean']>;
   sampleId: Scalars['Int'];
+};
+
+
+export type MutationUpdateSettingsArgs = {
+  updatedSettingsInput: UpdateSettingsInput;
 };
 
 
@@ -2769,6 +2775,11 @@ export enum SettingsId {
   TIMEZONE = 'TIMEZONE'
 }
 
+export type SettingsResponseWrap = {
+  rejection: Maybe<Rejection>;
+  settings: Maybe<Settings>;
+};
+
 export type Shipment = {
   created: Scalars['DateTime'];
   creatorId: Scalars['Int'];
@@ -3101,6 +3112,12 @@ export type UpdateProposalWorkflowInput = {
   description: Scalars['String'];
   id: Scalars['Int'];
   name: Scalars['String'];
+};
+
+export type UpdateSettingsInput = {
+  description?: InputMaybe<Scalars['String']>;
+  settingsId: SettingsId;
+  settingsValue?: InputMaybe<Scalars['String']>;
 };
 
 export type User = {
@@ -4336,8 +4353,7 @@ export type MoveProposalWorkflowStatusMutationVariables = Exact<{
 export type MoveProposalWorkflowStatusMutation = { moveProposalWorkflowStatus: { rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type UpdateFeaturesMutationVariables = Exact<{
-  featureIds: Array<FeatureId> | FeatureId;
-  action: FeatureUpdateAction;
+  input: UpdateFeaturesInput;
 }>;
 
 
@@ -4361,6 +4377,13 @@ export type UpdateProposalWorkflowMutationVariables = Exact<{
 
 
 export type UpdateProposalWorkflowMutation = { updateProposalWorkflow: { proposalWorkflow: { id: number, name: string, description: string, proposalWorkflowConnectionGroups: Array<{ groupId: string, parentGroupId: string | null, connections: Array<{ id: number, sortOrder: number, proposalWorkflowId: number, proposalStatusId: number, nextProposalStatusId: number | null, prevProposalStatusId: number | null, droppableGroupId: string, proposalStatus: { id: number, name: string, description: string }, statusChangingEvents: Array<{ statusChangingEventId: number, proposalWorkflowConnectionId: number, statusChangingEvent: string }> | null }> }> } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+
+export type UpdateSettingsMutationVariables = Exact<{
+  input: UpdateSettingsInput;
+}>;
+
+
+export type UpdateSettingsMutation = { updateSettings: { settings: { id: SettingsId, settingsValue: string | null, description: string | null } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type AddSamplesToShipmentMutationVariables = Exact<{
   shipmentId: Scalars['Int'];
@@ -7906,8 +7929,8 @@ export const MoveProposalWorkflowStatusDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateFeaturesDocument = gql`
-    mutation updateFeatures($featureIds: [FeatureId!]!, $action: FeatureUpdateAction!) {
-  updateFeatures(updatedFeaturesInput: {featureIds: $featureIds, action: $action}) {
+    mutation updateFeatures($input: UpdateFeaturesInput!) {
+  updateFeatures(updatedFeaturesInput: $input) {
     features {
       id
       isEnabled
@@ -7966,6 +7989,20 @@ export const UpdateProposalWorkflowDocument = gql`
           }
         }
       }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
+export const UpdateSettingsDocument = gql`
+    mutation updateSettings($input: UpdateSettingsInput!) {
+  updateSettings(updatedSettingsInput: $input) {
+    settings {
+      id
+      settingsValue
+      description
     }
     rejection {
       ...rejection
@@ -9512,6 +9549,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateProposalWorkflow(variables: UpdateProposalWorkflowMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProposalWorkflowMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateProposalWorkflowMutation>(UpdateProposalWorkflowDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProposalWorkflow', 'mutation');
+    },
+    updateSettings(variables: UpdateSettingsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateSettingsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateSettingsMutation>(UpdateSettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateSettings', 'mutation');
     },
     addSamplesToShipment(variables: AddSamplesToShipmentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddSamplesToShipmentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<AddSamplesToShipmentMutation>(AddSamplesToShipmentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addSamplesToShipment', 'mutation');

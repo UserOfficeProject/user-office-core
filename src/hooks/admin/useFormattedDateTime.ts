@@ -8,11 +8,11 @@ export function useFormattedDateTime(params?: {
   settingsFormatToUse?: SettingsId;
   shouldUseTimeZone?: boolean;
 }) {
-  const { settings } = useContext(SettingsContext);
+  const { settingsMap } = useContext(SettingsContext);
   const settingsFormat =
     params?.settingsFormatToUse || SettingsId.DATE_TIME_FORMAT;
-  const format = settings.get(settingsFormat)?.settingsValue;
-  const timezone = settings.get(SettingsId.TIMEZONE)?.settingsValue;
+  const format = settingsMap.get(settingsFormat)?.settingsValue;
+  const timezone = settingsMap.get(SettingsId.TIMEZONE)?.settingsValue;
   const settingsTimeZone = (params?.shouldUseTimeZone && timezone) || undefined;
   const mask = format?.replace(/[a-zA-Z]/g, '_');
 

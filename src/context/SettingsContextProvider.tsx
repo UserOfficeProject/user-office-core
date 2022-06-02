@@ -5,7 +5,9 @@ import { Settings, SettingsId } from 'generated/sdk';
 import { useSettings } from 'hooks/admin/useSettings';
 
 interface SettingsContextData {
-  readonly settings: Map<SettingsId, Settings>;
+  readonly settingsMap: Map<SettingsId, Settings>;
+  readonly settings: Settings[];
+  readonly setSettings: React.Dispatch<React.SetStateAction<Settings[]>>;
 }
 
 const useStyles = makeStyles({
@@ -19,14 +21,16 @@ const useStyles = makeStyles({
 });
 
 const initialSettingsData: SettingsContextData = {
-  settings: new Map<SettingsId, Settings>(),
+  settingsMap: new Map<SettingsId, Settings>(),
+  settings: [],
+  setSettings: () => {},
 };
 
 export const SettingsContext =
   React.createContext<SettingsContextData>(initialSettingsData);
 
 export const SettingsContextProvider: React.FC = (props) => {
-  const { settings, loadingSettings } = useSettings();
+  const { settings, loadingSettings, setSettings } = useSettings();
   const classes = useStyles();
 
   if (loadingSettings) {
@@ -44,7 +48,7 @@ export const SettingsContextProvider: React.FC = (props) => {
   }, new Map<SettingsId, Settings>());
 
   return (
-    <SettingsContext.Provider value={{ settings: settingsMap }}>
+    <SettingsContext.Provider value={{ settings, settingsMap, setSettings }}>
       {props.children}
     </SettingsContext.Provider>
   );

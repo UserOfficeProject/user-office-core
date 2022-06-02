@@ -32,14 +32,14 @@ const AppToolbar: React.FC<AppToolbarProps> = ({
   handleDrawerOpen,
   header,
 }) => {
-  const { settings } = useContext(SettingsContext);
+  const { settingsMap } = useContext(SettingsContext);
   const location = useLocation();
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
   const [logo, setLogo] = useState('');
 
   if (location.pathname === '/') document.title = 'User Office Dashboard';
-  const logoFilename = settings.get(
+  const logoFilename = settingsMap.get(
     SettingsId.HEADER_LOGO_FILENAME
   )?.settingsValue;
 
@@ -102,7 +102,7 @@ const AppToolbar: React.FC<AppToolbarProps> = ({
         ?.title ?? 'Unknown',
     [roles, currentRole]
   );
-  const externalProfileLink = settingsContext.settings.get(
+  const externalProfileLink = settingsContext.settingsMap.get(
     SettingsId.PROFILE_PAGE_LINK
   )?.settingsValue;
 

@@ -1,6 +1,7 @@
 import {
   AllocationTimeUnits,
   DataType,
+  FeatureId,
   Settings,
   SettingsId,
 } from '../../src/generated/sdk';
@@ -250,6 +251,20 @@ export default {
     completed: {
       startsAt: '07-02-2023 12:00',
       endsAt: '07-02-2023 13:00',
+    },
+  },
+  features: {
+    instrumentManagement: {
+      id: FeatureId.INSTRUMENT_MANAGEMENT,
+      description: 'Instrument management functionality',
+      isEnabled: true,
+    },
+  },
+  settings: {
+    dateTimeFormat: {
+      id: SettingsId.DATE_TIME_FORMAT,
+      description: 'Format used to represent date with time without seconds.',
+      settingsValue: 'dd-MM-yyyy HH:mm',
     },
   },
 };
