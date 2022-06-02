@@ -18,12 +18,12 @@ import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
   const theme = useTheme();
-  const { settings } = useContext(SettingsContext);
+  const { settingsMap } = useContext(SettingsContext);
 
-  const dateTimeFormat = settings.get(
+  const dateTimeFormat = settingsMap.get(
     SettingsId.DATE_TIME_FORMAT
   )?.settingsValue;
-  const dateFormat = settings.get(SettingsId.DATE_FORMAT)?.settingsValue;
+  const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
   const field = props.question;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);

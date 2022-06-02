@@ -1,10 +1,5 @@
-mutation updateFeatures(
-  $featureIds: [FeatureId!]!
-  $action: FeatureUpdateAction!
-) {
-  updateFeatures(
-    updatedFeaturesInput: { featureIds: $featureIds, action: $action }
-  ) {
+mutation updateFeatures($input: UpdateFeaturesInput!) {
+  updateFeatures(updatedFeaturesInput: $input) {
     features {
       id
       isEnabled

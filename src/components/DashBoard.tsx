@@ -46,6 +46,7 @@ import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ApiAccessTokensPage from './settings/apiAccessTokens/ApiAccessTokensPage';
+import AppSettingsPage from './settings/appSettings/AppSettingsPage';
 import FeaturesPage from './settings/features/FeaturesPage';
 import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
@@ -474,6 +475,14 @@ const Dashboard: React.FC = () => {
               title="Features"
               path="/Features"
               component={FeaturesPage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="App settings"
+              path="/Settings"
+              component={AppSettingsPage}
             />
           )}
           {isSchedulerEnabled && (

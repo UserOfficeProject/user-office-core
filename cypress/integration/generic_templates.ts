@@ -55,7 +55,7 @@ context('GenericTemplates tests', () => {
   let createdQuestion1Id: string;
 
   beforeEach(() => {
-    cy.resetDB(true);
+    cy.resetDB();
   });
 
   const createTemplateAndAllQuestions = () => {

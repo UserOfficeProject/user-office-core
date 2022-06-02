@@ -1,6 +1,7 @@
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import EventIcon from '@mui/icons-material/Event';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -123,6 +124,14 @@ const SettingsMenuListItem = () => {
               <ViewModuleIcon />
             </ListItemIcon>
             <ListItemText primary="Features" />
+          </ListItem>
+        </Tooltip>
+        <Tooltip title="App settings">
+          <ListItem component={NavLink} to="/Settings" button>
+            <ListItemIcon>
+              <DisplaySettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary="App settings" />
           </ListItem>
         </Tooltip>
       </Collapse>

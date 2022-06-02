@@ -152,7 +152,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
 
 export function useDataApi() {
   const settingsContext = useContext(SettingsContext);
-  const externalAuthLoginUrl = settingsContext.settings.get(
+  const externalAuthLoginUrl = settingsContext.settingsMap.get(
     SettingsId.EXTERNAL_AUTH_LOGIN_URL
   )?.settingsValue;
   const { token, handleNewToken, handleLogout } = useContext(UserContext);
