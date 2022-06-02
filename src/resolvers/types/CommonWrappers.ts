@@ -31,6 +31,7 @@ import { ScheduledEventCore } from './ScheduledEvent';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
+import { Settings } from './Settings';
 import { Shipment } from './Shipment';
 import { StatusChangingEvent } from './StatusChangingEvent';
 import { TechnicalReview } from './TechnicalReview';
@@ -284,6 +285,13 @@ export class FeaturesResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => [Feature], { nullable: true })
   public features: Feature[];
+}
+
+@ObjectType()
+export class SettingsResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => Settings, { nullable: true })
+  public settings: Settings;
 }
 
 @ObjectType()

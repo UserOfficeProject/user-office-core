@@ -7,6 +7,7 @@ import { Settings, SettingsId } from '../../models/Settings';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
+import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 
@@ -52,7 +53,11 @@ export class AdminDataSourceMock implements AdminDataSource {
     const shouldEnable =
       updatedFeaturesInput.action === FeatureUpdateAction.ENABLE;
 
-    return [{ ...dummyFeature, isEnabled: shouldEnable }];
+    return updatedFeaturesInput.featureIds.map((featureId) => ({
+      description: featureId,
+      id: featureId,
+      isEnabled: shouldEnable,
+    }));
   }
 
   async getInstitutionUsers(
@@ -169,13 +174,13 @@ export class AdminDataSourceMock implements AdminDataSource {
   }
 
   async updateSettings(
-    id: SettingsId,
-    value?: string,
-    description?: string
+    updatedSettingsInput: UpdateSettingsInput
   ): Promise<Settings> {
+    const { settingsId, description, settingsValue } = updatedSettingsInput;
+
     return {
-      id: id,
-      settingsValue: value || '',
+      id: settingsId,
+      settingsValue: settingsValue || '',
       description: description || '',
     };
   }

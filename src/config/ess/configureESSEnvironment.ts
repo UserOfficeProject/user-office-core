@@ -8,20 +8,62 @@ import { Tokens } from '../Tokens';
 
 async function setEssColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#519548');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_MAIN, '#519548');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_LIGHT, '#BEF202');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_ACCENT, '#000000');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_CONTRAST, '#ffffff');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#1B676B');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_MAIN, '#1B676B');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_LIGHT, '#1B676B');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_CONTRAST, '#ffffff');
-  await db.updateSettings(SettingsId.PALETTE_ERROR_MAIN, '#f44336');
-  await db.updateSettings(SettingsId.PALETTE_SUCCESS_MAIN, '#4caf50');
-  await db.updateSettings(SettingsId.PALETTE_WARNING_MAIN, '#ff9800');
-  await db.updateSettings(SettingsId.PALETTE_INFO_MAIN, '#2196f3');
-  await db.updateSettings(SettingsId.HEADER_LOGO_FILENAME, 'ess-white.svg');
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_DARK,
+    settingsValue: '#519548',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_MAIN,
+    settingsValue: '#519548',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_LIGHT,
+    settingsValue: '#BEF202',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_ACCENT,
+    settingsValue: '#000000',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_CONTRAST,
+    settingsValue: '#ffffff',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_DARK,
+    settingsValue: '#1B676B',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_MAIN,
+    settingsValue: '#1B676B',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_LIGHT,
+    settingsValue: '#1B676B',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_CONTRAST,
+    settingsValue: '#ffffff',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_ERROR_MAIN,
+    settingsValue: '#f44336',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SUCCESS_MAIN,
+    settingsValue: '#4caf50',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_WARNING_MAIN,
+    settingsValue: '#ff9800',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_INFO_MAIN,
+    settingsValue: '#2196f3',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.HEADER_LOGO_FILENAME,
+    settingsValue: 'ess-white.svg',
+  });
 }
 
 async function enableDefaultEssFeatures() {

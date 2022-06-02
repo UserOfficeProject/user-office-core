@@ -8,6 +8,7 @@ import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
+import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
@@ -37,11 +38,7 @@ export interface AdminDataSource {
     accessToken: string
   ): Promise<Permissions>;
   updateApiAccessToken(args: UpdateApiAccessTokenInput): Promise<Permissions>;
-  updateSettings(
-    id: SettingsId,
-    value?: string,
-    description?: string
-  ): Promise<Settings>;
+  updateSettings(updatedSettingsInput: UpdateSettingsInput): Promise<Settings>;
   getTokenAndPermissionsById(accessTokenId: string): Promise<Permissions>;
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;

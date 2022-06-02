@@ -9,23 +9,62 @@ import { Tokens } from '../Tokens';
 
 async function setStfcColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#2e2d62');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_MAIN, '#003088');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_ACCENT, '#003088');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_LIGHT, '#1e5df8');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_CONTRAST, '#ffffff');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#d77900');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_MAIN, '#ff9d1b');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_LIGHT, '#fbbe10');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_CONTRAST, '#000000');
-  await db.updateSettings(SettingsId.PALETTE_ERROR_MAIN, '#a91b2e');
-  await db.updateSettings(SettingsId.PALETTE_SUCCESS_MAIN, '#157846');
-  await db.updateSettings(SettingsId.PALETTE_WARNING_MAIN, '#fbbe10');
-  await db.updateSettings(SettingsId.PALETTE_INFO_MAIN, '#1e5df8');
-  await db.updateSettings(
-    SettingsId.HEADER_LOGO_FILENAME,
-    'stfc-ukri-white.svg'
-  );
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_DARK,
+    settingsValue: '#2e2d62',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_MAIN,
+    settingsValue: '#003088',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_ACCENT,
+    settingsValue: '#003088',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_LIGHT,
+    settingsValue: '#1e5df8',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_PRIMARY_CONTRAST,
+    settingsValue: '#ffffff',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_DARK,
+    settingsValue: '#d77900',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_MAIN,
+    settingsValue: '#ff9d1b',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_LIGHT,
+    settingsValue: '#fbbe10',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_CONTRAST,
+    settingsValue: '#000000',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_ERROR_MAIN,
+    settingsValue: '#a91b2e',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SUCCESS_MAIN,
+    settingsValue: '#157846',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_WARNING_MAIN,
+    settingsValue: '#fbbe10',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.PALETTE_INFO_MAIN,
+    settingsValue: '#1e5df8',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.HEADER_LOGO_FILENAME,
+    settingsValue: 'stfc-ukri-white.svg',
+  });
 }
 
 async function enableDefaultStfcFeatures() {
@@ -38,10 +77,10 @@ async function enableDefaultStfcFeatures() {
     ],
     true
   );
-  await db.updateSettings(
-    SettingsId.EXTERNAL_AUTH_LOGIN_URL,
-    process.env.EXTERNAL_AUTH_LOGIN_URL
-  );
+  await db.updateSettings({
+    settingsId: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
+    settingsValue: process.env.EXTERNAL_AUTH_LOGIN_URL,
+  });
 }
 
 export async function configureSTFCEnvironment() {

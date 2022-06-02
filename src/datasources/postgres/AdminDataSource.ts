@@ -13,6 +13,7 @@ import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
+import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 import { Entry } from './../../models/Entry';
@@ -486,13 +487,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async updateSettings(
-    id: SettingsId,
-    value?: string,
-    description?: string
+    updatedSettingsInput: UpdateSettingsInput
   ): Promise<Settings> {
+    const { settingsId, description, settingsValue } = updatedSettingsInput;
+
     return database('settings')
-      .update({ settings_value: value, description: description })
-      .where('settings_id', id)
+      .update({ settings_value: settingsValue, description: description })
+      .where('settings_id', settingsId)
       .returning('*')
       .then((records: SettingsRecord[]) => createSettingsObject(records[0]));
   }

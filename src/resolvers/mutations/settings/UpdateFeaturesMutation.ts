@@ -8,14 +8,14 @@ import { wrapResponse } from '../../wrapResponse';
 @InputType()
 export class UpdateFeaturesInput {
   @Field(() => [FeatureId])
-  public featureIds: [FeatureId];
+  public featureIds: FeatureId[];
 
   @Field(() => FeatureUpdateAction)
   public action: FeatureUpdateAction;
 }
 
 @Resolver()
-export class UpdateProposalStatusMutation {
+export class UpdateFeaturesMutation {
   @Mutation(() => FeaturesResponseWrap)
   async updateFeatures(
     @Ctx() context: ResolverContext,

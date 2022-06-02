@@ -14,12 +14,14 @@ import { Feature } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
+import { Settings } from '../models/Settings';
 import { UserWithRole } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
+import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 import { generateUniqueId } from '../utils/helperFunctions';
@@ -226,5 +228,19 @@ export default class AdminMutations {
     }
 
     return updatedFeatures;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async updateSettings(
+    agent: UserWithRole | null,
+    args: UpdateSettingsInput
+  ): Promise<Settings | Rejection> {
+    const updatedSettings = await this.dataSource.updateSettings(args);
+
+    if (!updatedSettings) {
+      return rejection('Could not update settings', { agent, args });
+    }
+
+    return updatedSettings;
   }
 }
