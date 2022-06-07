@@ -90,13 +90,9 @@ export abstract class UserAuthorization {
       return false;
     }
 
-    const [sep] = await this.sepDataSource.getUserSepsByRoleAndSepId(
-      agent.id,
-      agent.currentRole,
-      sepId
-    );
-
-    return sep !== null;
+    return this.sepDataSource
+      .getUserSepsByRoleAndSepId(agent.id, agent.currentRole, sepId)
+      .then((userSeps) => userSeps.length > 0);
   }
 
   async listReadableUsers(
@@ -109,7 +105,7 @@ export abstract class UserAuthorization {
 
     const isUserOfficer = this.isUserOfficer(agent);
     const isInstrumentScientist = this.isInstrumentScientist(agent);
-    const isSEPMember = this.isMemberOfSEP(agent, agent.id);
+    const isSEPMember = await this.isMemberOfSEP(agent, agent.id);
     if (isUserOfficer || isInstrumentScientist || isSEPMember) {
       return ids;
     }
