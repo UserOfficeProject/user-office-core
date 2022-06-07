@@ -52,7 +52,7 @@ export const fileUploadDefinition: Question = {
 
             const posFileTypes = await identifyFileType(path, errorContext);
 
-            if (!(await isValidFileType(posFileTypes, field))) {
+            if (!(await isValidFileType(posFileTypes, field, errorContext))) {
               fs.unlink(path);
 
               return false;
@@ -167,21 +167,38 @@ const identifyFileType = async (
  *
  * @param identifiedFileTypes The identified file types from the file's signature
  * @param field The question data containing the config
+ * @param errorContext File details to be logged in the event of an error
  * @returns True if the required file type in the question configuration
  * is one of the file types identified from the file's signature. False if not.
  */
 const isValidFileType = async (
   identifiedFileTypes: string[],
-  field: QuestionTemplateRelation
+  field: QuestionTemplateRelation,
+  errorContext: any
 ): Promise<boolean> => {
   const config = field.config as FileUploadConfig;
 
   return identifiedFileTypes.some((type) => {
     const anySubtype = type.split('/')[0]?.concat('/*'); // e.g. 'image/*'
 
-    return (
-      config.file_type.includes(type) || config.file_type.includes(anySubtype)
-    );
+    const isValidFileType =
+      config.file_type.includes(type) || config.file_type.includes(anySubtype);
+
+    if (!isValidFileType) {
+      logger.logError('File determined to be of wrong type', {
+        possibleTypesIdentified: identifiedFileTypes,
+        ...errorContext,
+      });
+
+      return false;
+    } else {
+      logger.logInfo('File type check passed', {
+        possibleTypesIdentified: identifiedFileTypes,
+        ...errorContext,
+      });
+
+      return true;
+    }
   });
 };
 
