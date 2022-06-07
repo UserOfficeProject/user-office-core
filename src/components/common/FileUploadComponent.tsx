@@ -433,7 +433,7 @@ export function FileUploadComponent(props: {
   const amountFilesInfo =
     maxFiles > 1 ? (
       <Box component="span" display="block">
-        Max: {maxFiles} file(s)
+        Maximum {maxFiles} file(s)
       </Box>
     ) : null;
 
@@ -444,15 +444,15 @@ export function FileUploadComponent(props: {
   const pdfPageLimitInfo =
     fileType.includes('.pdf') && pdfPageLimit > 0 ? (
       <Box component="span" display="block">
-        Maximum {pdfPageLimit} PDF page(s)
+        Maximum {pdfPageLimit} PDF page(s) per file
       </Box>
     ) : null;
 
   return (
     <>
       Accepted formats: {fileTypeInfo.join(', ')}
-      {pdfPageLimitInfo}
       {amountFilesInfo}
+      {pdfPageLimitInfo}
       <List component="ul" className={classes.questionnairesList}>
         {files.map &&
           files.map((metaData: FileMetaData) => {

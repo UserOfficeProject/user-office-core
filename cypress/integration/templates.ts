@@ -1766,8 +1766,8 @@ context('Template tests', () => {
 
     it('File limitation info is displayed', () => {
       cy.contains('Accepted formats: .pdf, .docx, any image');
-      cy.contains('Maximum 3 PDF page(s)');
-      cy.contains('Max: 3 file(s)');
+      cy.contains('Maximum 3 PDF page(s) per file');
+      cy.contains('Maximum 3 file(s)');
     });
 
     it('File without extension cannot be uploaded', () => {
