@@ -6,6 +6,7 @@ import { fileUploadQuestionValidationSchema } from '@user-office-software/duo-va
 import NodeClam from 'clamscan';
 import fileTypeInfo from 'magic-bytes.js';
 import { GuessedFile } from 'magic-bytes.js/dist/model/tree';
+import { createReader } from 'muhammara';
 import { container } from 'tsyringe';
 
 import FileMutations from '../../mutations/FileMutations';
@@ -57,6 +58,15 @@ export const fileUploadDefinition: Question = {
               return false;
             }
 
+            if (
+              posFileTypes.includes('.pdf') &&
+              !(await hasAllowedPdfNumPages(path, field, errorContext))
+            ) {
+              fs.unlink(path);
+
+              return false;
+            }
+
             fs.unlink(path);
 
             return true;
@@ -75,6 +85,7 @@ export const fileUploadDefinition: Question = {
     config.required = false;
     config.tooltip = '';
     config.file_type = [];
+    config.pdf_page_limit = 0;
     config.max_files = 0;
 
     return config;
@@ -229,4 +240,44 @@ const passesVirusScan = async (
 
       return true;
     });
+};
+
+/**
+ * Checks whether a PDF file has a page count within the allowed limit.
+ *
+ * @param path The path to the file
+ * @param field The question data containing the config
+ * @param errorContext File details to be logged in the event of an error
+ * @returns True if the page count is within the allowed limit, false if not.
+ */
+const hasAllowedPdfNumPages = async (
+  path: string,
+  field: QuestionTemplateRelation,
+  errorContext: any
+): Promise<boolean> => {
+  const config = field.config as FileUploadConfig;
+
+  const pageLimit = config.pdf_page_limit;
+
+  const readPdf = async () => {
+    return createReader(path);
+  };
+
+  const pageCount = (await readPdf()).getPagesCount();
+
+  if (pageCount > pageLimit) {
+    logger.logError('PDF page count exceeds limit', {
+      pageCount: pageCount,
+      ...errorContext,
+    });
+
+    return false;
+  } else {
+    logger.logInfo('PDF page count check passed', {
+      pageCount: pageCount,
+      ...errorContext,
+    });
+
+    return true;
+  }
 };
