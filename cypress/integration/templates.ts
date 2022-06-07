@@ -1764,10 +1764,10 @@ context('Template tests', () => {
       cy.contains(fileQuestion);
     });
 
-    it('Accepted formats are displayed', () => {
-      cy.contains('.pdf');
-      cy.contains('.docx');
-      cy.contains('any image');
+    it('File limitation info is displayed', () => {
+      cy.contains('Accepted formats: .pdf, .docx, any image');
+      cy.contains('Maximum 3 PDF page(s)');
+      cy.contains('Max: 3 file(s)');
     });
 
     it('File without extension cannot be uploaded', () => {
@@ -1890,6 +1890,54 @@ context('Template tests', () => {
       cy.contains('Save and continue').click();
 
       cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+    });
+
+    it('Question is not accepted when PDF file page count is outside limit', () => {
+      const fileName = 'pdf_5_pages.pdf';
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/pdf',
+      });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(fileName);
+
+      cy.contains('Save and continue').click();
+
+      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+    });
+
+    it('Question accepted when PDF file page count is within limit', () => {
+      const fileName = 'pdf_3_pages.pdf';
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/pdf',
+      });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(fileName);
+
+      cy.contains('Save and continue').click();
+
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
   });
 });

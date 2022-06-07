@@ -292,6 +292,7 @@ const ProposalTechnicalReview = ({
                   <FileUploadComponent
                     maxFiles={5}
                     fileType={'.pdf'}
+                    pdfPageLimit={0}
                     onChange={(
                       fileMetaDataList: FileIdWithCaptionAndFigure[]
                     ) => {

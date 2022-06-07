@@ -366,6 +366,7 @@ export function FileUploadComponent(props: {
   maxFiles?: number;
   id?: string;
   fileType: string;
+  pdfPageLimit: number;
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
 }) {
@@ -419,6 +420,7 @@ export function FileUploadComponent(props: {
   };
 
   const { fileType } = props;
+  const { pdfPageLimit } = props;
   const maxFiles = props.maxFiles ?? 0;
 
   let newFileEntry;
@@ -439,9 +441,17 @@ export function FileUploadComponent(props: {
     return type.includes('*') ? 'any ' + type.split('/')[0] : type;
   });
 
+  const pdfPageLimitInfo =
+    fileType.includes('.pdf') && pdfPageLimit > 0 ? (
+      <Box component="span" display="block">
+        Maximum {pdfPageLimit} PDF page(s)
+      </Box>
+    ) : null;
+
   return (
     <>
       Accepted formats: {fileTypeInfo.join(', ')}
+      {pdfPageLimitInfo}
       {amountFilesInfo}
       <List component="ul" className={classes.questionnairesList}>
         {files.map &&
