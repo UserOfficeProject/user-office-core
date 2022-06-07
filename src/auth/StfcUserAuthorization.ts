@@ -16,7 +16,7 @@ import { Instrument } from '../models/Instrument';
 import { User } from '../models/User';
 import { UserAuthorization } from './UserAuthorization';
 
-const client = new UOWSSoapClient(process.env.EXTERNAL_AUTH_SERVICE_URL);
+const client = UOWSSoapClient.getInstance();
 
 const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
   'User Officer': ['ISIS', 'ARTEMIS', 'HPL', 'LSF'],
