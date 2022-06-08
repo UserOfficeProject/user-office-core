@@ -1,20 +1,22 @@
 import { MTableToolbar, Options } from '@material-table/core';
-import PropTypes from 'prop-types';
 import React from 'react';
 import { NumberParam, useQueryParams, withDefault } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
+import { Sep } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 
 import SEPProposalsAndAssignmentsTable from './SEPProposalsAndAssignmentsTable';
 
 type SEPProposalsAndAssignmentsProps = {
   /** Id of the SEP we are assigning members to */
-  sepId: number;
+  data: Sep;
+  onSEPUpdate: (sep: Sep) => void;
 };
 
 const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
-  sepId,
+  data: sepData,
+  onSEPUpdate,
 }) => {
   const { loadingCalls, calls } = useCallsData();
   // NOTE: Default null means load all calls if nothing is selected
@@ -36,15 +38,12 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
 
   return (
     <SEPProposalsAndAssignmentsTable
-      sepId={sepId}
+      data={sepData}
+      onAssignmentsUpdate={onSEPUpdate}
       selectedCallId={query.call}
       Toolbar={Toolbar}
     />
   );
-};
-
-SEPProposalsAndAssignments.propTypes = {
-  sepId: PropTypes.number.isRequired,
 };
 
 export default SEPProposalsAndAssignments;

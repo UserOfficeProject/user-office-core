@@ -11,17 +11,7 @@ mutation createSEP(
     active: $active
   ) {
     sep {
-      id
-      code
-      description
-      numberRatingsRequired
-      active
-      sepChair {
-        ...basicUserDetails
-      }
-      sepSecretary {
-        ...basicUserDetails
-      }
+      ...sep
     }
     rejection {
       ...rejection

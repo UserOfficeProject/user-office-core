@@ -58,10 +58,12 @@ const SEPPage: React.FC = () => {
           />
           <SEPMembers
             data={sep}
-            sepId={sep.id}
             onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
           />
-          <SEPProposalsAndAssignmentsView sepId={sep.id} />
+          <SEPProposalsAndAssignmentsView
+            data={sep}
+            onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
+          />
           <SEPMeetingComponentsView sepId={sep.id} />
           {hasAccessRights && (
             <EventLogList changedObjectId={sep.id} eventType="SEP" />

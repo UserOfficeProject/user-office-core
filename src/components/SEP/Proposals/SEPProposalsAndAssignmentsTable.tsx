@@ -23,6 +23,7 @@ import {
   ProposalStatus,
   Review,
   SettingsId,
+  Sep,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -46,8 +47,10 @@ import AssignSEPMemberToProposal, {
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 
 type SEPProposalsAndAssignmentsTableProps = {
-  /** Id of the SEP we are assigning members to */
-  sepId: number;
+  /** SEP we are assigning members to */
+  data: Sep;
+  /** Call this function in case of SEP assigned members update */
+  onAssignmentsUpdate: (sep: Sep) => void;
   /** Toolbar component shown in the table */
   Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   /** Call id that we want to filter by */
@@ -130,12 +133,12 @@ const SEPProposalColumns = [
 
 const SEPProposalsAndAssignmentsTable: React.FC<
   SEPProposalsAndAssignmentsTableProps
-> = ({ sepId, selectedCallId, Toolbar, confirm }) => {
+> = ({ data, onAssignmentsUpdate, selectedCallId, Toolbar, confirm }) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     reviewModal: NumberParam,
   });
   const { loadingSEPProposals, SEPProposalsData, setSEPProposalsData } =
-    useSEPProposalsData(sepId, selectedCallId);
+    useSEPProposalsData(data.id, selectedCallId);
   const { api } = useDataApiWithFeedback();
   const [proposalPk, setProposalPk] = useState<null | number>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -202,7 +205,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       proposalPks: proposalsToRemove.map(
         (proposalToRemove) => proposalToRemove.proposalPk
       ),
-      sepId,
+      sepId: data.id,
     });
 
     setSEPProposalsData((sepProposalData) =>
@@ -244,7 +247,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
     }).assignSepReviewersToProposal({
       memberIds: assignedMembers.map(({ id }) => id),
       proposalPk: proposalPk,
-      sepId,
+      sepId: data.id,
     });
 
     if (rejection) {
@@ -284,6 +287,20 @@ const SEPProposalsAndAssignmentsTable: React.FC<
         }
       })
     );
+
+    onAssignmentsUpdate({
+      ...data,
+      sepChairProposalCount: assignedMembers.find(
+        (assignedMember) => assignedMember.id === data.sepChair?.id
+      )
+        ? (data.sepChairProposalCount || 0) + 1
+        : data.sepChairProposalCount,
+      sepSecretaryProposalCount: assignedMembers.find(
+        (assignedMember) => assignedMember.id === data.sepSecretary?.id
+      )
+        ? (data.sepSecretaryProposalCount || 0) + 1
+        : data.sepSecretaryProposalCount,
+    });
   };
 
   const initialValues: SEPProposalType[] = SEPProposalsData;
@@ -364,14 +381,14 @@ const SEPProposalsAndAssignmentsTable: React.FC<
           toastSuccessMessage: 'Reviewer removed',
         }).removeMemberFromSEPProposal({
           proposalPk,
-          sepId,
+          sepId: data.id,
           memberId: assignedReviewer.sepMemberUserId as number,
         });
 
         assignedReviewer.review &&
           (await api().removeUserForReview({
             reviewId: assignedReviewer.review.id,
-            sepId,
+            sepId: data.id,
           }));
 
         setSEPProposalsData((sepProposalData) =>
@@ -393,6 +410,18 @@ const SEPProposalsAndAssignmentsTable: React.FC<
             }
           })
         );
+
+        onAssignmentsUpdate({
+          ...data,
+          sepChairProposalCount:
+            assignedReviewer.sepMemberUserId === data.sepChair?.id
+              ? data.sepChairProposalCount! - 1
+              : data.sepChairProposalCount,
+          sepSecretaryProposalCount:
+            assignedReviewer.sepMemberUserId === data.sepSecretary?.id
+              ? data.sepSecretaryProposalCount! - 1
+              : data.sepSecretaryProposalCount,
+        });
       };
 
       return (
@@ -411,7 +440,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
         />
       );
     },
-    [setSEPProposalsData, sepId, api]
+    [setSEPProposalsData, data, onAssignmentsUpdate, api]
   );
 
   const SEPProposalsWitIdAndFormattedDate = initialValues.map((sepProposal) =>
@@ -449,7 +478,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       >
         <DialogContent>
           <AssignSEPMemberToProposal
-            sepId={sepId}
+            sepId={data.id}
             assignedMembers={
               proposalAssignments?.map((assignment) => assignment.user) ?? []
             }

@@ -451,6 +451,14 @@ context('SEP reviews tests', () => {
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
       cy.contains(sepMembers.chair.lastName);
+
+      cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
+
+      cy.get('[data-cy="sep-chair-reviews-info"]').should(
+        'have.attr',
+        'aria-label',
+        'Number of proposals to review: 1'
+      );
     });
 
     it('SEP Chair should be able to see proposal details in modal inside proposals and assignments', () => {
@@ -556,6 +564,14 @@ context('SEP reviews tests', () => {
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
       cy.contains(sepMembers.secretary.lastName);
+
+      cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
+
+      cy.get('[data-cy="sep-secretary-reviews-info"]').should(
+        'have.attr',
+        'aria-label',
+        'Number of proposals to review: 1'
+      );
     });
 
     it('SEP Secretary should be able to read/write non-submitted reviews', () => {

@@ -2556,8 +2556,11 @@ export type Sep = {
   description: Scalars['String'];
   id: Scalars['Int'];
   numberRatingsRequired: Scalars['Float'];
+  proposalCount: Scalars['Int'];
   sepChair: Maybe<BasicUserDetails>;
+  sepChairProposalCount: Maybe<Scalars['Int']>;
   sepSecretary: Maybe<BasicUserDetails>;
+  sepSecretaryProposalCount: Maybe<Scalars['Int']>;
 };
 
 export type SepAssignment = {
@@ -2595,6 +2598,7 @@ export type SepResponseWrap = {
 };
 
 export type SepReviewer = {
+  proposalsCount: Scalars['Int'];
   role: Maybe<Role>;
   sepId: Scalars['Int'];
   user: BasicUserDetails;
@@ -3290,7 +3294,7 @@ export type CreateSepMutationVariables = Exact<{
 }>;
 
 
-export type CreateSepMutation = { createSEP: { sep: { id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+export type CreateSepMutation = { createSEP: { sep: { id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChairProposalCount: number | null, sepSecretaryProposalCount: number | null, proposalCount: number, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type DeleteSepMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -3298,6 +3302,8 @@ export type DeleteSepMutationVariables = Exact<{
 
 
 export type DeleteSepMutation = { deleteSEP: { rejection: { reason: string, context: string | null, exception: string | null } | null, sep: { id: number } | null } };
+
+export type SepFragment = { id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChairProposalCount: number | null, sepSecretaryProposalCount: number | null, proposalCount: number, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null };
 
 export type SepMeetingDecisionFragment = { proposalPk: number, recommendation: ProposalEndStatus | null, commentForUser: string | null, commentForManagement: string | null, rankOrder: number | null, submitted: boolean, submittedBy: number | null };
 
@@ -3312,14 +3318,14 @@ export type GetInstrumentsBySepQuery = { instrumentsBySep: Array<{ id: number, n
 export type GetUserSepsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserSepsQuery = { me: { seps: Array<{ id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null }> } | null };
+export type GetUserSepsQuery = { me: { seps: Array<{ id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChairProposalCount: number | null, sepSecretaryProposalCount: number | null, proposalCount: number, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null }> } | null };
 
 export type GetSepQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type GetSepQuery = { sep: { id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null };
+export type GetSepQuery = { sep: { id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChairProposalCount: number | null, sepSecretaryProposalCount: number | null, proposalCount: number, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null } | null };
 
 export type GetSepMembersQueryVariables = Exact<{
   sepId: Scalars['Int'];
@@ -3358,7 +3364,7 @@ export type GetSepReviewersQueryVariables = Exact<{
 }>;
 
 
-export type GetSepReviewersQuery = { sepReviewers: Array<{ userId: number, sepId: number, role: { id: number, shortCode: string, title: string } | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } }> | null };
+export type GetSepReviewersQuery = { sepReviewers: Array<{ userId: number, sepId: number, proposalsCount: number, role: { id: number, shortCode: string, title: string } | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } }> | null };
 
 export type GetSePsQueryVariables = Exact<{
   filter: Scalars['String'];
@@ -3366,7 +3372,7 @@ export type GetSePsQueryVariables = Exact<{
 }>;
 
 
-export type GetSePsQuery = { seps: { totalCount: number, seps: Array<{ id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null }> } | null };
+export type GetSePsQuery = { seps: { totalCount: number, seps: Array<{ id: number, code: string, description: string, numberRatingsRequired: number, active: boolean, sepChairProposalCount: number | null, sepSecretaryProposalCount: number | null, proposalCount: number, sepChair: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null, sepSecretary: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null } | null }> } | null };
 
 export type RemoveProposalsFromSepMutationVariables = Exact<{
   proposalPks: Array<Scalars['Int']> | Scalars['Int'];
@@ -5076,6 +5082,36 @@ export type UpdateVisitRegistrationMutationVariables = Exact<{
 
 export type UpdateVisitRegistrationMutation = { updateVisitRegistration: { registration: { userId: number, visitId: number, registrationQuestionaryId: number | null, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null, startsAt: any | null, endsAt: any | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, position: string, created: any | null, placeholder: boolean | null }, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, value: any | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
+export const BasicUserDetailsFragmentDoc = gql`
+    fragment basicUserDetails on BasicUserDetails {
+  id
+  firstname
+  lastname
+  preferredname
+  organisation
+  position
+  created
+  placeholder
+}
+    `;
+export const SepFragmentDoc = gql`
+    fragment sep on SEP {
+  id
+  code
+  description
+  numberRatingsRequired
+  active
+  sepChair {
+    ...basicUserDetails
+  }
+  sepChairProposalCount
+  sepSecretary {
+    ...basicUserDetails
+  }
+  sepSecretaryProposalCount
+  proposalCount
+}
+    ${BasicUserDetailsFragmentDoc}`;
 export const CountryFragmentDoc = gql`
     fragment country on Entry {
   id
@@ -5087,18 +5123,6 @@ export const RejectionFragmentDoc = gql`
   reason
   context
   exception
-}
-    `;
-export const BasicUserDetailsFragmentDoc = gql`
-    fragment basicUserDetails on BasicUserDetails {
-  id
-  firstname
-  lastname
-  preferredname
-  organisation
-  position
-  created
-  placeholder
 }
     `;
 export const CallFragmentDoc = gql`
@@ -5709,24 +5733,14 @@ export const CreateSepDocument = gql`
     active: $active
   ) {
     sep {
-      id
-      code
-      description
-      numberRatingsRequired
-      active
-      sepChair {
-        ...basicUserDetails
-      }
-      sepSecretary {
-        ...basicUserDetails
-      }
+      ...sep
     }
     rejection {
       ...rejection
     }
   }
 }
-    ${BasicUserDetailsFragmentDoc}
+    ${SepFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const DeleteSepDocument = gql`
     mutation deleteSEP($id: Int!) {
@@ -5759,38 +5773,18 @@ export const GetUserSepsDocument = gql`
     query getUserSeps {
   me {
     seps {
-      id
-      code
-      description
-      numberRatingsRequired
-      active
-      sepChair {
-        ...basicUserDetails
-      }
-      sepSecretary {
-        ...basicUserDetails
-      }
+      ...sep
     }
   }
 }
-    ${BasicUserDetailsFragmentDoc}`;
+    ${SepFragmentDoc}`;
 export const GetSepDocument = gql`
     query getSEP($id: Int!) {
   sep(id: $id) {
-    id
-    code
-    description
-    numberRatingsRequired
-    active
-    sepChair {
-      ...basicUserDetails
-    }
-    sepSecretary {
-      ...basicUserDetails
-    }
+    ...sep
   }
 }
-    ${BasicUserDetailsFragmentDoc}`;
+    ${SepFragmentDoc}`;
 export const GetSepMembersDocument = gql`
     query getSEPMembers($sepId: Int!) {
   sepMembers(sepId: $sepId) {
@@ -5949,6 +5943,7 @@ export const GetSepReviewersDocument = gql`
     user {
       ...basicUserDetails
     }
+    proposalsCount
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
@@ -5956,22 +5951,12 @@ export const GetSePsDocument = gql`
     query getSEPs($filter: String!, $active: Boolean) {
   seps(filter: $filter, active: $active) {
     seps {
-      id
-      code
-      description
-      numberRatingsRequired
-      active
-      sepChair {
-        ...basicUserDetails
-      }
-      sepSecretary {
-        ...basicUserDetails
-      }
+      ...sep
     }
     totalCount
   }
 }
-    ${BasicUserDetailsFragmentDoc}`;
+    ${SepFragmentDoc}`;
 export const RemoveProposalsFromSepDocument = gql`
     mutation removeProposalsFromSep($proposalPks: [Int!]!, $sepId: Int!) {
   removeProposalsFromSep(proposalPks: $proposalPks, sepId: $sepId) {
