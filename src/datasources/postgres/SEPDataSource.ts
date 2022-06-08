@@ -736,7 +736,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       updateQuery.push('comment_for_user = EXCLUDED.comment_for_user');
     }
 
-    if (saveSepMeetingDecisionInput.recommendation) {
+    if (saveSepMeetingDecisionInput.recommendation !== undefined) {
       dataToUpsert.recommendation = saveSepMeetingDecisionInput.recommendation;
       updateQuery.push('recommendation = EXCLUDED.recommendation');
     }
