@@ -55,6 +55,13 @@ export class EssUserAuthorization extends UserAuthorization {
 
     const user = await this.userDataSource.getByOrcID(decoded.ORCID);
     if (user) {
+      await this.userDataSource.update({
+        ...user,
+        firstname: decoded.FirstName,
+        lastname: decoded.LastName,
+        email: decoded.mail,
+      });
+
       return user;
     } else {
       const newUser = await this.userDataSource.create(
