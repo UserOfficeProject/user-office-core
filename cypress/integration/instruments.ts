@@ -288,7 +288,10 @@ context('Instrument tests', () => {
       });
 
       cy.login(scientist2);
-
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: createdProposalPk,
+        userId: scientist2.id,
+      });
       cy.addProposalTechnicalReview({
         proposalPk: createdProposalPk,
         reviewerId: scientist2.id,

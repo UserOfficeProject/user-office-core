@@ -169,9 +169,11 @@ const ProposalTechnicalReview = ({
       <Typography variant="h6" component="h2" gutterBottom>
         Technical Review
       </Typography>
-      {proposal.technicalReview?.reviewer && (
+      {proposal.technicalReview?.technicalReviewAssignee && (
         <Typography variant="subtitle2" data-cy="reviewed-by-info">
-          {`Reviewed by ${getFullUserName(proposal.technicalReview?.reviewer)}`}
+          {`Reviewed by ${getFullUserName(
+            proposal.technicalReview.technicalReviewAssignee
+          )}`}
         </Typography>
       )}
       <Formik
