@@ -3,3 +3,4 @@ package-lock.json
 node_modules/
 .github/workflows/
 README.md
+/src/datasources/stfc/UOWSSoapInterface.ts

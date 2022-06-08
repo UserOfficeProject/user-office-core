@@ -105,9 +105,9 @@
     "@types/sparkpost": "^2.1.5",
     "@types/validator": "^13.7.0",
     "@types/yup": "^0.29.13",
-    "@typescript-eslint/eslint-plugin": "^5.7.0",
-    "@typescript-eslint/parser": "^5.7.0",
-    "@user-office-software/uows_client_generator": "^2.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "@user-office-software/uows_client_generator": "^3.0.0",
     "commander": "^5.1.0",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.3.0",
@@ -124,7 +124,7 @@
     "sinon": "^9.2.4",
     "ts-jest": "^27.1.2",
     "ts-node-dev": "^1.1.8",
-    "typescript": "^4.5.4"
+    "typescript": "^4.7.3"
   },
   "engines": {
     "npm": ">=8.0.0",
