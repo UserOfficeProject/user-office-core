@@ -1,4 +1,14 @@
 export default class UOWSSoapClient {
+  private static instance = new UOWSSoapClient();
+
+  static getInstance() {
+    return this.instance;
+  }
+
+  private UOWSSoapClient() {
+    return;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async getPersonDetailsFromSessionId(SessionId: any): Promise<any> {
     if (SessionId !== 'valid') {

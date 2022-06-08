@@ -9,7 +9,7 @@ import { UserDataSource } from '../UserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
 
 const postgresUserDataSource = new PostgresUserDataSource();
-const client = new UOWSSoapClient(process.env.EXTERNAL_AUTH_SERVICE_URL);
+const client = UOWSSoapClient.getInstance();
 const token = process.env.EXTERNAL_AUTH_TOKEN;
 
 type StfcRolesToEssRole = { [key: string]: Roles[] };
