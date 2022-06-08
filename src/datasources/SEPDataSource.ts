@@ -51,6 +51,8 @@ export interface SEPDataSource {
     reviewerId: number | null
   ): Promise<SEPAssignment[]>;
   getSEPProposals(sepId: number, callId: number | null): Promise<SEPProposal[]>;
+  getSEPProposalCount(sepId: number): Promise<number>;
+  getSEPReviewerProposalCount(reviewerId: number): Promise<number>;
   getSEPProposal(
     sepId: number,
     proposalPk: number

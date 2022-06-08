@@ -255,6 +255,26 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
+  async getSEPProposalCount(sepId: number): Promise<number> {
+    return database('SEP_Proposals')
+      .count('sep_id')
+      .where('sep_id', sepId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
+  }
+
+  async getSEPReviewerProposalCount(reviewerId: number): Promise<number> {
+    return database('SEP_Reviews')
+      .count('user_id')
+      .where('user_id', reviewerId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
+  }
+
   async getSEPProposal(
     sepId: number,
     proposalPk: number

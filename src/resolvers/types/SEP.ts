@@ -45,6 +45,20 @@ export class SEPResolvers {
     return context.queries.user.getBasic(context.user, sep.sepChairUserId);
   }
 
+  @FieldResolver(() => Int, { nullable: true })
+  async sepChairProposalCount(
+    @Root() sep: SEP,
+    @Ctx() context: ResolverContext
+  ) {
+    if (!sep.sepChairUserId) {
+      return null;
+    }
+
+    return context.queries.sep.dataSource.getSEPReviewerProposalCount(
+      sep.sepChairUserId
+    );
+  }
+
   @FieldResolver(() => BasicUserDetails, { nullable: true })
   async sepSecretary(@Root() sep: SEP, @Ctx() context: ResolverContext) {
     if (!sep.sepSecretaryUserId) {
@@ -52,5 +66,24 @@ export class SEPResolvers {
     }
 
     return context.queries.user.getBasic(context.user, sep.sepSecretaryUserId);
+  }
+
+  @FieldResolver(() => Int, { nullable: true })
+  async sepSecretaryProposalCount(
+    @Root() sep: SEP,
+    @Ctx() context: ResolverContext
+  ) {
+    if (!sep.sepSecretaryUserId) {
+      return null;
+    }
+
+    return context.queries.sep.dataSource.getSEPReviewerProposalCount(
+      sep.sepSecretaryUserId
+    );
+  }
+
+  @FieldResolver(() => Int)
+  async proposalCount(@Root() sep: SEP, @Ctx() context: ResolverContext) {
+    return context.queries.sep.dataSource.getSEPProposalCount(sep.id);
   }
 }
