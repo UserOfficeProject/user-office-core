@@ -31,6 +31,10 @@ const columns = [
     field: 'active',
     lookup: { true: 'Yes', false: 'No' },
   },
+  {
+    title: '# proposals',
+    field: 'proposalCount',
+  },
 ];
 
 const SEPsTable: React.FC = () => {

@@ -1,15 +1,5 @@
 query getSEP($id: Int!) {
   sep(id: $id) {
-    id
-    code
-    description
-    numberRatingsRequired
-    active
-    sepChair {
-      ...basicUserDetails
-    }
-    sepSecretary {
-      ...basicUserDetails
-    }
+    ...sep
   }
 }

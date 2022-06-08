@@ -10,5 +10,6 @@ query getSEPReviewers($sepId: Int!) {
     user {
       ...basicUserDetails
     }
+    proposalsCount
   }
 }

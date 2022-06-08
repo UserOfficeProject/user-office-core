@@ -1,17 +1,7 @@
 query getSEPs($filter: String!, $active: Boolean) {
   seps(filter: $filter, active: $active) {
     seps {
-      id
-      code
-      description
-      numberRatingsRequired
-      active
-      sepChair {
-        ...basicUserDetails
-      }
-      sepSecretary {
-        ...basicUserDetails
-      }
+      ...sep
     }
     totalCount
   }
