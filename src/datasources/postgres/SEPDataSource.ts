@@ -147,14 +147,13 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       qb.where('sep_chair_user_id', userId);
     } else if (role.shortCode === Roles.SEP_SECRETARY) {
       qb.where('sep_secretary_user_id', userId);
-      // Note: keep it in case we need it in the future
-      // } else if (role.shortCode === Roles.SEP_REVIEWER) {
-      //   qb.join(
-      //     'SEP_Reviewers',
-      //     'SEP_Reviewers.sep_id',
-      //     '=',
-      //     'SEPs.sep_id'
-      //   ).where('SEP_Reviewers.user_id', userId);
+    } else if (role.shortCode === Roles.SEP_REVIEWER) {
+      qb.join(
+        'SEP_Reviewers',
+        'SEP_Reviewers.sep_id',
+        '=',
+        'SEPs.sep_id'
+      ).where('SEP_Reviewers.user_id', userId);
     } else {
       logger.logWarn('User tried to list its SEPs but has invalid role', {
         userId,
