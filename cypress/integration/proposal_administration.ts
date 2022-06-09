@@ -79,8 +79,8 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy="managementTimeAllocation"] input').clear().type('20');
 
-      cy.setTinyMceContent('commentForUser', textUser);
-      cy.setTinyMceContent('commentForManagement', textManager);
+      cy.get('[data-cy="commentForUser"]').clear().type(textUser);
+      cy.get('[data-cy="commentForManagement"]').clear().type(textManager);
 
       cy.on('window:confirm', (str) => {
         expect(str).to.equal(
@@ -100,12 +100,14 @@ context('Proposal administration tests', () => {
 
       cy.reload();
 
-      cy.getTinyMceContent('commentForUser').then((content) =>
-        expect(content).to.have.string(textUser)
+      cy.get('[data-cy="commentForUser"] textarea').should(
+        'have.value',
+        textUser
       );
 
-      cy.getTinyMceContent('commentForManagement').then((content) =>
-        expect(content).to.have.string(textManager)
+      cy.get('[data-cy="commentForManagement"] textarea').should(
+        'have.value',
+        textManager
       );
 
       cy.get('[data-cy="managementTimeAllocation"] input').should(
@@ -221,7 +223,7 @@ context('Proposal administration tests', () => {
 
       cy.reload();
 
-      cy.get('#commentForUser').should('exist');
+      cy.get('[data-cy="commentForUser"]').should('exist');
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
