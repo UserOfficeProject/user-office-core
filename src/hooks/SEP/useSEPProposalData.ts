@@ -1,14 +1,9 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { SepProposal, Proposal } from 'generated/sdk';
+import { GetSepProposalQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export type SepProposalBasics = Pick<
-  SepProposal,
-  'proposalPk' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'
-> & {
-  proposal: Proposal;
-};
+export type SepProposalBasics = GetSepProposalQuery['sepProposal'];
 
 export function useSEPProposalData(
   sepId: number,

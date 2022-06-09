@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { SepAssignment, ReviewWithNextProposalStatus } from 'generated/sdk';
+import { ReviewWithNextProposalStatus } from 'generated/sdk';
+import { SEPProposalAssignmentType } from 'hooks/SEP/useSEPProposalsData';
 
 interface ReviewAndAssignmentData {
-  currentAssignment: SepAssignment | null;
-  setCurrentAssignment: React.Dispatch<SepAssignment | null>;
+  currentAssignment: SEPProposalAssignmentType | null;
+  setCurrentAssignment: React.Dispatch<SEPProposalAssignmentType | null>;
   setAssignmentReview: React.Dispatch<
     ReviewWithNextProposalStatus | null | undefined
   >;
@@ -26,14 +27,18 @@ const reducer = (
   previousState = initialState,
   action: {
     type: ActionType;
-    payload: SepAssignment | ReviewWithNextProposalStatus | null | undefined;
+    payload:
+      | SEPProposalAssignmentType
+      | ReviewWithNextProposalStatus
+      | null
+      | undefined;
   }
 ): ReviewAndAssignmentData => {
   switch (action.type) {
     case ActionType.SET_ASSIGNMENT:
       return {
         ...previousState,
-        currentAssignment: action.payload as SepAssignment,
+        currentAssignment: action.payload as SEPProposalAssignmentType,
       };
 
     case ActionType.SET_REVIEW:
@@ -42,7 +47,7 @@ const reducer = (
         currentAssignment: {
           ...previousState.currentAssignment,
           review: action.payload as ReviewWithNextProposalStatus,
-        } as SepAssignment,
+        } as SEPProposalAssignmentType,
       };
 
     default:
@@ -62,7 +67,7 @@ export const ReviewAndAssignmentContextProvider: React.FC = (
     <ReviewAndAssignmentContext.Provider
       value={{
         ...state,
-        setCurrentAssignment: (payload: SepAssignment | null) => {
+        setCurrentAssignment: (payload: SEPProposalAssignmentType | null) => {
           dispatch({
             type: ActionType.SET_ASSIGNMENT,
             payload,

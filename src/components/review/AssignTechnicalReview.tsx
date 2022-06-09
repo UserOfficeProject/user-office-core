@@ -35,7 +35,7 @@ function AssignTechnicalReview({
 
   const usersData = proposal.instrument?.scientists || [];
   const beamlineManagerAlreadyExists = proposal.instrument?.scientists.find(
-    (scientist) => scientist.id === proposal.instrument?.beamlineManager.id
+    (scientist) => scientist.id === proposal.instrument?.beamlineManager?.id
   );
 
   if (proposal.instrument?.beamlineManager && !beamlineManagerAlreadyExists) {

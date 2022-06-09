@@ -4,15 +4,12 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { Editor } from '@tinymce/tinymce-react';
 import { administrationProposalValidationSchema } from '@user-office-software/duo-validation/lib/Proposal';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
 import { Prompt } from 'react-router';
 
-import { useCheckAccess } from 'components/common/Can';
-import { UserRole } from 'generated/sdk';
 import { ProposalEndStatus } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
@@ -38,7 +35,6 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
   setAdministration,
 }) => {
   const { api } = useDataApiWithFeedback();
-  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const initialValues = {
     proposalPk: data.primaryKey,
@@ -101,7 +97,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
           await handleProposalAdministration(administrationValues);
         }}
       >
-        {({ isSubmitting, setFieldValue, values }) => (
+        {({ isSubmitting, values }) => (
           <Form>
             <PromptIfDirty />
             <Grid container spacing={2}>
@@ -118,7 +114,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                     name="finalStatus"
                     component={Select}
                     data-cy="proposal-final-status"
-                    disabled={!isUserOfficer || isSubmitting}
+                    disabled={isSubmitting}
                     MenuProps={{ 'data-cy': 'proposal-final-status-options' }}
                     required
                   >
@@ -140,106 +136,60 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   fullWidth
                   autoComplete="off"
                   data-cy="managementTimeAllocation"
-                  disabled={!isUserOfficer || isSubmitting}
+                  disabled={isSubmitting}
                 />
               </Grid>
               <Grid item xs={12}>
-                <InputLabel htmlFor="commentForUser" shrink margin="dense">
-                  Comment for user
-                </InputLabel>
-                <Editor
-                  id="commentForUser"
-                  initialValue={initialValues.commentForUser}
-                  init={{
-                    skin: false,
-                    content_css: false,
-                    plugins: [
-                      'link',
-                      'preview',
-                      'code',
-                      'charmap',
-                      'wordcount',
-                    ],
-                    toolbar: 'bold italic',
-                    branding: false,
-                  }}
-                  onEditorChange={(content, editor) => {
-                    const isStartContentDifferentThanCurrent =
-                      editor.startContent !==
-                      editor.contentDocument.body.innerHTML;
-
-                    if (
-                      isStartContentDifferentThanCurrent ||
-                      editor.isDirty()
-                    ) {
-                      setFieldValue('commentForUser', content);
-                    }
-                  }}
-                  disabled={!isUserOfficer || isSubmitting}
+                <Field
+                  name="commentForUser"
+                  label="Comment for user"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                  autoComplete="off"
+                  data-cy="commentForUser"
+                  multiline
+                  rows="4"
+                  disabled={isSubmitting}
                 />
               </Grid>
               <Grid item xs={12}>
-                <InputLabel
-                  htmlFor="commentForManagement"
-                  shrink
-                  margin="dense"
-                >
-                  Comment for management
-                </InputLabel>
-                <Editor
-                  id="commentForManagement"
-                  initialValue={initialValues.commentForManagement}
-                  init={{
-                    skin: false,
-                    content_css: false,
-                    plugins: [
-                      'link',
-                      'preview',
-                      'code',
-                      'charmap',
-                      'wordcount',
-                    ],
-                    toolbar: 'bold italic',
-                    branding: false,
-                  }}
-                  onEditorChange={(content, editor) => {
-                    const isStartContentDifferentThanCurrent =
-                      editor.startContent !==
-                      editor.contentDocument.body.innerHTML;
-
-                    if (
-                      isStartContentDifferentThanCurrent ||
-                      editor.isDirty()
-                    ) {
-                      setFieldValue('commentForManagement', content);
-                    }
-                  }}
-                  disabled={!isUserOfficer || isSubmitting}
+                <Field
+                  name="commentForManagement"
+                  label="Comment for management"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                  autoComplete="off"
+                  data-cy="commentForManagement"
+                  multiline
+                  rows="4"
+                  disabled={isSubmitting}
                 />
               </Grid>
-              {isUserOfficer && (
-                <Grid item xs={12}>
-                  <StyledButtonContainer>
-                    <Field
-                      id="managementDecisionSubmitted"
-                      name="managementDecisionSubmitted"
-                      component={CheckboxWithLabel}
-                      type="checkbox"
-                      Label={{
-                        label: 'Submitted',
-                      }}
-                      data-cy="is-management-decision-submitted"
-                    />
-                    <Button
-                      disabled={isSubmitting}
-                      type="submit"
-                      data-cy="save-admin-decision"
-                    >
-                      Save
-                    </Button>
-                  </StyledButtonContainer>
-                </Grid>
-              )}
+              <Grid item xs={12}>
+                <StyledButtonContainer>
+                  <Field
+                    id="managementDecisionSubmitted"
+                    name="managementDecisionSubmitted"
+                    component={CheckboxWithLabel}
+                    type="checkbox"
+                    Label={{
+                      label: 'Submitted',
+                    }}
+                    data-cy="is-management-decision-submitted"
+                  />
+                  <Button
+                    disabled={isSubmitting}
+                    type="submit"
+                    data-cy="save-admin-decision"
+                  >
+                    Save
+                  </Button>
+                </StyledButtonContainer>
+              </Grid>
             </Grid>
           </Form>
         )}
