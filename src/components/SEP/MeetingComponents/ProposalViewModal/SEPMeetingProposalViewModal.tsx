@@ -111,7 +111,8 @@ const SEPMeetingProposalViewModal: React.FC<
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              SEP Meeting Components - Proposal View
+              SEP Meeting Components - Proposal View: {proposalData?.title} (
+              {proposalData?.proposalId})
             </Typography>
           </Toolbar>
         </AppBar>

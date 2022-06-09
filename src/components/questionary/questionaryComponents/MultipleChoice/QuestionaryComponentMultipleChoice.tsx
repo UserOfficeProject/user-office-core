@@ -53,11 +53,8 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     setStateValue(answer.value);
   }, [answer]);
 
-  const handleOnChange = (
-    _evt: SelectChangeEvent<string | string[]>,
-    value: string | string[]
-  ) => {
-    const newValue = toArray(value);
+  const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
+    const newValue = toArray(event.target.value);
     onComplete(newValue);
   };
 
@@ -94,9 +91,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
                 ? stateValue[0]
                 : ''
             }
-            onChange={(evt) =>
-              handleOnChange(evt, (evt.target as HTMLInputElement).value)
-            }
+            onChange={handleOnChange}
             multiple={config.isMultipleSelect}
             labelId={`questionary-${id}`}
             required={config.required}
@@ -130,9 +125,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
             id={id}
             name={id}
             value={stateValue[0] || ''}
-            onChange={(evt) =>
-              handleOnChange(evt, (evt.target as HTMLInputElement).value)
-            }
+            onChange={handleOnChange}
             className={
               config.options.length < 3
                 ? classes.horizontalLayout
