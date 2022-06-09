@@ -146,14 +146,15 @@ export default class SEPQueries {
   ) {
     const [sepMeetingDecision] =
       await this.dataSource.getProposalsSepMeetingDecisions([proposalPk]);
+    const sep = await this.dataSource.getSEPByProposalPk(proposalPk);
 
-    if (!sepMeetingDecision) {
+    if (!sepMeetingDecision || !sep) {
       return null;
     }
 
     if (
       this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfSEP(agent, proposalPk))
+      (await this.userAuth.isMemberOfSEP(agent, sep.id))
     ) {
       return sepMeetingDecision;
     } else {
