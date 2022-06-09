@@ -24,6 +24,9 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field()
   public position: string;
 
+  @Field()
+  public email: string;
+
   @Field(() => Boolean, { nullable: true })
   public placeholder?: boolean;
 

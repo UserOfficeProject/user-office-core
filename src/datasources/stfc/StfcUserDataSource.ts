@@ -60,7 +60,8 @@ function toEssBasicUserDetails(
     stfcUser.orgName ?? '',
     '',
     new Date(),
-    false
+    false,
+    ''
   );
 }
 

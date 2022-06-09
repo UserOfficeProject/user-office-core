@@ -60,7 +60,8 @@ export default class UserQueries {
         user.organisation,
         user.position,
         user.created,
-        user.placeholder
+        user.placeholder,
+        user.email
       );
     } else {
       return null;
@@ -86,7 +87,8 @@ export default class UserQueries {
       user.organisation,
       user.position,
       user.created,
-      user.placeholder
+      user.placeholder,
+      user.email
     );
   }
 

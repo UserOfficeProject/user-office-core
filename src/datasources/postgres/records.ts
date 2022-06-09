@@ -785,7 +785,8 @@ export const createBasicUserObject = (user: UserRecord) => {
     user.institution,
     user.position,
     user.created_at,
-    user.placeholder
+    user.placeholder,
+    user.email
   );
 };
 
