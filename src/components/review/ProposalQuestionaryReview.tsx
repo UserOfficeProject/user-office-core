@@ -22,7 +22,6 @@ export default function ProposalQuestionaryReview(
   const users = data.users || [];
 
   const hasReferenceNumberFormat = !!data.call?.referenceNumberFormat;
-  console.log(data.users, data.proposer);
   const additionalDetails: TableRowData[] = [
     {
       label: 'Proposal ID',
