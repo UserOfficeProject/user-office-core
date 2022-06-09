@@ -42,8 +42,11 @@ export default class ProposalQueries {
       return null;
     }
 
-    // If not a user officer remove excellence, technical and safety score
-    if (!this.userAuth.isUserOfficer(agent)) {
+    // If not a user officer or instrument scientist remove excellence, technical and safety score
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.userAuth.isInstrumentScientist(agent)
+    ) {
       proposal = omit(proposal, 'commentForManagement') as Proposal;
     }
 
