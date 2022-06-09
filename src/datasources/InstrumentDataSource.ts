@@ -10,6 +10,7 @@ import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMut
 export interface InstrumentDataSource {
   create(args: CreateInstrumentArgs): Promise<Instrument>;
   getInstrument(instrumentId: number): Promise<Instrument | null>;
+  getInstrumentsByNames(instrumentNames: string[]): Promise<Instrument[]>;
   getInstruments(
     first?: number,
     offset?: number
@@ -36,6 +37,14 @@ export interface InstrumentDataSource {
   removeScientistFromInstrument(
     scientistId: number,
     instrumentId: number
+  ): Promise<boolean>;
+  assignScientistToInstruments(
+    scientistId: number,
+    instrumentIds: number[]
+  ): Promise<boolean>;
+  removeScientistFromInstruments(
+    scientistId: number,
+    instrumentIds: number[]
   ): Promise<boolean>;
   getInstrumentScientists(instrumentId: number): Promise<BasicUserDetails[]>;
   getInstrumentByProposalPk(proposalPk: number): Promise<Instrument | null>;

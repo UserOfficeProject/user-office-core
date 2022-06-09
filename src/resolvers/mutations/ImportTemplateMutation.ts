@@ -12,13 +12,16 @@ export class ImportTemplateMutation {
     @Arg('templateAsJson') templateAsJson: string,
     @Arg('conflictResolutions', () => [ConflictResolution])
     conflictResolutions: ConflictResolution[],
+    @Arg('subTemplatesConflictResolutions', () => [[ConflictResolution]])
+    subTemplatesConflictResolutions: ConflictResolution[][],
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
       context.mutations.template.importTemplate(
         context.user,
         templateAsJson,
-        conflictResolutions
+        conflictResolutions,
+        subTemplatesConflictResolutions
       ),
       TemplateResponseWrap
     );

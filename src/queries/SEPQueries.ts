@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -9,9 +9,10 @@ import { UserWithRole } from '../models/User';
 
 @injectable()
 export default class SEPQueries {
-  private userAuth = container.resolve(UserAuthorization);
-
-  constructor(@inject(Tokens.SEPDataSource) public dataSource: SEPDataSource) {}
+  constructor(
+    @inject(Tokens.SEPDataSource) public dataSource: SEPDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+  ) {}
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async get(agent: UserWithRole | null, id: number) {
@@ -145,14 +146,15 @@ export default class SEPQueries {
   ) {
     const [sepMeetingDecision] =
       await this.dataSource.getProposalsSepMeetingDecisions([proposalPk]);
+    const sep = await this.dataSource.getSEPByProposalPk(proposalPk);
 
-    if (!sepMeetingDecision) {
+    if (!sepMeetingDecision || !sep) {
       return null;
     }
 
     if (
       this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfSEP(agent, proposalPk))
+      (await this.userAuth.isMemberOfSEP(agent, sep.id))
     ) {
       return sepMeetingDecision;
     } else {

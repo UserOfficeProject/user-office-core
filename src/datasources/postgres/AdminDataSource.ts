@@ -5,13 +5,15 @@ import { logger } from '@user-office-software/duo-logger';
 import { injectable } from 'tsyringe';
 
 import { Page } from '../../models/Admin';
-import { Feature } from '../../models/Feature';
+import { Feature, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
 import { Settings } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
+import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
+import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 import { Entry } from './../../models/Entry';
@@ -40,14 +42,14 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
-  async getCountry(id: number): Promise<Entry> {
+  async getCountry(id: number): Promise<Entry | null> {
     return database
       .select('*')
       .from('countries')
       .where('country_id', id)
       .first()
-      .then(
-        (count: CountryRecord) => new Entry(count.country_id, count.country)
+      .then((country: CountryRecord) =>
+        country ? new Entry(country.country_id, country.country) : null
       );
   }
 
@@ -139,6 +141,22 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .whereIn('feature_id', features);
 
     return features;
+  }
+
+  async updateFeatures(
+    updatedFeaturesInput: UpdateFeaturesInput
+  ): Promise<Feature[]> {
+    const shouldEnable =
+      updatedFeaturesInput.action === FeatureUpdateAction.ENABLE;
+
+    const featureRecords: FeatureRecord[] = await database('features')
+      .update({ is_enabled: shouldEnable })
+      .whereIn('feature_id', updatedFeaturesInput.featureIds)
+      .returning('*');
+
+    return featureRecords.map((featureRecord) =>
+      createFeatureObject(featureRecord)
+    );
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
@@ -469,13 +487,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async updateSettings(
-    id: SettingsId,
-    value?: string,
-    description?: string
+    updatedSettingsInput: UpdateSettingsInput
   ): Promise<Settings> {
+    const { settingsId, description, settingsValue } = updatedSettingsInput;
+
     return database('settings')
-      .update({ settings_value: value, description: description })
-      .where('settings_id', id)
+      .update({ settings_value: settingsValue, description: description })
+      .where('settings_id', settingsId)
       .returning('*')
       .then((records: SettingsRecord[]) => createSettingsObject(records[0]));
   }

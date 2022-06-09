@@ -36,12 +36,10 @@ import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutatio
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
-import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
-  private userAuth = container.resolve(UserAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
   private cloneUtils = container.resolve(CloneUtils);
   constructor(
@@ -58,8 +56,7 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -283,7 +280,10 @@ export default class ProposalMutations {
       });
     }
 
-    if (!this.userAuth.isUserOfficer(agent)) {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.userAuth.isApiToken(agent)
+    ) {
       if (
         proposal.submitted ||
         !this.proposalAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
@@ -544,6 +544,7 @@ export default class ProposalMutations {
         ? sourceProposal.proposerId
         : agent!.id;
 
+      // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
         title: `Copy of ${clonedProposal.title}`,
@@ -563,7 +564,6 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
-        technicalReviewAssignee: clonedProposal.technicalReviewAssignee,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(

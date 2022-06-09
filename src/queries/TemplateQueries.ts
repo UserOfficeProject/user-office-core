@@ -26,8 +26,8 @@ export default class TemplateQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  getTemplateAsJson(user: UserWithRole | null, templateId: number) {
-    return this.dataSource.getTemplateAsJson(templateId);
+  async getTemplateAsJson(user: UserWithRole | null, templateId: number) {
+    return JSON.stringify(await this.dataSource.getTemplateExport(templateId));
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])

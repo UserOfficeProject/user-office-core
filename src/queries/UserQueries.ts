@@ -3,7 +3,7 @@ import * as bcrypt from 'bcryptjs';
 // TODO: Try to replace request-promise with axios. request-promise depends on request which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -18,13 +18,14 @@ import {
   UserRole,
   AuthJwtApiTokenPayload,
 } from '../models/User';
+import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserQueries {
-  private userAuth = container.resolve(UserAuthorization);
   constructor(
-    @inject(Tokens.UserDataSource) public dataSource: UserDataSource
+    @inject(Tokens.UserDataSource) public dataSource: UserDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   async getAgent(id: number) {
@@ -184,21 +185,8 @@ export default class UserQueries {
   }
 
   @Authorized()
-  async getAll(
-    agent: UserWithRole | null,
-    filter?: string,
-    first?: number,
-    offset?: number,
-    userRole?: UserRole,
-    subtractUsers?: [number]
-  ) {
-    const userData = await this.dataSource.getUsers(
-      filter,
-      first,
-      offset,
-      userRole,
-      subtractUsers
-    );
+  async getAll(agent: UserWithRole | null, args: UsersArgs) {
+    const userData = await this.dataSource.getUsers(args);
 
     const returnableUserIds = await this.userAuth.listReadableUsers(
       agent,

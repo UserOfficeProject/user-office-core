@@ -10,12 +10,12 @@ import { VisitAuthorization } from '../VisitAuthorization';
 
 @injectable()
 export class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
-  private userAuth = container.resolve(UserAuthorization);
   private visitAuth = container.resolve(VisitAuthorization);
 
   constructor(
     @inject(Tokens.VisitDataSource)
-    private visitDataSource: VisitDataSource
+    private visitDataSource: VisitDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
   /**
    * Visitor has read rights on his and other visitor questionaries

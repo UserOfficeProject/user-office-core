@@ -7,11 +7,13 @@ import { Settings, SettingsId } from '../models/Settings';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
+import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
+import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
-  getCountry(id: number): Promise<Entry>;
+  getCountry(id: number): Promise<Entry | null>;
   getInstitution(id: number): Promise<Institution | null>;
   createInstitution(institution: Institution): Promise<Institution | null>;
   updateInstitution(institution: Institution): Promise<Institution | null>;
@@ -27,6 +29,7 @@ export interface AdminDataSource {
   applyPatches(): Promise<string>;
   getFeatures(): Promise<Feature[]>;
   setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
+  updateFeatures(updatedFeaturesInput: UpdateFeaturesInput): Promise<Feature[]>;
   getSettings(): Promise<Settings[]>;
   getSetting(id: SettingsId): Promise<Settings>;
   createApiAccessToken(
@@ -35,11 +38,7 @@ export interface AdminDataSource {
     accessToken: string
   ): Promise<Permissions>;
   updateApiAccessToken(args: UpdateApiAccessTokenInput): Promise<Permissions>;
-  updateSettings(
-    id: SettingsId,
-    value?: string,
-    description?: string
-  ): Promise<Settings>;
+  updateSettings(updatedSettingsInput: UpdateSettingsInput): Promise<Settings>;
   getTokenAndPermissionsById(accessTokenId: string): Promise<Permissions>;
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;

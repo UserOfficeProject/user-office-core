@@ -42,6 +42,7 @@ import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutatio
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import { ConflictResolution } from '../resolvers/types/ConflictResolution';
+import { TemplateExport } from './../models/Template';
 @injectable()
 export default class TemplateMutations {
   constructor(
@@ -123,10 +124,19 @@ export default class TemplateMutations {
         break;
     }
 
+    const activeTemplateTypes = [
+      TemplateGroupId.SHIPMENT,
+      TemplateGroupId.VISIT_REGISTRATION,
+      TemplateGroupId.FEEDBACK,
+    ];
+
     const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(
       args.groupId
     );
-    if (!currentActiveTemplateId) {
+    if (
+      !currentActiveTemplateId &&
+      activeTemplateTypes.includes(args.groupId)
+    ) {
       // if there is no active template, then mark newly created template as active
       await this.dataSource.setActiveTemplate({
         templateGroupId: args.groupId,
@@ -461,13 +471,26 @@ export default class TemplateMutations {
       });
   }
 
+  convertStringToTemplateExport = (string: string): TemplateExport => {
+    const object: TemplateExport = JSON.parse(string);
+    object.metadata.exportDate = new Date(object.metadata.exportDate);
+
+    return object;
+  };
+
   @Authorized([Roles.USER_OFFICER])
   async validateTemplateImport(
     agent: UserWithRole | null,
     templateAsJson: string
   ) {
     try {
-      return await this.dataSource.validateTemplateImport(templateAsJson);
+      const templateExport = this.convertStringToTemplateExport(templateAsJson);
+
+      const validation = await this.dataSource.validateTemplateExport(
+        templateExport
+      );
+
+      return validation;
     } catch (error) {
       return rejection(
         `Could not validate template import. ${error}`,
@@ -481,13 +504,31 @@ export default class TemplateMutations {
   async importTemplate(
     agent: UserWithRole | null,
     templateAsJson: string,
-    conflictResolution: ConflictResolution[]
+    conflictResolution: ConflictResolution[],
+    subTemplatesConflictResolutions: ConflictResolution[][]
   ): Promise<Template | Rejection> {
     try {
-      return await this.dataSource.importTemplate(
-        templateAsJson,
-        conflictResolution
+      const templateExport: TemplateExport =
+        this.convertStringToTemplateExport(templateAsJson);
+
+      const template = await this.dataSource.importTemplate(
+        templateExport,
+        conflictResolution,
+        subTemplatesConflictResolutions
       );
+
+      const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(
+        template.groupId
+      );
+      if (!currentActiveTemplateId) {
+        // if there is no active template, then mark newly created template as active
+        await this.dataSource.setActiveTemplate({
+          templateGroupId: template.groupId,
+          templateId: template.templateId,
+        });
+      }
+
+      return template;
     } catch (error) {
       return rejection(
         'Could not import template',

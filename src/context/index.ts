@@ -1,4 +1,3 @@
-import { UserAuthorization } from '../auth/UserAuthorization';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
@@ -90,7 +89,6 @@ interface ResolverContextMutations {
 }
 
 export interface BasicResolverContext {
-  userAuthorization: UserAuthorization;
   mutations: ResolverContextMutations;
   queries: ResolverContextQueries;
 }

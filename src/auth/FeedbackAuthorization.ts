@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
@@ -6,19 +6,16 @@ import { Feedback } from '../models/Feedback';
 import { UserWithRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { VisitDataSource } from './../datasources/VisitDataSource';
-import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class FeedbackAuthorization {
-  private userAuth = container.resolve(UserAuthorization);
-  private proposalAuth = container.resolve(ProposalAuthorization);
-
   constructor(
     @inject(Tokens.VisitDataSource)
     private visitDataSource: VisitDataSource,
     @inject(Tokens.FeedbackDataSource)
-    private feedbackDataSource: FeedbackDataSource
+    private feedbackDataSource: FeedbackDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveFeedback(

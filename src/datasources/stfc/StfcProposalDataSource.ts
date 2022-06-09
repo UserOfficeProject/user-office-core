@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 
 import { ProposalView } from '../../models/ProposalView';
-import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { ReviewerFilter } from '../../models/Review';
 import database from '../postgres/database';
 import {
   createProposalViewObject,
@@ -19,19 +19,56 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     const result = database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select([
+        'proposal_table_view.*',
+        'instruments.name AS call_instrument_name',
+        'instruments.instrument_id AS call_instrument_id',
+        database.raw('count(*) OVER() AS full_count'),
+      ])
       .from('proposal_table_view')
+      .join(
+        'call_has_instruments',
+        'call_has_instruments.call_id',
+        '=',
+        'proposal_table_view.call_id'
+      )
+      .join(
+        'instruments',
+        'instruments.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
+      .join(
+        'instrument_has_scientists',
+        'instrument_has_scientists.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
+      .where(function () {
+        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
+          'instruments.manager_user_id',
+          scientistId
+        );
+      })
+      .distinct('proposal_table_view.proposal_pk')
+      .orderBy('proposal_table_view.proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
           query
             .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('abstract', 'ilike', `%${filter.text}%`);
         }
+        if (filter?.reviewer === ReviewerFilter.ME) {
+          query.where(
+            'proposal_table_view.technical_review_assignee_id',
+            scientistId
+          );
+        }
         if (filter?.callId) {
           query.where('proposal_table_view.call_id', filter.callId);
         }
         if (filter?.instrumentId) {
-          query.where('proposal_table_view.instrument_id', filter.instrumentId);
+          query.where('instruments.instrument_id', filter.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
@@ -53,22 +90,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
         if (filter?.questionFilter) {
           const questionFilter = filter.questionFilter;
-          const questionFilterQuery = getQuestionDefinition(
-            questionFilter.dataType
-          ).filterQuery;
-          if (!questionFilterQuery) {
-            throw new Error(
-              `Filter query not implemented for ${filter.questionFilter.dataType}`
-            );
-          }
-          query
-            .leftJoin(
-              'answers',
-              'answers.questionary_id',
-              'proposal_table_view.questionary_id'
-            )
-            .andWhere('answers.question_id', questionFilter.questionId)
-            .modify(questionFilterQuery, questionFilter);
+
+          this.addQuestionFilter(query, questionFilter);
         }
 
         if (first) {
@@ -78,16 +101,27 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.offset(offset);
         }
       })
-      .then((proposals: ProposalViewRecord[]) => {
-        const props = proposals.map((proposal) =>
-          createProposalViewObject(proposal)
-        );
+      .then(
+        (
+          proposals: (ProposalViewRecord & {
+            call_instrument_id: number;
+            call_instrument_name: string;
+          })[]
+        ) => {
+          const props = proposals.map((proposal) => {
+            const prop = createProposalViewObject(proposal);
+            prop.instrumentId = proposal.call_instrument_id;
+            prop.instrumentName = proposal.call_instrument_name;
 
-        return {
-          totalCount: proposals[0] ? proposals[0].full_count : 0,
-          proposals: props,
-        };
-      });
+            return prop;
+          });
+
+          return {
+            totalCount: proposals[0] ? proposals[0].full_count : 0,
+            proposals: props,
+          };
+        }
+      );
 
     return result;
   }

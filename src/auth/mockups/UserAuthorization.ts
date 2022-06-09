@@ -29,4 +29,11 @@ export class UserAuthorizationMock extends UserAuthorization {
 
     return null;
   }
+
+  async logout(token: string): Promise<void> {
+    return;
+  }
+  async isExternalTokenValid(externalToken: string): Promise<boolean> {
+    return true;
+  }
 }

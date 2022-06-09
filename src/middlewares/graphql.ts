@@ -106,6 +106,7 @@ const apolloServer = async (app: Express) => {
                     req.user.externalToken
                   )
                 : false,
+            impersonatingUserId: req.user.impersonatingUserId,
           } as UserWithRole;
         }
       }

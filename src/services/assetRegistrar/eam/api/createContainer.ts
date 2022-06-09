@@ -67,7 +67,7 @@ async function getAnswer(
     case DataType.BOOLEAN:
       return answerBasic?.answer.value;
     case DataType.NUMBER_INPUT:
-      return answerBasic?.answer.value.value;
+      return answerBasic?.answer.value.siValue;
     case DataType.TEXT_INPUT:
       return answerBasic?.answer.value;
     default:

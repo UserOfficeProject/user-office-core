@@ -6,7 +6,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../models/ConditionEvaluator';
-import { FeatureId } from '../models/Feature';
+import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
@@ -85,5 +85,8 @@ export const registerEnums = () => {
   });
   registerEnumType(TrainingStatus, {
     name: 'TrainingStatus',
+  });
+  registerEnumType(FeatureUpdateAction, {
+    name: 'FeatureUpdateAction',
   });
 };

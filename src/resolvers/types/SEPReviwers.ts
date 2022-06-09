@@ -36,4 +36,14 @@ export class SEPUserResolver {
   async user(@Root() sepMember: SEPReviewer, @Ctx() context: ResolverContext) {
     return context.queries.user.dataSource.getBasicUserInfo(sepMember.userId);
   }
+
+  @FieldResolver(() => Int)
+  async proposalsCount(
+    @Root() sepMember: SEPReviewer,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.sep.dataSource.getSEPReviewerProposalCount(
+      sepMember.userId
+    );
+  }
 }

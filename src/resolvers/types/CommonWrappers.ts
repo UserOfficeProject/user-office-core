@@ -7,6 +7,7 @@ import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { Feature } from './Feature';
 import { Feedback } from './Feedback';
 import { FeedbackRequest } from './FeedbackRequest';
 import { GenericTemplate } from './GenericTemplate';
@@ -30,11 +31,12 @@ import { ScheduledEventCore } from './ScheduledEvent';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
+import { Settings } from './Settings';
 import { Shipment } from './Shipment';
 import { StatusChangingEvent } from './StatusChangingEvent';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
-import { TemplateImportWithValidation } from './TemplateImportWithValidation';
+import { TemplateValidation } from './TemplateValidation';
 import { Topic } from './Topic';
 import { Unit } from './Unit';
 import { UnitsImportWithValidation } from './UnitsImportWithValidation';
@@ -116,6 +118,12 @@ export class TechnicalReviewResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => TechnicalReview, { nullable: true })
   public technicalReview: TechnicalReview;
+}
+@ObjectType()
+export class TechnicalReviewsResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => [TechnicalReview], { nullable: true })
+  public technicalReviews: TechnicalReview[];
 }
 
 @ObjectType()
@@ -273,6 +281,20 @@ export class ProposalStatusResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
+export class FeaturesResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => [Feature], { nullable: true })
+  public features: Feature[];
+}
+
+@ObjectType()
+export class SettingsResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => Settings, { nullable: true })
+  public settings: Settings;
+}
+
+@ObjectType()
 export class ProposalWorkflowResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ProposalWorkflow, { nullable: true })
@@ -364,10 +386,10 @@ export class FeedbackResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class TemplateImportWithValidationWrap extends ResponseWrapBase {
+export class TemplateValidationWrap extends ResponseWrapBase {
   @Response()
-  @Field(() => TemplateImportWithValidation, { nullable: true })
-  public validationResult: TemplateImportWithValidation;
+  @Field(() => TemplateValidation, { nullable: true })
+  public validationResult: TemplateValidation;
 }
 
 @ObjectType()

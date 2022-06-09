@@ -7,10 +7,23 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Page } from '../models/Admin';
+import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { Permissions } from '../models/Permissions';
+import { SettingsId } from '../models/Settings';
 import AdminMutations from './AdminMutations';
 
 const adminMutations = container.resolve(AdminMutations);
+
+const updatedFeatures = {
+  featureIds: [FeatureId.TECHNICAL_REVIEW],
+  action: FeatureUpdateAction.DISABLE,
+};
+
+const updatedSetting = {
+  settingsId: SettingsId.DATE_FORMAT,
+  description: 'test description',
+  settingsValue: 'dd-MM-YY',
+};
 
 describe('Test Admin Mutations', () => {
   test('A user can not set page text', () => {
@@ -57,6 +70,42 @@ describe('Test Admin Mutations', () => {
         country: 1,
         verified: true,
       })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A user officer can update settings', () => {
+    return expect(
+      adminMutations.updateSettings(dummyUserOfficerWithRole, updatedSetting)
+    ).resolves.toStrictEqual({
+      id: updatedSetting.settingsId,
+      description: updatedSetting.description,
+      settingsValue: updatedSetting.settingsValue,
+    });
+  });
+
+  test('A user can not update settings', () => {
+    return expect(
+      adminMutations.updateSettings(dummyUserWithRole, updatedSetting)
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A user officer can update features', () => {
+    const shouldEnable = updatedFeatures.action === FeatureUpdateAction.ENABLE;
+
+    return expect(
+      adminMutations.updateFeatures(dummyUserOfficerWithRole, updatedFeatures)
+    ).resolves.toStrictEqual(
+      updatedFeatures.featureIds.map((featureId) => ({
+        description: featureId,
+        id: featureId,
+        isEnabled: shouldEnable,
+      }))
+    );
+  });
+
+  test('A user can not update features', () => {
+    return expect(
+      adminMutations.updateFeatures(dummyUserWithRole, updatedFeatures)
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
 

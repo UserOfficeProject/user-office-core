@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
-import { UserAuthorization } from '../auth/UserAuthorization';
+import { EssUserAuthorization } from '../auth/EssUserAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -23,6 +23,7 @@ import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSour
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SparkPostMailService } from '../eventHandlers/MailService/SparkPostMailService';
 import {
   createListenToRabbitMQHandler,
@@ -59,11 +60,13 @@ mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
 
-mapClass(Tokens.UserAuthorization, UserAuthorization);
+mapClass(Tokens.UserAuthorization, EssUserAuthorization);
 
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
 mapClass(Tokens.MailService, SparkPostMailService);
+
+mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());

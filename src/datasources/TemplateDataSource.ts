@@ -6,7 +6,7 @@ import {
   TemplateCategory,
   TemplateCategoryId,
   TemplateGroupId,
-  TemplateImportWithValidation,
+  TemplateValidation,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -21,13 +21,14 @@ import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 import { ConflictResolution } from '../resolvers/types/ConflictResolution';
 import { TemplateGroup } from '../resolvers/types/TemplateGroup';
+import { TemplateExport } from './../models/Template';
 
 export interface TemplateDataSource {
   getTemplateCategories(): Promise<TemplateCategory[]>;
   // Template
   createTemplate(args: CreateTemplateArgs): Promise<Template>;
   getTemplate(templateId: number): Promise<Template | null>;
-  getTemplateAsJson(templateId: number): Promise<string>;
+  getTemplateExport(templateId: number): Promise<TemplateExport>;
   getTemplates(args?: TemplatesArgs): Promise<Template[]>;
   updateTemplate(values: UpdateTemplateArgs): Promise<Template | null>;
   deleteTemplate(id: number): Promise<Template>;
@@ -35,8 +36,9 @@ export interface TemplateDataSource {
   getTemplateSteps(templateId: number): Promise<TemplateStep[]>;
   setActiveTemplate(args: SetActiveTemplateArgs): Promise<boolean>;
   importTemplate(
-    templateAsJson: string,
-    conflictResolutions: ConflictResolution[]
+    templateExport: TemplateExport,
+    conflictResolutions: ConflictResolution[],
+    subTemplatesConflictResolutions: ConflictResolution[][]
   ): Promise<Template>;
   // TemplateField
   createQuestion(
@@ -99,5 +101,5 @@ export interface TemplateDataSource {
   deleteTopic(id: number): Promise<Topic>;
   isNaturalKeyPresent(naturalKey: string): Promise<boolean>;
   getGroup(groupId: TemplateGroupId): Promise<TemplateGroup>;
-  validateTemplateImport(json: string): Promise<TemplateImportWithValidation>;
+  validateTemplateExport(template: TemplateExport): Promise<TemplateValidation>;
 }

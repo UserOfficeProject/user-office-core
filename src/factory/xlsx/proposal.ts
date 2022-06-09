@@ -80,7 +80,7 @@ export const collectProposalXLSXData = async (
     proposal.proposalId,
     proposal.title,
     `${proposer.firstname} ${proposer.lastname}`,
-    technicalReview?.status !== undefined
+    technicalReview?.status !== undefined && technicalReview?.status !== null
       ? getTranslation(
           TechnicalReviewStatus[technicalReview?.status] as ResourceId
         )
