@@ -32,6 +32,7 @@ function createRegistrationStub(
       organisation: '',
       placeholder: false,
       position: '',
+      email: '',
     },
     questionary: {
       isCompleted: false,
