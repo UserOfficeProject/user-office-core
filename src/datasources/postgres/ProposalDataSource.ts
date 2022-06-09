@@ -649,6 +649,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 
+  async getProposalEvents(
+    proposalPk: number
+  ): Promise<ProposalEventsRecord | null> {
+    const result = await database
+      .select()
+      .from('proposal_events')
+      .where('proposal_pk', proposalPk)
+      .first();
+
+    if (!result) {
+      return null;
+    }
+
+    return result;
+  }
+
   async getCount(callId: number): Promise<number> {
     return database('proposals')
       .count('call_id')

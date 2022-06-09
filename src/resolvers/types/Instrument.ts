@@ -57,7 +57,7 @@ export class InstrumentResolver {
     return isRejection(scientists) ? [] : scientists;
   }
 
-  @FieldResolver(() => BasicUserDetails)
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
   async beamlineManager(
     @Root() instrument: Instrument,
     @Ctx() context: ResolverContext

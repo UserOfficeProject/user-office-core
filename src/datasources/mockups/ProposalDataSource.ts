@@ -97,6 +97,34 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   1
 );
 
+const dummyProposalEvents = {
+  proposal_pk: 1,
+  proposal_created: true,
+  proposal_submitted: true,
+  proposal_feasible: true,
+  proposal_unfeasible: false,
+  call_ended: false,
+  call_review_ended: false,
+  proposal_sep_selected: false,
+  proposal_instrument_selected: false,
+  proposal_feasibility_review_submitted: false,
+  proposal_sample_review_submitted: false,
+  proposal_all_sep_reviews_submitted: false,
+  proposal_feasibility_review_updated: false,
+  proposal_management_decision_submitted: false,
+  proposal_management_decision_updated: false,
+  proposal_sample_safe: false,
+  proposal_sep_review_updated: false,
+  proposal_all_sep_reviewers_selected: false,
+  proposal_sep_review_submitted: false,
+  proposal_sep_meeting_submitted: false,
+  proposal_instrument_submitted: false,
+  proposal_accepted: false,
+  proposal_reserved: false,
+  proposal_rejected: false,
+  proposal_notified: false,
+};
+
 export class ProposalDataSourceMock implements ProposalDataSource {
   proposalsUpdated: Proposal[];
   constructor() {
@@ -287,33 +315,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     event: Event,
     proposalPk: number
   ): Promise<ProposalEventsRecord | null> {
-    return {
-      proposal_pk: 1,
-      proposal_created: true,
-      proposal_submitted: true,
-      proposal_feasible: true,
-      proposal_unfeasible: false,
-      call_ended: false,
-      call_review_ended: false,
-      proposal_sep_selected: false,
-      proposal_instrument_selected: false,
-      proposal_feasibility_review_submitted: false,
-      proposal_sample_review_submitted: false,
-      proposal_all_sep_reviews_submitted: false,
-      proposal_feasibility_review_updated: false,
-      proposal_management_decision_submitted: false,
-      proposal_management_decision_updated: false,
-      proposal_sample_safe: false,
-      proposal_sep_review_updated: false,
-      proposal_all_sep_reviewers_selected: false,
-      proposal_sep_review_submitted: false,
-      proposal_sep_meeting_submitted: false,
-      proposal_instrument_submitted: false,
-      proposal_accepted: false,
-      proposal_reserved: false,
-      proposal_rejected: false,
-      proposal_notified: false,
-    };
+    return dummyProposalEvents;
+  }
+
+  async getProposalEvents(
+    proposalPk: number
+  ): Promise<ProposalEventsRecord | null> {
+    return dummyProposalEvents;
   }
 
   async getCount(callId: number): Promise<number> {

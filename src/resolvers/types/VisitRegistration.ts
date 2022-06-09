@@ -41,7 +41,7 @@ export class VisitRegistration implements Partial<VisitRegistrationOrig> {
 
 @Resolver((of) => VisitRegistration)
 export class UserVisitResolver {
-  @FieldResolver(() => BasicUserDetails)
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
   async user(
     @Root() userVisit: VisitRegistration,
     @Ctx() context: ResolverContext
