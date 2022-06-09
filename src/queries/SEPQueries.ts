@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
@@ -11,10 +12,17 @@ import { UserWithRole } from '../models/User';
 export default class SEPQueries {
   constructor(
     @inject(Tokens.SEPDataSource) public dataSource: SEPDataSource,
+    @inject(Tokens.ProposalDataSource)
+    public proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async get(agent: UserWithRole | null, id: number) {
     const sep = await this.dataSource.getSEP(id);
 
@@ -53,7 +61,12 @@ export default class SEPQueries {
     return this.dataSource.getReviewers(sepId);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getSEPProposals(
     agent: UserWithRole | null,
     { sepId, callId }: { sepId: number; callId: number | null }
@@ -68,7 +81,12 @@ export default class SEPQueries {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getSEPProposal(
     agent: UserWithRole | null,
     { sepId, proposalPk }: { sepId: number; proposalPk: number }
@@ -111,7 +129,12 @@ export default class SEPQueries {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getSEPProposalAssignments(
     agent: UserWithRole | null,
     {
@@ -124,10 +147,16 @@ export default class SEPQueries {
   ) {
     let reviewerId = null;
 
+    const proposalEvents = await this.proposalDataSource.getProposalEvents(
+      proposalPk
+    );
+
+    // NOTE: If not officer, SEP Chair or SEP Secretary should return all proposal assignments only if everything is submitted. Otherwise for SEP Reviewer return only it's own proposal reviews.
     if (
       agent &&
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId)) &&
+      !proposalEvents?.proposal_all_sep_reviews_submitted
     ) {
       reviewerId = agent.id;
     }
