@@ -23,7 +23,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
   const visit = event.visit;
 
   const initialValues = {
-    team: visit?.registrations.map((registration) => registration.user) || [],
+    team: visit?.registrations.map((registration) => registration.user!) || [],
     teamLeadUserId: visit?.teamLead.id || null,
   };
 
