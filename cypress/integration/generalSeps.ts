@@ -42,17 +42,6 @@ context('General scientific evaluation panel tests', () => {
     cy.get('@userMenuItems').should('not.contain', 'SEPs');
   });
 
-  it('SEP REviewer should not able to see SEPs page', () => {
-    cy.login(sepMembers.reviewer);
-    cy.visit('/');
-
-    cy.get('[data-cy="profile-page-btn"]').should('exist');
-
-    cy.get('[data-cy="SEPReviewer-menu-items"]').as('userMenuItems');
-
-    cy.get('@userMenuItems').should('not.contain', 'SEPs');
-  });
-
   describe('SEP basic tests as user officer role', () => {
     beforeEach(() => {
       cy.login('officer');

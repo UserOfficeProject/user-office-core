@@ -19,6 +19,7 @@ import {
   Review,
   UserRole,
   SepMeetingDecision,
+  Proposal,
 } from 'generated/sdk';
 import { useSEPProposalData } from 'hooks/SEP/useSEPProposalData';
 
@@ -83,7 +84,7 @@ const SEPMeetingProposalViewModal: React.FC<
     ? isUserOfficer
     : hasWriteAccess;
 
-  const proposalData = SEPProposalData?.proposal ?? null;
+  const proposalData = (SEPProposalData?.proposal ?? null) as Proposal;
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
@@ -111,7 +112,8 @@ const SEPMeetingProposalViewModal: React.FC<
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              SEP Meeting Components - Proposal View
+              SEP Meeting Components - Proposal View: {proposalData?.title} (
+              {proposalData?.proposalId})
             </Typography>
           </Toolbar>
         </AppBar>

@@ -17,18 +17,11 @@ import SEPProposalsAndAssignmentsView from './Proposals/SEPProposalsAndAssignmen
 const SEPPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { loading, sep, setSEP } = useSEPData(parseInt(id));
-  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
-
-  const tabNames = [
-    'General',
-    'Members',
-    'Proposals and Assignments',
-    'Meeting Components',
-  ];
-
-  if (hasAccessRights) {
-    tabNames.push('Logs');
-  }
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isSEPChairOrSecretary = useCheckAccess([
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
 
   if (loading) {
     return (
@@ -48,26 +41,68 @@ const SEPPage: React.FC = () => {
     );
   }
 
-  return (
-    <StyledContainer maxWidth="xl">
-      <StyledPaper>
-        <SimpleTabs tabNames={tabNames}>
+  let tabs = [
+    {
+      name: 'Proposals and Assignments',
+      element: (
+        <SEPProposalsAndAssignmentsView
+          data={sep}
+          onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
+        />
+      ),
+    },
+  ];
+
+  if (isSEPChairOrSecretary || isUserOfficer) {
+    tabs = [
+      {
+        name: 'General',
+        element: (
           <SEPGeneralInfo
             data={sep}
             onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
           />
+        ),
+      },
+      {
+        name: 'Members',
+        element: (
           <SEPMembers
             data={sep}
             onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
           />
+        ),
+      },
+      {
+        name: 'Proposals and Assignments',
+        element: (
           <SEPProposalsAndAssignmentsView
             data={sep}
             onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
           />
-          <SEPMeetingComponentsView sepId={sep.id} />
-          {hasAccessRights && (
-            <EventLogList changedObjectId={sep.id} eventType="SEP" />
-          )}
+        ),
+      },
+      {
+        name: 'Meeting Components',
+        element: <SEPMeetingComponentsView sepId={sep.id} />,
+      },
+    ];
+  }
+
+  if (isUserOfficer) {
+    tabs.push({
+      name: 'Logs',
+      element: <EventLogList changedObjectId={sep.id} eventType="SEP" />,
+    });
+  }
+
+  return (
+    <StyledContainer maxWidth="xl">
+      <StyledPaper>
+        <SimpleTabs tabNames={tabs.map((tab) => tab.name)}>
+          {tabs.map((tab, index) => (
+            <React.Fragment key={index}>{tab.element}</React.Fragment>
+          ))}
         </SimpleTabs>
       </StyledPaper>
     </StyledContainer>

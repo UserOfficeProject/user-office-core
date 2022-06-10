@@ -3,6 +3,7 @@ import Save from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
+import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { Editor } from '@tinymce/tinymce-react';
@@ -11,6 +12,7 @@ import { Field, Form, Formik, useFormikContext } from 'formik';
 import { Select, CheckboxWithLabel } from 'formik-mui';
 import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';
+import { Editor as TinyMCEEditor } from 'tinymce';
 
 import { useCheckAccess } from 'components/common/Can';
 import ErrorMessage from 'components/common/ErrorMessage';
@@ -53,6 +55,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   if (!review) {
@@ -110,6 +113,11 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
     setIsSubmitting(false);
   };
 
+  const handleCharacterCount = (editor: TinyMCEEditor) => {
+    const wordCount = editor.plugins.wordcount;
+    setNumberOfChars(wordCount.body.getCharacterCount());
+  };
+
   return (
     <Formik
       initialValues={initialValues}
@@ -151,17 +159,24 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
               toolbar: 'bold italic',
               branding: false,
+              init_instance_callback: (editor) => {
+                handleCharacterCount(editor);
+              },
             }}
             onEditorChange={(content, editor) => {
               const isStartContentDifferentThanCurrent =
                 editor.startContent !== editor.contentDocument.body.innerHTML;
 
               if (isStartContentDifferentThanCurrent || editor.isDirty()) {
+                handleCharacterCount(editor);
                 setFieldValue('comment', content);
               }
             }}
             disabled={isDisabled(isSubmitting)}
           />
+          <FormHelperText>
+            Characters: {numberOfChars} / {2000}
+          </FormHelperText>
           <ErrorMessage name="comment" />
           <Box marginTop={1} width={150}>
             <Field

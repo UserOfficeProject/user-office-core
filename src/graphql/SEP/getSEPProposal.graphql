@@ -3,7 +3,6 @@ query getSEPProposal($sepId: Int!, $proposalPk: Int!) {
     proposalPk
     sepId
     sepTimeAllocation
-
     instrumentSubmitted
     proposal {
       ...proposal
@@ -44,6 +43,26 @@ query getSEPProposal($sepId: Int!, $proposalPk: Int!) {
         id
         shortCode
         allocationTimeUnit
+      }
+    }
+    assignments {
+      proposalPk
+      sepMemberUserId
+      dateAssigned
+      user {
+        ...basicUserDetails
+      }
+      role {
+        id
+        shortCode
+        title
+      }
+      review {
+        id
+        status
+        comment
+        grade
+        sepID
       }
     }
   }

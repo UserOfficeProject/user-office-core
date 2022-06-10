@@ -17,7 +17,6 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import {
-  SepAssignment,
   UserRole,
   ReviewWithNextProposalStatus,
   ProposalStatus,
@@ -268,6 +267,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
           const newAssignments: SEPProposalAssignmentType[] = [
             ...(proposalItem.assignments ?? []),
             ...assignedMembers.map(({ role = null, ...user }) => ({
+              proposalPk: proposalItem.proposalPk,
               sepMemberUserId: user.id,
               dateAssigned: DateTime.now(),
               user,
@@ -329,7 +329,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       const updateReviewStatusAndGrade = (
         sepProposalData: SEPProposalType[],
         editingProposalData: SEPProposalType,
-        currentAssignment: SepAssignment
+        currentAssignment: SEPProposalAssignmentType
       ) => {
         const newProposalsData =
           sepProposalData?.map((sepProposalsData) => {
@@ -370,7 +370,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       };
 
       const removeAssignedReviewer = async (
-        assignedReviewer: SepAssignment,
+        assignedReviewer: SEPProposalAssignmentType,
         proposalPk: number
       ): Promise<void> => {
         /**
@@ -424,19 +424,47 @@ const SEPProposalsAndAssignmentsTable: React.FC<
         });
       };
 
+      const loadSEPProposal = async (proposalPk: number) => {
+        return api()
+          .getSEPProposal({ sepId: data.id, proposalPk })
+          .then((data) => {
+            return data.sepProposal;
+          });
+      };
+
+      const updateSEPProposalAssignmentsView = async (
+        currentAssignment: SEPProposalAssignmentType,
+        shouldRefreshProposalAssignments?: boolean
+      ) => {
+        if (shouldRefreshProposalAssignments) {
+          const refreshedSepProposal = await loadSEPProposal(
+            currentAssignment.proposalPk
+          );
+          setSEPProposalsData((sepProposalsData) => {
+            return sepProposalsData.map((sepProposal) => ({
+              ...sepProposal,
+              assignments:
+                refreshedSepProposal?.proposalPk === sepProposal.proposalPk
+                  ? refreshedSepProposal?.assignments
+                  : sepProposal.assignments,
+            }));
+          });
+        } else {
+          setSEPProposalsData((sepProposalData) =>
+            updateReviewStatusAndGrade(
+              sepProposalData,
+              rowData,
+              currentAssignment
+            )
+          );
+        }
+      };
+
       return (
         <SEPAssignedReviewersTable
           sepProposal={rowData}
           removeAssignedReviewer={removeAssignedReviewer}
-          updateView={(currentAssignment) => {
-            setSEPProposalsData((sepProposalData) =>
-              updateReviewStatusAndGrade(
-                sepProposalData,
-                rowData,
-                currentAssignment
-              )
-            );
-          }}
+          updateView={updateSEPProposalAssignmentsView}
         />
       );
     },

@@ -47,9 +47,12 @@ function withMarkTemplateAsActiveAction<T>(
           (rowData) => ({
             icon: function DoneIconComponent() {
               return rowData.templateId === activeTemplateId ? (
-                <DoneIcon />
+                <DoneIcon data-cy="mark-as-active" />
               ) : (
-                <DoneIcon className={classes.inactive} />
+                <DoneIcon
+                  className={classes.inactive}
+                  data-cy="mark-as-active"
+                />
               );
             },
             tooltip: 'Mark as active',
