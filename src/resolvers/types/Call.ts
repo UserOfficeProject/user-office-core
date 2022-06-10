@@ -122,9 +122,9 @@ export class CallInstrumentsResolver {
   isActive(@Root() call: Call): boolean {
     const now = new Date();
     const startCall = new Date(call.startCall);
-    const endCall = new Date(call.endCall);
+    const endCycle = new Date(call.endCycle);
 
-    return startCall <= now && endCall >= now;
+    return startCall <= now && endCycle >= now;
   }
 }
 

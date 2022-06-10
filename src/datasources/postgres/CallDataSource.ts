@@ -51,12 +51,12 @@ export default class PostgresCallDataSource implements CallDataSource {
       const currentDate = new Date().toISOString();
       query
         .where('start_call', '<=', currentDate)
-        .andWhere('end_call', '>=', currentDate);
+        .andWhere('end_cycle', '>=', currentDate);
     } else if (filter?.isActive === false) {
       const currentDate = new Date().toISOString();
       query
         .where('start_call', '>=', currentDate)
-        .orWhere('end_call', '<=', currentDate);
+        .orWhere('end_cycle', '<=', currentDate);
     }
 
     if (filter?.isEnded === true) {
