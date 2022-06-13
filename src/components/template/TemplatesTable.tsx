@@ -144,7 +144,7 @@ const TemplatesTable = ({
     };
   };
 
-  const DeleteIconComponent = () => <Delete />;
+  const DeleteIconComponent = () => <Delete data-cy="delete-template" />;
   const getDeleteButton = () => {
     return {
       icon: DeleteIconComponent,

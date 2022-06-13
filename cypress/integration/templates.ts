@@ -346,6 +346,36 @@ context('Template tests', () => {
   });
 
   describe('Proposal templates basic tests', () => {
+    it('User officer can delete active template', () => {
+      const newName = faker.lorem.words(3);
+      const newDescription = faker.lorem.words(5);
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Shipment declaration templates');
+
+      cy.get('[data-cy=create-new-button]').click();
+
+      cy.get('[data-cy=name] input').type(newName);
+      cy.get('[data-cy=description]').type(newDescription);
+
+      cy.get('[data-cy=submit]').click();
+
+      cy.visit('/');
+      cy.navigateToTemplatesSubmenu('Shipment declaration templates');
+
+      cy.get('[data-cy=mark-as-active]').click();
+
+      cy.get('[data-cy=delete-template]').click();
+
+      cy.get('[data-cy=confirm-ok]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(newName).should('not.exist');
+    });
+
     it('User officer can modify proposal template', () => {
       cy.login('officer');
       cy.visit('/');
