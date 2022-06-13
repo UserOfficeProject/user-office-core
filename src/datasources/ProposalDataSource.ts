@@ -72,6 +72,7 @@ export interface ProposalDataSource {
     callId: number,
     statusId: number
   ): Promise<boolean>;
+  getProposalEvents(proposalPk: number): Promise<ProposalEventsRecord | null>;
   changeProposalsStatus(
     statusId: number,
     proposalPks: number[]

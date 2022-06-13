@@ -68,7 +68,7 @@ export abstract class UserAuthorization {
 
   async isMemberOfSEP(
     agent: UserWithRole | null,
-    sepId: number
+    sepId?: number
   ): Promise<boolean> {
     if (!agent || !agent.currentRole) {
       return false;
@@ -89,7 +89,7 @@ export abstract class UserAuthorization {
 
     const isUserOfficer = this.isUserOfficer(agent);
     const isInstrumentScientist = this.isInstrumentScientist(agent);
-    const isSEPMember = await this.isMemberOfSEP(agent, agent.id);
+    const isSEPMember = await this.isMemberOfSEP(agent);
     if (isUserOfficer || isInstrumentScientist || isSEPMember) {
       return ids;
     }
