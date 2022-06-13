@@ -1,6 +1,7 @@
 import faker from 'faker';
 
 import { DataType, TemplateCategoryId } from '../../src/generated/sdk';
+import TestFilter from '../support/filterTests';
 import initialDBData from '../support/initialDBData';
 
 context('Questions tests', () => {
@@ -23,145 +24,151 @@ context('Questions tests', () => {
     });
   });
 
-  it('User officer search questions', () => {
-    cy.login('officer');
-    cy.visit('/');
+  TestFilter(['stfc', 'ess'], () => {
+    it('User officer search questions', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=category-dropdown]').click();
-    cy.get('[role=presentation] ').contains('Sample declaration').click();
+      cy.get('[data-cy=category-dropdown]').click();
+      cy.get('[role=presentation] ').contains('Sample declaration').click();
 
-    cy.contains(textQuestion).should('not.exist');
+      cy.contains(textQuestion).should('not.exist');
 
-    cy.get('[data-cy=category-dropdown]').click();
-    cy.get('[role=presentation]').contains('Proposal').click();
+      cy.get('[data-cy=category-dropdown]').click();
+      cy.get('[role=presentation]').contains('Proposal').click();
 
-    cy.get('[data-cy=type-dropdown]').click();
-    cy.get('[role=presentation] ').contains('Boolean').click();
+      cy.get('[data-cy=type-dropdown]').click();
+      cy.get('[role=presentation] ').contains('Boolean').click();
 
-    cy.contains(textQuestion).should('not.exist');
+      cy.contains(textQuestion).should('not.exist');
 
-    cy.get('[data-cy=type-dropdown]').click();
-    cy.get('[role=presentation]')
-      .find(`[data-value="${DataType.TEXT_INPUT}"]`)
-      .click();
+      cy.get('[data-cy=type-dropdown]').click();
+      cy.get('[role=presentation]')
+        .find(`[data-value="${DataType.TEXT_INPUT}"]`)
+        .click();
 
-    cy.contains(textQuestion);
+      cy.contains(textQuestion);
 
-    const modifiedQuestion = textQuestion.split('').reverse().join();
-    cy.get('[data-cy=search-input] input')
-      .clear()
-      .type(`${modifiedQuestion}{enter}`);
+      const modifiedQuestion = textQuestion.split('').reverse().join();
+      cy.get('[data-cy=search-input] input')
+        .clear()
+        .type(`${modifiedQuestion}{enter}`);
 
-    cy.contains(textQuestion).should('not.exist');
+      cy.contains(textQuestion).should('not.exist');
 
-    cy.get('[data-cy=search-input] input')
-      .clear()
-      .type(`${textQuestion}{enter}`);
+      cy.get('[data-cy=search-input] input')
+        .clear()
+        .type(`${textQuestion}{enter}`);
 
-    cy.contains(textQuestion);
-  });
+      cy.contains(textQuestion);
+    });
 
-  it('Search text should be trimmed', () => {
-    cy.login('officer');
-    cy.visit('/');
+    it('Search text should be trimmed', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    const samplesQuestionWithSpaces = '   ' + samplesQuestion + '   ';
+      const samplesQuestionWithSpaces = '   ' + samplesQuestion + '   ';
 
-    cy.get('[data-cy=search-input] input')
-      .clear()
-      .type(`${samplesQuestionWithSpaces}{enter}`);
+      cy.get('[data-cy=search-input] input')
+        .clear()
+        .type(`${samplesQuestionWithSpaces}{enter}`);
 
-    cy.get('[data-cy=questions-table]')
-      .contains(samplesQuestion)
-      .should('exist');
-  });
+      cy.get('[data-cy=questions-table]')
+        .contains(samplesQuestion)
+        .should('exist');
+    });
 
-  it('Officer can delete question with action button', () => {
-    cy.login('officer');
-    cy.visit('/');
+    it('Officer can delete question with action button', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
-      .clear()
-      .type(`${textQuestion}{enter}`);
+      cy.get('[data-cy=search-input] input')
+        .clear()
+        .type(`${textQuestion}{enter}`);
 
-    cy.get('[data-cy=questions-table]').contains(textQuestion).should('exist');
-    cy.get('[data-cy=questions-table]')
-      .contains(textQuestion)
-      .closest('tr')
-      .find('[aria-label=Delete]')
-      .click();
-    cy.get('[aria-label=Save]').click();
-    cy.finishedLoading();
-    cy.contains(textQuestion).should('not.exist');
-  });
+      cy.get('[data-cy=questions-table]')
+        .contains(textQuestion)
+        .should('exist');
+      cy.get('[data-cy=questions-table]')
+        .contains(textQuestion)
+        .closest('tr')
+        .find('[aria-label=Delete]')
+        .click();
+      cy.get('[aria-label=Save]').click();
+      cy.finishedLoading();
+      cy.contains(textQuestion).should('not.exist');
+    });
 
-  it('Officer can delete question from edit view', () => {
-    cy.login('officer');
-    cy.visit('/');
+    it('Officer can delete question from edit view', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
-      .clear()
-      .type(`${textQuestion}{enter}`);
+      cy.get('[data-cy=search-input] input')
+        .clear()
+        .type(`${textQuestion}{enter}`);
 
-    cy.get('[data-cy=questions-table]').contains(textQuestion).should('exist');
-    cy.get('[data-cy=questions-table]')
-      .contains(textQuestion)
-      .closest('tr')
-      .find('[aria-label=Edit]')
-      .click();
+      cy.get('[data-cy=questions-table]')
+        .contains(textQuestion)
+        .should('exist');
+      cy.get('[data-cy=questions-table]')
+        .contains(textQuestion)
+        .closest('tr')
+        .find('[aria-label=Edit]')
+        .click();
 
-    cy.finishedLoading();
+      cy.finishedLoading();
 
-    cy.get('[role=dialog]').get('[data-cy=delete]').click();
+      cy.get('[role=dialog]').get('[data-cy=delete]').click();
 
-    cy.get('[data-cy=confirm-ok]').click();
+      cy.get('[data-cy=confirm-ok]').click();
 
-    cy.finishedLoading();
+      cy.finishedLoading();
 
-    cy.contains(textQuestion).should('not.exist');
-  });
+      cy.contains(textQuestion).should('not.exist');
+    });
 
-  it('Officer can open template', () => {
-    cy.login('officer');
-    cy.visit('/');
+    it('Officer can open template', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=open-template-details-btn]').first().click();
+      cy.get('[data-cy=open-template-details-btn]').first().click();
 
-    cy.finishedLoading();
+      cy.finishedLoading();
 
-    cy.get('[role=dialog]').contains(initialDBData.template.name).click();
+      cy.get('[role=dialog]').contains(initialDBData.template.name).click();
 
-    cy.url().should('contain', '/QuestionaryEditor/');
+      cy.url().should('contain', '/QuestionaryEditor/');
 
-    cy.get('[data-cy=edit-metadata]').contains(initialDBData.template.name);
-  });
+      cy.get('[data-cy=edit-metadata]').contains(initialDBData.template.name);
+    });
 
-  it('Officer can open proposal', () => {
-    cy.login('officer');
-    cy.visit('/');
+    it('Officer can open proposal', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
-      .clear()
-      .type(`${initialDBData.questions.boolean.text}{enter}`);
+      cy.get('[data-cy=search-input] input')
+        .clear()
+        .type(`${initialDBData.questions.boolean.text}{enter}`);
 
-    cy.get('[data-cy=open-answer-details-btn]').first().click();
+      cy.get('[data-cy=open-answer-details-btn]').first().click();
 
-    cy.get('[role=dialog]').contains(initialDBData.proposal.title).click();
+      cy.get('[role=dialog]').contains(initialDBData.proposal.title).click();
 
-    cy.url().should('contain', 'Proposals?reviewModal=1');
+      cy.url().should('contain', 'Proposals?reviewModal=1');
 
-    cy.contains(`${initialDBData.proposal.title}`);
+      cy.contains(`${initialDBData.proposal.title}`);
+    });
   });
 });

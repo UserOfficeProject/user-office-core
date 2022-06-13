@@ -1,3 +1,4 @@
+import TestFilter from '../support/filterTests';
 import initialDBData from '../support/initialDBData';
 
 context('Experiments tests', () => {
@@ -24,68 +25,70 @@ context('Experiments tests', () => {
     });
   });
 
-  describe('Experiments tests', () => {
-    it('Can filter by call and instrument', () => {
-      cy.login('officer');
-      cy.visit('/');
-      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
-      cy.get('[value=NONE]').click();
+  TestFilter(['ess'], () => {
+    describe('Experiments tests', () => {
+      it('Can filter by call and instrument', () => {
+        cy.login('officer');
+        cy.visit('/');
+        cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+        cy.get('[value=NONE]').click();
 
-      cy.get('[data-cy=call-filter]').click();
-      cy.get('[role=presentation]').contains('call 1').click();
-      cy.contains('1-4 of 4');
+        cy.get('[data-cy=call-filter]').click();
+        cy.get('[role=presentation]').contains('call 1').click();
+        cy.contains('1-4 of 4');
 
-      cy.get('[data-cy=instrument-filter]').click();
-      cy.get('[role=presentation]').contains('Instrument 3').click();
-      cy.contains('0-0 of 0');
+        cy.get('[data-cy=instrument-filter]').click();
+        cy.get('[role=presentation]').contains('Instrument 3').click();
+        cy.contains('0-0 of 0');
 
-      cy.get('[data-cy=instrument-filter]').click();
-      cy.get('[role=presentation]').contains('Instrument 2').click();
-      cy.contains('0-0 of 0');
+        cy.get('[data-cy=instrument-filter]').click();
+        cy.get('[role=presentation]').contains('Instrument 2').click();
+        cy.contains('0-0 of 0');
 
-      cy.get('[data-cy=instrument-filter]').click();
-      cy.get('[role=presentation]').contains('Instrument 1').click();
-      cy.contains('1-4 of 4');
-    });
+        cy.get('[data-cy=instrument-filter]').click();
+        cy.get('[role=presentation]').contains('Instrument 1').click();
+        cy.contains('1-4 of 4');
+      });
 
-    it('Can filter by date', () => {
-      cy.login('officer');
-      cy.visit('/');
-      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      it('Can filter by date', () => {
+        cy.login('officer');
+        cy.visit('/');
+        cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
 
-      cy.get('[value=TODAY]').click();
-      cy.contains('0-0 of 0');
+        cy.get('[value=TODAY]').click();
+        cy.contains('0-0 of 0');
 
-      cy.get('[value=NONE]').click();
-      cy.contains('1-4 of 4');
-    });
+        cy.get('[value=NONE]').click();
+        cy.contains('1-4 of 4');
+      });
 
-    it('Can view ESI', () => {
-      cy.login('officer');
-      cy.visit('/');
-      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
-      cy.get('[value=NONE]').click();
+      it('Can view ESI', () => {
+        cy.login('officer');
+        cy.visit('/');
+        cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+        cy.get('[value=NONE]').click();
 
-      cy.get('[data-cy=officer-scheduled-events-table]')
-        .contains('View ESI')
-        .click();
-      cy.get('[role=dialog]').contains(initialDBData.proposal.title);
-    });
+        cy.get('[data-cy=officer-scheduled-events-table]')
+          .contains('View ESI')
+          .click();
+        cy.get('[role=dialog]').contains(initialDBData.proposal.title);
+      });
 
-    it('Can view visits', () => {
-      cy.login('officer');
-      cy.visit('/');
-      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
-      cy.get('[value=NONE]').click();
+      it('Can view visits', () => {
+        cy.login('officer');
+        cy.visit('/');
+        cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+        cy.get('[value=NONE]').click();
 
-      cy.finishedLoading();
+        cy.finishedLoading();
 
-      cy.get('[data-cy=officer-scheduled-events-table] Table button')
-        .first()
-        .click();
-      cy.get('[data-cy=officer-scheduled-events-table]').contains(
-        initialDBData.users.user1.lastName
-      );
+        cy.get('[data-cy=officer-scheduled-events-table] Table button')
+          .first()
+          .click();
+        cy.get('[data-cy=officer-scheduled-events-table]').contains(
+          initialDBData.users.user1.lastName
+        );
+      });
     });
   });
 });

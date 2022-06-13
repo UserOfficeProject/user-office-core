@@ -7,6 +7,7 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import TestFilter from '../support/filterTests';
 import initialDBData from '../support/initialDBData';
 
 context('Samples tests', () => {
@@ -142,405 +143,409 @@ context('Samples tests', () => {
     });
   });
 
-  describe('Samples basic tests', () => {
-    it('Should be able to create proposal template with sample', () => {
-      cy.login('officer');
-      cy.visit('/');
+  TestFilter(['stfc', 'ess'], () => {
+    describe('Samples basic tests', () => {
+      it('Should be able to create proposal template with sample', () => {
+        cy.login('officer');
+        cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('Sample declaration');
+        cy.navigateToTemplatesSubmenu('Sample declaration');
 
-      cy.get('[data-cy=create-new-button]').click();
+        cy.get('[data-cy=create-new-button]').click();
 
-      cy.get('[data-cy=name] input')
-        .type(sampleTemplateName)
-        .should('have.value', sampleTemplateName);
+        cy.get('[data-cy=name] input')
+          .type(sampleTemplateName)
+          .should('have.value', sampleTemplateName);
 
-      cy.get('[data-cy=description]').type(sampleTemplateDescription);
+        cy.get('[data-cy=description]').type(sampleTemplateDescription);
 
-      cy.get('[data-cy=submit]').click();
+        cy.get('[data-cy=submit]').click();
 
-      cy.contains('New sample');
+        cy.contains('New sample');
 
-      cy.get('[data-cy=show-more-button]').last().click();
+        cy.get('[data-cy=show-more-button]').last().click();
 
-      cy.get('[data-cy=add-topic-menu-item]').last().click();
+        cy.get('[data-cy=add-topic-menu-item]').last().click();
 
-      cy.finishedLoading();
+        cy.finishedLoading();
 
-      cy.createTextQuestion(sampleQuestionaryQuestion);
+        cy.createTextQuestion(sampleQuestionaryQuestion);
 
-      cy.visit('/');
+        cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+        cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.get('[data-cy=create-new-button]').click();
+        cy.get('[data-cy=create-new-button]').click();
 
-      cy.get('[data-cy=name] input')
-        .type(proposalTemplateName)
-        .should('have.value', proposalTemplateName);
+        cy.get('[data-cy=name] input')
+          .type(proposalTemplateName)
+          .should('have.value', proposalTemplateName);
 
-      cy.get('[data-cy=submit]').click();
+        cy.get('[data-cy=submit]').click();
 
-      cy.get('[data-cy=show-more-button]').last().click();
+        cy.get('[data-cy=show-more-button]').last().click();
 
-      cy.get('[data-cy=add-topic-menu-item]').last().click();
+        cy.get('[data-cy=add-topic-menu-item]').last().click();
 
-      cy.finishedLoading();
+        cy.finishedLoading();
 
-      cy.createSampleQuestion(sampleQuestion, sampleTemplateName, {
-        minEntries: 1,
-        maxEntries: 2,
+        cy.createSampleQuestion(sampleQuestion, sampleTemplateName, {
+          minEntries: 1,
+          maxEntries: 2,
+        });
+
+        cy.contains(sampleQuestion); // checking if question in the topic column
       });
 
-      cy.contains(sampleQuestion); // checking if question in the topic column
-    });
+      it('Should be possible to change template in a call', () => {
+        cy.createTemplate({
+          groupId: TemplateGroupId.PROPOSAL,
+          name: proposalTemplateName,
+        });
+        cy.login('officer');
+        cy.visit('/');
 
-    it('Should be possible to change template in a call', () => {
-      cy.createTemplate({
-        groupId: TemplateGroupId.PROPOSAL,
-        name: proposalTemplateName,
+        cy.contains('Calls').click();
+
+        cy.get('[aria-label="Edit"]').click();
+
+        cy.get('[data-cy=call-template]').click();
+
+        cy.contains(proposalTemplateName).click();
+
+        cy.get('[data-cy="call-workflow"]').click();
+        cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
+
+        cy.get('[data-cy="next-step"]').click();
+
+        cy.get('[data-cy="next-step"]').click();
+
+        cy.get('[data-cy="submit"]').click();
       });
-      cy.login('officer');
-      cy.visit('/');
+      it('Should be able to create proposal with sample', () => {
+        createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
+        cy.login('user');
+        cy.visit('/');
 
-      cy.contains('Calls').click();
+        cy.contains('new proposal', { matchCase: false }).click();
+        cy.get('[data-cy=title] input').type(proposalTitle);
 
-      cy.get('[aria-label="Edit"]').click();
+        cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);
 
-      cy.get('[data-cy=call-template]').click();
+        cy.contains('Save and continue').click();
 
-      cy.contains(proposalTemplateName).click();
+        cy.finishedLoading();
 
-      cy.get('[data-cy="call-workflow"]').click();
-      cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
+        cy.get('[data-cy=add-button]').click();
 
-      cy.get('[data-cy="next-step"]').click();
+        cy.get('[data-cy=title-input] input').clear();
 
-      cy.get('[data-cy="next-step"]').click();
+        cy.get(
+          '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+        ).click();
 
-      cy.get('[data-cy="submit"]').click();
-    });
-    it('Should be able to create proposal with sample', () => {
-      createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user');
-      cy.visit('/');
+        cy.contains('This is a required field');
 
-      cy.contains('new proposal', { matchCase: false }).click();
-      cy.get('[data-cy=title] input').type(proposalTitle);
+        cy.get('[data-cy=title-input] input')
+          .clear()
+          .type(sampleTitle)
+          .should('have.value', sampleTitle);
 
-      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);
+        cy.get(
+          '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+        ).click();
 
-      cy.contains('Save and continue').click();
+        cy.finishedLoading();
 
-      cy.finishedLoading();
+        cy.get(
+          '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+        ).click();
 
-      cy.get('[data-cy=add-button]').click();
+        cy.finishedLoading();
 
-      cy.get('[data-cy=title-input] input').clear();
+        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
-      cy.get(
-        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
-      ).click();
+        cy.get('[data-cy="clone"]').click();
 
-      cy.contains('This is a required field');
+        cy.contains('OK').click();
 
-      cy.get('[data-cy=title-input] input')
-        .clear()
-        .type(sampleTitle)
-        .should('have.value', sampleTitle);
+        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
-      cy.get(
-        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
-      ).click();
+        cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+          'have.length',
+          2
+        );
 
-      cy.finishedLoading();
+        cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
 
-      cy.get(
-        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
-      ).click();
+        cy.get('[data-cy="delete"]').eq(1).click();
 
-      cy.finishedLoading();
+        cy.contains('OK').click();
 
-      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
-      cy.get('[data-cy="clone"]').click();
+        cy.get('[data-cy=add-button]').should('not.be.disabled');
 
-      cy.contains('OK').click();
+        cy.contains('Save and continue').click();
 
-      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+        cy.contains('Submit').click();
 
-      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
-        'have.length',
-        2
-      );
-
-      cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
-
-      cy.get('[data-cy="delete"]').eq(1).click();
-
-      cy.contains('OK').click();
-
-      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
-
-      cy.get('[data-cy=add-button]').should('not.be.disabled');
-
-      cy.contains('Save and continue').click();
-
-      cy.contains('Submit').click();
-
-      cy.contains('OK').click();
-    });
-  });
-
-  describe('Samples advanced tests', () => {
-    let createdProposalId: string;
-    let createdProposalPk: number;
-
-    beforeEach(() => {
-      createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
-          createdProposalId = result.createProposal.proposal.proposalId;
-
-          cy.updateProposal({
-            proposalPk: createdProposalPk,
-            title: proposalTitle,
-            abstract: proposalTitle,
-            proposerId: existingUser.id,
-          });
-        }
+        cy.contains('OK').click();
       });
     });
 
-    it('Officer should able to delete proposal with sample', () => {
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
+    describe('Samples advanced tests', () => {
+      let createdProposalId: string;
+      let createdProposalPk: number;
+
+      beforeEach(() => {
+        createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
+        cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+          if (result.createProposal.proposal) {
+            createdProposalPk = result.createProposal.proposal.primaryKey;
+            createdProposalId = result.createProposal.proposal.proposalId;
+
+            cy.updateProposal({
+              proposalPk: createdProposalPk,
+              title: proposalTitle,
+              abstract: proposalTitle,
+              proposerId: existingUser.id,
+            });
+          }
+        });
       });
 
-      cy.login('officer');
-      cy.visit('/');
+      it('Officer should able to delete proposal with sample', () => {
+        cy.createSample({
+          proposalPk: createdProposalPk,
+          templateId: createdSampleTemplateId,
+          questionId: createdSampleQuestionId,
+          title: sampleTitle,
+        });
 
-      cy.contains('Proposals').click();
+        cy.login('officer');
+        cy.visit('/');
 
-      cy.contains(proposalTitle)
-        .parent()
-        .find('input[type="checkbox"]')
-        .click();
+        cy.contains('Proposals').click();
 
-      cy.get("[aria-label='Delete proposals']").first().click();
+        cy.contains(proposalTitle)
+          .parent()
+          .find('input[type="checkbox"]')
+          .click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+        cy.get("[aria-label='Delete proposals']").first().click();
 
-      cy.contains(proposalTitle).should('not.exist');
-    });
+        cy.get('[data-cy="confirm-ok"]').click();
 
-    it('Should be able to clone proposal with samples', () => {
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
+        cy.contains(proposalTitle).should('not.exist');
       });
 
-      cy.login('officer');
-      cy.visit('/');
+      it('Should be able to clone proposal with samples', () => {
+        cy.createSample({
+          proposalPk: createdProposalPk,
+          templateId: createdSampleTemplateId,
+          questionId: createdSampleQuestionId,
+          title: sampleTitle,
+        });
 
-      cy.contains('Proposals').click();
+        cy.login('officer');
+        cy.visit('/');
 
-      cy.contains(proposalTitle)
-        .parent()
-        .find('input[type="checkbox"]')
-        .click();
+        cy.contains('Proposals').click();
 
-      cy.get('[aria-label="Clone proposals to call"]').click();
+        cy.contains(proposalTitle)
+          .parent()
+          .find('input[type="checkbox"]')
+          .click();
 
-      cy.get('#selectedCallId-input').click();
-      cy.get('[role="presentation"]').contains(updatedCall.shortCode).click();
+        cy.get('[aria-label="Clone proposals to call"]').click();
 
-      cy.get('[data-cy="submit"]').click();
+        cy.get('#selectedCallId-input').click();
+        cy.get('[role="presentation"]').contains(updatedCall.shortCode).click();
 
-      cy.notification({
-        variant: 'success',
-        text: 'Proposal/s cloned successfully',
+        cy.get('[data-cy="submit"]').click();
+
+        cy.notification({
+          variant: 'success',
+          text: 'Proposal/s cloned successfully',
+        });
+
+        cy.contains(`Copy of ${proposalTitle}`)
+          .parent()
+          .find('[aria-label="View proposal"]')
+          .click();
+
+        cy.contains('Edit proposal').click();
+
+        cy.contains('new topic', { matchCase: false }).click();
+
+        cy.get('[data-cy=questionnaires-list-item]')
+          .contains(sampleTitle)
+          .click();
+
+        cy.get('[data-cy="sample-declaration-modal"]').should('exist');
+        cy.get(
+          '[data-cy="sample-declaration-modal"] [data-cy=questionary-title]'
+        ).contains(sampleTitle);
       });
 
-      cy.contains(`Copy of ${proposalTitle}`)
-        .parent()
-        .find('[aria-label="View proposal"]')
-        .click();
+      it('User should not be able to submit proposal with unfinished sample', () => {
+        cy.login('user');
+        cy.visit('/');
 
-      cy.contains('Edit proposal').click();
+        cy.contains(proposalTitle)
+          .parent()
+          .find('[aria-label="Edit proposal"]')
+          .click();
 
-      cy.contains('new topic', { matchCase: false }).click();
+        cy.contains('Save and continue').click();
 
-      cy.get('[data-cy=questionnaires-list-item]')
-        .contains(sampleTitle)
-        .click();
+        cy.get('[data-cy=add-button]').click();
 
-      cy.get('[data-cy="sample-declaration-modal"]').should('exist');
-      cy.get(
-        '[data-cy="sample-declaration-modal"] [data-cy=questionary-title]'
-      ).contains(sampleTitle);
-    });
+        cy.get('[data-cy=title-input] input')
+          .clear()
+          .type(sampleTitle)
+          .should('have.value', sampleTitle);
 
-    it('User should not be able to submit proposal with unfinished sample', () => {
-      cy.login('user');
-      cy.visit('/');
+        cy.get(
+          '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
+        ).click();
 
-      cy.contains(proposalTitle)
-        .parent()
-        .find('[aria-label="Edit proposal"]')
-        .click();
+        cy.finishedLoading();
 
-      cy.contains('Save and continue').click();
+        cy.get('body').type('{esc}');
 
-      cy.get('[data-cy=add-button]').click();
+        cy.finishedLoading();
 
-      cy.get('[data-cy=title-input] input')
-        .clear()
-        .type(sampleTitle)
-        .should('have.value', sampleTitle);
+        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
-      cy.get(
-        '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
-      ).click();
+        cy.get('[data-cy="save-and-continue-button"]').click();
 
-      cy.finishedLoading();
+        cy.contains('All samples must be completed');
 
-      cy.get('body').type('{esc}');
+        cy.contains(sampleTitle).click();
 
-      cy.finishedLoading();
+        cy.get(
+          '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
+        ).click();
 
-      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+        cy.finishedLoading();
 
-      cy.get('[data-cy="save-and-continue-button"]').click();
+        cy.get('.Mui-error').should('not.exist');
 
-      cy.contains('All samples must be completed');
+        cy.contains('Save and continue').click();
 
-      cy.contains(sampleTitle).click();
+        cy.contains('Submit').click();
 
-      cy.get(
-        '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
-      ).click();
-
-      cy.finishedLoading();
-
-      cy.get('.Mui-error').should('not.exist');
-
-      cy.contains('Save and continue').click();
-
-      cy.contains('Submit').click();
-
-      cy.contains('OK').click();
-    });
-
-    it('Officer should be able to evaluate sample', () => {
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
+        cy.contains('OK').click();
       });
 
-      cy.submitProposal({ proposalPk: createdProposalPk });
+      it('Officer should be able to evaluate sample', () => {
+        cy.createSample({
+          proposalPk: createdProposalPk,
+          templateId: createdSampleTemplateId,
+          questionId: createdSampleQuestionId,
+          title: sampleTitle,
+        });
 
-      cy.login('officer');
-      cy.visit('/');
+        cy.submitProposal({ proposalPk: createdProposalPk });
 
-      cy.contains('Sample safety').click();
+        cy.login('officer');
+        cy.visit('/');
 
-      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+        cy.contains('Sample safety').click();
 
-      cy.get('[placeholder=Search]').click().clear().type(createdProposalId);
+        cy.get('[data-cy=samples-table]').contains(createdProposalId);
 
-      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+        cy.get('[placeholder=Search]').click().clear().type(createdProposalId);
 
-      cy.get('[data-cy=samples-table]').should('not.contain', '999999');
+        cy.get('[data-cy=samples-table]').contains(createdProposalId);
 
-      cy.get('[placeholder=Search]').click().clear();
+        cy.get('[data-cy=samples-table]').should('not.contain', '999999');
 
-      cy.get('[data-cy=samples-table]').contains('999999');
+        cy.get('[placeholder=Search]').click().clear();
 
-      cy.contains(createdProposalId)
-        .last()
-        .parent()
-        .find('[aria-label="Review sample"]')
-        .click();
+        cy.get('[data-cy=samples-table]').contains('999999');
 
-      cy.get('[data-cy="safety-status"]').click();
+        cy.contains(createdProposalId)
+          .last()
+          .parent()
+          .find('[aria-label="Review sample"]')
+          .click();
 
-      cy.get('[role=presentation]').contains('Low risk').click();
+        cy.get('[data-cy="safety-status"]').click();
 
-      cy.get('[data-cy="safety-comment"]').type(safetyComment);
+        cy.get('[role=presentation]').contains('Low risk').click();
 
-      cy.get('[data-cy="submit"]').click();
+        cy.get('[data-cy="safety-comment"]').type(safetyComment);
 
-      cy.notification({ variant: 'success', text: 'submitted' });
+        cy.get('[data-cy="submit"]').click();
 
-      cy.reload();
+        cy.notification({ variant: 'success', text: 'submitted' });
 
-      cy.contains(createdProposalId)
-        .last()
-        .parent()
-        .find('[aria-label="Review sample"]')
-        .last()
-        .click();
+        cy.reload();
 
-      cy.contains(safetyComment); // test if comment entered is present after reload
+        cy.contains(createdProposalId)
+          .last()
+          .parent()
+          .find('[aria-label="Review sample"]')
+          .last()
+          .click();
 
-      cy.get('[data-cy="safety-status"]').click();
+        cy.contains(safetyComment); // test if comment entered is present after reload
 
-      cy.contains('High risk').click();
+        cy.get('[data-cy="safety-status"]').click();
 
-      cy.get('[data-cy="submit"]').click();
+        cy.contains('High risk').click();
 
-      cy.contains('HIGH_RISK'); // test if status has changed
-    });
+        cy.get('[data-cy="submit"]').click();
 
-    it('Download samples is working with dialog window showing up', () => {
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
+        cy.contains('HIGH_RISK'); // test if status has changed
       });
-      cy.login('officer');
-      cy.visit('/');
 
-      cy.contains('Sample safety').click();
+      it('Download samples is working with dialog window showing up', () => {
+        cy.createSample({
+          proposalPk: createdProposalPk,
+          templateId: createdSampleTemplateId,
+          questionId: createdSampleQuestionId,
+          title: sampleTitle,
+        });
+        cy.login('officer');
+        cy.visit('/');
 
-      cy.get('[data-cy=samples-table]')
-        .contains(sampleTitle)
-        .first()
-        .closest('tr')
-        .find('[data-cy="download-sample"]')
-        .click();
+        cy.contains('Sample safety').click();
 
-      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        sampleTitle
-      );
-    });
+        cy.get('[data-cy=samples-table]')
+          .contains(sampleTitle)
+          .first()
+          .closest('tr')
+          .find('[data-cy="download-sample"]')
+          .click();
 
-    it('Should be able to download sample pdf', () => {
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
+        cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+        cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+          sampleTitle
+        );
       });
-      cy.login('officer');
-      cy.visit('/');
 
-      cy.contains('Sample safety').click();
+      it('Should be able to download sample pdf', () => {
+        cy.createSample({
+          proposalPk: createdProposalPk,
+          templateId: createdSampleTemplateId,
+          questionId: createdSampleQuestionId,
+          title: sampleTitle,
+        });
+        cy.login('officer');
+        cy.visit('/');
 
-      cy.request('GET', '/download/pdf/sample/1').then((response) => {
-        expect(response.headers['content-type']).to.be.equal('application/pdf');
-        expect(response.status).to.be.equal(200);
+        cy.contains('Sample safety').click();
+
+        cy.request('GET', '/download/pdf/sample/1').then((response) => {
+          expect(response.headers['content-type']).to.be.equal(
+            'application/pdf'
+          );
+          expect(response.status).to.be.equal(200);
+        });
       });
     });
   });

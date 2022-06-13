@@ -1,5 +1,7 @@
 import faker from 'faker';
 
+import TestFilter from '../support/filterTests';
+
 context('Page tests', () => {
   beforeEach(() => {
     cy.resetDB();
@@ -7,32 +9,34 @@ context('Page tests', () => {
 
   const faqContents = faker.random.words(2);
 
-  it('Should be able update FAQ', () => {
-    cy.login('officer');
-    cy.visit('/');
+  TestFilter(['stfc', 'ess'], () => {
+    it('Should be able update FAQ', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.contains('Pages').click();
+      cy.contains('Pages').click();
 
-    cy.contains('Set user homepage');
-    cy.contains('Help').click();
+      cy.contains('Set user homepage');
+      cy.contains('Help').click();
 
-    cy.setTinyMceContent('HELPPAGE', faqContents);
+      cy.setTinyMceContent('HELPPAGE', faqContents);
 
-    cy.contains('Update').click();
+      cy.contains('Update').click();
 
-    cy.notification({ text: 'Updated Page', variant: 'success' });
+      cy.notification({ text: 'Updated Page', variant: 'success' });
 
-    cy.getTinyMceContent('HELPPAGE').then((content) =>
-      expect(content).to.have.string(faqContents)
-    );
+      cy.getTinyMceContent('HELPPAGE').then((content) =>
+        expect(content).to.have.string(faqContents)
+      );
 
-    cy.reload();
-    cy.contains('Proposals').click();
-    cy.contains('FAQ').click();
+      cy.reload();
+      cy.contains('Proposals').click();
+      cy.contains('FAQ').click();
 
-    cy.get('[role="presentation"]').should('exist');
+      cy.get('[role="presentation"]').should('exist');
 
-    cy.contains(faqContents);
-    cy.contains('Close').click();
+      cy.contains(faqContents);
+      cy.contains('Close').click();
+    });
   });
 });
