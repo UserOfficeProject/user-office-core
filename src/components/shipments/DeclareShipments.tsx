@@ -1,4 +1,12 @@
-import { Dialog, DialogContent, Typography, Alert, Stack } from '@mui/material';
+import {
+  Typography,
+  Alert,
+  Stack,
+  Dialog,
+  DialogContent,
+  Divider,
+  Paper,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
@@ -14,6 +22,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 import CreateUpdateShipment from './CreateUpdateShipment';
+import ShippingInstructions from './ShippingInstructions';
 
 interface DeclareShipmentsProps extends WithConfirmProps {
   scheduledEventId: number;
@@ -115,34 +124,40 @@ function DeclareShipments({
   const hasLocalContact = scheduledEvent.localContactId !== null;
 
   return (
-    <Stack spacing={4}>
-      <Typography variant="h6" component="h2">
+    <>
+      <Typography variant="h6" component="h2" sx={{ marginBottom: 3 }}>
         Declare Shipments
       </Typography>
-      <Typography variant="body1">
-        Follow the steps below to declare your shipments:
-        <ol style={{ margin: 0 }}>
-          <li>Add all the shipments (one shipment per parcel)</li>
-          <li>Download labels</li>
-          <li>Post the shipment</li>
-        </ol>
-      </Typography>
-      {!hasLocalContact && (
-        <Alert severity="warning" className={classes.alert}>
-          Shipment declarations are not possible until the local contact has
-          been assigned to your scheduled event
-        </Alert>
-      )}
-
-      <Typography variant="h6">My shipment list</Typography>
-      <QuestionnairesList
-        addButtonLabel="Add Shipment"
-        data={shipments.map(shipmentToListRow) ?? []}
-        onEditClick={onEditClicked}
-        onDeleteClick={onDeleteClicked}
-        onAddNewClick={hasLocalContact ? onAddClicked : undefined}
-        style={{ maxWidth: '100%' }}
-      />
+      <Stack spacing={4} direction="row">
+        <Stack flex={1}>
+          <Typography variant="h6" component="h2" sx={{ paddingBottom: 3 }}>
+            Shipment guide
+          </Typography>
+          <ShippingInstructions />
+          {!hasLocalContact && (
+            <Alert severity="warning" className={classes.alert}>
+              Shipment declarations are not possible until the local contact has
+              been assigned to your scheduled event
+            </Alert>
+          )}
+        </Stack>
+        <Divider orientation="vertical" flexItem />
+        <Stack flex={1}>
+          <Typography variant="h6" component="h2" sx={{ paddingBottom: 3 }}>
+            My shipment list
+          </Typography>
+          <Paper sx={{ padding: 3 }}>
+            <QuestionnairesList
+              addButtonLabel="Add Shipment Declaration"
+              data={shipments.map(shipmentToListRow) ?? []}
+              onEditClick={onEditClicked}
+              onDeleteClick={onDeleteClicked}
+              onAddNewClick={hasLocalContact ? onAddClicked : undefined}
+              style={{ maxWidth: '100%' }}
+            />
+          </Paper>
+        </Stack>
+      </Stack>
       <Dialog
         aria-labelledby="shipment-declaration"
         aria-describedby="shipment-declaration-description"
@@ -163,7 +178,7 @@ function DeclareShipments({
           />
         </DialogContent>
       </Dialog>
-    </Stack>
+    </>
   );
 }
 
