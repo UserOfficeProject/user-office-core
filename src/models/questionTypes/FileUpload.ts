@@ -85,8 +85,8 @@ export const fileUploadDefinition: Question = {
     config.required = false;
     config.tooltip = '';
     config.file_type = [];
-    config.pdf_page_limit = 0;
-    config.max_files = 0;
+    config.pdf_page_limit = 0; // Unlimited
+    config.max_files = 0; // Unliimited
 
     return config;
   },
