@@ -363,10 +363,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 export function FileUploadComponent(props: {
-  maxFiles?: number;
+  maxFiles?: number; // 0 is unlimited
   id?: string;
   fileType: string;
-  pdfPageLimit: number;
+  pdfPageLimit: number; // 0 is unlimited
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
 }) {
