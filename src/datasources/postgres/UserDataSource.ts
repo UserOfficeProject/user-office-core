@@ -354,33 +354,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users')
       .where({ user_id: userId });
+
     if (!user || user.length == 0) {
+      logger.logInfo('Creating dummy user', { userId });
+
       user = await database
-        .insert({
-          user_id: userId,
-          user_title: '',
-          firstname: '',
-          middlename: '',
-          lastname: '',
-          username: userId.toString(),
-          password: '',
-          preferredname: '',
-          orcid: '',
-          orcid_refreshtoken: '',
-          gender: '',
-          nationality: 1,
-          birthdate: '2000-01-01',
-          organisation: 1,
-          department: '',
-          position: '',
-          email: userId.toString(),
-          telephone: '',
-          telephone_alt: '',
-        })
+        .insert(this.createDummyUserRecord(userId))
         .returning(['*'])
         .into('users');
-
-      logger.logInfo('Creating dummy user', { userId });
     }
 
     if (!user || user.length == 0) {
@@ -388,6 +369,63 @@ export default class PostgresUserDataSource implements UserDataSource {
     }
 
     return createUserObject(user[0]);
+  }
+
+  async ensureDummyUsersExist(userIds: number[]): Promise<User[]> {
+    const users: UserRecord[] = await database
+      .select()
+      .from('users')
+      .whereIn('user_id', userIds);
+
+    const missedUsers = userIds.filter(
+      (userId) => !users.find((user) => user.user_id === userId)
+    );
+
+    if (missedUsers.length > 0) {
+      logger.logInfo('Creating dummy users', { missedUsers });
+
+      const newUsers = await database
+        .insert(userIds.map(this.createDummyUserRecord))
+        .returning(['*'])
+        .into('users');
+
+      users.push(...newUsers);
+    }
+
+    if (userIds.length !== users.length) {
+      const failedUsers = userIds.filter(
+        (userId) => !users.find((user) => user.user_id === userId)
+      );
+
+      logger.logError('Failed to create dummy users', { failedUsers });
+      throw new Error(`Could not create users ${failedUsers}`);
+    }
+
+    return users.map(createUserObject);
+  }
+
+  private createDummyUserRecord(userId: number) {
+    return {
+      user_id: userId,
+      user_title: '',
+      firstname: '',
+      middlename: '',
+      lastname: '',
+      username: userId.toString(),
+      password: '',
+      preferredname: '',
+      orcid: '',
+      orcid_refreshtoken: '',
+      gender: '',
+      nationality: 1,
+      birthdate: '2000-01-01',
+      organisation: 1,
+      department: '',
+      position: '',
+      email: userId.toString(),
+      telephone: '',
+      telephone_alt: '',
+    };
   }
 
   async getUsers({

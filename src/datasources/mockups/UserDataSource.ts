@@ -376,6 +376,10 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
+  async ensureDummyUsersExist(userIds: number[]): Promise<User[]> {
+    return [dummyUser];
+  }
+
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
   }
