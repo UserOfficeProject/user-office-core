@@ -1,4 +1,5 @@
 import { Role, Roles } from '../../models/Role';
+import { LRUCache } from '../../utils/LRUCache';
 import { dummyUser } from '../mockups/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
@@ -8,7 +9,7 @@ jest.mock('../postgres/UserDataSource.ts');
 const dummyUserNumber = 12345;
 
 beforeAll(() => {
-  jest.useFakeTimers();
+  jest.spyOn(LRUCache.prototype, 'enableStatsLogging').mockReturnThis();
 
   const mockGetRoles = jest.spyOn(StfcUserDataSource.prototype, 'getRoles');
   mockGetRoles.mockImplementation(() =>
