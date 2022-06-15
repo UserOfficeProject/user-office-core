@@ -1,0 +1,21 @@
+fragment answer on Answer {
+  answerId
+  question {
+    ...question
+  }
+  sortOrder
+  topicId
+  config {
+    ...fieldConfig
+  }
+  dependencies {
+    questionId
+    dependencyId
+    dependencyNaturalKey
+    condition {
+      ...fieldCondition
+    }
+  }
+  dependenciesOperator
+  value
+}

@@ -1,0 +1,56 @@
+mutation createCall(
+  $shortCode: String!
+  $startCall: DateTime!
+  $endCall: DateTime!
+  $startReview: DateTime!
+  $endReview: DateTime!
+  $startSEPReview: DateTime
+  $endSEPReview: DateTime
+  $startNotify: DateTime!
+  $endNotify: DateTime!
+  $startCycle: DateTime!
+  $endCycle: DateTime!
+  $cycleComment: String!
+  $submissionMessage: String
+  $surveyComment: String!
+  $allocationTimeUnit: AllocationTimeUnits!
+  $referenceNumberFormat: String
+  $proposalWorkflowId: Int!
+  $templateId: Int!
+  $esiTemplateId: Int
+  $title: String
+  $description: String
+) {
+  createCall(
+    createCallInput: {
+      shortCode: $shortCode
+      startCall: $startCall
+      endCall: $endCall
+      startReview: $startReview
+      endReview: $endReview
+      startSEPReview: $startSEPReview
+      endSEPReview: $endSEPReview
+      startNotify: $startNotify
+      endNotify: $endNotify
+      startCycle: $startCycle
+      endCycle: $endCycle
+      cycleComment: $cycleComment
+      submissionMessage: $submissionMessage
+      surveyComment: $surveyComment
+      allocationTimeUnit: $allocationTimeUnit
+      referenceNumberFormat: $referenceNumberFormat
+      proposalWorkflowId: $proposalWorkflowId
+      templateId: $templateId
+      esiTemplateId: $esiTemplateId
+      title: $title
+      description: $description
+    }
+  ) {
+    rejection {
+      ...rejection
+    }
+    call {
+      ...call
+    }
+  }
+}

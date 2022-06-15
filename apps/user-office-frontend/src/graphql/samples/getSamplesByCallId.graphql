@@ -1,0 +1,9 @@
+query getSamplesByCallId($callId: Int!) {
+  samplesByCallId(callId: $callId) {
+    ...sample
+    proposal {
+      primaryKey
+      proposalId
+    }
+  }
+}

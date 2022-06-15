@@ -1,0 +1,5 @@
+query getCall($id: Int!) {
+  call(id: $id) {
+    ...call
+  }
+}

@@ -1,0 +1,7 @@
+mutation removeUserForReview($reviewId: Int!, $sepId: Int!) {
+  removeUserForReview(reviewId: $reviewId, sepId: $sepId) {
+    rejection {
+      ...rejection
+    }
+  }
+}

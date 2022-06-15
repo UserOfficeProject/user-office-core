@@ -1,0 +1,46 @@
+query getProposalsCore(
+  $filter: ProposalsFilter
+  $first: Int
+  $offset: Int
+  $sortField: String
+  $sortDirection: String
+  $searchText: String
+) {
+  proposalsView(
+    filter: $filter
+    first: $first
+    offset: $offset
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
+  ) {
+    proposalViews {
+      primaryKey
+      title
+      statusId
+      statusName
+      statusDescription
+      proposalId
+      rankOrder
+      finalStatus
+      notified
+      managementTimeAllocation
+      technicalTimeAllocation
+      technicalReviewAssigneeId
+      technicalReviewAssigneeFirstName
+      technicalReviewAssigneeLastName
+      technicalStatus
+      instrumentName
+      callShortCode
+      sepCode
+      sepId
+      reviewAverage
+      reviewDeviation
+      instrumentId
+      callId
+      submitted
+      allocationTimeUnit
+    }
+    totalCount
+  }
+}

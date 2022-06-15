@@ -1,0 +1,20 @@
+mutation createSEP(
+  $code: String!
+  $description: String!
+  $numberRatingsRequired: Int!
+  $active: Boolean!
+) {
+  createSEP(
+    code: $code
+    description: $description
+    numberRatingsRequired: $numberRatingsRequired
+    active: $active
+  ) {
+    sep {
+      ...sep
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

@@ -1,0 +1,16 @@
+mutation setInstrumentAvailabilityTime(
+  $callId: Int!
+  $instrumentId: Int!
+  $availabilityTime: Int!
+) {
+  setInstrumentAvailabilityTime(
+    callId: $callId
+    instrumentId: $instrumentId
+    availabilityTime: $availabilityTime
+  ) {
+    rejection {
+      ...rejection
+    }
+    isSuccess
+  }
+}

@@ -1,0 +1,14 @@
+mutation removeMemberFromSep(
+  $memberId: Int!
+  $sepId: Int!
+  $roleId: UserRole!
+) {
+  removeMemberFromSep(memberId: $memberId, sepId: $sepId, roleId: $roleId) {
+    rejection {
+      ...rejection
+    }
+    sep {
+      id
+    }
+  }
+}

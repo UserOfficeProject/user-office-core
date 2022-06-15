@@ -1,0 +1,11 @@
+mutation deleteTemplate($id: Int!) {
+  deleteTemplate(templateId: $id) {
+    template {
+      templateId
+      name
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

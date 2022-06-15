@@ -1,0 +1,45 @@
+mutation updateProposalWorkflow(
+  $id: Int!
+  $name: String!
+  $description: String!
+) {
+  updateProposalWorkflow(
+    updatedProposalWorkflowInput: {
+      id: $id
+      name: $name
+      description: $description
+    }
+  ) {
+    proposalWorkflow {
+      id
+      name
+      description
+      proposalWorkflowConnectionGroups {
+        groupId
+        parentGroupId
+        connections {
+          id
+          sortOrder
+          proposalWorkflowId
+          proposalStatusId
+          proposalStatus {
+            id
+            name
+            description
+          }
+          nextProposalStatusId
+          prevProposalStatusId
+          droppableGroupId
+          statusChangingEvents {
+            statusChangingEventId
+            proposalWorkflowConnectionId
+            statusChangingEvent
+          }
+        }
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

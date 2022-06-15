@@ -1,0 +1,18 @@
+mutation createVisitRegistration($visitId: Int!) {
+  createVisitRegistration(visitId: $visitId) {
+    registration {
+      ...visitRegistration
+      user {
+        ...basicUserDetails
+      }
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

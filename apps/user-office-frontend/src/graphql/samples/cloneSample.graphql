@@ -1,0 +1,14 @@
+mutation cloneSample($sampleId: Int!, $title: String, $isPostProposalSubmission: Boolean) {
+  cloneSample(sampleId: $sampleId, title: $title, isPostProposalSubmission: $isPostProposalSubmission) {
+    sample {
+      ...sample
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

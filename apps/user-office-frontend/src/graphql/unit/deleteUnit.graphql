@@ -1,0 +1,10 @@
+mutation deleteUnit($id: String!) {
+  deleteUnit(id: $id) {
+    unit {
+      id
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

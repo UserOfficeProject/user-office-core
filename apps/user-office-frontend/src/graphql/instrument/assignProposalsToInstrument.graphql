@@ -1,0 +1,14 @@
+mutation assignProposalsToInstrument(
+  $proposals: [ProposalPkWithCallId!]!
+  $instrumentId: Int!
+) {
+  assignProposalsToInstrument(
+    proposals: $proposals
+    instrumentId: $instrumentId
+  ) {
+    rejection {
+      ...rejection
+    }
+    isSuccess
+  }
+}

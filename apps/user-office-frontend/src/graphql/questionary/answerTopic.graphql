@@ -1,0 +1,20 @@
+mutation answerTopic(
+  $questionaryId: Int!
+  $topicId: Int!
+  $answers: [AnswerInput!]!
+  $isPartialSave: Boolean
+) {
+  answerTopic(
+    questionaryId: $questionaryId
+    topicId: $topicId
+    answers: $answers
+    isPartialSave: $isPartialSave
+  ) {
+    questionaryStep {
+      ...questionaryStep
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

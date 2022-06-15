@@ -1,0 +1,23 @@
+fragment template on Template {
+  steps {
+    topic {
+      ...topic
+    }
+    fields {
+      ...questionTemplateRelation
+    }
+  }
+  isArchived
+  questionaryCount
+  templateId
+  groupId
+  name
+  description
+  complementaryQuestions {
+    ...question
+  }
+  group {
+    groupId
+    categoryId
+  }
+}

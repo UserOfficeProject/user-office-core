@@ -1,0 +1,5 @@
+query getBasicUserDetailsByEmail($email: String!, $role: UserRole) {
+  basicUserDetailsByEmail(email: $email, role: $role) {
+    ...basicUserDetails
+  }
+}

@@ -1,0 +1,18 @@
+mutation removeMemberFromSEPProposal(
+  $memberId: Int!
+  $sepId: Int!
+  $proposalPk: Int!
+) {
+  removeMemberFromSEPProposal(
+    memberId: $memberId
+    sepId: $sepId
+    proposalPk: $proposalPk
+  ) {
+    rejection {
+      ...rejection
+    }
+    sep {
+      id
+    }
+  }
+}

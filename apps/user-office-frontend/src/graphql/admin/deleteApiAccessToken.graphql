@@ -1,0 +1,10 @@
+mutation deleteApiAccessToken($accessTokenId: String!) {
+  deleteApiAccessToken(
+    deleteApiAccessTokenInput: { accessTokenId: $accessTokenId }
+  ) {
+    rejection {
+      ...rejection
+    }
+    isSuccess
+  }
+}

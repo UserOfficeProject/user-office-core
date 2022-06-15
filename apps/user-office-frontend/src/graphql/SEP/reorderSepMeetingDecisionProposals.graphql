@@ -1,0 +1,14 @@
+mutation reorderSepMeetingDecisionProposals(
+  $reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput!
+) {
+  reorderSepMeetingDecisionProposals(
+    reorderSepMeetingDecisionProposalsInput: $reorderSepMeetingDecisionProposalsInput
+  ) {
+    rejection {
+      ...rejection
+    }
+    sepMeetingDecision {
+      proposalPk
+    }
+  }
+}

@@ -1,0 +1,12 @@
+query getFields {
+  getFields {
+    nationalities {
+      id
+      value
+    }
+    countries {
+      id
+      value
+    }
+  }
+}

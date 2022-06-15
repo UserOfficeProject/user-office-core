@@ -1,0 +1,16 @@
+mutation deleteQuestionTemplateRelation(
+  $questionId: String!
+  $templateId: Int!
+) {
+  deleteQuestionTemplateRelation(
+    questionId: $questionId
+    templateId: $templateId
+  ) {
+    template {
+      ...template
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

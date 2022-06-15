@@ -1,0 +1,15 @@
+mutation updateInstitution($id: Int!, $name: String!, $country: Int!, $verified: Boolean!) {
+  updateInstitution(id: $id, name: $name, country: $country, verified: $verified) {
+    institution {
+      id
+      verified
+      name
+      country {
+        ...country
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

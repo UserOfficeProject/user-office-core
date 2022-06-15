@@ -1,0 +1,13 @@
+query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
+  instrumentsBySep(sepId: $sepId, callId: $callId) {
+    id
+    name
+    shortCode
+    description
+    availabilityTime
+    submitted
+    scientists {
+      ...basicUserDetails
+    }
+  }
+}

@@ -1,0 +1,10 @@
+fragment questionComparison on QuestionComparison {
+  existingQuestion {
+    ...question
+  }
+  newQuestion {
+  ...question
+  }
+  status 
+  conflictResolutionStrategy
+}

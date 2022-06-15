@@ -1,0 +1,9 @@
+fragment questionaryStep on QuestionaryStep {
+  topic {
+    ...topic
+  }
+  isCompleted
+  fields {
+    ...answer
+  }
+}

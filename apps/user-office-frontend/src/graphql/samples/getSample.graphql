@@ -1,0 +1,9 @@
+query getSample($sampleId: Int!) {
+  sample(sampleId: $sampleId) {
+    ...sample
+    questionary {
+      isCompleted
+      ...questionary
+    }
+  }
+}

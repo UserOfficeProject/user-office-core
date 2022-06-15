@@ -1,0 +1,10 @@
+mutation deleteQuestion($questionId: String!) {
+  deleteQuestion(questionId: $questionId) {
+    question {
+      ...question
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

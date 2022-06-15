@@ -1,0 +1,15 @@
+mutation mergeInstitutions($institutionIdFrom: Int!, $institutionIdInto: Int!, $newTitle: String!) {
+  mergeInstitutions(institutionIdFrom: $institutionIdFrom, institutionIdInto: $institutionIdInto, newTitle: $newTitle) {
+    institution {
+      id
+      verified
+      name
+      country {
+        ...country
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
