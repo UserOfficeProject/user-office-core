@@ -1,0 +1,4 @@
+node_modules
+apps/user-office-frontend/node_modules
+apps/user-office-frontend-e2e/node_modules
+apps/user-office-backend/node_modules

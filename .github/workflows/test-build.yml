@@ -1,69 +1,206 @@
-name: Build, Test and Push
+name: E2E and build testing.
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the develop and master branches
 on:
   pull_request:
-    branches: [develop, master]
+    branches: [main]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test:
+  resolve_dep:
+    runs-on: ubuntu-latest
+    outputs:
+      FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
+
+    steps:
+      - name: Resolve required repositories
+        id: resolve_rep
+        run: |
+          # this assumes the result is an array, and .name property is used
+          check_feature() {
+            # first param is the branch, everything after is endpoint for curl
+            local branch=$1
+            local found=0
+            shift
+            for endpoint in $@; do
+              local json=$(curl -s $endpoint)
+              local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
+              # to track what we found
+              >&2 echo "$endpoint -> $branch_found"
+              if [[ $branch_found != "" ]]; then
+                found=$((found += 1))
+              fi
+            done
+            echo $found
+          }
+
+          FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+          )
+
+          FACTORY_TAG=develop
+          if [[ $FACTORY_TAGS == "2" ]]; then
+            FACTORY_TAG="${{ github.head_ref }}"
+          fi
+
+          echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
+
+      - name: Resolved
+        run: |
+          echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
+
+  build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
+    needs: resolve_dep
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
       - name: Cache node_modules
+        id: cached-modules
         uses: actions/cache@v2
         env:
-          cache-name: ${{ matrix.node-version }}-cache-node-modules
+          cache-name: node-modules-cache
         with:
-          path: ~/.npm
+          path: node_modules
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-
-
-      - run: npm ci --loglevel error --no-fund
-      - run: npm run build
-      - run: npm test
-        env:
-          NODE_ENV: test
-          secret: ${{secrets.secret}}
-          tokenLife: 7d
-          SPARKPOST_TOKEN: wrong_token_for_test
-
-  build:
+  e2e:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [resolve_dep, build]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        pattern:
+          [
+            'cypress/integration/[a-e]*.ts',
+            'cypress/integration/[f-g]*.ts',
+            'cypress/integration/[h-i]*.ts',
+            'cypress/integration/[j-n]*.ts',
+            'cypress/integration/[m-p]*.ts',
+            'cypress/integration/[r-s]*.ts',
+            'cypress/integration/[t-t]*.ts',
+            'cypress/integration/[u-z]*.ts',
+            'cypress/integration/[A-Z]*.ts',
+          ]
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      # Caching should be reviewed and set up better
+      # - name: Cache frontend node_modules
+      #   id: frontend-cached-modules
+      #   uses: actions/cache@v2
+      #   env:
+      #     cache-name: frontend-node-modules-cache
+      #   with:
+      #     path: apps/user-office-frontend/node_modules
+      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ env.cache-name }}-
 
-      - name: Cache app docker layers
+      # - name: Cache backend node_modules
+      #   id: backend-cached-modules
+      #   uses: actions/cache@v2
+      #   env:
+      #     cache-name: backend-node-modules-cache
+      #   with:
+      #     path: apps/user-office-backend/node_modules
+      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install root dependencies
+        run: |
+          npm install
+          npm run install:all
+
+      # Caching should be reviewed and set up better
+      # - name: Install all dependencies
+      #   if: ${{ (steps.frontend-cached-modules.outputs.cache-hit != 'true') && (steps.backend-cached-modules.outputs.cache-hit != 'true') }}
+      #   run: npm run install:all
+
+      - name: Login to GitHub Packages Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download required repositories
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+
+      - name: Run e2e tests
+        env:
+          USER_OFFICE_BACKEND_DIR: apps/user-office-backend
+          USER_OFFICE_FRONTEND_DIR: apps/user-office-frontend
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/user-office-frontend-e2e
+          USER_OFFICE_BACKEND: http://localhost:4000/graphql
+          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
+          TZ: Europe/Stockholm
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          DEPENDENCY_CONFIG: ess
+          secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          NODE_ENV: development
+          baseURL: localhost:3000
+          tokenLife: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          SCHEMA_URL: http://localhost:4000/graphql
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+          CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
+          BUILD_TAG: ${{ github.sha }}
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run e2e:after:dev
+
+      - name: Upload cypres screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-screenshots
+          path: apps/user-office-frontend-e2e/cypress/screenshots
+
+  push:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: e2e
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Load app cache
+        id: cached-image
         uses: actions/cache@v2
         with:
-          path: /tmp/.buildx-layer-cache
+          path: |
+            /tmp/.buildx-layer-cache
+            /tmp/.buildx-image-cache
           key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-${{ github.head_ref }}-
-            ${{ runner.os }}-buildx-
+
+      - name: Fail on cache miss
+        if: steps.cached-image.outputs.cache-hit != 'true'
+        run: |
+          echo "No cache hit!"
+          exit 1
+
+      # For debugging capture the selected branch
+      - name: Branch
+        run: echo "Branch ${{ github.head_ref }}"
+
+      - name: Load cached app image
+        run: |
+          docker load --input /tmp/.buildx-image-cache/img.tar
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -71,14 +208,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # For debugging capture the selected branch
-      - name: Extracted branch
-        run: echo "Extracted branch ${{ github.head_ref }}"
-
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: dmsc/duo-backend:${{ github.head_ref }}
-          cache-from: type=local,src=/tmp/.buildx-layer-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+      - name: Push
+        run: |
+          docker tag user-office-core-monorepo:${{ github.sha }} dmsc/user-office-core-monorepo:${{ github.head_ref }}
+          docker push dmsc/user-office-core-monorepo:${{ github.head_ref }}
