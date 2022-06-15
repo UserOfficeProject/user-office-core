@@ -16,11 +16,9 @@ export const QuestionTemplateRelationGenericTemplateBasisForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            titlePlaceholder: Yup.string(),
-            questionLabel: Yup.string(),
-          }),
+        config: Yup.object({
+          titlePlaceholder: Yup.string(),
+          questionLabel: Yup.string(),
         }),
       })}
     >

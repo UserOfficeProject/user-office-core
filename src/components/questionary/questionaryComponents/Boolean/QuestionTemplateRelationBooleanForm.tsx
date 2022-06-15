@@ -18,10 +18,8 @@ export const QuestionTemplateRelationBooleanForm: FC<
       {...props}
       template={props.template}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            required: Yup.bool(),
-          }),
+        config: Yup.object({
+          required: Yup.bool(),
         }),
       })}
     >

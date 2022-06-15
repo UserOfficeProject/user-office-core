@@ -52,13 +52,11 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            addEntryButtonLabel: Yup.string().required(),
-            minEntries: Yup.number().min(0).nullable(),
-            maxEntries: Yup.number().min(1).nullable(),
-            templateId: Yup.number().required('Template is required'),
-          }),
+        config: Yup.object({
+          addEntryButtonLabel: Yup.string().required(),
+          minEntries: Yup.number().min(0).nullable(),
+          maxEntries: Yup.number().min(1).nullable(),
+          templateId: Yup.number().required('Template is required'),
         }),
       })}
     >

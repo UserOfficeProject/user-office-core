@@ -28,15 +28,13 @@ export const QuestionTemplateRelationFileUploadForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            file_type: Yup.array().required().min(1, 'File type is required'),
-            small_label: Yup.string(),
-            max_files: Yup.number().min(
-              0,
-              'Value must be grater than or equal to 0'
-            ),
-          }),
+        config: Yup.object({
+          file_type: Yup.array().required().min(1, 'File type is required'),
+          small_label: Yup.string(),
+          max_files: Yup.number().min(
+            0,
+            'Value must be grater than or equal to 0'
+          ),
         }),
       })}
     >
