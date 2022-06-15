@@ -1,0 +1,20 @@
+mutation addStatusChangingEventsToConnection(
+  $proposalWorkflowConnectionId: Int!
+  $statusChangingEvents: [String!]!
+) {
+  addStatusChangingEventsToConnection(
+    addStatusChangingEventsToConnectionInput: {
+      proposalWorkflowConnectionId: $proposalWorkflowConnectionId
+      statusChangingEvents: $statusChangingEvents
+    }
+  ) {
+    statusChangingEvents {
+      statusChangingEventId
+      proposalWorkflowConnectionId
+      statusChangingEvent
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

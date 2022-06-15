@@ -1,0 +1,12 @@
+mutation submitInstrument($callId: Int!, $instrumentId: Int!, $sepId: Int!) {
+  submitInstrument(
+    callId: $callId
+    instrumentId: $instrumentId
+    sepId: $sepId
+  ) {
+    rejection {
+      ...rejection
+    }
+    isSuccess
+  }
+}

@@ -1,0 +1,36 @@
+query getSEPProposals($sepId: Int!, $callId: Int) {
+  sepProposals(sepId: $sepId, callId: $callId) {
+    proposalPk
+    dateAssigned
+    sepId
+    sepTimeAllocation
+    proposal {
+      title
+      primaryKey
+      proposalId
+      status {
+        ...proposalStatus
+      }
+    }
+    assignments {
+      proposalPk
+      sepMemberUserId
+      dateAssigned
+      user {
+        ...basicUserDetails
+      }
+      role {
+        id
+        shortCode
+        title
+      }
+      review {
+        id
+        status
+        comment
+        grade
+        sepID
+      }
+    }
+  }
+}

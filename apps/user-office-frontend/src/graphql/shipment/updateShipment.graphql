@@ -1,0 +1,24 @@
+mutation updateShipment(
+  $shipmentId: Int!
+  $title: String
+  $proposalPk: Int
+  $status: ShipmentStatus
+) {
+  updateShipment(
+    shipmentId: $shipmentId
+    title: $title
+    status: $status
+    proposalPk: $proposalPk
+  ) {
+    rejection {
+      ...rejection
+    }
+    shipment {
+      ...shipment
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+  }
+}

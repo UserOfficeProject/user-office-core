@@ -1,0 +1,8 @@
+mutation selectRole($token: String!, $selectedRoleId: Int!) {
+  selectRole(token: $token, selectedRoleId: $selectedRoleId) {
+    token
+    rejection {
+      ...rejection
+    }
+  }
+}

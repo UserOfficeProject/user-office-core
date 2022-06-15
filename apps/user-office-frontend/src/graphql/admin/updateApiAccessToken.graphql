@@ -1,0 +1,23 @@
+mutation updateApiAccessToken(
+  $accessTokenId: String!
+  $name: String!
+  $accessPermissions: String!
+) {
+  updateApiAccessToken(
+    updateApiAccessTokenInput: {
+      accessTokenId: $accessTokenId
+      name: $name
+      accessPermissions: $accessPermissions
+    }
+  ) {
+    rejection {
+      ...rejection
+    }
+    apiAccessToken {
+      id
+      name
+      accessToken
+      accessPermissions
+    }
+  }
+}

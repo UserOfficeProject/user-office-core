@@ -1,0 +1,7 @@
+mutation setUserEmailVerified($id: Int!) {
+  setUserEmailVerified(id: $id) {
+    rejection {
+      ...rejection
+    }
+  }
+}

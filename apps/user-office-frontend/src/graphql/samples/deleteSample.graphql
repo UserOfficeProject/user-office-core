@@ -1,0 +1,10 @@
+mutation deleteSample($sampleId: Int!) {
+  deleteSample(sampleId: $sampleId) {
+    sample {
+      ...sample
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

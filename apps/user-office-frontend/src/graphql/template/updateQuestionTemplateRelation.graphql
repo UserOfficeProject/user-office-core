@@ -1,0 +1,22 @@
+mutation updateQuestionTemplateRelation(
+  $questionId: String!
+  $templateId: Int!
+  $topicId: Int
+  $sortOrder: Int!
+  $config: String
+) {
+  updateQuestionTemplateRelation(
+    questionId: $questionId
+    templateId: $templateId
+    topicId: $topicId
+    sortOrder: $sortOrder
+    config: $config
+  ) {
+    template {
+      ...template
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

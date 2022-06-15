@@ -1,0 +1,25 @@
+fragment proposal on Proposal {
+  primaryKey
+  title
+  abstract
+  statusId
+  status {
+    ...proposalStatus
+  }
+  publicStatus
+  proposalId
+  finalStatus
+  commentForUser
+  commentForManagement
+  created
+  updated
+  callId
+  questionaryId
+  notified
+  submitted
+  managementTimeAllocation
+  managementDecisionSubmitted
+  sepMeetingDecision {
+    ...sepMeetingDecision
+  }
+}

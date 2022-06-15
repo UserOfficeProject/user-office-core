@@ -1,0 +1,21 @@
+mutation updateFeedback(
+  $feedbackId: Int!
+  $status: FeedbackStatus
+) {
+  updateFeedback(
+    feedbackId: $feedbackId
+    status: $status
+  ) {
+    feedback {
+      ...feedback
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

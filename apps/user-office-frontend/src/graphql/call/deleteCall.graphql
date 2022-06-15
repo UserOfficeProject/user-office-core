@@ -1,0 +1,13 @@
+mutation deleteCall($id: Int!) {
+  deleteCall(id: $id) {
+    rejection {
+      ...rejection
+    }
+    call {
+      id
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

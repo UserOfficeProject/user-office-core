@@ -1,0 +1,14 @@
+mutation assignScientistsToInstrument(
+  $scientistIds: [Int!]!
+  $instrumentId: Int!
+) {
+  assignScientistsToInstrument(
+    scientistIds: $scientistIds
+    instrumentId: $instrumentId
+  ) {
+    rejection {
+      ...rejection
+    }
+    isSuccess
+  }
+}

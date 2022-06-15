@@ -1,0 +1,225 @@
+:root {
+  --PALETTE_PRIMARY_DARK: #303f9f;
+  --PALETTE_PRIMARY_MAIN: #3f51b5;
+  --PALETTE_PRIMARY_ACCENT: #0000008a;
+  --PALETTE_PRIMARY_LIGHT: #7986cb;
+  --PALETTE_PRIMARY_CONTRAST: #fff;
+  --PALETTE_SECONDARY_DARK: #c51162;
+  --PALETTE_SECONDARY_MAIN: #f50057;
+  --PALETTE_SECONDARY_LIGHT: #ff4081;
+  --PALETTE_SECONDARY_CONTRAST: #fff;
+  --PALETTE_ERROR_MAIN: #f44336;
+  --PALETTE_SUCCESS_MAIN: #4caf50;
+  --PALETTE_WARNING_MAIN: #ff9800;
+  --PALETTE_INFO_MAIN: #2196f3;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.MuiPaper-elevation2.MuiPaper-root {
+  box-shadow: none;
+}
+
+.MuiFormLabel-asterisk {
+  color: #b40000;
+}
+
+.MuiList-root .MuiListItem-root.active {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.MuiList-root .MuiCollapse-wrapper .MuiListItem-root {
+  padding-left: 26px;
+}
+
+.tinyScroll::-webkit-scrollbar {
+  -webkit-appearance: none;
+  max-height: 10px;
+  max-width: 10px;
+}
+
+.tinyScroll::-webkit-scrollbar-thumb {
+  border: 2px solid white;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--PALETTE_PRIMARY_DARK);
+}
+
+/* Drawer icons */
+.MuiDrawer-root .MuiListItemIcon-root {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Drawer close icon */
+.MuiDrawer-root .MuiIconButton-root {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Table row buttons */
+.MuiTable-root .MuiTableRow-root .MuiIconButton-root:not(.Mui-disabled) {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Table search icon */
+.MuiGrid-root
+  .MuiToolbar-root
+  .MuiInputAdornment-positionStart:not(.Mui-disabled) {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Table show columns icon */
+.MuiGrid-root .MuiToolbar-root .MuiIconButton-root:not(.Mui-disabled) {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Table drop-down icons */
+.MuiGrid-root .MuiFormControl-root .MuiInput-root > svg {
+  fill: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Table search clear button, date pickers */
+.MuiFormControl-root .MuiInputAdornment-positionEnd button:not(.Mui-disabled) {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Table pagination icons */
+.MuiTablePagination-input > svg {
+  fill: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Drop-down icons */
+.MuiSvgIcon-root.MuiSelect-icon {
+  fill: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* 'Box' search icon */
+.MuiBox-root
+  .MuiToolbar-root
+  .MuiInputAdornment-positionStart:not(.Mui-disabled) {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* 'Box' buttons */
+.MuiBox-root .MuiIconButton-root:not(.Mui-disabled) {
+  color: var(--PALETTE_PRIMARY_ACCENT);
+}
+.MuiBox-root .MuiIconButton-root:not(.Mui-disabled).MuiSwitch-switchBase {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
+.MuiBox-root .MuiIconButton-root:not(.Mui-disabled).Mui-checked {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
+
+/* Role icons */
+.MuiList-root .MuiMenuItem-root:not(.Mui-disabled) svg {
+  fill: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Checkbox checked icon */
+.MuiCheckbox-root.Mui-checked {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
+.MuiTable-root
+  .MuiTableRow-root
+  .MuiIconButton-root:not(.Mui-disabled).Mui-checked {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
+
+/* Logo image - ensures min 1/4 of the height is padding */
+.header-logo {
+  max-height: 71.4%;
+}
+
+.header-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 24px;
+}
+
+.MuiButton-contained {
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+  background-color: var(--PALETTE_PRIMARY_MAIN);
+}
+
+.MuiButton-contained:hover {
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+  background-color: var(--PALETTE_PRIMARY_LIGHT);
+}
+
+.MuiButton-containedPrimary {
+  color: var(--PALETTE_SECONDARY_CONTRAST);
+  background-color: var(--PALETTE_SECONDARY_MAIN);
+}
+
+.MuiButton-containedPrimary:hover {
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+  background-color: var(--PALETTE_SECONDARY_DARK);
+}
+
+.MuiButton-containedSecondary {
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+  background-color: var(--PALETTE_PRIMARY_MAIN);
+}
+
+.MuiButton-containedSecondary:hover {
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+  background-color: var(--PALETTE_PRIMARY_LIGHT);
+}
+
+.MuiSnackbar-root [class*='SnackbarItem-variantSuccess'] {
+  background-color: var(--PALETTE_SUCCESS_MAIN);
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+}
+
+.MuiSnackbar-root [class*='SnackbarItem-variantError'] {
+  background-color: var(--PALETTE_ERROR_MAIN);
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+}
+
+.MuiSnackbar-root [class*='SnackbarItem-variantWarning'] {
+  background-color: var(--PALETTE_WARNING_MAIN);
+  color: var(--PALETTE_PRIMARY_CONTRAST);
+}
+
+.MuiSnackbar-root [class*='SnackbarItem-variantInformation'] {
+  background-color: var(--PALETTE_INFO_MAIN);
+  color: var(--PALETTE_SECONDARY_CONTRAST);
+}
+
+.MuiCircularProgress-root {
+  color: var(--PALETTE_PRIMARY_MAIN);
+}
+
+.MuiTabs-indicator {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
+
+.header-logo-container {
+  height: 64px;
+}
+
+/*------ Mobile view improvements ------*/
+
+div.MuiToolbar-root[class*='MTableToolbar-highlight'] {
+  flex-wrap: wrap;
+}
+
+/*------ Mobile view improvements ------*/

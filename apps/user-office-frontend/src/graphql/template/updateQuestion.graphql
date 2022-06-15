@@ -1,0 +1,20 @@
+mutation updateQuestion(
+  $id: String!
+  $naturalKey: String
+  $question: String
+  $config: String
+) {
+  updateQuestion(
+    id: $id
+    naturalKey: $naturalKey
+    question: $question
+    config: $config
+  ) {
+    question {
+      ...question
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

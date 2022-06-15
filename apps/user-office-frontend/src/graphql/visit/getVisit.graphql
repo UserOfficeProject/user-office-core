@@ -1,0 +1,17 @@
+query getVisit($visitId: Int!) {
+  visit(visitId: $visitId) {
+    ...visit
+    registrations {
+      ...visitRegistration
+      user {
+        ...basicUserDetails
+      }
+    }
+    proposal {
+      ...proposal
+      instrument {
+        name
+      }
+    }
+  }
+}

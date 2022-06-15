@@ -1,0 +1,20 @@
+mutation updateTemplate(
+  $templateId: Int!
+  $name: String
+  $description: String
+  $isArchived: Boolean
+) {
+  updateTemplate(
+    templateId: $templateId
+    name: $name
+    description: $description
+    isArchived: $isArchived
+  ) {
+    template {
+      ...templateMetadata
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

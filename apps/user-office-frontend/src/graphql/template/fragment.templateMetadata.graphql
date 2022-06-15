@@ -1,0 +1,11 @@
+fragment templateMetadata on Template {
+  templateId
+  name
+  description
+  isArchived
+  steps {
+    topic {
+      ...topic
+    }
+  }
+}

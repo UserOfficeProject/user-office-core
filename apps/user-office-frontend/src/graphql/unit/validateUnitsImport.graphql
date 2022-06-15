@@ -1,0 +1,26 @@
+mutation validateUnitsImport($unitsAsJson: String!) {
+  validateUnitsImport(unitsAsJson:$unitsAsJson) {
+    validationResult {
+      json
+      version
+      exportDate
+      isValid
+      errors
+      unitComparisons {
+        existingUnit
+        {
+          ...unit
+        }
+        newUnit
+        {
+          ...unit
+        }
+        status
+        conflictResolutionStrategy
+      }
+    }
+    rejection {
+       ...rejection
+    }
+  }
+}

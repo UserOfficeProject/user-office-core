@@ -1,0 +1,8 @@
+mutation removeProposalsFromInstrument($proposalPks: [Int!]!) {
+  removeProposalsFromInstrument(proposalPks: $proposalPks) {
+    rejection {
+      ...rejection
+    }
+    isSuccess
+  }
+}

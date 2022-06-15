@@ -1,0 +1,13 @@
+mutation createQuestion(
+  $categoryId: TemplateCategoryId!
+  $dataType: DataType!
+) {
+  createQuestion(categoryId: $categoryId, dataType: $dataType) {
+    question {
+      ...question
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

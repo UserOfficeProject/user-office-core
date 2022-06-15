@@ -1,0 +1,27 @@
+query getUserProposals {
+  me {
+    proposals {
+      primaryKey
+      proposalId
+      title
+      status {
+        ...proposalStatus
+      }
+      publicStatus
+      statusId
+      created
+      finalStatus
+      notified
+      submitted
+      proposer {
+        id
+      }
+      call {
+        id
+        shortCode
+        isActive
+        referenceNumberFormat
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+mutation setUserNotPlaceholder($id: Int!) {
+  setUserNotPlaceholder(id: $id) {
+    rejection {
+      ...rejection
+    }
+  }
+}

@@ -1,0 +1,16 @@
+FROM cypress/included:9.7.0
+
+WORKDIR /e2e
+
+COPY cypress/cypress.json .
+COPY cypress/package* ./
+COPY cypress/tsconfig.json .
+
+RUN npm ci --silent
+
+COPY cypress ./cypress/
+COPY src/generated ./src/generated/
+
+COPY cypress/wait-for-frontend.sh /
+
+ENTRYPOINT ["npm", "run", "cy:run"]

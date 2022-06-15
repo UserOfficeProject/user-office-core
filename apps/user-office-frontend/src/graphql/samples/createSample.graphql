@@ -1,0 +1,26 @@
+mutation createSample(
+  $title: String!
+  $templateId: Int!
+  $proposalPk: Int!
+  $questionId: String!
+  $isPostProposalSubmission: Boolean
+) {
+  createSample(
+    title: $title
+    templateId: $templateId
+    proposalPk: $proposalPk
+    questionId: $questionId
+    isPostProposalSubmission: $isPostProposalSubmission
+  ) {
+    sample {
+      ...sample
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

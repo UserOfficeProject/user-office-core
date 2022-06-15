@@ -1,0 +1,7 @@
+fragment esi on ExperimentSafetyInput {
+  id
+  creatorId
+  questionaryId
+  isSubmitted
+  created
+}

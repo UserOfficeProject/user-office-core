@@ -1,0 +1,10 @@
+mutation submitShipment($shipmentId: Int!) {
+  submitShipment(shipmentId: $shipmentId) {
+    rejection {
+      ...rejection
+    }
+    shipment {
+      ...shipment
+    }
+  }
+}

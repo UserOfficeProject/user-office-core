@@ -1,0 +1,10 @@
+mutation deleteProposal($proposalPk: Int!) {
+  deleteProposal(proposalPk: $proposalPk) {
+    rejection {
+      ...rejection
+    }
+    proposal {
+      primaryKey
+    }
+  }
+}

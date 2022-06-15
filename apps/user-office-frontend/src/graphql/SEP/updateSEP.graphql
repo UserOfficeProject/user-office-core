@@ -1,0 +1,22 @@
+mutation updateSEP(
+  $id: Int!
+  $code: String!
+  $description: String!
+  $numberRatingsRequired: Int!
+  $active: Boolean!
+) {
+  updateSEP(
+    id: $id
+    code: $code
+    description: $description
+    numberRatingsRequired: $numberRatingsRequired
+    active: $active
+  ) {
+    sep {
+      id
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

@@ -1,0 +1,16 @@
+fragment coreTechnicalReview on TechnicalReview {
+  id
+  comment
+  publicComment
+  timeAllocation
+  status
+  proposalPk
+  submitted
+  files
+  technicalReviewAssigneeId
+  technicalReviewAssignee {
+    id
+    firstname
+    lastname
+  }
+}

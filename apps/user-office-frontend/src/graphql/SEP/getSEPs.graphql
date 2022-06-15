@@ -1,0 +1,8 @@
+query getSEPs($filter: String!, $active: Boolean) {
+  seps(filter: $filter, active: $active) {
+    seps {
+      ...sep
+    }
+    totalCount
+  }
+}

@@ -1,0 +1,25 @@
+mutation assignReviewersToSEP($memberIds: [Int!]!, $sepId: Int!) {
+  assignReviewersToSEP(memberIds: $memberIds, sepId: $sepId) {
+    rejection {
+      ...rejection
+    }
+    sep {
+      id
+    }
+  }
+}
+
+mutation assignChairOrSecretary(
+  $assignChairOrSecretaryToSEPInput: AssignChairOrSecretaryToSEPInput!
+) {
+  assignChairOrSecretary(
+    assignChairOrSecretaryToSEPInput: $assignChairOrSecretaryToSEPInput
+  ) {
+    rejection {
+      ...rejection
+    }
+    sep {
+      id
+    }
+  }
+}

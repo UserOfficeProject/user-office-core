@@ -1,0 +1,7 @@
+fragment unit on Unit {
+    id
+    unit
+    quantity
+    symbol
+    siConversionFormula
+}

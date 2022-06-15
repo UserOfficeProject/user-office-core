@@ -1,0 +1,7 @@
+query getMyProposals($filter: UserProposalsFilter) {
+  me {
+    proposals(filter: $filter) {
+      ...proposal
+    }
+  }
+}

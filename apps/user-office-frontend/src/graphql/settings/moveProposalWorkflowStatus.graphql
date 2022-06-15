@@ -1,0 +1,17 @@
+mutation moveProposalWorkflowStatus(
+  $from: IndexWithGroupId!
+  $to: IndexWithGroupId!
+  $proposalWorkflowId: Int!
+) {
+  moveProposalWorkflowStatus(
+    moveProposalWorkflowStatusInput: {
+      from: $from
+      to: $to
+      proposalWorkflowId: $proposalWorkflowId
+    }
+  ) {
+    rejection {
+      ...rejection
+    }
+  }
+}

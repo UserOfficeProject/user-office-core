@@ -1,0 +1,22 @@
+mutation updateTopic(
+  $topicId: Int!
+  $templateId: Int
+  $title: String
+  $sortOrder: Int
+  $isEnabled: Boolean
+) {
+  updateTopic(
+    id: $topicId
+    templateId: $templateId
+    title: $title
+    sortOrder: $sortOrder
+    isEnabled: $isEnabled
+  ) {
+    template {
+      ...template
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

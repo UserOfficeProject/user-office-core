@@ -1,0 +1,32 @@
+mutation updateReview(
+  $reviewID: Int!
+  $grade: Int!
+  $comment: String!
+  $status: ReviewStatus!
+  $sepID: Int!
+) {
+  updateReview(
+    reviewID: $reviewID
+    grade: $grade
+    comment: $comment
+    status: $status
+    sepID: $sepID
+  ) {
+    rejection {
+      ...rejection
+    }
+    review {
+      id
+      userID
+      status
+      comment
+      grade
+      sepID
+      nextProposalStatus {
+        id
+        shortCode
+        name
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+mutation administrationProposal(
+  $proposalPk: Int!
+  $finalStatus: ProposalEndStatus
+  $statusId: Int
+  $commentForUser: String
+  $commentForManagement: String
+  $managementTimeAllocation: Int
+  $managementDecisionSubmitted: Boolean
+) {
+  administrationProposal(
+    proposalPk: $proposalPk
+    finalStatus: $finalStatus
+    statusId: $statusId
+    commentForUser: $commentForUser
+    commentForManagement: $commentForManagement
+    managementTimeAllocation: $managementTimeAllocation
+    managementDecisionSubmitted: $managementDecisionSubmitted
+  ) {
+    proposal {
+      primaryKey
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

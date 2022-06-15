@@ -1,0 +1,31 @@
+mutation updateProposal(
+  $proposalPk: Int!
+  $title: String
+  $abstract: String
+  $users: [Int!]
+  $proposerId: Int
+) {
+  updateProposal(
+    proposalPk: $proposalPk
+    title: $title
+    abstract: $abstract
+    users: $users
+    proposerId: $proposerId
+  ) {
+    proposal {
+      primaryKey
+      title
+      abstract
+
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

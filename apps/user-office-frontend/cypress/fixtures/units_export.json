@@ -1,0 +1,454 @@
+{
+  "version": "1.0.0",
+  "exportDate": "2022-02-11T12:17:34.442Z",
+  "units": [
+    {
+      "id": "electric_current",
+      "unit": "ampere",
+      "quantity": "electric current",
+      "symbol": "A",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "magnetic_field_strength",
+      "unit": "ampere per meter",
+      "quantity": "magnetic field strength",
+      "symbol": "A/m",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "becquerel",
+      "unit": "becquerel",
+      "quantity": "activity (of a radionuclide)",
+      "symbol": "Bq",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "luminous_intensity",
+      "unit": "candela",
+      "quantity": "luminous intensity",
+      "symbol": "cd",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "luminance",
+      "unit": "candela per square meter",
+      "quantity": "luminance",
+      "symbol": "cd/m2",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "celsius",
+      "unit": "celsius",
+      "quantity": "mass",
+      "symbol": "",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "electricity_quantity",
+      "unit": "coulomb",
+      "quantity": "electric charge, quantity of electricity",
+      "symbol": "C",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "elecelectric_charge_densitytric",
+      "unit": "coulomb per cubic meter",
+      "quantity": "electric charge density",
+      "symbol": "C/m3",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "exposure",
+      "unit": "coulomb per kilogram",
+      "quantity": "exposure (x and gamma rays)",
+      "symbol": "C/kg",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "electric_flux_density",
+      "unit": "coulomb per square meter",
+      "quantity": "electric flux density",
+      "symbol": "C/m2",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "volume",
+      "unit": "cubic meter",
+      "quantity": "volume",
+      "symbol": "m3",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "capacitance",
+      "unit": "farad",
+      "quantity": "capacitance",
+      "symbol": "F",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "permittivity",
+      "unit": "farad per meter",
+      "quantity": "permittivity",
+      "symbol": "F/m",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "gray",
+      "unit": "gray",
+      "quantity": "absorbed dose, specific energy (imparted), kerma",
+      "symbol": "Gy",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "absorbed_dose_rate",
+      "unit": "gray per second",
+      "quantity": "absorbed dose rate",
+      "symbol": "Gy/s",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "inductance",
+      "unit": "henry",
+      "quantity": "inductance",
+      "symbol": "H",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "permeability",
+      "unit": "henry per meter",
+      "quantity": "permeability",
+      "symbol": "H/m",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "frequency",
+      "unit": "hertz",
+      "quantity": "frequency",
+      "symbol": "Hz",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "energy",
+      "unit": "joule",
+      "quantity": "energy, work, quantity of heat",
+      "symbol": "J",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "energy_density",
+      "unit": "joule per cubic meter",
+      "quantity": "energy density",
+      "symbol": "J/m3",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "heat_capacity",
+      "unit": "joule per kelvin",
+      "quantity": "heat capacity, entropy",
+      "symbol": "J/K",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "specific_energy",
+      "unit": "joule per kilogram",
+      "quantity": "specific energy",
+      "symbol": "J/kg",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "molar_energy",
+      "unit": "joule per mole",
+      "quantity": "molar energy",
+      "symbol": "J/mol",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "molar_entropy",
+      "unit": "joule per mole kelvin",
+      "quantity": "molar entropy, molar heat capacity",
+      "symbol": "J/(mol·K)",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "catalytic_concentration",
+      "unit": "katal per cubic meter",
+      "quantity": "catalytic (activity) concentration",
+      "symbol": "kat/m3",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "kelvin",
+      "unit": "kelvin",
+      "quantity": "mass",
+      "symbol": "",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "temperature",
+      "unit": "kelvin",
+      "quantity": "thermodynamic temperature",
+      "symbol": "K",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "mass",
+      "unit": "kilogram",
+      "quantity": "mass",
+      "symbol": "kg",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "mass_density",
+      "unit": "kilogram per cubic meter",
+      "quantity": "mass density",
+      "symbol": "kg/m3",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "luminous_flux",
+      "unit": "lumen",
+      "quantity": "luminous flux",
+      "symbol": "lm",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "illuminance",
+      "unit": "lux",
+      "quantity": "illuminance",
+      "symbol": "lx",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "length",
+      "unit": "meter",
+      "quantity": "length",
+      "symbol": "m",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "speed",
+      "unit": "meter per second",
+      "quantity": "speed, velocity",
+      "symbol": "m/s",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "acceleration",
+      "unit": "meter per second squared",
+      "quantity": "acceleration",
+      "symbol": "m/s2",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "amount_of_substance",
+      "unit": "mole",
+      "quantity": "amount of substance",
+      "symbol": "mol",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "concentration",
+      "unit": "mole per cubic meter",
+      "quantity": "concentration",
+      "symbol": "mol/m3",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "force",
+      "unit": "newton",
+      "quantity": "force",
+      "symbol": "N",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "surface_tension",
+      "unit": "newton per meter",
+      "quantity": "surface tension",
+      "symbol": "N/m",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "electric_resistance",
+      "unit": "ohm",
+      "quantity": "electric resistance",
+      "symbol": "Ω",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "pressure",
+      "unit": "pascal",
+      "quantity": "pressure, stress",
+      "symbol": "Pa",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "angle",
+      "unit": "radian (a)",
+      "quantity": "angle",
+      "symbol": "rad",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "angular_velocity",
+      "unit": "radian per second",
+      "quantity": "angular velocity",
+      "symbol": "rad/s",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "angular_acceleration",
+      "unit": "radian per second squared",
+      "quantity": "angular acceleration",
+      "symbol": "rad/s2",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "time",
+      "unit": "second",
+      "quantity": "time",
+      "symbol": "s",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "electric_conductance",
+      "unit": "siemens",
+      "quantity": "electric conductance",
+      "symbol": "S",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "sievert",
+      "unit": "sievert",
+      "quantity": "dose equivalent",
+      "symbol": "Sv",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "area",
+      "unit": "square meter",
+      "quantity": "area",
+      "symbol": "m2",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "magnetic_flux_density",
+      "unit": "tesla",
+      "quantity": "magnetic flux density",
+      "symbol": "T",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "electromotive_force",
+      "unit": "volt",
+      "quantity": "electromotive force",
+      "symbol": "V",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "electric_field_strength",
+      "unit": "volt per meter",
+      "quantity": "electric field strength",
+      "symbol": "V/m",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "power",
+      "unit": "watt",
+      "quantity": "power radiant flux",
+      "symbol": "W",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "thermal_conductivity",
+      "unit": "watt per meter kelvin",
+      "quantity": "thermal conductivity",
+      "symbol": "W/(m·K)",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "irradiance",
+      "unit": "watt per square meter",
+      "quantity": "heat flux density, irradiance",
+      "symbol": "W/m2",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "radiance",
+      "unit": "watt per square meter steradian",
+      "quantity": "radiance",
+      "symbol": "W/(m2·sr)",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "radiant_intensity",
+      "unit": "watt per steradian",
+      "quantity": "radiant intensity",
+      "symbol": "W/sr",
+      "siConversionFormula": "x"
+    },
+    {
+      "id": "magnetic_flux",
+      "unit": "weber",
+      "quantity": "magnetic flux",
+      "symbol": "Wb",
+      "siConversionFormula": "x"
+    }
+  ],
+  "quantities": [
+    { "id": "absorbed dose rate" },
+    { "id": "absorbed dose, specific energy (imparted), kerma" },
+    { "id": "acceleration" },
+    { "id": "activity (of a radionuclide)" },
+    { "id": "amount of substance" },
+    { "id": "angle" },
+    { "id": "angular acceleration" },
+    { "id": "angular velocity" },
+    { "id": "area" },
+    { "id": "capacitance" },
+    { "id": "catalytic (activity) concentration" },
+    { "id": "concentration" },
+    { "id": "dose equivalent" },
+    { "id": "electric charge density" },
+    { "id": "electric charge, quantity of electricity" },
+    { "id": "electric conductance" },
+    { "id": "electric current" },
+    { "id": "electric field strength" },
+    { "id": "electric flux density" },
+    { "id": "electric resistance" },
+    { "id": "electromotive force" },
+    { "id": "energy density" },
+    { "id": "energy, work, quantity of heat" },
+    { "id": "exposure (x and gamma rays)" },
+    { "id": "force" },
+    { "id": "frequency" },
+    { "id": "heat capacity, entropy" },
+    { "id": "heat flux density, irradiance" },
+    { "id": "illuminance" },
+    { "id": "inductance" },
+    { "id": "length" },
+    { "id": "luminance" },
+    { "id": "luminous flux" },
+    { "id": "luminous intensity" },
+    { "id": "magnetic field strength" },
+    { "id": "magnetic flux" },
+    { "id": "magnetic flux density" },
+    { "id": "mass" },
+    { "id": "mass density" },
+    { "id": "molar energy" },
+    { "id": "molar entropy, molar heat capacity" },
+    { "id": "permeability" },
+    { "id": "permittivity" },
+    { "id": "power radiant flux" },
+    { "id": "pressure, stress" },
+    { "id": "radiance" },
+    { "id": "radiant intensity" },
+    { "id": "specific energy" },
+    { "id": "speed, velocity" },
+    { "id": "surface tension" },
+    { "id": "thermal conductivity" },
+    { "id": "thermodynamic temperature" },
+    { "id": "time" },
+    { "id": "volume" }
+  ]
+}

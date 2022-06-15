@@ -1,0 +1,15 @@
+mutation assignProposalsToSep(
+  $proposals: [ProposalPkWithCallId!]!
+  $sepId: Int!
+) {
+  assignProposalsToSep(proposals: $proposals, sepId: $sepId) {
+    rejection {
+      ...rejection
+    }
+    nextProposalStatus {
+      id
+      shortCode
+      name
+    }
+  }
+}
