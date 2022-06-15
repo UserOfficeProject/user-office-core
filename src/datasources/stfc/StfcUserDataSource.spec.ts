@@ -1,16 +1,14 @@
 import { Role, Roles } from '../../models/Role';
-import { LRUCache } from '../../utils/LRUCache';
 import { dummyUser } from '../mockups/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('./UOWSSoapInterface');
 jest.mock('../postgres/UserDataSource.ts');
+jest.mock('../../utils/LRUCache');
 
 const dummyUserNumber = 12345;
 
 beforeAll(() => {
-  jest.spyOn(LRUCache.prototype, 'enableStatsLogging').mockReturnThis();
-
   const mockGetRoles = jest.spyOn(StfcUserDataSource.prototype, 'getRoles');
   mockGetRoles.mockImplementation(() =>
     Promise.resolve([

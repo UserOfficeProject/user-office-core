@@ -5,10 +5,10 @@ import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { dummyUser } from '../datasources/mockups/UserDataSource';
 import { Instrument } from '../models/Instrument';
-import { LRUCache } from '../utils/LRUCache';
 import { StfcUserAuthorization } from './StfcUserAuthorization';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface.ts');
+jest.mock('../utils/LRUCache');
 
 const userAuthorization = container.resolve(StfcUserAuthorization);
 
@@ -36,8 +36,6 @@ const lsfInstrument = instruments[1];
 const nonExistingInstrumentName = 'NONEXISTING_INSTRUMENT';
 
 beforeAll(() => {
-  jest.spyOn(LRUCache.prototype, 'enableStatsLogging').mockReturnThis();
-
   jest
     .spyOn(instrumentDataSource, 'getInstrumentsByNames')
     .mockImplementation(async (instrumentNames: string[]) =>

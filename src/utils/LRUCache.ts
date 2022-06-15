@@ -8,6 +8,16 @@ type CacheEntry<T> = {
   previous: CacheEntry<T>;
 };
 
+export interface ILRUCache<T> {
+  get(id: string): T | undefined;
+  put(id: string, value: T): void;
+  remove(id: string): void;
+  size(): number;
+  getStats(): { [key: string]: number };
+  resetStats(): void;
+  enableStatsLogging(cacheName: string, intervalSeconds?: number): void;
+}
+
 /**
  * A simple, generic least-recently-used (LRU) cache.
  *
@@ -39,7 +49,7 @@ type CacheEntry<T> = {
  * The index links an entry ID to its element in the linked list, providing fast lookup
  * of any ID.
  */
-export class LRUCache<T> {
+export class LRUCache<T> implements ILRUCache<T> {
   private cacheRoot: CacheEntry<T> | undefined = undefined;
   private index: Map<string, CacheEntry<T>> = new Map();
   private length = 0;
