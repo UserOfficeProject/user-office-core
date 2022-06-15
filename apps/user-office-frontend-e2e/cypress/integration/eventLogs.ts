@@ -1,7 +1,10 @@
+import {
+  UpdateUserMutationVariables,
+  User,
+} from '@user-office-software-libs/shared-types';
 import faker from 'faker';
 import { DateTime } from 'luxon';
 
-import { UpdateUserMutationVariables, User } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('Event log tests', () => {

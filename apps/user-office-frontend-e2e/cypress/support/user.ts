@@ -1,5 +1,3 @@
-import jwtDecode from 'jwt-decode';
-
 import {
   CreateUserMutation,
   CreateUserMutationVariables,
@@ -12,7 +10,9 @@ import {
   UpdateUserMutationVariables,
   UpdateUserRolesMutationVariables,
   User,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import jwtDecode from 'jwt-decode';
+
 import { getE2EApi } from './utils';
 
 type DecodedTokenData = {

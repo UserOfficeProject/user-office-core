@@ -1,4 +1,8 @@
-import { GetSettingsQuery, PrepareDbMutation } from '../../src/generated/sdk';
+import {
+  GetSettingsQuery,
+  PrepareDbMutation,
+} from '@user-office-software-libs/shared-types';
+
 import { getE2EApi } from './utils';
 
 const resetDB = (

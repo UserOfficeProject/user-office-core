@@ -1,6 +1,9 @@
+import {
+  DataType,
+  TemplateCategoryId,
+} from '@user-office-software-libs/shared-types';
 import faker from 'faker';
 
-import { DataType, TemplateCategoryId } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('Questions tests', () => {

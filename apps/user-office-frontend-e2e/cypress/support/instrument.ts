@@ -15,7 +15,8 @@ import {
   SubmitInstrumentMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+
 import { getE2EApi } from './utils';
 
 const createInstrument = (

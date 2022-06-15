@@ -2,12 +2,12 @@ FROM cypress/included:9.7.0
 
 WORKDIR /e2e
 
-COPY apps/user-office-frontend-e2e/cypress.json .
-COPY apps/user-office-frontend-e2e/package* .
-COPY apps/user-office-frontend-e2e/tsconfig.e2e.json ./tsconfig.json
-COPY apps/user-office-frontend-e2e/wait-for-frontend.sh .
-COPY apps/user-office-frontend-e2e/cypress ./cypress/
-COPY apps/user-office-frontend/src/generated libs/shared-types/src
+COPY apps/user-office-frontend-e2e/cypress.json ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/package* ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/tsconfig.json ./user-office-frontend-e2e/tsconfig.json
+COPY apps/user-office-frontend-e2e/wait-for-frontend.sh ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/cypress ./user-office-frontend-e2e/cypress/
+COPY apps/user-office-frontend/src/generated user-office-frontend/src/generated
 
 RUN npm ci --silent
 
