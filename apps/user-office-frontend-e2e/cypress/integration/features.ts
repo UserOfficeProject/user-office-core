@@ -9,8 +9,7 @@ context('Features tests', () => {
     beforeEach(() => {
       cy.login('officer');
     });
-    
-    
+
     it('User officer should be able to disable and enable features', () => {
       cy.visit('/');
 
