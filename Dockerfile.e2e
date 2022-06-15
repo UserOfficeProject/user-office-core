@@ -1,0 +1,14 @@
+FROM cypress/included:9.7.0
+
+WORKDIR /e2e
+
+COPY apps/user-office-frontend-e2e/cypress.json .
+COPY apps/user-office-frontend-e2e/package* .
+COPY apps/user-office-frontend-e2e/tsconfig.e2e.json ./tsconfig.json
+COPY apps/user-office-frontend-e2e/wait-for-frontend.sh .
+COPY apps/user-office-frontend-e2e/cypress ./cypress/
+COPY libs/shared-types/src libs/shared-types/src
+
+RUN npm ci --silent
+
+ENTRYPOINT ["npm", "run", "cy:run"]

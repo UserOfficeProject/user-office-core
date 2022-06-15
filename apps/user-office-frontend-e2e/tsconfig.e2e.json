@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "lib": ["ES6", "dom"],
-    "types": ["node", "cypress", "cypress-file-upload", "./types"],
+    "types": ["node", "cypress", "cypress-file-upload", "./cypress/types"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -15,8 +15,14 @@
     "isolatedModules": false,
     "noEmit": true,
     "jsx": "preserve",
-    "baseUrl": "integration"
+    "baseUrl": ".",
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@user-office-software-libs/shared-types": [
+        "libs/shared-types/src/index.ts"
+      ]
+    }
   },
-  "include": ["**/*.ts"],
+  "include": ["cypress"],
   "exclude": ["node_modules"]
 }
