@@ -28,7 +28,4 @@ jobs:
               npm run install:all
 
           - name: Lint Action
-            uses: wearerequired/lint-action@v2
-            with:
-              eslint: true
-              prettier: true
+            run: npm run lint
