@@ -15,6 +15,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
@@ -649,6 +650,18 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.reference_number_sequence,
     proposal.management_time_allocation,
     proposal.management_decision_submitted
+  );
+};
+
+export const createReviewObject = (review: ReviewRecord) => {
+  return new Review(
+    review.review_id,
+    review.proposal_pk,
+    review.user_id,
+    review.comment,
+    review.grade,
+    review.status,
+    review.sep_id
   );
 };
 
