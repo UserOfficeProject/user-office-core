@@ -86,7 +86,7 @@ export const fileUploadDefinition: Question = {
     config.tooltip = '';
     config.file_type = [];
     config.pdf_page_limit = 0; // Unlimited
-    config.max_files = 0; // Unliimited
+    config.max_files = 0; // Unlimited
 
     return config;
   },
@@ -185,7 +185,7 @@ const isValidFileType = async (
       config.file_type.includes(type) || config.file_type.includes(anySubtype);
 
     if (!isValidFileType) {
-      logger.logError('File determined to be of wrong type', {
+      logger.logInfo('File determined to be of wrong type', {
         possibleTypesIdentified: identifiedFileTypes,
         ...errorContext,
       });
@@ -283,7 +283,7 @@ const hasAllowedPdfNumPages = async (
   const pageCount = (await readPdf()).getPagesCount();
 
   if (pageCount > pageLimit) {
-    logger.logError('PDF page count exceeds limit', {
+    logger.logInfo('PDF page count exceeds limit', {
       pageCount: pageCount,
       ...errorContext,
     });
