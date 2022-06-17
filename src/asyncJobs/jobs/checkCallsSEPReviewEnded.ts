@@ -1,23 +1,70 @@
 import { logger } from '@user-office-software/duo-logger';
+import { DateTime } from 'luxon';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { SEPDataSource } from '../../datasources/SEPDataSource';
 import { eventBus } from '../../events';
 import { Event } from '../../events/event.enum';
+import { Call } from '../../models/Call';
+import { ReviewStatus } from '../../models/Review';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
-const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
-  const isTestingMode = process.env.NODE_ENV === 'test';
+const isTestingMode = process.env.NODE_ENV === 'test';
+const DAYS_BEFORE_SENDING_NOTIFICATION_EMAILS = 2;
+const sepDataSource = container.resolve<SEPDataSource>(Tokens.SEPDataSource);
 
+const checkAndNotifySEPReviewersBeforeReviewEnds = async (
+  sepReviewNotEndedCalls: Call[],
+  currentDate: DateTime
+) => {
+  const callsThatShouldSendEmailsToSEPReviewers = sepReviewNotEndedCalls.filter(
+    (sepReviewNotEndedCall) =>
+      sepReviewNotEndedCall.endSEPReview.getTime() <=
+      currentDate
+        .plus({ days: DAYS_BEFORE_SENDING_NOTIFICATION_EMAILS })
+        .toMillis()
+  );
+
+  const sepReviewsThatShouldBeNotified =
+    await sepDataSource.getSEPReviewsByCallAndStatus(
+      callsThatShouldSendEmailsToSEPReviewers.map((call) => call.id),
+      ReviewStatus.DRAFT
+    );
+
+  for (const sepReviewThatShouldBeNotified of sepReviewsThatShouldBeNotified) {
+    if (!isTestingMode) {
+      // NOTE: Fire the "SEP_REVIEWER_NOTIFIED" event.
+      eventBus.publish({
+        type: Event.SEP_REVIEWER_NOTIFIED,
+        sepReview: sepReviewThatShouldBeNotified,
+        isRejection: false,
+        key: 'sepReview',
+        loggedInUserId: 0,
+      });
+    }
+  }
+};
+
+// NOTE: This check is for call SEP review ended and for notifying SEP reviewers 2 days before sep review ends.
+const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
   try {
     const sepReviewNotEndedCalls = await dataSource.getCalls({
       isSEPReviewEnded: false,
     });
 
-    const currentDate = new Date();
+    const currentDate = DateTime.now();
 
     const callsThatShouldEndSEPReview = sepReviewNotEndedCalls.filter(
       (sepReviewNotEndedCall) =>
-        sepReviewNotEndedCall.endSEPReview.getTime() <= currentDate.getTime()
+        sepReviewNotEndedCall.endSEPReview.getTime() <= currentDate.toMillis()
+    );
+
+    // NOTE: Check if there is any SEP review that is not submitted 2 days before the SEP review ends on a call.
+    await checkAndNotifySEPReviewersBeforeReviewEnds(
+      sepReviewNotEndedCalls,
+      currentDate
     );
 
     const updatedCalls = [];

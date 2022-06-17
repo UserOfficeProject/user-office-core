@@ -1,4 +1,5 @@
 import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { Review, ReviewStatus } from '../models/Review';
 import { Role } from '../models/Role';
 import {
   SEP,
@@ -50,6 +51,15 @@ export interface SEPDataSource {
     proposalPk: number,
     reviewerId: number | null
   ): Promise<SEPAssignment[]>;
+  getSEPReviewsByCallAndStatus(
+    callIds: number[],
+    status: ReviewStatus
+  ): Promise<Review[]>;
+  setSEPReviewNotificationEmailSent(
+    reviewId: number,
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean>;
   getSEPProposals(sepId: number, callId: number | null): Promise<SEPProposal[]>;
   getSEPProposalCount(sepId: number): Promise<number>;
   getSEPReviewerProposalCount(reviewerId: number): Promise<number>;
