@@ -21,15 +21,13 @@ export const QuestionTemplateRelationTextInputForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            min: Yup.number().nullable(),
-            max: Yup.number().nullable(),
-            required: Yup.boolean(),
-            placeholder: Yup.string(),
-            multiline: Yup.boolean(),
-            isHtmlQuestion: Yup.boolean(),
-          }),
+        config: Yup.object({
+          min: Yup.number().nullable(),
+          max: Yup.number().nullable(),
+          required: Yup.boolean(),
+          placeholder: Yup.string(),
+          multiline: Yup.boolean(),
+          isHtmlQuestion: Yup.boolean(),
         }),
       })}
     >

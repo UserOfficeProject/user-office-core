@@ -35,7 +35,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<
             small_label: Yup.string(),
             max_files: Yup.number().min(
               0,
-              'Value must be grater than or equal to 0'
+              'Value must be greater than or equal to 0'
             ),
             pdf_page_limit: Yup.number().min(
               0,
