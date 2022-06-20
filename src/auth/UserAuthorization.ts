@@ -90,7 +90,13 @@ export abstract class UserAuthorization {
     const isUserOfficer = this.isUserOfficer(agent);
     const isInstrumentScientist = this.isInstrumentScientist(agent);
     const isSEPMember = await this.isMemberOfSEP(agent);
-    if (isUserOfficer || isInstrumentScientist || isSEPMember) {
+    const isApiAccessToken = this.isApiToken(agent);
+    if (
+      isUserOfficer ||
+      isInstrumentScientist ||
+      isSEPMember ||
+      isApiAccessToken
+    ) {
       return ids;
     }
 
