@@ -116,7 +116,7 @@ VALUES
   (
     'file_upload_question', 'FILE_UPLOAD', 
     'File upload question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'file_upload_question', 1
@@ -127,7 +127,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'file_upload_question', 1, 5, 8, '{ "tooltip": "", "required": false, "small_label": "" }'
+    'file_upload_question', 1, 5, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer

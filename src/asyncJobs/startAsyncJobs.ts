@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import ALL_AYNC_JOBS from './allAsyncJobs';
+import ALL_ASYNC_JOBS from './allAsyncJobs';
 
 const callDataSource = container.resolve<CallDataSource>(Tokens.CallDataSource);
 
@@ -27,7 +27,7 @@ export const runAsyncJobs = (allJobs: UserOfficeAsyncJob[]) => {
 };
 
 export const startAsyncJobs = () => {
-  runAsyncJobs(ALL_AYNC_JOBS);
+  runAsyncJobs(ALL_ASYNC_JOBS);
 };
 
 export default startAsyncJobs;
