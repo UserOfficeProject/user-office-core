@@ -5,12 +5,14 @@ import {
   ReviewStatus,
   TechnicalReviewStatus,
   UserRole,
+  UpdateUserMutationVariables,
+  User,
 } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 const sepMembers = {
   chair: initialDBData.users.user2,
-  secretary: initialDBData.users.user1,
+  secretary: initialDBData.users.user3,
   reviewer: initialDBData.users.reviewer,
   reviewer2: initialDBData.users.user3,
 };
@@ -271,6 +273,12 @@ context('SEP reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
+      cy.get('[data-cy="confirmation-dialog"]').contains(
+        'Are you sure you want to assign all selected users to the SEP proposal?'
+      );
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
       cy.notification({
         variant: 'success',
         text: 'Members assigned',
@@ -434,6 +442,20 @@ context('SEP reviews tests', () => {
     });
 
     it('SEP Chair should be able to assign SEP member to proposal in existing SEP', () => {
+      const loggedInUser = window.localStorage.getItem('user');
+
+      if (!loggedInUser) {
+        throw new Error('No logged in user');
+      }
+
+      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+
+      // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
+      cy.updateUserDetails({
+        ...loggedInUserParsed,
+        organisation: 2,
+      } as UpdateUserMutationVariables);
+
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
@@ -449,6 +471,8 @@ context('SEP reviews tests', () => {
         .click();
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',
@@ -547,6 +571,22 @@ context('SEP reviews tests', () => {
     });
 
     it('SEP Secretary should be able to assign SEP member to proposal in existing SEP', () => {
+      const loggedInUser = window.localStorage.getItem('user');
+
+      if (!loggedInUser) {
+        throw new Error('No logged in user');
+      }
+
+      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+
+      // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
+      cy.updateUserDetails({
+        ...loggedInUserParsed,
+        organisation: 2,
+        telephone: faker.phone.phoneNumber('+4670#######'),
+        telephone_alt: faker.phone.phoneNumber('+4670#######'),
+      } as UpdateUserMutationVariables);
+
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
       cy.finishedLoading();
@@ -562,6 +602,8 @@ context('SEP reviews tests', () => {
         .click();
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',
