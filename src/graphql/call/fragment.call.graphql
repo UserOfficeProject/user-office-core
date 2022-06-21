@@ -17,7 +17,7 @@ fragment call on Call {
   proposalWorkflowId
   templateId
   esiTemplateId
-  allocationTimeUnit  
+  allocationTimeUnit
   instruments {
     id
     name
@@ -43,4 +43,5 @@ fragment call on Call {
   title
   description
   submissionMessage
+  isActive
 }
