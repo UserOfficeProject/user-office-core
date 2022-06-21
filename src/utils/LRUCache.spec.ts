@@ -127,7 +127,7 @@ test('When cache statistics are reset, all values return to 0 aside from entries
   cache.get('id1'); // 1 hit
   cache.remove('id1'); // 1 removal
 
-  cache.put('id2', 'tets'); // Leaves 1 entry
+  cache.put('id2', 'test'); // Leaves 1 entry
 
   cache.resetStats();
 
