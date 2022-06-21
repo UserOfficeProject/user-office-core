@@ -21,6 +21,7 @@ fragment fieldConfig on FieldConfig {
   ... on FileUploadConfig {
     file_type
     max_files
+    pdf_page_limit
 
     small_label
     required
