@@ -48,15 +48,9 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     // if filter is explicitly set to true or false
     if (filter?.isActive === true) {
-      const currentDate = new Date().toISOString();
-      query
-        .where('start_call', '<=', currentDate)
-        .andWhere('end_cycle', '>=', currentDate);
+      query.where('is_active', true);
     } else if (filter?.isActive === false) {
-      const currentDate = new Date().toISOString();
-      query
-        .where('start_call', '>=', currentDate)
-        .orWhere('end_cycle', '<=', currentDate);
+      query.where('is_active', false);
     }
 
     if (filter?.isEnded === true) {
@@ -190,6 +184,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               allocation_time_unit: args.allocationTimeUnit,
               title: args.title,
               description: args.description,
+              is_active: args.isActive,
             },
             ['*']
           )
