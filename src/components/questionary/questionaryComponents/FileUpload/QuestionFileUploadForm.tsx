@@ -29,7 +29,7 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
       {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
+        question: Yup.string().required('Question is required form'),
         config: Yup.object({
           file_type: Yup.array().required().min(1, 'File type is required'),
           small_label: Yup.string(),
