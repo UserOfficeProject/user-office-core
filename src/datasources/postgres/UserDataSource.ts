@@ -350,25 +350,10 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {
-    let user: UserRecord[] = await database
-      .select()
-      .from('users')
-      .where({ user_id: userId });
-
-    if (!user || user.length == 0) {
-      logger.logInfo('Creating dummy user', { userId });
-
-      user = await database
-        .insert(this.createDummyUserRecord(userId))
-        .returning(['*'])
-        .into('users');
-    }
-
-    if (!user || user.length == 0) {
-      throw new Error(`Could not create user ${userId}`);
-    }
-
-    return createUserObject(user[0]);
+    // ensureDummyUsersExist throws an error if it could not create all users ot was given,
+    // so on success it will always return a list of exactly 1 element here.
+    // In the code below, always returning the first element should therefore be safe
+    return this.ensureDummyUsersExist([userId]).then((users) => users[0]);
   }
 
   async ensureDummyUsersExist(userIds: number[]): Promise<User[]> {
@@ -382,7 +367,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     );
 
     if (missedUsers.length > 0) {
-      logger.logInfo('Creating dummy users', { missedUsers });
+      logger.logInfo('Creating dummy users', { usersIds: missedUsers });
 
       const newUsers = await database
         .insert(userIds.map(this.createDummyUserRecord))
@@ -397,7 +382,9 @@ export default class PostgresUserDataSource implements UserDataSource {
         (userId) => !users.find((user) => user.user_id === userId)
       );
 
-      logger.logError('Failed to create dummy users', { failedUsers });
+      logger.logError('Failed to create dummy users', {
+        usersIds: failedUsers,
+      });
       throw new Error(`Could not create users ${failedUsers}`);
     }
 
