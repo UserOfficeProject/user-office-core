@@ -53,10 +53,20 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('is_active', false);
     }
 
+    /**
+     * NOTE: We are comparing dates instead of using the call_ended flag,
+     * because the flag is set once per hour and we could have a gap.
+     * TODO: Maybe there is a need to use the timezone setting here but not quite sure about it. Discussion is needed here!
+     */
+    const currentDate = new Date().toISOString();
     if (filter?.isEnded === true) {
-      query.where('call_ended', true);
+      query
+        .where('start_call', '>=', currentDate)
+        .andWhere('end_call', '<=', currentDate);
     } else if (filter?.isEnded === false) {
-      query.where('call_ended', false);
+      query
+        .where('start_call', '<=', currentDate)
+        .andWhere('end_call', '>=', currentDate);
     }
 
     if (filter?.isReviewEnded === true) {
@@ -269,7 +279,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     return records.map(createCallObject);
   }
 
-  public async checkActiveCall(callId: number): Promise<boolean> {
+  public async isCallEnded(callId: number): Promise<boolean> {
     const currentDate = new Date().toISOString();
 
     return database
@@ -279,6 +289,6 @@ export default class PostgresCallDataSource implements CallDataSource {
       .andWhere('end_call', '>=', currentDate)
       .andWhere('call_id', '=', callId)
       .first()
-      .then((call: CallRecord) => (call ? true : false));
+      .then((call: CallRecord) => (call ? false : true));
   }
 }
