@@ -16,6 +16,7 @@ export const basicDummyUser = new BasicUserDetails(
   'doe',
   'john',
   'org',
+  1,
   'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
   false
@@ -27,6 +28,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   'doe',
   'john',
   'org',
+  1,
   'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
   false
@@ -222,6 +224,7 @@ export class UserDataSourceMock implements UserDataSource {
       'Smith',
       'John',
       'ESS',
+      2,
       'Manager',
       new Date('2019-07-17 08:25:12.23043+00'),
       false
@@ -254,6 +257,7 @@ export class UserDataSourceMock implements UserDataSource {
       'Smith',
       'John',
       'ESS',
+      2,
       'Manager',
       new Date('2019-07-17 08:25:12.23043+00'),
       false

@@ -45,6 +45,7 @@ export interface StfcBasicPersonDetails {
   givenName: string;
   initials: string;
   orgName: string;
+  orgId: number;
   title: string;
   userNumber: string;
   workPhone: string;
@@ -59,6 +60,7 @@ function toEssBasicUserDetails(
     stfcUser.familyName ?? '',
     stfcUser.displayName ?? '',
     stfcUser.orgName ?? '',
+    stfcUser.orgId ?? 1,
     '',
     new Date(),
     false
