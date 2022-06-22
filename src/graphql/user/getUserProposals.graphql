@@ -21,6 +21,8 @@ query getUserProposals {
         shortCode
         isActive
         referenceNumberFormat
+        startCall
+        endCall
       }
     }
   }

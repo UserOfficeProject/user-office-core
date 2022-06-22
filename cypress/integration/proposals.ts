@@ -472,7 +472,7 @@ context('Proposal tests', () => {
       cy.contains(newProposalTitle).should('not.exist');
     });
 
-    it('User should not be able to create and submit proposal with inactive call', () => {
+    it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
       cy.login('user');
       cy.visit('/');
