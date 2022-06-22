@@ -22,6 +22,7 @@ import {
   UserRole,
   SepMeetingDecision,
   Call,
+  Proposal,
 } from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
@@ -192,6 +193,7 @@ const SEPInstrumentProposalsTable: React.FC<
   const isSEPReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
+  const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
 
   // NOTE: This is needed for adding the allocation time unit information on the column title without causing some console warning on re-rendering.
   const columns = assignmentColumns.map((column) => ({
@@ -365,11 +367,12 @@ const SEPInstrumentProposalsTable: React.FC<
           <Tooltip title="View proposal details">
             <IconButton
               color="inherit"
-              onClick={() =>
+              onClick={() => {
                 setUrlQueryParams({
                   sepMeetingModal: rowData.proposal.primaryKey,
-                })
-              }
+                });
+                setOpenProposal(rowData.proposal);
+              }}
             >
               <Visibility />
             </IconButton>
@@ -647,9 +650,13 @@ const SEPInstrumentProposalsTable: React.FC<
   return (
     <div className={classes.root} data-cy="sep-instrument-proposals-table">
       <SEPMeetingProposalViewModal
-        proposalViewModalOpen={!!urlQueryParams.sepMeetingModal}
+        proposalViewModalOpen={
+          !!urlQueryParams.sepMeetingModal &&
+          urlQueryParams.sepMeetingModal === openProposal?.primaryKey
+        }
         setProposalViewModalOpen={() => {
           setUrlQueryParams({ sepMeetingModal: undefined });
+          setOpenProposal(null);
           refreshInstrumentProposalsData();
         }}
         proposalPk={urlQueryParams.sepMeetingModal}
