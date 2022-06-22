@@ -1281,33 +1281,27 @@ context('Template tests', () => {
           });
         });
       });
-    });
 
-    it('should validate question template relation input', () => {
-      createTopicWithQuestionsAndRelations();
+      it('should validate question template relation input', () => {
+        createTopicWithQuestionsAndRelations();
 
-      cy.login('officer');
-      cy.visit('/ProposalTemplates');
+        cy.login('officer');
+        cy.visit('/ProposalTemplates');
 
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+        cy.contains(initialDBData.template.name)
+          .parent()
+          .find("[aria-label='Edit']")
+          .first()
+          .click();
 
-      cy.contains(initialDBData.questions.fileUpload.text).click();
+        cy.contains(initialDBData.questions.fileUpload.text).click();
 
-      cy.get('[data-cy=max_files] input').clear().type('1');
-      cy.get('[data-cy=submit]').should('not.be.disabled');
+        cy.get('[data-cy=max_files] input').clear().type('1');
+        cy.get('[data-cy=submit]').should('not.be.disabled');
 
-      cy.get('[data-cy=max_files] input').clear().type('-1');
-      cy.get('[data-cy=submit]').should('be.disabled');
-    });
-  });
-
-  describe('Proposal templates advanced tests', () => {
-    beforeEach(() => {
-      createTopicWithQuestionsAndRelations(true);
+        cy.get('[data-cy=max_files] input').clear().type('-1');
+        cy.get('[data-cy=submit]').should('be.disabled');
+      });
     });
 
     describe('Proposal templates advanced tests', () => {
@@ -1496,9 +1490,6 @@ context('Template tests', () => {
         cy.get('[data-cy="max_files"] input').clear().type('-1');
 
         cy.contains('Update').should('be.disabled');
-
-        cy.get('[data-cy="max_files"] input').should('be.focused');
-        cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
 
         cy.get('[data-cy="max_files"] input').clear();
 

@@ -319,6 +319,8 @@ function createFileUploadQuestion(question: string, fileTypes: string[]) {
 
   cy.get('[data-cy=max_files]').clear().type('3');
 
+  cy.get('[data-cy=pdf_page_limit]').clear().type('3');
+
   cy.contains('Save').click();
 
   cy.contains(question)
