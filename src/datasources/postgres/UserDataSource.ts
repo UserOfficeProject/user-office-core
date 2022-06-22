@@ -350,44 +350,69 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {
-    let user: UserRecord[] = await database
+    // ensureDummyUsersExist throws an error if it could not create all users ot was given,
+    // so on success it will always return a list of exactly 1 element here.
+    // In the code below, always returning the first element should therefore be safe
+    return this.ensureDummyUsersExist([userId]).then((users) => users[0]);
+  }
+
+  async ensureDummyUsersExist(userIds: number[]): Promise<User[]> {
+    const users: UserRecord[] = await database
       .select()
       .from('users')
-      .where({ user_id: userId });
-    if (!user || user.length == 0) {
-      user = await database
-        .insert({
-          user_id: userId,
-          user_title: '',
-          firstname: '',
-          middlename: '',
-          lastname: '',
-          username: userId.toString(),
-          password: '',
-          preferredname: '',
-          orcid: '',
-          orcid_refreshtoken: '',
-          gender: '',
-          nationality: 1,
-          birthdate: '2000-01-01',
-          organisation: 1,
-          department: '',
-          position: '',
-          email: userId.toString(),
-          telephone: '',
-          telephone_alt: '',
-        })
+      .whereIn('user_id', userIds);
+
+    const missedUsers = userIds.filter(
+      (userId) => !users.find((user) => user.user_id === userId)
+    );
+
+    if (missedUsers.length > 0) {
+      logger.logInfo('Creating dummy users', { usersIds: missedUsers });
+
+      const newUsers = await database
+        .insert(userIds.map(this.createDummyUserRecord))
         .returning(['*'])
         .into('users');
 
-      logger.logInfo('Creating dummy user', { userId });
+      users.push(...newUsers);
     }
 
-    if (!user || user.length == 0) {
-      throw new Error(`Could not create user ${userId}`);
+    if (userIds.length !== users.length) {
+      const failedUsers = userIds.filter(
+        (userId) => !users.find((user) => user.user_id === userId)
+      );
+
+      logger.logError('Failed to create dummy users', {
+        usersIds: failedUsers,
+      });
+      throw new Error(`Could not create users ${failedUsers}`);
     }
 
-    return createUserObject(user[0]);
+    return users.map(createUserObject);
+  }
+
+  private createDummyUserRecord(userId: number) {
+    return {
+      user_id: userId,
+      user_title: '',
+      firstname: '',
+      middlename: '',
+      lastname: '',
+      username: userId.toString(),
+      password: '',
+      preferredname: '',
+      orcid: '',
+      orcid_refreshtoken: '',
+      gender: '',
+      nationality: 1,
+      birthdate: '2000-01-01',
+      organisation: 1,
+      department: '',
+      position: '',
+      email: userId.toString(),
+      telephone: '',
+      telephone_alt: '',
+    };
   }
 
   async getUsers({
