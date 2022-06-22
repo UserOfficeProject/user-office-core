@@ -69,6 +69,9 @@ export class FileUploadConfig extends ConfigBase {
 
   @Field(() => Int)
   max_files: number;
+
+  @Field(() => Int)
+  pdf_page_limit: number;
 }
 
 @ObjectType()
