@@ -199,6 +199,7 @@ const ProposalTableInstrumentScientist: React.FC<{
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
+    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
   ];
 
   /**
