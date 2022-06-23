@@ -8,6 +8,7 @@ import { Instrument } from '../models/Instrument';
 import { StfcUserAuthorization } from './StfcUserAuthorization';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface.ts');
+jest.mock('../utils/LRUCache');
 
 const userAuthorization = container.resolve(StfcUserAuthorization);
 

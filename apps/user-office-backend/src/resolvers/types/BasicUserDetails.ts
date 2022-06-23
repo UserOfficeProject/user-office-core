@@ -21,6 +21,9 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field()
   public organisation: string;
 
+  @Field(() => Int)
+  public organizationId: number;
+
   @Field()
   public position: string;
 
