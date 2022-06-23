@@ -284,6 +284,11 @@ interface InstrumentDeletedEvent extends GeneralEvent {
   instrument: Instrument;
 }
 
+interface SEPReviewerNotified extends GeneralEvent {
+  type: Event.SEP_REVIEWER_NOTIFIED;
+  sepReview: Review;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -335,4 +340,5 @@ export type ApplicationEvent =
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
   | ProposalBookingTimeSlotsRemovedEvent
-  | InstrumentDeletedEvent;
+  | InstrumentDeletedEvent
+  | SEPReviewerNotified;

@@ -44,6 +44,7 @@ export enum Event {
   SEP_PROPOSAL_REMOVED = 'SEP_PROPOSAL_REMOVED',
   SEP_MEMBER_ASSIGNED_TO_PROPOSAL = 'SEP_MEMBER_ASSIGNED_TO_PROPOSAL',
   SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
+  SEP_REVIEWER_NOTIFIED = 'SEP_REVIEWER_NOTIFIED',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
@@ -174,6 +175,10 @@ export const EventLabel = new Map<Event, string>([
   [Event.SEP_CREATED, 'Event occurs when SEP is created'],
   [Event.SEP_UPDATED, 'Event occurs when SEP is updated'],
   [Event.SEP_MEMBERS_ASSIGNED, 'Event occurs when we assign member/s to a SEP'],
+  [
+    Event.SEP_REVIEWER_NOTIFIED,
+    'Event occurs when we notify the SEP reviewer, about its not submitted review, by email 2 days before the review end date',
+  ],
   [
     Event.SEP_MEMBER_REMOVED,
     'Event occurs when SEP member gets removed from the panel',

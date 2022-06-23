@@ -2,6 +2,7 @@ import {
   ProposalEndStatus,
   ProposalPksWithNextStatus,
 } from '../../models/Proposal';
+import { Review, ReviewStatus } from '../../models/Review';
 import { Role } from '../../models/Role';
 import {
   SEP,
@@ -75,6 +76,8 @@ export const anotherDummySEPAssignment = new SEPAssignment(
   null,
   false
 );
+
+export const dummySEPReview = new Review(1, 1, 1, 'Dummy SEP review', 7, 0, 1);
 
 export const dummySEPProposal = new SEPProposal(
   1,
@@ -291,6 +294,18 @@ export class SEPDataSourceMock implements SEPDataSource {
 
   async getSEPReviewerProposalCount(reviewerId: number) {
     return dummySEPProposals.length;
+  }
+
+  async getSEPReviewsByCallAndStatus(callIds: number[], status: ReviewStatus) {
+    return [dummySEPReview];
+  }
+
+  async setSEPReviewNotificationEmailSent(
+    reviewId: number,
+    userId: number,
+    proposalPk: number
+  ) {
+    return true;
   }
 
   async getSEPProposalsByInstrument(

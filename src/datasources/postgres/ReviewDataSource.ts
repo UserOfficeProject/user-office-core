@@ -7,24 +7,13 @@ import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation
 import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
 import {
+  createReviewObject,
   createTechnicalReviewObject,
   ReviewRecord,
   TechnicalReviewRecord,
 } from './records';
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
-  private createReviewObject(review: ReviewRecord) {
-    return new Review(
-      review.review_id,
-      review.proposal_pk,
-      review.user_id,
-      review.comment,
-      review.grade,
-      review.status,
-      review.sep_id
-    );
-  }
-
   async setTechnicalReview(
     args: AddTechnicalReviewInput | SubmitTechnicalReviewInput,
     shouldUpdateReview: boolean
@@ -99,7 +88,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .from('SEP_Reviews')
       .where('review_id', id)
       .first()
-      .then((review: ReviewRecord) => this.createReviewObject(review));
+      .then((review: ReviewRecord) => createReviewObject(review));
   }
 
   async getAssignmentReview(sepId: number, proposalPk: number, userId: number) {
@@ -111,7 +100,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .andWhere('user_id', userId)
       .first()
       .then((review?: ReviewRecord) =>
-        review ? this.createReviewObject(review) : null
+        review ? createReviewObject(review) : null
       );
   }
 
@@ -122,7 +111,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .returning('*')
       .del();
 
-    return this.createReviewObject(reviewRecord);
+    return createReviewObject(reviewRecord);
   }
 
   async updateReview(args: UpdateReviewArgs): Promise<Review> {
@@ -158,7 +147,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .from('SEP_Reviews')
       .where('proposal_pk', id)
       .then((reviews: ReviewRecord[]) => {
-        return reviews.map((review) => this.createReviewObject(review));
+        return reviews.map((review) => createReviewObject(review));
       });
   }
 
@@ -174,7 +163,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       })
       .returning('*')
       .into('SEP_Reviews')
-      .then((records: ReviewRecord[]) => this.createReviewObject(records[0]));
+      .then((records: ReviewRecord[]) => createReviewObject(records[0]));
   }
 
   async getUserReviews(
@@ -215,7 +204,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .whereIn('sep_id', sepIds)
       .distinctOn('SEP_Reviews.proposal_pk')
       .then((reviews: ReviewRecord[]) => {
-        return reviews.map((review) => this.createReviewObject(review));
+        return reviews.map((review) => createReviewObject(review));
       });
   }
 }
