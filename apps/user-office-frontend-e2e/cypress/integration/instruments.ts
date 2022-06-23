@@ -1,6 +1,9 @@
+import {
+  ReviewerFilter,
+  TechnicalReviewStatus,
+} from '@user-office-software-libs/shared-types';
 import faker from 'faker';
 
-import { ReviewerFilter, TechnicalReviewStatus } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 const selectAllProposalsFilterStatus = () => {

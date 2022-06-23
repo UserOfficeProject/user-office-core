@@ -1,11 +1,11 @@
-import faker from 'faker';
-
 import {
   ProposalEndStatus,
   ReviewStatus,
   TechnicalReviewStatus,
   UserRole,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import faker from 'faker';
+
 import initialDBData from '../support/initialDBData';
 
 const sepMembers = {

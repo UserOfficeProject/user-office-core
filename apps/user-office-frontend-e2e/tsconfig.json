@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@user-office-software-libs/shared-types": [
-        "../../libs/shared-types/src/index.ts"
+        "../user-office-frontend/src/generated/sdk.ts"
       ]
     }
   },

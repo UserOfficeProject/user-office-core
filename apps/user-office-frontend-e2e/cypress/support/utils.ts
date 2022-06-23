@@ -1,11 +1,11 @@
-import 'cypress-file-upload';
-import { GraphQLClient } from 'graphql-request';
-
 import {
   CreateApiAccessTokenMutation,
   CreateApiAccessTokenMutationVariables,
   getSdk,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import 'cypress-file-upload';
+import { GraphQLClient } from 'graphql-request';
+
 import initialDBData from './initialDBData';
 
 const KEY_CODES = {

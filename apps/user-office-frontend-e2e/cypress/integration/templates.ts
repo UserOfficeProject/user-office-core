@@ -1,14 +1,14 @@
 import path from 'path';
 
-import faker, { lorem } from 'faker';
-import { DateTime } from 'luxon';
-
 import {
   DataType,
   DependenciesLogicOperator,
   EvaluatorOperator,
   TemplateCategoryId,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import faker, { lorem } from 'faker';
+import { DateTime } from 'luxon';
+
 import initialDBData from '../support/initialDBData';
 
 context('Template tests', () => {

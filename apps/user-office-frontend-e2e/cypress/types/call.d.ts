@@ -3,7 +3,7 @@ import {
   CreateCallMutation,
   UpdateCallMutation,
   UpdateCallMutationVariables,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
 
 declare global {
   namespace Cypress {
