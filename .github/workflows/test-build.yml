@@ -50,19 +50,19 @@ jobs:
       - name: Resolved
         run: |
           echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
-
-  build:
-    # The type of runner that the job will run on
+  setup:
     runs-on: ubuntu-latest
-    needs: resolve_dep
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Cache node_modules
-        id: cached-modules
-        uses: actions/cache@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache root node_modules
+        id: cached-modules-root
+        uses: actions/cache@v3
         env:
           cache-name: node-modules-cache
         with:
@@ -70,9 +70,59 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Cache backend node_modules
+        id: cached-modules-backend
+        uses: actions/cache@v3
+        env:
+          cache-name: node-modules-cache-backend
+        with:
+          path: ./apps/user-office-backend/node_modules
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('./apps/user-office-backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Cache frontend node_modules
+        id: cached-modules-frontend
+        uses: actions/cache@v3
+        env:
+          cache-name: node-modules-cache-frontend
+        with:
+          path: ./apps/user-office-frontend/node_modules
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('./apps/user-office-frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm run install:all
+
+  build_backend:
+    runs-on: ubuntu-latest
+    needs: [resolve_dep, setup]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore backend node_modules
+        id: cached-modules-backend
+        uses: actions/cache@v3
+        env:
+          cache-name: node-modules-cache-backend
+        with:
+          path: ./apps/user-office-backend/node_modules
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('./apps/user-office-backend/package-lock.json') }}
+
+      - run: npm run build:backend
   e2e:
     runs-on: ubuntu-latest
-    needs: [resolve_dep, build]
+    needs: [resolve_dep, setup]
 
     strategy:
       fail-fast: false
@@ -137,7 +187,7 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
-
+      
       - name: Run e2e tests
         env:
           USER_OFFICE_BACKEND_DIR: apps/user-office-backend
@@ -164,7 +214,6 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          npm run build
           npm run e2e:after:dev
 
       - name: Upload cypres screenshots
