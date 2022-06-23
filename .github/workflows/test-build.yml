@@ -164,6 +164,7 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
+          npm run build
           npm run e2e:after:dev
 
       - name: Upload cypres screenshots
