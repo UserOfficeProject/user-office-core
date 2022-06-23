@@ -5,13 +5,15 @@ import {
   ReviewStatus,
   TechnicalReviewStatus,
   UserRole,
+  UpdateUserMutationVariables,
+  User,
 } from '../../src/generated/sdk';
 import TestFilter from '../support/filterTests';
 import initialDBData from '../support/initialDBData';
 
 const sepMembers = {
   chair: initialDBData.users.user2,
-  secretary: initialDBData.users.user1,
+  secretary: initialDBData.users.user3,
   reviewer: initialDBData.users.reviewer,
   reviewer2: initialDBData.users.user3,
 };
@@ -273,6 +275,12 @@ context('SEP reviews tests', () => {
         cy.contains('1 user(s) selected');
         cy.contains('Update').click();
 
+        cy.get('[data-cy="confirmation-dialog"]').contains(
+          'Are you sure you want to assign all selected users to the SEP proposal?'
+        );
+
+        cy.get('[data-cy="confirm-ok"]').click();
+
         cy.notification({
           variant: 'success',
           text: 'Members assigned',
@@ -438,6 +446,20 @@ context('SEP reviews tests', () => {
       });
 
       it('SEP Chair should be able to assign SEP member to proposal in existing SEP', () => {
+        const loggedInUser = window.localStorage.getItem('user');
+
+        if (!loggedInUser) {
+          throw new Error('No logged in user');
+        }
+
+        const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+
+        // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
+        cy.updateUserDetails({
+          ...loggedInUserParsed,
+          organisation: 2,
+        } as UpdateUserMutationVariables);
+
         cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
         cy.finishedLoading();
@@ -453,6 +475,8 @@ context('SEP reviews tests', () => {
           .click();
         cy.contains('1 user(s) selected');
         cy.contains('Update').click();
+
+        cy.get('[data-cy="confirm-ok"]').click();
 
         cy.notification({
           variant: 'success',
@@ -551,6 +575,22 @@ context('SEP reviews tests', () => {
       });
 
       it('SEP Secretary should be able to assign SEP member to proposal in existing SEP', () => {
+        const loggedInUser = window.localStorage.getItem('user');
+
+        if (!loggedInUser) {
+          throw new Error('No logged in user');
+        }
+
+        const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+
+        // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
+        cy.updateUserDetails({
+          ...loggedInUserParsed,
+          organisation: 2,
+          telephone: faker.phone.phoneNumber('+4670#######'),
+          telephone_alt: faker.phone.phoneNumber('+4670#######'),
+        } as UpdateUserMutationVariables);
+
         cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
         cy.finishedLoading();
@@ -566,6 +606,8 @@ context('SEP reviews tests', () => {
           .click();
         cy.contains('1 user(s) selected');
         cy.contains('Update').click();
+
+        cy.get('[data-cy="confirm-ok"]').click();
 
         cy.notification({
           variant: 'success',
@@ -934,6 +976,80 @@ context('SEP reviews tests', () => {
         cy.finishedLoading();
 
         cy.get('[aria-label="Submit instrument"]').should('not.be.disabled');
+      });
+
+      it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
+        cy.createInstrument(instrument).then((result) => {
+          const createdInstrument2Id = result.createInstrument.instrument?.id;
+          if (createdInstrument2Id) {
+            cy.assignInstrumentToCall({
+              callId: initialDBData.call.id,
+              instrumentIds: [createdInstrument2Id],
+            });
+
+            cy.createProposal({ callId: initialDBData.call.id }).then(
+              (result) => {
+                const createdProposal = result.createProposal.proposal;
+                if (createdProposal) {
+                  cy.updateProposal({
+                    proposalPk: createdProposal.primaryKey,
+                    title: proposal2.title,
+                    proposerId: initialDBData.users.user1.id,
+                  });
+
+                  cy.assignProposalsToInstrument({
+                    instrumentId: createdInstrument2Id,
+                    proposals: [
+                      {
+                        callId: initialDBData.call.id,
+                        primaryKey: createdProposal.primaryKey,
+                      },
+                    ],
+                  });
+
+                  cy.assignProposalsToSep({
+                    sepId: createdSepId,
+                    proposals: [
+                      {
+                        callId: initialDBData.call.id,
+                        primaryKey: createdProposal.primaryKey,
+                      },
+                    ],
+                  });
+
+                  // Manually changing the proposal status to be shown in the SEPs. -------->
+                  cy.changeProposalsStatus({
+                    statusId: initialDBData.proposalStatuses.sepReview.id,
+                    proposals: [
+                      {
+                        callId: initialDBData.call.id,
+                        primaryKey: createdProposal.primaryKey,
+                      },
+                    ],
+                  });
+                }
+              }
+            );
+          }
+        });
+
+        cy.login('officer');
+        cy.visit(`/SEPPage/${createdSepId}?tab=3`);
+
+        cy.finishedLoading();
+
+        cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+        cy.get('[aria-label="Detail panel visibility toggle"]').last().click();
+
+        cy.contains(proposal1.title)
+          .parent()
+          .parent()
+          .find('[aria-label="View proposal details"]')
+          .click();
+
+        cy.get('[role="presentation"][data-cy="SEP-meeting-modal"]')
+          .should('exist')
+          .and('have.length', 1);
       });
 
       it('Officer should be able to reorder proposal with drag and drop', () => {
