@@ -967,6 +967,80 @@ context('SEP meeting components tests', () => {
       cy.get('[aria-label="Submit instrument"]').should('not.be.disabled');
     });
 
+    it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
+      cy.createInstrument(instrument).then((result) => {
+        const createdInstrument2Id = result.createInstrument.instrument?.id;
+        if (createdInstrument2Id) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentIds: [createdInstrument2Id],
+          });
+
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            (result) => {
+              const createdProposal = result.createProposal.proposal;
+              if (createdProposal) {
+                cy.updateProposal({
+                  proposalPk: createdProposal.primaryKey,
+                  title: proposal2.title,
+                  proposerId: initialDBData.users.user1.id,
+                });
+
+                cy.assignProposalsToInstrument({
+                  instrumentId: createdInstrument2Id,
+                  proposals: [
+                    {
+                      callId: initialDBData.call.id,
+                      primaryKey: createdProposal.primaryKey,
+                    },
+                  ],
+                });
+
+                cy.assignProposalsToSep({
+                  sepId: createdSepId,
+                  proposals: [
+                    {
+                      callId: initialDBData.call.id,
+                      primaryKey: createdProposal.primaryKey,
+                    },
+                  ],
+                });
+
+                // Manually changing the proposal status to be shown in the SEPs. -------->
+                cy.changeProposalsStatus({
+                  statusId: initialDBData.proposalStatuses.sepReview.id,
+                  proposals: [
+                    {
+                      callId: initialDBData.call.id,
+                      primaryKey: createdProposal.primaryKey,
+                    },
+                  ],
+                });
+              }
+            }
+          );
+        }
+      });
+
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').last().click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .parent()
+        .find('[aria-label="View proposal details"]')
+        .click();
+
+      cy.get('[role="presentation"][data-cy="SEP-meeting-modal"]')
+        .should('exist')
+        .and('have.length', 1);
+    });
+
     it('Officer should be able to reorder proposal with drag and drop', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;

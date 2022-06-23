@@ -99,6 +99,7 @@ const SEPMeetingProposalViewModal: React.FC<
         fullScreen
         onClose={(): void => handleClose()}
         TransitionComponent={Transition}
+        data-cy="SEP-meeting-modal"
       >
         <AppBar className={classes.appBar}>
           <Toolbar>
