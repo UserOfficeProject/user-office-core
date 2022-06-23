@@ -17,11 +17,9 @@ export const QuestionTemplateRelationEmbellishmentForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            html: Yup.string().required('Content is required'),
-            plain: Yup.string().required('Plain description is required'),
-          }),
+        config: Yup.object({
+          html: Yup.string().required('Content is required'),
+          plain: Yup.string().required('Plain description is required'),
         }),
       })}
     >

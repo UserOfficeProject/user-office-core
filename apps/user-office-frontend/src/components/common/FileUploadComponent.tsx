@@ -363,9 +363,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 export function FileUploadComponent(props: {
-  maxFiles?: number;
+  maxFiles?: number; // 0 is unlimited
   id?: string;
   fileType: string;
+  pdfPageLimit: number; // 0 is unlimited
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
 }) {
@@ -419,6 +420,7 @@ export function FileUploadComponent(props: {
   };
 
   const { fileType } = props;
+  const { pdfPageLimit } = props;
   const maxFiles = props.maxFiles ?? 0;
 
   let newFileEntry;
@@ -431,7 +433,7 @@ export function FileUploadComponent(props: {
   const amountFilesInfo =
     maxFiles > 1 ? (
       <Box component="span" display="block">
-        Max: {maxFiles} file(s)
+        Maximum {maxFiles} file(s)
       </Box>
     ) : null;
 
@@ -439,10 +441,18 @@ export function FileUploadComponent(props: {
     return type.includes('*') ? 'any ' + type.split('/')[0] : type;
   });
 
+  const pdfPageLimitInfo =
+    fileType.includes('.pdf') && pdfPageLimit > 0 ? (
+      <Box component="span" display="block">
+        Maximum {pdfPageLimit} PDF page(s) per file
+      </Box>
+    ) : null;
+
   return (
     <>
       Accepted formats: {fileTypeInfo.join(', ')}
       {amountFilesInfo}
+      {pdfPageLimitInfo}
       <List component="ul" className={classes.questionnairesList}>
         {files.map &&
           files.map((metaData: FileMetaData) => {
