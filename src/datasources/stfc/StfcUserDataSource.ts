@@ -4,6 +4,7 @@ import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
+import { LRUCache } from '../../utils/LRUCache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
@@ -95,6 +96,107 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
 }
 
 export class StfcUserDataSource implements UserDataSource {
+  private static readonly userDetailsCacheMaxElements = 200;
+  private static readonly userDetailsCacheSecondsToLive = 600; // 10 minutes
+  private static readonly rolesCacheMaxElements = 200;
+  private static readonly rolesCacheSecondsToLive = 300; //5 minutes
+
+  private uowsBasicUserDetailsCache = new LRUCache<StfcBasicPersonDetails>(
+    StfcUserDataSource.userDetailsCacheMaxElements,
+    StfcUserDataSource.userDetailsCacheSecondsToLive
+  ).enableStatsLogging('uowsBasicUserDetailsCache');
+
+  private uowsSearchableBasicUserDetailsCache =
+    new LRUCache<StfcBasicPersonDetails>(
+      StfcUserDataSource.userDetailsCacheMaxElements,
+      StfcUserDataSource.userDetailsCacheSecondsToLive
+    ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
+
+  private uowsRolesCache = new LRUCache<Role[]>(
+    StfcUserDataSource.rolesCacheMaxElements,
+    StfcUserDataSource.rolesCacheSecondsToLive
+  ).enableStatsLogging('uowsRolesCache');
+
+  private async getStfcBasicPersonByUserNumber(
+    userNumber: string,
+    searchableOnly?: boolean
+  ): Promise<StfcBasicPersonDetails | null> {
+    return this.getStfcBasicPeopleByUserNumbers(
+      [userNumber],
+      searchableOnly
+    ).then((stfcUsers) => (stfcUsers.length > 0 ? stfcUsers[0] : null));
+  }
+
+  private async getStfcBasicPeopleByUserNumbers(
+    userNumbers: string[],
+    searchableOnly?: boolean
+  ): Promise<StfcBasicPersonDetails[]> {
+    const cache = searchableOnly
+      ? this.uowsSearchableBasicUserDetailsCache
+      : this.uowsBasicUserDetailsCache;
+
+    const stfcUsers: StfcBasicPersonDetails[] = [];
+    const cacheMisses: string[] = [];
+
+    for (const userNumber of userNumbers) {
+      const cachedUser = cache.get(userNumber);
+      if (cachedUser) {
+        stfcUsers.push(cachedUser);
+      } else {
+        cacheMisses.push(userNumber);
+      }
+    }
+
+    if (cacheMisses.length > 0) {
+      const uowsRequest = searchableOnly
+        ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
+            token,
+            userNumbers
+          )
+        : client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers);
+      const usersFromUows: StfcBasicPersonDetails[] | null = (await uowsRequest)
+        .return;
+
+      if (usersFromUows) {
+        this.ensureDummyUsersExist(
+          usersFromUows.map((stfcUser) => parseInt(stfcUser.userNumber))
+        );
+        usersFromUows.map((user) => cache.put(user.userNumber, user));
+        stfcUsers.push(...usersFromUows);
+      }
+    }
+
+    return stfcUsers;
+  }
+
+  private async getStfcBasicPersonByEmail(
+    email: string,
+    searchableOnly?: boolean
+  ): Promise<StfcBasicPersonDetails | null> {
+    const cache = searchableOnly
+      ? this.uowsSearchableBasicUserDetailsCache
+      : this.uowsBasicUserDetailsCache;
+
+    const cachedUser = cache.get(email);
+    if (cachedUser) {
+      return cachedUser;
+    }
+
+    const uowsRequest = searchableOnly
+      ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
+      : client.getBasicPersonDetailsFromEmail;
+    const stfcUser: StfcBasicPersonDetails | null = (await uowsRequest).return;
+
+    if (!stfcUser) {
+      return null;
+    }
+
+    this.ensureDummyUserExists(parseInt(stfcUser.userNumber));
+    cache.put(email, stfcUser);
+
+    return stfcUser;
+  }
+
   async delete(id: number): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
@@ -121,37 +223,24 @@ export class StfcUserDataSource implements UserDataSource {
     );
     const userNumbers: string[] = users.map((user) => String(user.id));
 
-    const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-      await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-    )?.return;
-
-    return stfcBasicPeople
-      ? stfcBasicPeople.map((person) => toEssUser(person))
-      : Promise.resolve([]);
+    return this.getStfcBasicPeopleByUserNumbers(userNumbers).then((stfcUsers) =>
+      stfcUsers.map((person) => toEssUser(person))
+    );
   }
 
   async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
-    const stfcUser = (
-      await client.getBasicPersonDetailsFromUserNumber(token, id)
-    )?.return;
-    if (stfcUser != null) {
-      this.ensureDummyUserExists(stfcUser.userNumber);
-    }
-
-    return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
+    return this.getStfcBasicPersonByUserNumber(String(id)).then(
+      (stfcBasicPerson) =>
+        stfcBasicPerson ? toEssBasicUserDetails(stfcBasicPerson) : null
+    );
   }
 
   async getBasicUserDetailsByEmail(
     email: string
   ): Promise<BasicUserDetails | null> {
-    const stfcUser = (
-      await client.getSearchableBasicPersonDetailsFromEmail(token, email)
-    )?.return;
-    if (stfcUser != null) {
-      this.ensureDummyUserExists(stfcUser.userNumber);
-    }
-
-    return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
+    return this.getStfcBasicPersonByEmail(email, true).then((stfcUser) =>
+      stfcUser ? toEssBasicUserDetails(stfcUser) : null
+    );
   }
 
   async checkOrcIDExist(orcID: string): Promise<boolean> {
@@ -159,7 +248,7 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async checkEmailExist(email: string): Promise<boolean> {
-    return (await client.getBasicPersonDetailsFromEmail(token, email)) != null;
+    return this.getStfcBasicPersonByEmail(email).then((user) => !!user);
   }
 
   async getPasswordByEmail(email: string): Promise<string> {
@@ -182,24 +271,14 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getByEmail(email: string): Promise<User | null> {
-    const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
-      ?.return;
-    if (stfcUser != null) {
-      this.ensureDummyUserExists(stfcUser.userNumber);
-    }
-
-    return stfcUser ? toEssUser(stfcUser) : null;
+    return this.getStfcBasicPersonByEmail(email).then((stfcUser) =>
+      stfcUser ? toEssUser(stfcUser) : null
+    );
   }
 
   async getByUsername(username: string): Promise<User | null> {
-    const stfcUser = (
-      await client.getBasicPersonDetailsFromUserNumber(token, username)
-    )?.return;
-    if (stfcUser != null) {
-      this.ensureDummyUserExists(stfcUser.userNumber);
-    }
-
-    return stfcUser ? toEssUser(stfcUser) : null;
+    // We use user numbers as usernames
+    return this.getUser(parseInt(username));
   }
 
   async getPasswordByUsername(username: string): Promise<string | null> {
@@ -211,6 +290,11 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getUserRoles(id: number): Promise<Role[]> {
+    const cachedRoles = this.uowsRolesCache.get(String(id));
+    if (cachedRoles) {
+      return cachedRoles;
+    }
+
     const stfcRoles: stfcRole[] | null = (
       await client.getRolesForUser(token, id)
     )?.return;
@@ -253,7 +337,11 @@ export class StfcUserDataSource implements UserDataSource {
     /*
      * Prepend the user role as it must be first.
      */
-    return [userRole, ...uniqueRoles];
+    const userRoles = [userRole, ...uniqueRoles];
+
+    this.uowsRolesCache.put(String(id), userRoles);
+
+    return userRoles;
   }
 
   async getRoles(): Promise<Role[]> {
@@ -265,26 +353,21 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async me(id: number) {
-    const stfcUser = (
-      await client.getBasicPersonDetailsFromUserNumber(token, id)
-    )?.return;
-
-    return stfcUser ? toEssUser(stfcUser) : null;
+    return this.getUser(id);
   }
 
   async getUser(id: number) {
-    const stfcUser = (
-      await client.getBasicPersonDetailsFromUserNumber(token, id)
-    )?.return;
-    if (stfcUser != null) {
-      await this.ensureDummyUserExists(stfcUser.userNumber);
-    }
-
-    return stfcUser ? toEssUser(stfcUser) : null;
+    return this.getStfcBasicPersonByUserNumber(String(id)).then(
+      (stfcBasicPerson) => (stfcBasicPerson ? toEssUser(stfcBasicPerson) : null)
+    );
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {
     return await postgresUserDataSource.ensureDummyUserExists(userId);
+  }
+
+  async ensureDummyUsersExist(userIds: number[]): Promise<User[]> {
+    return await postgresUserDataSource.ensureDummyUsersExist(userIds);
   }
 
   async getUsers({
@@ -322,13 +405,13 @@ export class StfcUserDataSource implements UserDataSource {
 
       if (users[0]) {
         const userNumbers: string[] = users.map((record) => String(record.id));
-        const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-        )?.return;
+        const stfcBasicPeople = await this.getStfcBasicPeopleByUserNumbers(
+          userNumbers
+        );
 
-        userDetails = stfcBasicPeople
-          ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
-          : [];
+        userDetails = stfcBasicPeople.map((person) =>
+          toEssBasicUserDetails(person)
+        );
       }
     }
 
@@ -361,12 +444,10 @@ export class StfcUserDataSource implements UserDataSource {
 
     if (dbUsers[0]) {
       const userNumbers: string[] = dbUsers.map((record) => String(record.id));
-      const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-        await client.getSearchableBasicPeopleDetailsFromUserNumbers(
-          token,
-          userNumbers
-        )
-      )?.return;
+      const stfcBasicPeople = await this.getStfcBasicPeopleByUserNumbers(
+        userNumbers,
+        true
+      );
 
       users = stfcBasicPeople
         ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
@@ -384,13 +465,9 @@ export class StfcUserDataSource implements UserDataSource {
       await postgresUserDataSource.getProposalUsers(proposalPk);
     const userNumbers: string[] = users.map((user) => String(user.id));
 
-    const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-      await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-    )?.return;
-
-    return stfcBasicPeople
-      ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
-      : Promise.resolve([]);
+    return this.getStfcBasicPeopleByUserNumbers(userNumbers).then((stfcUsers) =>
+      stfcUsers.map((stfcUser) => toEssBasicUserDetails(stfcUser))
+    );
   }
 
   async checkScientistToProposal(
