@@ -17,10 +17,8 @@ export const QuestionTemplateRelationRichTextInputForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            required: Yup.boolean(),
-          }),
+        config: Yup.object({
+          required: Yup.boolean(),
         }),
       })}
     >

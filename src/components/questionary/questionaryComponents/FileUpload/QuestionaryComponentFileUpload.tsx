@@ -48,8 +48,9 @@ export function QuestionaryComponentFileUpload(
         )}
       </FormLabel>
       <FileUploadComponent
-        maxFiles={config.max_files}
         id={answer.question.id}
+        maxFiles={config.max_files}
+        pdfPageLimit={config.pdf_page_limit}
         fileType={config.file_type ? config.file_type.join(',') : ''}
         onChange={(fileMetaDataList: FileIdWithCaptionAndFigure[]) => {
           const newStateValue = fileMetaDataList.map((file) => ({

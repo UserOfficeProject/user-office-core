@@ -35,11 +35,9 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            required: Yup.bool(),
-            variant: Yup.string().required('Variant is required'),
-          }),
+        config: Yup.object({
+          required: Yup.bool(),
+          variant: Yup.string().required('Variant is required'),
         }),
       })}
     >

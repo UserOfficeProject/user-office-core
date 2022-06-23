@@ -39,12 +39,10 @@ export const QuestionTemplateRelationGenericTemplateForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            addEntryButtonLabel: Yup.string(),
-            maxEntries: Yup.number().nullable(),
-            templateId: Yup.number().required('Template is required'),
-          }),
+        config: Yup.object({
+          addEntryButtonLabel: Yup.string(),
+          maxEntries: Yup.number().nullable(),
+          templateId: Yup.number().required('Template is required'),
         }),
       })}
     >

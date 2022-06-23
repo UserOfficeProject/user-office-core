@@ -89,7 +89,6 @@ export function QuestionnairesList({
             onClick={onAddNewClick}
             variant="outlined"
             data-cy="add-button"
-            size="small"
             color="primary"
             startIcon={<AddCircleOutlineIcon />}
             disabled={

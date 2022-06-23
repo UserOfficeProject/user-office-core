@@ -26,19 +26,17 @@ export const QuestionTemplateRelationNumberForm: FC<
     <QuestionTemplateRelationFormShell
       {...props}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            required: Yup.bool(),
-            units: Yup.array().of(
-              Yup.object({
-                id: Yup.string(),
-                quantity: Yup.string(),
-                siConversionFormula: Yup.string(),
-                symbol: Yup.string(),
-                unit: Yup.string(),
-              })
-            ),
-          }),
+        config: Yup.object({
+          required: Yup.bool(),
+          units: Yup.array().of(
+            Yup.object({
+              id: Yup.string(),
+              quantity: Yup.string(),
+              siConversionFormula: Yup.string(),
+              symbol: Yup.string(),
+              unit: Yup.string(),
+            })
+          ),
         }),
       })}
     >
