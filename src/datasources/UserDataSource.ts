@@ -59,6 +59,7 @@ export interface UserDataSource {
     telephone_alt: string | undefined
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
+  ensureDummyUsersExist(userIds: number[]): Promise<User[]>;
   createOrganisation(
     name: string,
     verified: boolean,

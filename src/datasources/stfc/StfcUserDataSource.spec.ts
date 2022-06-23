@@ -4,12 +4,12 @@ import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('./UOWSSoapInterface');
 jest.mock('../postgres/UserDataSource.ts');
+jest.mock('../../utils/LRUCache');
 
-const userdataSource = new StfcUserDataSource();
 const dummyUserNumber = 12345;
 
 beforeAll(() => {
-  const mockGetRoles = jest.spyOn(userdataSource, 'getRoles');
+  const mockGetRoles = jest.spyOn(StfcUserDataSource.prototype, 'getRoles');
   mockGetRoles.mockImplementation(() =>
     Promise.resolve([
       new Role(1, Roles.USER, 'User'),
@@ -18,7 +18,7 @@ beforeAll(() => {
     ])
   );
   const mockEnsureDummyUserExists = jest.spyOn(
-    userdataSource,
+    StfcUserDataSource.prototype,
     'ensureDummyUserExists'
   );
   mockEnsureDummyUserExists.mockImplementation((userId: number) => {
@@ -30,6 +30,7 @@ beforeAll(() => {
 });
 
 test('When getting roles for a user, the User role is the first role in the list', async () => {
+  const userdataSource = new StfcUserDataSource();
   const roles = await userdataSource.getUserRoles(dummyUserNumber);
 
   return expect(roles[0]).toEqual(
@@ -38,6 +39,8 @@ test('When getting roles for a user, the User role is the first role in the list
 });
 
 test('When getting roles for a user, STFC roles are translated into ESS roles', async () => {
+  const userdataSource = new StfcUserDataSource();
+
   return expect(userdataSource.getUserRoles(dummyUserNumber)).resolves.toEqual(
     expect.arrayContaining([
       new Role(1, Roles.USER, 'User'),
@@ -48,6 +51,7 @@ test('When getting roles for a user, STFC roles are translated into ESS roles', 
 });
 
 test('When getting roles for a user, no roles are granted if role definitions do not exist', async () => {
+  const userdataSource = new StfcUserDataSource();
   const mockGetRoles = jest.spyOn(userdataSource, 'getRoles');
   mockGetRoles.mockImplementation(() => Promise.resolve([]));
 
