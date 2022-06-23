@@ -157,6 +157,6 @@ export class CallDataSourceMock implements CallDataSource {
   }
 
   async isCallEnded(callId: number): Promise<boolean> {
-    return callId === 1;
+    return callId !== 1;
   }
 }
