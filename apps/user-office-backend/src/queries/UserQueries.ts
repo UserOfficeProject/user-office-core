@@ -58,6 +58,7 @@ export default class UserQueries {
         user.lastname,
         user.preferredname,
         user.organisation,
+        user.organizationId,
         user.position,
         user.created,
         user.placeholder
@@ -84,6 +85,7 @@ export default class UserQueries {
       user.lastname,
       user.preferredname,
       user.organisation,
+      user.organizationId,
       user.position,
       user.created,
       user.placeholder
