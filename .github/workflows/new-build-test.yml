@@ -1,4 +1,4 @@
-name: E2E and build testing.
+name: E2E and build and testing.
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the develop and master branches
@@ -8,7 +8,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  resolve_dep:
+  resolve_dep_1:
     runs-on: ubuntu-latest
     outputs:
       FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
@@ -50,7 +50,7 @@ jobs:
       - name: Resolved
         run: |
           echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
-  setup:
+  setup_1:
     runs-on: ubuntu-latest
     needs: resolve_dep
     steps:
@@ -99,7 +99,7 @@ jobs:
           npm install
           npm run install:all
 
-  build_backend:
+  build_backend_1:
     runs-on: ubuntu-latest
     needs: [resolve_dep, setup]
 
