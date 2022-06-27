@@ -1,0 +1,123 @@
+name: E2E and build testing.
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the develop and master branches
+on:
+  pull_request:
+    branches: [develop]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  resolve_dep:
+    runs-on: ubuntu-latest
+    outputs:
+      FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
+
+    steps:
+      - name: Resolve required repositories
+        id: resolve_rep
+        run: |
+          # this assumes the result is an array, and .name property is used
+          check_feature() {
+            # first param is the branch, everything after is endpoint for curl
+            local branch=$1
+            local found=0
+            shift
+            for endpoint in $@; do
+              local json=$(curl -s $endpoint)
+              local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
+              # to track what we found
+              >&2 echo "$endpoint -> $branch_found"
+              if [[ $branch_found != "" ]]; then
+                found=$((found += 1))
+              fi
+            done
+            echo $found
+          }
+
+          FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+          )
+
+          FACTORY_TAG=develop
+          if [[ $FACTORY_TAGS == "2" ]]; then
+            FACTORY_TAG="${{ github.head_ref }}"
+          fi
+
+          echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
+
+      - name: Resolved
+        run: |
+          echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
+  setup:
+    runs-on: ubuntu-latest
+    needs: resolve_dep
+    steps:
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache root node_modules
+        id: cached-modules-root
+        uses: actions/cache@v3
+        env:
+          cache-name: node-modules-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+
+      # - name: Cache backend node_modules
+      #   id: cached-modules-backend
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: node-modules-cache-backend
+      #   with:
+      #     path: ./apps/user-office-backend/node_modules
+      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('./apps/user-office-backend/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ env.cache-name }}-
+
+      # - name: Cache frontend node_modules
+      #   id: cached-modules-frontend
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: node-modules-cache-frontend
+      #   with:
+      #     path: ./apps/user-office-frontend/node_modules
+      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('./apps/user-office-frontend/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm run install:all
+
+  build_backend:
+    runs-on: ubuntu-latest
+    needs: [resolve_dep, setup]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore backend node_modules
+        id: cached-modules-root
+        uses: actions/cache@v3
+        env:
+          cache-name: node-modules-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npm run build:backend
