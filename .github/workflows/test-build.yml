@@ -70,14 +70,26 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Cache node_modules
-        id: cache-node-modules
+        id: cached-node-modules-root
         uses: actions/cache@v3
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
 
-      - name: Install dependencies
+      - name: Install root dependencies
+        if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
         run: npm install
+
+      - name: Cache backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-backend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+
+      - name: Install backend dependencies
+        if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
+        run: npm run install:backend
 
   build:
     # The type of runner that the job will run on
@@ -94,8 +106,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Restore node_modules
-        id: cache-node-modules
-        uses: actions/cache@v2
+        id: cached-node-modules-root
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
