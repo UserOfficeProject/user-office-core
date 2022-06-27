@@ -51,33 +51,33 @@ jobs:
         run: |
           echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
 
-  install-and-cache:
-    name: Run install and cache
-    needs: resolve_dep
-    runs-on: ubuntu-latest
+  # install-and-cache:
+  #   name: Run install and cache
+  #   needs: resolve_dep
+  #   runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x]
+  #   strategy:
+  #     matrix:
+  #       node-version: [16.x]
 
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Check out Git repository
+  #       uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
 
-        - name: Cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+  #       - name: Cache node_modules
+  #       id: cache-node-modules
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: node_modules
+  #         key: node-modules-${{ hashFiles('package-lock.json') }}
 
-      - name: Install dependencies
-        run: npm install
+  #     - name: Install dependencies
+  #       run: npm install
 
   build:
     # The type of runner that the job will run on
