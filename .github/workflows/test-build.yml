@@ -192,14 +192,16 @@ jobs:
           path: apps/user-office-frontend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
-      - name: Cache e2e node_modules
-        id: cached-node-modules-e2e
-        uses: actions/cache@v3
-        with:
-          path: apps/user-office-frontend-e2e/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+      # - name: Cache e2e node_modules
+      #   id: cached-node-modules-e2e
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: apps/user-office-frontend-e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
 
       - name: Install e2e dependencies
+        env:
+          CYPRESS_CACHE_FOLDER: ./tmp/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
 
@@ -238,6 +240,7 @@ jobs:
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
           BUILD_TAG: ${{ github.sha }}
+          CYPRESS_CACHE_FOLDER: ./tmp/Cypress
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
