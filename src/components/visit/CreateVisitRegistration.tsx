@@ -33,6 +33,7 @@ function createRegistrationStub(
       organizationId: 1,
       placeholder: false,
       position: '',
+      email: '',
     },
     questionary: {
       isCompleted: false,
