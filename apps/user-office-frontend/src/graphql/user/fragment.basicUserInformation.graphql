@@ -8,4 +8,5 @@ fragment basicUserDetails on BasicUserDetails {
   position
   created
   placeholder
+  email
 }

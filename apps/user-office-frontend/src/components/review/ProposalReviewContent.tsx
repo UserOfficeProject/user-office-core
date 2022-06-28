@@ -55,6 +55,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
 }) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
   const { proposalData, setProposalData, loading } = useProposalData(
     proposalPk || reviewData?.proposal?.primaryKey
@@ -136,7 +137,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
     </>
   );
 
-  const ProposalAdminTab = isUserOfficer && (
+  const ProposalAdminTab = (isUserOfficer || isInstrumentScientist) && (
     <ProposalAdmin
       data={proposalData}
       setAdministration={(data: AdministrationFormData) =>

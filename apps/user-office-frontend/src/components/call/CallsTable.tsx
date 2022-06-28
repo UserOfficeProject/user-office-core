@@ -1,3 +1,5 @@
+import Archive from '@mui/icons-material/Archive';
+import Unarchive from '@mui/icons-material/Unarchive';
 import { Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
@@ -9,12 +11,18 @@ import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import {
+  Call,
+  InstrumentWithAvailabilityTime,
+  UserRole,
+  UpdateCallInput,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
+import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
@@ -30,7 +38,7 @@ const getFilterStatus = (callStatus: string | CallStatus) =>
     ? undefined // if set to ALL we don't filter by status
     : callStatus === CallStatus.ACTIVE;
 
-const CallsTable: React.FC = () => {
+const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
   const { api } = useDataApiWithFeedback();
   const { timezone, toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
@@ -118,6 +126,35 @@ const CallsTable: React.FC = () => {
       setCalls(callsWithInstruments);
       setAssigningInstrumentsCallId(null);
     }
+  };
+
+  const changeCallActiveStatus = (call: Call) => {
+    const shouldActivateCall = !call.isActive;
+    confirm(
+      async () => {
+        const data = await api({
+          toastSuccessMessage: `Call ${
+            shouldActivateCall ? 'activated' : 'deactivated'
+          } successfully`,
+        }).updateCall({
+          ...call,
+          isActive: shouldActivateCall,
+        } as UpdateCallInput);
+
+        if (!data.updateCall.rejection) {
+          const newCallsArray = calls.filter(
+            (objectItem) => objectItem.id !== call.id
+          );
+          setCalls(newCallsArray);
+        }
+      },
+      {
+        title: `${shouldActivateCall ? 'Activate' : 'Deactivate'} call`,
+        description: `Are you sure you want to ${
+          shouldActivateCall ? 'activate' : 'deactivate'
+        } this call?`,
+      }
+    )();
   };
 
   const deleteCall = async (id: number | string) => {
@@ -247,7 +284,8 @@ const CallsTable: React.FC = () => {
         setData={setCalls}
         delete={deleteCall}
         hasAccess={{
-          create: isUserOfficer,
+          create:
+            isUserOfficer && urlQueryParams.callStatus !== CallStatus.INACTIVE,
           update: isUserOfficer,
           remove: isUserOfficer,
         }}
@@ -277,6 +315,12 @@ const CallsTable: React.FC = () => {
               setAssigningInstrumentsCallId((rowData as Call).id),
             position: 'row',
           },
+          (rowData) => ({
+            icon: rowData.isActive ? Archive : Unarchive,
+            tooltip: `${rowData.isActive ? 'Deactivate' : 'Activate'} call`,
+            onClick: (): void => changeCallActiveStatus(rowData as Call),
+            position: 'row',
+          }),
         ]}
         urlQueryParams={urlQueryParams}
         setUrlQueryParams={setUrlQueryParams}
@@ -285,4 +329,4 @@ const CallsTable: React.FC = () => {
   );
 };
 
-export default CallsTable;
+export default withConfirm(CallsTable);

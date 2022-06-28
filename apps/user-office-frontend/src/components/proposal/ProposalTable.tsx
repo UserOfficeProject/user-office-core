@@ -15,6 +15,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
+import { isCallEnded } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -177,9 +178,13 @@ const ProposalTable = ({
         }}
         actions={[
           (rowData) => {
-            const isCallActive = rowData.call?.isActive ?? true;
+            const callHasEnded = isCallEnded(
+              rowData.call?.startCall,
+              rowData.call?.endCall
+            );
+
             const readOnly =
-              !isCallActive ||
+              callHasEnded ||
               (rowData.submitted &&
                 rowData.status?.shortCode !== 'EDITABLE_SUBMITTED');
 
