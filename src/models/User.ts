@@ -90,6 +90,7 @@ export class BasicUserDetails {
     public organizationId: number,
     public position: string,
     public created: Date,
-    public placeholder: boolean
+    public placeholder: boolean,
+    public email: string
   ) {}
 }
