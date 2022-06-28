@@ -129,7 +129,7 @@ jobs:
         with:
           path: apps/user-office-backend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
-      
+
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
@@ -143,6 +143,50 @@ jobs:
           secret: ${{secrets.secret}}
           tokenLife: 7d
           SPARKPOST_TOKEN: wrong_token_for_test
+
+  test_backend:
+    runs-on: ubuntu-latest
+    needs: [resolve_dep, build]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-backend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+
+      - name: Run backend unit tests
+        env:
+          TZ: Europe/Stockholm
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          DEPENDENCY_CONFIG: ess
+          secret: dummysecret
+          NODE_ENV: test
+          baseURL: localhost:3000
+          tokenLife: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          EAM_AUTH_URL: https://ios.esss.lu.se
+          EAM_AUTH_SECRET: dummyEAMsecret
+          EAM_AUTH_USER: dummyAuthUser
+          EAM_AUTH_PASS: dummyAuthPass
+          EAM_API_URL: https://ios.esss.lu.se:7443
+          EAM_PART_CODE: 12413
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run test:backend
   e2e:
     runs-on: ubuntu-latest
     needs: [resolve_dep, build]
@@ -184,7 +228,7 @@ jobs:
         with:
           path: apps/user-office-backend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
-      
+
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
@@ -192,12 +236,12 @@ jobs:
           path: apps/user-office-frontend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
-      # - name: Cache e2e node_modules
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: apps/user-office-frontend-e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+      - name: Cache e2e node_modules
+        id: cached-node-modules-e2e
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend-e2e/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
 
       - name: Install e2e dependencies
         env:
@@ -228,8 +272,8 @@ jobs:
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
           DEPENDENCY_CONFIG: ess
-          secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
-          NODE_ENV: development
+          secret: dummysecret
+          NODE_ENV: test
           baseURL: localhost:3000
           tokenLife: 7d
           SPARKPOST_TOKEN: dummytoken
@@ -241,6 +285,12 @@ jobs:
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
           BUILD_TAG: ${{ github.sha }}
           CYPRESS_CACHE_FOLDER: ./tmp/Cypress
+          EAM_AUTH_URL: https://ios.esss.lu.se
+          EAM_AUTH_SECRET: dummyEAMsecret
+          EAM_AUTH_USER: dummyAuthUser
+          EAM_AUTH_PASS: dummyAuthPass
+          EAM_API_URL: https://ios.esss.lu.se:7443
+          EAM_PART_CODE: 12413
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
