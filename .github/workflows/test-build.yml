@@ -236,14 +236,19 @@ jobs:
           path: apps/user-office-frontend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
-      - name: Cache e2e node_modules
-        env:
-          CYPRESS_CACHE_FOLDER: .cache/Cypress
-        id: cached-node-modules-e2e
-        uses: actions/cache@v3
-        with:
-          path: apps/user-office-frontend-e2e/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+      # TODO: See how to proceed with e2e caching because there is some error: 
+      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
+      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
+      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
+      # 
+      # - name: Cache e2e node_modules
+      #   env:
+      #     CYPRESS_CACHE_FOLDER: .cache/Cypress
+      #   id: cached-node-modules-e2e
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: apps/user-office-frontend-e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
 
       - name: Install e2e dependencies
         env:
