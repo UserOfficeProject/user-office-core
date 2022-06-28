@@ -245,7 +245,7 @@ jobs:
 
       - name: Install e2e dependencies
         env:
-          CYPRESS_CACHE_FOLDER: ./tmp/Cypress
+          CYPRESS_CACHE_FOLDER: /home/runner/.cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
 
@@ -284,7 +284,7 @@ jobs:
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
           BUILD_TAG: ${{ github.sha }}
-          CYPRESS_CACHE_FOLDER: ./tmp/Cypress
+          CYPRESS_CACHE_FOLDER: /home/runner/.cache/Cypress
           EAM_AUTH_URL: https://ios.esss.lu.se
           EAM_AUTH_SECRET: dummyEAMsecret
           EAM_AUTH_USER: dummyAuthUser
