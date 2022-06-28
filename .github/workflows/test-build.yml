@@ -274,8 +274,8 @@ jobs:
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
           DEPENDENCY_CONFIG: ess
-          secret: dummysecret
-          NODE_ENV: test
+          secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          NODE_ENV: development
           baseURL: localhost:3000
           tokenLife: 7d
           SPARKPOST_TOKEN: dummytoken
