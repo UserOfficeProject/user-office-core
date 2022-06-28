@@ -236,16 +236,18 @@ jobs:
           path: apps/user-office-frontend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
-      - name: Cache e2e node_modules
-        id: cached-node-modules-e2e
-        uses: actions/cache@v3
-        with:
-          path: apps/user-office-frontend-e2e/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+      # - name: Cache e2e node_modules
+      #   env:
+      #     CYPRESS_CACHE_FOLDER: .cache/Cypress
+      #   id: cached-node-modules-e2e
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: apps/user-office-frontend-e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
 
       - name: Install e2e dependencies
         env:
-          CYPRESS_CACHE_FOLDER: /home/runner/.cache/Cypress
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
 
@@ -271,7 +273,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-          DEPENDENCY_CONFIG: ess
+          DEPENDENCY_CONFIG: e2e
           secret: dummysecret
           NODE_ENV: test
           baseURL: localhost:3000
@@ -284,7 +286,7 @@ jobs:
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
           BUILD_TAG: ${{ github.sha }}
-          CYPRESS_CACHE_FOLDER: /home/runner/.cache/Cypress
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
           EAM_AUTH_URL: https://ios.esss.lu.se
           EAM_AUTH_SECRET: dummyEAMsecret
           EAM_AUTH_USER: dummyAuthUser
