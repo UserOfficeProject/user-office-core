@@ -142,6 +142,7 @@ describe('Test Call Mutations', () => {
       callReviewEnded: false,
       callSEPReviewEnded: false,
       templateId: 1,
+      isActive: true,
     });
   });
 
@@ -198,6 +199,7 @@ describe('Test Call Mutations', () => {
       templateId: 1,
       title: 'Title',
       description: 'Description',
+      isActive: true,
     };
 
     return expect(
