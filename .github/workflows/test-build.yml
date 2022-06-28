@@ -236,14 +236,14 @@ jobs:
           path: apps/user-office-frontend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
-      # - name: Cache e2e node_modules
-      #   env:
-      #     CYPRESS_CACHE_FOLDER: .cache/Cypress
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: apps/user-office-frontend-e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+      - name: Cache e2e node_modules
+        env:
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+        id: cached-node-modules-e2e
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend-e2e/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
 
       - name: Install e2e dependencies
         env:
