@@ -273,7 +273,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-          DEPENDENCY_CONFIG: e2e
+          DEPENDENCY_CONFIG: ess
           secret: dummysecret
           NODE_ENV: test
           baseURL: localhost:3000
