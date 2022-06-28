@@ -196,15 +196,12 @@ jobs:
       matrix:
         pattern:
           [
-            'cypress/integration/[a-e]*.ts',
-            'cypress/integration/[f-g]*.ts',
-            'cypress/integration/[h-i]*.ts',
-            'cypress/integration/[j-n]*.ts',
-            'cypress/integration/[m-p]*.ts',
-            'cypress/integration/[r-s]*.ts',
-            'cypress/integration/[t-t]*.ts',
-            'cypress/integration/[u-z]*.ts',
-            'cypress/integration/[A-Z]*.ts',
+            "cypress/integration/[a-e]*.ts",
+            "cypress/integration/[f-i]*.ts",
+            "cypress/integration/[j-p]*.ts",
+            "cypress/integration/[r-s]*.ts",
+            "cypress/integration/[t-z]*.ts",
+            "cypress/integration/[A-Z]*.ts",
           ]
 
     steps:
