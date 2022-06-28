@@ -146,7 +146,7 @@ jobs:
 
   test_backend:
     runs-on: ubuntu-latest
-    needs: [resolve_dep, build]
+    needs: [resolve_dep, install-and-cache]
 
     steps:
       - uses: actions/checkout@v3
@@ -189,7 +189,7 @@ jobs:
           npm run test:backend
   e2e:
     runs-on: ubuntu-latest
-    needs: [resolve_dep, build]
+    needs: [resolve_dep, install-and-cache]
 
     strategy:
       fail-fast: false
