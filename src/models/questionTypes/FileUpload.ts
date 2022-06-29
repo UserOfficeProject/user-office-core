@@ -276,6 +276,14 @@ const hasAllowedPdfNumPages = async (
 
   const pageLimit = config.pdf_page_limit;
 
+  if (pageLimit == 0) {
+    logger.logInfo('Skipping PDF page check as limit is unlimited', {
+      ...errorContext,
+    });
+
+    return true;
+  }
+
   const readPdf = async () => {
     return createReader(path);
   };

@@ -39,3 +39,4 @@ For example: `node .\dev-commands\crudHelper.js c instrument` will initialize al
 Please reffer to the [Contribution guide](CONTRIBUTING.md) to get information about contributing and versioning.
 
 Happy coding! 👨‍💻
+
