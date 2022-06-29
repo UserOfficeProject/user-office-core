@@ -55,7 +55,7 @@ context('Shipments tests', () => {
     const STORAGE_TEMPERATURE_KEY = 'storage_temperature';
     const IS_FRAGILE_KEY = 'is_fragile';
     const LOCAL_CONTACT_KEY = 'shipment_local_contact';
-    const IS_DANGEROUS_KEY = 'is_dangerous';
+    const IS_DANGEROUS_KEY = 'is_dangerous_goods';
 
     const localContactName = faker.name.firstName();
     const storageOption = faker.lorem.words(3);
