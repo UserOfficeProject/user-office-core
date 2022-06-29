@@ -19,7 +19,8 @@ export const basicDummyUser = new BasicUserDetails(
   1,
   'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
-  false
+  false,
+  'test@email.com'
 );
 
 export const basicDummyUserNotOnProposal = new BasicUserDetails(
@@ -31,7 +32,8 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   1,
   'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
-  false
+  false,
+  'test@email.com'
 );
 
 export const dummyUserOfficer = new User(
@@ -227,7 +229,8 @@ export class UserDataSourceMock implements UserDataSource {
       2,
       'Manager',
       new Date('2019-07-17 08:25:12.23043+00'),
-      false
+      false,
+      'test@email.com'
     );
   }
 
@@ -260,7 +263,8 @@ export class UserDataSourceMock implements UserDataSource {
       2,
       'Manager',
       new Date('2019-07-17 08:25:12.23043+00'),
-      false
+      false,
+      'test@email.com'
     );
   }
   async getByEmail(email: string): Promise<User | null> {

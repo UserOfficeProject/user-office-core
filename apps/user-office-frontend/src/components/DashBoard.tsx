@@ -190,7 +190,7 @@ const Dashboard: React.FC = () => {
   )?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
-  const { calls } = useCallsData({ isActive: true });
+  const { calls } = useCallsData({ isActive: true, isEnded: false });
 
   useEffect(() => {
     if (isTabletOrMobile) {

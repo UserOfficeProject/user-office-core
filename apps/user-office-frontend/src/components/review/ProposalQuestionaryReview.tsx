@@ -6,7 +6,7 @@ import ProposalQuestionaryDetails from 'components/proposal/ProposalQuestionaryD
 import { TableRowData } from 'components/questionary/QuestionaryDetails';
 import { BasicUserDetails } from 'generated/sdk';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
-import { getFullUserName } from 'utils/user';
+import { getFullUserNameWithEmail } from 'utils/user';
 
 export default function ProposalQuestionaryReview(
   props: {
@@ -22,7 +22,6 @@ export default function ProposalQuestionaryReview(
   const users = data.users || [];
 
   const hasReferenceNumberFormat = !!data.call?.referenceNumberFormat;
-
   const additionalDetails: TableRowData[] = [
     {
       label: 'Proposal ID',
@@ -35,12 +34,12 @@ export default function ProposalQuestionaryReview(
     { label: 'Abstract', value: data.abstract },
     {
       label: 'Principal Investigator',
-      value: getFullUserName(data.proposer),
+      value: getFullUserNameWithEmail(data.proposer),
     },
     {
       label: 'Co-Proposers',
       value: users
-        .map((user: BasicUserDetails) => getFullUserName(user))
+        .map((user: BasicUserDetails) => getFullUserNameWithEmail(user))
         .join(', '),
     },
   ];

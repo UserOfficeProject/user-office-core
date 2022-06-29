@@ -196,7 +196,7 @@ export class ProposalAuthorization {
 
   private async isProposalEditable(proposal: Proposal): Promise<boolean> {
     const callId = proposal.callId;
-    const isCallActive = await this.callDataSource.checkActiveCall(callId);
+    const isCallEnded = await this.callDataSource.isCallEnded(callId);
     const proposalStatus = (
       await this.proposalSettingsDataSource.getProposalStatus(proposal.statusId)
     )?.shortCode;
@@ -205,10 +205,10 @@ export class ProposalAuthorization {
       return true;
     }
 
-    if (isCallActive) {
-      return proposalStatus === ProposalStatusDefaultShortCodes.DRAFT;
-    } else {
+    if (isCallEnded) {
       return false;
+    } else {
+      return proposalStatus === ProposalStatusDefaultShortCodes.DRAFT;
     }
   }
 

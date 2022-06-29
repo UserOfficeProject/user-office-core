@@ -289,6 +289,7 @@ export interface CallRecord {
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly title: string;
   readonly description: string;
+  readonly is_active: boolean;
 }
 
 export interface PageTextRecord {
@@ -799,7 +800,8 @@ export const createBasicUserObject = (user: UserRecord) => {
     user.organisation,
     user.position,
     user.created_at,
-    user.placeholder
+    user.placeholder,
+    user.email
   );
 };
 
@@ -844,7 +846,8 @@ export const createCallObject = (call: CallRecord) => {
     call.esi_template_id,
     call.allocation_time_unit,
     call.title,
-    call.description
+    call.description,
+    call.is_active
   );
 };
 

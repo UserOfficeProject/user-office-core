@@ -1,6 +1,7 @@
-import { ObjectType, Field, Int, Directive } from 'type-graphql';
+import { ObjectType, Field, Int, Directive, Authorized } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { Roles } from '../../models/Role';
 import { BasicUserDetails as BasicUserDetailsOrigin } from '../../models/User';
 
 @ObjectType()
@@ -26,6 +27,10 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
 
   @Field()
   public position: string;
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Field({ nullable: true })
+  public email: string;
 
   @Field(() => Boolean, { nullable: true })
   public placeholder?: boolean;
