@@ -80,6 +80,9 @@ export class CreateCallInput {
 
   @Field({ nullable: true })
   public description: string;
+
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public seps?: number[];
 }
 
 @Resolver()

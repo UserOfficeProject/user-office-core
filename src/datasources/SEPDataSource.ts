@@ -39,6 +39,7 @@ export interface SEPDataSource {
     sepId?: number
   ): Promise<SEP[]>;
   getUserSeps(id: number, role: Role): Promise<SEP[]>;
+  getSepsByCallId(callId: number): Promise<SEP[]>;
   getSEPByProposalPk(proposalPk: number): Promise<SEP | null>;
   getSEPs(
     active?: boolean,

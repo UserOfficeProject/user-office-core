@@ -82,7 +82,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     );
   }
 
-  async create(args: CreateCallInput): Promise<Call> {
+  async create(args: CreateCallInput): Promise<Call | null> {
     return database
       .insert({
         call_short_code: args.shortCode,
@@ -112,7 +112,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       .returning('*')
       .then((call: CallRecord[]) => {
         if (call.length !== 1) {
-          throw new Error('Could not create call');
+          return null;
         }
 
         return createCallObject(call[0]);
@@ -231,6 +231,47 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     throw new Error(`Call not found ${args.callId}`);
+  }
+
+  async assignSepsToCall(args: {
+    callId: number;
+    sepIds: number[];
+  }): Promise<boolean> {
+    const valuesToInsert = args.sepIds.map((sepId) => ({
+      sep_id: sepId,
+      call_id: args.callId,
+    }));
+
+    const sepsAssigned = await database.transaction(async (trx) => {
+      try {
+        /*
+         * Remove all assigned SEPs from a call and then re-assign
+         */
+        await database('call_has_seps')
+          .del()
+          .where('call_id', args.callId)
+          .transacting(trx);
+
+        const sepsAssignedTransaction = await database
+          .insert(valuesToInsert)
+          .into('call_has_seps')
+          .transacting(trx);
+
+        return await trx.commit(sepsAssignedTransaction);
+      } catch (error) {
+        logger.logException(
+          `Could not assign seps to a call '${args.callId}'`,
+          error
+        );
+        trx.rollback();
+      }
+    });
+
+    if (sepsAssigned?.length === args.sepIds.length) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async removeAssignedInstrumentFromCall(

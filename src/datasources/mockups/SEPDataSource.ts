@@ -320,6 +320,10 @@ export class SEPDataSourceMock implements SEPDataSource {
     return dummySEP;
   }
 
+  async getSepsByCallId(callId: number): Promise<SEP[]> {
+    return [dummySEP];
+  }
+
   async getSEPProposalAssignments(
     sepId: number,
     proposalPk: number,
