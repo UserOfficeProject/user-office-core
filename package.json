@@ -11,7 +11,7 @@
     "@date-io/luxon": "^2.13.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@graphql-codegen/cli": "^2.6.2",
+    "@graphql-codegen/cli": "^2.6.3",
     "@graphql-codegen/typescript": "^2.4.9",
     "@graphql-codegen/typescript-graphql-request": "^4.4.6",
     "@graphql-codegen/typescript-operations": "^2.3.6",
