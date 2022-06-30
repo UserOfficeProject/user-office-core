@@ -31,7 +31,7 @@ export function SelectImportFile(props: {
           onChange={onFileSelected}
         />
         <ActionButtonContainer>
-          <Button component="span">
+          <Button component="span" data-cy="select-file">
             <PublishIcon /> Select file
           </Button>
         </ActionButtonContainer>
