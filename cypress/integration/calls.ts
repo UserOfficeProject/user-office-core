@@ -321,6 +321,43 @@ context('Calls tests', () => {
         .should('include.text', '0');
     });
 
+    it('A user-officer should be able to add SEPs to a call', () => {
+      cy.createCall({
+        ...newCall,
+        esiTemplateId: esiTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+
+      cy.contains('Calls').click();
+
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.finishedLoading();
+      cy.get('[data-cy="call-template"] input').should(
+        'have.value',
+        initialDBData.template.name
+      );
+      cy.get('[data-cy="next-step"]').click();
+
+      cy.get('[data-cy="call-seps"]').click();
+
+      cy.get('[data-cy="call-seps-options"]').click();
+
+      cy.contains(initialDBData.sep.code).click();
+
+      cy.get('[data-cy="next-step"]').click();
+      cy.get('[data-cy="submit"]').click();
+
+      cy.finishedLoading();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains(newCall.shortCode).parent().find('td').last().contains('1');
+    });
+
     it('A user-officer should be able to edit a call', () => {
       const { shortCode, startDate, endDate } = updatedCall;
       const updatedCallStartDate = startDate.toFormat(

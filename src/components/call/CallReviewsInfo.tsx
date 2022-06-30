@@ -116,8 +116,8 @@ const CallReviewAndNotification: React.FC = () => {
         multiple
         loading={loadingSEPs}
         noOptionsText="No SEPs"
+        data-cy="call-seps"
         items={sepOptions}
-        InputProps={{ 'data-cy': 'call-seps' }}
       />
       <Field
         name="surveyComment"
