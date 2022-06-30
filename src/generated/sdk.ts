@@ -147,6 +147,7 @@ export type Call = {
   proposalWorkflow: Maybe<ProposalWorkflow>;
   proposalWorkflowId: Maybe<Scalars['Int']>;
   referenceNumberFormat: Maybe<Scalars['String']>;
+  seps: Maybe<Array<Sep>>;
   shortCode: Scalars['String'];
   startCall: Scalars['DateTime'];
   startCycle: Scalars['DateTime'];
@@ -212,6 +213,7 @@ export type CreateCallInput = {
   proposalSequence?: InputMaybe<Scalars['Int']>;
   proposalWorkflowId: Scalars['Int'];
   referenceNumberFormat?: InputMaybe<Scalars['String']>;
+  seps?: InputMaybe<Array<Scalars['Int']>>;
   shortCode: Scalars['String'];
   startCall: Scalars['DateTime'];
   startCycle: Scalars['DateTime'];
@@ -3092,6 +3094,7 @@ export type UpdateCallInput = {
   proposalSequence?: InputMaybe<Scalars['Int']>;
   proposalWorkflowId: Scalars['Int'];
   referenceNumberFormat?: InputMaybe<Scalars['String']>;
+  seps?: InputMaybe<Array<Scalars['Int']>>;
   shortCode: Scalars['String'];
   startCall: Scalars['DateTime'];
   startCycle: Scalars['DateTime'];
@@ -3602,10 +3605,11 @@ export type CreateCallMutationVariables = Exact<{
   esiTemplateId?: InputMaybe<Scalars['Int']>;
   title?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
+  seps?: InputMaybe<Array<Scalars['Int']> | Scalars['Int']>;
 }>;
 
 
-export type CreateCallMutation = { createCall: { rejection: { reason: string, context: string | null, exception: string | null } | null, call: { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } } | null } };
+export type CreateCallMutation = { createCall: { rejection: { reason: string, context: string | null, exception: string | null } | null, call: { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, seps: Array<{ id: number, code: string }> | null, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } } | null } };
 
 export type DeleteCallMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -3614,28 +3618,28 @@ export type DeleteCallMutationVariables = Exact<{
 
 export type DeleteCallMutation = { deleteCall: { rejection: { reason: string, context: string | null, exception: string | null } | null, call: { id: number } | null } };
 
-export type CallFragment = { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } };
+export type CallFragment = { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, seps: Array<{ id: number, code: string }> | null, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } };
 
 export type GetCallQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type GetCallQuery = { call: { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } } | null };
+export type GetCallQuery = { call: { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, seps: Array<{ id: number, code: string }> | null, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } } | null };
 
 export type GetCallsQueryVariables = Exact<{
   filter?: InputMaybe<CallsFilter>;
 }>;
 
 
-export type GetCallsQuery = { calls: Array<{ id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } }> | null };
+export type GetCallsQuery = { calls: Array<{ id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, seps: Array<{ id: number, code: string }> | null, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } }> | null };
 
 export type GetCallsByInstrumentScientistQueryVariables = Exact<{
   scientistId: Scalars['Int'];
 }>;
 
 
-export type GetCallsByInstrumentScientistQuery = { callsByInstrumentScientist: Array<{ id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } }> | null };
+export type GetCallsByInstrumentScientistQuery = { callsByInstrumentScientist: Array<{ id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, seps: Array<{ id: number, code: string }> | null, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } }> | null };
 
 export type RemoveAssignedInstrumentFromCallMutationVariables = Exact<{
   instrumentId: Scalars['Int'];
@@ -3668,10 +3672,11 @@ export type UpdateCallMutationVariables = Exact<{
   esiTemplateId?: InputMaybe<Scalars['Int']>;
   title?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
+  seps?: InputMaybe<Array<Scalars['Int']> | Scalars['Int']>;
 }>;
 
 
-export type UpdateCallMutation = { updateCall: { rejection: { reason: string, context: string | null, exception: string | null } | null, call: { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } } | null } };
+export type UpdateCallMutation = { updateCall: { rejection: { reason: string, context: string | null, exception: string | null } | null, call: { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, seps: Array<{ id: number, code: string }> | null, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } } | null } };
 
 export type CreateEsiMutationVariables = Exact<{
   scheduledEventId: Scalars['Int'];
@@ -5164,6 +5169,10 @@ export const CallFragmentDoc = gql`
       ...basicUserDetails
     }
   }
+  seps {
+    id
+    code
+  }
   proposalWorkflow {
     id
     name
@@ -6325,9 +6334,9 @@ export const AssignInstrumentsToCallDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $submissionMessage: String, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $submissionMessage: String, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String, $seps: [Int!]) {
   createCall(
-    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, submissionMessage: $submissionMessage, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
+    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, submissionMessage: $submissionMessage, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description, seps: $seps}
   ) {
     rejection {
       ...rejection
@@ -6390,9 +6399,9 @@ export const RemoveAssignedInstrumentFromCallDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateCallDocument = gql`
-    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $submissionMessage: String, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
+    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $submissionMessage: String, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String, $seps: [Int!]) {
   updateCall(
-    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, submissionMessage: $submissionMessage, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
+    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, submissionMessage: $submissionMessage, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description, seps: $seps}
   ) {
     rejection {
       ...rejection
