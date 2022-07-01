@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { ReviewerFilter, TechnicalReviewStatus } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';

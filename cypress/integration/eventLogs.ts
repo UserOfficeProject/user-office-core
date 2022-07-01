@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 
 import { UpdateUserMutationVariables, User } from '../../src/generated/sdk';
