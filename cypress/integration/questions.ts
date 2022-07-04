@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { DataType, TemplateCategoryId } from '../../src/generated/sdk';
 import TestFilter from '../support/filterTests';
