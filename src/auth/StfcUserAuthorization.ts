@@ -210,7 +210,7 @@ export class StfcUserAuthorization extends UserAuthorization {
       // The UOWS sometimes returns duplicate roles. We remove them here
       const uniqueRoles = stfcRoles.filter(
         (role, index) =>
-          stfcRoles.findIndex((r) => r.name == role.name) !== index
+          stfcRoles.findIndex((r) => r.name == role.name) === index
       );
       const requiredInstruments =
         this.getRequiredInstrumentForRole(uniqueRoles);
