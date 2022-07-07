@@ -183,8 +183,8 @@ export class StfcUserDataSource implements UserDataSource {
 
     const uowsRequest = searchableOnly
       ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
-      : client.getBasicPersonDetailsFromEmail;
-    const stfcUser: StfcBasicPersonDetails | null = (await uowsRequest)?.return;
+      : client.getBasicPersonDetailsFromEmail(token, email);
+    const stfcUser: StfcBasicPersonDetails | null = (await uowsRequest).return;
 
     if (!stfcUser) {
       return null;
