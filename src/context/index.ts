@@ -5,6 +5,7 @@ import FeedbackMutations from '../mutations/FeedbackMutations';
 import FileMutations from '../mutations/FileMutations';
 import GenericTemplateMutations from '../mutations/GenericTemplateMutations';
 import InstrumentMutations from '../mutations/InstrumentMutations';
+import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalSettingsMutations from '../mutations/ProposalSettingsMutations';
@@ -86,6 +87,7 @@ interface ResolverContextMutations {
   unit: UnitMutations;
   user: UserMutations;
   visit: VisitMutations;
+  predefinedMessage: PredefinedMessageMutations;
 }
 
 export interface BasicResolverContext {

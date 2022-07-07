@@ -30,4 +30,5 @@ export const Tokens = {
   UserAuthorization: Symbol('UserAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
+  PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
 };

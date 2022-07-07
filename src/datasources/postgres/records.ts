@@ -10,6 +10,7 @@ import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
+import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
@@ -315,6 +316,15 @@ export interface UnitRecord {
   readonly symbol: string;
   readonly si_conversion_formula: string;
 }
+
+export interface PredefinedMessageRecord {
+  readonly predefined_message_id: number;
+  readonly short_code: string;
+  readonly message: string;
+  readonly date_modified: Date;
+  readonly last_modified_by: number;
+}
+
 export interface CountryRecord {
   readonly country_id: number;
   readonly country: string;
@@ -1083,6 +1093,17 @@ export const createUnitObject = (unit: UnitRecord) =>
     unit.quantity,
     unit.symbol,
     unit.si_conversion_formula
+  );
+
+export const createPredefinedMessageObject = (
+  predefinedMessage: PredefinedMessageRecord
+) =>
+  new PredefinedMessage(
+    predefinedMessage.predefined_message_id,
+    predefinedMessage.short_code,
+    predefinedMessage.message,
+    predefinedMessage.date_modified,
+    predefinedMessage.last_modified_by
   );
 
 export const createQuantityObject = (quantity: QuantityRecord) =>

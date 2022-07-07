@@ -7,6 +7,7 @@ import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
+import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ProposalSettingsMutations from './mutations/ProposalSettingsMutations';
@@ -88,6 +89,7 @@ const context: BasicResolverContext = {
     unit: container.resolve(UnitMutations),
     user: container.resolve(UserMutations),
     visit: container.resolve(VisitMutations),
+    predefinedMessage: container.resolve(PredefinedMessageMutations),
   },
 };
 
