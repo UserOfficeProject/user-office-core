@@ -120,4 +120,21 @@ describe('Email search tests', () => {
 
     expect(result).toBeNull();
   });
+
+  test('When an invalid token is provided, a dummy user is not created', async () => {
+    mockGetBasicPersonDetailsFromEmail.mockImplementation(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      (Token: any, Email: any) => {
+        return Promise.resolve({
+          return: null,
+        });
+      }
+    );
+
+    const result = await userdataSource.getByEmail('valid');
+
+    expect(mockEnsureDummyUserExists).toBeCalledTimes(0);
+
+    expect(result).toBeNull();
+  });
 });
