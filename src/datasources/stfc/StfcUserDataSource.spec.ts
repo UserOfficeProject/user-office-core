@@ -97,8 +97,8 @@ describe('Email search tests', () => {
     const result = await userdataSource.getBasicUserDetailsByEmail('valid');
 
     expect(mockGetBasicPersonDetailsFromEmail).toBeCalledTimes(0);
-    expect(mockGetSearchableBasicPersonDetailsFromEmail).toBeCalled();
-    expect(mockEnsureDummyUserExists).toBeCalled();
+    expect(mockGetSearchableBasicPersonDetailsFromEmail).toBeCalledTimes(1);
+    expect(mockEnsureDummyUserExists).toBeCalledTimes(1);
 
     expect(result).toHaveProperty('id', 12345);
   });
@@ -106,9 +106,9 @@ describe('Email search tests', () => {
   test('When getting non-basic user details, the non-basic user is created and returned', async () => {
     const result = await userdataSource.getByEmail('valid');
 
-    expect(mockGetBasicPersonDetailsFromEmail).toBeCalled();
+    expect(mockGetBasicPersonDetailsFromEmail).toBeCalledTimes(1);
     expect(mockGetSearchableBasicPersonDetailsFromEmail).toBeCalledTimes(0);
-    expect(mockEnsureDummyUserExists).toBeCalled();
+    expect(mockEnsureDummyUserExists).toBeCalledTimes(1);
 
     expect(result).toHaveProperty('id', 12345);
   });
