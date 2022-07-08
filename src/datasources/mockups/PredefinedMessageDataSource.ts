@@ -16,7 +16,7 @@ const dummyPredefinedMessage = new PredefinedMessage(
 );
 
 @injectable()
-export default class PostgresPredefinedMessageDataSource
+export default class PredefinedMessageDataSourceMock
   implements PredefinedMessageDataSource
 {
   async create(

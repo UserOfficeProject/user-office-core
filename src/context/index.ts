@@ -26,6 +26,7 @@ import FeedbackQueries from '../queries/FeedbackQueries';
 import FileQueries from '../queries/FileQueries';
 import GenericTemplateQueries from '../queries/GenericTemplateQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
+import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalEsiQueries from '../queries/ProposalEsiQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import ProposalSettingsQueries from '../queries/ProposalSettingsQueries';
@@ -65,6 +66,7 @@ interface ResolverContextQueries {
   unit: UnitQueries;
   user: UserQueries;
   visit: VisitQueries;
+  predefinedMessage: PredefinedMessageQueries;
 }
 
 interface ResolverContextMutations {
