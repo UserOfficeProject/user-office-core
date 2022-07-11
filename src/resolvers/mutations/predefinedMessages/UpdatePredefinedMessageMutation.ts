@@ -30,7 +30,7 @@ export class UpdatePredefinedMessageInput
 @Resolver()
 export class UpdatePredefinedMessageMutation {
   @Mutation(() => PredefinedMessageResponseWrap)
-  addTechnicalReview(
+  updatePredefinedMessage(
     @Arg('updatePredefinedMessageInput')
     updatePredefinedMessageInput: UpdatePredefinedMessageInput,
     @Ctx() context: ResolverContext

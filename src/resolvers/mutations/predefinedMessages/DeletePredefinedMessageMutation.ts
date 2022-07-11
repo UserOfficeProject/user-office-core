@@ -24,7 +24,7 @@ export class DeletePredefinedMessageInput
 @Resolver()
 export class DeletePredefinedMessageMutation {
   @Mutation(() => PredefinedMessageResponseWrap)
-  addTechnicalReview(
+  deletePredefinedMessage(
     @Arg('deletePredefinedMessageInput')
     deletePredefinedMessageInput: DeletePredefinedMessageInput,
     @Ctx() context: ResolverContext

@@ -25,7 +25,7 @@ export default class PostgresPredefinedMessageDataSource
 
     const [predefinedMessageRecord]: PredefinedMessageRecord[] = await database
       .insert({
-        shortCode: input.shortCode,
+        short_code: input.shortCode,
         message: input.message,
         date_modified: dateModified,
         last_modified_by: lastModifiedBy,
@@ -75,7 +75,7 @@ export default class PostgresPredefinedMessageDataSource
       'predefined_messages'
     )
       .update({
-        shortCode: input.shortCode,
+        short_code: input.shortCode,
         message: input.message,
         date_modified: dateModified,
         last_modified_by: lastModifiedBy,

@@ -19,7 +19,7 @@ export class CreatePredefinedMessageInput
 @Resolver()
 export class CreatePredefinedMessageMutation {
   @Mutation(() => PredefinedMessageResponseWrap)
-  addTechnicalReview(
+  createPredefinedMessage(
     @Arg('createPredefinedMessageInput')
     createPredefinedMessageInput: CreatePredefinedMessageInput,
     @Ctx() context: ResolverContext

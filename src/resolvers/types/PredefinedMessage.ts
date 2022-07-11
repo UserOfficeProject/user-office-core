@@ -10,7 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { PredefinedMessage as PredefinedMessageOrigin } from '../../models/PredefinedMessage';
-import { User } from './User';
+import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
 export class PredefinedMessage implements Partial<PredefinedMessageOrigin> {
@@ -32,12 +32,12 @@ export class PredefinedMessage implements Partial<PredefinedMessageOrigin> {
 
 @Resolver(() => PredefinedMessage)
 export class PredefinedMessageResolver {
-  @FieldResolver(() => User)
+  @FieldResolver(() => BasicUserDetails)
   async modifiedBy(
     @Root() predefinedMessage: PredefinedMessageOrigin,
     @Ctx() context: ResolverContext
-  ): Promise<User | null> {
-    return await context.queries.user.getUser(
+  ): Promise<BasicUserDetails | null> {
+    return await context.queries.user.getBasic(
       context.user,
       predefinedMessage.lastModifiedBy
     );
