@@ -1,0 +1,10 @@
+mutation updatePredefinedMessage($input: UpdatePredefinedMessageInput!) {
+  updatePredefinedMessage(updatePredefinedMessageInput: $input) {
+    predefinedMessage {
+      ...predefinedMessage
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

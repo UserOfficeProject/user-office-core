@@ -10,6 +10,7 @@ import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
 import { Prompt } from 'react-router';
 
+import FormikUIPredefinedMessagesTextField from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
 import { ProposalEndStatus } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
@@ -140,7 +141,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <FormikUIPredefinedMessagesTextField
                   name="commentForUser"
                   label="Comment for user"
                   type="text"
@@ -150,7 +151,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   autoComplete="off"
                   data-cy="commentForUser"
                   multiline
-                  rows="4"
+                  rows={4}
                   disabled={isSubmitting}
                 />
               </Grid>

@@ -1,0 +1,5 @@
+query getPredefinedMessages {
+  predefinedMessages {
+    ...predefinedMessage
+  }
+}
