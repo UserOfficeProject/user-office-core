@@ -1,11 +1,11 @@
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 export function word() {
   return faker.random.word().split(' ').join().split('-').join();
 }
 
 export function positiveNumber(max: number) {
-  return faker.random.number(max - 1) + 1;
+  return faker.datatype.number(max - 1) + 1;
 }
 
 export function title() {
