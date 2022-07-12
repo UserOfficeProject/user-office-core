@@ -154,7 +154,7 @@ export class StfcUserDataSource implements UserDataSource {
           )
         : client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers);
       const usersFromUows: StfcBasicPersonDetails[] | null = (await uowsRequest)
-        .return;
+        ?.return;
 
       if (usersFromUows) {
         this.ensureDummyUsersExist(
