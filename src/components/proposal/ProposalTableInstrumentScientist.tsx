@@ -19,9 +19,7 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import ReviewerFilterComponent, {
-  defaultReviewerQueryFilter,
-} from 'components/review/ReviewerFilter';
+import ReviewerFilterComponent from 'components/review/ReviewerFilter';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -121,14 +119,24 @@ const ProposalTableInstrumentScientist: React.FC<{
     ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,
-    proposalStatus: withDefault(NumberParam, 2),
+    proposalStatus: withDefault(
+      NumberParam,
+      featureContext.featuresMap.get(FeatureId.PROPOSAL_FILTER)?.isEnabled
+        ? 0
+        : 2
+    ),
     questionId: StringParam,
     compareOperator: StringParam,
     value: StringParam,
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    reviewer: defaultReviewerQueryFilter,
+    reviewer: withDefault(
+      StringParam,
+      featureContext.featuresMap.get(FeatureId.PROPOSAL_FILTER)?.isEnabled
+        ? ReviewerFilter.ALL
+        : ReviewerFilter.ME
+    ),
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({

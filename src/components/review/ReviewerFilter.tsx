@@ -3,10 +3,11 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
-import React from 'react';
+import React, { useContext } from 'react';
 import { StringParam, useQueryParams, withDefault } from 'use-query-params';
 
-import { ReviewerFilter } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { ReviewerFilter, FeatureId } from 'generated/sdk';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -14,11 +15,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 120,
   },
 }));
-
-export const defaultReviewerQueryFilter = withDefault(
-  StringParam,
-  ReviewerFilter.ME
-);
 
 type ReviewerFilterComponentProps = {
   reviewer: string;
@@ -31,7 +27,13 @@ const ReviewerFilterComponent: React.FC<ReviewerFilterComponentProps> = ({
 }) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
-    reviewer: defaultReviewerQueryFilter,
+    reviewer: withDefault(
+      StringParam,
+      useContext(FeatureContext).featuresMap.get(FeatureId.PROPOSAL_FILTER)
+        ?.isEnabled
+        ? ReviewerFilter.ALL
+        : ReviewerFilter.ME
+    ),
   });
 
   return (
