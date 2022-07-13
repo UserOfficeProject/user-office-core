@@ -74,6 +74,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.EXTERNAL_AUTH,
       FeatureId.EMAIL_SEARCH,
       FeatureId.INSTRUMENT_MANAGEMENT,
+      FeatureId.PROPOSAL_FILTER,
     ],
     true
   );
