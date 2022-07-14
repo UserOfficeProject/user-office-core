@@ -125,9 +125,7 @@ describe('Email search tests', () => {
     mockGetBasicPersonDetailsFromEmail.mockImplementation(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       (Token: any, Email: any) => {
-        return Promise.resolve({
-          return: null,
-        });
+        return Promise.resolve(null);
       }
     );
 
