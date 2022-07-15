@@ -23,6 +23,38 @@ export default class UOWSSoapClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async getSearchableBasicPersonDetailsFromEmail(
+    Token: any,
+    Email: any
+  ): Promise<any> {
+    if (Email === 'valid') {
+      return {
+        return: {
+          userNumber: '12345',
+        },
+      };
+    } else {
+      return null;
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async getBasicPersonDetailsFromEmail(
+    Token: any,
+    Email: any
+  ): Promise<any> {
+    if (Email === 'valid') {
+      return {
+        return: {
+          userNumber: '12345',
+        },
+      };
+    } else {
+      return null;
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async getRolesForUser(): Promise<any> {
     return {
       return: [
