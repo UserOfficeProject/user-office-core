@@ -11,7 +11,7 @@ import React from 'react';
 import { Prompt } from 'react-router';
 
 import FormikUIPredefinedMessagesTextField from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
-import { ProposalEndStatus } from 'generated/sdk';
+import { ProposalEndStatus, PredefinedMessageKey } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -153,10 +153,11 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   multiline
                   rows={4}
                   disabled={isSubmitting}
+                  message-key={PredefinedMessageKey.USER}
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <FormikUIPredefinedMessagesTextField
                   name="commentForManagement"
                   label="Comment for management"
                   type="text"
@@ -166,8 +167,9 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   autoComplete="off"
                   data-cy="commentForManagement"
                   multiline
-                  rows="4"
+                  rows={4}
                   disabled={isSubmitting}
+                  message-key={PredefinedMessageKey.MANAGER}
                 />
               </Grid>
               <Grid item xs={12}>

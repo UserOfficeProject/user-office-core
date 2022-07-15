@@ -5,12 +5,15 @@ import Tooltip from '@mui/material/Tooltip';
 import { Field, FieldAttributes, useField } from 'formik';
 import React, { useState } from 'react';
 
+import { PredefinedMessageKey } from 'generated/sdk';
+
 import PredefinedMessagesModal from './PredefinedMessagesModal';
 
 const FormikUIPredefinedMessagesTextField: React.FC<
-  FieldAttributes<TextFieldProps>
+  FieldAttributes<TextFieldProps> & { 'message-key'?: PredefinedMessageKey }
 > = (props) => {
-  const [field] = useField(props);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [field, _, helpers] = useField(props.name);
   const [modalOpen, setModalOpen] = useState(false);
 
   const openPredefinedMessagesModal = () => {
@@ -22,9 +25,11 @@ const FormikUIPredefinedMessagesTextField: React.FC<
       <PredefinedMessagesModal
         open={modalOpen}
         setOpen={setModalOpen}
-        fieldName={field.name}
         selectedMessage={field.value as string}
+        messageKey={props['message-key']}
+        setFieldValue={helpers.setValue}
       />
+
       <Field
         {...props}
         InputProps={{

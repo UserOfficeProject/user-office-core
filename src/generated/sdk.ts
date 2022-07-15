@@ -225,6 +225,7 @@ export type CreateCallInput = {
 };
 
 export type CreatePredefinedMessageInput = {
+  key: PredefinedMessageKey;
   message: Scalars['String'];
   shortCode: Scalars['String'];
 };
@@ -1726,9 +1727,19 @@ export type PredefinedMessage = {
   shortCode: Scalars['String'];
 };
 
+export enum PredefinedMessageKey {
+  GENERAL = 'GENERAL',
+  MANAGER = 'MANAGER',
+  USER = 'USER'
+}
+
 export type PredefinedMessageResponseWrap = {
   predefinedMessage: Maybe<PredefinedMessage>;
   rejection: Maybe<Rejection>;
+};
+
+export type PredefinedMessagesFilter = {
+  key?: InputMaybe<PredefinedMessageKey>;
 };
 
 export type PrepareDbResponseWrap = {
@@ -2236,6 +2247,11 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryPredefinedMessageArgs = {
   predefinedMessageId: Scalars['Int'];
+};
+
+
+export type QueryPredefinedMessagesArgs = {
+  filter?: InputMaybe<PredefinedMessagesFilter>;
 };
 
 
@@ -3159,6 +3175,7 @@ export type UpdateFeaturesInput = {
 
 export type UpdatePredefinedMessageInput = {
   id: Scalars['Int'];
+  key: PredefinedMessageKey;
   message: Scalars['String'];
   shortCode: Scalars['String'];
 };
@@ -3932,7 +3949,9 @@ export type UpdateInstrumentMutation = { updateInstrument: { instrument: { id: n
 
 export type PredefinedMessageFragment = { id: number, shortCode: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } };
 
-export type GetPredefinedMessagesQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetPredefinedMessagesQueryVariables = Exact<{
+  filter?: InputMaybe<PredefinedMessagesFilter>;
+}>;
 
 
 export type GetPredefinedMessagesQuery = { predefinedMessages: Array<{ id: number, shortCode: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } }> };
@@ -6888,8 +6907,8 @@ export const UpdateInstrumentDocument = gql`
     ${InstrumentFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const GetPredefinedMessagesDocument = gql`
-    query getPredefinedMessages {
-  predefinedMessages {
+    query getPredefinedMessages($filter: PredefinedMessagesFilter) {
+  predefinedMessages(filter: $filter) {
     ...predefinedMessage
   }
 }

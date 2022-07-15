@@ -1,9 +1,9 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { PredefinedMessage } from 'generated/sdk';
+import { PredefinedMessage, PredefinedMessagesFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function usePredefinedMessagesData(): {
+export function usePredefinedMessagesData({ key }: PredefinedMessagesFilter): {
   loadingPredefinedMessages: boolean;
   predefinedMessages: PredefinedMessage[];
   setPredefinedMessages: Dispatch<SetStateAction<PredefinedMessage[]>>;
@@ -20,7 +20,7 @@ export function usePredefinedMessagesData(): {
     let cancelled = false;
     setLoadingPredefinedMessages(true);
     api()
-      .getPredefinedMessages()
+      .getPredefinedMessages({ filter: { key } })
       .then((data) => {
         if (cancelled) {
           return;
@@ -35,7 +35,7 @@ export function usePredefinedMessagesData(): {
     return () => {
       cancelled = true;
     };
-  }, [api]);
+  }, [api, key]);
 
   return {
     loadingPredefinedMessages,

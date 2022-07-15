@@ -3,33 +3,35 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
-import { Field, Form, Formik, useField } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { Autocomplete } from 'formik-mui';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 
+import { PredefinedMessageKey } from 'generated/sdk';
 import { usePredefinedMessagesData } from 'hooks/predefinedMessage/usePredefinedMessagesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type PredefinedMessagesModalProps = {
   open: boolean;
-  fieldName: string;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedMessage: string;
+  setFieldValue: (value: string, shouldValidate?: boolean | undefined) => void;
+  messageKey?: PredefinedMessageKey;
 };
 
 const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
   open,
   setOpen,
-  fieldName,
   selectedMessage,
+  messageKey,
+  setFieldValue,
 }) => {
   const {
     loadingPredefinedMessages,
     predefinedMessages,
     setPredefinedMessages,
-  } = usePredefinedMessagesData();
+  } = usePredefinedMessagesData({ key: messageKey });
   const { api } = useDataApiWithFeedback();
-  const [_, __, helpers] = useField(fieldName);
 
   const [shouldClose, setShouldClose] = useState(false);
 
@@ -40,15 +42,21 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
   }));
 
   const initialValues = {
-    predefinedMessage: predefinedMessagesOptions.find(
-      (message) => message.message === selectedMessage
-    )?.value,
-    message: predefinedMessagesOptions.find(
-      (message) => message.message === selectedMessage
-    )?.message,
+    predefinedMessage:
+      predefinedMessagesOptions.find(
+        (message) => message.message === selectedMessage
+      )?.value || null,
+    message:
+      predefinedMessagesOptions.find(
+        (message) => message.message === selectedMessage
+      )?.message || '',
   };
 
   const [message, setMessage] = useState(initialValues.message);
+
+  useEffect(() => {
+    setMessage(initialValues.message || '');
+  }, [initialValues.message]);
 
   const saveMessageChanges = async (values: {
     id: number;
@@ -57,7 +65,9 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
   }) => {
     const response = await api({
       toastSuccessMessage: 'Message changes saved successfully',
-    }).updatePredefinedMessage({ input: values });
+    }).updatePredefinedMessage({
+      input: { ...values, key: messageKey || PredefinedMessageKey.GENERAL },
+    });
 
     if (!response.updatePredefinedMessage.rejection) {
       const newMessages = predefinedMessages.map((message) => ({
@@ -108,7 +118,7 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
               shortCode: foundMessage?.shortCode,
               message: values.message,
             });
-            helpers.setValue(values.message);
+            setFieldValue(values.message);
             setOpen(false);
           }
         }}
@@ -123,10 +133,14 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
                 loading={loadingPredefinedMessages}
                 options={options}
                 noOptionsText="No predefined messages"
-                onChange={(_: any, selectedItem: any) => {
-                  const newSelectedMessage = predefinedMessagesOptions.find(
-                    (option) => option.value === selectedItem
-                  )?.message;
+                onChange={(
+                  _: React.SyntheticEvent<Element, Event>,
+                  selectedItem: number
+                ) => {
+                  const newSelectedMessage =
+                    predefinedMessagesOptions.find(
+                      (option) => option.value === selectedItem
+                    )?.message || '';
                   setFieldValue('message', newSelectedMessage);
                   setMessage(newSelectedMessage);
                   setFieldValue('predefinedMessage', selectedItem);
