@@ -10,6 +10,7 @@ import { Proposal } from '../../models/Proposal';
 import { User } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
+import { getCallNotificationEmailSettings } from './StfcEmailNotification';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   if (event.isRejection) {
@@ -108,6 +109,28 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
             });
           });
       });
+
+      return;
+    }
+
+    case Event.CALL_CREATED: {
+      // eslint-disable-next-line no-console
+      console.log('In call created');
+      const emailSettings = getCallNotificationEmailSettings(event.call);
+      mailService
+        .sendMail(emailSettings)
+        .then((res: any) => {
+          logger.logInfo('Emails sent on call creation:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email(s) on call creation:', {
+            error: err,
+            event,
+          });
+        });
 
       return;
     }
