@@ -5,6 +5,7 @@ import { UserWithRole } from '../../models/User';
 import { CreatePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/CreatePredefinedMessageMutation';
 import { DeletePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/DeletePredefinedMessageMutation';
 import { UpdatePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/UpdatePredefinedMessageMutation';
+import { PredefinedMessagesFilter } from '../../resolvers/queries/PredefinedMessageQuery';
 import { PredefinedMessageDataSource } from '../PredefinedMessageDataSource';
 
 const dummyPredefinedMessage = new PredefinedMessage(
@@ -30,7 +31,7 @@ export default class PredefinedMessageDataSourceMock
     return dummyPredefinedMessage;
   }
 
-  async getAll(): Promise<PredefinedMessage[]> {
+  async getAll(filter: PredefinedMessagesFilter): Promise<PredefinedMessage[]> {
     return [dummyPredefinedMessage];
   }
 

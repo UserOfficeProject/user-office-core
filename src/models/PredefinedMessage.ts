@@ -7,3 +7,9 @@ export class PredefinedMessage {
     public lastModifiedBy: number
   ) {}
 }
+
+export enum PredefinedMessageKey {
+  GENERAL = 'general',
+  MANAGER = 'manager',
+  USER = 'user',
+}

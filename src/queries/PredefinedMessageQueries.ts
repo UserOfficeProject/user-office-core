@@ -5,6 +5,7 @@ import { PredefinedMessageDataSource } from '../datasources/PredefinedMessageDat
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { PredefinedMessagesFilter } from '../resolvers/queries/PredefinedMessageQuery';
 
 @injectable()
 export default class PredefinedMessageQueries {
@@ -21,8 +22,8 @@ export default class PredefinedMessageQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getAll(agent: UserWithRole | null) {
-    const predefinedMessages = await this.dataSource.getAll();
+  async getAll(agent: UserWithRole | null, filter: PredefinedMessagesFilter) {
+    const predefinedMessages = await this.dataSource.getAll(filter);
 
     return predefinedMessages;
   }

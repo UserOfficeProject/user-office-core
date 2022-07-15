@@ -1,10 +1,14 @@
 import { injectable } from 'tsyringe';
 
-import { PredefinedMessage } from '../../models/PredefinedMessage';
+import {
+  PredefinedMessage,
+  PredefinedMessageKey,
+} from '../../models/PredefinedMessage';
 import { UserWithRole } from '../../models/User';
 import { CreatePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/CreatePredefinedMessageMutation';
 import { DeletePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/DeletePredefinedMessageMutation';
 import { UpdatePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/UpdatePredefinedMessageMutation';
+import { PredefinedMessagesFilter } from '../../resolvers/queries/PredefinedMessageQuery';
 import { PredefinedMessageDataSource } from '../PredefinedMessageDataSource';
 import database from './database';
 import {
@@ -26,6 +30,7 @@ export default class PostgresPredefinedMessageDataSource
     const [predefinedMessageRecord]: PredefinedMessageRecord[] = await database
       .insert({
         short_code: input.shortCode,
+        key: input.key,
         message: input.message,
         date_modified: dateModified,
         last_modified_by: lastModifiedBy,
@@ -53,10 +58,17 @@ export default class PostgresPredefinedMessageDataSource
       );
   }
 
-  async getAll(): Promise<PredefinedMessage[]> {
+  async getAll(filter: PredefinedMessagesFilter): Promise<PredefinedMessage[]> {
     return database
       .select('*')
       .from('predefined_messages')
+      .modify((query) => {
+        if (filter.key) {
+          query.where('key', filter.key);
+        } else {
+          query.where('key', PredefinedMessageKey.GENERAL);
+        }
+      })
       .then((predefinedMessages: PredefinedMessageRecord[]) =>
         predefinedMessages.map((predefinedMessage) =>
           createPredefinedMessageObject(predefinedMessage)
@@ -76,6 +88,7 @@ export default class PostgresPredefinedMessageDataSource
     )
       .update({
         short_code: input.shortCode,
+        key: input.key,
         message: input.message,
         date_modified: dateModified,
         last_modified_by: lastModifiedBy,

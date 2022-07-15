@@ -5,11 +5,12 @@ BEGIN
   BEGIN
 
     CREATE TABLE predefined_messages (
-      predefined_message_id serial PRIMARY KEY,
+      predefined_message_id SERIAL PRIMARY KEY,
       short_code TEXT,
+      key VARCHAR(20) NOT NULL,
       message TEXT,
       date_modified TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      last_modified_by int REFERENCES users (user_id)
+      last_modified_by INT REFERENCES users (user_id)
     ); 
 
   END;

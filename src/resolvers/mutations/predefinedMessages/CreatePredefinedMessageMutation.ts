@@ -1,7 +1,10 @@
 import { Arg, Ctx, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { PredefinedMessage } from '../../../models/PredefinedMessage';
+import {
+  PredefinedMessage,
+  PredefinedMessageKey,
+} from '../../../models/PredefinedMessage';
 import { PredefinedMessageResponseWrap } from '../../types/CommonWrappers';
 import { wrapResponse } from '../../wrapResponse';
 
@@ -14,6 +17,9 @@ export class CreatePredefinedMessageInput
 
   @Field(() => String)
   public message: string;
+
+  @Field(() => PredefinedMessageKey)
+  public key: PredefinedMessageKey;
 }
 
 @Resolver()
