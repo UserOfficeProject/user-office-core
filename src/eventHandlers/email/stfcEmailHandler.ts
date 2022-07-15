@@ -114,8 +114,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
     }
 
     case Event.CALL_CREATED: {
-      // eslint-disable-next-line no-console
-      console.log('In call created');
       const emailSettings = getCallNotificationEmailSettings(event.call);
       mailService
         .sendMail(emailSettings)
