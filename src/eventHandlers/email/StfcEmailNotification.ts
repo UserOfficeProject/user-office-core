@@ -22,8 +22,6 @@ const callCreatedEmailEmail = (_emailInput: EmailInput): EmailSettings => ({
 
 export function getCallNotificationEmailSettings(_call: Call) {
   const { shortCode, startCall, endCall } = _call;
-  // eslint-disable-next-line no-console
-  console.log('Sending mail' + shortCode);
 
   return callCreatedEmailEmail({ shortCode, startCall, endCall });
 }
