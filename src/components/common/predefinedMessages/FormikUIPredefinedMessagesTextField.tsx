@@ -5,9 +5,13 @@ import Tooltip from '@mui/material/Tooltip';
 import { Field, FieldAttributes, useField } from 'formik';
 import React, { useState } from 'react';
 
-import { PredefinedMessageKey } from 'generated/sdk';
-
 import PredefinedMessagesModal from './PredefinedMessagesModal';
+
+export enum PredefinedMessageKey {
+  MANAGER = 'manager',
+  USER = 'user',
+  GENERAL = 'general',
+}
 
 const FormikUIPredefinedMessagesTextField: React.FC<
   FieldAttributes<TextFieldProps> & { 'message-key'?: PredefinedMessageKey }
@@ -22,13 +26,15 @@ const FormikUIPredefinedMessagesTextField: React.FC<
 
   return (
     <>
-      <PredefinedMessagesModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        selectedMessage={field.value as string}
-        messageKey={props['message-key']}
-        setFieldValue={helpers.setValue}
-      />
+      {modalOpen && (
+        <PredefinedMessagesModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          selectedMessage={field.value as string}
+          messageKey={props['message-key']}
+          setFormFieldValue={helpers.setValue}
+        />
+      )}
 
       <Field
         {...props}

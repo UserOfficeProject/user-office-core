@@ -7,15 +7,19 @@ import { Field, Form, Formik } from 'formik';
 import { Autocomplete } from 'formik-mui';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
-import { PredefinedMessageKey } from 'generated/sdk';
 import { usePredefinedMessagesData } from 'hooks/predefinedMessage/usePredefinedMessagesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+import { PredefinedMessageKey } from './FormikUIPredefinedMessagesTextField';
 
 type PredefinedMessagesModalProps = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedMessage: string;
-  setFieldValue: (value: string, shouldValidate?: boolean | undefined) => void;
+  setFormFieldValue: (
+    value: string,
+    shouldValidate?: boolean | undefined
+  ) => void;
   messageKey?: PredefinedMessageKey;
 };
 
@@ -24,7 +28,7 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
   setOpen,
   selectedMessage,
   messageKey,
-  setFieldValue,
+  setFormFieldValue,
 }) => {
   const {
     loadingPredefinedMessages,
@@ -32,35 +36,48 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
     setPredefinedMessages,
   } = usePredefinedMessagesData({ key: messageKey });
   const { api } = useDataApiWithFeedback();
-
-  const [shouldClose, setShouldClose] = useState(false);
+  const [shouldSave, setShouldSave] = useState(false);
 
   const predefinedMessagesOptions = predefinedMessages.map((message) => ({
     value: message.id,
-    text: message.shortCode,
+    text: message.title,
     message: message.message,
   }));
 
-  const initialValues = {
-    predefinedMessage:
-      predefinedMessagesOptions.find(
-        (message) => message.message === selectedMessage
-      )?.value || null,
-    message:
-      predefinedMessagesOptions.find(
-        (message) => message.message === selectedMessage
-      )?.message || '',
-  };
-
-  const [message, setMessage] = useState(initialValues.message);
+  const [initialValues, setInitialValues] = useState<{
+    predefinedMessageId: number | null;
+    title: string;
+    message: string;
+  }>({
+    predefinedMessageId: null,
+    title: '',
+    message: selectedMessage,
+  });
 
   useEffect(() => {
-    setMessage(initialValues.message || '');
-  }, [initialValues.message]);
+    const foundMessage = predefinedMessagesOptions.find(
+      (message) => message.message === initialValues.message
+    );
+
+    if (
+      foundMessage &&
+      foundMessage.value !== initialValues.predefinedMessageId
+    ) {
+      setInitialValues({
+        predefinedMessageId: foundMessage.value,
+        title: foundMessage.text,
+        message: foundMessage.message,
+      });
+    }
+  }, [
+    predefinedMessagesOptions,
+    initialValues.predefinedMessageId,
+    initialValues.message,
+  ]);
 
   const saveMessageChanges = async (values: {
     id: number;
-    shortCode: string;
+    title: string;
     message: string;
   }) => {
     const response = await api({
@@ -72,6 +89,7 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
     if (!response.updatePredefinedMessage.rejection) {
       const newMessages = predefinedMessages.map((message) => ({
         ...message,
+        title: message.id === values.id ? values.title : message.title,
         message: message.id === values.id ? values.message : message.message,
       }));
 
@@ -79,7 +97,32 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
     }
   };
 
+  const onPredefinedMessageSelectionChange = (
+    selectedItem: number,
+    setFieldValue: (
+      field: string,
+      value: number | string,
+      shouldValidate?: boolean | undefined
+    ) => void
+  ) => {
+    const newSelectedMessage = predefinedMessagesOptions.find(
+      (option) => option.value === selectedItem
+    );
+    setFieldValue('message', newSelectedMessage?.message || '');
+    setFieldValue('title', newSelectedMessage?.text || '');
+    setFieldValue('predefinedMessageId', selectedItem);
+    setInitialValues({
+      predefinedMessageId: selectedItem,
+      title: newSelectedMessage?.text || '',
+      message: newSelectedMessage?.message || '',
+    });
+  };
+
   const options = predefinedMessagesOptions.map((item) => item.value);
+
+  if (loadingPredefinedMessages) {
+    return null;
+  }
 
   return (
     <Dialog
@@ -96,39 +139,40 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
         // validationSchema={administrationProposalValidationSchema}
         onSubmit={async (values): Promise<void> => {
           const foundMessage = predefinedMessages.find(
-            (message) => message.id === values.predefinedMessage
+            (message) => message.id === values.predefinedMessageId
           );
           if (
-            !values.predefinedMessage ||
+            !values.predefinedMessageId ||
             !values.message ||
-            !foundMessage?.shortCode
+            !foundMessage?.title
           ) {
             return;
           }
 
-          if (shouldClose) {
+          if (shouldSave) {
             saveMessageChanges({
-              id: values.predefinedMessage,
-              shortCode: foundMessage?.shortCode,
+              id: values.predefinedMessageId,
+              title: values.title,
               message: values.message,
             });
+            setFormFieldValue(values.message);
+            setOpen(false);
           } else {
-            saveMessageChanges({
-              id: values.predefinedMessage,
-              shortCode: foundMessage?.shortCode,
-              message: values.message,
-            });
-            setFieldValue(values.message);
+            setFormFieldValue(values.message);
             setOpen(false);
           }
         }}
       >
         {({ isSubmitting, values, setFieldValue }) => (
-          <Form>
+          <Form
+            onChange={() => {
+              setShouldSave(true);
+            }}
+          >
             <DialogContent>
               <Field
                 id="predefined-message-input"
-                name="predefinedMessage"
+                name="predefinedMessageId"
                 component={Autocomplete}
                 loading={loadingPredefinedMessages}
                 options={options}
@@ -136,15 +180,12 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
                 onChange={(
                   _: React.SyntheticEvent<Element, Event>,
                   selectedItem: number
-                ) => {
-                  const newSelectedMessage =
-                    predefinedMessagesOptions.find(
-                      (option) => option.value === selectedItem
-                    )?.message || '';
-                  setFieldValue('message', newSelectedMessage);
-                  setMessage(newSelectedMessage);
-                  setFieldValue('predefinedMessage', selectedItem);
-                }}
+                ) =>
+                  onPredefinedMessageSelectionChange(
+                    selectedItem,
+                    setFieldValue
+                  )
+                }
                 getOptionLabel={(option: number | string) => {
                   const foundOption = predefinedMessagesOptions.find(
                     (item) => item.value === option
@@ -161,41 +202,44 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
                 )}
               />
               <Field
+                name="title"
+                label="Predefined message title"
+                type="text"
+                component={TextField}
+                value={initialValues.title}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFieldValue('title', e.target.value);
+                  setInitialValues({ ...initialValues, title: e.target.value });
+                }}
+                fullWidth
+                data-cy="message-title"
+                disabled={isSubmitting}
+                InputLabelProps={{ shrink: !!values.message }}
+              />
+              <Field
                 name="message"
                 label="Predefined message"
                 type="text"
                 component={TextField}
                 fullWidth
-                data-cy="message-test"
+                data-cy="message"
                 multiline
-                rows="4"
-                value={message}
+                rows="5"
+                value={initialValues.message}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFieldValue('message', e.target.value);
-                  setMessage(e.target.value);
+                  setInitialValues({
+                    ...initialValues,
+                    message: e.target.value,
+                  });
                 }}
                 disabled={isSubmitting}
                 InputLabelProps={{ shrink: !!values.message }}
               />
             </DialogContent>
             <DialogActions>
-              <Button
-                type="submit"
-                onClick={() => {
-                  setShouldClose(false);
-                }}
-                disabled={isSubmitting}
-              >
-                Use message
-              </Button>
-              <Button
-                type="submit"
-                onClick={() => {
-                  setShouldClose(true);
-                }}
-                disabled={isSubmitting}
-              >
-                Save changes
+              <Button type="submit" disabled={isSubmitting}>
+                {shouldSave ? 'Save & Use' : 'Use'}
               </Button>
               <Button
                 variant="text"

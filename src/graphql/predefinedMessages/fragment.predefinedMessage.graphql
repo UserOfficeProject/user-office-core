@@ -1,6 +1,6 @@
 fragment predefinedMessage on PredefinedMessage {
   id
-  shortCode
+  title
   message
   lastModifiedBy
   dateModified

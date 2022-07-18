@@ -10,8 +10,10 @@ import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
 import { Prompt } from 'react-router';
 
-import FormikUIPredefinedMessagesTextField from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
-import { ProposalEndStatus, PredefinedMessageKey } from 'generated/sdk';
+import FormikUIPredefinedMessagesTextField, {
+  PredefinedMessageKey,
+} from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
+import { ProposalEndStatus } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

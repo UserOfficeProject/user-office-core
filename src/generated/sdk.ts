@@ -225,9 +225,9 @@ export type CreateCallInput = {
 };
 
 export type CreatePredefinedMessageInput = {
-  key: PredefinedMessageKey;
+  key: Scalars['String'];
   message: Scalars['String'];
-  shortCode: Scalars['String'];
+  title: Scalars['String'];
 };
 
 export type CreateProposalStatusInput = {
@@ -1724,14 +1724,8 @@ export type PredefinedMessage = {
   lastModifiedBy: Scalars['Int'];
   message: Scalars['String'];
   modifiedBy: BasicUserDetails;
-  shortCode: Scalars['String'];
+  title: Scalars['String'];
 };
-
-export enum PredefinedMessageKey {
-  GENERAL = 'GENERAL',
-  MANAGER = 'MANAGER',
-  USER = 'USER'
-}
 
 export type PredefinedMessageResponseWrap = {
   predefinedMessage: Maybe<PredefinedMessage>;
@@ -1739,7 +1733,7 @@ export type PredefinedMessageResponseWrap = {
 };
 
 export type PredefinedMessagesFilter = {
-  key?: InputMaybe<PredefinedMessageKey>;
+  key?: InputMaybe<Scalars['String']>;
 };
 
 export type PrepareDbResponseWrap = {
@@ -3175,9 +3169,9 @@ export type UpdateFeaturesInput = {
 
 export type UpdatePredefinedMessageInput = {
   id: Scalars['Int'];
-  key: PredefinedMessageKey;
+  key: Scalars['String'];
   message: Scalars['String'];
-  shortCode: Scalars['String'];
+  title: Scalars['String'];
 };
 
 export type UpdateProposalStatusInput = {
@@ -3947,21 +3941,21 @@ export type UpdateInstrumentMutationVariables = Exact<{
 
 export type UpdateInstrumentMutation = { updateInstrument: { instrument: { id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
-export type PredefinedMessageFragment = { id: number, shortCode: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } };
+export type PredefinedMessageFragment = { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } };
 
 export type GetPredefinedMessagesQueryVariables = Exact<{
   filter?: InputMaybe<PredefinedMessagesFilter>;
 }>;
 
 
-export type GetPredefinedMessagesQuery = { predefinedMessages: Array<{ id: number, shortCode: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } }> };
+export type GetPredefinedMessagesQuery = { predefinedMessages: Array<{ id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } }> };
 
 export type UpdatePredefinedMessageMutationVariables = Exact<{
   input: UpdatePredefinedMessageInput;
 }>;
 
 
-export type UpdatePredefinedMessageMutation = { updatePredefinedMessage: { predefinedMessage: { id: number, shortCode: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+export type UpdatePredefinedMessageMutation = { updatePredefinedMessage: { predefinedMessage: { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type AdministrationProposalMutationVariables = Exact<{
   proposalPk: Scalars['Int'];
@@ -5311,7 +5305,7 @@ export const InstrumentFragmentDoc = gql`
 export const PredefinedMessageFragmentDoc = gql`
     fragment predefinedMessage on PredefinedMessage {
   id
-  shortCode
+  title
   message
   lastModifiedBy
   dateModified
