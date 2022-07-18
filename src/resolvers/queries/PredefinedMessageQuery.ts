@@ -1,13 +1,12 @@
 import { Arg, Ctx, Field, InputType, Int, Query, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { PredefinedMessageKey } from '../../models/PredefinedMessage';
 import { PredefinedMessage } from '../types/PredefinedMessage';
 
 @InputType()
 export class PredefinedMessagesFilter {
-  @Field(() => PredefinedMessageKey, { nullable: true })
-  public key?: PredefinedMessageKey;
+  @Field(() => String, { nullable: true })
+  public key?: string;
 }
 @Resolver()
 export class PredefinedMessageQuery {

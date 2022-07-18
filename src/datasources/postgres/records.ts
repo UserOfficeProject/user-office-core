@@ -319,7 +319,7 @@ export interface UnitRecord {
 
 export interface PredefinedMessageRecord {
   readonly predefined_message_id: number;
-  readonly short_code: string;
+  readonly title: string;
   readonly message: string;
   readonly date_modified: Date;
   readonly last_modified_by: number;
@@ -1100,7 +1100,7 @@ export const createPredefinedMessageObject = (
 ) =>
   new PredefinedMessage(
     predefinedMessage.predefined_message_id,
-    predefinedMessage.short_code,
+    predefinedMessage.title,
     predefinedMessage.message,
     predefinedMessage.date_modified,
     predefinedMessage.last_modified_by

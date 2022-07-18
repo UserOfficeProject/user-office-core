@@ -1,9 +1,6 @@
 import { injectable } from 'tsyringe';
 
-import {
-  PredefinedMessage,
-  PredefinedMessageKey,
-} from '../../models/PredefinedMessage';
+import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { UserWithRole } from '../../models/User';
 import { CreatePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/CreatePredefinedMessageMutation';
 import { DeletePredefinedMessageInput } from '../../resolvers/mutations/predefinedMessages/DeletePredefinedMessageMutation';
@@ -29,7 +26,7 @@ export default class PostgresPredefinedMessageDataSource
 
     const [predefinedMessageRecord]: PredefinedMessageRecord[] = await database
       .insert({
-        short_code: input.shortCode,
+        title: input.title,
         key: input.key,
         message: input.message,
         date_modified: dateModified,
@@ -66,7 +63,8 @@ export default class PostgresPredefinedMessageDataSource
         if (filter.key) {
           query.where('key', filter.key);
         } else {
-          query.where('key', PredefinedMessageKey.GENERAL);
+          // NOTE: If there is no key provided(which shouldn't be the case) set to "general".
+          query.where('key', 'general');
         }
       })
       .then((predefinedMessages: PredefinedMessageRecord[]) =>
@@ -87,7 +85,7 @@ export default class PostgresPredefinedMessageDataSource
       'predefined_messages'
     )
       .update({
-        short_code: input.shortCode,
+        title: input.title,
         key: input.key,
         message: input.message,
         date_modified: dateModified,

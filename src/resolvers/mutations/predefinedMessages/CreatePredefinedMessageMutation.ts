@@ -1,10 +1,7 @@
 import { Arg, Ctx, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import {
-  PredefinedMessage,
-  PredefinedMessageKey,
-} from '../../../models/PredefinedMessage';
+import { PredefinedMessage } from '../../../models/PredefinedMessage';
 import { PredefinedMessageResponseWrap } from '../../types/CommonWrappers';
 import { wrapResponse } from '../../wrapResponse';
 
@@ -13,13 +10,13 @@ export class CreatePredefinedMessageInput
   implements Partial<PredefinedMessage>
 {
   @Field(() => String)
-  public shortCode: string;
+  public title: string;
 
   @Field(() => String)
   public message: string;
 
-  @Field(() => PredefinedMessageKey)
-  public key: PredefinedMessageKey;
+  @Field(() => String)
+  public key: string;
 }
 
 @Resolver()

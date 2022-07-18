@@ -18,7 +18,7 @@ export class PredefinedMessage implements Partial<PredefinedMessageOrigin> {
   public id: number;
 
   @Field(() => String)
-  public shortCode: string;
+  public title: string;
 
   @Field(() => String)
   public message: string;

@@ -9,7 +9,6 @@ import {
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
-import { PredefinedMessageKey } from '../models/PredefinedMessage';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewerFilter, ReviewStatus } from '../models/Review';
@@ -89,8 +88,5 @@ export const registerEnums = () => {
   });
   registerEnumType(FeatureUpdateAction, {
     name: 'FeatureUpdateAction',
-  });
-  registerEnumType(PredefinedMessageKey, {
-    name: 'PredefinedMessageKey',
   });
 };
