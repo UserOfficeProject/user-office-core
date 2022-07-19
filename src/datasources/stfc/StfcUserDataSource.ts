@@ -155,7 +155,7 @@ export class StfcUserDataSource implements UserDataSource {
           )
         : client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers);
       const usersFromUows: StfcBasicPersonDetails[] | null = (await uowsRequest)
-        .return;
+        ?.return;
 
       if (usersFromUows) {
         this.ensureDummyUsersExist(
@@ -185,7 +185,7 @@ export class StfcUserDataSource implements UserDataSource {
     const uowsRequest = searchableOnly
       ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
       : client.getBasicPersonDetailsFromEmail(token, email);
-    const stfcUser: StfcBasicPersonDetails | null = (await uowsRequest).return;
+    const stfcUser: StfcBasicPersonDetails | null = (await uowsRequest)?.return;
 
     if (!stfcUser) {
       return null;
