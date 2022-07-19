@@ -6,13 +6,14 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
+import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { User } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-import { getCallNotificationEmailSettings } from './StfcEmailNotification';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
+  //test for null
   if (event.isRejection) {
     return;
   }
@@ -114,21 +115,33 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
     }
 
     case Event.CALL_CREATED: {
-      const emailSettings = getCallNotificationEmailSettings(event.call);
-      mailService
-        .sendMail(emailSettings)
-        .then((res: any) => {
-          logger.logInfo('Emails sent on call creation:', {
-            result: res,
-            event,
+      //test for EmailSettings or log returned error
+      if (event?.call && 'startCall' in event?.call) {
+        const templateID = 'isis-call-created-pi';
+        //create emun types
+        const noficicationEmailAdress = 'FacilitiesBusinessSystem@stfc.ac.uk';
+        //get from env with default value
+        const eventCall: Call = event.call;
+        const emailSettings = getNotificationEmailSettings<Call>(
+          eventCall,
+          templateID,
+          noficicationEmailAdress
+        );
+        mailService
+          .sendMail(emailSettings)
+          .then((res: any) => {
+            logger.logInfo('Emails sent on call creation:', {
+              result: res,
+              event,
+            });
+          })
+          .catch((err: string) => {
+            logger.logError('Could not send email(s) on call creation:', {
+              error: err,
+              event,
+            });
           });
-        })
-        .catch((err: string) => {
-          logger.logError('Could not send email(s) on call creation:', {
-            error: err,
-            event,
-          });
-        });
+      }
 
       return;
     }
@@ -194,3 +207,25 @@ const uoRapidSubmissionEmail = (
   },
   recipients: [{ address: uoAddress }],
 });
+
+function getNotificationEmailSettings<NotificationType>(
+  _notificationInput: NotificationType,
+  _templateID: string,
+  _notificationEmailAddress: string
+): EmailSettings {
+  const emailSettings: EmailSettings = {
+    content: {
+      template_id: _templateID,
+    },
+    substitution_data: {
+      ..._notificationInput,
+    },
+    recipients: [
+      {
+        address: _notificationEmailAddress,
+      },
+    ],
+  };
+
+  return emailSettings;
+}
