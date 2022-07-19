@@ -107,7 +107,7 @@ export default class PostgresPredefinedMessageDataSource
     const [predefinedMessageRecord]: PredefinedMessageRecord[] = await database(
       'predefined_messages'
     )
-      .where('predefined_messages_id', input.id)
+      .where('predefined_message_id', input.id)
       .del()
       .returning('*');
 
