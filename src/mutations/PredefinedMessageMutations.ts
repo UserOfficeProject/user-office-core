@@ -2,7 +2,8 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { PredefinedMessageDataSource } from '../datasources/PredefinedMessageDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, EventBus } from '../decorators';
+import { Event } from '../events/event.enum';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreatePredefinedMessageInput } from '../resolvers/mutations/predefinedMessages/CreatePredefinedMessageMutation';
@@ -16,6 +17,7 @@ export default class PredefinedMessageMutations {
     private predefinedMessageDataSource: PredefinedMessageDataSource
   ) {}
 
+  @EventBus(Event.PREDEFINED_MESSAGE_CREATED)
   @Authorized([Roles.USER_OFFICER])
   async create(
     agent: UserWithRole | null,
@@ -24,6 +26,7 @@ export default class PredefinedMessageMutations {
     return await this.predefinedMessageDataSource.create(agent, input);
   }
 
+  @EventBus(Event.PREDEFINED_MESSAGE_UPDATED)
   @Authorized([Roles.USER_OFFICER])
   async update(
     agent: UserWithRole | null,
@@ -32,6 +35,7 @@ export default class PredefinedMessageMutations {
     return await this.predefinedMessageDataSource.update(agent, input);
   }
 
+  @EventBus(Event.PREDEFINED_MESSAGE_DELETED)
   @Authorized([Roles.USER_OFFICER])
   async delete(
     agent: UserWithRole | null,
