@@ -115,12 +115,9 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
     }
 
     case Event.CALL_CREATED: {
-      //test for EmailSettings or log returned error
       if (event?.call && 'startCall' in event?.call) {
         const templateID = 'isis-call-created-pi';
-        //create emun types
         const noficicationEmailAdress = 'FacilitiesBusinessSystem@stfc.ac.uk';
-        //get from env with default value
         const eventCall: Call = event.call;
         const emailSettings = getNotificationEmailSettings<Call>(
           eventCall,
