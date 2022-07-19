@@ -119,7 +119,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
         const templateID = 'isis-call-created-pi';
         const noficicationEmailAdress = 'FacilitiesBusinessSystem@stfc.ac.uk';
         const eventCall: Call = event.call;
-        const emailSettings = getNotificationEmailSettings<Call>(
+        const emailSettings = piCallCreationEmail<Call>(
           eventCall,
           templateID,
           noficicationEmailAdress
@@ -205,7 +205,7 @@ const uoRapidSubmissionEmail = (
   recipients: [{ address: uoAddress }],
 });
 
-function getNotificationEmailSettings<NotificationType>(
+function piCallCreationEmail<NotificationType>(
   _notificationInput: NotificationType,
   _templateID: string,
   _notificationEmailAddress: string
