@@ -164,7 +164,7 @@ export class StfcUserAuthorization extends UserAuthorization {
   async externalTokenLogin(token: string): Promise<User | null> {
     const stfcUser: StfcBasicPersonDetails | null = await client
       .getPersonDetailsFromSessionId(token)
-      .then((rawStfcUser) => rawStfcUser.return)
+      .then((rawStfcUser) => rawStfcUser?.return)
       .catch((error) => {
         const rethrowMessage =
           'Failed to fetch user details for STFC external authentication';
@@ -210,7 +210,7 @@ export class StfcUserAuthorization extends UserAuthorization {
       // The UOWS sometimes returns duplicate roles. We remove them here
       const uniqueRoles = stfcRoles.filter(
         (role, index) =>
-          stfcRoles.findIndex((r) => r.name == role.name) !== index
+          stfcRoles.findIndex((r) => r.name == role.name) === index
       );
       const requiredInstruments =
         this.getRequiredInstrumentForRole(uniqueRoles);
@@ -243,7 +243,7 @@ export class StfcUserAuthorization extends UserAuthorization {
       return cachedValidity;
     }
 
-    const isValid: boolean = (await client.isTokenValid(token)).return;
+    const isValid: boolean = (await client.isTokenValid(token))?.return;
     // Only cache valid tokens to avoid locking out users for a long time
     if (isValid) {
       this.uowsTokenCache.put(token, true);
