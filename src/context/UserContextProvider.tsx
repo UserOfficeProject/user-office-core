@@ -156,6 +156,19 @@ const reducer = (
   }
 };
 
+function getCookieDomain(hostname: string): string {
+  const parts = hostname.split('.');
+  if (parts.length > 2) {
+    // e.g. "www.example.com"
+    const parts = hostname.split('.');
+    parts.shift(); // remove the first part
+
+    return `.${parts.join('.')}`;
+  } else {
+    return hostname; // e.g. localhost
+  }
+}
+
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const [, setCookie] = useCookies();
@@ -169,10 +182,7 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
     setCookie('token', state.token, {
       path: '/',
       secure: false,
-      // looks like domains like `localhost` or `proxy` in e2e
-      // don't support .domain in browsers while setting cookies
-      // include the leading dot only for "real" domains
-      domain: hostname.includes('.') ? `.${hostname}` : hostname,
+      domain: getCookieDomain(hostname),
       sameSite: 'lax',
     });
   }, [setCookie, state]);
