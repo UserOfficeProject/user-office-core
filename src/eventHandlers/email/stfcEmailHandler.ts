@@ -6,7 +6,6 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { User } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
@@ -115,12 +114,18 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
     }
 
     case Event.CALL_CREATED: {
-      if (event?.call && 'startCall' in event?.call) {
+      if (event?.call) {
         const templateID = 'isis-call-created-pi';
-        const noficicationEmailAdress = 'FacilitiesBusinessSystem@stfc.ac.uk';
-        const eventCall: Call = event.call;
-        const emailSettings = piCallCreationEmail<Call>(
-          eventCall,
+        const noficicationEmailAdress =
+          (process.env && process.env.FBSEMAIL) ||
+          'FacilitiesBusinessSystem@stfc.ac.uk';
+        const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
+          shortCode,
+          startCall,
+          endCall,
+        }))(event.call);
+        const emailSettings = piCallCreationEmail<typeof eventCallPartial>(
+          eventCallPartial,
           templateID,
           noficicationEmailAdress
         );
@@ -205,8 +210,8 @@ const uoRapidSubmissionEmail = (
   recipients: [{ address: uoAddress }],
 });
 
-function piCallCreationEmail<NotificationType>(
-  _notificationInput: NotificationType,
+const piCallCreationEmail = function createNotificationEmail<T>(
+  _notificationInput: T,
   _templateID: string,
   _notificationEmailAddress: string
 ): EmailSettings {
@@ -225,4 +230,4 @@ function piCallCreationEmail<NotificationType>(
   };
 
   return emailSettings;
-}
+};
