@@ -330,6 +330,9 @@ export enum Event {
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
   EMAIL_INVITE = 'EMAIL_INVITE',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
+  PREDEFINED_MESSAGE_CREATED = 'PREDEFINED_MESSAGE_CREATED',
+  PREDEFINED_MESSAGE_DELETED = 'PREDEFINED_MESSAGE_DELETED',
+  PREDEFINED_MESSAGE_UPDATED = 'PREDEFINED_MESSAGE_UPDATED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
   PROPOSAL_ALL_SEP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_SEP_REVIEWERS_SELECTED',
   PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
@@ -3941,6 +3944,20 @@ export type UpdateInstrumentMutationVariables = Exact<{
 
 export type UpdateInstrumentMutation = { updateInstrument: { instrument: { id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
+export type CreatePredefinedMessageMutationVariables = Exact<{
+  input: CreatePredefinedMessageInput;
+}>;
+
+
+export type CreatePredefinedMessageMutation = { createPredefinedMessage: { predefinedMessage: { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+
+export type DeletePredefinedMessageMutationVariables = Exact<{
+  input: DeletePredefinedMessageInput;
+}>;
+
+
+export type DeletePredefinedMessageMutation = { deletePredefinedMessage: { predefinedMessage: { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+
 export type PredefinedMessageFragment = { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } };
 
 export type GetPredefinedMessagesQueryVariables = Exact<{
@@ -6900,6 +6917,32 @@ export const UpdateInstrumentDocument = gql`
 }
     ${InstrumentFragmentDoc}
 ${RejectionFragmentDoc}`;
+export const CreatePredefinedMessageDocument = gql`
+    mutation createPredefinedMessage($input: CreatePredefinedMessageInput!) {
+  createPredefinedMessage(createPredefinedMessageInput: $input) {
+    predefinedMessage {
+      ...predefinedMessage
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${PredefinedMessageFragmentDoc}
+${RejectionFragmentDoc}`;
+export const DeletePredefinedMessageDocument = gql`
+    mutation deletePredefinedMessage($input: DeletePredefinedMessageInput!) {
+  deletePredefinedMessage(deletePredefinedMessageInput: $input) {
+    predefinedMessage {
+      ...predefinedMessage
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${PredefinedMessageFragmentDoc}
+${RejectionFragmentDoc}`;
 export const GetPredefinedMessagesDocument = gql`
     query getPredefinedMessages($filter: PredefinedMessagesFilter) {
   predefinedMessages(filter: $filter) {
@@ -9504,6 +9547,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateInstrument(variables: UpdateInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateInstrumentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateInstrumentMutation>(UpdateInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateInstrument', 'mutation');
+    },
+    createPredefinedMessage(variables: CreatePredefinedMessageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreatePredefinedMessageMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreatePredefinedMessageMutation>(CreatePredefinedMessageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createPredefinedMessage', 'mutation');
+    },
+    deletePredefinedMessage(variables: DeletePredefinedMessageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeletePredefinedMessageMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DeletePredefinedMessageMutation>(DeletePredefinedMessageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deletePredefinedMessage', 'mutation');
     },
     getPredefinedMessages(variables?: GetPredefinedMessagesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPredefinedMessagesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetPredefinedMessagesQuery>(GetPredefinedMessagesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPredefinedMessages', 'query');
