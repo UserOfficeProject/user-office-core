@@ -116,7 +116,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
     case Event.CALL_CREATED: {
       if (event?.call) {
         const templateID = 'isis-call-created-pi';
-        const noficicationEmailAdress =
+        const nofEmailAdress =
           (process.env && process.env.FBSEMAIL) ||
           'FacilitiesBusinessSystem@stfc.ac.uk';
         const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
@@ -127,7 +127,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
         const emailSettings = piCallCreationEmail<typeof eventCallPartial>(
           eventCallPartial,
           templateID,
-          noficicationEmailAdress
+          nofEmailAdress
         );
         mailService
           .sendMail(emailSettings)
