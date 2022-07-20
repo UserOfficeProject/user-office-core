@@ -278,8 +278,12 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
                       {...params}
                       label="Select from predefined messages"
                       disabled={isSubmitting}
+                      data-cy="predefined-message-select"
                     />
                   )}
+                  ListboxProps={{
+                    'data-cy': 'predefined-message-select-options',
+                  }}
                 />
                 <Field
                   name="title"
@@ -325,6 +329,7 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
                   type="submit"
                   disabled={isSubmitting}
                   startIcon={<SaveIcon />}
+                  data-cy={shouldSave ? 'save-and-use-message' : 'use-message'}
                 >
                   {shouldSave ? 'Save & Use' : 'Use'}
                 </Button>
@@ -334,6 +339,7 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
                   disabled={isSubmitting || !initialValues.predefinedMessageId}
                   startIcon={<DeleteIcon />}
                   onClick={handlePredefinedMessageDelete}
+                  data-cy="delete-message"
                 >
                   Delete
                 </Button>

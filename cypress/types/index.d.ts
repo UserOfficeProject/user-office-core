@@ -7,3 +7,4 @@ import './user';
 import './utils';
 import './visits';
 import './workflow';
+import './predefinedMessage';

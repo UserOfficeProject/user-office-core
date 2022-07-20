@@ -44,6 +44,7 @@ const FormikUIPredefinedMessagesTextField: React.FC<
               <IconButton
                 aria-label="Select from predefined messages"
                 onClick={openPredefinedMessagesModal}
+                data-cy="select-predefined-message"
               >
                 <AddCommentIcon />
               </IconButton>
