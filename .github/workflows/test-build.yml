@@ -331,15 +331,15 @@ jobs:
         run: |
           cd ./apps/user-office-backend
           docker build -t user-office-backend:${{ github.sha }} .
-          docker tag user-office-backend:${{ github.sha }} ghcr.io/UserOfficeProject/user-office-backend:${{ github.head_ref }}
-          docker push ghcr.io/UserOfficeProject/user-office-backend:${{ github.head_ref }}
+          docker tag user-office-backend:${{ github.sha }} ghcr.io/user-office-core/user-office-backend:${{ github.head_ref }}
+          docker push ghcr.io/user-office-core/user-office-backend:${{ github.head_ref }}
 
       - name: Build and push frontend
         run: |
           cd ./apps/user-office-frontend
           docker build -t user-office-frontend:${{ github.sha }} .
-          docker tag user-office-core-frontend:${{ github.sha }} ghcr.io/UserOfficeProject/user-office-frontend:${{ github.head_ref }}
-          docker push ghcr.io/UserOfficeProject/user-office-frontend:${{ github.head_ref }}
+          docker tag user-office-core-frontend:${{ github.sha }} ghcr.io/user-office-core/user-office-frontend:${{ github.head_ref }}
+          docker push ghcr.io/user-office-core/user-office-frontend:${{ github.head_ref }}
 
       # - name: Build and push backend
       #   uses: docker/build-push-action@v3
