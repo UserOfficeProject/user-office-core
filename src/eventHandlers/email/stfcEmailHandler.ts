@@ -116,33 +116,34 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
     case Event.CALL_CREATED: {
       if (event?.call) {
         const templateID = 'isis-call-created-pi';
-        const noficicationEmailAdress =
-          (process.env && process.env.FBSEMAIL) ||
-          'FacilitiesBusinessSystem@stfc.ac.uk';
-        const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
-          shortCode,
-          startCall,
-          endCall,
-        }))(event.call);
-        const emailSettings = piCallCreationEmail<typeof eventCallPartial>(
-          eventCallPartial,
-          templateID,
-          noficicationEmailAdress
-        );
-        mailService
-          .sendMail(emailSettings)
-          .then((res: any) => {
-            logger.logInfo('Emails sent on call creation:', {
-              result: res,
-              event,
+        if (process.env && process.env.FBSEMAIL) {
+          const noficicationEmailAdress = process.env && process.env.FBSEMAIL;
+          const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
+            shortCode,
+            startCall,
+            endCall,
+          }))(event.call);
+          const emailSettings = callCreationEmail<typeof eventCallPartial>(
+            eventCallPartial,
+            templateID,
+            noficicationEmailAdress
+          );
+
+          mailService
+            .sendMail(emailSettings)
+            .then((res: any) => {
+              logger.logInfo('Emails sent on call creation:', {
+                result: res,
+                event,
+              });
+            })
+            .catch((err: string) => {
+              logger.logError('Could not send email(s) on call creation:', {
+                error: err,
+                event,
+              });
             });
-          })
-          .catch((err: string) => {
-            logger.logError('Could not send email(s) on call creation:', {
-              error: err,
-              event,
-            });
-          });
+        }
       }
 
       return;
@@ -210,21 +211,21 @@ const uoRapidSubmissionEmail = (
   recipients: [{ address: uoAddress }],
 });
 
-const piCallCreationEmail = function createNotificationEmail<T>(
-  _notificationInput: T,
-  _templateID: string,
-  _notificationEmailAddress: string
+const callCreationEmail = function createNotificationEmail<T>(
+  notificationInput: T,
+  templateID: string,
+  notificationEmailAddress: string
 ): EmailSettings {
   const emailSettings: EmailSettings = {
     content: {
-      template_id: _templateID,
+      template_id: templateID,
     },
     substitution_data: {
-      ..._notificationInput,
+      ...notificationInput,
     },
     recipients: [
       {
-        address: _notificationEmailAddress,
+        address: notificationEmailAddress,
       },
     ],
   };
