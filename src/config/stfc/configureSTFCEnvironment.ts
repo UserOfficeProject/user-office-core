@@ -74,13 +74,20 @@ async function enableDefaultStfcFeatures() {
       FeatureId.EXTERNAL_AUTH,
       FeatureId.EMAIL_SEARCH,
       FeatureId.INSTRUMENT_MANAGEMENT,
-      FeatureId.PROPOSAL_FILTER,
     ],
     true
   );
   await db.updateSettings({
     settingsId: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
     settingsValue: process.env.EXTERNAL_AUTH_LOGIN_URL,
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
+    settingsValue: 'ALL',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
+    settingsValue: 'ALL',
   });
 }
 
