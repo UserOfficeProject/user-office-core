@@ -228,15 +228,14 @@ jobs:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
       # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
       # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
-      #
-      - name: Cache e2e node_modules
-        env:
-          CYPRESS_CACHE_FOLDER: cache/Cypress
-        id: cached-node-modules-e2e
-        uses: actions/cache@v3
-        with:
-          path: apps/user-office-frontend-e2e/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+      # - name: Cache e2e node_modules
+      #   env:
+      #     CYPRESS_CACHE_FOLDER: cache/Cypress
+      #   id: cached-node-modules-e2e
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: apps/user-office-frontend-e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
 
       - name: Install e2e dependencies
         env:
@@ -321,14 +320,14 @@ jobs:
       #     docker load --input /tmp/.buildx-image-cache/img.tar
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           push: true
           file: apps/user-office-backend/Dockerfile
