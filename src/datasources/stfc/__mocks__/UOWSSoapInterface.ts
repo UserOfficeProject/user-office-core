@@ -34,9 +34,7 @@ export default class UOWSSoapClient {
         },
       };
     } else {
-      return {
-        return: null,
-      };
+      return null;
     }
   }
 
@@ -52,9 +50,7 @@ export default class UOWSSoapClient {
         },
       };
     } else {
-      return {
-        return: null,
-      };
+      return null;
     }
   }
 
