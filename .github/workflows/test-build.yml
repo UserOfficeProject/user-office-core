@@ -328,6 +328,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
+        env:
+          BUILD_VERSION: ${{ github.sha }}
         run: |
           cd ./apps/user-office-backend
           docker build -t user-office-backend:${{ github.sha }} .
@@ -335,6 +337,9 @@ jobs:
           docker push ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
 
       - name: Build and push frontend
+        env:
+          BUILD_VERSION: ${{ github.sha }}
+          ORCID_REDIRECT: ${{ secrets.REACT_APP_ORCID_REDIRECT }}
         run: |
           cd ./apps/user-office-frontend
           docker build -t user-office-frontend:${{ github.sha }} .
