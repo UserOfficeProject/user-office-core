@@ -187,12 +187,12 @@ jobs:
       matrix:
         pattern:
           [
-            "cypress/integration/[a-e]*.ts",
-            "cypress/integration/[f-i]*.ts",
-            "cypress/integration/[j-p]*.ts",
-            "cypress/integration/[r-s]*.ts",
-            "cypress/integration/[t-z]*.ts",
-            "cypress/integration/[A-Z]*.ts",
+            'cypress/integration/[a-e]*.ts',
+            'cypress/integration/[f-i]*.ts',
+            'cypress/integration/[j-p]*.ts',
+            'cypress/integration/[r-s]*.ts',
+            'cypress/integration/[t-z]*.ts',
+            'cypress/integration/[A-Z]*.ts',
           ]
 
     steps:
@@ -224,32 +224,25 @@ jobs:
           path: apps/user-office-frontend/node_modules
           key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
-      # TODO: See how to proceed with e2e caching because there is some error: 
+      # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
       # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
       # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
-      # 
-      # - name: Cache e2e node_modules
-      #   env:
-      #     CYPRESS_CACHE_FOLDER: .cache/Cypress
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: apps/user-office-frontend-e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+      #
+      - name: Cache e2e node_modules
+        env:
+          CYPRESS_CACHE_FOLDER: cache/Cypress
+        id: cached-node-modules-e2e
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend-e2e/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
 
       - name: Install e2e dependencies
         env:
           CYPRESS_CACHE_FOLDER: .cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
-
-      - name: Login to GitHub Packages Docker Registry
-        uses: docker/login-action@v1
-        with:
-          registry: docker.pkg.github.com
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download required repositories
         run: |
@@ -298,42 +291,61 @@ jobs:
           name: cypress-screenshots
           path: apps/user-office-frontend-e2e/cypress/screenshots
 
-  # push:
-  #   # The type of runner that the job will run on
-  #   runs-on: ubuntu-latest
-  #   needs: e2e
-  #   # Steps represent a sequence of tasks that will be executed as part of the job
-  #   steps:
-  #     - name: Load app cache
-  #       id: cached-image
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: |
-  #           /tmp/.buildx-layer-cache
-  #           /tmp/.buildx-image-cache
-  #         key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
+  push:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: e2e
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Load app cache
+        id: cached-image
+        uses: actions/cache@v2
+        with:
+          path: |
+            /tmp/.buildx-layer-cache
+            /tmp/.buildx-image-cache
+          key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
 
-  #     - name: Fail on cache miss
-  #       if: steps.cached-image.outputs.cache-hit != 'true'
-  #       run: |
-  #         echo "No cache hit!"
-  #         exit 1
+      - name: Fail on cache miss
+        if: steps.cached-image.outputs.cache-hit != 'true'
+        run: |
+          echo "No cache hit!"
+          exit 1
 
-  #     # For debugging capture the selected branch
-  #     - name: Branch
-  #       run: echo "Branch ${{ github.head_ref }}"
+      # For debugging capture the selected branch
+      - name: Branch
+        run: echo "Branch ${{ github.head_ref }}"
 
-  #     - name: Load cached app image
-  #       run: |
-  #         docker load --input /tmp/.buildx-image-cache/img.tar
+      - name: Load cached app image
+        run: |
+          docker load --input /tmp/.buildx-image-cache/img.tar
 
-  #     - name: Login to DockerHub
-  #       uses: docker/login-action@v1
-  #       with:
-  #         username: ${{ secrets.DOCKER_USERNAME }}
-  #         password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Push
-  #       run: |
-  #         docker tag user-office-core-monorepo:${{ github.sha }} dmsc/user-office-core-monorepo:${{ github.head_ref }}
-  #         docker push dmsc/user-office-core-monorepo:${{ github.head_ref }}
+      - name: Build and push backend
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          file: apps/user-office-backend/Dockerfile
+          tags: dmsc/user-office-core-backend:${{ github.head_ref }}
+          cache-from: type=local,src=/tmp/.buildx-layer-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          file: apps/user-office-frontend/Dockerfile
+          tags: dmsc/user-office-core-frontend:${{ github.head_ref }}
+          cache-from: type=local,src=/tmp/.buildx-layer-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+
+      # - name: Push
+      #   run: |
+      #     docker tag user-office-core-backend:${{ github.sha }} dmsc/user-office-core-backend:${{ github.head_ref }}
+      #     docker push dmsc/user-office-core-monorepo:${{ github.head_ref }}
