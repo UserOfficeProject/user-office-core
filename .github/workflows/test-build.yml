@@ -330,7 +330,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          file: apps/user-office-backend/Dockerfile
+          context: apps/user-office-backend
           tags: dmsc/user-office-core-backend:${{ github.head_ref }}
           # cache-from: type=local,src=/tmp/.buildx-layer-cache
           # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
@@ -339,7 +339,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          file: apps/user-office-frontend/Dockerfile
+          context: apps/user-office-frontend
           tags: dmsc/user-office-core-frontend:${{ github.head_ref }}
           # cache-from: type=local,src=/tmp/.buildx-layer-cache
           # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
