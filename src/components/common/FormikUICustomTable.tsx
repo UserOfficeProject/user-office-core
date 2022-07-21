@@ -38,7 +38,6 @@ function move(
         elementRows[_elementRowIndex + _direction],
         elementRows[_elementRowIndex],
       ];
-      console.log(elementRows, ' output');
 
       return [...elementRows];
     }
