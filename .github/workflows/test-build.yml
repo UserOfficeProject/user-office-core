@@ -328,14 +328,16 @@ jobs:
 
       - name: Build and push backend
         run: |
-          cd apps/user-office-backend
+          ls -a
+          cd ./apps/user-office-backend
           docker build -t user-office-core-backend:${{ github.sha }} .
           docker tag user-office-core-backend:${{ github.sha }} dmsc/user-office-core-backend:${{ github.head_ref }}
           docker push dmsc/user-office-core-backend:${{ github.head_ref }}
 
       - name: Build and push frontend
         run: |
-          cd apps/user-office-frontend
+          ls -a
+          cd ./apps/user-office-frontend
           docker build -t user-office-core-frontend:${{ github.sha }} .
           docker tag user-office-core-frontend:${{ github.sha }} dmsc/user-office-core-frontend:${{ github.head_ref }}
           docker push dmsc/user-office-core-frontend:${{ github.head_ref }}
