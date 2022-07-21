@@ -327,22 +327,36 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          context: '{{defaultContext}}:apps/user-office-backend'
-          tags: dmsc/user-office-core-backend:${{ github.head_ref }}
-          # cache-from: type=local,src=/tmp/.buildx-layer-cache
-          # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+        run: |
+          cd apps/user-office-backend
+          docker build -t user-office-core-backend:${{ github.sha }} .
+          docker tag user-office-core-backend:${{ github.sha }} dmsc/user-office-core-backend:${{ github.head_ref }}
+          docker push dmsc/user-office-core-backend:${{ github.head_ref }}
 
       - name: Build and push frontend
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          context: '{{defaultContext}}:apps/user-office-frontend'
-          tags: dmsc/user-office-core-frontend:${{ github.head_ref }}
-          # cache-from: type=local,src=/tmp/.buildx-layer-cache
-          # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+        run: |
+          cd apps/user-office-frontend
+          docker build -t user-office-core-frontend:${{ github.sha }} .
+          docker tag user-office-core-frontend:${{ github.sha }} dmsc/user-office-core-frontend:${{ github.head_ref }}
+          docker push dmsc/user-office-core-frontend:${{ github.head_ref }}
+
+      # - name: Build and push backend
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     push: true
+      #     file: apps/user-office-backend/Dockerfile
+      #     tags: dmsc/user-office-core-backend:${{ github.head_ref }}
+      #     # cache-from: type=local,src=/tmp/.buildx-layer-cache
+      #     # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+
+      # - name: Build and push frontend
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     push: true
+      #     file: apps/user-office-frontend/Dockerfile
+      #     tags: dmsc/user-office-core-frontend:${{ github.head_ref }}
+      #     # cache-from: type=local,src=/tmp/.buildx-layer-cache
+      #     # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
 
       # - name: Push
       #   run: |
