@@ -297,14 +297,14 @@ jobs:
     # needs: e2e
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Load app cache
-        id: cached-image
-        uses: actions/cache@v2
-        with:
-          path: |
-            /tmp/.buildx-layer-cache
-            /tmp/.buildx-image-cache
-          key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
+      # - name: Load app cache
+      #   id: cached-image
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       /tmp/.buildx-layer-cache
+      #       /tmp/.buildx-image-cache
+      #     key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
 
       # - name: Fail on cache miss
       #   if: steps.cached-image.outputs.cache-hit != 'true'
@@ -321,20 +321,20 @@ jobs:
       #     docker load --input /tmp/.buildx-image-cache/img.tar
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v2
         with:
           push: true
           file: apps/user-office-backend/Dockerfile
           tags: dmsc/user-office-core-backend:${{ github.head_ref }}
-          cache-from: type=local,src=/tmp/.buildx-layer-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+          # cache-from: type=local,src=/tmp/.buildx-layer-cache
+          # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
 
       - name: Build and push frontend
         uses: docker/build-push-action@v3
@@ -342,8 +342,8 @@ jobs:
           push: true
           file: apps/user-office-frontend/Dockerfile
           tags: dmsc/user-office-core-frontend:${{ github.head_ref }}
-          cache-from: type=local,src=/tmp/.buildx-layer-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
+          # cache-from: type=local,src=/tmp/.buildx-layer-cache
+          # cache-to: type=local,mode=max,dest=/tmp/.buildx-layer-cache
 
       # - name: Push
       #   run: |
