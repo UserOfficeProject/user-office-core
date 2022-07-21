@@ -19,8 +19,11 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import ReviewerFilterComponent from 'components/review/ReviewerFilter';
+import ReviewerFilterComponent, {
+  reviewFilter,
+} from 'components/review/ReviewerFilter';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeatureId,
@@ -28,6 +31,9 @@ import {
   ProposalsFilter,
   ReviewerFilter,
   SubmitTechnicalReviewInput,
+  SettingsId,
+  Scalars,
+  Maybe,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -109,34 +115,46 @@ const SEPReviewColumns = [
   { title: 'SEP', field: 'sepCode', emptyValue: '-', hidden: true },
 ];
 
+const proposalStatusFilter = new Map<Maybe<string> | undefined, Scalars['Int']>(
+  [
+    ['ALL', 0],
+    ['FEASIBILITY_REVIEW', 2],
+  ]
+);
+
 const ProposalTableInstrumentScientist: React.FC<{
   confirm: WithConfirmType;
 }> = ({ confirm }) => {
   const { user } = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
+  const { settingsMap } = useContext(SettingsContext);
+  const statusFilterValue = settingsMap.get(
+    SettingsId.DEFAULT_INST_SCI_STATUS_FILTER
+  )?.settingsValue;
+  let statusFilter = proposalStatusFilter.get(statusFilterValue);
+  if (!statusFilter && statusFilter != 0) {
+    statusFilter = 2;
+  }
+  const reviewFilterValue = settingsMap.get(
+    SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER
+  )?.settingsValue;
+  let reviewerFilter = reviewFilter.get(reviewFilterValue);
+  if (!reviewerFilter) {
+    reviewerFilter = ReviewerFilter.ME;
+  }
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,
-    proposalStatus: withDefault(
-      NumberParam,
-      featureContext.featuresMap.get(FeatureId.PROPOSAL_FILTER)?.isEnabled
-        ? 0
-        : 2
-    ),
+    proposalStatus: withDefault(NumberParam, statusFilter),
     questionId: StringParam,
     compareOperator: StringParam,
     value: StringParam,
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    reviewer: withDefault(
-      StringParam,
-      featureContext.featuresMap.get(FeatureId.PROPOSAL_FILTER)?.isEnabled
-        ? ReviewerFilter.ALL
-        : ReviewerFilter.ME
-    ),
+    reviewer: withDefault(StringParam, reviewerFilter),
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({

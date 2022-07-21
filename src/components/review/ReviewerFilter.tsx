@@ -6,8 +6,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext } from 'react';
 import { StringParam, useQueryParams, withDefault } from 'use-query-params';
 
-import { FeatureContext } from 'context/FeatureContextProvider';
-import { ReviewerFilter, FeatureId } from 'generated/sdk';
+import { SettingsContext } from 'context/SettingsContextProvider';
+import { Maybe, ReviewerFilter, SettingsId } from 'generated/sdk';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -21,19 +21,26 @@ type ReviewerFilterComponentProps = {
   onChange?: (reviewer: ReviewerFilter) => void;
 };
 
+export const reviewFilter = new Map<Maybe<string> | undefined, ReviewerFilter>([
+  ['ALL', ReviewerFilter.ALL],
+  ['ME', ReviewerFilter.ME],
+]);
+
 const ReviewerFilterComponent: React.FC<ReviewerFilterComponentProps> = ({
   reviewer,
   onChange,
 }) => {
+  const { settingsMap } = useContext(SettingsContext);
+  const reviewFilterValue = settingsMap.get(
+    SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER
+  )?.settingsValue;
+  let reviewerFilter = reviewFilter.get(reviewFilterValue);
+  if (!reviewerFilter) {
+    reviewerFilter = ReviewerFilter.ME;
+  }
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
-    reviewer: withDefault(
-      StringParam,
-      useContext(FeatureContext).featuresMap.get(FeatureId.PROPOSAL_FILTER)
-        ?.isEnabled
-        ? ReviewerFilter.ALL
-        : ReviewerFilter.ME
-    ),
+    reviewer: withDefault(StringParam, reviewerFilter),
   });
 
   return (
