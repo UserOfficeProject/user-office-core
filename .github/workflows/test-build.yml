@@ -296,29 +296,12 @@ jobs:
     needs: e2e
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # - name: Load app cache
-      #   id: cached-image
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       /tmp/.buildx-layer-cache
-      #       /tmp/.buildx-image-cache
-      #     key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
-
-      # - name: Fail on cache miss
-      #   if: steps.cached-image.outputs.cache-hit != 'true'
-      #   run: |
-      #     echo "No cache hit!"
-      #     exit 1
+      # TODO: Maybe it is a good idea to use some caching mechanism here for building docker images.
+      - uses: actions/checkout@v3
 
       # For debugging capture the selected branch
-      # - name: Branch
-      #   run: echo "Branch ${{ github.head_ref }}"
-
-      # - name: Load cached app image
-      #   run: |
-      #     docker load --input /tmp/.buildx-image-cache/img.tar
-      - uses: actions/checkout@v3
+      - name: Branch
+        run: echo "Branch ${{ github.head_ref }}"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
