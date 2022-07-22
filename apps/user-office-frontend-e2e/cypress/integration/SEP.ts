@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   ProposalEndStatus,
   ReviewStatus,
@@ -6,7 +7,6 @@ import {
   User,
   UpdateUserMutationVariables,
 } from '@user-office-software-libs/shared-types';
-import faker from 'faker';
 
 import initialDBData from '../support/initialDBData';
 

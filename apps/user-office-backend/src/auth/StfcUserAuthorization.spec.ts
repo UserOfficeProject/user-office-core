@@ -26,6 +26,11 @@ const mockAssignScientistToInstruments = jest.spyOn(
   'assignScientistToInstruments'
 );
 
+const mockGetRequiredInstrumentForRole = jest.spyOn(
+  userAuthorization,
+  'getRequiredInstrumentForRole'
+);
+
 const instruments = [
   new Instrument(0, 'ISIS', '', '', 0),
   new Instrument(1, 'LSF', '', '', 0),
@@ -48,6 +53,7 @@ beforeAll(() => {
 beforeEach(() => {
   mockAssignScientistToInstruments.mockClear();
   mockRemoveScientistFromInstruments.mockClear();
+  mockGetRequiredInstrumentForRole.mockClear();
 });
 
 test('When an invalid external token is supplied, no user is found', async () => {
@@ -63,6 +69,32 @@ test('When a valid external token is supplied, valid user is returned', async ()
 
   expect(result?.id).toBe(dummyUser.id);
   expect(result?.email).toBe(dummyUser.email);
+});
+
+test('When getting instruments for roles, duplicate roles are filtered out before', async () => {
+  await userAuthorization.externalTokenLogin('valid');
+
+  // Duplicate 'User Officer' and 'ISIS Instrument Scientist' roles removed
+  expect(mockGetRequiredInstrumentForRole).toBeCalledWith([
+    {
+      name: 'ISIS Instrument Scientist',
+    },
+    {
+      name: 'ISIS Administrator',
+    },
+    {
+      name: 'Developer',
+    },
+    {
+      name: 'Admin',
+    },
+    {
+      name: 'User Officer',
+    },
+    {
+      name: 'User',
+    },
+  ]);
 });
 
 // getInstrumentsToAdd

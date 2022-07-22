@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   CreateInstrumentMutationVariables,
   TemplateGroupId,
   UpdateCallInput,
 } from '@user-office-software-libs/shared-types';
-import faker from 'faker';
 import { DateTime } from 'luxon';
 
 import initialDBData from '../support/initialDBData';
