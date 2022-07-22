@@ -1,4 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
@@ -72,20 +71,6 @@ export default class CallMutations {
     }
   }
 
-  async assignSepsToCall(callId: number, sepIds: number[]) {
-    const sepsAssigned = await this.dataSource.assignSepsToCall({
-      callId,
-      sepIds,
-    });
-
-    if (!sepsAssigned) {
-      logger.logException(
-        `Call with id: '${callId}' updated but could not assign SEPs to a call. Please try again later. `,
-        new Error('Could not assign SEPs to a call')
-      );
-    }
-  }
-
   @ValidateArgs(createCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.CALL_CREATED)
@@ -93,20 +78,16 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: CreateCallInput
   ): Promise<Call | Rejection> {
-    const createdCall = await this.dataSource.create(args);
+    try {
+      const createdCall = await this.dataSource.create(args);
 
-    if (!createdCall) {
+      return createdCall;
+    } catch (error) {
       return rejection('Could not create call', {
         agent,
         shortCode: args.shortCode,
       });
     }
-
-    if (args.seps?.length) {
-      await this.assignSepsToCall(createdCall.id, args.seps);
-    }
-
-    return createdCall;
   }
 
   @ValidateArgs(updateCallValidationSchema)
@@ -115,22 +96,17 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: UpdateCallInput
   ): Promise<Call | Rejection> {
-    const updatedCall = await this.dataSource
-      .update(args)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not create call',
-          { agent, shortCode: args.shortCode },
-          error
-        );
-      });
+    try {
+      const updatedCall = await this.dataSource.update(args);
 
-    if (args.seps?.length) {
-      await this.assignSepsToCall(args.id, args.seps);
+      return updatedCall;
+    } catch (error) {
+      return rejection(
+        'Could not update call',
+        { agent, shortCode: args.shortCode },
+        error
+      );
     }
-
-    return updatedCall;
   }
 
   @ValidateArgs(assignInstrumentsToCallValidationSchema)

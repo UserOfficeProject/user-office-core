@@ -5,8 +5,8 @@ BEGIN
 	BEGIN
 
     CREATE TABLE IF NOT EXISTS "call_has_seps" (
-      call_id int REFERENCES call (call_id) ON UPDATE CASCADE,
-      sep_id int REFERENCES "SEPs" (sep_id) ON UPDATE CASCADE,
+      call_id int REFERENCES call (call_id) ON UPDATE CASCADE ON DELETE CASCADE,
+      sep_id int REFERENCES "SEPs" (sep_id) ON UPDATE CASCADE ON DELETE CASCADE,
       CONSTRAINT call_has_seps_pkey PRIMARY KEY (call_id, sep_id)  -- explicit pk
     );
 

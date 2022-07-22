@@ -10,14 +10,10 @@ import { CallsFilter } from './../resolvers/queries/CallsQuery';
 export interface CallDataSource {
   getCall(id: number): Promise<Call | null>;
   getCalls(filter?: CallsFilter): Promise<Call[]>;
-  create(args: CreateCallInput): Promise<Call | null>;
+  create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
   delete(id: number): Promise<Call>;
   assignInstrumentsToCall(args: AssignInstrumentsToCallInput): Promise<Call>;
-  assignSepsToCall(args: {
-    callId: number;
-    sepIds: number[];
-  }): Promise<boolean>;
   removeAssignedInstrumentFromCall(
     args: RemoveAssignedInstrumentFromCallInput
   ): Promise<Call>;

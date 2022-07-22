@@ -143,13 +143,6 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCall;
   }
 
-  async assignSepsToCall(args: {
-    callId: number;
-    sepIds: number[];
-  }): Promise<boolean> {
-    return true;
-  }
-
   async removeAssignedInstrumentFromCall(
     args: RemoveAssignedInstrumentFromCallInput
   ) {
