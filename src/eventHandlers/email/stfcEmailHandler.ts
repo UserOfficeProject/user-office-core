@@ -115,35 +115,41 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
     case Event.CALL_CREATED: {
       if (event?.call) {
-        const templateID = 'call-created-email';
-        if (process.env && process.env.FBS_EMAIL) {
-          const notificationEmailAddress = process.env.FBS_EMAIL;
-          const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
-            shortCode,
-            startCall,
-            endCall,
-          }))(event.call);
-          const emailSettings = callCreationEmail<typeof eventCallPartial>(
-            eventCallPartial,
-            templateID,
-            notificationEmailAddress
+        if (!(process.env && process.env.FBS_EMAIL)) {
+          logger.logError(
+            'Could not send email(s) on call creation, environmental variable (FBS_EMAIL) not found',
+            {}
           );
 
-          mailService
-            .sendMail(emailSettings)
-            .then((res: any) => {
-              logger.logInfo('Emails sent on call creation:', {
-                result: res,
-                event,
-              });
-            })
-            .catch((err: string) => {
-              logger.logError('Could not send email(s) on call creation:', {
-                error: err,
-                event,
-              });
-            });
+          return;
         }
+        const templateID = 'call-created-email';
+        const notificationEmailAddress = process.env.FBS_EMAIL;
+        const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
+          shortCode,
+          startCall,
+          endCall,
+        }))(event.call);
+        const emailSettings = callCreationEmail<typeof eventCallPartial>(
+          eventCallPartial,
+          templateID,
+          notificationEmailAddress
+        );
+
+        mailService
+          .sendMail(emailSettings)
+          .then((res: any) => {
+            logger.logInfo('Emails sent on call creation:', {
+              result: res,
+              event,
+            });
+          })
+          .catch((err: string) => {
+            logger.logError('Could not send email(s) on call creation:', {
+              error: err,
+              event,
+            });
+          });
       }
 
       return;
