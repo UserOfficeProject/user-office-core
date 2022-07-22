@@ -117,7 +117,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
       if (event?.call) {
         const templateID = 'call-created-email';
         if (process.env && process.env.FBS_EMAIL) {
-          const noficicationEmailAdress = process.env.FBS_EMAIL;
+          const notificationEmailAddress = process.env.FBS_EMAIL;
           const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
             shortCode,
             startCall,
@@ -126,7 +126,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           const emailSettings = callCreationEmail<typeof eventCallPartial>(
             eventCallPartial,
             templateID,
-            noficicationEmailAdress
+            notificationEmailAddress
           );
 
           mailService
