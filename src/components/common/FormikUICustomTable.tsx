@@ -11,43 +11,28 @@ import makeStyles from '@mui/styles/makeStyles';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useRef } from 'react';
 
+import { clamp } from 'utils/Math';
 import { FunctionType } from 'utils/utilTypes';
 
 import { ActionButtonContainer } from './ActionButtonContainer';
-enum Direction {
-  UP = -1,
-  DOWN = 1,
-}
+
 function move(
-  _elementRows: Record<string, unknown>[],
-  _elementRowIndex: number,
-  _direction: Direction
+  array: Record<string, unknown>[],
+  element: Record<string, unknown>,
+  direction: 'UP' | 'DOWN'
 ) {
-  if (_elementRows !== null && _elementRowIndex > -1) {
-    const elementRows = [..._elementRows];
-    const rowIndex = _elementRowIndex;
-    const elementRowsCount = _elementRows.length - 1;
-    const swapLock =
-      (rowIndex === elementRowsCount && _direction === Direction.DOWN) ||
-      (rowIndex === 0 && _direction === Direction.UP);
-    if (!swapLock) {
-      [
-        elementRows[_elementRowIndex],
-        elementRows[_elementRowIndex + _direction],
-      ] = [
-        elementRows[_elementRowIndex + _direction],
-        elementRows[_elementRowIndex],
-      ];
+  const currentIndex = array.indexOf(element);
+  const delta = direction === 'DOWN' ? 1 : -1;
+  const newIndex = clamp(currentIndex + delta, 0, array.length - 1);
+  if (currentIndex !== newIndex) {
+    const newArray = [...array];
+    newArray.splice(currentIndex, 1);
+    newArray.splice(newIndex, 0, element);
 
-      return [...elementRows];
-    }
+    return newArray;
   }
-  //if last or first do nothing
 
-  return _elementRows;
-}
-function getRowDataIndex(_rowData: Record<string, { id: number }>): number {
-  return -1 && _rowData.tableData.id;
+  return array;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -122,31 +107,20 @@ export const FormikUICustomTable = ({
         actions={[
           (rowData) => ({
             icon: ArrowUpwardIcon,
-            disabled:
-              getRowDataIndex(rowData as Record<string, { id: number }>) === 0,
+            disabled: state.indexOf(rowData) === 0,
             tooltip: 'Up',
             onClick: (event, rowData): void =>
               handleChange(
-                move(
-                  state,
-                  getRowDataIndex(rowData as Record<string, { id: number }>),
-                  Direction.UP
-                )
+                move(state, rowData as Record<string, unknown>, 'UP')
               ),
           }),
           (rowData) => ({
             icon: ArrowDownwardIcon,
-            disabled:
-              getRowDataIndex(rowData as Record<string, { id: number }>) ===
-              state.length - 1,
+            disabled: state.indexOf(rowData) === state.length - 1,
             tooltip: 'Down',
             onClick: (event, rowData): void =>
               handleChange(
-                move(
-                  state,
-                  getRowDataIndex(rowData as Record<string, { id: number }>),
-                  Direction.DOWN
-                )
+                move(state, rowData as Record<string, unknown>, 'DOWN')
               ),
           }),
         ]}
