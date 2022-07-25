@@ -18,6 +18,7 @@ type FormikUIAutocompleteProps = {
   disabled?: boolean;
   TextFieldProps?: MUITextFieldProps;
   InputProps?: Partial<InputProps> & { 'data-cy': string };
+  multiple?: boolean;
   'data-cy'?: string;
 };
 
@@ -31,6 +32,7 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
   disabled,
   InputProps,
   TextFieldProps,
+  multiple = false,
   ...props
 }) => {
   const options = items.map((item) => item.value);
@@ -41,6 +43,7 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
       name={name}
       component={Autocomplete}
       loading={loading}
+      multiple={multiple}
       options={options}
       noOptionsText={noOptionsText}
       getOptionLabel={(option: number | string) => {
