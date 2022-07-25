@@ -21,13 +21,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       .del()
       .from('call')
       .returning('*')
-      .then((call: CallRecord[]) => {
-        if (call === undefined || call.length !== 1) {
-          throw new Error(`Could not delete call with id:${id}`);
-        }
-
-        return createCallObject(call[0]);
-      });
+      .then((call: CallRecord[]) => createCallObject(call[0]));
   }
   async getCall(id: number): Promise<Call | null> {
     return database
@@ -83,40 +77,63 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async create(args: CreateCallInput): Promise<Call> {
-    return database
-      .insert({
-        call_short_code: args.shortCode,
-        start_call: args.startCall,
-        end_call: args.endCall,
-        start_review: args.startReview,
-        end_review: args.endReview,
-        start_sep_review: args.startSEPReview,
-        end_sep_review: args.endSEPReview,
-        start_notify: args.startNotify,
-        end_notify: args.endNotify,
-        start_cycle: args.startCycle,
-        end_cycle: args.endCycle,
-        cycle_comment: args.cycleComment,
-        submission_message: args.submissionMessage,
-        survey_comment: args.surveyComment,
-        reference_number_format: args.referenceNumberFormat,
-        proposal_sequence: args.proposalSequence,
-        proposal_workflow_id: args.proposalWorkflowId,
-        template_id: args.templateId,
-        esi_template_id: args.esiTemplateId,
-        allocation_time_unit: args.allocationTimeUnit,
-        title: args.title,
-        description: args.description,
-      })
-      .into('call')
-      .returning('*')
-      .then((call: CallRecord[]) => {
-        if (call.length !== 1) {
-          throw new Error('Could not create call');
+    const [call]: CallRecord[] = await database.transaction(async (trx) => {
+      try {
+        const createdCall: CallRecord[] = await database
+          .insert({
+            call_short_code: args.shortCode,
+            start_call: args.startCall,
+            end_call: args.endCall,
+            start_review: args.startReview,
+            end_review: args.endReview,
+            start_sep_review: args.startSEPReview,
+            end_sep_review: args.endSEPReview,
+            start_notify: args.startNotify,
+            end_notify: args.endNotify,
+            start_cycle: args.startCycle,
+            end_cycle: args.endCycle,
+            cycle_comment: args.cycleComment,
+            submission_message: args.submissionMessage,
+            survey_comment: args.surveyComment,
+            reference_number_format: args.referenceNumberFormat,
+            proposal_sequence: args.proposalSequence,
+            proposal_workflow_id: args.proposalWorkflowId,
+            template_id: args.templateId,
+            esi_template_id: args.esiTemplateId,
+            allocation_time_unit: args.allocationTimeUnit,
+            title: args.title,
+            description: args.description,
+          })
+          .into('call')
+          .returning('*')
+          .transacting(trx);
+
+        // NOTE: Attach SEPs to a call if they are provided.
+        if (createdCall[0].call_id && args.seps?.length) {
+          const valuesToInsert = args.seps.map((sepId) => ({
+            sep_id: sepId,
+            call_id: createdCall[0].call_id,
+          }));
+
+          await database
+            .insert(valuesToInsert)
+            .into('call_has_seps')
+            .transacting(trx);
         }
 
-        return createCallObject(call[0]);
-      });
+        return await trx.commit(createdCall);
+      } catch (error) {
+        logger.logException(
+          `Could not create call with args: '${JSON.stringify(args)}'`,
+          error
+        );
+        trx.rollback();
+
+        throw new Error('Could not create call');
+      }
+    });
+
+    return createCallObject(call);
   }
 
   async update(args: UpdateCallInput): Promise<Call> {
@@ -163,6 +180,24 @@ export default class PostgresCallDataSource implements CallDataSource {
           );
         }
 
+        // NOTE: Attach SEPs to a call if they are provided.
+        if (args.id && args.seps?.length) {
+          const valuesToInsert = args.seps.map((sepId) => ({
+            sep_id: sepId,
+            call_id: args.id,
+          }));
+          // NOTE: Remove all assigned SEPs from a call and then re-assign
+          await database('call_has_seps')
+            .del()
+            .where('call_id', args.id)
+            .transacting(trx);
+
+          await database
+            .insert(valuesToInsert)
+            .into('call_has_seps')
+            .transacting(trx);
+        }
+
         const callUpdate = await database
           .update(
             {
@@ -204,12 +239,10 @@ export default class PostgresCallDataSource implements CallDataSource {
           error
         );
         trx.rollback();
+
+        throw new Error('Could not update call');
       }
     });
-
-    if (call?.length !== 1) {
-      throw new Error('Could not update call');
-    }
 
     return createCallObject(call[0]);
   }

@@ -141,6 +141,20 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return sepRecords.map(createSEPObject);
   }
 
+  async getSepsByCallId(callId: number): Promise<SEP[]> {
+    return database
+      .select('*')
+      .from('SEPs as s')
+      .join('call_has_seps as chs', {
+        's.sep_id': 'chs.sep_id',
+      })
+      .where('chs.call_id', callId)
+      .distinct('s.sep_id')
+      .then((seps: SEPRecord[]) => {
+        return seps.map(createSEPObject);
+      });
+  }
+
   async getUserSeps(userId: number, role: Role): Promise<SEP[]> {
     const qb = database<SEPRecord>('SEPs').select<SEPRecord[]>('SEPs.*');
 
