@@ -98,6 +98,11 @@ const CallsTable: React.FC = () => {
       title: '#proposals',
       field: 'proposalCount',
     },
+    {
+      title: '#seps',
+      field: 'seps.length',
+      emptyValue: '-',
+    },
   ];
 
   const assignInstrumentsToCall = (
