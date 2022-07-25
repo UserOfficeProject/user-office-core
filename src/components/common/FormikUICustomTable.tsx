@@ -36,7 +36,7 @@ function move(
         elementRows[elementIndex + direction],
         elementRows[elementIndex],
       ];
-      
+
       return [...elementRows];
     }
   }
