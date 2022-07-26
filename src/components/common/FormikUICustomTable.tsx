@@ -60,7 +60,6 @@ function move(
       return [...elementRows];
     }
   }
-  //if last or first do nothing
 
   return elements;
 }
