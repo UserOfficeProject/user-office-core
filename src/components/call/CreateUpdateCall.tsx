@@ -80,6 +80,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         startCycle: getDateTimeFromISO(call.startCycle),
         endCycle: getDateTimeFromISO(call.endCycle),
         submissionMessage: call.submissionMessage || '',
+        seps: call.seps?.map((sep) => sep.id),
       }
     : {
         shortCode: '',
@@ -103,6 +104,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         title: '',
         description: '',
         submissionMessage: '',
+        seps: [],
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {
