@@ -120,3 +120,30 @@ export const removeColumns = <T extends object>(
     }
   });
 };
+
+export const isObject = (object: null) => {
+  return object != null && typeof object === 'object';
+};
+export const isObjectsEqual = (obja: object, objb: object) => {
+  if (!(obja && objb)) {
+    return false;
+  }
+  const propsa = Object.getOwnPropertyNames(obja);
+  const propsb = Object.getOwnPropertyNames(objb);
+  if (propsa.length != propsb.length) {
+    return false;
+  }
+  for (let i = 0; i < propsa.length; i++) {
+    const vala = obja[propsa[i] as keyof typeof obja];
+    const valb = objb[propsa[i] as keyof typeof objb];
+    const isObjects = isObject(vala) && isObject(valb);
+    if (
+      (isObjects && !isObjectsEqual(vala, valb)) ||
+      (!isObjects && vala !== valb)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};

@@ -11,6 +11,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useRef } from 'react';
 
+import { isObjectsEqual } from 'utils/helperFunctions';
 import { FunctionType } from 'utils/utilTypes';
 
 import { ActionButtonContainer } from './ActionButtonContainer';
@@ -19,6 +20,25 @@ enum Direction {
   UP = -1,
   DOWN = 1,
 }
+
+function getElementIndex(
+  elements: Record<string, unknown>[],
+  element: Record<string, unknown>
+): number {
+  if (!(elements && element)) {
+    return -1;
+  }
+  type Flatten<Type> = Type extends Array<infer Item> ? Item : Type;
+  const newElement = {} as Flatten<typeof elements>;
+  Object.entries(element as typeof newElement).forEach(([key, value]) => {
+    if (Object.getOwnPropertyNames(elements[0]).includes(key)) {
+      newElement[key as keyof typeof newElement] = value;
+    }
+  });
+
+  return elements.findIndex((value) => isObjectsEqual(value, newElement));
+}
+
 function move(
   elements: Record<string, unknown>[],
   elementIndex: number,
@@ -44,29 +64,6 @@ function move(
 
   return elements;
 }
-function getElementIndex(
-  elements: Record<string, unknown>[],
-  element: Record<string, unknown>
-): number {
-  type Flatten<Type> = Type extends Array<infer Item> ? Item : Type;
-  type ElementType = Flatten<typeof elements>;
-  const newelement: ElementType = element;
-
-  return elements.findIndex((value) => {
-    for (const [keyA, valueA] of Object.entries(value)) {
-      for (const [keyB, valueB] of Object.entries(newelement)) {
-        if (keyB === keyA) {
-          if (valueB === valueA) {
-            return true;
-          }
-        }
-      }
-    }
-
-    return false;
-  });
-}
-
 const useStyles = makeStyles((theme) => ({
   StyledButtonContainer: {
     marginTop: theme.spacing(1),
