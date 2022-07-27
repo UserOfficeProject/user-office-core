@@ -20,18 +20,18 @@ import { useSEPsData } from 'hooks/SEP/useSEPsData';
 const CallReviewAndNotification: React.FC = () => {
   const theme = useTheme();
   const { currentRole } = useContext(UserContext);
-  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData(
-    '',
-    true,
-    currentRole as UserRole
-  );
+  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+  });
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
   const mask = dateFormat?.replace(/[a-zA-Z]/g, '_');
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
-  const { startReview, startSEPReview, seps } = formik.values;
+  const { startReview, startSEPReview } = formik.values;
 
   const sepOptions =
     allActiveSeps?.map((sep) => ({
