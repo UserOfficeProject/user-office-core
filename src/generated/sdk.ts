@@ -171,6 +171,7 @@ export type CallsFilter = {
   isEnded?: InputMaybe<Scalars['Boolean']>;
   isReviewEnded?: InputMaybe<Scalars['Boolean']>;
   isSEPReviewEnded?: InputMaybe<Scalars['Boolean']>;
+  sepIds?: InputMaybe<Array<Scalars['Int']>>;
   templateIds?: InputMaybe<Array<Scalars['Int']>>;
 };
 
@@ -2330,10 +2331,7 @@ export type QuerySepReviewersArgs = {
 
 
 export type QuerySepsArgs = {
-  active?: InputMaybe<Scalars['Boolean']>;
-  filter?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  filter?: InputMaybe<SePsFilter>;
 };
 
 
@@ -2610,6 +2608,14 @@ export type SepReviewer = {
   sepId: Scalars['Int'];
   user: BasicUserDetails;
   userId: Scalars['Int'];
+};
+
+export type SePsFilter = {
+  active?: InputMaybe<Scalars['Boolean']>;
+  callIds?: InputMaybe<Array<Scalars['Int']>>;
+  filter?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
 };
 
 export type SePsQueryResult = {
@@ -3375,8 +3381,7 @@ export type GetSepReviewersQueryVariables = Exact<{
 export type GetSepReviewersQuery = { sepReviewers: Array<{ userId: number, sepId: number, proposalsCount: number, role: { id: number, shortCode: string, title: string } | null, user: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } }> | null };
 
 export type GetSePsQueryVariables = Exact<{
-  filter: Scalars['String'];
-  active?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<SePsFilter>;
 }>;
 
 
@@ -5994,8 +5999,8 @@ export const GetSepReviewersDocument = gql`
 }
     ${BasicUserDetailsFragmentDoc}`;
 export const GetSePsDocument = gql`
-    query getSEPs($filter: String!, $active: Boolean) {
-  seps(filter: $filter, active: $active) {
+    query getSEPs($filter: SEPsFilter) {
+  seps(filter: $filter) {
     seps {
       ...sep
     }
@@ -9224,7 +9229,7 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getSEPReviewers(variables: GetSepReviewersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSepReviewersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetSepReviewersQuery>(GetSepReviewersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPReviewers', 'query');
     },
-    getSEPs(variables: GetSePsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSePsQuery> {
+    getSEPs(variables?: GetSePsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSePsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetSePsQuery>(GetSePsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEPs', 'query');
     },
     removeProposalsFromSep(variables: RemoveProposalsFromSepMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveProposalsFromSepMutation> {

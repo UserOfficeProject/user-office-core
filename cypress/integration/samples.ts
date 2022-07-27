@@ -1,13 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { DateTime } from 'luxon';
 
 import {
-  AllocationTimeUnits,
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 context('Samples tests', () => {
   const existingUser = initialDBData.users.user1;
@@ -24,25 +23,6 @@ context('Samples tests', () => {
     description: faker.random.words(5),
   };
 
-  const currentDayStart = DateTime.now().startOf('day');
-
-  const updatedCall = {
-    id: initialDBData.call.id,
-    shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 10),
-    endCall: faker.date.future().toISOString().slice(0, 10),
-    startReview: currentDayStart,
-    endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
-    startNotify: currentDayStart,
-    endNotify: currentDayStart,
-    startCycle: currentDayStart,
-    endCycle: currentDayStart,
-    allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
-  };
   let createdWorkflowId: number;
   let createdSampleTemplateId: number;
   let createdSampleQuestionId: string;
@@ -123,6 +103,7 @@ context('Samples tests', () => {
             });
 
             cy.updateCall({
+              id: initialDBData.call.id,
               ...updatedCall,
               proposalWorkflowId: createdWorkflowId,
               templateId: templateId,
