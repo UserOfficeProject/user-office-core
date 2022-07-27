@@ -1,12 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { DateTime } from 'luxon';
 
 import {
-  AllocationTimeUnits,
   TechnicalReviewStatus,
   TemplateGroupId,
 } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
   beforeEach(() => {
@@ -132,26 +131,6 @@ context('Settings tests', () => {
     let createdWorkflowId: number;
     let prevProposalStatusId: number;
     let createdEsiTemplateId: number;
-
-    const currentDayStart = DateTime.now().startOf('day');
-
-    const updatedCall = {
-      shortCode: faker.random.alphaNumeric(15),
-      startCall: faker.date.past().toISOString().slice(0, 10),
-      endCall: faker.date.future().toISOString().slice(0, 10),
-      startReview: currentDayStart,
-      endReview: currentDayStart,
-      startSEPReview: currentDayStart,
-      endSEPReview: currentDayStart,
-      startNotify: currentDayStart,
-      endNotify: currentDayStart,
-      startCycle: currentDayStart,
-      endCycle: currentDayStart,
-      allocationTimeUnit: AllocationTimeUnits.DAY,
-      cycleComment: faker.lorem.word(10),
-      surveyComment: faker.lorem.word(10),
-      templateId: initialDBData.template.id,
-    };
 
     const addMultipleStatusesToProposalWorkflowWithChangingEvents = () => {
       cy.addProposalWorkflowStatus({
@@ -299,6 +278,7 @@ context('Settings tests', () => {
                 ...updatedCall,
                 proposalWorkflowId: workflow.id,
                 esiTemplateId: createdEsiTemplateId,
+                seps: [initialDBData.sep.id],
               });
             }
           });
