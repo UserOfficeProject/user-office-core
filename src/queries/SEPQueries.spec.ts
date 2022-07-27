@@ -25,25 +25,33 @@ describe('Test SEPQueries', () => {
 
   test('A userofficer can get all SEPs if no filter is passed', () => {
     return expect(
-      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, false)
+      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, { active: false })
     ).resolves.toStrictEqual({ totalCount: 2, seps: dummySEPs });
   });
 
   test('A userofficer can get only `active` SEPs', () => {
     return expect(
-      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, true)
+      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, { active: true })
     ).resolves.toStrictEqual({ totalCount: 1, seps: [dummySEP] });
   });
 
   test('A userofficer can filter SEPs by `code` and `description`', () => {
     return expect(
-      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, false, 'SEP 2')
+      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, {
+        active: false,
+        filter: 'SEP 2',
+      })
     ).resolves.toStrictEqual({ totalCount: 1, seps: [anotherDummySEP] });
   });
 
   test('A userofficer can get SEPs paginated', () => {
     return expect(
-      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, false, '', 1, 1)
+      SEPQueriesInstance.getAll(dummyUserOfficerWithRole, {
+        active: false,
+        filter: '',
+        first: 1,
+        offset: 1,
+      })
     ).resolves.toStrictEqual({ totalCount: 1, seps: [dummySEP] });
   });
 
