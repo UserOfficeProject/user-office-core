@@ -1,4 +1,7 @@
-import { GetSettingsQuery, PrepareDbMutation } from '../../src/generated/sdk';
+import {
+  GetSettingsQuery,
+  PrepareDbMutation,
+} from '@user-office-software-libs/shared-types';
 
 declare global {
   namespace Cypress {

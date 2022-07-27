@@ -1,12 +1,12 @@
-import faker from 'faker';
-import { DateTime } from 'luxon';
-
+import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
+
 import initialDBData from '../support/initialDBData';
 
 function twoFakes(numberWords: number) {

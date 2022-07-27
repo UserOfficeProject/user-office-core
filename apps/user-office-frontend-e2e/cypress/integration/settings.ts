@@ -1,11 +1,11 @@
-import faker from 'faker';
-import { DateTime } from 'luxon';
-
+import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   TechnicalReviewStatus,
   TemplateGroupId,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
+
 import initialDBData from '../support/initialDBData';
 
 context('Settings tests', () => {
@@ -712,6 +712,8 @@ context('Settings tests', () => {
         .click();
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',

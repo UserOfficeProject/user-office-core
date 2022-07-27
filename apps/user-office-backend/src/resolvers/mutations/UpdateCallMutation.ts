@@ -92,6 +92,9 @@ export class UpdateCallInput {
 
   @Field({ nullable: true })
   public description: string;
+
+  @Field(() => Boolean, { nullable: true })
+  public isActive?: boolean;
 }
 
 @InputType()

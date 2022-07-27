@@ -30,8 +30,10 @@ function createRegistrationStub(
       id: userId,
       created: new Date(),
       organisation: '',
+      organizationId: 1,
       placeholder: false,
       position: '',
+      email: '',
     },
     questionary: {
       isCompleted: false,

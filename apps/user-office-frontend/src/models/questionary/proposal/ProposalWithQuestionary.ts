@@ -20,7 +20,11 @@ export type ProposalWithQuestionary = Pick<
   | 'callId'
   | 'questionaryId'
   | 'submitted'
-> & { call?: Maybe<Pick<Call, 'isActive' | 'referenceNumberFormat'>> } & {
+> & {
+  call?: Maybe<
+    Pick<Call, 'isActive' | 'referenceNumberFormat' | 'startCall' | 'endCall'>
+  >;
+} & {
   samples: Maybe<
     (SampleFragment & { questionary: Pick<Questionary, 'isCompleted'> })[]
   >;

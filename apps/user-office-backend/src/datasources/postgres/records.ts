@@ -15,6 +15,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
@@ -288,6 +289,7 @@ export interface CallRecord {
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly title: string;
   readonly description: string;
+  readonly is_active: boolean;
 }
 
 export interface PageTextRecord {
@@ -652,6 +654,18 @@ export const createProposalObject = (proposal: ProposalRecord) => {
   );
 };
 
+export const createReviewObject = (review: ReviewRecord) => {
+  return new Review(
+    review.review_id,
+    review.proposal_pk,
+    review.user_id,
+    review.comment,
+    review.grade,
+    review.status,
+    review.sep_id
+  );
+};
+
 export const createTechnicalReviewObject = (
   technicalReview: TechnicalReviewRecord
 ) => {
@@ -783,9 +797,11 @@ export const createBasicUserObject = (user: UserRecord) => {
     user.lastname,
     user.preferredname,
     user.institution,
+    user.organisation,
     user.position,
     user.created_at,
-    user.placeholder
+    user.placeholder,
+    user.email
   );
 };
 
@@ -830,7 +846,8 @@ export const createCallObject = (call: CallRecord) => {
     call.esi_template_id,
     call.allocation_time_unit,
     call.title,
-    call.description
+    call.description,
+    call.is_active
   );
 };
 

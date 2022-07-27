@@ -1,12 +1,12 @@
-import faker from 'faker';
-import { DateTime } from 'luxon';
-
+import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
+
 import initialDBData from '../support/initialDBData';
 
 context('Proposal tests', () => {
@@ -472,7 +472,7 @@ context('Proposal tests', () => {
       cy.contains(newProposalTitle).should('not.exist');
     });
 
-    it('User should not be able to create and submit proposal with inactive call', () => {
+    it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
       cy.login('user');
       cy.visit('/');

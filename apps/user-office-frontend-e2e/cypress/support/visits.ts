@@ -1,4 +1,5 @@
-import { CreateVisitMutationVariables } from '../../src/generated/sdk';
+import { CreateVisitMutationVariables } from '@user-office-software-libs/shared-types';
+
 import { getE2EApi } from './utils';
 
 const createVisit = (createVisitInput: CreateVisitMutationVariables) => {

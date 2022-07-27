@@ -297,6 +297,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             firstname: selectedItem.firstname,
             lastname: selectedItem.lastname,
             organisation: selectedItem.organisation,
+            organizationId: selectedItem.organizationId,
           })) as BasicUserDetails[]),
         ]);
       }
@@ -317,6 +318,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
               firstname: selectedItem.firstname,
               lastname: selectedItem.lastname,
               organisation: selectedItem.organisation,
+              organizationId: selectedItem.organizationId,
             },
           ] as BasicUserDetails[])
         : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
@@ -527,7 +529,6 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
               onClick={() => {
                 if (props.onUpdate) {
                   props.onUpdate(selectedParticipants);
-                  setSelectedParticipants([]);
                 }
               }}
               disabled={selectedParticipants.length === 0}

@@ -4,7 +4,7 @@ name: E2E and build testing.
 # events but only for the develop and master branches
 on:
   pull_request:
-    branches: [main]
+    branches: [develop]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -51,28 +51,136 @@ jobs:
         run: |
           echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
 
+  install-and-cache:
+    name: Run install and cache
+    needs: resolve_dep
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache node_modules
+        id: cached-node-modules-root
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install root dependencies
+        if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Cache backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-backend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+
+      - name: Install backend dependencies
+        if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
+        run: npm run install:backend
+
+      - name: Cache frontend node_modules
+        id: cached-node-modules-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+
+      - name: Install frontend dependencies
+        if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
+        run: npm run install:frontend
+
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    needs: resolve_dep
+    needs: [resolve_dep, install-and-cache]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Cache node_modules
-        id: cached-modules
-        uses: actions/cache@v2
-        env:
-          cache-name: node-modules-cache
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore node_modules
+        id: cached-node-modules-root
+        uses: actions/cache@v3
         with:
           path: node_modules
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Restore backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-backend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+
+      - name: Restore frontend node_modules
+        id: cached-node-modules-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+
+      - run: npm run build
+        env:
+          NODE_ENV: development
+          secret: ${{secrets.secret}}
+          tokenLife: 7d
+          SPARKPOST_TOKEN: wrong_token_for_test
+
+  test_backend:
+    runs-on: ubuntu-latest
+    needs: [resolve_dep, install-and-cache]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-backend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+
+      - name: Run backend unit tests
+        env:
+          TZ: Europe/Stockholm
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          DEPENDENCY_CONFIG: e2e
+          secret: dummysecret
+          NODE_ENV: development
+          tokenLife: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run test:backend
   e2e:
     runs-on: ubuntu-latest
-    needs: [resolve_dep, build]
+    needs: [resolve_dep, install-and-cache]
 
     strategy:
       fail-fast: false
@@ -80,58 +188,60 @@ jobs:
         pattern:
           [
             'cypress/integration/[a-e]*.ts',
-            'cypress/integration/[f-g]*.ts',
-            'cypress/integration/[h-i]*.ts',
-            'cypress/integration/[j-n]*.ts',
-            'cypress/integration/[m-p]*.ts',
+            'cypress/integration/[f-i]*.ts',
+            'cypress/integration/[j-p]*.ts',
             'cypress/integration/[r-s]*.ts',
-            'cypress/integration/[t-t]*.ts',
-            'cypress/integration/[u-z]*.ts',
+            'cypress/integration/[t-z]*.ts',
             'cypress/integration/[A-Z]*.ts',
           ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      # Caching should be reviewed and set up better
-      # - name: Cache frontend node_modules
-      #   id: frontend-cached-modules
-      #   uses: actions/cache@v2
-      #   env:
-      #     cache-name: frontend-node-modules-cache
-      #   with:
-      #     path: apps/user-office-frontend/node_modules
-      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-${{ env.cache-name }}-
-
-      # - name: Cache backend node_modules
-      #   id: backend-cached-modules
-      #   uses: actions/cache@v2
-      #   env:
-      #     cache-name: backend-node-modules-cache
-      #   with:
-      #     path: apps/user-office-backend/node_modules
-      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-${{ env.cache-name }}-
-
-      - name: Install root dependencies
-        run: |
-          npm install
-          npm run install:all
-
-      # Caching should be reviewed and set up better
-      # - name: Install all dependencies
-      #   if: ${{ (steps.frontend-cached-modules.outputs.cache-hit != 'true') && (steps.backend-cached-modules.outputs.cache-hit != 'true') }}
-      #   run: npm run install:all
-
-      - name: Login to GitHub Packages Docker Registry
-        uses: docker/login-action@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          registry: docker.pkg.github.com
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore node_modules
+        id: cached-node-modules-root
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Restore backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-backend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+
+      - name: Restore frontend node_modules
+        id: cached-node-modules-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/node_modules
+          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+
+      # TODO: See how to proceed with e2e caching because there is some error:
+      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
+      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
+      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
+      # - name: Cache e2e node_modules
+      #   env:
+      #     CYPRESS_CACHE_FOLDER: cache/Cypress
+      #   id: cached-node-modules-e2e
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: apps/user-office-frontend-e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}
+
+      - name: Install e2e dependencies
+        env:
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+        if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
+        run: npm run install:e2e
 
       - name: Download required repositories
         run: |
@@ -148,7 +258,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-          DEPENDENCY_CONFIG: ess
+          DEPENDENCY_CONFIG: e2e
           secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
           baseURL: localhost:3000
@@ -161,6 +271,13 @@ jobs:
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
           BUILD_TAG: ${{ github.sha }}
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+          EAM_AUTH_URL: https://ios.esss.lu.se
+          EAM_AUTH_SECRET: dummyEAMsecret
+          EAM_AUTH_USER: dummyAuthUser
+          EAM_AUTH_PASS: dummyAuthPass
+          EAM_API_URL: https://ios.esss.lu.se:7443
+          EAM_PART_CODE: 12413
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
@@ -179,36 +296,35 @@ jobs:
     needs: e2e
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Load app cache
-        id: cached-image
-        uses: actions/cache@v2
-        with:
-          path: |
-            /tmp/.buildx-layer-cache
-            /tmp/.buildx-image-cache
-          key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
-
-      - name: Fail on cache miss
-        if: steps.cached-image.outputs.cache-hit != 'true'
-        run: |
-          echo "No cache hit!"
-          exit 1
+      # TODO: Maybe it is a good idea to use some caching mechanism here for building docker images.
+      - uses: actions/checkout@v3
 
       # For debugging capture the selected branch
       - name: Branch
         run: echo "Branch ${{ github.head_ref }}"
 
-      - name: Load cached app image
-        run: |
-          docker load --input /tmp/.buildx-image-cache/img.tar
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push
+      - name: Build and push backend
+        env:
+          BUILD_VERSION: ${{ github.sha }}
         run: |
-          docker tag user-office-core-monorepo:${{ github.sha }} dmsc/user-office-core-monorepo:${{ github.head_ref }}
-          docker push dmsc/user-office-core-monorepo:${{ github.head_ref }}
+          cd ./apps/user-office-backend
+          docker build -t user-office-backend:${{ github.sha }} .
+          docker tag user-office-backend:${{ github.sha }} ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
+          docker push ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
+
+      - name: Build and push frontend
+        env:
+          BUILD_VERSION: ${{ github.sha }}
+          ORCID_REDIRECT: ${{ secrets.REACT_APP_ORCID_REDIRECT }}
+        run: |
+          cd ./apps/user-office-frontend
+          docker build -t user-office-frontend:${{ github.sha }} .
+          docker tag user-office-frontend:${{ github.sha }} ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}
+          docker push ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}

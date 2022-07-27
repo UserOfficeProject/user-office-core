@@ -87,8 +87,10 @@ export class BasicUserDetails {
     public lastname: string,
     public preferredname: string,
     public organisation: string,
+    public organizationId: number,
     public position: string,
     public created: Date,
-    public placeholder: boolean
+    public placeholder: boolean,
+    public email: string
   ) {}
 }

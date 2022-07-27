@@ -4,7 +4,7 @@ import {
   FeatureId,
   Settings,
   SettingsId,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
 
 // NOTE: Instruments, proposal and scheduled events are seeded only if resetDB(true).
 export default {

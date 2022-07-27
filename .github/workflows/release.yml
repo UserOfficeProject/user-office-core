@@ -9,16 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract tag name
         id: extract_tag
@@ -30,13 +28,21 @@ jobs:
           # set output variable accessible in the action
           echo ::set-output name=TAG_NAME::${TAG_NAME}
 
-        # Build and push release image tagged with the same tag as github release
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          build-args: |
-            BUILD_VERSION=${{ github.sha }}
-            ORCID_REDIRECT=${{ secrets.REACT_APP_ORCID_REDIRECT }}
-          push: true
-          tags: dmsc/duo-frontend:${{ steps.extract_tag.outputs.TAG_NAME }}
+      - name: Build and push backend
+        env:
+          BUILD_VERSION: ${{ github.sha }}
+        run: |
+          cd ./apps/user-office-backend
+          docker build -t user-office-backend:${{ github.sha }} .
+          docker tag user-office-backend:${{ github.sha }} ghcr.io/userofficeproject/user-office-backend:${{ steps.extract_tag.outputs.TAG_NAME }}
+          docker push ghcr.io/userofficeproject/user-office-backend:${{ steps.extract_tag.outputs.TAG_NAME }}
+
+      - name: Build and push frontend
+        env:
+          BUILD_VERSION: ${{ github.sha }}
+          ORCID_REDIRECT: ${{ secrets.REACT_APP_ORCID_REDIRECT }}
+        run: |
+          cd ./apps/user-office-frontend
+          docker build -t user-office-frontend:${{ github.sha }} .
+          docker tag user-office-frontend:${{ github.sha }} ghcr.io/userofficeproject/user-office-frontend:${{ steps.extract_tag.outputs.TAG_NAME }}
+          docker push ghcr.io/userofficeproject/user-office-frontend:${{ steps.extract_tag.outputs.TAG_NAME }}

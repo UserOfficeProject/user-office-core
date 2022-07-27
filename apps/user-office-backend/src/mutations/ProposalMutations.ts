@@ -67,7 +67,7 @@ export default class ProposalMutations {
     { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    if (!(await this.callDataSource.checkActiveCall(callId))) {
+    if (await this.callDataSource.isCallEnded(callId)) {
       return rejection('Call is not active', { callId, agent });
     }
 
@@ -216,10 +216,8 @@ export default class ProposalMutations {
     }
 
     // Check if there is an open call
-    const hasActiveCall = await this.callDataSource.checkActiveCall(
-      proposal.callId
-    );
-    if (!isUserOfficer && !hasActiveCall) {
+    const isCallEnded = await this.callDataSource.isCallEnded(proposal.callId);
+    if (!isUserOfficer && isCallEnded) {
       return rejection('Can not submit proposal because call is not active', {
         agent,
         proposalPk,
@@ -501,7 +499,7 @@ export default class ProposalMutations {
     }
 
     // Check if there is an open call
-    if (!(await this.callDataSource.checkActiveCall(callId))) {
+    if (await this.callDataSource.isCallEnded(callId)) {
       return rejection(
         'Can not clone proposal because the call is not active',
         { callId, agent, sourceProposal }

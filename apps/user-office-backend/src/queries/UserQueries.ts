@@ -58,9 +58,11 @@ export default class UserQueries {
         user.lastname,
         user.preferredname,
         user.organisation,
+        user.organizationId,
         user.position,
         user.created,
-        user.placeholder
+        user.placeholder,
+        user.email
       );
     } else {
       return null;
@@ -84,9 +86,11 @@ export default class UserQueries {
       user.lastname,
       user.preferredname,
       user.organisation,
+      user.organizationId,
       user.position,
       user.created,
-      user.placeholder
+      user.placeholder,
+      user.email
     );
   }
 

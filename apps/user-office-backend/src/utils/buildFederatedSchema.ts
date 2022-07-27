@@ -13,6 +13,7 @@ import {
 import { ResolverContext } from '../context';
 import rejectionLogger from '../middlewares/rejectionLogger';
 import rejectionSanitizer from '../middlewares/rejectionSanitizer';
+import { customAuthChecker } from './custom-auth-checker';
 
 export async function buildFederatedSchema(
   options: Omit<BuildSchemaOptions, 'skipCheck'>,
@@ -26,6 +27,8 @@ export async function buildFederatedSchema(
       ...(options.directives || []),
     ],
     skipCheck: true,
+    authChecker: customAuthChecker,
+    authMode: 'null',
   });
 
   let federatedSchema = buildSubgraphSchema({

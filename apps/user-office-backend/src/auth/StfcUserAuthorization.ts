@@ -14,6 +14,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Instrument } from '../models/Instrument';
 import { User } from '../models/User';
+import { LRUCache } from '../utils/LRUCache';
 import { UserAuthorization } from './UserAuthorization';
 
 const client = UOWSSoapClient.getInstance();
@@ -31,6 +32,14 @@ const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
 
 @injectable()
 export class StfcUserAuthorization extends UserAuthorization {
+  private static readonly tokenCacheMaxElements = 200;
+  private static readonly tokenCacheSecondsToLive = 300; // 5 minutes
+
+  private uowsTokenCache = new LRUCache<boolean>(
+    StfcUserAuthorization.tokenCacheMaxElements,
+    StfcUserAuthorization.tokenCacheSecondsToLive
+  ).enableStatsLogging('uowsTokenCache');
+
   constructor(
     @inject(Tokens.UserDataSource) protected userDataSource: UserDataSource,
     @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
@@ -155,7 +164,7 @@ export class StfcUserAuthorization extends UserAuthorization {
   async externalTokenLogin(token: string): Promise<User | null> {
     const stfcUser: StfcBasicPersonDetails | null = await client
       .getPersonDetailsFromSessionId(token)
-      .then((rawStfcUser) => rawStfcUser.return)
+      .then((rawStfcUser) => rawStfcUser?.return)
       .catch((error) => {
         const rethrowMessage =
           'Failed to fetch user details for STFC external authentication';
@@ -201,7 +210,7 @@ export class StfcUserAuthorization extends UserAuthorization {
       // The UOWS sometimes returns duplicate roles. We remove them here
       const uniqueRoles = stfcRoles.filter(
         (role, index) =>
-          stfcRoles.findIndex((r) => r.name == role.name) !== index
+          stfcRoles.findIndex((r) => r.name == role.name) === index
       );
       const requiredInstruments =
         this.getRequiredInstrumentForRole(uniqueRoles);
@@ -218,6 +227,8 @@ export class StfcUserAuthorization extends UserAuthorization {
   }
 
   async logout(token: string): Promise<void> {
+    this.uowsTokenCache.remove(token);
+
     await client.logout(token).catch(() => {
       logger.logWarn('Failed to log out user', { token });
       throw new Error(`Failed to logout ${token}`);
@@ -227,8 +238,17 @@ export class StfcUserAuthorization extends UserAuthorization {
   }
 
   async isExternalTokenValid(token: string): Promise<boolean> {
-    const result = await client.isTokenValid(token);
+    const cachedValidity = this.uowsTokenCache.get(token);
+    if (cachedValidity) {
+      return cachedValidity;
+    }
 
-    return result.return;
+    const isValid: boolean = (await client.isTokenValid(token))?.return;
+    // Only cache valid tokens to avoid locking out users for a long time
+    if (isValid) {
+      this.uowsTokenCache.put(token, true);
+    }
+
+    return isValid;
   }
 }

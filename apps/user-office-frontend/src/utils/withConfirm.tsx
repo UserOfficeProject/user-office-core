@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import makeStyles from '@mui/styles/makeStyles';
-import React, { useCallback, useState } from 'react';
+import React, { ReactElement, useCallback, useState } from 'react';
 
 import { FunctionType } from './utilTypes';
 
@@ -15,7 +15,8 @@ const defaultOptions = {
   description: '',
   confirmationText: 'OK',
   cancellationText: 'Cancel',
-  alertText: '',
+  alertText: null,
+  shouldEnableOKWithAlert: false,
   dialogProps: {},
   onClose: (): void => {},
   onCancel: (): void => {},
@@ -31,7 +32,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
   return function WithConfirmComponent(props: Omit<T, 'confirm'>): JSX.Element {
     const classes = useStyles();
     const [onConfirm, setOnConfirm] = useState<FunctionType | null>(null);
-    const [options, setOptions] = useState(defaultOptions);
+    const [options, setOptions] = useState<Options>(defaultOptions);
     const {
       title,
       description,
@@ -39,15 +40,16 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
       cancellationText,
       dialogProps,
       alertText,
+      shouldEnableOKWithAlert,
       onClose,
       onCancel,
     } = options;
     const handleClose = useCallback(() => {
-      onClose();
+      onClose?.();
       setOnConfirm(null);
     }, [onClose]);
     const handleCancel = useCallback(() => {
-      onCancel();
+      onCancel?.();
       handleClose();
     }, [onCancel, handleClose]);
     const handleConfirm = useCallback(
@@ -63,7 +65,11 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
     const confirm = useCallback(
       (onConfirm, options: Options) => (): void => {
         setOnConfirm(() => onConfirm);
-        setOptions({ ...defaultOptions, ...options });
+
+        setOptions({
+          ...defaultOptions,
+          ...options,
+        });
       },
       []
     );
@@ -100,7 +106,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
               onClick={handleConfirm}
               data-cy="confirm-ok"
               variant="text"
-              disabled={!!alertText}
+              disabled={!shouldEnableOKWithAlert && !!alertText}
             >
               {confirmationText}
             </Button>
@@ -116,7 +122,8 @@ interface Options {
   description: string;
   confirmationText?: string;
   cancellationText?: string;
-  alertText?: string;
+  shouldEnableOKWithAlert?: boolean;
+  alertText?: ReactElement | string | null;
   dialogProps?: Record<string, unknown>;
   onClose?: FunctionType;
   onCancel?: FunctionType;

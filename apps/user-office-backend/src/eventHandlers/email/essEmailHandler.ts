@@ -2,6 +2,8 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import { SEPDataSource } from '../../datasources/SEPDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -12,6 +14,10 @@ import { MailService } from '../MailService/MailService';
 
 export async function essEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+  const sepDataSource = container.resolve<SEPDataSource>(Tokens.SEPDataSource);
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -237,6 +243,57 @@ export async function essEmailHandler(event: ApplicationEvent) {
         })
         .catch((err: string) => {
           logger.logError('Could not send email on proposal notify:', {
+            error: err,
+            event,
+          });
+        });
+
+      return;
+    }
+    case Event.SEP_REVIEWER_NOTIFIED: {
+      const { id: reviewId, userID, proposalPk } = event.sepReview;
+      const sepReviewer = await userDataSource.getUser(userID);
+      const proposal = await proposalDataSource.get(proposalPk);
+
+      if (!sepReviewer || !proposal) {
+        return;
+      }
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: 'review-reminder',
+          },
+          substitution_data: {
+            sepReviewerPreferredName: sepReviewer.preferredname,
+            sepReviewerLastName: sepReviewer.lastname,
+            proposalNumber: proposal.proposalId,
+            proposalTitle: proposal.title,
+            commentForUser: proposal.commentForUser,
+          },
+          recipients: [
+            { address: sepReviewer.email },
+            {
+              address: {
+                email: 'useroffice@esss.se',
+                header_to: sepReviewer.email,
+              },
+            },
+          ],
+        })
+        .then(async (res: any) => {
+          await sepDataSource.setSEPReviewNotificationEmailSent(
+            reviewId,
+            userID,
+            proposalPk
+          );
+          logger.logInfo('Email sent on SEP reviewer notify:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on SEP reviewer notify:', {
             error: err,
             event,
           });

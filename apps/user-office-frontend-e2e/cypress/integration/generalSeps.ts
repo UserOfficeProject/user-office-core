@@ -1,6 +1,6 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
+import { UserRole } from '@user-office-software-libs/shared-types';
 
-import { UserRole } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 function searchMuiTableAsync(search: string) {

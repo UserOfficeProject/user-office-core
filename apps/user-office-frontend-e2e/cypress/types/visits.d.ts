@@ -1,4 +1,4 @@
-import { CreateVisitMutationVariables } from '../../src/generated/sdk';
+import { CreateVisitMutationVariables } from '@user-office-software-libs/shared-types';
 
 declare global {
   namespace Cypress {

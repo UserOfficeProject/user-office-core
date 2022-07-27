@@ -5,7 +5,12 @@ import {
 } from '@user-office-software/duo-localisation';
 
 import { SortDirectionType } from 'components/common/SuperMaterialTable';
-import { Proposal, ProposalEndStatus, ProposalStatus } from 'generated/sdk';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalStatus,
+  Scalars,
+} from 'generated/sdk';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 
 import {
@@ -119,4 +124,15 @@ export const removeColumns = <T extends object>(
       columns.splice(columnIndex, 1);
     }
   });
+};
+
+export const isCallEnded = (
+  startDate: Scalars['DateTime'],
+  endDate: Scalars['DateTime']
+) => {
+  const now = new Date();
+  const startCall = new Date(startDate);
+  const endCall = new Date(endDate);
+
+  return startCall >= now || endCall <= now;
 };

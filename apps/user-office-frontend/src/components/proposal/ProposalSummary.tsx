@@ -11,8 +11,9 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { isCallEnded } from 'utils/helperFunctions';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
@@ -30,9 +31,13 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isCallActive = state.proposal?.call?.isActive ?? true;
+
+  const callHasEnded = isCallEnded(
+    state.proposal.call?.startCall,
+    state.proposal.call?.endCall
+  );
 
   const [loadingSubmitMessage, setLoadingSubmitMessage] =
     useState<boolean>(true);
@@ -50,7 +55,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     proposal.questionary.steps.every((step) => step.isCompleted);
 
   const submitDisabled =
-    (!isUserOfficer && !isCallActive) || // disallow submit for non user officers if the call ended
+    (!isUserOfficer && callHasEnded) || // disallow submit for non user officers if the call ended
     !allStepsComplete ||
     proposal.submitted;
 
@@ -126,7 +131,9 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             confirm(
               async () => {
                 setIsSubmitting(true);
-                const result = await api().submitProposal({
+                const result = await api({
+                  toastSuccessMessage: 'Proposal submitted successfully',
+                }).submitProposal({
                   proposalPk: state.proposal.primaryKey,
                 });
                 if (!result.submitProposal.proposal) {
