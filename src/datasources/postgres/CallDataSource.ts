@@ -65,6 +65,12 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_review_ended', false);
     }
 
+    if (filter?.sepIds?.length) {
+      query
+        .leftJoin('call_has_seps as chs', 'chs.call_id', 'call.call_id')
+        .whereIn('chs.sep_id', filter.sepIds);
+    }
+
     if (filter?.isSEPReviewEnded === true) {
       query.where('call_sep_review_ended', true);
     } else if (filter?.isSEPReviewEnded === false) {
@@ -181,7 +187,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         }
 
         // NOTE: Attach SEPs to a call if they are provided.
-        if (args.id && args.seps?.length) {
+        if (args.id && args.seps !== undefined) {
           const valuesToInsert = args.seps.map((sepId) => ({
             sep_id: sepId,
             call_id: args.id,
@@ -192,10 +198,12 @@ export default class PostgresCallDataSource implements CallDataSource {
             .where('call_id', args.id)
             .transacting(trx);
 
-          await database
-            .insert(valuesToInsert)
-            .into('call_has_seps')
-            .transacting(trx);
+          if (valuesToInsert.length) {
+            await database
+              .insert(valuesToInsert)
+              .into('call_has_seps')
+              .transacting(trx);
+          }
         }
 
         const callUpdate = await database
