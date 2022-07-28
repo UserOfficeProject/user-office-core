@@ -20,6 +20,7 @@ mutation createCall(
   $esiTemplateId: Int
   $title: String
   $description: String
+  $seps: [Int!]
 ) {
   createCall(
     createCallInput: {
@@ -44,6 +45,7 @@ mutation createCall(
       esiTemplateId: $esiTemplateId
       title: $title
       description: $description
+      seps: $seps
     }
   ) {
     rejection {

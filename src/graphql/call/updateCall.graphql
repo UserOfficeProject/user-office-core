@@ -21,6 +21,7 @@ mutation updateCall(
   $esiTemplateId: Int
   $title: String
   $description: String
+  $seps: [Int!]
 ) {
   updateCall(
     updateCallInput: {
@@ -46,6 +47,7 @@ mutation updateCall(
       esiTemplateId: $esiTemplateId
       title: $title
       description: $description
+      seps: $seps
     }
   ) {
     rejection {
