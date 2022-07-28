@@ -32,8 +32,6 @@ import {
   ReviewerFilter,
   SubmitTechnicalReviewInput,
   SettingsId,
-  Scalars,
-  Maybe,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -115,12 +113,10 @@ const SEPReviewColumns = [
   { title: 'SEP', field: 'sepCode', emptyValue: '-', hidden: true },
 ];
 
-const proposalStatusFilter = new Map<Maybe<string> | undefined, Scalars['Int']>(
-  [
-    ['ALL', 0],
-    ['FEASIBILITY_REVIEW', 2],
-  ]
-);
+const proposalStatusFilter: Record<string, number> = {
+  ALL: 0,
+  FEASIBILITY_REVIEW: 2,
+};
 
 const ProposalTableInstrumentScientist: React.FC<{
   confirm: WithConfirmType;
@@ -129,11 +125,11 @@ const ProposalTableInstrumentScientist: React.FC<{
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
   const { settingsMap } = useContext(SettingsContext);
-  const statusFilterValue = settingsMap.get(
-    SettingsId.DEFAULT_INST_SCI_STATUS_FILTER
-  )?.settingsValue;
-  let statusFilter = proposalStatusFilter.get(statusFilterValue);
-  if (!statusFilter && statusFilter != 0) {
+  const statusFilterValue =
+    settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)?.settingsValue ||
+    2;
+  let statusFilter = proposalStatusFilter[statusFilterValue];
+  if (statusFilter === undefined || statusFilter === null) {
     statusFilter = 2;
   }
   const reviewFilterValue = settingsMap.get(
