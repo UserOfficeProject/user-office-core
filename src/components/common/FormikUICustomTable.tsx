@@ -11,7 +11,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useRef } from 'react';
 
-import { isObjectsEqual } from 'utils/helperFunctions';
+import { deepEqual } from 'utils/json';
 import { FunctionType } from 'utils/utilTypes';
 
 import { ActionButtonContainer } from './ActionButtonContainer';
@@ -36,7 +36,7 @@ function getElementIndex(
     }
   });
 
-  return elements.findIndex((value) => isObjectsEqual(value, newElement));
+  return elements.findIndex((value) => deepEqual(value, newElement));
 }
 
 function move(
