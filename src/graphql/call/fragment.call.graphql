@@ -29,6 +29,10 @@ fragment call on Call {
       ...basicUserDetails
     }
   }
+  seps {
+    id
+    code
+  }
   proposalWorkflow {
     id
     name
