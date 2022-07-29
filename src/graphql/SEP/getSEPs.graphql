@@ -1,5 +1,5 @@
-query getSEPs($filter: String!, $active: Boolean) {
-  seps(filter: $filter, active: $active) {
+query getSEPs($filter: SEPsFilter) {
+  seps(filter: $filter) {
     seps {
       ...sep
     }

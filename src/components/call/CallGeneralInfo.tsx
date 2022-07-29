@@ -148,7 +148,7 @@ const CallGeneralInfo: React.FC<{
     <>
       <Field
         name="shortCode"
-        label="Short Code"
+        label="Short Code (public)"
         id="short-code-input"
         type="text"
         component={TextField}

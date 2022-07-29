@@ -18,7 +18,7 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   data: sepData,
   onSEPUpdate,
 }) => {
-  const { loadingCalls, calls } = useCallsData();
+  const { loadingCalls, calls } = useCallsData({ sepIds: [sepData.id] });
   // NOTE: Default null means load all calls if nothing is selected
   const [query] = useQueryParams({
     call: withDefault(NumberParam, null),

@@ -3,11 +3,17 @@ import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Sep, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useSEPsData(
-  filter: string,
-  active: boolean | undefined,
-  role = UserRole.SEP_REVIEWER
-): {
+export function useSEPsData({
+  filter,
+  active,
+  role = UserRole.SEP_REVIEWER,
+  callIds,
+}: {
+  filter: string;
+  active?: boolean;
+  role?: UserRole;
+  callIds?: number[];
+}): {
   loadingSEPs: boolean;
   SEPs: Sep[];
   setSEPsWithLoading: Dispatch<SetStateAction<Sep[]>>;
@@ -30,8 +36,11 @@ export function useSEPsData(
     if (role === UserRole.USER_OFFICER) {
       api()
         .getSEPs({
-          filter,
-          active,
+          filter: {
+            filter,
+            active,
+            callIds,
+          },
         })
         .then((data) => {
           if (unmounted) {
@@ -73,7 +82,7 @@ export function useSEPsData(
     return () => {
       unmounted = true;
     };
-  }, [filter, active, api, role]);
+  }, [filter, active, api, role, callIds]);
 
   return { loadingSEPs, SEPs, setSEPsWithLoading };
 }
