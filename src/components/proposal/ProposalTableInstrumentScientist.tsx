@@ -132,10 +132,10 @@ const ProposalTableInstrumentScientist: React.FC<{
   if (statusFilter === undefined || statusFilter === null) {
     statusFilter = 2;
   }
-  const reviewFilterValue = settingsMap.get(
-    SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER
-  )?.settingsValue;
-  let reviewerFilter = reviewFilter.get(reviewFilterValue);
+  const reviewFilterValue =
+    settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
+      ?.settingsValue || 'ME';
+  let reviewerFilter = reviewFilter[reviewFilterValue];
   if (!reviewerFilter) {
     reviewerFilter = ReviewerFilter.ME;
   }

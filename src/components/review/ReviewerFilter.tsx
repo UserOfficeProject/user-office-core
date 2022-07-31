@@ -7,7 +7,7 @@ import React, { useContext } from 'react';
 import { StringParam, useQueryParams, withDefault } from 'use-query-params';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { Maybe, ReviewerFilter, SettingsId } from 'generated/sdk';
+import { ReviewerFilter, SettingsId } from 'generated/sdk';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -21,20 +21,20 @@ type ReviewerFilterComponentProps = {
   onChange?: (reviewer: ReviewerFilter) => void;
 };
 
-export const reviewFilter = new Map<Maybe<string> | undefined, ReviewerFilter>([
-  ['ALL', ReviewerFilter.ALL],
-  ['ME', ReviewerFilter.ME],
-]);
+export const reviewFilter: Record<string, ReviewerFilter> = {
+  ALL: ReviewerFilter.ALL,
+  ME: ReviewerFilter.ME,
+};
 
 const ReviewerFilterComponent: React.FC<ReviewerFilterComponentProps> = ({
   reviewer,
   onChange,
 }) => {
   const { settingsMap } = useContext(SettingsContext);
-  const reviewFilterValue = settingsMap.get(
-    SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER
-  )?.settingsValue;
-  let reviewerFilter = reviewFilter.get(reviewFilterValue);
+  const reviewFilterValue =
+    settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
+      ?.settingsValue || 'ME';
+  let reviewerFilter = reviewFilter[reviewFilterValue];
   if (!reviewerFilter) {
     reviewerFilter = ReviewerFilter.ME;
   }
