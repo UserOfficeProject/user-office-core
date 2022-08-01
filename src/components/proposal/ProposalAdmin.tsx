@@ -10,7 +10,8 @@ import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
 import { Prompt } from 'react-router';
 
-import { ProposalEndStatus } from 'generated/sdk';
+import { useCheckAccess } from 'components/common/Can';
+import { ProposalEndStatus, UserRole } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -35,6 +36,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
   setAdministration,
 }) => {
   const { api } = useDataApiWithFeedback();
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const initialValues = {
     proposalPk: data.primaryKey,
@@ -114,7 +116,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                     name="finalStatus"
                     component={Select}
                     data-cy="proposal-final-status"
-                    disabled={isSubmitting}
+                    disabled={!isUserOfficer || isSubmitting}
                     MenuProps={{ 'data-cy': 'proposal-final-status-options' }}
                     required
                   >
@@ -136,7 +138,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   fullWidth
                   autoComplete="off"
                   data-cy="managementTimeAllocation"
-                  disabled={isSubmitting}
+                  disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -151,7 +153,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   data-cy="commentForUser"
                   multiline
                   rows="4"
-                  disabled={isSubmitting}
+                  disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -166,7 +168,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   data-cy="commentForManagement"
                   multiline
                   rows="4"
-                  disabled={isSubmitting}
+                  disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -180,11 +182,13 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                       label: 'Submitted',
                     }}
                     data-cy="is-management-decision-submitted"
+                    disabled={!isUserOfficer || isSubmitting}
                   />
+
                   <Button
-                    disabled={isSubmitting}
                     type="submit"
                     data-cy="save-admin-decision"
+                    disabled={!isUserOfficer || isSubmitting}
                   >
                     Save
                   </Button>
