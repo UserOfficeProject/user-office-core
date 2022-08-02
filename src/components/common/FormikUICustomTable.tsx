@@ -11,30 +11,58 @@ import makeStyles from '@mui/styles/makeStyles';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useRef } from 'react';
 
-import { clamp } from 'utils/Math';
+import { deepEqual } from 'utils/json';
 import { FunctionType } from 'utils/utilTypes';
 
 import { ActionButtonContainer } from './ActionButtonContainer';
 
-function move(
-  array: Record<string, unknown>[],
-  element: Record<string, unknown>,
-  direction: 'UP' | 'DOWN'
-) {
-  const currentIndex = array.indexOf(element);
-  const delta = direction === 'DOWN' ? 1 : -1;
-  const newIndex = clamp(currentIndex + delta, 0, array.length - 1);
-  if (currentIndex !== newIndex) {
-    const newArray = [...array];
-    newArray.splice(currentIndex, 1);
-    newArray.splice(newIndex, 0, element);
-
-    return newArray;
-  }
-
-  return array;
+enum Direction {
+  UP = -1,
+  DOWN = 1,
 }
 
+function getElementIndex(
+  elements: Record<string, unknown>[],
+  element: Record<string, unknown>
+): number {
+  if (!(elements && element)) {
+    return -1;
+  }
+  type Flatten<Type> = Type extends Array<infer Item> ? Item : Type;
+  const newElement = {} as Flatten<typeof elements>;
+  Object.entries(element as typeof newElement).forEach(([key, value]) => {
+    if (Object.getOwnPropertyNames(elements[0]).includes(key)) {
+      newElement[key as keyof typeof newElement] = value;
+    }
+  });
+
+  return elements.findIndex((value) => deepEqual(value, newElement));
+}
+
+function move(
+  elements: Record<string, unknown>[],
+  elementIndex: number,
+  direction: Direction
+) {
+  if (elements !== null && elementIndex > -1) {
+    const elementRows = [...elements];
+    const rowIndex = elementIndex;
+    const elementRowsCount = elements.length - 1;
+    const swapLock =
+      (rowIndex === elementRowsCount && direction === Direction.DOWN) ||
+      (rowIndex === 0 && direction === Direction.UP);
+    if (!swapLock) {
+      [elementRows[elementIndex], elementRows[elementIndex + direction]] = [
+        elementRows[elementIndex + direction],
+        elementRows[elementIndex],
+      ];
+
+      return [...elementRows];
+    }
+  }
+
+  return elements;
+}
 const useStyles = makeStyles((theme) => ({
   StyledButtonContainer: {
     marginTop: theme.spacing(1),
@@ -107,20 +135,28 @@ export const FormikUICustomTable = ({
         actions={[
           (rowData) => ({
             icon: ArrowUpwardIcon,
-            disabled: state.indexOf(rowData) === 0,
+            disabled: getElementIndex(state, rowData) === 0,
             tooltip: 'Up',
             onClick: (event, rowData): void =>
               handleChange(
-                move(state, rowData as Record<string, unknown>, 'UP')
+                move(
+                  state,
+                  getElementIndex(state, rowData as Record<string, unknown>),
+                  Direction.UP
+                )
               ),
           }),
           (rowData) => ({
             icon: ArrowDownwardIcon,
-            disabled: state.indexOf(rowData) === state.length - 1,
+            disabled: getElementIndex(state, rowData) === state.length - 1,
             tooltip: 'Down',
             onClick: (event, rowData): void =>
               handleChange(
-                move(state, rowData as Record<string, unknown>, 'DOWN')
+                move(
+                  state,
+                  getElementIndex(state, rowData as Record<string, unknown>),
+                  Direction.DOWN
+                )
               ),
           }),
         ]}

@@ -531,8 +531,41 @@ context('Template tests', () => {
         .click();
 
       cy.get('[index=0]').contains(multipleChoiceQuestion.answers[1]);
+      cy.get('[index=1]').contains(multipleChoiceQuestion.answers[0]);
 
       cy.contains(multipleChoiceQuestion.answers[1])
+        .parent()
+        .find('[aria-label=Down]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[0])
+        .parent()
+        .find('[aria-label=Up]')
+        .find('[type=button]')
+        .should('be.disabled');
+
+      cy.contains(multipleChoiceQuestion.answers[0])
+        .parent()
+        .find('[aria-label=Down]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[0])
+        .parent()
+        .find('[aria-label=Up]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[2])
+        .parent()
+        .find('[aria-label=Down]')
+        .find('[type=button]')
+        .should('be.disabled');
+
+      cy.contains(multipleChoiceQuestion.answers[2])
+        .parent()
+        .find('[aria-label=Up]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[2])
         .parent()
         .find('[aria-label=Down]')
         .click();
