@@ -572,6 +572,7 @@ export type InstitutionResponseWrap = {
 
 export type InstitutionsFilter = {
   isVerified?: InputMaybe<Scalars['Boolean']>;
+  name?: InputMaybe<Scalars['String']>;
 };
 
 export type Instrument = {
@@ -611,11 +612,6 @@ export type IntervalConfig = {
   small_label: Scalars['String'];
   tooltip: Scalars['String'];
   units: Array<Unit>;
-};
-
-export type LogoutTokenWrap = {
-  rejection: Maybe<Rejection>;
-  token: Maybe<Scalars['String']>;
 };
 
 export type MoveProposalWorkflowStatusInput = {
@@ -700,7 +696,7 @@ export type Mutation = {
   importTemplate: TemplateResponseWrap;
   importUnits: UnitsResponseWrap;
   login: TokenResponseWrap;
-  logout: LogoutTokenWrap;
+  logout: TokenResponseWrap;
   mergeInstitutions: InstitutionResponseWrap;
   moveProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   notifyProposal: ProposalResponseWrap;
@@ -1037,15 +1033,12 @@ export type MutationCreateUserArgs = {
   lastname: Scalars['String'];
   middlename?: InputMaybe<Scalars['String']>;
   nationality: Scalars['Int'];
-  orcid: Scalars['String'];
-  orcidHash: Scalars['String'];
   organisation: Scalars['Int'];
   organizationCountry?: InputMaybe<Scalars['Int']>;
   otherOrganisation?: InputMaybe<Scalars['String']>;
   password: Scalars['String'];
   position: Scalars['String'];
   preferredname?: InputMaybe<Scalars['String']>;
-  refreshToken: Scalars['String'];
   telephone: Scalars['String'];
   telephone_alt?: InputMaybe<Scalars['String']>;
   user_title?: InputMaybe<Scalars['String']>;
@@ -1581,14 +1574,12 @@ export type MutationUpdateUserArgs = {
   lastname?: InputMaybe<Scalars['String']>;
   middlename?: InputMaybe<Scalars['String']>;
   nationality?: InputMaybe<Scalars['Int']>;
-  orcid?: InputMaybe<Scalars['String']>;
   organisation?: InputMaybe<Scalars['Int']>;
   organizationCountry?: InputMaybe<Scalars['Int']>;
   otherOrganisation?: InputMaybe<Scalars['String']>;
   placeholder?: InputMaybe<Scalars['String']>;
   position?: InputMaybe<Scalars['String']>;
   preferredname?: InputMaybe<Scalars['String']>;
-  refreshToken?: InputMaybe<Scalars['String']>;
   roles?: InputMaybe<Array<Scalars['Int']>>;
   telephone?: InputMaybe<Scalars['String']>;
   telephone_alt?: InputMaybe<Scalars['String']>;
@@ -1655,15 +1646,6 @@ export enum NumberValueConstraint {
   ONLY_NEGATIVE = 'ONLY_NEGATIVE',
   ONLY_POSITIVE = 'ONLY_POSITIVE'
 }
-
-export type OrcIdInformation = {
-  firstname: Maybe<Scalars['String']>;
-  lastname: Maybe<Scalars['String']>;
-  orcid: Maybe<Scalars['String']>;
-  orcidHash: Maybe<Scalars['String']>;
-  refreshToken: Maybe<Scalars['String']>;
-  token: Maybe<Scalars['String']>;
-};
 
 export type Page = {
   content: Maybe<Scalars['String']>;
@@ -1981,7 +1963,6 @@ export type Query = {
   genericTemplate: Maybe<GenericTemplate>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
   getFields: Maybe<Fields>;
-  getOrcIDInformation: Maybe<OrcIdInformation>;
   getPageContent: Maybe<Scalars['String']>;
   institutions: Maybe<Array<Institution>>;
   instrument: Maybe<Instrument>;
@@ -2137,11 +2118,6 @@ export type QueryGenericTemplateArgs = {
 
 export type QueryGenericTemplatesArgs = {
   filter?: InputMaybe<GenericTemplatesFilter>;
-};
-
-
-export type QueryGetOrcIdInformationArgs = {
-  authorizationCode: Scalars['String'];
 };
 
 
@@ -2771,6 +2747,7 @@ export enum SettingsId {
   DATE_FORMAT = 'DATE_FORMAT',
   DATE_TIME_FORMAT = 'DATE_TIME_FORMAT',
   EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL',
+  EXTERNAL_AUTH_LOGOUT_URL = 'EXTERNAL_AUTH_LOGOUT_URL',
   FEEDBACK_EXHAUST_DAYS = 'FEEDBACK_EXHAUST_DAYS',
   FEEDBACK_FREQUENCY_DAYS = 'FEEDBACK_FREQUENCY_DAYS',
   FEEDBACK_MAX_REQUESTS = 'FEEDBACK_MAX_REQUESTS',
@@ -3151,13 +3128,14 @@ export type User = {
   lastname: Scalars['String'];
   middlename: Maybe<Scalars['String']>;
   nationality: Maybe<Scalars['Int']>;
-  orcid: Scalars['String'];
+  oidcAccessToken: Maybe<Scalars['String']>;
+  oidcRefreshToken: Maybe<Scalars['String']>;
+  oidcSub: Maybe<Scalars['String']>;
   organisation: Scalars['Int'];
   placeholder: Scalars['Boolean'];
   position: Scalars['String'];
   preferredname: Maybe<Scalars['String']>;
   proposals: Array<Proposal>;
-  refreshToken: Scalars['String'];
   reviews: Array<Review>;
   roles: Array<Role>;
   seps: Array<Sep>;
@@ -4785,9 +4763,6 @@ export type CreateUserMutationVariables = Exact<{
   lastname: Scalars['String'];
   password: Scalars['String'];
   preferredname?: InputMaybe<Scalars['String']>;
-  orcid: Scalars['String'];
-  orcidHash: Scalars['String'];
-  refreshToken: Scalars['String'];
   gender: Scalars['String'];
   nationality: Scalars['Int'];
   birthdate: Scalars['DateTime'];
@@ -4855,13 +4830,6 @@ export type GetMyRolesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetMyRolesQuery = { me: { firstname: string, lastname: string, roles: Array<{ id: number, shortCode: string, title: string }> } | null };
 
-export type GetOrcIdInformationQueryVariables = Exact<{
-  authorizationCode: Scalars['String'];
-}>;
-
-
-export type GetOrcIdInformationQuery = { getOrcIDInformation: { firstname: string | null, lastname: string | null, orcid: string | null, orcidHash: string | null, refreshToken: string | null, token: string | null } | null };
-
 export type GetPreviousCollaboratorsQueryVariables = Exact<{
   userId: Scalars['Int'];
   filter?: InputMaybe<Scalars['String']>;
@@ -4898,12 +4866,12 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { user: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: any, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, orcid: string, emailVerified: boolean, placeholder: boolean } | null };
+export type GetUserQuery = { user: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: any, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, oidcSub: string | null, emailVerified: boolean, placeholder: boolean } | null };
 
 export type GetUserMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserMeQuery = { me: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: any, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, orcid: string, emailVerified: boolean, placeholder: boolean } | null };
+export type GetUserMeQuery = { me: { user_title: string, username: string, firstname: string, middlename: string | null, lastname: string, preferredname: string | null, gender: string, nationality: number | null, birthdate: any, organisation: number, department: string, position: string, email: string, telephone: string, telephone_alt: string | null, oidcSub: string | null, emailVerified: boolean, placeholder: boolean } | null };
 
 export type GetUserProposalsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -8589,7 +8557,7 @@ export const CheckTokenDocument = gql`
 }
     `;
 export const CreateUserDocument = gql`
-    mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: DateTime!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String, $organizationCountry: Int) {
+    mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $gender: String!, $nationality: Int!, $birthdate: DateTime!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String, $organizationCountry: Int) {
   createUser(
     user_title: $user_title
     firstname: $firstname
@@ -8597,9 +8565,6 @@ export const CreateUserDocument = gql`
     lastname: $lastname
     password: $password
     preferredname: $preferredname
-    orcid: $orcid
-    orcidHash: $orcidHash
-    refreshToken: $refreshToken
     gender: $gender
     nationality: $nationality
     birthdate: $birthdate
@@ -8699,18 +8664,6 @@ export const GetMyRolesDocument = gql`
   }
 }
     `;
-export const GetOrcIdInformationDocument = gql`
-    query getOrcIDInformation($authorizationCode: String!) {
-  getOrcIDInformation(authorizationCode: $authorizationCode) {
-    firstname
-    lastname
-    orcid
-    orcidHash
-    refreshToken
-    token
-  }
-}
-    `;
 export const GetPreviousCollaboratorsDocument = gql`
     query getPreviousCollaborators($userId: Int!, $filter: String, $first: Int, $offset: Int, $userRole: UserRole, $subtractUsers: [Int!]) {
   previousCollaborators(
@@ -8775,7 +8728,7 @@ export const GetUserDocument = gql`
     email
     telephone
     telephone_alt
-    orcid
+    oidcSub
     emailVerified
     placeholder
   }
@@ -8799,7 +8752,7 @@ export const GetUserMeDocument = gql`
     email
     telephone
     telephone_alt
-    orcid
+    oidcSub
     emailVerified
     placeholder
   }
@@ -9732,9 +9685,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getMyRoles(variables?: GetMyRolesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMyRolesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetMyRolesQuery>(GetMyRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyRoles', 'query');
-    },
-    getOrcIDInformation(variables: GetOrcIdInformationQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetOrcIdInformationQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetOrcIdInformationQuery>(GetOrcIdInformationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getOrcIDInformation', 'query');
     },
     getPreviousCollaborators(variables: GetPreviousCollaboratorsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPreviousCollaboratorsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetPreviousCollaboratorsQuery>(GetPreviousCollaboratorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPreviousCollaborators', 'query');

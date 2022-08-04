@@ -1,4 +1,6 @@
 import Close from '@mui/icons-material/Close';
+import Lock from '@mui/icons-material/Lock';
+import { Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
@@ -10,6 +12,7 @@ import {
   Route,
   RouteProps,
   Switch,
+  useHistory,
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
@@ -22,8 +25,10 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
+import clearSession from 'utils/clearSession';
 
-import { getPingAuthTokenFromCallbackUrl } from '../utils/getPingAuthTokenFromCallbackUrl';
+import AnimatedEllipsis from './AnimatedEllipsis';
+import CenteredAlert from './common/CenteredAlert';
 import DashBoard from './DashBoard';
 import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
@@ -31,8 +36,6 @@ import ExternalAuth from './user/ExternalAuth';
 import ResetPassword from './user/ResetPassword';
 import ResetPasswordEmail from './user/ResetPasswordEmail';
 import SharedAuth from './user/SharedAuth';
-import SignIn from './user/SignIn';
-import SignUp from './user/SignUp';
 
 const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   if (!component) {
@@ -51,6 +54,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
     SettingsId.EXTERNAL_AUTH_LOGIN_URL
   )?.settingsValue;
 
+  const history = useHistory();
+
   return (
     <UserContext.Consumer>
       {({ roles, token, currentRole, handleRole }): JSX.Element => (
@@ -58,16 +63,30 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              const pingAccessToken = getPingAuthTokenFromCallbackUrl();
-
-              if (pingAccessToken !== null) {
-                window.location.href = `/external-auth?token=${pingAccessToken}`;
-
-                return <p>Redirecting to auth page...</p>;
-              } else if (isExternalAuthEnabled && externalAuthLoginUrl) {
+              if (isExternalAuthEnabled && externalAuthLoginUrl) {
+                localStorage.setItem('landingUrl', props.location.pathname);
                 window.location.href = externalAuthLoginUrl;
 
-                return <p>Redirecting to external sign-in page...</p>;
+                return (
+                  <CenteredAlert
+                    severity="info"
+                    action={
+                      <Button
+                        color="inherit"
+                        size="small"
+                        variant="outlined"
+                        onClick={() => history.push('/')}
+                      >
+                        Cancel
+                      </Button>
+                    }
+                    icon={<Lock fontSize="medium" />}
+                  >
+                    <AnimatedEllipsis>
+                      Contacting authorization server
+                    </AnimatedEllipsis>
+                  </CenteredAlert>
+                );
               }
 
               return <Redirect to="/SignIn" />;
@@ -97,6 +116,7 @@ const Routes: React.FC<RouteProps> = () => {
         <Switch>
           <Route path="/external-auth/:sessionId" component={ExternalAuth} />
           <Route path="/external-auth/:token" component={ExternalAuth} />
+          <Route path="/external-auth/:code" component={ExternalAuth} />
           <Route path="/external-auth/" component={ExternalAuth} />
           <PrivateRoute path="/" component={DashBoard} />
         </Switch>
@@ -106,8 +126,6 @@ const Routes: React.FC<RouteProps> = () => {
     return (
       <div className="App">
         <Switch>
-          <Route path="/SignUp" component={SignUp} />
-          <Route path="/SignIn" component={SignIn} />
           <Route path="/shared-auth" component={SharedAuth} />
           <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
           <Route path="/ResetPassword/:token" component={ResetPassword} />
@@ -132,11 +150,7 @@ class App extends React.Component {
       currentRole: localStorage.getItem('currentRole'),
     };
 
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentRole');
-    localStorage.removeItem('user');
-    localStorage.removeItem('expToken');
-    localStorage.removeItem('impersonatingUserId');
+    clearSession();
 
     return { errorUserInformation };
   }

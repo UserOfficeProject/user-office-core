@@ -5,9 +5,6 @@ mutation createUser(
   $lastname: String!
   $password: String!
   $preferredname: String
-  $orcid: String!
-  $orcidHash: String!
-  $refreshToken: String!
   $gender: String!
   $nationality: Int!
   $birthdate: DateTime!
@@ -27,9 +24,6 @@ mutation createUser(
     lastname: $lastname
     password: $password
     preferredname: $preferredname
-    orcid: $orcid
-    orcidHash: $orcidHash
-    refreshToken: $refreshToken
     gender: $gender
     nationality: $nationality
     birthdate: $birthdate

@@ -17,6 +17,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useState } from 'react';
 
 import ImpersonateButton from 'components/common/ImpersonateButton';
+import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
 
@@ -33,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AccountActionButton: React.FC = () => {
   const classes = useStyles();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [show, setShow] = useState(false);
   const { roles, handleLogout, impersonatingUserId } = useContext(UserContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -52,7 +54,10 @@ const AccountActionButton: React.FC = () => {
   const handleModalClose = () => setShow(false);
 
   const handleOnLogout = () => {
-    handleLogout();
+    setIsLoggingOut(true);
+    handleLogout().catch(() => {
+      setIsLoggingOut(false);
+    });
   };
 
   return (
@@ -136,9 +141,13 @@ const AccountActionButton: React.FC = () => {
               </ImpersonateButton>
             </MenuItem>
           )}
-          <MenuItem data-cy="logout" onClick={handleOnLogout}>
+          <MenuItem
+            data-cy="logout"
+            onClick={handleOnLogout}
+            disabled={isLoggingOut}
+          >
             <Box paddingRight={1} paddingTop={1}>
-              <ExitToApp />
+              {isLoggingOut ? <UOLoader size={24} /> : <ExitToApp />}
             </Box>
             Logout
           </MenuItem>

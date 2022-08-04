@@ -15,7 +15,7 @@ query getUser($id: Int!) {
     email
     telephone
     telephone_alt
-    orcid
+    oidcSub
     emailVerified
     placeholder
   }
