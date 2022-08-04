@@ -15,8 +15,6 @@ const coProposer = initialDBData.users.user2;
 const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
 const shipmentTitle = faker.lorem.words(2);
-const shipmentTemplateName = faker.lorem.words(2);
-const shipmentTemplateDescription = faker.lorem.words(3);
 
 context('Shipments tests', () => {
   beforeEach(() => {
