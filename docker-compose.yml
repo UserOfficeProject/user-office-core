@@ -100,3 +100,13 @@ services:
       - scheduler-db
     ports:
       - 44000:4000 # avoid collision
+
+  duo-development-authorization-server:
+    image: "dmsc/duo-development-authorization-server:develop"
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
+      PORT: 5000
