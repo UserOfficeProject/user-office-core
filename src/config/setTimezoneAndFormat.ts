@@ -44,6 +44,7 @@ async function setDateTimeFormats() {
       settingsId: SettingsId.DATE_FORMAT,
       settingsValue: process.env.DATE_FORMAT,
     });
+    logger.logInfo(`Using date format:'${process.env.DATE_FORMAT}'`, {});
   } else {
     const defaultDateFormat = 'dd-MM-yyyy';
     logger.logInfo(
@@ -61,6 +62,10 @@ async function setDateTimeFormats() {
       settingsId: SettingsId.DATE_TIME_FORMAT,
       settingsValue: process.env.DATE_TIME_FORMAT,
     });
+    logger.logInfo(
+      `Using date time format:'${process.env.DATE_TIME_FORMAT}'`,
+      {}
+    );
   } else {
     const defaultDateTimeFormat = 'dd-MM-yyyy HH:mm';
     logger.logInfo(

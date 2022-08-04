@@ -202,7 +202,9 @@ export interface UserRecord {
   readonly lastname: string;
   readonly username: string;
   readonly preferredname: string;
-  readonly orcid: string;
+  readonly oidc_sub: string | null;
+  readonly oidc_refresh_token: string | null;
+  readonly oidc_access_token: string | null;
   readonly gender: string;
   readonly nationality: number;
   readonly birthdate: Date;
@@ -220,7 +222,6 @@ export interface UserRecord {
   readonly full_count: number;
   readonly institution: string;
   readonly placeholder: boolean;
-  readonly orcid_refreshtoken: string;
 }
 
 export interface VisitRegistrationRecord {
@@ -771,8 +772,9 @@ export const createUserObject = (user: UserRecord) => {
     user.lastname,
     user.username,
     user.preferredname,
-    user.orcid,
-    user.orcid_refreshtoken,
+    user.oidc_sub,
+    user.oidc_refresh_token,
+    user.oidc_access_token,
     user.gender,
     user.nationality,
     user.birthdate,

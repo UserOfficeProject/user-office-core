@@ -80,6 +80,7 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     '',
     '',
     '',
+    '',
     1,
     new Date('2000-01-01'),
     1,
@@ -205,7 +206,7 @@ export class StfcUserDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
 
-  getByOrcID(orcID: string): Promise<User | null> {
+  getByOIDCSub(oidcSub: string): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
 
@@ -241,10 +242,6 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getStfcBasicPersonByEmail(email, true).then((stfcUser) =>
       stfcUser ? toEssBasicUserDetails(stfcUser) : null
     );
-  }
-
-  async checkOrcIDExist(orcID: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
   }
 
   async checkEmailExist(email: string): Promise<boolean> {
@@ -498,8 +495,9 @@ export class StfcUserDataSource implements UserDataSource {
     username: string,
     password: string,
     preferredname: string | undefined,
-    orcid: string,
-    orcid_refreshtoken: string,
+    oidc_sub: string,
+    oidc_access_htoken: string,
+    oidc_refres_htoken: string,
     gender: string,
     nationality: number,
     birthdate: Date,

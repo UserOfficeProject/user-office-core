@@ -46,6 +46,7 @@ export const dummyUserOfficer = new User(
   'Hailey',
   '324235',
   '683142616',
+  '783142617',
   'male',
   12,
   new Date('1990-01-25'),
@@ -76,6 +77,7 @@ export const dummyUser = new User(
   'Meta',
   '12312414',
   '568567353',
+  '668567354',
   'male',
   2,
   new Date('1981-05-04'),
@@ -141,6 +143,7 @@ export const dummyPlaceHolderUser = new User(
   'Meta',
   '12312414',
   '568567353',
+  '668567354',
   'male',
   2,
   new Date('1981-05-04'),
@@ -166,6 +169,7 @@ export const dummyUserNotOnProposal = new User(
   'Damion',
   '182082741',
   'Apricot',
+  'Pear',
   'female',
   3,
   new Date('1991-11-08'),
@@ -194,7 +198,7 @@ export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
-  getByOrcID(orcID: string): Promise<User | null> {
+  getByOIDCSub(oidcSub: string): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
@@ -234,9 +238,6 @@ export class UserDataSourceMock implements UserDataSource {
     );
   }
 
-  async checkOrcIDExist(orcID: string): Promise<boolean> {
-    return false;
-  }
   async checkEmailExist(email: string): Promise<boolean> {
     return false;
   }

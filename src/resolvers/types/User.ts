@@ -64,11 +64,14 @@ export class User implements Partial<UserOrigin> {
   @Field(() => String, { nullable: true })
   public preferredname: string | undefined;
 
-  @Field()
-  public orcid: string;
+  @Field(() => String, { nullable: true })
+  public oidcSub: string | null;
 
-  @Field()
-  public refreshToken: string;
+  @Field(() => String, { nullable: true })
+  public oidcRefreshToken: string | null;
+
+  @Field(() => String, { nullable: true })
+  public oidcAccessToken: string | null;
 
   @Field()
   public gender: string;

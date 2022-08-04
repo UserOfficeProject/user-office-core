@@ -1,14 +1,15 @@
+import { logger } from '@user-office-software/duo-logger';
 import {
-  deleteUserValidationSchema,
+  addUserRoleValidationSchema,
   createUserByEmailInviteValidationSchema,
   createUserValidationSchema,
-  updateUserValidationSchema,
-  updateUserRolesValidationSchema,
-  signInValidationSchema,
+  deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   resetPasswordByEmailValidationSchema,
-  addUserRoleValidationSchema,
+  signInValidationSchema,
   updatePasswordValidationSchema,
+  updateUserRolesValidationSchema,
+  updateUserValidationSchema,
   userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
@@ -18,22 +19,22 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { EventBus, Authorized, ValidateArgs } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { FeatureId } from '../models/Feature';
 import { isRejection, rejection, Rejection } from '../models/Rejection';
-import { Roles, Role } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import {
-  User,
-  BasicUserDetails,
-  UserWithRole,
-  EmailVerificationJwtPayload,
   AuthJwtPayload,
+  BasicUserDetails,
+  EmailVerificationJwtPayload,
   PasswordResetJwtPayload,
+  User,
+  UserRole,
   UserRoleShortCodeMap,
+  UserWithRole,
 } from '../models/User';
-import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
@@ -173,11 +174,8 @@ export default class UserMutations {
     agent: UserWithRole | null,
     args: CreateUserArgs
   ): Promise<UserLinkResponse | Rejection> {
-    if (
-      this.createHash(args.orcid) !== args.orcidHash &&
-      !(process.env.NODE_ENV === 'development')
-    ) {
-      return rejection('Can not create user because of ORCID hash mismatch', {
+    if (!(process.env.NODE_ENV === 'development')) {
+      return rejection('Users can only be created on development env', {
         args,
       });
     }
@@ -234,11 +232,12 @@ export default class UserMutations {
           args.firstname,
           args.middlename,
           args.lastname,
-          `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+          `${args.firstname}.${args.lastname}`, // This is just for now, while we decide on the final format
           hash,
           args.preferredname,
-          args.orcid,
-          args.refreshToken,
+          '',
+          '',
+          '',
           args.gender,
           args.nationality,
           args.birthdate,
@@ -325,9 +324,6 @@ export default class UserMutations {
         args.organizationCountry
       );
     }
-
-    delete args.orcid;
-    delete args.refreshToken;
 
     user = {
       ...user,
@@ -509,17 +505,11 @@ export default class UserMutations {
     try {
       const decodedToken = verifyToken<AuthJwtPayload>(token);
 
-      if (this.externalAuth) {
-        if (decodedToken.externalToken) {
-          this.userAuth.logout(decodedToken.externalToken);
-        } else {
-          return rejection('No external token found in JWT', { token });
-        }
-      }
-
-      return;
+      return this.userAuth.logout(decodedToken);
     } catch (error) {
-      return rejection('Error occurred during external logout', {}, error);
+      logger.logException('Error occurred during logout', error);
+
+      return rejection('Error occurred during logout', {}, error);
     }
   }
 

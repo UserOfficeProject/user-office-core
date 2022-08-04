@@ -239,13 +239,6 @@ export class ExternalTokenLoginWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class LogoutTokenWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => String, { nullable: true })
-  public token: string;
-}
-
-@ObjectType()
 export class PrepareDBResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => String, { nullable: true })

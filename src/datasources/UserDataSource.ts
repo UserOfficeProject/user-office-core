@@ -14,13 +14,12 @@ export interface UserDataSource {
     role?: UserRole
   ): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<boolean>;
-  checkOrcIDExist(orcID: string): Promise<boolean>;
   // Read
   me(id: number): Promise<User | null>;
   getUser(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
   getByEmail(email: string): Promise<User | null>;
-  getByOrcID(orcID: string): Promise<User | null>;
+  getByOIDCSub(sub: string): Promise<User | null>;
   getPasswordByEmail(email: string): Promise<string | null>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
@@ -46,8 +45,9 @@ export interface UserDataSource {
     username: string,
     password: string,
     preferredname: string | undefined,
-    orcid: string,
-    orcid_refreshtoken: string,
+    oidcSub: string,
+    oidcSub_accesstoken: string,
+    oidcSub_refreshtoken: string,
     gender: string,
     nationality: number,
     birthdate: Date,
