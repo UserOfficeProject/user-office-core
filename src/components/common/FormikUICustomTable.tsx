@@ -63,6 +63,32 @@ function move(
 
   return elements;
 }
+
+function updateElement(
+  elements: Record<string, unknown>[],
+  oldelement: Record<string, unknown>,
+  newelement: Record<string, unknown>
+) {
+  const newElements = [...elements];
+  const elementIndex = getElementIndex(elements, oldelement);
+
+  return elements &&
+    elementIndex > -1 &&
+    newElements.splice(elementIndex, 1, newelement)
+    ? newElements
+    : elements;
+}
+function removeElement(
+  elements: Record<string, unknown>[],
+  removeelement: Record<string, unknown>
+) {
+  const newElements = [...elements];
+  const elementIndex = getElementIndex(elements, removeelement);
+
+  return elements && elementIndex > -1 && newElements.splice(elementIndex, 1)
+    ? newElements
+    : elements;
+}
 const useStyles = makeStyles((theme) => ({
   StyledButtonContainer: {
     marginTop: theme.spacing(1),
@@ -168,17 +194,18 @@ export const FormikUICustomTable = ({
             }),
           onRowUpdate: (newData, oldData) =>
             new Promise<void>((resolve) => {
-              const newState = [...state];
-              newState[state.indexOf(oldData as Record<string, unknown>)] =
-                newData;
-              handleChange(newState);
+              handleChange(
+                updateElement(
+                  state,
+                  oldData as Record<string, unknown>,
+                  newData as Record<string, unknown>
+                )
+              );
               resolve();
             }),
           onRowDelete: (oldData) =>
             new Promise<void>((resolve) => {
-              const newState = [...state];
-              newState.splice(state.indexOf(oldData), 1);
-              handleChange(newState);
+              handleChange(removeElement(state, oldData));
               resolve();
             }),
         }}
