@@ -9,7 +9,9 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
+import useTheme from '@mui/styles/useTheme';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
 
@@ -119,6 +121,9 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
   },
+  mobileUpdateButton: {
+    paddingBottom: '10px',
+  },
   titleStyle: {
     display: 'inline',
   },
@@ -156,6 +161,8 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
     refreshData: false,
   });
 
+  const theme = useTheme();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
   const featureContext = useContext(FeatureContext);
   const isEmailInviteEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
@@ -390,6 +397,32 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
               </Alert>
             )}
           </div>
+
+          {!isLargeScreen && (
+            <div className={classes.mobileUpdateButton}>
+              {props.selection && (
+                <ActionButtonContainer>
+                  <div className={classes.verticalCentered}>
+                    {selectedParticipants.length} user(s) selected
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (props.onUpdate) {
+                        props.onUpdate(selectedParticipants);
+                        setSelectedParticipants([]);
+                      }
+                    }}
+                    disabled={selectedParticipants.length === 0}
+                    data-cy="assign-selected-users"
+                  >
+                    Update
+                  </Button>
+                </ActionButtonContainer>
+              )}
+            </div>
+          )}
+
           <div data-cy="co-proposers" className={classes.tableWrapper}>
             <MaterialTable
               tableRef={tableRef}
@@ -442,7 +475,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 Toolbar: EmailSearchBar,
               }}
             />
-            {props.selection && (
+            {isLargeScreen && props.selection && (
               <ActionButtonContainer>
                 <div className={classes.verticalCentered}>
                   {selectedParticipants.length} user(s) selected
