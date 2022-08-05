@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -24,6 +25,9 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
+  const InstrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
 
   switch (event.type) {
     /*
@@ -35,17 +39,32 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
       const call = await callDataSource.getCall(event.proposal.callId);
 
-      const isIsis = call?.shortCode?.toLowerCase().includes('isis');
+      const instruments = await InstrumentDataSource.getInstrumentsByCallId([
+        event.proposal.callId,
+      ]);
+
+      if (instruments.length == 0) {
+        logger.logWarn(
+          'Could not send email beacause no instrument was assigned to this call.',
+          { event, call }
+        );
+
+        return;
+      }
+
+      const instrument = instruments[0].name;
+
+      let piEmailTemplate: string;
+
+      const isIsis = instrument === 'ISIS';
 
       const isRapidAccess =
         isIsis && call?.shortCode?.toLowerCase().includes('rapid');
 
-      let piEmailTemplate: string;
-
-      if (isRapidAccess) {
-        piEmailTemplate = 'isis-rapid-proposal-submitted-pi';
-      } else if (isIsis) {
+      if (isIsis) {
         piEmailTemplate = 'isis-proposal-submitted-pi';
+      } else if (isRapidAccess) {
+        piEmailTemplate = 'isis-rapid-proposal-submitted-pi';
       } else {
         piEmailTemplate = 'clf-proposal-submitted-pi';
       }
