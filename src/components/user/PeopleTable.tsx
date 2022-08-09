@@ -362,6 +362,12 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     ? ((query.offset as number) + invitedUsers.length) / (query.first as number)
     : 0;
 
+  const onClickHandlerUpdateBtn = () => {
+    if (props.onUpdate) {
+      props.onUpdate(selectedParticipants);
+    }
+  };
+
   return (
     <Formik
       initialValues={{
@@ -462,11 +468,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                 </div>
                 <Button
                   type="button"
-                  onClick={() => {
-                    if (props.onUpdate) {
-                      props.onUpdate(selectedParticipants);
-                    }
-                  }}
+                  onClick={onClickHandlerUpdateBtn}
                   disabled={selectedParticipants.length === 0}
                   data-cy="assign-selected-users"
                 >
@@ -557,11 +559,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             </div>
             <Button
               type="button"
-              onClick={() => {
-                if (props.onUpdate) {
-                  props.onUpdate(selectedParticipants);
-                }
-              }}
+              onClick={onClickHandlerUpdateBtn}
               disabled={selectedParticipants.length === 0}
               data-cy="assign-selected-users"
             >

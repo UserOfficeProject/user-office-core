@@ -320,6 +320,13 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
     ? 'Please check the spelling and if the user has registered with us. If not found, the user can be added through email invite.'
     : 'Please check the spelling and if the user has registered with us or has the correct privacy settings to be found by this search.';
 
+  const onClickHandlerUpdateBtn = () => {
+    if (props.onUpdate) {
+      props.onUpdate(selectedParticipants);
+      setSelectedParticipants([]);
+    }
+  };
+
   return (
     <Formik
       initialValues={{
@@ -407,12 +414,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                   </div>
                   <Button
                     type="button"
-                    onClick={() => {
-                      if (props.onUpdate) {
-                        props.onUpdate(selectedParticipants);
-                        setSelectedParticipants([]);
-                      }
-                    }}
+                    onClick={onClickHandlerUpdateBtn}
                     disabled={selectedParticipants.length === 0}
                     data-cy="assign-selected-users"
                   >
@@ -482,12 +484,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 </div>
                 <Button
                   type="button"
-                  onClick={() => {
-                    if (props.onUpdate) {
-                      props.onUpdate(selectedParticipants);
-                      setSelectedParticipants([]);
-                    }
-                  }}
+                  onClick={onClickHandlerUpdateBtn}
                   disabled={selectedParticipants.length === 0}
                   data-cy="assign-selected-users"
                 >
