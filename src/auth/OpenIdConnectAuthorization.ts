@@ -13,7 +13,7 @@ type ValidUserInfo = RequiredField<
   'sub' | 'given_name' | 'family_name' | 'email'
 >;
 
-type ValidTokenSet = RequiredField<TokenSet, 'access_token' | 'refresh_token'>;
+type ValidTokenSet = RequiredField<TokenSet, 'access_token'>;
 
 type ValidUser = NonNullableField<
   User,
@@ -185,15 +185,11 @@ export abstract class OpenIdConnectAuthorization extends UserAuthorization {
       throw new Error('Invalid tokenSet');
     }
 
-    if (!tokenSet.access_token) {
-      tokenSet.refresh_token = ''; // some OpenID Connect providers does not support offline_access and therefore does not return a refresh_token
-    }
-
     return tokenSet as ValidTokenSet;
   }
 
   private validateUser(user: User | null): ValidUser {
-    if (!user?.oidcSub || !user?.oidcAccessToken || !user?.oidcRefreshToken) {
+    if (!user?.oidcSub || !user?.oidcAccessToken) {
       logger.logError('Invalid user', {
         authorizer: this.constructor.name,
         user,

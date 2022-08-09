@@ -17,12 +17,10 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { AdminDataSource } from '../datasources/AdminDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { FeatureId } from '../models/Feature';
 import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import {
@@ -47,20 +45,10 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserMutations {
-  //Set as a class variable to avoid excessive calls to database
-  private externalAuth: boolean;
-
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
-    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
-  ) {
-    adminDataSource.getFeatures().then((features) => {
-      this.externalAuth = features.filter(
-        (feature) => feature.id == FeatureId.EXTERNAL_AUTH
-      )[0].isEnabled;
-    });
-  }
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
+  ) {}
 
   createHash(password: string): string {
     //Check that password follows rules

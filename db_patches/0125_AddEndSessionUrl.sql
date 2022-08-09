@@ -8,6 +8,10 @@ BEGIN
       VALUES
         ('EXTERNAL_AUTH_LOGOUT_URL', '', 'URL which terminates the external auth session');
 
+
+    DELETE FROM features WHERE feature_id = 'EXTERNAL_AUTH';
+
+
     END IF;
 END;
 $$
