@@ -13,7 +13,6 @@ import {
   UpdateUserRolesMutationVariables,
   User,
 } from '../../src/generated/sdk';
-import clearSession from '../../src/utils/clearSession';
 import { getE2EApi } from './utils';
 
 type DecodedTokenData = {
@@ -162,7 +161,11 @@ const login = (
 };
 
 const logout = () => {
-  clearSession();
+  localStorage.removeItem('token');
+  localStorage.removeItem('currentRole');
+  localStorage.removeItem('user');
+  localStorage.removeItem('expToken');
+  localStorage.removeItem('impersonatingUserId');
 
   cy.visit('/');
 };
