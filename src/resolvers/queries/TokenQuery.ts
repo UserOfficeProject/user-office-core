@@ -13,12 +13,13 @@ import {
   AuthJwtPayload as AuthJwtPayloadBase,
   AuthJwtApiTokenPayload as AuthJwtApiTokenPayloadBase,
 } from '../../models/User';
+import { User } from '../../models/User';
 import { Role } from '../types/Role';
-import { User } from '../types/User';
+import { User as UserGQLType } from '../types/User';
 
 @ObjectType()
 class AuthJwtPayload implements AuthJwtPayloadBase {
-  @Field(() => User)
+  @Field(() => UserGQLType)
   user: User;
 
   @Field(() => Role)

@@ -70,9 +70,6 @@ export class User implements Partial<UserOrigin> {
   @Field(() => String, { nullable: true })
   public oidcRefreshToken: string | null;
 
-  @Field(() => String, { nullable: true })
-  public oidcAccessToken: string | null;
-
   @Field()
   public gender: string;
 

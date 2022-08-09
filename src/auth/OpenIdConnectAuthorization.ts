@@ -177,13 +177,16 @@ export abstract class OpenIdConnectAuthorization extends UserAuthorization {
   }
 
   private validateTokenSet(tokenSet: TokenSet): ValidTokenSet {
-    tokenSet.refresh_token = tokenSet.refresh_token ?? ''; // refresh_token is optional
-    if (!tokenSet.refresh_token || !tokenSet.access_token) {
+    if (!tokenSet.access_token) {
       logger.logError('Invalid tokenSet', {
         authorizer: this.constructor.name,
         tokenSet,
       });
       throw new Error('Invalid tokenSet');
+    }
+
+    if (!tokenSet.access_token) {
+      tokenSet.refresh_token = ''; // some OpenID Connect providers does not support offline_access and therefore does not return a refresh_token
     }
 
     return tokenSet as ValidTokenSet;
