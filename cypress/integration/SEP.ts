@@ -7,8 +7,10 @@ import {
   UserRole,
   UpdateUserMutationVariables,
   User,
+  TemplateGroupId,
 } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 const sepMembers = {
   chair: initialDBData.users.user2,
@@ -107,6 +109,32 @@ const instrument = {
 let createdSepId: number;
 let createdProposalPk: number;
 let createdProposalId: string;
+let createdWorkflowId: number;
+let createdEsiTemplateId: number;
+
+function createWorkflowAndEsiTemplate() {
+  const workflowName = faker.lorem.words(2);
+  const workflowDescription = faker.lorem.words(5);
+
+  cy.createProposalWorkflow({
+    name: workflowName,
+    description: workflowDescription,
+  }).then((result) => {
+    const workflow = result.createProposalWorkflow.proposalWorkflow;
+    if (workflow) {
+      createdWorkflowId = workflow.id;
+
+      cy.createTemplate({
+        name: 'default esi template',
+        groupId: TemplateGroupId.PROPOSAL_ESI,
+      }).then((result) => {
+        if (result.createTemplate.template) {
+          createdEsiTemplateId = result.createTemplate.template.templateId;
+        }
+      });
+    }
+  });
+}
 
 function initializationBeforeTests() {
   cy.resetDB();
@@ -154,6 +182,7 @@ function initializationBeforeTests() {
     id: sepMembers.reviewer.id,
     roles: [initialDBData.roles.sepReviewer],
   });
+  createWorkflowAndEsiTemplate();
 }
 
 context('SEP reviews tests', () => {
@@ -172,6 +201,32 @@ context('SEP reviews tests', () => {
       );
 
       cy.contains('Proposals').click();
+
+      cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
+
+      cy.get("[aria-label='Assign proposals to SEP']").first().click();
+
+      cy.get('[data-cy="sep-selection"] input').should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+      cy.get('[data-cy="sep-selection"]').click();
+
+      // NOTE: Check first for empty list because call has no SEPs assigned.
+      cy.get('[role="presentation"] .MuiAutocomplete-noOptions').contains(
+        'No SEPs'
+      );
+
+      // NOTE: Assign SEP to a call.
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...updatedCall,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        seps: [createdSepId],
+      });
+
+      cy.reload();
 
       cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
 
@@ -857,6 +912,7 @@ context('SEP meeting components tests', () => {
 
   beforeEach(() => {
     initializationBeforeTests();
+    createWorkflowAndEsiTemplate();
     cy.assignProposalsToSep({
       sepId: createdSepId,
       proposals: [
@@ -908,6 +964,14 @@ context('SEP meeting components tests', () => {
           availabilityTime: instrumentAvailabilityTime,
         });
       }
+    });
+    // NOTE: Assign SEP to a call.
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...updatedCall,
+      proposalWorkflowId: createdWorkflowId,
+      esiTemplateId: createdEsiTemplateId,
+      seps: [createdSepId],
     });
   });
 
@@ -1554,7 +1618,9 @@ context('SEP meeting components tests', () => {
       cy.get('[data-cy="download-sep-xlsx"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains('call 1');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        updatedCall.shortCode
+      );
     });
 
     it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {

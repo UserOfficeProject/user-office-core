@@ -1,4 +1,3 @@
-import TestFilter from '../support/filterTests';
 import initialDBData from '../support/initialDBData';
 
 context('Scheduler tests', () => {
@@ -41,92 +40,90 @@ context('Scheduler tests', () => {
     cy.visit('/');
   });
 
-  TestFilter(['ess'], () => {
-    it('User should not be able to see upcoming experiments in DRAFT state', () => {
-      cy.contains('Upcoming experiments');
+  it('User should not be able to see upcoming experiments in DRAFT state', () => {
+    cy.contains('Upcoming experiments');
 
-      cy.contains(upcomingDraft.startsAt).should('not.exist');
-      cy.contains(upcomingDraft.endsAt).should('not.exist');
+    cy.contains(upcomingDraft.startsAt).should('not.exist');
+    cy.contains(upcomingDraft.endsAt).should('not.exist');
 
-      cy.logout();
-    });
+    cy.logout();
+  });
 
-    it('Instrument scientist should not be able to see upcoming experiments in DRAFT state', () => {
-      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
-      cy.visit('/');
-      cy.finishedLoading();
+  it('Instrument scientist should not be able to see upcoming experiments in DRAFT state', () => {
+    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+    cy.visit('/');
+    cy.finishedLoading();
 
-      cy.contains('Upcoming experiments').click();
+    cy.contains('Upcoming experiments').click();
 
-      cy.finishedLoading();
+    cy.finishedLoading();
 
-      cy.contains(upcomingDraft.startsAt).should('not.exist');
-      cy.contains(upcomingDraft.endsAt).should('not.exist');
-    });
+    cy.contains(upcomingDraft.startsAt).should('not.exist');
+    cy.contains(upcomingDraft.endsAt).should('not.exist');
+  });
 
-    it('User should be able to see upcoming experiments in ACTIVE', () => {
-      cy.contains('Upcoming experiments').should('exist');
+  it('User should be able to see upcoming experiments in ACTIVE', () => {
+    cy.contains('Upcoming experiments').should('exist');
 
-      cy.contains(upcoming.startsAt);
-      cy.contains(upcoming.endsAt);
+    cy.contains(upcoming.startsAt);
+    cy.contains(upcoming.endsAt);
 
-      cy.contains(ended.startsAt).should('not.exist');
-      cy.contains(ended.endsAt).should('not.exist');
-      cy.logout();
-    });
+    cy.contains(ended.startsAt).should('not.exist');
+    cy.contains(ended.endsAt).should('not.exist');
+    cy.logout();
+  });
 
-    it('Instrument scientist should be able to see upcoming experiments in ACTIVE', () => {
-      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
-      cy.visit('/');
+  it('Instrument scientist should be able to see upcoming experiments in ACTIVE', () => {
+    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+    cy.visit('/');
 
-      cy.finishedLoading();
-      cy.contains('Upcoming experiments').click();
+    cy.finishedLoading();
+    cy.contains('Upcoming experiments').click();
 
-      cy.contains(upcoming.startsAt);
-      cy.contains(upcoming.endsAt);
+    cy.contains(upcoming.startsAt);
+    cy.contains(upcoming.endsAt);
 
-      cy.contains(ended.startsAt).should('not.exist');
-      cy.contains(ended.endsAt).should('not.exist');
-      cy.logout();
-    });
+    cy.contains(ended.startsAt).should('not.exist');
+    cy.contains(ended.endsAt).should('not.exist');
+    cy.logout();
+  });
 
-    it('User should be able to see upcoming experiments in COMPLETED', () => {
-      cy.contains('Upcoming experiments').should('exist');
+  it('User should be able to see upcoming experiments in COMPLETED', () => {
+    cy.contains('Upcoming experiments').should('exist');
 
-      cy.contains(completed.startsAt);
-      cy.contains(completed.endsAt);
+    cy.contains(completed.startsAt);
+    cy.contains(completed.endsAt);
 
-      cy.contains(ended.startsAt).should('not.exist');
-      cy.contains(ended.endsAt).should('not.exist');
-      cy.logout();
-    });
+    cy.contains(ended.startsAt).should('not.exist');
+    cy.contains(ended.endsAt).should('not.exist');
+    cy.logout();
+  });
 
-    it('Instrument scientist should be able to see upcoming experiments in COMPLETED', () => {
-      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
-      cy.visit('/');
+  it('Instrument scientist should be able to see upcoming experiments in COMPLETED', () => {
+    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+    cy.visit('/');
 
-      cy.finishedLoading();
-      cy.contains('Upcoming experiments').click();
+    cy.finishedLoading();
+    cy.contains('Upcoming experiments').click();
 
-      cy.contains(completed.startsAt);
-      cy.contains(completed.endsAt);
+    cy.contains(completed.startsAt);
+    cy.contains(completed.endsAt);
 
-      cy.contains(ended.startsAt).should('not.exist');
-      cy.contains(ended.endsAt).should('not.exist');
-      cy.logout();
-    });
+    cy.contains(ended.startsAt).should('not.exist');
+    cy.contains(ended.endsAt).should('not.exist');
+    cy.logout();
+  });
 
-    it('User should be able to see past and upcoming experiments', () => {
-      cy.contains('Experiment Times').click();
-      cy.finishedLoading();
+  it('User should be able to see past and upcoming experiments', () => {
+    cy.contains('Experiment Times').click();
+    cy.finishedLoading();
 
-      cy.contains(upcoming.startsAt);
-      cy.contains(upcoming.endsAt);
-      cy.contains(completed.startsAt);
-      cy.contains(completed.endsAt);
+    cy.contains(upcoming.startsAt);
+    cy.contains(upcoming.endsAt);
+    cy.contains(completed.startsAt);
+    cy.contains(completed.endsAt);
 
-      cy.contains(ended.startsAt);
-      cy.contains(ended.endsAt);
-    });
+    cy.contains(ended.startsAt);
+    cy.contains(ended.endsAt);
   });
 });
