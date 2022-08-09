@@ -3128,7 +3128,6 @@ export type User = {
   lastname: Scalars['String'];
   middlename: Maybe<Scalars['String']>;
   nationality: Maybe<Scalars['Int']>;
-  oidcAccessToken: Maybe<Scalars['String']>;
   oidcRefreshToken: Maybe<Scalars['String']>;
   oidcSub: Maybe<Scalars['String']>;
   organisation: Scalars['Int'];
