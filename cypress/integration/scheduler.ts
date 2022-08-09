@@ -1,3 +1,5 @@
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Scheduler tests', () => {
@@ -9,7 +11,15 @@ context('Scheduler tests', () => {
   const scientist = initialDBData.users.user1;
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+  });
+
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      this.skip();
+    }
+
     cy.updateUserRoles({
       id: scientist.id,
       roles: [

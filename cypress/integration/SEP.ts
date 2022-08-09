@@ -8,7 +8,9 @@ import {
   UpdateUserMutationVariables,
   User,
   TemplateGroupId,
+  FeatureId,
 } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import { updatedCall } from '../support/utils';
 
@@ -137,6 +139,7 @@ function createWorkflowAndEsiTemplate() {
 }
 
 function initializationBeforeTests() {
+  cy.getAndStoreFeaturesEnabled();
   cy.resetDB();
   cy.createSep({
     code: sep1.code,
@@ -188,6 +191,11 @@ function initializationBeforeTests() {
 context('SEP reviews tests', () => {
   beforeEach(() => {
     initializationBeforeTests();
+  });
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+      this.skip();
+    }
   });
 
   describe('User officer role', () => {
@@ -912,6 +920,11 @@ context('SEP meeting components tests', () => {
 
   beforeEach(() => {
     initializationBeforeTests();
+  });
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+      this.skip();
+    }
     createWorkflowAndEsiTemplate();
     cy.assignProposalsToSep({
       sepId: createdSepId,

@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
 
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 faker.seed(1);
@@ -20,7 +22,14 @@ const shipmentTemplateDescription = faker.lorem.words(3);
 
 context('Shipments tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+  });
+
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
+      this.skip();
+    }
 
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,

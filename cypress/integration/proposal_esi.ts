@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
 
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 const coProposer = initialDBData.users.user2;
@@ -17,6 +19,7 @@ const clonedSampleTitle = faker.lorem.words(2);
 
 context('visits tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
     cy.updateProposal({
       proposalPk: existingProposalId,
@@ -34,6 +37,12 @@ context('visits tests', () => {
       teamLeadUserId: coProposer.id,
       scheduledEventId: existingScheduledEventId,
     });
+  });
+
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
+      this.skip();
+    }
   });
 
   it('PI should see ESI assessment button ', () => {

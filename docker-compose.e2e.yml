@@ -23,8 +23,6 @@ services:
     ipc: host # see https://github.com/cypress-io/cypress/issues/350
     environment:
       CYPRESS_SVC_ACC_TOKEN: $SVC_ACC_TOKEN
-      CYPRESS_STFC: "false"
-      CYPRESS_TEST_TAGS: "ess"
     entrypoint:
       [
         "/wait-for-frontend.sh",
