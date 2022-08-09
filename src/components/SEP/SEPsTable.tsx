@@ -40,13 +40,19 @@ const columns = [
 const SEPsTable: React.FC = () => {
   const { currentRole } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
-  const [sepFilter, setSEPFilter] = useState<undefined | boolean>(true);
+  const [isActiveFilter, setIsActiveFilter] = useState<undefined | boolean>(
+    true
+  );
   const history = useHistory();
   const {
     loadingSEPs,
     SEPs,
     setSEPsWithLoading: setSEPs,
-  } = useSEPsData('', sepFilter, currentRole as UserRole);
+  } = useSEPsData({
+    filter: '',
+    active: isActiveFilter,
+    role: currentRole as UserRole,
+  });
   const [editSEPID, setEditSEPID] = useState(0);
 
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
@@ -60,9 +66,9 @@ const SEPsTable: React.FC = () => {
   const handleStatusFilterChange = (sepStatus: SEPStatus) => {
     setUrlQueryParams((queries) => ({ ...queries, sepStatus }));
     if (sepStatus === SEPStatus.ALL) {
-      setSEPFilter(undefined);
+      setIsActiveFilter(undefined);
     } else {
-      setSEPFilter(sepStatus === SEPStatus.ACTIVE ? true : false);
+      setIsActiveFilter(sepStatus === SEPStatus.ACTIVE ? true : false);
     }
   };
 

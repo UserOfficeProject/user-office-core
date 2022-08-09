@@ -29,7 +29,7 @@ const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
 }) => {
   const classes = useStyles();
   const downloadSEPXLSX = useDownloadXLSXSEP();
-  const { loadingCalls, calls } = useCallsData();
+  const { loadingCalls, calls } = useCallsData({ sepIds: [sepId] });
   const [query, setQuery] = useQueryParams({
     call: withDefault(NumberParam, null),
   });

@@ -7,7 +7,6 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
-import TestFilter from '../support/filterTests';
 import initialDBData from '../support/initialDBData';
 
 function twoFakes(numberWords: number) {
@@ -178,396 +177,392 @@ context('GenericTemplates tests', () => {
     });
   };
 
-  TestFilter(['stfc', 'ess'], () => {
-    describe('Generic templates basic tests', () => {
-      it('Should be able to create proposal template with genericTemplate', () => {
-        cy.createTemplate({
-          name: proposalTemplateName,
-          groupId: TemplateGroupId.PROPOSAL,
-        });
-        cy.login('officer');
-        cy.visit('/');
+  describe('Generic templates basic tests', () => {
+    it('Should be able to create proposal template with genericTemplate', () => {
+      cy.createTemplate({
+        name: proposalTemplateName,
+        groupId: TemplateGroupId.PROPOSAL,
+      });
+      cy.login('officer');
+      cy.visit('/');
 
-        cy.finishedLoading();
+      cy.finishedLoading();
 
-        cy.navigateToTemplatesSubmenu('Sub Template');
+      cy.navigateToTemplatesSubmenu('Sub Template');
 
-        cy.get('[data-cy=create-new-button]').click();
+      cy.get('[data-cy=create-new-button]').click();
 
-        cy.get('[data-cy=name] input')
-          .type(genericTemplateName[0])
-          .should('have.value', genericTemplateName[0]);
+      cy.get('[data-cy=name] input')
+        .type(genericTemplateName[0])
+        .should('have.value', genericTemplateName[0]);
 
-        cy.get('[data-cy=description]').type(genericTemplateDescription[0]);
+      cy.get('[data-cy=description]').type(genericTemplateDescription[0]);
 
-        cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=submit]').click();
 
-        cy.get('[data-cy="proposal-question-id"').click();
+      cy.get('[data-cy="proposal-question-id"').click();
 
-        cy.get('[data-cy="question"').type(genericTemplateQuestions[0]);
+      cy.get('[data-cy="question"').type(genericTemplateQuestions[0]);
 
-        cy.get('[data-cy="submit"').click();
+      cy.get('[data-cy="submit"').click();
 
-        cy.contains('New Sub Topic');
+      cy.contains('New Sub Topic');
 
-        cy.get('[data-cy=show-more-button]').last().click();
+      cy.get('[data-cy=show-more-button]').last().click();
 
-        cy.get('[data-cy=add-topic-menu-item]').last().click();
+      cy.get('[data-cy=add-topic-menu-item]').last().click();
 
-        cy.get('[data-cy="topic-title-edit"]').last().click();
+      cy.get('[data-cy="topic-title-edit"]').last().click();
 
-        cy.get('[data-cy=topic-title-input] input')
-          .last()
-          .clear()
-          .type(`${faker.lorem.word()}{enter}`);
+      cy.get('[data-cy=topic-title-input] input')
+        .last()
+        .clear()
+        .type(`${faker.lorem.word()}{enter}`);
 
-        cy.createTextQuestion(genericTemplateQuestionaryQuestion[0]);
+      cy.createTextQuestion(genericTemplateQuestionaryQuestion[0]);
 
-        cy.visit('/');
+      cy.visit('/');
 
-        cy.navigateToTemplatesSubmenu('Sub Template');
+      cy.navigateToTemplatesSubmenu('Sub Template');
 
-        cy.get('[data-cy=create-new-button]').click();
+      cy.get('[data-cy=create-new-button]').click();
 
-        cy.get('[data-cy=name] input')
-          .type(genericTemplateName[1])
-          .should('have.value', genericTemplateName[1]);
+      cy.get('[data-cy=name] input')
+        .type(genericTemplateName[1])
+        .should('have.value', genericTemplateName[1]);
 
-        cy.get('[data-cy=description]').type(genericTemplateDescription[1]);
+      cy.get('[data-cy=description]').type(genericTemplateDescription[1]);
 
-        cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=submit]').click();
 
-        cy.get('[data-cy="proposal-question-id"').click();
+      cy.get('[data-cy="proposal-question-id"').click();
 
-        cy.get('[data-cy="question"').type(genericTemplateQuestions[1]);
+      cy.get('[data-cy="question"').type(genericTemplateQuestions[1]);
 
-        cy.get('[data-cy="submit"').click();
+      cy.get('[data-cy="submit"').click();
 
-        cy.contains('New Sub Topic');
+      cy.contains('New Sub Topic');
 
-        cy.get('[data-cy=show-more-button]').last().click();
+      cy.get('[data-cy=show-more-button]').last().click();
 
-        cy.get('[data-cy=add-topic-menu-item]').last().click();
+      cy.get('[data-cy=add-topic-menu-item]').last().click();
 
-        cy.get('[data-cy="topic-title-edit"]').last().click();
+      cy.get('[data-cy="topic-title-edit"]').last().click();
 
-        cy.get('[data-cy=topic-title-input] input')
-          .last()
-          .clear()
-          .type(`${faker.lorem.word()}{enter}`);
+      cy.get('[data-cy=topic-title-input] input')
+        .last()
+        .clear()
+        .type(`${faker.lorem.word()}{enter}`);
 
-        cy.createTextQuestion(genericTemplateQuestionaryQuestion[1]);
+      cy.createTextQuestion(genericTemplateQuestionaryQuestion[1]);
 
-        cy.visit('/');
+      cy.visit('/');
 
-        cy.navigateToTemplatesSubmenu('Proposal');
+      cy.navigateToTemplatesSubmenu('Proposal');
 
-        cy.contains(proposalTemplateName)
-          .parent()
-          .find('[aria-label="Edit"]')
-          .click();
+      cy.contains(proposalTemplateName)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
 
-        cy.finishedLoading();
+      cy.finishedLoading();
 
-        cy.createGenericTemplateQuestion(
-          genericTemplateQuestion[0],
-          genericTemplateName[0],
-          addButtonLabel[0],
-          {
-            minEntries: 1,
-            maxEntries: 2,
-          }
-        );
+      cy.createGenericTemplateQuestion(
+        genericTemplateQuestion[0],
+        genericTemplateName[0],
+        addButtonLabel[0],
+        {
+          minEntries: 1,
+          maxEntries: 2,
+        }
+      );
 
-        cy.createGenericTemplateQuestion(
-          genericTemplateQuestion[1],
-          genericTemplateName[1],
-          addButtonLabel[1],
-          {
-            minEntries: 0,
-            maxEntries: 2,
-          }
-        );
+      cy.createGenericTemplateQuestion(
+        genericTemplateQuestion[1],
+        genericTemplateName[1],
+        addButtonLabel[1],
+        {
+          minEntries: 0,
+          maxEntries: 2,
+        }
+      );
 
-        cy.contains(genericTemplateQuestion[0]); // checking if question in the topic column
-        cy.contains(genericTemplateQuestion[1]); // checking if question in the topic column
+      cy.contains(genericTemplateQuestion[0]); // checking if question in the topic column
+      cy.contains(genericTemplateQuestion[1]); // checking if question in the topic column
+    });
+  });
+
+  describe('Generic templates advanced tests', () => {
+    beforeEach(() => {
+      createTemplateAndAllQuestions();
+
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
+        } else {
+          throw new Error('Workflow creation failed');
+        }
       });
     });
 
-    describe('Generic templates advanced tests', () => {
-      beforeEach(() => {
-        createTemplateAndAllQuestions();
+    it('Should have different Question lables for different tables', () => {
+      cy.updateCall({
+        ...updatedCall,
+        templateId: createdTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      cy.login('user');
+      cy.visit('/');
 
-        cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-          if (result.createProposalWorkflow.proposalWorkflow) {
-            workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
-          } else {
-            throw new Error('Workflow creation failed');
-          }
-        });
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=title] input').type(faker.lorem.words(1));
+
+      cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]).should('exist');
+
+      cy.get('[data-cy=genericTemplate-declaration-modal]').type('{esc}');
+
+      cy.contains(addButtonLabel[1]).click();
+
+      cy.contains(genericTemplateQuestions[1]).should('exist');
+    });
+
+    it('Should be able to create proposal with genericTemplate', () => {
+      cy.updateCall({
+        ...updatedCall,
+        templateId: createdTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      cy.login('user');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] input').clear();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.contains('This is a required field');
+
+      cy.get('[data-cy=title-input] input')
+        .clear()
+        .type(genericTemplateTitle)
+        .should('have.value', genericTemplateTitle);
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="clone"]').click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        2
+      );
+
+      cy.contains(addButtonLabel[0]).should('be.disabled'); // Add button should be disabled because of max entry limit
+
+      cy.get('[data-cy="delete"]').eq(1).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+      cy.contains(addButtonLabel[0]).should('not.be.disabled');
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+    });
+
+    it('Should be able to clone proposal with GenericTemplates', () => {
+      cy.updateCall({
+        ...updatedCall,
+        templateId: createdTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      cy.createProposal({ callId: updatedCall.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            title: proposalTitle[1],
+            abstract: faker.lorem.words(3),
+          });
+          cy.createGenericTemplate({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            title: genericTemplateTitle,
+            templateId: createdGenericTemplateId,
+            questionId: createdQuestion1Id,
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains('Proposals').click();
+
+      cy.contains(proposalTitle[1])
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[aria-label="Clone proposals to call"]').click();
+
+      cy.get('#selectedCallId-input').click();
+      cy.get('[role="presentation"]').contains(updatedCall.shortCode).click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal/s cloned successfully',
       });
 
-      it('Should have different Question lables for different tables', () => {
-        cy.updateCall({
-          ...updatedCall,
-          templateId: createdTemplateId,
-          proposalWorkflowId: workflowId,
-        });
-        cy.login('user');
-        cy.visit('/');
+      cy.contains(`Copy of ${proposalTitle[1]}`)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
 
-        cy.contains('New proposal', { matchCase: false }).click();
-        cy.get('[data-cy=title] input').type(faker.lorem.words(1));
+      cy.contains('Edit proposal').click();
 
-        cy.get('[data-cy=abstract] textarea')
-          .first()
-          .type(faker.lorem.words(2));
+      cy.finishedLoading();
 
-        cy.contains('Save and continue').click();
+      cy.contains('New topic', { matchCase: false }).click();
 
-        cy.finishedLoading();
+      cy.get('[data-cy=questionnaires-list-item]')
+        .contains(genericTemplateTitle)
+        .click();
 
-        cy.contains(addButtonLabel[0]).click();
+      cy.get('[data-cy="genericTemplate-declaration-modal"]').should('exist');
+      cy.get(
+        '[data-cy="genericTemplate-declaration-modal"] [data-cy=questionary-title]'
+      ).contains(genericTemplateTitle);
+    });
 
-        cy.contains(genericTemplateQuestions[0]).should('exist');
-
-        cy.get('[data-cy=genericTemplate-declaration-modal]').type('{esc}');
-
-        cy.contains(addButtonLabel[1]).click();
-
-        cy.contains(genericTemplateQuestions[1]).should('exist');
+    it('User should not be able to submit proposal with unfinished genericTemplate', () => {
+      cy.updateCall({
+        ...updatedCall,
+        templateId: createdTemplateId,
+        proposalWorkflowId: workflowId,
       });
+      cy.createProposal({ callId: updatedCall.id });
+      cy.login('user');
+      cy.visit('/');
 
-      it('Should be able to create proposal with genericTemplate', () => {
-        cy.updateCall({
-          ...updatedCall,
-          templateId: createdTemplateId,
-          proposalWorkflowId: workflowId,
-        });
-        cy.login('user');
-        cy.visit('/');
+      cy.contains('New proposal', { matchCase: false }).click();
 
-        cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
 
-        cy.get('[data-cy=title] input').type(proposalTitle[1]);
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
 
-        cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+      cy.contains('Save and continue').click();
 
-        cy.contains('Save and continue').click();
+      cy.finishedLoading();
 
-        cy.finishedLoading();
+      cy.contains(addButtonLabel[0]).click();
 
-        cy.contains(addButtonLabel[0]).click();
+      cy.get('[data-cy=title-input] input')
+        .clear()
+        .type(genericTemplateTitle)
+        .should('have.value', genericTemplateTitle)
+        .blur();
 
-        cy.contains(genericTemplateQuestions[0]);
+      cy.get(
+        '[data-cy="genericTemplate-declaration-modal"] [data-cy="save-button"]'
+      ).click();
 
-        cy.get('[data-cy=title-input] input').clear();
+      cy.finishedLoading();
 
-        cy.get(
-          '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
-        ).click();
+      cy.get('body').type('{esc}');
 
-        cy.contains('This is a required field');
+      cy.finishedLoading();
 
-        cy.get('[data-cy=title-input] input')
-          .clear()
-          .type(genericTemplateTitle)
-          .should('have.value', genericTemplateTitle);
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
-        cy.get(
-          '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
-        ).click();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
-        cy.finishedLoading();
+      cy.contains('All genericTemplates must be completed');
 
-        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+      cy.contains(genericTemplateTitle).click();
 
-        cy.get('[data-cy="clone"]').click();
+      cy.get(
+        '[data-cy="genericTemplate-declaration-modal"] [data-cy="save-and-continue-button"]'
+      ).click();
 
-        cy.contains('OK').click();
+      cy.finishedLoading();
 
-        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+      cy.get('.Mui-error').should('not.exist');
 
-        cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
-          'have.length',
-          2
-        );
+      cy.contains('Save and continue').click();
 
-        cy.contains(addButtonLabel[0]).should('be.disabled'); // Add button should be disabled because of max entry limit
+      cy.contains('Submit').click();
 
-        cy.get('[data-cy="delete"]').eq(1).click();
+      cy.contains('OK').click();
+    });
 
-        cy.contains('OK').click();
-
-        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
-        cy.contains(addButtonLabel[0]).should('not.be.disabled');
-
-        cy.contains('Save and continue').click();
-
-        cy.contains('Submit').click();
-
-        cy.contains('OK').click();
+    it('Officer should able to delete proposal with genericTemplate', () => {
+      cy.updateCall({
+        ...updatedCall,
+        templateId: createdTemplateId,
+        proposalWorkflowId: workflowId,
       });
-
-      it('Should be able to clone proposal with GenericTemplates', () => {
-        cy.updateCall({
-          ...updatedCall,
-          templateId: createdTemplateId,
-          proposalWorkflowId: workflowId,
-        });
-        cy.createProposal({ callId: updatedCall.id }).then((result) => {
-          if (result.createProposal.proposal) {
-            cy.updateProposal({
-              proposalPk: result.createProposal.proposal.primaryKey,
-              title: proposalTitle[1],
-              abstract: faker.lorem.words(3),
-            });
-            cy.createGenericTemplate({
-              proposalPk: result.createProposal.proposal.primaryKey,
-              title: genericTemplateTitle,
-              templateId: createdGenericTemplateId,
-              questionId: createdQuestion1Id,
-            });
-          }
-        });
-        cy.login('officer');
-        cy.visit('/');
-
-        cy.contains('Proposals').click();
-
-        cy.contains(proposalTitle[1])
-          .parent()
-          .find('input[type="checkbox"]')
-          .click();
-
-        cy.get('[aria-label="Clone proposals to call"]').click();
-
-        cy.get('#selectedCallId-input').click();
-        cy.get('[role="presentation"]').contains(updatedCall.shortCode).click();
-
-        cy.get('[data-cy="submit"]').click();
-
-        cy.notification({
-          variant: 'success',
-          text: 'Proposal/s cloned successfully',
-        });
-
-        cy.contains(`Copy of ${proposalTitle[1]}`)
-          .parent()
-          .find('[aria-label="View proposal"]')
-          .click();
-
-        cy.contains('Edit proposal').click();
-
-        cy.finishedLoading();
-
-        cy.contains('New topic', { matchCase: false }).click();
-
-        cy.get('[data-cy=questionnaires-list-item]')
-          .contains(genericTemplateTitle)
-          .click();
-
-        cy.get('[data-cy="genericTemplate-declaration-modal"]').should('exist');
-        cy.get(
-          '[data-cy="genericTemplate-declaration-modal"] [data-cy=questionary-title]'
-        ).contains(genericTemplateTitle);
+      cy.createProposal({ callId: updatedCall.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            title: proposalTitle[1],
+            abstract: faker.lorem.words(3),
+          });
+          cy.createGenericTemplate({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            title: genericTemplateTitle,
+            templateId: createdGenericTemplateId,
+            questionId: createdQuestion1Id,
+          });
+        }
       });
+      cy.login('officer');
+      cy.visit('/');
 
-      it('User should not be able to submit proposal with unfinished genericTemplate', () => {
-        cy.updateCall({
-          ...updatedCall,
-          templateId: createdTemplateId,
-          proposalWorkflowId: workflowId,
-        });
-        cy.createProposal({ callId: updatedCall.id });
-        cy.login('user');
-        cy.visit('/');
+      cy.contains('Proposals').click();
 
-        cy.contains('New proposal', { matchCase: false }).click();
+      cy.get("input[type='checkbox']").first().click();
 
-        cy.get('[data-cy=title] input').type(proposalTitle[1]);
+      cy.get("[aria-label='Delete proposals']").first().click();
 
-        cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+      cy.get('[data-cy="confirm-ok"]').click();
 
-        cy.contains('Save and continue').click();
-
-        cy.finishedLoading();
-
-        cy.contains(addButtonLabel[0]).click();
-
-        cy.get('[data-cy=title-input] input')
-          .clear()
-          .type(genericTemplateTitle)
-          .should('have.value', genericTemplateTitle)
-          .blur();
-
-        cy.get(
-          '[data-cy="genericTemplate-declaration-modal"] [data-cy="save-button"]'
-        ).click();
-
-        cy.finishedLoading();
-
-        cy.get('body').type('{esc}');
-
-        cy.finishedLoading();
-
-        cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
-
-        cy.get('[data-cy="save-and-continue-button"]').click();
-
-        cy.contains('All genericTemplates must be completed');
-
-        cy.contains(genericTemplateTitle).click();
-
-        cy.get(
-          '[data-cy="genericTemplate-declaration-modal"] [data-cy="save-and-continue-button"]'
-        ).click();
-
-        cy.finishedLoading();
-
-        cy.get('.Mui-error').should('not.exist');
-
-        cy.contains('Save and continue').click();
-
-        cy.contains('Submit').click();
-
-        cy.contains('OK').click();
-      });
-
-      it('Officer should able to delete proposal with genericTemplate', () => {
-        cy.updateCall({
-          ...updatedCall,
-          templateId: createdTemplateId,
-          proposalWorkflowId: workflowId,
-        });
-        cy.createProposal({ callId: updatedCall.id }).then((result) => {
-          if (result.createProposal.proposal) {
-            cy.updateProposal({
-              proposalPk: result.createProposal.proposal.primaryKey,
-              title: proposalTitle[1],
-              abstract: faker.lorem.words(3),
-            });
-            cy.createGenericTemplate({
-              proposalPk: result.createProposal.proposal.primaryKey,
-              title: genericTemplateTitle,
-              templateId: createdGenericTemplateId,
-              questionId: createdQuestion1Id,
-            });
-          }
-        });
-        cy.login('officer');
-        cy.visit('/');
-
-        cy.contains('Proposals').click();
-
-        cy.get("input[type='checkbox']").first().click();
-
-        cy.get("[aria-label='Delete proposals']").first().click();
-
-        cy.get('[data-cy="confirm-ok"]').click();
-
-        cy.contains(proposalTitle[1]).should('not.exist');
-      });
+      cy.contains(proposalTitle[1]).should('not.exist');
     });
   });
 });
