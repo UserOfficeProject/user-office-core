@@ -187,21 +187,26 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
     });
   }, [setCookie, state]);
 
+  async function userLogoutHandler() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      await unauthorizedApi()
+        .logout({
+          token: token,
+        })
+        .finally(() => {
+          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
+        });
+    }
+  }
+
   return (
     <UserContext.Provider
       value={{
         ...state,
         handleLogin: (data): void =>
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
-        handleLogout: () => {
-          if (localStorage.token) {
-            unauthorizedApi().logout({
-              token: localStorage.token,
-            });
-          }
-
-          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
-        },
+        handleLogout: userLogoutHandler,
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(
