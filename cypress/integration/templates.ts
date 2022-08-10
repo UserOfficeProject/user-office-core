@@ -48,7 +48,12 @@ context('Template tests', () => {
   };
   const multipleChoiceQuestion = {
     title: faker.lorem.words(2),
-    answers: [faker.lorem.words(3), faker.lorem.words(3), faker.lorem.words(3)],
+    answers: [
+      faker.lorem.words(3),
+      faker.lorem.words(3),
+      faker.lorem.words(3),
+      faker.lorem.words(3),
+    ],
   };
 
   const numberQuestion2 = { title: faker.lorem.words(3) };
@@ -531,11 +536,63 @@ context('Template tests', () => {
         .click();
 
       cy.get('[index=0]').contains(multipleChoiceQuestion.answers[1]);
+      cy.get('[index=1]').contains(multipleChoiceQuestion.answers[0]);
 
       cy.contains(multipleChoiceQuestion.answers[1])
         .parent()
         .find('[aria-label=Down]')
         .click();
+
+      cy.contains(multipleChoiceQuestion.answers[0])
+        .parent()
+        .find('[aria-label=Up]')
+        .find('[type=button]')
+        .should('be.disabled');
+
+      cy.contains(multipleChoiceQuestion.answers[0])
+        .parent()
+        .find('[aria-label=Down]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[0])
+        .parent()
+        .find('[aria-label=Up]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[2])
+        .parent()
+        .find('[aria-label=Down]')
+        .find('[type=button]')
+        .should('be.disabled');
+
+      cy.contains(multipleChoiceQuestion.answers[2])
+        .parent()
+        .find('[aria-label=Up]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[2])
+        .parent()
+        .find('[aria-label=Down]')
+        .click();
+
+      cy.contains(multipleChoiceQuestion.answers[0])
+        .parent()
+        .find('[aria-label=Edit]')
+        .click()
+        .get('[aria-label=Answer]')
+        .type(multipleChoiceQuestion.answers[3])
+        .get('[aria-label=Save]')
+        .click()
+        .get('[index=0]')
+        .should('contain', multipleChoiceQuestion.answers[3]);
+
+      cy.contains(multipleChoiceQuestion.answers[1])
+        .parent()
+        .find('[aria-label=Delete]')
+        .click()
+        .get('[aria-label=Save]')
+        .click()
+        .should('not.exist');
 
       cy.contains('Save').click();
 
