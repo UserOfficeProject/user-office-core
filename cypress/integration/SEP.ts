@@ -199,7 +199,10 @@ context('SEP reviews tests', () => {
   });
 
   describe('User officer role', () => {
-    it('Officer should be able to assign proposal to existing SEP', () => {
+    it('Officer should be able to assign proposal to existing SEP', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
