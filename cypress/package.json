@@ -4,7 +4,7 @@
   "private": true,
   "proxy": "http://localhost:4000",
   "dependencies": {
-    "@types/luxon": "^2.3.2",
+    "@types/luxon": "^2.4.0",
     "cypress-file-upload": "^6.0.0-beta.0",
     "graphql": "^15.8.0",
     "graphql-request": "^3.7.0",
