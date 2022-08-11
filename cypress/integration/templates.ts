@@ -355,7 +355,7 @@ context('Template tests', () => {
 
   describe('Proposal templates basic tests', () => {
     it('User officer can delete active template', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
         this.skip();
       }
       const newName = faker.lorem.words(3);
