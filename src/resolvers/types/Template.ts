@@ -96,11 +96,14 @@ export class TemplateResolver {
     @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<PdfTemplate | null> {
-    return (
-      await context.queries.pdfTemplate.getPdfTemplates(context.user, {
+    const templates = await context.queries.pdfTemplate.getPdfTemplates(
+      context.user,
+      {
         filter: { templateIds: [template.templateId] },
-      })
-    ).filter(
+      }
+    );
+
+    return templates?.filter(
       (pdfTemplate) => pdfTemplate.templateId === template.templateId
     )[0];
   }
