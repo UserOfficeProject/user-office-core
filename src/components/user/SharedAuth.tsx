@@ -1,30 +1,17 @@
-import makeStyles from '@mui/styles/makeStyles';
-import React, { useContext, useEffect } from 'react';
-import { Redirect, useLocation } from 'react-router';
+import Lock from '@mui/icons-material/Lock';
+import { useSnackbar } from 'notistack';
+import React from 'react';
+import { useHistory } from 'react-router';
 
-import UOLoader from 'components/common/UOLoader';
-import { UserContext } from 'context/UserContextProvider';
-import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import AnimatedEllipsis from 'components/AnimatedEllipsis';
+import CenteredAlert from 'components/common/CenteredAlert';
+import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-  },
-  message: {
-    margin: theme.spacing(2),
-    color: theme.palette.grey[700],
-  },
-}));
+function isValidUrl(authRedirect: string | null): boolean {
+  if (!authRedirect) {
+    return false;
+  }
 
-function checkAuthRedirect(authRedirect: string): boolean {
   try {
     new URL(authRedirect);
 
@@ -38,47 +25,30 @@ function checkAuthRedirect(authRedirect: string): boolean {
 }
 
 export default function SharedAuth() {
-  const classes = useStyles();
-  const { token, handleLogout } = useContext(UserContext);
-  const location = useLocation();
-  const unauthorizedApi = useUnauthorizedApi();
-
+  const api = getUnauthorizedApi();
+  const { enqueueSnackbar } = useSnackbar();
   const authRedirect = new URLSearchParams(location.search).get('authRedirect');
+  const history = useHistory();
 
-  useEffect(() => {
-    if (!authRedirect) {
-      return;
+  if (!isValidUrl(authRedirect)) {
+    {
+      api.addClientLog({
+        error: `Invalid authRedirect URL; authRedirect: ${authRedirect}`,
+      });
+
+      enqueueSnackbar('Invalid authRedirect URL', { variant: 'error' });
+
+      history.push('/');
+
+      return null;
     }
-
-    if (token && checkAuthRedirect(authRedirect)) {
-      unauthorizedApi()
-        .checkToken({ token })
-        .then(({ checkToken: { isValid } }) => {
-          if (isValid) {
-            window.location.assign(authRedirect);
-          } else {
-            handleLogout();
-          }
-        })
-        .catch(() => handleLogout());
-    }
-  }, [token, authRedirect, unauthorizedApi, handleLogout]);
-
-  if (token && authRedirect) {
-    return (
-      <div className={classes.root}>
-        <UOLoader />
-        <div className={classes.message}>Please wait</div>
-      </div>
-    );
   }
 
+  window.location.href = authRedirect as string;
+
   return (
-    <Redirect
-      to={{
-        pathname: '/SignIn',
-        search: location.search,
-      }}
-    />
+    <CenteredAlert severity="info" icon={<Lock fontSize="medium" />}>
+      <AnimatedEllipsis>Please wait...</AnimatedEllipsis>
+    </CenteredAlert>
   );
 }

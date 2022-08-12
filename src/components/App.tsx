@@ -32,7 +32,6 @@ import DashBoard from './DashBoard';
 import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
 import ExternalAuth from './user/ExternalAuth';
-import SharedAuth from './user/SharedAuth';
 
 const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   if (!component) {
@@ -83,7 +82,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
               if (!externalAuthLoginUrl) {
                 return SystemConfigurationError();
               }
-              localStorage.setItem('landingUrl', props.location.pathname);
+              localStorage.setItem('landingUrl', window.location.href);
               window.location.href = externalAuthLoginUrl;
 
               return ContactingAuthorizationServerInfo();
@@ -109,7 +108,6 @@ const Routes: React.FC<RouteProps> = () => {
         <Route path="/external-auth/:token" component={ExternalAuth} />
         <Route path="/external-auth/:code" component={ExternalAuth} />
         <Route path="/external-auth/" component={ExternalAuth} />
-        <Route path="/shared-auth" component={SharedAuth} />
         <Route path="/EmailVerification/:token" component={EmailVerification} />
         <PrivateRoute path="/" component={DashBoard} />
       </Switch>
