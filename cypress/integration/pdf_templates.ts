@@ -138,24 +138,5 @@ context('PDF template tests', () => {
 
       cy.contains(pdfTemplateData.replace(/\n|\r/g, ' ')).should('exist');
     });
-
-    it('User officer can delete PDF template', () => {
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('PDF');
-
-      cy.contains(createdTemplateName);
-
-      cy.contains(createdTemplateName)
-        .parent()
-        .find("[aria-label='Delete']")
-        .first()
-        .click();
-
-      cy.contains('Yes').click();
-
-      cy.contains(createdTemplateName).should('not.exist');
-    });
   });
 });
