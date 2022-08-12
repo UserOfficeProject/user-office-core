@@ -84,7 +84,7 @@ export class CreateCallInput {
   @Field(() => [Int], { nullable: true })
   public seps?: number[];
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   public pdfTemplateId?: number;
 }
 
