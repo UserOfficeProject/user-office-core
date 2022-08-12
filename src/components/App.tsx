@@ -50,7 +50,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
 
   const SystemConfigurationError = () => (
     <CenteredAlert severity="error" icon={<BugReportIcon fontSize="medium" />}>
-      <AnimatedEllipsis>System configuration error</AnimatedEllipsis>
+      <span>System configuration error</span>
     </CenteredAlert>
   );
 
