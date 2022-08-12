@@ -199,11 +199,35 @@ context('SEP reviews tests', () => {
   });
 
   describe('User officer role', () => {
-    it('Officer should be able to assign proposal to existing SEP', function () {
-      cy.getAndStoreFeaturesEnabled();
-      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
-        this.skip();
-      }
+    it('Officer should be able to see proposal details in modal inside proposals and assignments', () => {
+      cy.assignProposalsToSep({
+        sepId: createdSepId,
+        proposals: [
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+        ],
+      });
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Proposal information');
+      cy.get('[role="dialog"]').contains('Technical review');
+
+      cy.get('[role="dialog"]').contains(proposal1.title);
+      cy.get('[role="dialog"]').contains('Download PDF');
+
+      cy.closeModal();
+    });
+
+    it('Officer should be able to assign proposal to existing SEP', () => {
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
@@ -267,34 +291,6 @@ context('SEP reviews tests', () => {
         'contain.text',
         proposal1.title
       );
-    });
-
-    it('Officer should be able to see proposal details in modal inside proposals and assignments', () => {
-      cy.assignProposalsToSep({
-        sepId: createdSepId,
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
-      });
-      cy.login('officer');
-      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
-
-      cy.finishedLoading();
-
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[data-cy="view-proposal"]')
-        .click();
-
-      cy.finishedLoading();
-
-      cy.get('[role="dialog"]').contains('Proposal information');
-      cy.get('[role="dialog"]').contains('Technical review');
-
-      cy.get('[role="dialog"]').contains(proposal1.title);
-      cy.get('[role="dialog"]').contains('Download PDF');
-
-      cy.closeModal();
     });
 
     it('Proposal should contain standard deviation field inside proposals and assignments', () => {
