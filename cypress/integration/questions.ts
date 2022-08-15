@@ -8,6 +8,7 @@ context('Questions tests', () => {
   const samplesQuestion = initialDBData.questions.addSamples.text;
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
 
     cy.createQuestion({

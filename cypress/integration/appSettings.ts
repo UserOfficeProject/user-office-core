@@ -5,6 +5,7 @@ context('App settings tests', () => {
   beforeEach(() => {
     cy.viewport(1920, 2000);
     cy.getAndStoreAppSettings();
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 

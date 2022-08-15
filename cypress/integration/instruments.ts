@@ -1,6 +1,11 @@
 import { faker } from '@faker-js/faker';
 
-import { ReviewerFilter, TechnicalReviewStatus } from '../../src/generated/sdk';
+import {
+  FeatureId,
+  ReviewerFilter,
+  TechnicalReviewStatus,
+} from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 const selectAllProposalsFilterStatus = () => {
@@ -37,6 +42,7 @@ context('Instrument tests', () => {
   };
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -61,7 +67,10 @@ context('Instrument tests', () => {
       });
     });
 
-    it('User officer should be able to create instrument', () => {
+    it('User officer should be able to create instrument', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+        this.skip();
+      }
       cy.contains('Instruments').click();
       cy.contains('Create').click();
       cy.get('#name').type(instrument1.name);
@@ -275,7 +284,10 @@ context('Instrument tests', () => {
       });
     });
 
-    it('User Officer should be able to see who submitted the technical review', () => {
+    it('User Officer should be able to see who submitted the technical review', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
@@ -320,7 +332,10 @@ context('Instrument tests', () => {
       );
     });
 
-    it('User Officer should be able to re-open submitted technical review', () => {
+    it('User Officer should be able to re-open submitted technical review', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
@@ -405,7 +420,10 @@ context('Instrument tests', () => {
       );
     });
 
-    it('User Officer should be able to see proposal instrument scientist and re-assign technical reviewer', () => {
+    it('User Officer should be able to see proposal instrument scientist and re-assign technical reviewer', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       const numberOfScientistsAndManagerAssignedToCreatedInstrument = 2;
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
@@ -518,7 +536,10 @@ context('Instrument tests', () => {
     let createdProposalPk: number;
     let createdProposalId: string;
 
-    beforeEach(() => {
+    beforeEach(function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+        this.skip();
+      }
       cy.updateUserRoles({
         id: scientist2.id,
         roles: [initialDBData.roles.instrumentScientist],
