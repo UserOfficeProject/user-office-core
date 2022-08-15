@@ -1,9 +1,12 @@
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import Preview from '@mui/icons-material/Preview';
 import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
+import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import Switch from '@mui/material/Switch';
+import Tooltip from '@mui/material/Tooltip';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
@@ -15,6 +18,7 @@ import {
   QuestionaryStep,
   QuestionTemplateRelation,
   Template,
+  TemplateGroupId,
 } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel, {
@@ -30,6 +34,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
+import PreviewTemplateModal from './PreviewTemplateModal';
 import QuestionEditor from './QuestionEditor';
 import { QuestionPicker } from './QuestionPicker';
 import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
@@ -56,6 +61,9 @@ export default function TemplateEditor() {
   );
 
   const [hoveredDependency, setHoveredDependency] = useState<string>('');
+  const [openedPreviewTemplateId, setOpenedPreviewTemplateId] = useState<
+    number | null
+  >(null);
 
   const [questionPickerTopicId, setQuestionPickerTopicId] = useState<
     number | null
@@ -237,30 +245,57 @@ export default function TemplateEditor() {
       </Button>
     ) : null;
 
-  const enableReorderTopicsToggle =
-    state.steps.length > 1 ? (
-      <FormGroup
-        row
-        style={{ justifyContent: 'flex-end', paddingBottom: '25px' }}
-      >
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isTopicReorderMode}
-              onChange={(): void => setIsTopicReorderMode(!isTopicReorderMode)}
-            />
-          }
-          label="Reorder topics mode"
-        />
-      </FormGroup>
-    ) : null;
+  const topControlBarElements = [];
+
+  if (state.steps.length > 1) {
+    topControlBarElements.push(
+      <FormControlLabel
+        control={
+          <Switch
+            checked={isTopicReorderMode}
+            onChange={(): void => setIsTopicReorderMode(!isTopicReorderMode)}
+          />
+        }
+        label="Reorder topics mode"
+      />
+    );
+  }
+
+  // NOTE: For now preview works on proposal templates only. Another task is added to make it work for all of the templates.
+  if (state.groupId === TemplateGroupId.PROPOSAL) {
+    topControlBarElements.push(
+      <Tooltip title="Preview questionary">
+        <IconButton
+          onClick={() => setOpenedPreviewTemplateId(state.templateId)}
+          data-cy="preview-questionary-template"
+        >
+          <Preview />
+        </IconButton>
+      </Tooltip>
+    );
+  }
+
+  const topControlBar = topControlBarElements.length ? (
+    <FormGroup
+      row
+      style={{ justifyContent: 'flex-end', paddingBottom: '25px' }}
+    >
+      {topControlBarElements.map((element) => element)}
+    </FormGroup>
+  ) : null;
 
   return (
     <StyledContainer maxWidth={false}>
+      {openedPreviewTemplateId !== null && (
+        <PreviewTemplateModal
+          templateId={openedPreviewTemplateId}
+          setTemplateId={setOpenedPreviewTemplateId}
+        />
+      )}
       <TemplateMetadataEditor dispatch={dispatch} template={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
-        {enableReorderTopicsToggle}
+        {topControlBar}
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="topics" direction="horizontal" type="topic">
             {(provided, snapshot) => (

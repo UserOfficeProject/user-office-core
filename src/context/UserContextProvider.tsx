@@ -10,7 +10,18 @@ import clearSession from 'utils/clearSession';
 
 import { SettingsContext } from './SettingsContextProvider';
 
-export type BasicUser = Pick<User, 'id' | 'email'>;
+export type BasicUser = Pick<
+  User,
+  | 'id'
+  | 'email'
+  | 'firstname'
+  | 'lastname'
+  | 'organisation'
+  | 'preferredname'
+  | 'placeholder'
+  | 'created'
+  | 'position'
+>;
 
 interface UserContextData {
   user: BasicUser;
@@ -40,7 +51,17 @@ enum ActionType {
 }
 
 const initUserData: UserContextData = {
-  user: { id: 0, email: '' },
+  user: {
+    id: 0,
+    email: '',
+    firstname: '',
+    lastname: '',
+    organisation: 0,
+    created: '',
+    placeholder: false,
+    preferredname: '',
+    position: '',
+  },
   token: '',
   roles: [],
   currentRole: null,
@@ -188,31 +209,31 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
     });
   }, [setCookie, state]);
 
+  async function userLogoutHandler() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      unauthorizedApi()
+        .logout({ token })
+        .finally(() => {
+          const logoutUrl = settingsContext.settingsMap.get(
+            SettingsId.EXTERNAL_AUTH_LOGOUT_URL
+          )?.settingsValue;
+          if (logoutUrl) {
+            window.location.assign(logoutUrl);
+          } else {
+            dispatch({ type: ActionType.LOGOFFUSER, payload: null });
+          }
+        });
+    }
+  }
+
   return (
     <UserContext.Provider
       value={{
         ...state,
         handleLogin: (data): void =>
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
-        handleLogout: async () => {
-          if (localStorage.token) {
-            unauthorizedApi()
-              .logout({
-                token: localStorage.token,
-              })
-              .then(() => {
-                dispatch({ type: ActionType.LOGOFFUSER, payload: null });
-
-                const logoutUrl = settingsContext.settingsMap.get(
-                  SettingsId.EXTERNAL_AUTH_LOGOUT_URL
-                )?.settingsValue;
-
-                if (logoutUrl) {
-                  window.location.href = logoutUrl;
-                }
-              });
-          }
-        },
+        handleLogout: userLogoutHandler,
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(
