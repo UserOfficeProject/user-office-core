@@ -2,6 +2,7 @@
 import produce, { Draft } from 'immer';
 import { Reducer } from 'react';
 
+import { StepsWizardWithoutReviewStepFactory } from 'components/questionary/questionaries/sample/StepsWizardWithoutReviewStepFactory';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
 import { TemplateGroupId } from 'generated/sdk';
 import { Answer, Questionary, QuestionaryStep } from 'generated/sdk';
@@ -79,13 +80,19 @@ const clamStepIndex = (stepIndex: number, stepCount: number) => {
 
   return clamp(stepIndex, minStepIndex, maxStepIndex);
 };
+
 export abstract class QuestionarySubmissionState {
   constructor(
     public templateGroupId: TemplateGroupId,
     public initItem: ItemWithQuestionary,
-    public wizardSteps: WizardStep[] = getQuestionaryDefinition(
-      templateGroupId
-    ).wizardStepFactory.getWizardSteps(initItem.questionary.steps),
+    public isPreviewMode?: boolean,
+    public wizardSteps: WizardStep[] = isPreviewMode
+      ? new StepsWizardWithoutReviewStepFactory().getWizardSteps(
+          initItem.questionary.steps
+        )
+      : getQuestionaryDefinition(
+          templateGroupId
+        ).wizardStepFactory.getWizardSteps(initItem.questionary.steps),
     public stepIndex: number = 0,
     public isDirty: boolean = false
   ) {
