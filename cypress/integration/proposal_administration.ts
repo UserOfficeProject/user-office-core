@@ -168,11 +168,7 @@ context('Proposal administration tests', () => {
         );
     });
 
-    it('Should be able to re-open proposal for submission', function () {
-      // if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
-      //   //temporaily disable test in for stfc until logout function works
-      //   this.skip();
-      // }
+    it('Should be able to re-open proposal for submission', () => {
       cy.contains('Proposals').click();
 
       if (proposalName1) {
