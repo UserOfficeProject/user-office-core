@@ -11,18 +11,18 @@ import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWit
 
 import ProposalContainer from './ProposalContainer';
 
-function createProposalStub(
-  callId: number,
+export function createProposalStub(
   templateId: number,
   questionarySteps: QuestionaryStep[],
   proposer: BasicUserDetails,
-  call: Call | null
+  callId?: number,
+  call?: Call | null
 ): ProposalWithQuestionary {
   return {
     primaryKey: 0,
     title: '',
     abstract: '',
-    callId: callId,
+    callId: callId || 0,
     proposer: proposer,
     questionary: {
       questionaryId: 0,
@@ -68,11 +68,11 @@ export default function ProposalCreate() {
   return (
     <ProposalContainer
       proposal={createProposalStub(
-        parseInt(callId as string),
-        parseInt(templateId as string),
+        parseInt(templateId),
         questionarySteps,
         userData,
-        call as Call
+        parseInt(callId),
+        call
       )}
     />
   );

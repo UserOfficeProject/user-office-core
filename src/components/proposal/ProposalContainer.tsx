@@ -27,11 +27,14 @@ interface ProposalContainerProps {
   proposal: ProposalWithQuestionary;
   proposalUpdated?: (proposal: ProposalWithQuestionary) => void;
   elevation?: PaperProps['elevation'];
+  previewMode?: boolean;
 }
 export default function ProposalContainer(props: ProposalContainerProps) {
-  const { proposal, proposalUpdated, elevation } = props;
+  const { proposal, proposalUpdated, elevation, previewMode } = props;
 
-  const [initialState] = useState(new ProposalSubmissionState(proposal));
+  const [initialState] = useState(
+    new ProposalSubmissionState(proposal, previewMode)
+  );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.PROPOSAL);
 
@@ -88,6 +91,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
           <Questionary
             title={state.proposal.title || 'New Proposal'}
             info={info}
+            previewMode={previewMode}
           />
         </StyledPaper>
       </StyledContainer>

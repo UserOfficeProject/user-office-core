@@ -3,7 +3,7 @@ import { WizardStep } from 'models/questionary/QuestionarySubmissionState';
 
 import { SampleQuestionaryWizardStep } from './SampleQuestionaryWizardStep';
 
-export class SampleWizardStepFactory {
+export class StepsWizardWithoutReviewStepFactory {
   getWizardSteps(questionarySteps: QuestionaryStep[]): WizardStep[] {
     const wizardSteps: WizardStep[] = [];
 
