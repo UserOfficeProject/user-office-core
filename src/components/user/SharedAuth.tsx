@@ -27,7 +27,9 @@ function isValidUrl(authRedirect: string | null): boolean {
 export default function SharedAuth() {
   const api = getUnauthorizedApi();
   const { enqueueSnackbar } = useSnackbar();
-  const authRedirect = new URLSearchParams(location.search).get('authRedirect');
+  const authRedirect = new URLSearchParams(window.location.search).get(
+    'authRedirect'
+  );
   const history = useHistory();
 
   if (!isValidUrl(authRedirect)) {
