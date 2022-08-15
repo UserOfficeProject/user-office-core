@@ -822,6 +822,39 @@ context('Instrument tests', () => {
       cy.contains('20');
     });
 
+    it('Instrument scientists should be able to see but not modify the management decision', () => {
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .click();
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Admin').click();
+
+      cy.get('@dialog')
+        .find('[data-cy="proposal-final-status"] input')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="managementTimeAllocation"] input')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="commentForUser"] textarea')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="commentForManagement"] textarea')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="is-management-decision-submitted"] input')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="save-admin-decision"]')
+        .should('be.disabled');
+    });
+
     it('Technical review assignee should see edit icon if assigned to review a proposal and review is not submitted', () => {
       selectAllProposalsFilterStatus();
 
