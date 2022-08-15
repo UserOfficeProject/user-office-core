@@ -4,8 +4,10 @@ import { DateTime } from 'luxon';
 import {
   AllocationTimeUnits,
   CreateInstrumentMutationVariables,
+  FeatureId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Calls tests', () => {
@@ -74,6 +76,7 @@ context('Calls tests', () => {
   };
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
     cy.createTemplate({
       groupId: TemplateGroupId.PROPOSAL_ESI,
@@ -110,6 +113,7 @@ context('Calls tests', () => {
 
   describe('Call basic tests', () => {
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
       cy.login('officer');
       cy.visit('/');
     });
@@ -180,8 +184,10 @@ context('Calls tests', () => {
         .contains(initialDBData.template.name)
         .click();
 
-      cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="presentation"]').contains(esiTemplateName).click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
+        cy.get('[data-cy="call-esi-template"]').click();
+        cy.get('[role="presentation"]').contains(esiTemplateName).click();
+      }
 
       cy.get('[data-cy="call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
@@ -291,8 +297,10 @@ context('Calls tests', () => {
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
 
-      cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="presentation"]').contains(esiTemplateName).click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
+        cy.get('[data-cy="call-esi-template"]').click();
+        cy.get('[role="presentation"]').contains(esiTemplateName).click();
+      }
 
       cy.get('#proposalWorkflowId-input').click();
 
@@ -428,6 +436,7 @@ context('Calls tests', () => {
     let createdInstrumentId: number;
 
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
       cy.login('officer');
       cy.createCall({
         ...newCall,

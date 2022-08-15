@@ -1,8 +1,17 @@
 import { faker } from '@faker-js/faker';
 
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
+
 context('Institution tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+  });
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
   });
 
   it('User should not be able to see Institutions page', () => {

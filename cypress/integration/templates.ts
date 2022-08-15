@@ -7,8 +7,10 @@ import {
   DataType,
   DependenciesLogicOperator,
   EvaluatorOperator,
+  FeatureId,
   TemplateCategoryId,
 } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Template tests', () => {
@@ -346,12 +348,16 @@ context('Template tests', () => {
   };
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
     cy.viewport(1920, 1680);
   });
 
   describe('Proposal templates basic tests', () => {
-    it('User officer can delete active template', () => {
+    it('User officer can delete active template', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+        this.skip();
+      }
       const newName = faker.lorem.words(3);
       const newDescription = faker.lorem.words(5);
 

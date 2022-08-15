@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 
-import { UserRole } from '../../src/generated/sdk';
+import { FeatureId, UserRole } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 function searchMuiTableAsync(search: string) {
@@ -28,6 +29,7 @@ const sep2 = {
 
 context('General scientific evaluation panel tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -43,7 +45,10 @@ context('General scientific evaluation panel tests', () => {
   });
 
   describe('SEP basic tests as user officer role', () => {
-    beforeEach(() => {
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       cy.login('officer');
       cy.visit('/');
     });
@@ -156,7 +161,10 @@ context('General scientific evaluation panel tests', () => {
   describe('SEP members manipulation tests as user officer role', () => {
     let createdSepId: number;
 
-    beforeEach(() => {
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       cy.login('officer');
       cy.visit('/');
       cy.createSep({
@@ -390,7 +398,10 @@ context('General scientific evaluation panel tests', () => {
   describe('SEP tests as SEP Chair role', () => {
     let createdSepId: number;
 
-    beforeEach(() => {
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       cy.updateUserRoles({
         id: sepMembers.chair.id,
         roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
@@ -502,7 +513,10 @@ context('General scientific evaluation panel tests', () => {
   });
 
   describe('SEP tests as SEP Secretary', () => {
-    beforeEach(() => {
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       cy.updateUserRoles({
         id: sepMembers.secretary.id,
         roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],

@@ -1,11 +1,17 @@
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 
-import { UpdateUserMutationVariables, User } from '../../src/generated/sdk';
+import {
+  FeatureId,
+  UpdateUserMutationVariables,
+  User,
+} from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Event log tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -44,7 +50,10 @@ context('Event log tests', () => {
   });
 
   describe('User event logs', () => {
-    beforeEach(() => {
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
       cy.login('user');
     });
 
