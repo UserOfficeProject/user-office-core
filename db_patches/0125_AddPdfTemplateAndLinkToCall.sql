@@ -15,7 +15,7 @@ BEGIN
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
-    ALTER TABLE call ADD COLUMN pdf_template int REFERENCES pdf_templates(pdf_template_id);
+    ALTER TABLE call ADD COLUMN pdf_template_id int REFERENCES pdf_templates(pdf_template_id);
 
     END IF;
 END;
