@@ -4,6 +4,8 @@ import {
   CreateUserMutation,
   CreateUserMutationVariables,
   ExternalTokenLoginMutation,
+  FeatureId,
+  GetFeaturesQuery,
   LoginMutation,
   Role,
   SetUserEmailVerifiedMutation,
@@ -13,6 +15,7 @@ import {
   UpdateUserRolesMutationVariables,
   User,
 } from '../../src/generated/sdk';
+import featureFlags from './featureFlags';
 import { getE2EApi } from './utils';
 
 type DecodedTokenData = {
@@ -53,6 +56,21 @@ const testCredentialStore = {
     email: 'unverified-user@example.com',
     password: 'Test1234!',
   },
+};
+
+const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
+  const api = getE2EApi();
+  const request = api.getFeatures().then((resp) => {
+    const enabledFeatures = resp.features.filter((feat) => feat.isEnabled);
+    window.localStorage.setItem(
+      'enabledFeatures',
+      JSON.stringify(enabledFeatures)
+    );
+
+    return resp;
+  });
+
+  return cy.wrap(request);
 };
 
 function changeActiveRole(selectedRoleId: number) {
@@ -126,7 +144,7 @@ const login = (
       ? testCredentialStore[roleOrCredentials]
       : roleOrCredentials;
 
-  if (Cypress.env('STFC') === true) {
+  if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
     if (typeof roleOrCredentials !== 'string') {
       throw new Error('Role not authorised to login');
     }
@@ -213,3 +231,4 @@ Cypress.Commands.add('updateUserDetails', updateUserDetails);
 Cypress.Commands.add('setUserEmailVerified', setUserEmailVerified);
 
 Cypress.Commands.add('changeActiveRole', changeActiveRole);
+Cypress.Commands.add('getAndStoreFeaturesEnabled', getAndStoreFeaturesEnabled);

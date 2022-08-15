@@ -2,6 +2,7 @@ import initialDBData from '../support/initialDBData';
 
 context('App settings tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 

@@ -4,9 +4,11 @@ import { DateTime } from 'luxon';
 import {
   AllocationTimeUnits,
   DataType,
+  FeatureId,
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Proposal tests', () => {
@@ -83,6 +85,7 @@ context('Proposal tests', () => {
 
   describe('Proposal basic tests', () => {
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
       cy.createTemplate({
         name: 'default esi template',
@@ -211,7 +214,10 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it('User officer should be able to save proposal column selection', () => {
+    it('User officer should be able to save proposal column selection', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       cy.login('officer');
       cy.visit('/');
 
@@ -233,7 +239,10 @@ context('Proposal tests', () => {
       cy.contains('SEP');
     });
 
-    it('Should be able to see proposal allocation time unit on the proposal', () => {
+    it('Should be able to see proposal allocation time unit on the proposal', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.login('officer');
       cy.visit('/');
 
@@ -549,6 +558,7 @@ context('Proposal tests', () => {
 
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
       cy.resetDB(true);
     });
 

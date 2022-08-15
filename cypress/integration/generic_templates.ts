@@ -33,6 +33,7 @@ context('GenericTemplates tests', () => {
   let createdQuestion1Id: string;
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 

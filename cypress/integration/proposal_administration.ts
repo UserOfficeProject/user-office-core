@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Proposal administration tests', () => {
@@ -16,6 +18,7 @@ context('Proposal administration tests', () => {
   const existingQuestionaryId = 1;
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -44,7 +47,10 @@ context('Proposal administration tests', () => {
       cy.visit('/');
     });
 
-    it('Should be able to set comment for user/manager and final status', () => {
+    it('Should be able to set comment for user/manager and final status', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.contains('Proposals').click();
 
       cy.get('[data-cy=view-proposal]').click();
@@ -197,7 +203,9 @@ context('Proposal administration tests', () => {
 
       cy.contains(proposalName1).parent().contains('No');
 
-      cy.logout();
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+        cy.logout();
+      }
 
       cy.login('user');
       cy.visit('/');
@@ -213,7 +221,10 @@ context('Proposal administration tests', () => {
       cy.contains('Submit').parent().should('not.be.disabled');
     });
 
-    it('If you select a tab in tabular view and reload the page it should stay on specific selected tab', () => {
+    it('If you select a tab in tabular view and reload the page it should stay on specific selected tab', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.contains('Proposals').click();
 
       cy.get('[data-cy=view-proposal]').click();
@@ -402,7 +413,10 @@ context('Proposal administration tests', () => {
       cy.get('table tbody tr').eq(0).contains(proposalFixedName);
     });
 
-    it('User officer should see Reviews tab before doing the Admin(management decision)', () => {
+    it('User officer should see Reviews tab before doing the Admin(management decision)', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.contains('Proposals').click();
 
       cy.finishedLoading();

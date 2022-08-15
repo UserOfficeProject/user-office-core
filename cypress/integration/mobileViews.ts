@@ -1,5 +1,6 @@
 context('Mobile views tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
     cy.viewport('iphone-x');
   });
