@@ -82,6 +82,10 @@ async function enableDefaultStfcFeatures() {
     settingsValue: process.env.EXTERNAL_AUTH_LOGIN_URL,
   });
   await db.updateSettings({
+    settingsId: SettingsId.PROFILE_PAGE_LINK,
+    settingsValue: process.env.PROFILE_PAGE_LINK,
+  });
+  await db.updateSettings({
     settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
     settingsValue: 'ALL',
   });
