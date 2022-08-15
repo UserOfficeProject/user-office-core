@@ -7,8 +7,11 @@ import { ProposalWithQuestionary } from './ProposalWithQuestionary';
 
 export class ProposalSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(public proposal: ProposalWithQuestionary) {
-    super(TemplateGroupId.PROPOSAL, proposal);
+  constructor(
+    public proposal: ProposalWithQuestionary,
+    public isPreviewMode: boolean | undefined
+  ) {
+    super(TemplateGroupId.PROPOSAL, proposal, isPreviewMode);
     this.stepIndex = this.getInitialStepIndex();
   }
 

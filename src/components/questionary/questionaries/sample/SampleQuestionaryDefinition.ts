@@ -3,12 +3,12 @@ import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionSta
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { SampleStepDisplayElementFactory } from './SampleStepDisplayElementFactory';
-import { SampleWizardStepFactory } from './SampleWizardStepFactory';
+import { StepsWizardWithoutReviewStepFactory } from './StepsWizardWithoutReviewStepFactory';
 
 export const sampleQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.SAMPLE,
   displayElementFactory: new SampleStepDisplayElementFactory(),
-  wizardStepFactory: new SampleWizardStepFactory(),
+  wizardStepFactory: new StepsWizardWithoutReviewStepFactory(),
   getItemWithQuestionary(
     api: Sdk,
     sampleId: number
