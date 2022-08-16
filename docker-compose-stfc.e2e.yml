@@ -112,7 +112,7 @@ services:
       - "./${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/"
   mockServer:
     image: mockserver/mockserver:5.13.0
-    command: -logLevel INFO -serverPort 1080
+    command: -logLevel ERROR -serverPort 1080
     ports:
       - 1080:1080
   mockserver-client:
