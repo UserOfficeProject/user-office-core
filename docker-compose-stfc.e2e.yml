@@ -40,6 +40,8 @@ services:
       ANTIVIRUS_PORT: 3310
       TZ: Europe/London
       ISIS_UO_EMAIL: isisuo@stfc.ac.uk
+      FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
+      PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
     labels:
       - "traefik.http.routers.backend.rule=PathPrefix(`/api`, `/graphql`, `/gateway`, `/download`, `/downloads`, `/files`, `/proposal`, `/uploads`)"
       - "traefik.http.services.backend.loadbalancer.server.port=4000"
