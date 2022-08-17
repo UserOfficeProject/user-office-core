@@ -1,5 +1,5 @@
-query getProposalWorkflow($id: Int!) {
-  proposalWorkflow(id: $id) {
+query getProposalWorkflow($proposalWorkflowId: Int!) {
+  proposalWorkflow(proposalWorkflowId: $proposalWorkflowId) {
     id
     name
     description

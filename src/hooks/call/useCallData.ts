@@ -13,7 +13,7 @@ export function useCallData(callId: number | undefined) {
     let unmounted = false;
     if (callId) {
       api()
-        .getCall({ id: callId })
+        .getCall({ callId })
         .then((data) => {
           if (unmounted) {
             return;
