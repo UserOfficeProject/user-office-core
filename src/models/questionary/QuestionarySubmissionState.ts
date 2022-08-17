@@ -4,7 +4,7 @@ import { Reducer } from 'react';
 
 import { StepsWizardWithoutReviewStepFactory } from 'components/questionary/questionaries/sample/StepsWizardWithoutReviewStepFactory';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
-import { TemplateGroupId } from 'generated/sdk';
+import { GenericTemplateFragment, Maybe, TemplateGroupId } from 'generated/sdk';
 import { Answer, Questionary, QuestionaryStep } from 'generated/sdk';
 import { deepClone } from 'utils/json';
 import { clamp } from 'utils/Math';
@@ -54,7 +54,25 @@ export type Event =
       sampleEsi: SampleEsiWithQuestionary;
     }
   | { type: 'ESI_SAMPLE_ESI_UPDATED'; sampleEsi: SampleEsiWithQuestionary }
-  | { type: 'ESI_SAMPLE_ESI_DELETED'; sampleId: number };
+  | { type: 'ESI_SAMPLE_ESI_DELETED'; sampleId: number }
+  | {
+      type: 'SAMPLE_DECLARATION_ITEMS_MODIFIED';
+      id: string;
+      newItems: Maybe<
+        (SampleFragment & {
+          questionary: Pick<Questionary, 'isCompleted'>;
+        })[]
+      >;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_ITEMS_MODIFIED';
+      id: string;
+      newItems: Maybe<
+        (GenericTemplateFragment & {
+          questionary: Pick<Questionary, 'isCompleted'>;
+        })[]
+      >;
+    };
 
 export interface WizardStepMetadata {
   title: string;
@@ -169,7 +187,6 @@ export function QuestionarySubmissionModel<
           field.value = action.newValue;
           draftState.isDirty = true;
           break;
-
         case 'CLEAN_DIRTY_STATE':
           draftState.isDirty = false;
           break;

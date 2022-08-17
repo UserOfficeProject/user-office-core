@@ -1,14 +1,17 @@
 import { faker } from '@faker-js/faker';
 
 import {
+  FeatureId,
   TechnicalReviewStatus,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -483,7 +486,10 @@ context('Settings tests', () => {
       cy.contains('PROPOSAL_SUBMITTED & PROPOSAL_FEASIBLE');
     });
 
-    it('Proposal should follow the selected workflow', () => {
+    it('Proposal should follow the selected workflow', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
@@ -625,7 +631,10 @@ context('Settings tests', () => {
       cy.contains('SEP_REVIEW');
     });
 
-    it('Proposal status should update immediately after all SEP reviews submitted', () => {
+    it('Proposal status should update immediately after all SEP reviews submitted', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
@@ -867,7 +876,10 @@ context('Settings tests', () => {
       ).should('have.length', 2);
     });
 
-    it('Proposal should follow multi-column workflow', () => {
+    it('Proposal should follow multi-column workflow', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       const firstProposalTitle = faker.random.words(2);
       const firstProposalAbstract = faker.random.words(5);
       const secondProposalTitle = faker.random.words(2);

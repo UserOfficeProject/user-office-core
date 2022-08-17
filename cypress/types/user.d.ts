@@ -108,6 +108,16 @@ declare global {
        *    cy.changeActiveRole(selectedRoleId: number)
        */
       changeActiveRole: (selectedRoleId: number) => void;
+
+      /**
+       * Gets app features and stores in the localStorage to be used inside tests.
+       *
+       * @returns {typeof getAndStoreFeaturesEnabled}
+       * @memberof Chainable
+       * @example
+       *    cy.getAndStoreFeaturesEnabled()
+       */
+      getAndStoreFeaturesEnabled: () => Cypress.Chainable<GetFeaturesQuery>;
     }
   }
 }
