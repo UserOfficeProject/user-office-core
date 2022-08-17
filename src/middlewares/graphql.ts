@@ -50,10 +50,10 @@ const apolloServer = async (app: Express) => {
   const errorLoggingPlugin: ApolloServerPlugin<BaseContext> = {
     async requestDidStart() {
       return {
-        async willSendResponse({ response: { errors } }) {
-          if (errors) {
-            logger.logInfo('GraphQL response contained error(s)', { errors });
-          }
+        async didEncounterErrors({ errors }) {
+          logger.logInfo('GraphQL response contained error(s)', {
+            errors,
+          });
         },
       };
     },
