@@ -1,5 +1,5 @@
-query getUserWithRoles($id: Int!) {
-  user(id: $id) {
+query getUserWithRoles($userId: Int!) {
+  user(userId: $userId) {
     firstname
     lastname
     roles {

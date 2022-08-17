@@ -1,7 +1,11 @@
+import { ReviewerFilter } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('App settings tests', () => {
   beforeEach(() => {
+    cy.viewport(1920, 2000);
+    cy.getAndStoreAppSettings();
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -29,6 +33,10 @@ context('App settings tests', () => {
 
       cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
       cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();
+
+      cy.get('[data-cy="settings-table"]')
+        .find('button[aria-label="Next Page"]')
+        .click();
 
       cy.get('[data-cy="settings-table"]')
         .contains(initialDBData.settings.dateTimeFormat.id)
@@ -72,6 +80,43 @@ context('App settings tests', () => {
         'placeholder',
         newDateTimeFormat
       );
+    });
+
+    it('Instrument Scientist filter should differ based on setting value', () => {
+      const scientist2 = initialDBData.users.user2;
+
+      cy.updateUserRoles({
+        id: scientist2.id,
+
+        roles: [initialDBData.roles.instrumentScientist],
+      });
+
+      cy.login(scientist2);
+
+      cy.visit('/');
+
+      cy.log(
+        'hello' + JSON.stringify(initialDBData.getFormats().reviewerFilter)
+      );
+
+      cy.contains('Proposals');
+
+      if (initialDBData.getFormats().reviewerFilter === 'ALL') {
+        cy.get('[data-cy="reviewer-filter"] input').should(
+          'have.value',
+          ReviewerFilter.ALL
+        );
+      } else {
+        cy.get('[data-cy="reviewer-filter"] input').should(
+          'have.value',
+          ReviewerFilter.ME
+        );
+      }
+      if (initialDBData.getFormats().statusFilter === 'ALL') {
+        cy.get('[data-cy="status-filter"] input').should('have.value', 0);
+      } else {
+        cy.get('[data-cy="status-filter"] input').should('have.value', 2);
+      }
     });
   });
 });

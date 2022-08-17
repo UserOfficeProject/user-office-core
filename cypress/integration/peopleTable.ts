@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
 
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('PageTable component tests', () => {
@@ -8,7 +10,13 @@ context('PageTable component tests', () => {
   const abstract = faker.random.words(8);
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+  });
+  beforeEach(function () {
+    if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      this.skip();
+    }
   });
 
   describe('ProposalPeopleTable component Preserve selected users', () => {

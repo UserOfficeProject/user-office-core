@@ -1,5 +1,5 @@
-query getBasicUserDetails($id: Int!) {
-  basicUserDetails(id: $id) {
+query getBasicUserDetails($userId: Int!) {
+  basicUserDetails(userId: $userId) {
     ...basicUserDetails
   }
 }

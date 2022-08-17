@@ -2,14 +2,17 @@ import { faker } from '@faker-js/faker';
 
 import {
   DataType,
+  FeatureId,
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import { updatedCall } from '../support/utils';
 
 context('Samples tests', () => {
   const existingUser = initialDBData.users.user1;
+  const booleanQuestion = faker.lorem.words(3);
   const proposalTemplateName = faker.lorem.words(2);
   const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
@@ -99,6 +102,27 @@ context('Samples tests', () => {
                     });
                   }
                 });
+
+                cy.createQuestion({
+                  categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+                  dataType: DataType.BOOLEAN,
+                }).then((questionResult) => {
+                  const createdQuestion =
+                    questionResult.createQuestion.question;
+                  if (createdQuestion) {
+                    cy.updateQuestion({
+                      id: createdQuestion.id,
+                      question: booleanQuestion,
+                    });
+
+                    cy.createQuestionTemplateRelation({
+                      questionId: createdQuestion.id,
+                      templateId: templateId,
+                      sortOrder: 0,
+                      topicId: topicId,
+                    });
+                  }
+                });
               }
             });
 
@@ -115,6 +139,7 @@ context('Samples tests', () => {
   };
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
     cy.createProposalWorkflow(proposalWorkflow).then((result) => {
       if (result.createProposalWorkflow.proposalWorkflow) {
@@ -260,6 +285,101 @@ context('Samples tests', () => {
       cy.get('[data-cy="delete"]').eq(1).click();
 
       cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy=add-button]').should('not.be.disabled');
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+    });
+
+    it('Should be able to modify sample declaration question and all other questions without loosing information', () => {
+      createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
+      cy.login('user');
+      cy.visit('/');
+
+      cy.contains('new proposal', { matchCase: false }).click();
+      cy.get('[data-cy=title] input').type(proposalTitle);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=add-button]').click();
+
+      cy.get('[data-cy=title-input] input').clear();
+
+      cy.get(
+        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.contains('This is a required field');
+
+      cy.get('[data-cy=title-input] input')
+        .clear()
+        .type(sampleTitle)
+        .should('have.value', sampleTitle);
+
+      cy.get(
+        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get(
+        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains(booleanQuestion)
+        .parent()
+        .find('input')
+        .should('have.value', 'false')
+        .click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="clone"]').click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        2
+      );
+
+      cy.contains(booleanQuestion)
+        .parent()
+        .find('input')
+        .should('have.value', 'true')
+        .click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
+
+      cy.get('[data-cy="delete"]').eq(1).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains(booleanQuestion)
+        .parent()
+        .find('input')
+        .should('have.value', 'false')
+        .click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
@@ -419,7 +539,10 @@ context('Samples tests', () => {
       cy.contains('OK').click();
     });
 
-    it('Officer should be able to evaluate sample', () => {
+    it('Officer should be able to evaluate sample', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+        this.skip();
+      }
       cy.createSample({
         proposalPk: createdProposalPk,
         templateId: createdSampleTemplateId,
@@ -482,7 +605,10 @@ context('Samples tests', () => {
       cy.contains('HIGH_RISK'); // test if status has changed
     });
 
-    it('Download samples is working with dialog window showing up', () => {
+    it('Download samples is working with dialog window showing up', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+        this.skip();
+      }
       cy.createSample({
         proposalPk: createdProposalPk,
         templateId: createdSampleTemplateId,
@@ -507,7 +633,10 @@ context('Samples tests', () => {
       );
     });
 
-    it('Should be able to download sample pdf', () => {
+    it('Should be able to download sample pdf', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+        this.skip();
+      }
       cy.createSample({
         proposalPk: createdProposalPk,
         templateId: createdSampleTemplateId,

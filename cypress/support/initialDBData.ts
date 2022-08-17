@@ -26,8 +26,14 @@ export default {
     const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT) || 'dd-MM-yyyy';
     const dateTimeFormat =
       settingsMap.get(SettingsId.DATE_TIME_FORMAT) || 'dd-MM-yyyy HH:mm';
+    const statusFilter = settingsMap.get(
+      SettingsId.DEFAULT_INST_SCI_STATUS_FILTER
+    );
+    const reviewerFilter = settingsMap.get(
+      SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER
+    );
 
-    return { dateFormat, dateTimeFormat };
+    return { dateFormat, dateTimeFormat, statusFilter, reviewerFilter };
   },
   call: {
     id: 1,

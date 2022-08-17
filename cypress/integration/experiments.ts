@@ -1,13 +1,18 @@
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Experiments tests', () => {
-  before(() => {
+  beforeEach(() => {
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
   });
 
-  beforeEach(() => {
+  beforeEach(function () {
     cy.viewport(1920, 1080);
-    cy.resetDB(true);
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      this.skip();
+    }
     cy.updateProposalManagementDecision({
       proposalPk: initialDBData.proposal.id,
       statusId: 1,

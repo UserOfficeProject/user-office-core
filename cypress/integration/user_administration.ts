@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
 
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('User administration tests', () => {
@@ -15,7 +17,14 @@ context('User administration tests', () => {
   const placeholderUser = initialDBData.users.placeholder;
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+  });
+
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
 
     cy.login('officer');
     cy.visit('/');

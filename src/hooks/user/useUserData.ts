@@ -13,7 +13,7 @@ import { UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useUserData({
-  id,
+  userId,
 }: GetUserQueryVariables | GetUserMeQueryVariables) {
   const api = useDataApi();
   const { user } = useContext(UserContext);
@@ -26,9 +26,9 @@ export function useUserData({
     let unmounted = false;
 
     setLoading(true);
-    if (user.id !== id) {
+    if (user.id !== userId) {
       api()
-        .getUser({ id })
+        .getUser({ userId })
         .then((data) => {
           if (unmounted || !data.user) {
             return;
@@ -51,7 +51,7 @@ export function useUserData({
     return () => {
       unmounted = true;
     };
-  }, [api, id, user.id]);
+  }, [api, userId, user.id]);
 
   return { loading, userData, setUserData } as const;
 }
@@ -90,22 +90,22 @@ export function useUserWithReviewsData(filters?: {
   return { loading, userData, setUserData, setUserWithReviewsFilter } as const;
 }
 
-export function useBasicUserData(id?: number) {
+export function useBasicUserData(userId?: number) {
   const api = useDataApi();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] =
     useState<GetBasicUserDetailsQuery['basicUserDetails']>(null);
   useEffect(() => {
-    if (id) {
+    if (userId) {
       setLoading(true);
       api()
-        .getBasicUserDetails({ id })
+        .getBasicUserDetails({ userId })
         .then((data) => {
           setUserData(data.basicUserDetails);
           setLoading(false);
         });
     }
-  }, [api, id]);
+  }, [api, userId]);
 
   return { loading, userData };
 }
