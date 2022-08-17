@@ -84,7 +84,6 @@ async function enableDefaultEssFeatures() {
     ],
     true
   );
-
   if (OpenIdClient.hasConfiguration()) {
     const client = await OpenIdClient.getInstance();
     const scopes = OpenIdClient.getScopes().join(' ');
@@ -109,6 +108,14 @@ async function enableDefaultEssFeatures() {
       settingsValue: endSessionUrl,
     });
   }
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
+    settingsValue: 'ME',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
+    settingsValue: 'FEASIBILITY_REVIEW',
+  });
 }
 
 export async function configureESSDevelopmentEnvironment() {
