@@ -2059,7 +2059,7 @@ export type QueryActiveTemplateIdArgs = {
 
 
 export type QueryBasicUserDetailsArgs = {
-  id: Scalars['Int'];
+  userId: Scalars['Int'];
 };
 
 
@@ -2080,7 +2080,7 @@ export type QueryBlankQuestionaryStepsArgs = {
 
 
 export type QueryCallArgs = {
-  id: Scalars['Int'];
+  callId: Scalars['Int'];
 };
 
 
@@ -2146,7 +2146,7 @@ export type QueryGetOrcIdInformationArgs = {
 
 
 export type QueryGetPageContentArgs = {
-  id: PageName;
+  pageId: PageName;
 };
 
 
@@ -2217,7 +2217,7 @@ export type QueryProposalReviewsArgs = {
 
 
 export type QueryProposalStatusArgs = {
-  id: Scalars['Int'];
+  proposalStatusId: Scalars['Int'];
 };
 
 
@@ -2227,7 +2227,7 @@ export type QueryProposalTemplatesArgs = {
 
 
 export type QueryProposalWorkflowArgs = {
-  id: Scalars['Int'];
+  proposalWorkflowId: Scalars['Int'];
 };
 
 
@@ -2356,7 +2356,7 @@ export type QueryTemplatesArgs = {
 
 
 export type QueryUserArgs = {
-  id: Scalars['Int'];
+  userId: Scalars['Int'];
 };
 
 
@@ -3521,7 +3521,7 @@ export type GetInstitutionsWithCountryQueryVariables = Exact<{
 export type GetInstitutionsWithCountryQuery = { institutions: Array<{ id: number, name: string, verified: boolean, country: { id: number, value: string } | null }> | null };
 
 export type GetPageContentQueryVariables = Exact<{
-  id: PageName;
+  pageId: PageName;
 }>;
 
 
@@ -3628,7 +3628,7 @@ export type DeleteCallMutation = { deleteCall: { rejection: { reason: string, co
 export type CallFragment = { id: number, shortCode: string, startCall: any, endCall: any, startReview: any, endReview: any, startSEPReview: any | null, endSEPReview: any | null, startNotify: any, endNotify: any, startCycle: any, endCycle: any, cycleComment: string, surveyComment: string, referenceNumberFormat: string | null, proposalWorkflowId: number | null, templateId: number, esiTemplateId: number | null, allocationTimeUnit: AllocationTimeUnits, proposalCount: number, title: string | null, description: string | null, submissionMessage: string | null, instruments: Array<{ id: number, name: string, shortCode: string, description: string, availabilityTime: number | null, submitted: boolean | null, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }>, seps: Array<{ id: number, code: string }> | null, proposalWorkflow: { id: number, name: string, description: string } | null, template: { templateId: number, name: string, isArchived: boolean } };
 
 export type GetCallQueryVariables = Exact<{
-  id: Scalars['Int'];
+  callId: Scalars['Int'];
 }>;
 
 
@@ -4355,7 +4355,7 @@ export type GetProposalStatusesQueryVariables = Exact<{ [key: string]: never; }>
 export type GetProposalStatusesQuery = { proposalStatuses: Array<{ id: number, shortCode: string, name: string, description: string, isDefault: boolean }> | null };
 
 export type GetProposalWorkflowQueryVariables = Exact<{
-  id: Scalars['Int'];
+  proposalWorkflowId: Scalars['Int'];
 }>;
 
 
@@ -4833,7 +4833,7 @@ export type ExternalTokenLoginMutation = { externalTokenLogin: { token: string |
 export type BasicUserDetailsFragment = { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null };
 
 export type GetBasicUserDetailsQueryVariables = Exact<{
-  id: Scalars['Int'];
+  userId: Scalars['Int'];
 }>;
 
 
@@ -4896,7 +4896,7 @@ export type GetTokenForUserMutationVariables = Exact<{
 export type GetTokenForUserMutation = { getTokenForUser: { token: string | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type GetUserQueryVariables = Exact<{
-  id: Scalars['Int'];
+  userId: Scalars['Int'];
 }>;
 
 
@@ -4913,7 +4913,7 @@ export type GetUserProposalsQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetUserProposalsQuery = { me: { proposals: Array<{ primaryKey: number, proposalId: string, title: string, publicStatus: ProposalPublicStatus, statusId: number, created: any, finalStatus: ProposalEndStatus | null, notified: boolean, submitted: boolean, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, proposer: { id: number } | null, call: { id: number, shortCode: string, isActive: boolean, referenceNumberFormat: string | null } | null }> } | null };
 
 export type GetUserWithRolesQueryVariables = Exact<{
-  id: Scalars['Int'];
+  userId: Scalars['Int'];
 }>;
 
 
@@ -6226,8 +6226,8 @@ export const GetInstitutionsWithCountryDocument = gql`
 }
     ${CountryFragmentDoc}`;
 export const GetPageContentDocument = gql`
-    query getPageContent($id: PageName!) {
-  getPageContent(id: $id)
+    query getPageContent($pageId: PageName!) {
+  getPageContent(pageId: $pageId)
 }
     `;
 export const GetQuantitiesDocument = gql`
@@ -6371,8 +6371,8 @@ export const DeleteCallDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const GetCallDocument = gql`
-    query getCall($id: Int!) {
-  call(id: $id) {
+    query getCall($callId: Int!) {
+  call(callId: $callId) {
     ...call
   }
 }
@@ -7917,8 +7917,8 @@ export const GetProposalStatusesDocument = gql`
 }
     ${ProposalStatusFragmentDoc}`;
 export const GetProposalWorkflowDocument = gql`
-    query getProposalWorkflow($id: Int!) {
-  proposalWorkflow(id: $id) {
+    query getProposalWorkflow($proposalWorkflowId: Int!) {
+  proposalWorkflow(proposalWorkflowId: $proposalWorkflowId) {
     id
     name
     description
@@ -8661,8 +8661,8 @@ export const ExternalTokenLoginDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const GetBasicUserDetailsDocument = gql`
-    query getBasicUserDetails($id: Int!) {
-  basicUserDetails(id: $id) {
+    query getBasicUserDetails($userId: Int!) {
+  basicUserDetails(userId: $userId) {
     ...basicUserDetails
   }
 }
@@ -8760,8 +8760,8 @@ export const GetTokenForUserDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const GetUserDocument = gql`
-    query getUser($id: Int!) {
-  user(id: $id) {
+    query getUser($userId: Int!) {
+  user(userId: $userId) {
     user_title
     username
     firstname
@@ -8837,8 +8837,8 @@ export const GetUserProposalsDocument = gql`
 }
     ${ProposalStatusFragmentDoc}`;
 export const GetUserWithRolesDocument = gql`
-    query getUserWithRoles($id: Int!) {
-  user(id: $id) {
+    query getUserWithRoles($userId: Int!) {
+  user(userId: $userId) {
     firstname
     lastname
     roles {

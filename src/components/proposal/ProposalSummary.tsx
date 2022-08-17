@@ -63,11 +63,11 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
         return;
       }
-      const { call } = await api().getCall({ id: proposal.callId });
+      const { call } = await api().getCall({ callId: proposal.callId });
       const workflowId = call?.proposalWorkflowId;
       if (workflowId) {
         const connections = (
-          await api().getProposalWorkflow({ id: workflowId })
+          await api().getProposalWorkflow({ proposalWorkflowId: workflowId })
         ).proposalWorkflow?.proposalWorkflowConnectionGroups;
 
         if (connections) {
