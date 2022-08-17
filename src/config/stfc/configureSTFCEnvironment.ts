@@ -85,6 +85,14 @@ async function enableDefaultStfcFeatures() {
     settingsId: SettingsId.PROFILE_PAGE_LINK,
     settingsValue: process.env.PROFILE_PAGE_LINK,
   });
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
+    settingsValue: 'ALL',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
+    settingsValue: 'ALL',
+  });
 }
 
 export async function configureSTFCEnvironment() {
