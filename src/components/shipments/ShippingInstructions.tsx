@@ -30,6 +30,7 @@ const steps = [
     description: (
       <ul>
         <li>Print and cut the label;</li>
+        <li>Place the label inside a plastic wallet for extra protection;</li>
         <li>Stick the label to both sides of the parcel;</li>
         <li>If using tape not tape over the barcodes.</li>
       </ul>
