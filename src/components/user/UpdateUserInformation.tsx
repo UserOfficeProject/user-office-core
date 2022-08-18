@@ -66,10 +66,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function UpdateUserInformation(props: { id: number }) {
+interface UpdateUserInformationProps {
+  id: number;
+}
+export default function UpdateUserInformation(
+  props: UpdateUserInformationProps
+) {
   const theme = useTheme();
   const { currentRole, user } = useContext(UserContext);
-  const { userData, setUserData } = useUserData(props);
+  const { userData, setUserData } = useUserData({ userId: props.id });
   const { format, mask } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });

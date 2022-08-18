@@ -1,3 +1,3 @@
-query getPageContent($id: PageName!) {
-  getPageContent(id: $id)
+query getPageContent($pageId: PageName!) {
+  getPageContent(pageId: $pageId)
 }
