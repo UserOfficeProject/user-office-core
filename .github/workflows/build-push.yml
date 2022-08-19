@@ -58,6 +58,8 @@ jobs:
           context: ./apps/user-office-backend
           file: ./apps/user-office-backend/Dockerfile
           push: true
+          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
+          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
           tags: |
             dmsc/duo-backend:${{ steps.extract_branch.outputs.branch }}
             ghcr.io/userofficeproject/user-office-backend:${{ steps.extract_branch.outputs.branch }}
@@ -68,6 +70,8 @@ jobs:
           context: ./apps/user-office-frontend
           file: ./apps/user-office-frontend/Dockerfile
           push: true
+          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
+          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
           tags: |
             dmsc/duo-frontend:${{ steps.extract_branch.outputs.branch }}
             ghcr.io/userofficeproject/user-office-frontend:${{ steps.extract_branch.outputs.branch }}

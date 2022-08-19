@@ -31,16 +31,6 @@ services:
     volumes:
       - ./db_patches/:/docker-entrypoint-initdb.d/
 
-  scheduler-db:
-    image: postgres:11-alpine
-    restart: always
-    environment:
-      POSTGRES_DB: scheduler
-      POSTGRES_USER: schedulerUser
-      POSTGRES_PASSWORD: schedulerPassword
-    ports:
-      - 54320:5432 # avoid collision
-
   rabbitmq:
     image: "rabbitmq:3-management"
     ports:
@@ -63,40 +53,3 @@ services:
       - 4500:4500
     cap_add:
       - SYS_ADMIN
-
-  gateway:
-    image: "dmsc/duo-gateway:develop"
-    environment:
-      USER_OFFICE_BACKEND: http://host.docker.internal:4000/graphql
-      USER_OFFICE_SCHEDULER_BACKEND: http://scheduler-backend:4000/graphql
-      NODE_ENV: development
-      ENABLE_SERVICE_POLLING: 1 # see gateway
-      KEEP_RETRYING: 1 # see gateway
-    ports:
-      - 4100:4100
-    labels:
-      - "traefik.frontend.rule=PathPrefix:/gateway"
-      - "traefik.port=4100"
-
-  scheduler-frontend:
-    image: "dmsc/duo-scheduler-frontend:develop"
-    labels:
-      - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.port=80"
-
-  scheduler-backend:
-    image: "dmsc/duo-scheduler-backend:develop"
-    environment:
-      NODE_ENV: development
-      DATABASE_HOSTNAME: scheduler-db
-      DATABASE_PORT: 5432
-      DATABASE_USER: schedulerUser
-      DATABASE_PASSWORD: schedulerPassword
-      DATABASE_DATABASE: scheduler
-      SCHEDULER_CONFIG_AUTH_REDIRECT: http://localhost:3000/shared-auth
-      USER_OFFICE_ENDPOINT: http://host.docker.internal:4000/graphql
-      RABBITMQ_HOSTNAME: rabbitmq
-    depends_on:
-      - scheduler-db
-    ports:
-      - 44000:4000 # avoid collision
