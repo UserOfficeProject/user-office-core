@@ -15,6 +15,12 @@ All you need to do is run two commands:
 1. Pull latest changes from the backend repository: `git pull https://github.com/UserOfficeProject/user-office-backend.git develop`. It uses develop branch to pull from. If you want another branch just change that part.
 2. Pull latest changes from the frontend repository: `git pull https://github.com/UserOfficeProject/user-office-frontend.git develop`. It uses develop branch to pull from. If you want another branch just change that part.
 
+## Monorepo future plans
+
+Plan on how to continue with the monorepo in the future:
+
+1.  Start adding the shared libraries like: shared-types, validation and others that need to be shared between different apps (example here: https://github.com/martin-trajanovski/user-office-core-monorepo). It requires [craco](https://github.com/dilanx/craco) tool for building react apps that have sources outside src folder. This will cleanup the frontend app a lot because we can move all graphql files and scripts in the shared-types lib and validation will simplify things a lot if added directly as part of the monorepo libs.
+
 ## Available Scripts
 
 In the project directory, you can run:
