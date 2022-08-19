@@ -24,9 +24,9 @@
     "postinstall": "concurrently \"npm run install:backend\" \"npm run install:frontend\" \"npm run install:e2e\"",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:e2e": "concurrently \"npm run dev:backend:e2e\" \"npm run dev:frontend\"",
-    "dev:backend": "cd apps/user-office-backend && npm run dev",
+    "dev:backend": "cd apps/user-office-backend && node $INIT_CWD/copyIfNotExist.js example.development.env .env && npm run dev",
     "dev:backend:e2e": "cd apps/user-office-backend && npm run dev:e2e",
-    "dev:frontend": "cd apps/user-office-frontend && npm run dev",
+    "dev:frontend": "cd apps/user-office-frontend && node $INIT_CWD/copyIfNotExist.js example.development.env .env && npm run dev",
     "generate:shared:types": "cd apps/user-office-frontend && npm run generate:local",
     "e2e:after:dev": "concurrently -k -s first \"wait-on http://localhost:3000 && cd apps/user-office-frontend-e2e && npm run cy:run:action\" \"npm run dev:e2e\""
   },
