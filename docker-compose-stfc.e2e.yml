@@ -1,0 +1,123 @@
+version: "3.1"
+services:
+  duo-reverse-proxy:
+    image: traefik:2.4 # The official Traefik docker image
+    command: --api.insecure=true --providers.docker # Enables the web UI and tells Traefik to listen to docker
+    ports:
+      - "8081:80" # The HTTP port
+      - "8082:8080" # The Web UI (enabled by --api)
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+
+  backend:
+    image: "dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}"
+    depends_on:
+      - db
+      - duo-reverse-proxy
+      - factory
+    volumes:
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches:/home/node/app/db_patches"
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
+      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      EXTERNAL_AUTH_TOKEN: abc
+      NODE_ENV: development
+      tokenLife: 7d
+      baseURL: localhost:3000
+      SINK_EMAIL: BISAPPSSINK@stfc.ac.uk
+      EMAIL_SENDER: '"STFC User Office" <users@stfc.ac.uk>'
+      USER_OFFICE_FACTORY_ENDPOINT: http://user-office-factory:4500/generate
+      EMAIL_AUTH_HOST: exchsmtp.stfc.ac.uk
+      EMAIL_TEMPLATE_PATH: /config/emails/
+      EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
+      DEPENDENCY_CONFIG: stfc
+      EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
+      EXTERNAL_AUTH_SERVICE_URL: http://mockServer:1080/ws/UserOfficeWebService?wsdl
+      ANTIVIRUS_HOST: clam-antivirus
+      ANTIVIRUS_PORT: 3310
+      TZ: Europe/London
+      ISIS_UO_EMAIL: isisuo@stfc.ac.uk
+      FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
+      PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
+    labels:
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`, `/graphql`, `/gateway`, `/download`, `/downloads`, `/files`, `/proposal`, `/uploads`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=4000"
+
+  clam-antivirus:
+    image: clamav/clamav:0.104
+    ports:
+      - "3310:3310"
+
+  cypress:
+    image: e2e-cypress:latest
+    depends_on:
+      - frontend
+      - mockserver-client
+      - mockServer
+    ipc: host # see https://github.com/cypress-io/cypress/issues/350
+    environment:
+      CYPRESS_SVC_ACC_TOKEN: $SVC_ACC_TOKEN
+    entrypoint:
+      [
+        "/wait-for-frontend.sh",
+        "duo-reverse-proxy:80",
+        "cypress run --spec ${CYPRES_SPEC_PATTERN} --browser chrome --config baseUrl=http://duo-reverse-proxy:80 defaultCommandTimeout=15000"
+      ]
+    volumes:
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/screenshots:/tmp/screenshots"
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/fixtures:/e2e/cypress/fixtures"
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/integration:/e2e/cypress/integration"
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/plugins:/e2e/cypress/plugins"
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/support:/e2e/cypress/support"
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/types:/e2e/cypress/types"
+
+  frontend:
+    image: "duo-frontend:${BUILD_TAG}"
+    depends_on:
+      - duo-reverse-proxy
+      - backend
+    labels:
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+  factory:
+    image: dmsc/duo-factory:${USER_OFFICE_FACTORY_TAG}
+    depends_on:
+      - duo-reverse-proxy
+      - db
+    environment:
+      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      EXTERNAL_AUTH_TOKEN: abc
+      NODE_ENV: development
+      DATABASE_CONNECTION_STRING: postgres://duouser:duopassword@db:5432/duo
+      UO_FEATURE_ALLOW_NO_SANDBOX: 1
+      HEADER_LOGO_PATH: /config/logos/STFC-Logo.png
+    ports:
+      - "4500:4500"
+    labels:
+      - "traefik.http.routers.factory.rule=PathPrefix(`/generate`, `/test-template`, `/version`, `/health-check`)"
+      - "traefik.port=4500"
+
+  db:
+    image: postgres:11-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: duopassword
+      POSTGRES_USER: duouser
+      POSTGRES_DB: duo
+    ports:
+      - 5432:5432
+    volumes:
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/"
+  mockServer:
+    image: mockserver/mockserver:5.13.0
+    command: -logLevel ERROR -serverPort 1080
+    ports:
+      - 1080:1080
+  mockserver-client:
+    image: "dmsc/stfc-mockserver-client:master"
+    depends_on:
+      - mockServer
