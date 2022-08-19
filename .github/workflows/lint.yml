@@ -6,26 +6,25 @@ on:
 
 jobs:
   run-linters:
-        name: Run linters
-        runs-on: ubuntu-latest
+    name: Run linters
+    runs-on: ubuntu-latest
 
-        strategy:
-          matrix:
-            node-version: [16.x]
+    strategy:
+      matrix:
+        node-version: [16.x]
 
-        steps:
-          - name: Check out Git repository
-            uses: actions/checkout@v3
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
 
-          - name: Set up Node.js
-            uses: actions/setup-node@v3
-            with:
-              node-version: ${{ matrix.node-version }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
-          - name: Install Node.js dependencies
-            run: |
-              npm install
-              npm run install:all
+      - name: Install Node.js dependencies
+        run: |
+          npm install
 
-          - name: Lint Action
-            run: npm run lint
+      - name: Lint Action
+        run: npm run lint
