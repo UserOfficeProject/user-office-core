@@ -36,6 +36,7 @@ type ProposalPDFData = {
       'genericTemplate' | 'genericTemplateQuestionaryFields'
     >
   >;
+  pdfTemplateId: number | undefined;
 };
 
 const getTechnicalReviewHumanReadableStatus = (
@@ -83,6 +84,8 @@ export const collectProposalPDFData = async (
   if (hasReadRights === false) {
     throw new Error('User was not allowed to download PDF');
   }
+
+  const call = await baseContext.queries.call.get(user, proposal.callId);
 
   const queries = baseContext.queries.questionary;
 
@@ -165,6 +168,7 @@ export const collectProposalPDFData = async (
     attachments: [],
     samples: samplePDFData,
     genericTemplates: genericTemplatePDFData,
+    pdfTemplateId: call?.pdfTemplateId,
   };
 
   // Information from each topic in proposal
