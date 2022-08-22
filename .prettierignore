@@ -6,3 +6,4 @@ src/generated/
 README.md
 .vscode/
 cypress/fixtures/
+docker-compose-stfc.e2e.yml

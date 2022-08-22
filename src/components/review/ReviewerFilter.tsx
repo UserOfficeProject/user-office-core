@@ -3,10 +3,11 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
-import React from 'react';
+import React, { useContext } from 'react';
 import { StringParam, useQueryParams, withDefault } from 'use-query-params';
 
-import { ReviewerFilter } from 'generated/sdk';
+import { SettingsContext } from 'context/SettingsContextProvider';
+import { ReviewerFilter, SettingsId } from 'generated/sdk';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -15,23 +16,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const defaultReviewerQueryFilter = withDefault(
-  StringParam,
-  ReviewerFilter.ME
-);
-
 type ReviewerFilterComponentProps = {
   reviewer: string;
   onChange?: (reviewer: ReviewerFilter) => void;
+};
+
+export const reviewFilter: Record<string, ReviewerFilter> = {
+  ALL: ReviewerFilter.ALL,
+  ME: ReviewerFilter.ME,
 };
 
 const ReviewerFilterComponent: React.FC<ReviewerFilterComponentProps> = ({
   reviewer,
   onChange,
 }) => {
+  const { settingsMap } = useContext(SettingsContext);
+  const reviewFilterValue =
+    settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
+      ?.settingsValue || 'ME';
+  let reviewerFilter = reviewFilter[reviewFilterValue];
+  if (!reviewerFilter) {
+    reviewerFilter = ReviewerFilter.ME;
+  }
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
-    reviewer: defaultReviewerQueryFilter,
+    reviewer: withDefault(StringParam, reviewerFilter),
   });
 
   return (

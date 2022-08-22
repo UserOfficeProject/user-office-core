@@ -6,7 +6,9 @@ import {
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useUserWithRolesData({ id }: GetUserWithRolesQueryVariables) {
+export function useUserWithRolesData({
+  userId,
+}: GetUserWithRolesQueryVariables) {
   const api = useDataApi();
   const [userData, setUserData] = useState<GetUserWithRolesQuery['user']>(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,7 @@ export function useUserWithRolesData({ id }: GetUserWithRolesQueryVariables) {
 
     setLoading(true);
     api()
-      .getUserWithRoles({ id })
+      .getUserWithRoles({ userId })
       .then((data) => {
         if (unmounted) {
           return;
@@ -29,7 +31,7 @@ export function useUserWithRolesData({ id }: GetUserWithRolesQueryVariables) {
     return () => {
       unmounted = true;
     };
-  }, [id, api]);
+  }, [userId, api]);
 
   return { loading, userData, setUserData } as const;
 }

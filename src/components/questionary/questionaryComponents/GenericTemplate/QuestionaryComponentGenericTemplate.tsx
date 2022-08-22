@@ -1,16 +1,17 @@
 import makeStyles from '@mui/styles/makeStyles';
-import { Field, FieldProps, FormikProps } from 'formik';
+import { Field, FieldProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
+import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { Answer, QuestionaryStep, SubTemplateConfig } from 'generated/sdk';
+import { QuestionaryStep, SubTemplateConfig } from 'generated/sdk';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -64,20 +65,18 @@ function createGenericTemplateStub(
   };
 }
 
-type QuestionaryComponentGenericTemplateProps = {
-  answer: Answer;
-  formikProps: FormikProps<Record<string, unknown>>;
-  confirm: WithConfirmType;
-  prompt: WithPromptType;
-};
-
 function QuestionaryComponentGenericTemplate(
-  props: QuestionaryComponentGenericTemplateProps
+  props: BasicComponentProps & {
+    confirm: WithConfirmType;
+    prompt: WithPromptType;
+  }
 ) {
   const { answer, confirm, prompt } = props;
   const answerId = answer.question.id;
   const config = answer.config as SubTemplateConfig;
-  const { state } = useContext(QuestionaryContext) as ProposalContextType;
+  const { state, dispatch } = useContext(
+    QuestionaryContext
+  ) as ProposalContextType;
 
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
@@ -92,6 +91,17 @@ function QuestionaryComponentGenericTemplate(
   return (
     <Field name={answerId}>
       {({ field, form }: FieldProps<GenericTemplateWithQuestionary[]>) => {
+        const updateFieldValueAndState = (
+          updatedItems: GenericTemplateCore[] | null
+        ) => {
+          form.setFieldValue(answerId, updatedItems);
+          dispatch({
+            type: 'GENERIC_TEMPLATE_ITEMS_MODIFIED',
+            id: answerId,
+            newItems: updatedItems,
+          });
+        };
+
         const copyGenericTemplate = (id: number, title: string) =>
           api()
             .cloneGenericTemplate({ genericTemplateId: id, title: title })
@@ -99,10 +109,9 @@ function QuestionaryComponentGenericTemplate(
               const clonedGenericTemplate =
                 response.cloneGenericTemplate.genericTemplate;
               if (clonedGenericTemplate) {
-                form.setFieldValue(answerId, [
-                  ...field.value,
-                  clonedGenericTemplate,
-                ]);
+                const newStateItems = [...field.value, clonedGenericTemplate];
+
+                updateFieldValueAndState(newStateItems);
               }
             });
 
@@ -111,10 +120,11 @@ function QuestionaryComponentGenericTemplate(
             .deleteGenericTemplate({ genericTemplateId: id })
             .then((response) => {
               if (!response.deleteGenericTemplate.rejection) {
-                const newStateValue = field.value.filter(
+                const newStateItems = field.value.filter(
                   (genericTemplate) => genericTemplate.id !== id
                 );
-                form.setFieldValue(answerId, newStateValue);
+
+                updateFieldValueAndState(newStateItems);
               }
             });
 
@@ -199,19 +209,18 @@ function QuestionaryComponentGenericTemplate(
                 <GenericTemplateContainer
                   genericTemplate={selectedGenericTemplate}
                   genericTemplateUpdated={(updatedGenericTemplate) => {
-                    const newValue = field.value.map((genericTemplate) =>
+                    const newStateItems = field.value.map((genericTemplate) =>
                       genericTemplate.id === updatedGenericTemplate.id
                         ? updatedGenericTemplate
                         : genericTemplate
                     );
 
-                    form.setFieldValue(answerId, newValue);
+                    updateFieldValueAndState(newStateItems);
                   }}
                   genericTemplateCreated={(newGenericTemplate) => {
-                    form.setFieldValue(answerId, [
-                      ...field.value,
-                      newGenericTemplate,
-                    ]);
+                    const newStateItems = [...field.value, newGenericTemplate];
+
+                    updateFieldValueAndState(newStateItems);
                   }}
                   genericTemplateEditDone={() => {
                     // refresh all genericTemplates
@@ -223,7 +232,7 @@ function QuestionaryComponentGenericTemplate(
                         },
                       })
                       .then((result) => {
-                        form.setFieldValue(answerId, result.genericTemplates);
+                        updateFieldValueAndState(result.genericTemplates);
                       });
 
                     setSelectedGenericTemplate(null);
