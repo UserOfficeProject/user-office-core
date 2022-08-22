@@ -47,6 +47,7 @@
     "apollo-graphql": "^0.9.5",
     "apollo-server-core": "^3.10.1",
     "apollo-server-express": "^3.6.3",
+    "apollo-server-plugin-base": "^3.6.2",
     "await-to-js": "^2.1.1",
     "axios": "^0.26.0",
     "bcryptjs": "^2.4.3",
