@@ -166,8 +166,6 @@ const reducer = (
         currentRole: action.payload.toUpperCase(),
       };
     case ActionType.LOGOFFUSER:
-      clearSession();
-
       return {
         ...initUserData,
       };
@@ -218,10 +216,10 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
           const logoutUrl = settingsContext.settingsMap.get(
             SettingsId.EXTERNAL_AUTH_LOGOUT_URL
           )?.settingsValue;
+          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
+          clearSession();
           if (logoutUrl) {
             window.location.assign(logoutUrl);
-          } else {
-            dispatch({ type: ActionType.LOGOFFUSER, payload: null });
           }
         });
     }
