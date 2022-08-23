@@ -8,10 +8,10 @@ import { BasicUserDetails } from '../types/BasicUserDetails';
 export class BasicUserDetailsQuery {
   @Query(() => BasicUserDetails, { nullable: true })
   basicUserDetails(
-    @Arg('id', () => Int) id: number,
+    @Arg('userId', () => Int) userId: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.user.getBasic(context.user, id);
+    return context.queries.user.getBasic(context.user, userId);
   }
 
   @Query(() => BasicUserDetails, { nullable: true })
