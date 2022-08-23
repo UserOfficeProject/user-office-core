@@ -129,7 +129,7 @@ export default class TemplateMutations {
         await this.pdfTemplateDataSource.create(
           newTemplate.templateId,
           '',
-          agent?.id || 0
+          (agent as UserWithRole).id
         );
     }
 

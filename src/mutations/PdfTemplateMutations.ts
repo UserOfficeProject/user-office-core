@@ -37,7 +37,7 @@ export default class PdfTemplateMutations {
       return await this.pdfTemplateDataSource.create(
         template.templateId,
         args.templateData,
-        agent?.id || -1 // Agent will never be null with Authorized decorator
+        (agent as UserWithRole).id
       );
     } catch (error) {
       return rejection('Can not create PDF template', { agent, args }, error);
