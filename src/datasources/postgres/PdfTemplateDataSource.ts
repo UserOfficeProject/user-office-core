@@ -49,7 +49,7 @@ export default class PostgresPdfTemplateDataSource
       .first();
 
     if (!template) {
-      logger.logError('Could not get PDF template as it does not exist', {
+      logger.logInfo('Could not get PDF template as it does not exist', {
         pdfTemplateId,
       });
     }

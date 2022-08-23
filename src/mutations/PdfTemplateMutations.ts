@@ -52,7 +52,7 @@ export default class PdfTemplateMutations {
     try {
       return await this.pdfTemplateDataSource.updatePdfTemplate(args);
     } catch (error) {
-      return rejection('Can not create PDF template', { agent, args }, error);
+      return rejection('Can not update PDF template', { agent, args }, error);
     }
   }
 
