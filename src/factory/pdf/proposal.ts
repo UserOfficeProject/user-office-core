@@ -16,6 +16,7 @@ import {
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
+import { PdfTemplate } from '../../resolvers/types/PdfTemplate';
 import { getFileAttachments, Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,
@@ -36,7 +37,7 @@ type ProposalPDFData = {
       'genericTemplate' | 'genericTemplateQuestionaryFields'
     >
   >;
-  pdfTemplateId: number | undefined;
+  pdfTemplate: PdfTemplate | null;
 };
 
 const getTechnicalReviewHumanReadableStatus = (
@@ -86,6 +87,22 @@ export const collectProposalPDFData = async (
   }
 
   const call = await baseContext.queries.call.get(user, proposal.callId);
+
+  /*
+   * Because naming things is hard, the PDF template ID is the templateId for
+   * for the PdfTemplate and not the pdfTemplateId.
+   */
+  const pdfTemplateId = call?.pdfTemplateId;
+  let pdfTemplate: PdfTemplate | null = null;
+  if (pdfTemplateId !== undefined) {
+    pdfTemplate = (
+      await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
+        filter: {
+          templateIds: [pdfTemplateId],
+        },
+      })
+    )[0];
+  }
 
   const queries = baseContext.queries.questionary;
 
@@ -168,7 +185,7 @@ export const collectProposalPDFData = async (
     attachments: [],
     samples: samplePDFData,
     genericTemplates: genericTemplatePDFData,
-    pdfTemplateId: call?.pdfTemplateId,
+    pdfTemplate,
   };
 
   // Information from each topic in proposal
