@@ -1,3 +1,5 @@
+import { PdfTemplateRecord } from 'knex/types/tables';
+
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -48,6 +50,21 @@ import {
 } from '../../resolvers/types/ProposalBooking';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
+
+// Adds types to datasources: https://knexjs.org/guide/#typescript
+declare module 'knex/types/tables' {
+  export interface PdfTemplateRecord {
+    readonly pdf_template_id: number;
+    readonly template_id: number;
+    readonly template_data: string;
+    readonly creator_id: number;
+    readonly created_at: Date;
+  }
+
+  interface Tables {
+    pdf_templates: PdfTemplateRecord;
+  }
+}
 
 // Interfaces corresponding exactly to database tables
 
@@ -599,16 +616,6 @@ export interface FeedbackRequestRecord {
 
 export interface QuantityRecord {
   readonly quantity_id: string;
-}
-
-export interface PdfTemplateRecord {
-  readonly pdf_template_id: number;
-  readonly template_id: number;
-  readonly title: string;
-  readonly description: string;
-  readonly template_data: string;
-  readonly creator_id: number;
-  readonly created_at: Date;
 }
 
 export const createTopicObject = (record: TopicRecord) => {
