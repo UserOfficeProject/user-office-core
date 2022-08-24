@@ -1,7 +1,10 @@
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { UpdatePdfTemplateArgs } from '../../resolvers/mutations/UpdatePdfTemplateMutation';
 import { PdfTemplatesArgs } from '../../resolvers/queries/PdfTemplatesQuery';
-import { CreatePdfTemplateInputWithCreator, PdfTemplateDataSource } from '../PdfTemplateDataSource';
+import {
+  CreatePdfTemplateInputWithCreator,
+  PdfTemplateDataSource,
+} from '../PdfTemplateDataSource';
 
 export let dummyPdfTemplate: PdfTemplate;
 
