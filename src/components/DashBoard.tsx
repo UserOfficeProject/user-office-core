@@ -375,7 +375,7 @@ const Dashboard: React.FC = () => {
           <TitledRoute
             setHeader={setHeader}
             title="PDF Template Editor"
-            path="/PdfTemplateEditor/:pdfTemplateId"
+            path="/PdfTemplateEditor/:templateId"
             component={PdfTemplateEditor}
           />
           <TitledRoute
