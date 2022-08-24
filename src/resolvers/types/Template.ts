@@ -103,6 +103,6 @@ export class TemplateResolver {
       }
     );
 
-    return templates[0];
+    return templates?.length ? templates[0] : null;
   }
 }
