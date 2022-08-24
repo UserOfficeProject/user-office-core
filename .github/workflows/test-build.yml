@@ -27,7 +27,7 @@ jobs:
 
             local dockerhub_endpoint=$1
             local dockerhub_json=$(curl -s $dockerhub_endpoint)
-            local dockerhub_branch_found=$(echo $json | jq -c ".results[] | select(.name==\"$branch\") | .name")
+            local dockerhub_branch_found=$(echo $dockerhub_json | jq -c ".results[] | select(.name==\"$branch\") | .name")
             # to track what we found
             >&2 echo "$dockerhub_endpoint -> $dockerhub_branch_found"
             if [[ $dockerhub_branch_found != "" ]]; then
@@ -36,7 +36,7 @@ jobs:
 
             local github_endpoint=$2
             local github_json=$(curl -s $github_endpoint)
-            local github_branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
+            local github_branch_found=$(echo $github_json | jq -c ".[] | select(.name==\"$branch\") | .name")
             # to track what we found
             >&2 echo "$github_endpoint -> $github_branch_found"
             if [[ $github_branch_found != "" ]]; then
