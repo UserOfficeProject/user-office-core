@@ -51,7 +51,7 @@ test('An userofficer can update topic', async () => {
   expect(isRejection(result)).toBeFalsy();
 
   const template = result as Template;
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
 });
 
 test('An userofficer can create template', async () => {
@@ -71,7 +71,7 @@ test('An userofficer can create template', async () => {
 test('A userofficer can create PDF template', async () => {
   const mockCreatePdfTemplate = jest.spyOn(
     PdfTemplateDataSourceMock.prototype,
-    'create'
+    'createPdfTemplate'
   );
 
   const name = 'The name';
@@ -294,7 +294,7 @@ test('User officer can clone template', async () => {
 test('User officer can clone PDF template', async () => {
   const mockCreatePdfTemplate = jest.spyOn(
     PdfTemplateDataSourceMock.prototype,
-    'create'
+    'createPdfTemplate'
   );
   const mockClonePdfTemplate = jest.spyOn(
     PdfTemplateDataSourceMock.prototype,

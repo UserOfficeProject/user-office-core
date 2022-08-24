@@ -126,11 +126,11 @@ export default class TemplateMutations {
         );
         break;
       case TemplateGroupId.PDF_TEMPLATE:
-        await this.pdfTemplateDataSource.create(
-          newTemplate.templateId,
-          '',
-          (agent as UserWithRole).id
-        );
+        await this.pdfTemplateDataSource.createPdfTemplate({
+          templateId: newTemplate.templateId,
+          templateData: '',
+          creatorId: (agent as UserWithRole).id,
+        });
     }
 
     const activeTemplateTypes = [

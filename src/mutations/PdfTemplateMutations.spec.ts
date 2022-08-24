@@ -22,7 +22,7 @@ const mockGetTemplate = jest.spyOn(
 
 const mockCreatePdfTemplate = jest.spyOn(
   PdfTemplateDataSourceMock.prototype,
-  'create'
+  'createPdfTemplate'
 );
 
 const mockUpdatePdfTemplate = jest.spyOn(

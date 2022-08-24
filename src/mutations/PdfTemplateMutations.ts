@@ -34,11 +34,11 @@ export default class PdfTemplateMutations {
     }
 
     try {
-      return await this.pdfTemplateDataSource.create(
-        template.templateId,
-        args.templateData,
-        (agent as UserWithRole).id
-      );
+      return await this.pdfTemplateDataSource.createPdfTemplate({
+        templateId: template.templateId,
+        templateData: args.templateData,
+        creatorId: (agent as UserWithRole).id,
+      });
     } catch (error) {
       return rejection('Can not create PDF template', { agent, args }, error);
     }

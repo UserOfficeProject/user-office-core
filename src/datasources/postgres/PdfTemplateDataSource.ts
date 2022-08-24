@@ -4,18 +4,21 @@ import { PdfTemplateRecord } from 'knex/types/tables';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { UpdatePdfTemplateArgs } from '../../resolvers/mutations/UpdatePdfTemplateMutation';
 import { PdfTemplatesArgs } from '../../resolvers/queries/PdfTemplatesQuery';
-import { PdfTemplateDataSource } from '../PdfTemplateDataSource';
+import {
+  CreatePdfTemplateInputWithCreator,
+  PdfTemplateDataSource,
+} from '../PdfTemplateDataSource';
 import database from './database';
 import { createPdfTemplateObject } from './records';
 
 export default class PostgresPdfTemplateDataSource
   implements PdfTemplateDataSource
 {
-  async create(
-    templateId: number,
-    templateData: string,
-    creatorId: number
-  ): Promise<PdfTemplate> {
+  async createPdfTemplate({
+    templateId,
+    templateData,
+    creatorId,
+  }: CreatePdfTemplateInputWithCreator): Promise<PdfTemplate> {
     const templates: PdfTemplateRecord[] = await database(
       'pdf_templates'
     ).insert(
@@ -112,11 +115,11 @@ export default class PostgresPdfTemplateDataSource
       throw new Error('Could not clone PDF template');
     }
 
-    const newTemplate = await this.create(
-      newTemplateId,
-      sourceTemplate.template_data,
-      sourceTemplate.creator_id
-    );
+    const newTemplate = await this.createPdfTemplate({
+      templateId: newTemplateId,
+      templateData: sourceTemplate.template_data,
+      creatorId: sourceTemplate.creator_id,
+    });
 
     return newTemplate;
   }
