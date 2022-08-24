@@ -3157,6 +3157,7 @@ export type UpdateCallInput = {
   endSEPReview?: InputMaybe<Scalars['DateTime']>;
   esiTemplateId?: InputMaybe<Scalars['Int']>;
   id: Scalars['Int'];
+  pdfTemplateId?: InputMaybe<Scalars['Int']>;
   proposalSequence?: InputMaybe<Scalars['Int']>;
   proposalWorkflowId: Scalars['Int'];
   referenceNumberFormat?: InputMaybe<Scalars['String']>;
