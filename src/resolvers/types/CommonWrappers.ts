@@ -13,6 +13,7 @@ import { FeedbackRequest } from './FeedbackRequest';
 import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
+import { PdfTemplate } from './PdfTemplate';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
 import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
@@ -411,4 +412,11 @@ export class UnitsImportWithValidationWrap extends ResponseWrapBase {
   @Response()
   @Field(() => UnitsImportWithValidation, { nullable: true })
   public validationResult: UnitsImportWithValidation;
+}
+
+@ObjectType()
+export class PdfTemplateResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => PdfTemplate, { nullable: true })
+  public pdfTemplate: PdfTemplate;
 }
