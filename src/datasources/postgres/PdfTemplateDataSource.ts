@@ -1,20 +1,24 @@
 import { logger } from '@user-office-software/duo-logger';
+import { PdfTemplateRecord } from 'knex/types/tables';
 
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { UpdatePdfTemplateArgs } from '../../resolvers/mutations/UpdatePdfTemplateMutation';
 import { PdfTemplatesArgs } from '../../resolvers/queries/PdfTemplatesQuery';
-import { PdfTemplateDataSource } from '../PdfTemplateDataSource';
+import {
+  CreatePdfTemplateInputWithCreator,
+  PdfTemplateDataSource,
+} from '../PdfTemplateDataSource';
 import database from './database';
-import { createPdfTemplateObject, PdfTemplateRecord } from './records';
+import { createPdfTemplateObject } from './records';
 
 export default class PostgresPdfTemplateDataSource
   implements PdfTemplateDataSource
 {
-  async create(
-    templateId: number,
-    templateData: string,
-    creatorId: number
-  ): Promise<PdfTemplate> {
+  async createPdfTemplate({
+    templateId,
+    templateData,
+    creatorId,
+  }: CreatePdfTemplateInputWithCreator): Promise<PdfTemplate> {
     const templates: PdfTemplateRecord[] = await database(
       'pdf_templates'
     ).insert(
@@ -40,13 +44,15 @@ export default class PostgresPdfTemplateDataSource
   }
 
   async getPdfTemplate(pdfTemplateId: number): Promise<PdfTemplate | null> {
-    const template: PdfTemplateRecord = await database('pdf_templates')
+    const template: PdfTemplateRecord | undefined = await database(
+      'pdf_templates'
+    )
       .select('*')
       .where('pdf_template_id', pdfTemplateId)
       .first();
 
     if (!template) {
-      logger.logError('Could not get PDF template as it does not exist', {
+      logger.logInfo('Could not get PDF template as it does not exist', {
         pdfTemplateId,
       });
     }
@@ -93,7 +99,9 @@ export default class PostgresPdfTemplateDataSource
     sourceTemplateId: number,
     newTemplateId: number
   ): Promise<PdfTemplate> {
-    const sourceTemplate: PdfTemplateRecord = await database('pdf_templates')
+    const sourceTemplate: PdfTemplateRecord | undefined = await database(
+      'pdf_templates'
+    )
       .where({
         template_id: sourceTemplateId,
       })
@@ -107,11 +115,11 @@ export default class PostgresPdfTemplateDataSource
       throw new Error('Could not clone PDF template');
     }
 
-    const newTemplate = await this.create(
-      newTemplateId,
-      sourceTemplate.template_data,
-      sourceTemplate.creator_id
-    );
+    const newTemplate = await this.createPdfTemplate({
+      templateId: newTemplateId,
+      templateData: sourceTemplate.template_data,
+      creatorId: sourceTemplate.creator_id,
+    });
 
     return newTemplate;
   }

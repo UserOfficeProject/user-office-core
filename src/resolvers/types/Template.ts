@@ -103,8 +103,6 @@ export class TemplateResolver {
       }
     );
 
-    return templates?.filter(
-      (pdfTemplate) => pdfTemplate.templateId === template.templateId
-    )[0];
+    return templates?.length ? templates[0] : null;
   }
 }

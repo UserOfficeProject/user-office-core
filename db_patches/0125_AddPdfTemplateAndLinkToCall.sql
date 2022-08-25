@@ -11,7 +11,7 @@ BEGIN
       pdf_template_id serial PRIMARY KEY,
       template_id int REFERENCES templates (template_id) UNIQUE NOT NULL,
       template_data TEXT NOT NULL DEFAULT '',
-      creator_id int REFERENCES users (user_id),
+      creator_id int REFERENCES users (user_id) NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 

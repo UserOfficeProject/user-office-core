@@ -1,7 +1,10 @@
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { UpdatePdfTemplateArgs } from '../../resolvers/mutations/UpdatePdfTemplateMutation';
 import { PdfTemplatesArgs } from '../../resolvers/queries/PdfTemplatesQuery';
-import { PdfTemplateDataSource } from '../PdfTemplateDataSource';
+import {
+  CreatePdfTemplateInputWithCreator,
+  PdfTemplateDataSource,
+} from '../PdfTemplateDataSource';
 
 export let dummyPdfTemplate: PdfTemplate;
 
@@ -48,11 +51,11 @@ export class PdfTemplateDataSourceMock implements PdfTemplateDataSource {
     return dummyPdfTemplate;
   }
 
-  async create(
-    templateId: number,
-    templateData: string,
-    creatorId: number
-  ): Promise<PdfTemplate> {
+  async createPdfTemplate({
+    templateId,
+    templateData,
+    creatorId,
+  }: CreatePdfTemplateInputWithCreator): Promise<PdfTemplate> {
     dummyPdfTemplate = dummyPdfTemplateFactory({
       templateId,
       templateData,

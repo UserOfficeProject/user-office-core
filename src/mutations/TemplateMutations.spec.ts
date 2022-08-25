@@ -51,7 +51,7 @@ test('An userofficer can update topic', async () => {
   expect(isRejection(result)).toBeFalsy();
 
   const template = result as Template;
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
 });
 
 test('An userofficer can create template', async () => {
@@ -63,7 +63,7 @@ test('An userofficer can create template', async () => {
     name,
     description,
   });
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
   expect((template as Template).name).toEqual(name);
   expect((template as Template).description).toEqual(description);
 });
@@ -71,7 +71,7 @@ test('An userofficer can create template', async () => {
 test('A userofficer can create PDF template', async () => {
   const mockCreatePdfTemplate = jest.spyOn(
     PdfTemplateDataSourceMock.prototype,
-    'create'
+    'createPdfTemplate'
   );
 
   const name = 'The name';
@@ -84,7 +84,7 @@ test('A userofficer can create PDF template', async () => {
     description,
   });
 
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
   expect((template as Template).name).toEqual(name);
   expect((template as Template).description).toEqual(description);
   expect(mockCreatePdfTemplate).toBeCalledTimes(1);
@@ -99,7 +99,7 @@ test('An user cannot create template', async () => {
     name,
     description,
   });
-  expect(template instanceof Template).toBe(false);
+  expect(template).not.toBeInstanceOf(Template);
 });
 
 test('An userofficer can delete template', async () => {
@@ -107,7 +107,7 @@ test('An userofficer can delete template', async () => {
   const template = await mutations.deleteTemplate(dummyUserOfficerWithRole, {
     templateId,
   });
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
   expect((template as Template).templateId).toEqual(templateId);
 });
 
@@ -116,7 +116,7 @@ test('An user can not delete template', async () => {
   const template = await mutations.deleteTemplate(dummyUserWithRole, {
     templateId,
   });
-  expect(template instanceof Template).toBe(false);
+  expect(template).not.toBeInstanceOf(Template);
 });
 
 test('Can not delete non-existing template', async () => {
@@ -294,7 +294,7 @@ test('User officer can clone template', async () => {
 test('User officer can clone PDF template', async () => {
   const mockCreatePdfTemplate = jest.spyOn(
     PdfTemplateDataSourceMock.prototype,
-    'create'
+    'createPdfTemplate'
   );
   const mockClonePdfTemplate = jest.spyOn(
     PdfTemplateDataSourceMock.prototype,

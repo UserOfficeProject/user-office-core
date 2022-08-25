@@ -34,11 +34,11 @@ export default class PdfTemplateMutations {
     }
 
     try {
-      return await this.pdfTemplateDataSource.create(
-        template.templateId,
-        args.templateData,
-        agent?.id || -1 // Agent will never be null with Authorized decorator
-      );
+      return await this.pdfTemplateDataSource.createPdfTemplate({
+        templateId: template.templateId,
+        templateData: args.templateData,
+        creatorId: (agent as UserWithRole).id,
+      });
     } catch (error) {
       return rejection('Can not create PDF template', { agent, args }, error);
     }
@@ -52,7 +52,7 @@ export default class PdfTemplateMutations {
     try {
       return await this.pdfTemplateDataSource.updatePdfTemplate(args);
     } catch (error) {
-      return rejection('Can not create PDF template', { agent, args }, error);
+      return rejection('Can not update PDF template', { agent, args }, error);
     }
   }
 
