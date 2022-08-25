@@ -1,6 +1,7 @@
-import { TextField, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-mui';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -79,7 +80,6 @@ export default function PdfTemplateEditor() {
                 minRows={10}
                 variant="outlined"
                 onChange={handleChange}
-                value={values.templateData}
               />
               <StyledButtonContainer>
                 <Button type="submit" data-cy="submit">
