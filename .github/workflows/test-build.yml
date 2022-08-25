@@ -24,24 +24,34 @@ jobs:
             local branch=$1
             local found=0
             shift
-            for endpoint in $@; do
-              local json=$(curl -s $endpoint)
-              local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
-              # to track what we found
-              >&2 echo "$endpoint -> $branch_found"
-              if [[ $branch_found != "" ]]; then
-                found=$((found += 1))
-              fi
-            done
+
+            local dockerhub_endpoint=$1
+            local dockerhub_json=$(curl -s $dockerhub_endpoint)
+            local dockerhub_branch_found=$(echo $dockerhub_json | jq -c ".results[] | select(.name==\"$branch\") | .name")
+            # to track what we found
+            >&2 echo "$dockerhub_endpoint -> $dockerhub_branch_found"
+            if [[ $dockerhub_branch_found != "" ]]; then
+              found=$((found += 1))
+            fi
+
+            local github_endpoint=$2
+            local github_json=$(curl -s $github_endpoint)
+            local github_branch_found=$(echo $github_json | jq -c ".[] | select(.name==\"$branch\") | .name")
+            # to track what we found
+            >&2 echo "$github_endpoint -> $github_branch_found"
+            if [[ $github_branch_found != "" ]]; then
+              found=$((found += 1))
+            fi
+
             echo $found
           }
 
           BE_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags \
+            https://registry.hub.docker.com/v2/repositories/dmsc/duo-backend/tags \
             https://api.github.com/repos/UserOfficeProject/user-office-backend/branches
           )
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
+            https://registry.hub.docker.com/v2/repositories/dmsc/duo-factory/tags \
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
           )
 
@@ -263,7 +273,7 @@ jobs:
         run: |
           DOCKERFILE_VERSION=${{ hashFiles('Dockerfile.e2e', 'cypress/*.json') }}
           TAG="docker.pkg.github.com/userofficeproject/user-office-frontend/e2e-cypress-core:$DOCKERFILE_VERSION"
-          docker pull $TAG 
+          docker pull $TAG
           docker tag $TAG e2e-cypress:latest
 
       - name: Load app cache
@@ -329,7 +339,7 @@ jobs:
             -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
             -f docker-compose.all.yml \
             up --exit-code-from cypress
-      
+
       - name: Run docker-compose stfc
         env:
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}

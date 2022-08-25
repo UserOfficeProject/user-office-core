@@ -1,7 +1,9 @@
-import { TextField, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-mui';
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 
 import UOLoader from 'components/common/UOLoader';
 import { PdfTemplate, Template } from 'generated/sdk';
@@ -18,8 +20,10 @@ export default function PdfTemplateEditor() {
   const [template, setTemplate] = useState<Template | null>(null);
   const [pdfTemplate, setPdfTemplate] = useState<PdfTemplate | null>(null);
 
-  // TODO: get the template ID a better way
-  const templateId = Number(window.location.pathname.split('/').pop());
+  const { templateId: templateIdQueryParam } = useParams<{
+    templateId: string;
+  }>();
+  const templateId = parseInt(templateIdQueryParam);
 
   const initialValues = {
     templateData: pdfTemplate?.templateData,
@@ -76,7 +80,6 @@ export default function PdfTemplateEditor() {
                 minRows={10}
                 variant="outlined"
                 onChange={handleChange}
-                value={values.templateData}
               />
               <StyledButtonContainer>
                 <Button type="submit" data-cy="submit">
