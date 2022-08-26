@@ -76,6 +76,12 @@ const CallFilter: React.FC<CallFilterProps> = ({
           <Autocomplete
             id="call-select"
             aria-labelledby="call-select-label"
+            /*
+             * The clear event is triggered when backspacing to empty, which
+             * will reset the value to undefined, which will select "All".
+             * Disabling it gives a better experience. If left empty, it will
+             * reset to the last used value.
+             */
             disableClearable
             onChange={(_, call) => {
               setQuery({
