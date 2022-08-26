@@ -21,10 +21,10 @@ test('A userofficer can get a PDF template', () => {
   ).resolves.toBeInstanceOf(PdfTemplate);
 });
 
-test('A user cannot get a PDF template', () => {
+test('A user can get a PDF template', () => {
   return expect(
     pdfTemplateQueries.getPdfTemplate(dummyUserWithRole, 1)
-  ).resolves.not.toBeInstanceOf(PdfTemplate);
+  ).resolves.toBeInstanceOf(PdfTemplate);
 });
 
 test('A userofficer can get multiple PDF templates', async () => {
@@ -40,12 +40,15 @@ test('A userofficer can get multiple PDF templates', async () => {
   expect(pdfTemplates.length).toBeGreaterThan(0);
 });
 
-test('A user cannot get multiple PDF templates', async () => {
-  return expect(
-    pdfTemplateQueries.getPdfTemplates(dummyUserWithRole, {
+test('A user can get multiple PDF templates', async () => {
+  const pdfTemplates = await pdfTemplateQueries.getPdfTemplates(
+    dummyUserWithRole,
+    {
       filter: {
         pdfTemplateIds: [1],
       },
-    })
-  ).resolves.not.toBeInstanceOf(PdfTemplate);
+    }
+  );
+
+  expect(pdfTemplates.length).toBeGreaterThan(0);
 });
