@@ -911,8 +911,6 @@ context('Template tests', () => {
     });
 
     it('should render the Number field accepting only positive, negative numbers if set', () => {
-      const questions: Record<string, string> = {};
-
       cy.login('officer');
       cy.visit('/');
 
@@ -957,45 +955,43 @@ context('Template tests', () => {
       cy.contains(numberQuestion4.title);
       cy.contains(numberQuestion5.title);
 
-      cy.get('body').then(() => {
-        cy.get(
-          `[data-cy="${questions[numberQuestion2.title]}.value"] input`
-        ).as('numberField2');
-        cy.get(
-          `[data-cy="${questions[numberQuestion3.title]}.value"] input`
-        ).as('numberField3');
-        cy.get(
-          `[data-cy="${questions[numberQuestion4.title]}.value"] input`
-        ).as('numberField4');
-        cy.get(
-          `[data-cy="${questions[numberQuestion5.title]}.value"] input`
-        ).as('numberField5');
+      cy.get(`[data-natural-key="${numberQuestion2.title}"] input`).as(
+        'numberField2'
+      );
+      cy.get(`[data-natural-key="${numberQuestion3.title}"] input`).as(
+        'numberField3'
+      );
+      cy.get(`[data-natural-key="${numberQuestion4.title}"] input`).as(
+        'numberField4'
+      );
+      cy.get(`[data-natural-key="${numberQuestion5.title}"] input`).as(
+        'numberField5'
+      );
 
-        cy.get('@numberField2').type('1{leftarrow}-');
-        cy.get('@numberField3').type('1');
-        cy.get('@numberField4').type('1.1{leftarrow}{leftarrow}{leftarrow}-');
-        cy.get('@numberField5').type('1.1');
+      cy.get('@numberField2').type('1{leftarrow}-');
+      cy.get('@numberField3').type('1');
+      cy.get('@numberField4').type('1.1{leftarrow}{leftarrow}{leftarrow}-');
+      cy.get('@numberField5').type('1.1');
 
-        cy.contains('Save and continue').click();
-        cy.contains('Value must be a negative number');
-        cy.contains('Value must be a positive number');
-        cy.contains('Value must be a negative whole number');
-        cy.contains('Value must be a positive whole number');
+      cy.contains('Save and continue').click();
+      cy.contains('Value must be a negative number');
+      cy.contains('Value must be a positive number');
+      cy.contains('Value must be a negative whole number');
+      cy.contains('Value must be a positive whole number');
 
-        cy.get('@numberField2').clear().type('1');
-        cy.get('@numberField3').clear().type('1{leftarrow}-');
-        cy.get('@numberField4').clear().type('1');
-        cy.get('@numberField5').clear().type('1{leftarrow}-');
+      cy.get('@numberField2').clear().type('1');
+      cy.get('@numberField3').clear().type('1{leftarrow}-');
+      cy.get('@numberField4').clear().type('1');
+      cy.get('@numberField5').clear().type('1{leftarrow}-');
 
-        cy.contains('Value must be a negative number').should('not.exist');
-        cy.contains('Value must be a positive number').should('not.exist');
-        cy.contains('Value must be a negative whole number').should(
-          'not.exist'
-        );
-        cy.contains('Value must be a positive whole number').should(
-          'not.exist'
-        );
-      });
+      cy.contains('Value must be a negative number').should('not.exist');
+      cy.contains('Value must be a positive number').should('not.exist');
+      cy.contains('Value must be a negative whole number').should(
+        'not.exist'
+      );
+      cy.contains('Value must be a positive whole number').should(
+        'not.exist'
+      );
     });
 
     it('User officer can add multiple choice question as a dependency', () => {
