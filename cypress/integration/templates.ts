@@ -945,24 +945,6 @@ context('Template tests', () => {
         valueConstraint: 'Only positive integers',
       });
 
-      cy.finishedLoading();
-
-      cy.contains(numberQuestion3.title).click();
-
-      cy.get('[data-cy=units]').contains('celsius');
-      cy.get('[data-cy=units]').contains('kelvin');
-
-      cy.get('[data-cy="numberValueConstraint"] input').should(
-        'have.value',
-        'Only positive numbers'
-      );
-
-      cy.get('[data-cy="numberValueConstraint"]').click();
-
-      cy.contains('Only negative numbers').click();
-
-      cy.contains('Update').click();
-
       cy.logout();
 
       cy.login('user');
