@@ -924,50 +924,26 @@ context('Template tests', () => {
         .first()
         .click();
 
-      function createNumberQuestion(title: string, restriction: string) {
-        cy.get('[data-cy=show-more-button]').first().click();
-
-        cy.get('[data-cy=add-question-menu-item]').first().click();
-
-        cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-          .first()
-          .click();
-
-        cy.contains('Add Number').click();
-
-        cy.get('[data-cy=question]').clear().type(title);
-
-        cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-        cy.contains('celsius').click();
-
-        cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-        cy.contains('kelvin').click();
-
-        cy.get('[data-cy="numberValueConstraint"]').click();
-
-        cy.contains(restriction).click();
-
-        cy.contains('Save').click();
-
-        cy.contains(title)
-          .closest('[data-cy=question-container]')
-          .find("[data-cy='proposal-question-id']")
-          .invoke('html')
-          .then((fieldId) => {
-            questions[title] = fieldId;
-          });
-
-        cy.contains(title)
-          .parent()
-          .dragElement([{ direction: 'left', length: 1 }]);
-      }
-
-      createNumberQuestion(numberQuestion2.title, 'Only positive numbers');
-      createNumberQuestion(numberQuestion3.title, 'Only negative numbers');
-      createNumberQuestion(numberQuestion4.title, 'Only positive integers');
-      createNumberQuestion(numberQuestion5.title, 'Only negative integers');
+      cy.createNumberInputQuestion(numberQuestion2.title, {
+        key: numberQuestion2.title,
+        units: ['kelvin'],
+        valueConstraint: 'Only negative numbers',
+      });
+      cy.createNumberInputQuestion(numberQuestion2.title, {
+        key: numberQuestion2.title,
+        units: ['kelvin'],
+        valueConstraint: 'Only positive numbers',
+      });
+      cy.createNumberInputQuestion(numberQuestion2.title, {
+        key: numberQuestion2.title,
+        units: ['kelvin'],
+        valueConstraint: 'Only negative integers',
+      });
+      cy.createNumberInputQuestion(numberQuestion2.title, {
+        key: numberQuestion2.title,
+        units: ['kelvin'],
+        valueConstraint: 'Only positive integers',
+      });
 
       cy.finishedLoading();
 
@@ -996,6 +972,9 @@ context('Template tests', () => {
 
       cy.contains(numberQuestion2.title);
       cy.contains(numberQuestion3.title);
+      cy.contains(numberQuestion4.title);
+      cy.contains(numberQuestion5.title);
+
       cy.get('body').then(() => {
         cy.get(
           `[data-cy="${questions[numberQuestion2.title]}.value"] input`
