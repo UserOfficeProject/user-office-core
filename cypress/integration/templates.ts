@@ -942,17 +942,17 @@ context('Template tests', () => {
         units: ['kelvin'],
         valueConstraint: 'Only negative numbers',
       });
-      cy.createNumberInputQuestion(numberQuestion2.title, {
+      cy.createNumberInputQuestion(numberQuestion3.title, {
         key: numberQuestion3.id,
         units: ['kelvin'],
         valueConstraint: 'Only positive numbers',
       });
-      cy.createNumberInputQuestion(numberQuestion2.title, {
+      cy.createNumberInputQuestion(numberQuestion4.title, {
         key: numberQuestion4.id,
         units: ['kelvin'],
         valueConstraint: 'Only negative integers',
       });
-      cy.createNumberInputQuestion(numberQuestion2.title, {
+      cy.createNumberInputQuestion(numberQuestion5.title, {
         key: numberQuestion5.id,
         units: ['kelvin'],
         valueConstraint: 'Only positive integers',
