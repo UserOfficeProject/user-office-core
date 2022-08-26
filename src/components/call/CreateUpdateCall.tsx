@@ -41,6 +41,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     TemplateGroupId.PROPOSAL_ESI,
     call?.esiTemplateId
   );
+
+  const { templates: pdfTemplates } = useActiveTemplates(
+    TemplateGroupId.PDF_TEMPLATE,
+    call?.pdfTemplateId
+  );
+
   const { proposalWorkflows, loadingProposalWorkflows } =
     useProposalWorkflowsData();
 
@@ -67,6 +73,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         description: call.description || '',
         templateId: call.templateId,
         esiTemplateId: call.esiTemplateId,
+        pdfTemplateId: call.pdfTemplateId,
         proposalWorkflowId: call.proposalWorkflowId,
         referenceNumberFormat: call.referenceNumberFormat || '',
         startCall: getDateTimeFromISO(call.startCall),
@@ -100,6 +107,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         proposalWorkflowId: null,
         templateId: null,
         esiTemplateId: null,
+        pdfTemplateId: null,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
@@ -153,6 +161,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           <CallGeneralInfo
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
+            pdfTemplates={pdfTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}
