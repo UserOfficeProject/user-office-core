@@ -17,6 +17,7 @@ fragment call on Call {
   proposalWorkflowId
   templateId
   esiTemplateId
+  pdfTemplateId
   allocationTimeUnit  
   instruments {
     id
