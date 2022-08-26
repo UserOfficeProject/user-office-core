@@ -81,7 +81,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     private endpoint: string,
     private token: string,
     private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
-    private error?: () => void,
+    private onSessionExpired: () => void,
     private tokenRenewed?: (newToken: string) => void,
     private externalAuthLoginUrl?: string
   ) {
@@ -106,7 +106,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           'Server rejected user credentials',
           data.token.rejection.reason
         );
-        this.error && this.error();
+        this.onSessionExpired();
       } else {
         const newToken = data.token.token;
         this.setHeader('authorization', `Bearer ${newToken}`);
@@ -137,6 +137,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           error,
           false
         );
+        this.onSessionExpired();
       } else if ((jwtDecode(this.token) as any).exp < nowTimestampSeconds) {
         notifyAndLog(
           this.enqueueSnackbar,
@@ -144,11 +145,10 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           error,
           false
         );
+        this.onSessionExpired();
       } else {
         notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
       }
-
-      this.error && this.error();
 
       throw error;
     });
