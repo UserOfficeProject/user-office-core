@@ -60,6 +60,8 @@ context('Template tests', () => {
 
   const numberQuestion2 = { title: faker.lorem.words(3) };
   const numberQuestion3 = { title: faker.lorem.words(3) };
+  const numberQuestion4 = { title: faker.lorem.words(3) };
+  const numberQuestion5 = { title: faker.lorem.words(3) };
 
   const templateSearch = {
     title: faker.lorem.words(3),
@@ -909,91 +911,69 @@ context('Template tests', () => {
     });
 
     it('should render the Number field accepting only positive, negative numbers if set', () => {
-      let numberField1Id: string;
-      let numberField2Id: string;
+      const questions: Record<string, string> = {};
 
       cy.login('officer');
       cy.visit('/');
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      function createNumberQuestion(title: string, restriction: string) {
+        cy.contains(initialDBData.template.name)
+          .parent()
+          .find("[aria-label='Edit']")
+          .first()
+          .click();
 
-      cy.get('[data-cy=show-more-button]').first().click();
+        cy.get('[data-cy=show-more-button]').first().click();
 
-      cy.get('[data-cy=add-question-menu-item]').first().click();
+        cy.get('[data-cy=add-question-menu-item]').first().click();
 
-      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-        .first()
-        .click();
+        cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+          .first()
+          .click();
 
-      cy.contains('Add Number').click();
+        cy.contains('Add Number').click();
 
-      cy.get('[data-cy=question]').clear().type(numberQuestion2.title);
+        cy.get('[data-cy=question]').clear().type(title);
 
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
+        cy.get('[data-cy=units]').find('[aria-label=Open]').click();
 
-      cy.contains('celsius').click();
+        cy.contains('celsius').click();
 
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
+        cy.get('[data-cy=units]').find('[aria-label=Open]').click();
 
-      cy.contains('kelvin').click();
+        cy.contains('kelvin').click();
 
-      cy.get('[data-cy="numberValueConstraint"]').click();
+        cy.get('[data-cy="numberValueConstraint"]').click();
 
-      cy.contains('Only positive numbers').click();
+        cy.contains(restriction).click();
 
-      cy.contains('Save').click();
+        cy.contains('Save').click();
 
-      cy.contains(numberQuestion2.title)
-        .closest('[data-cy=question-container]')
-        .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          numberField1Id = fieldId;
-        });
+        cy.contains(title)
+          .closest('[data-cy=question-container]')
+          .find("[data-cy='proposal-question-id']")
+          .invoke('html')
+          .then((fieldId) => {
+            questions[title] = fieldId;
+          });
 
-      cy.contains(numberQuestion2.title)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
+        cy.contains(numberQuestion2.title)
+          .parent()
+          .dragElement([{ direction: 'left', length: 1 }]);
+      }
 
-      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-        .first()
-        .click();
-
-      cy.contains('Add Number').click();
-
-      cy.get('[data-cy=question]').clear().type(numberQuestion3.title);
-
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-      cy.contains('celsius').click();
-
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-      cy.contains('kelvin').click();
-
-      cy.get('[data-cy="numberValueConstraint"]').click();
-
-      cy.contains('Only positive numbers').click();
-
-      cy.contains('Save').click();
-
-      cy.contains(numberQuestion3.title)
-        .closest('[data-cy=question-container]')
-        .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          numberField2Id = fieldId;
-        });
-
-      cy.contains(numberQuestion3.title)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
+      createNumberQuestion(numberQuestion2.title, 'Only positive numbers');
+      createNumberQuestion(numberQuestion3.title, 'Only negative numbers');
+      createNumberQuestion(
+        numberQuestion4.title,
+        'Only positive whole numbers'
+      );
+      createNumberQuestion(
+        numberQuestion5.title,
+        'Only negative whole numbers'
+      );
 
       cy.finishedLoading();
 
@@ -1023,21 +1003,43 @@ context('Template tests', () => {
       cy.contains(numberQuestion2.title);
       cy.contains(numberQuestion3.title);
       cy.get('body').then(() => {
-        cy.get(`[data-cy="${numberField1Id}.value"] input`).as('numberField1');
-        cy.get(`[data-cy="${numberField2Id}.value"] input`).as('numberField2');
+        cy.get(
+          `[data-cy="${questions[numberQuestion2.title]}.value"] input`
+        ).as('numberField2');
+        cy.get(
+          `[data-cy="${questions[numberQuestion3.title]}.value"] input`
+        ).as('numberField3');
+        cy.get(
+          `[data-cy="${questions[numberQuestion4.title]}.value"] input`
+        ).as('numberField4');
+        cy.get(
+          `[data-cy="${questions[numberQuestion5.title]}.value"] input`
+        ).as('numberField5');
 
-        cy.get('@numberField1').type('1{leftarrow}-');
-        cy.get('@numberField2').type('1');
+        cy.get('@numberField2').type('1{leftarrow}-');
+        cy.get('@numberField3').type('1');
+        cy.get('@numberField4').type('1.1{leftarrow}{leftarrow}{leftarrow}-');
+        cy.get('@numberField5').type('1.1');
 
         cy.contains('Save and continue').click();
         cy.contains('Value must be a negative number');
         cy.contains('Value must be a positive number');
+        cy.contains('Value must be a negative whole number');
+        cy.contains('Value must be a positive whole number');
 
-        cy.get('@numberField1').clear().type('1');
-        cy.get('@numberField2').clear().type('1{leftarrow}-');
+        cy.get('@numberField2').clear().type('1');
+        cy.get('@numberField3').clear().type('1{leftarrow}-');
+        cy.get('@numberField4').clear().type('1');
+        cy.get('@numberField5').clear().type('1{leftarrow}-');
 
         cy.contains('Value must be a negative number').should('not.exist');
         cy.contains('Value must be a positive number').should('not.exist');
+        cy.contains('Value must be a negative whole number').should(
+          'not.exist'
+        );
+        cy.contains('Value must be a positive whole number').should(
+          'not.exist'
+        );
       });
     });
 
