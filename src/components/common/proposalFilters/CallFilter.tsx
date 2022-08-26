@@ -62,7 +62,7 @@ const CallFilter: React.FC<CallFilterProps> = ({
     shortCode: 'All',
   };
   const options: CallOption[] = [
-    ...(shouldShowAll ? [allOption] : []), // Add default call option if should show all.
+    ...(shouldShowAll ? [allOption] : []), // Add all call option if should show all.
     ...sortedCalls,
   ];
 
