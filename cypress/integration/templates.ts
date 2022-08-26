@@ -959,7 +959,7 @@ context('Template tests', () => {
             questions[title] = fieldId;
           });
 
-        cy.contains(numberQuestion2.title)
+        cy.contains(title)
           .parent()
           .dragElement([{ direction: 'left', length: 1 }]);
       }
