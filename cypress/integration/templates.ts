@@ -58,26 +58,6 @@ context('Template tests', () => {
     ],
   };
 
-  const generateId = () =>
-    faker.lorem.word() + '_' + faker.lorem.word() + '_' + faker.lorem.word();
-
-  const numberQuestion2 = {
-    id: generateId(),
-    title: faker.lorem.words(3),
-  };
-  const numberQuestion3 = {
-    id: generateId(),
-    title: faker.lorem.words(3),
-  };
-  const numberQuestion4 = {
-    id: generateId(),
-    title: faker.lorem.words(3),
-  };
-  const numberQuestion5 = {
-    id: generateId(),
-    title: faker.lorem.words(3),
-  };
-
   const templateSearch = {
     title: faker.lorem.words(3),
     description: faker.lorem.words(3),
@@ -926,6 +906,48 @@ context('Template tests', () => {
     });
 
     it('should render the Number field accepting only positive, negative numbers if set', () => {
+      const generateId = () =>
+        `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
+
+      const questions = [
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive numbers',
+          fieldName: 'numberField2',
+          badInput: '1{leftarrow}-',
+          goodInput: '1',
+          failureMessage: 'Value must be a negative number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative numbers',
+          fieldName: 'numberField3',
+          badInput: '1',
+          goodInput: '1{leftarrow}-',
+          failureMessage: 'Value must be a positive number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative integers',
+          fieldName: 'numberField4',
+          badInput: '1.1{leftarrow}{leftarrow}{leftarrow}-',
+          goodInput: '-1',
+          failureMessage: 'Value must be a negative whole number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive integers',
+          fieldName: 'numberField5',
+          badInput: '1.1',
+          goodInput: '1',
+          failureMessage: 'Value must be a positive whole number',
+        },
+      ];
+
       cy.login('officer');
       cy.visit('/');
 
@@ -937,26 +959,14 @@ context('Template tests', () => {
         .first()
         .click();
 
-      cy.createNumberInputQuestion(numberQuestion2.title, {
-        key: numberQuestion2.id,
-        units: ['kelvin'],
-        valueConstraint: 'Only negative numbers',
-      });
-      cy.createNumberInputQuestion(numberQuestion3.title, {
-        key: numberQuestion3.id,
-        units: ['kelvin'],
-        valueConstraint: 'Only positive numbers',
-      });
-      cy.createNumberInputQuestion(numberQuestion4.title, {
-        key: numberQuestion4.id,
-        units: ['kelvin'],
-        valueConstraint: 'Only negative integers',
-      });
-      cy.createNumberInputQuestion(numberQuestion5.title, {
-        key: numberQuestion5.id,
-        units: ['kelvin'],
-        valueConstraint: 'Only positive integers',
-      });
+      /* Create questions */
+      for (const question of questions) {
+        cy.createNumberInputQuestion(question.title, {
+          key: question.id,
+          units: ['kelvin'],
+          valueConstraint: question.valueConstraint,
+        });
+      }
 
       cy.logout();
 
@@ -965,44 +975,32 @@ context('Template tests', () => {
 
       cy.contains('New Proposal').click();
 
-      cy.contains(numberQuestion2.title);
-      cy.contains(numberQuestion3.title);
-      cy.contains(numberQuestion4.title);
-      cy.contains(numberQuestion5.title);
+      /* Test questions exist */
+      for (const question of questions) {
+        cy.contains(question.title);
+      }
 
-      cy.get(`[data-natural-key="${numberQuestion2.id}"] input`).as(
-        'numberField2'
-      );
-      cy.get(`[data-natural-key="${numberQuestion3.id}"] input`).as(
-        'numberField3'
-      );
-      cy.get(`[data-natural-key="${numberQuestion4.id}"] input`).as(
-        'numberField4'
-      );
-      cy.get(`[data-natural-key="${numberQuestion5.id}"] input`).as(
-        'numberField5'
-      );
-
-      cy.get('@numberField2').type('1{leftarrow}-');
-      cy.get('@numberField3').type('1');
-      cy.get('@numberField4').type('1.1{leftarrow}{leftarrow}{leftarrow}-');
-      cy.get('@numberField5').type('1.1');
-
+      /* Test bad inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}"] input`).type(
+          question.badInput
+        );
+      }
       cy.contains('Save and continue').click();
-      cy.contains('Value must be a negative number');
-      cy.contains('Value must be a positive number');
-      cy.contains('Value must be a negative whole number');
-      cy.contains('Value must be a positive whole number');
+      for (const question of questions) {
+        cy.contains(question.failureMessage);
+      }
 
-      cy.get('@numberField2').clear().type('1');
-      cy.get('@numberField3').clear().type('1{leftarrow}-');
-      cy.get('@numberField4').clear().type('1');
-      cy.get('@numberField5').clear().type('1{leftarrow}-');
-
-      cy.contains('Value must be a negative number').should('not.exist');
-      cy.contains('Value must be a positive number').should('not.exist');
-      cy.contains('Value must be a negative whole number').should('not.exist');
-      cy.contains('Value must be a positive whole number').should('not.exist');
+      /* Test good inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}"] input`).type(
+          question.goodInput
+        );
+      }
+      cy.contains('Save and continue').click();
+      for (const question of questions) {
+        cy.contains(question.failureMessage).should('not.exist');
+      }
     });
 
     it('User officer can add multiple choice question as a dependency', () => {
