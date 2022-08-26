@@ -2,9 +2,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import useAutocomplete from '@mui/material/useAutocomplete';
 import makeStyles from '@mui/styles/makeStyles';
-
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
@@ -78,6 +76,7 @@ const CallFilter: React.FC<CallFilterProps> = ({
           <Autocomplete
             id="call-select"
             aria-labelledby="call-select-label"
+            disableClearable
             onChange={(_, call) => {
               setQuery({
                 call: call?.id ? (call?.id as number) : undefined,
@@ -87,7 +86,10 @@ const CallFilter: React.FC<CallFilterProps> = ({
             getOptionLabel={(option) => option.shortCode}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             options={options}
-            value={options.find((v) => v.id === callId) || allOption}
+            value={
+              options.find((v) => v.id === callId) ||
+              (shouldShowAll ? allOption : undefined)
+            }
             data-cy="call-filter"
             renderInput={(params) => <TextField {...params} />}
           />
