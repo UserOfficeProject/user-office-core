@@ -58,10 +58,25 @@ context('Template tests', () => {
     ],
   };
 
-  const numberQuestion2 = { title: faker.lorem.words(3) };
-  const numberQuestion3 = { title: faker.lorem.words(3) };
-  const numberQuestion4 = { title: faker.lorem.words(3) };
-  const numberQuestion5 = { title: faker.lorem.words(3) };
+  const generateId = () =>
+    faker.lorem.word() + '_' + faker.lorem.word() + '_' + faker.lorem.word();
+
+  const numberQuestion2 = {
+    id: generateId(),
+    title: faker.lorem.words(3),
+  };
+  const numberQuestion3 = {
+    id: generateId(),
+    title: faker.lorem.words(3),
+  };
+  const numberQuestion4 = {
+    id: generateId(),
+    title: faker.lorem.words(3),
+  };
+  const numberQuestion5 = {
+    id: generateId(),
+    title: faker.lorem.words(3),
+  };
 
   const templateSearch = {
     title: faker.lorem.words(3),
@@ -923,22 +938,22 @@ context('Template tests', () => {
         .click();
 
       cy.createNumberInputQuestion(numberQuestion2.title, {
-        key: numberQuestion2.title,
+        key: numberQuestion2.id,
         units: ['kelvin'],
         valueConstraint: 'Only negative numbers',
       });
       cy.createNumberInputQuestion(numberQuestion2.title, {
-        key: numberQuestion2.title,
+        key: numberQuestion3.id,
         units: ['kelvin'],
         valueConstraint: 'Only positive numbers',
       });
       cy.createNumberInputQuestion(numberQuestion2.title, {
-        key: numberQuestion2.title,
+        key: numberQuestion4.id,
         units: ['kelvin'],
         valueConstraint: 'Only negative integers',
       });
       cy.createNumberInputQuestion(numberQuestion2.title, {
-        key: numberQuestion2.title,
+        key: numberQuestion5.id,
         units: ['kelvin'],
         valueConstraint: 'Only positive integers',
       });
@@ -955,16 +970,16 @@ context('Template tests', () => {
       cy.contains(numberQuestion4.title);
       cy.contains(numberQuestion5.title);
 
-      cy.get(`[data-natural-key="${numberQuestion2.title}"] input`).as(
+      cy.get(`[data-natural-key="${numberQuestion2.id}"] input`).as(
         'numberField2'
       );
-      cy.get(`[data-natural-key="${numberQuestion3.title}"] input`).as(
+      cy.get(`[data-natural-key="${numberQuestion3.id}"] input`).as(
         'numberField3'
       );
-      cy.get(`[data-natural-key="${numberQuestion4.title}"] input`).as(
+      cy.get(`[data-natural-key="${numberQuestion4.id}"] input`).as(
         'numberField4'
       );
-      cy.get(`[data-natural-key="${numberQuestion5.title}"] input`).as(
+      cy.get(`[data-natural-key="${numberQuestion5.id}"] input`).as(
         'numberField5'
       );
 
