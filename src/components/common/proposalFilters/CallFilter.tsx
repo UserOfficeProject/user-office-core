@@ -1,7 +1,7 @@
+import Autocomplete from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
@@ -47,10 +47,23 @@ const CallFilter: React.FC<CallFilterProps> = ({
     return null;
   }
 
-  /**
-   * NOTE: We might use https://material-ui.com/components/autocomplete/.
-   * If we have lot of dropdown options to be able to search.
-   */
+  const sortedCalls = [...calls];
+  sortedCalls.sort((a, b) => a.shortCode.localeCompare(b.shortCode));
+
+  type CallOption = {
+    id: number;
+    shortCode: string;
+  };
+
+  const allOption: CallOption = {
+    id: 0,
+    shortCode: 'All',
+  };
+  const options: CallOption[] = [
+    ...(shouldShowAll ? [allOption] : []), // Add all call option if should show all.
+    ...sortedCalls,
+  ];
+
   return (
     <>
       <FormControl className={classes.formControl}>
@@ -60,28 +73,32 @@ const CallFilter: React.FC<CallFilterProps> = ({
         {isLoading ? (
           <div className={classes.loadingText}>Loading...</div>
         ) : (
-          <Select
+          <Autocomplete
             id="call-select"
             aria-labelledby="call-select-label"
-            onChange={(call) => {
+            /*
+             * The clear event is triggered when backspacing to empty, which
+             * will reset the value to undefined, which will select "All".
+             * Disabling it gives a better experience. If left empty, it will
+             * reset to the last used value.
+             */
+            disableClearable
+            onChange={(_, call) => {
               setQuery({
-                call: call.target.value
-                  ? (call.target.value as number)
-                  : undefined,
+                call: call?.id ? (call?.id as number) : undefined,
               });
-              onChange?.(call.target.value as number);
+              onChange?.(call?.id as number);
             }}
-            value={callId || 0}
-            defaultValue={0}
+            getOptionLabel={(option) => option.shortCode}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            options={options}
+            value={
+              options.find((v) => v.id === callId) ||
+              (shouldShowAll ? allOption : undefined)
+            }
             data-cy="call-filter"
-          >
-            {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-            {calls.map((call) => (
-              <MenuItem key={call.id} value={call.id}>
-                {call.shortCode}
-              </MenuItem>
-            ))}
-          </Select>
+            renderInput={(params) => <TextField {...params} />}
+          />
         )}
       </FormControl>
     </>
