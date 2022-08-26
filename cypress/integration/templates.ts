@@ -918,13 +918,13 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      function createNumberQuestion(title: string, restriction: string) {
-        cy.contains(initialDBData.template.name)
-          .parent()
-          .find("[aria-label='Edit']")
-          .first()
-          .click();
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
 
+      function createNumberQuestion(title: string, restriction: string) {
         cy.get('[data-cy=show-more-button]').first().click();
 
         cy.get('[data-cy=add-question-menu-item]').first().click();
