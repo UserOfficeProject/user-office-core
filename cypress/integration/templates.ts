@@ -986,12 +986,8 @@ context('Template tests', () => {
 
       cy.contains('Value must be a negative number').should('not.exist');
       cy.contains('Value must be a positive number').should('not.exist');
-      cy.contains('Value must be a negative whole number').should(
-        'not.exist'
-      );
-      cy.contains('Value must be a positive whole number').should(
-        'not.exist'
-      );
+      cy.contains('Value must be a negative whole number').should('not.exist');
+      cy.contains('Value must be a positive whole number').should('not.exist');
     });
 
     it('User officer can add multiple choice question as a dependency', () => {
