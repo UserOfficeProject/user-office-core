@@ -966,14 +966,8 @@ context('Template tests', () => {
 
       createNumberQuestion(numberQuestion2.title, 'Only positive numbers');
       createNumberQuestion(numberQuestion3.title, 'Only negative numbers');
-      createNumberQuestion(
-        numberQuestion4.title,
-        'Only positive whole numbers'
-      );
-      createNumberQuestion(
-        numberQuestion5.title,
-        'Only negative whole numbers'
-      );
+      createNumberQuestion(numberQuestion4.title, 'Only positive integers');
+      createNumberQuestion(numberQuestion5.title, 'Only negative integers');
 
       cy.finishedLoading();
 
