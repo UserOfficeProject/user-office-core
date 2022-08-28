@@ -150,7 +150,10 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
   }
 
-  async externalTokenLogin(token: string): Promise<User | null> {
+  async externalTokenLogin(
+    token: string,
+    _redirecturi: string
+  ): Promise<User | null> {
     const stfcUser: StfcBasicPersonDetails | null = await client
       .getPersonDetailsFromSessionId(token)
       .then((rawStfcUser) => rawStfcUser?.return)

@@ -21,18 +21,24 @@ type ValidUser = NonNullableField<
 >;
 
 export abstract class OpenIdConnectAuthorization extends UserAuthorization {
-  public async externalTokenLogin(code: string): Promise<User | null> {
+  public async externalTokenLogin(
+    code: string,
+    redirectUri: string
+  ): Promise<User | null> {
     try {
-      const { redirectUrl } = OpenIdClient.getConfig(); // URL that the user is redirected back to after login
       const client = await OpenIdClient.getInstance();
 
       /**
        * Requesting Authorization server to exchange the code for a tokenset,
        ** and validating the return value that it has both - access_token and id_token
        */
-      const params = client.callbackParams('?code=' + code);
+      const callbackParams = new URLSearchParams();
+      callbackParams.append('code', code);
+
+      const params = client.callbackParams(`?${callbackParams.toString()}`);
+
       const tokenSet = this.validateTokenSet(
-        await client.callback(redirectUrl, params)
+        await client.callback(redirectUri, params)
       );
 
       /**

@@ -142,7 +142,10 @@ export abstract class UserAuthorization {
     return readableUsers.includes(id);
   }
 
-  abstract externalTokenLogin(token: string): Promise<User | null>;
+  abstract externalTokenLogin(
+    token: string,
+    redirectUri: string
+  ): Promise<User | null>;
 
   abstract logout(token: AuthJwtPayload): Promise<void | Rejection>;
 

@@ -462,9 +462,15 @@ export default class UserMutations {
     }
   }
 
-  async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
+  async externalTokenLogin(
+    externalToken: string,
+    redirecturi: string
+  ): Promise<string | Rejection> {
     try {
-      const user = await this.userAuth.externalTokenLogin(externalToken);
+      const user = await this.userAuth.externalTokenLogin(
+        externalToken,
+        redirecturi
+      );
 
       if (!user) {
         return rejection('User not found', { externalToken });

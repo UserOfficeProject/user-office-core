@@ -13,14 +13,13 @@ export class OpenIdClient {
   }
 
   private static async createClient() {
-    const { clientId, clientSecret, redirectUrl } = this.getConfig();
+    const { clientId, clientSecret } = this.getConfig();
 
     const OpenIDIssuer = await this.getIssuer();
 
     return new OpenIDIssuer.Client({
       client_id: clientId,
       client_secret: clientSecret,
-      redirect_uris: [redirectUrl],
       response_types: ['code'],
     });
   }
@@ -73,14 +72,11 @@ export class OpenIdClient {
     const discoveryUrl = process.env.AUTH_DISCOVERY_URL;
     const clientId = process.env.AUTH_CLIENT_ID;
     const clientSecret = process.env.AUTH_CLIENT_SECRET;
-    const redirectUrl = `${process.env.protocol}://${process.env.baseURL}/external-auth`;
-
-    if (!discoveryUrl || !clientId || !clientSecret || !redirectUrl) {
+    if (!discoveryUrl || !clientId || !clientSecret) {
       logger.logError('One or more ENV variables not defined', {
         discoveryUrl,
         clientId,
         clientSecret: clientSecret ? '******' : undefined,
-        redirectUrl,
       });
       throw new Error('One or more ENV variables not defined');
     }
@@ -89,15 +85,17 @@ export class OpenIdClient {
       discoveryUrl,
       clientId,
       clientSecret,
-      redirectUrl,
     };
   }
 
   public static hasConfiguration() {
-    const { discoveryUrl, clientId, clientSecret, redirectUrl } =
-      this.getConfig();
+    try {
+      const { discoveryUrl, clientId, clientSecret } = this.getConfig();
 
-    return !!discoveryUrl && !!clientId && !!clientSecret && !!redirectUrl;
+      return !!discoveryUrl && !!clientId && !!clientSecret;
+    } catch (error) {
+      return false;
+    }
   }
 
   public static getScopes() {

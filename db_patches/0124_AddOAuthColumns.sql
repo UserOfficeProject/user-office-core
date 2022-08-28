@@ -10,14 +10,11 @@ BEGIN
         ALTER TABLE "users" 
         ALTER COLUMN oidc_sub DROP NOT NULL;
 
-
-        /* orcid_refreshtoken */
-        /* Token sizes set to standart sizes https://developers.google.com/identity/protocols/oauth2#size */
         ALTER TABLE "users"
         RENAME COLUMN orcid_refreshtoken TO oidc_refresh_token;
         
         ALTER TABLE "users" 
-        ALTER COLUMN oidc_refresh_token TYPE varchar(512);
+        ALTER COLUMN oidc_refresh_token TYPE varchar(2048);
 
         ALTER TABLE "users" 
         ALTER COLUMN oidc_refresh_token DROP NOT NULL;
