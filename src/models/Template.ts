@@ -102,6 +102,7 @@ export enum TemplateCategoryId {
   VISIT_REGISTRATION = 4,
   GENERIC_TEMPLATE = 7,
   FEEDBACK = 8,
+  PDF = 9,
 }
 
 export enum TemplateGroupId {
@@ -113,6 +114,7 @@ export enum TemplateGroupId {
   VISIT_REGISTRATION = 'VISIT_REGISTRATION',
   GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   FEEDBACK = 'FEEDBACK',
+  PDF_TEMPLATE = 'PDF_TEMPLATE',
 }
 
 export class FieldCondition {

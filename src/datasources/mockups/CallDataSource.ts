@@ -35,7 +35,8 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.esiTemplateId || 2,
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
     values?.title || 'Title',
-    values?.description || 'Description'
+    values?.description || 'Description',
+    values?.pdfTemplateId || 1
   );
 };
 
@@ -65,7 +66,8 @@ export const dummyCall = new Call(
   2,
   AllocationTimeUnits.Day,
   '',
-  ''
+  '',
+  1
 );
 
 export const anotherDummyCall = new Call(
@@ -94,7 +96,8 @@ export const anotherDummyCall = new Call(
   2,
   AllocationTimeUnits.Day,
   '',
-  ''
+  '',
+  1
 );
 
 export const dummyCalls = [dummyCall, anotherDummyCall];
