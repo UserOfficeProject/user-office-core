@@ -21,65 +21,25 @@ const ExternalAuthQueryParams = {
 
 function ExternalAuth() {
   const [urlQueryParams] = useQueryParams(ExternalAuthQueryParams);
-  const externalToken = urlQueryParams.sessionid ?? urlQueryParams.code;
 
-  const { token, handleLogin } = useContext(UserContext);
-  const [error, setError] = React.useState<string | undefined>(undefined);
   const unauthorizedApi = useUnauthorizedApi();
   const history = useHistory();
 
   const isFirstRun = useRef<boolean>(true);
 
-  const settingsContext = useContext(SettingsContext);
-  const externalAuthLoginUrl = settingsContext.settingsMap.get(
-    SettingsId.EXTERNAL_AUTH_LOGIN_URL
-  )?.settingsValue;
+  const { handleLogin } = useContext(UserContext);
+  const { settingsMap } = useContext(SettingsContext);
+
+  const [View, setView] = React.useState<JSX.Element | null>(null);
 
   useEffect(() => {
     if (!isFirstRun.current) {
       return;
     }
+
     isFirstRun.current = false;
 
-    if (!externalToken) {
-      setError(
-        urlQueryParams.error_description ??
-          'Could not log in. Identity provider did not return a token.'
-      );
-
-      return;
-    }
-
-    unauthorizedApi()
-      .externalTokenLogin({ externalToken })
-      .then((token) => {
-        if (token.externalTokenLogin.rejection) {
-          setError(token.externalTokenLogin.rejection.reason);
-
-          return;
-        }
-        if (token.externalTokenLogin) {
-          handleLogin(token.externalTokenLogin.token);
-          const landingUrl = localStorage.getItem('landingUrl'); // redirect to originally requested page successful after login
-          localStorage.removeItem('landingUrl');
-          window.location.href = landingUrl ?? '/';
-        } else {
-          if (externalAuthLoginUrl) {
-            window.location.href = externalAuthLoginUrl;
-          }
-        }
-      });
-  }, [
-    token,
-    handleLogin,
-    externalToken,
-    unauthorizedApi,
-    externalAuthLoginUrl,
-    urlQueryParams.error_description,
-  ]);
-
-  if (error) {
-    return (
+    const ErrorMessage = (props: { message: string }) => (
       <CenteredAlert
         severity="error"
         action={
@@ -94,29 +54,119 @@ function ExternalAuth() {
         }
         icon={<BugReportIcon fontSize="medium" />}
       >
-        {error}
+        {props.message}
       </CenteredAlert>
     );
-  }
 
-  return (
-    <CenteredAlert
-      severity="info"
-      action={
-        <Button
-          color="inherit"
-          size="small"
-          variant="outlined"
-          onClick={() => history.push('/')}
-        >
-          Cancel
-        </Button>
+    const LoadingMessage = () => (
+      <CenteredAlert
+        severity="info"
+        action={
+          <Button
+            color="inherit"
+            size="small"
+            variant="outlined"
+            onClick={() => history.push('/')}
+          >
+            Cancel
+          </Button>
+        }
+        icon={<Lock />}
+      >
+        <AnimatedEllipsis>Please wait</AnimatedEllipsis>
+      </CenteredAlert>
+    );
+
+    const ContactingAuthorizationServerMessage = () => (
+      <CenteredAlert
+        severity="info"
+        action={
+          <Button
+            color="inherit"
+            size="small"
+            variant="outlined"
+            onClick={() => history.push('/')}
+          >
+            Cancel
+          </Button>
+        }
+        icon={<Lock fontSize="medium" />}
+      >
+        <AnimatedEllipsis>Contacting authorization server</AnimatedEllipsis>
+      </CenteredAlert>
+    );
+
+    const handleCode = (code: string) => {
+      const { protocol, host, pathname } = window.location;
+      const currentUrlWithoutParams = [protocol, '//', host, pathname].join('');
+
+      setView(<ContactingAuthorizationServerMessage />);
+
+      unauthorizedApi()
+        .externalTokenLogin({
+          externalToken: code,
+          redirectUri: currentUrlWithoutParams,
+        })
+        .then(({ externalTokenLogin }) => {
+          if (externalTokenLogin.token) {
+            handleLogin(externalTokenLogin.token);
+            window.location.href = '/';
+          } else {
+            setView(
+              <ErrorMessage
+                message={
+                  externalTokenLogin.rejection?.reason ||
+                  'Unknown error occurred'
+                }
+              />
+            );
+          }
+        })
+        .catch((error) => {
+          setView(<ErrorMessage message={error.message} />);
+        });
+    };
+
+    const handleNoCode = () => {
+      const externalAuthLoginUrl = settingsMap.get(
+        SettingsId.EXTERNAL_AUTH_LOGIN_URL
+      )?.settingsValue;
+      if (!externalAuthLoginUrl) {
+        setView(<ErrorMessage message="System configuration error" />);
+
+        return;
       }
-      icon={<Lock />}
-    >
-      <AnimatedEllipsis>Verifying external authentication</AnimatedEllipsis>
-    </CenteredAlert>
-  );
-}
+      const url = new URL(externalAuthLoginUrl);
+      url.searchParams.set('redirect_uri', encodeURI(window.location.href));
+      window.location.href = url.toString();
+    };
 
+    const handleError = (error: string) => {
+      setView(<ErrorMessage message={error} />);
+    };
+
+    setView(<LoadingMessage />);
+
+    const errorDescription = urlQueryParams.error_description;
+    const code = urlQueryParams.sessionid ?? urlQueryParams.code;
+
+    if (errorDescription) {
+      handleError(errorDescription);
+    } else if (code) {
+      handleCode(code);
+    } else {
+      handleNoCode();
+    }
+  }, [
+    handleLogin,
+    history,
+    settingsMap,
+    unauthorizedApi,
+    urlQueryParams.code,
+    urlQueryParams.error_description,
+    urlQueryParams.sessionid,
+  ]);
+
+  return View;
+}
 export default ExternalAuth;

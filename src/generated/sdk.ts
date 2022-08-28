@@ -1178,6 +1178,7 @@ export type MutationEmailVerificationArgs = {
 
 export type MutationExternalTokenLoginArgs = {
   externalToken: Scalars['String'];
+  redirectUri: Scalars['String'];
 };
 
 
@@ -4798,6 +4799,7 @@ export type DeleteUserMutation = { deleteUser: { user: { id: number } | null, re
 
 export type ExternalTokenLoginMutationVariables = Exact<{
   externalToken: Scalars['String'];
+  redirectUri: Scalars['String'];
 }>;
 
 
@@ -8614,8 +8616,8 @@ export const DeleteUserDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const ExternalTokenLoginDocument = gql`
-    mutation externalTokenLogin($externalToken: String!) {
-  externalTokenLogin(externalToken: $externalToken) {
+    mutation externalTokenLogin($externalToken: String!, $redirectUri: String!) {
+  externalTokenLogin(externalToken: $externalToken, redirectUri: $redirectUri) {
     token
     rejection {
       ...rejection

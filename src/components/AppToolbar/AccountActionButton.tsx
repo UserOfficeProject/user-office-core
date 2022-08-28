@@ -55,7 +55,7 @@ const AccountActionButton: React.FC = () => {
 
   const handleOnLogout = () => {
     setIsLoggingOut(true);
-    handleLogout().catch(() => {
+    handleLogout().finally(() => {
       setIsLoggingOut(false);
     });
   };

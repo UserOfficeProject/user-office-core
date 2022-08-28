@@ -1,7 +1,5 @@
 import BugReportIcon from '@mui/icons-material/BugReport';
 import Close from '@mui/icons-material/Close';
-import Lock from '@mui/icons-material/Lock';
-import { Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
@@ -9,6 +7,7 @@ import React, { ErrorInfo, useContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
+  Redirect,
   Route,
   RouteProps,
   Switch,
@@ -26,7 +25,6 @@ import { SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 import clearSession from 'utils/clearSession';
 
-import AnimatedEllipsis from './AnimatedEllipsis';
 import CenteredAlert from './common/CenteredAlert';
 import DashBoard from './DashBoard';
 import Theme from './theme/theme';
@@ -53,25 +51,6 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
     </CenteredAlert>
   );
 
-  const ContactingAuthorizationServerInfo = () => (
-    <CenteredAlert
-      severity="info"
-      action={
-        <Button
-          color="inherit"
-          size="small"
-          variant="outlined"
-          onClick={() => history.push('/')}
-        >
-          Cancel
-        </Button>
-      }
-      icon={<Lock fontSize="medium" />}
-    >
-      <AnimatedEllipsis>Contacting authorization server</AnimatedEllipsis>
-    </CenteredAlert>
-  );
-
   return (
     <UserContext.Consumer>
       {({ roles, token, currentRole, handleRole }): JSX.Element => (
@@ -79,13 +58,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (!externalAuthLoginUrl) {
-                return SystemConfigurationError();
-              }
-              localStorage.setItem('landingUrl', window.location.href);
-              window.location.href = externalAuthLoginUrl;
-
-              return ContactingAuthorizationServerInfo();
+              return <Redirect to="/external-auth" />;
             }
 
             if (!currentRole) {

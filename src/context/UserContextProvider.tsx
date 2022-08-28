@@ -175,19 +175,6 @@ const reducer = (
   }
 };
 
-function getCookieDomain(hostname: string): string {
-  const parts = hostname.split('.');
-  if (parts.length > 2) {
-    // e.g. "www.example.com"
-    const parts = hostname.split('.');
-    parts.shift(); // remove the first part
-
-    return `.${parts.join('.')}`;
-  } else {
-    return hostname; // e.g. localhost
-  }
-}
-
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const [, setCookie] = useCookies();
@@ -196,13 +183,10 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
 
   checkLocalStorage(dispatch, state);
   useEffect(() => {
-    const hostname = window.location.hostname;
-
     // NOTE: Cookies are used for scheduler authorization.
     setCookie('token', state.token, {
       path: '/',
       secure: false,
-      domain: getCookieDomain(hostname),
       sameSite: 'lax',
     });
   }, [setCookie, state]);
