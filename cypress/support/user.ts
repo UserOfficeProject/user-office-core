@@ -4,7 +4,6 @@ import {
   CreateUserMutation,
   CreateUserMutationVariables,
   ExternalTokenLoginMutation,
-  FeatureId,
   GetFeaturesQuery,
   LoginMutation,
   Role,
@@ -15,7 +14,6 @@ import {
   UpdateUserRolesMutationVariables,
   User,
 } from '../../src/generated/sdk';
-import featureFlags from './featureFlags';
 import { getE2EApi } from './utils';
 
 type DecodedTokenData = {
@@ -108,25 +106,30 @@ const externalTokenLogin = (
   const credentials = testCredentialStoreStfc[roleOrCredentials];
 
   const api = getE2EApi();
-  const request = api.externalTokenLogin(credentials).then((resp) => {
-    if (!resp.externalTokenLogin.token) {
+  const request = api
+    .externalTokenLogin({
+      externalToken: credentials.externalToken,
+      redirectUri: '',
+    })
+    .then((resp) => {
+      if (!resp.externalTokenLogin.token) {
+        return resp;
+      }
+
+      const { user, exp } = jwtDecode(
+        resp.externalTokenLogin.token
+      ) as DecodedTokenData;
+
+      window.localStorage.setItem('token', resp.externalTokenLogin.token);
+      window.localStorage.setItem(
+        'currentRole',
+        roleOrCredentials === 'officer' ? 'USER_OFFICER' : 'USER'
+      );
+      window.localStorage.setItem('expToken', `${exp}`);
+      window.localStorage.setItem('user', JSON.stringify(user));
+
       return resp;
-    }
-
-    const { user, exp } = jwtDecode(
-      resp.externalTokenLogin.token
-    ) as DecodedTokenData;
-
-    window.localStorage.setItem('token', resp.externalTokenLogin.token);
-    window.localStorage.setItem(
-      'currentRole',
-      roleOrCredentials === 'officer' ? 'USER_OFFICER' : 'USER'
-    );
-    window.localStorage.setItem('expToken', `${exp}`);
-    window.localStorage.setItem('user', JSON.stringify(user));
-
-    return resp;
-  });
+    });
 
   return cy.wrap(request);
 };
@@ -143,16 +146,6 @@ const login = (
     typeof roleOrCredentials === 'string'
       ? testCredentialStore[roleOrCredentials]
       : roleOrCredentials;
-
-  if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
-    if (typeof roleOrCredentials !== 'string') {
-      throw new Error('Role not authorised to login');
-    }
-
-    return externalTokenLogin(roleOrCredentials).then(() =>
-      changeActiveRole(roleOrCredentials === 'user' ? 1 : 2)
-    );
-  }
 
   const api = getE2EApi();
   const request = api.login(credentials).then((resp) => {
