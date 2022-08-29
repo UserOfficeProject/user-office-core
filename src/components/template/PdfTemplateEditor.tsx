@@ -66,7 +66,7 @@ export default function PdfTemplateEditor() {
             }
           }}
         >
-          {({ handleChange, values }) => (
+          {({ handleChange }) => (
             <Form>
               <Field
                 name="templateData"

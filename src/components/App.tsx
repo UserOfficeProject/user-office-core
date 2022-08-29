@@ -1,9 +1,8 @@
-import BugReportIcon from '@mui/icons-material/BugReport';
 import Close from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
-import React, { ErrorInfo, useContext } from 'react';
+import React, { ErrorInfo } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
@@ -11,7 +10,6 @@ import {
   Route,
   RouteProps,
   Switch,
-  useHistory,
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
@@ -19,13 +17,10 @@ import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
-import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
-import { SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 import clearSession from 'utils/clearSession';
 
-import CenteredAlert from './common/CenteredAlert';
 import DashBoard from './DashBoard';
 import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
@@ -37,19 +32,6 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   }
 
   const Component = component; // JSX Elements have to be uppercase.
-
-  const settingsContext = useContext(SettingsContext);
-  const externalAuthLoginUrl = settingsContext.settingsMap.get(
-    SettingsId.EXTERNAL_AUTH_LOGIN_URL
-  )?.settingsValue;
-
-  const history = useHistory();
-
-  const SystemConfigurationError = () => (
-    <CenteredAlert severity="error" icon={<BugReportIcon fontSize="medium" />}>
-      <span>System configuration error</span>
-    </CenteredAlert>
-  );
 
   return (
     <UserContext.Consumer>
