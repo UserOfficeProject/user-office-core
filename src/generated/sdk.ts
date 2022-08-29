@@ -502,11 +502,6 @@ export type FieldDependencyInput = {
   dependencyId: Scalars['String'];
 };
 
-export type Fields = {
-  countries: Array<Entry>;
-  nationalities: Array<Entry>;
-};
-
 export type FileMetadata = {
   createdDate: Scalars['DateTime'];
   fileId: Scalars['String'];
@@ -2014,6 +2009,7 @@ export type Query = {
   callsByInstrumentScientist: Maybe<Array<Call>>;
   checkEmailExist: Maybe<Scalars['Boolean']>;
   checkToken: TokenResult;
+  countries: Maybe<Array<Entry>>;
   esi: Maybe<ExperimentSafetyInput>;
   eventLogs: Maybe<Array<EventLog>>;
   factoryVersion: Scalars['String'];
@@ -2023,7 +2019,6 @@ export type Query = {
   fileMetadata: Maybe<Array<FileMetadata>>;
   genericTemplate: Maybe<GenericTemplate>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
-  getFields: Maybe<Fields>;
   getOrcIDInformation: Maybe<OrcIdInformation>;
   getPageContent: Maybe<Scalars['String']>;
   institutions: Maybe<Array<Institution>>;
@@ -2037,6 +2032,7 @@ export type Query = {
   me: Maybe<User>;
   myShipments: Maybe<Array<Shipment>>;
   myVisits: Array<Visit>;
+  nationalities: Maybe<Array<Entry>>;
   pdfTemplate: Maybe<PdfTemplate>;
   pdfTemplates: Maybe<Array<PdfTemplate>>;
   previousCollaborators: Maybe<UserQueryResult>;
@@ -4923,15 +4919,20 @@ export type GetBasicUserDetailsByEmailQueryVariables = Exact<{
 
 export type GetBasicUserDetailsByEmailQuery = { basicUserDetailsByEmail: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } | null };
 
-export type GetFieldsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetCountriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFieldsQuery = { getFields: { nationalities: Array<{ id: number, value: string }>, countries: Array<{ id: number, value: string }> } | null };
+export type GetCountriesQuery = { countries: Array<{ id: number, value: string }> | null };
 
 export type GetMyRolesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetMyRolesQuery = { me: { firstname: string, lastname: string, roles: Array<{ id: number, shortCode: string, title: string }> } | null };
+
+export type GetNationalitiesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetNationalitiesQuery = { nationalities: Array<{ id: number, value: string }> | null };
 
 export type GetOrcIdInformationQueryVariables = Exact<{
   authorizationCode: Scalars['String'];
@@ -8780,17 +8781,11 @@ export const GetBasicUserDetailsByEmailDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
-export const GetFieldsDocument = gql`
-    query getFields {
-  getFields {
-    nationalities {
-      id
-      value
-    }
-    countries {
-      id
-      value
-    }
+export const GetCountriesDocument = gql`
+    query getCountries {
+  countries {
+    id
+    value
   }
 }
     `;
@@ -8804,6 +8799,14 @@ export const GetMyRolesDocument = gql`
       shortCode
       title
     }
+  }
+}
+    `;
+export const GetNationalitiesDocument = gql`
+    query getNationalities {
+  nationalities {
+    id
+    value
   }
 }
     `;
@@ -9841,11 +9844,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getBasicUserDetailsByEmail(variables: GetBasicUserDetailsByEmailQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetBasicUserDetailsByEmailQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetBasicUserDetailsByEmailQuery>(GetBasicUserDetailsByEmailDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBasicUserDetailsByEmail', 'query');
     },
-    getFields(variables?: GetFieldsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetFieldsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetFieldsQuery>(GetFieldsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFields', 'query');
+    getCountries(variables?: GetCountriesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetCountriesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetCountriesQuery>(GetCountriesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCountries', 'query');
     },
     getMyRoles(variables?: GetMyRolesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMyRolesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetMyRolesQuery>(GetMyRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyRoles', 'query');
+    },
+    getNationalities(variables?: GetNationalitiesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNationalitiesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetNationalitiesQuery>(GetNationalitiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNationalities', 'query');
     },
     getOrcIDInformation(variables: GetOrcIdInformationQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetOrcIdInformationQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetOrcIdInformationQuery>(GetOrcIdInformationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getOrcIDInformation', 'query');
