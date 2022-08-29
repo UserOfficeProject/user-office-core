@@ -70,7 +70,6 @@ import TitledRoute from './TitledRoute';
 import ImportUnitsPage from './unit/ImportUnitsPage';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
-import SharedAuth from './user/SharedAuth';
 import UserPage from './user/UserPage';
 
 type BottomNavItemProps = {
@@ -570,12 +569,7 @@ const Dashboard: React.FC = () => {
             path="/DeclareShipments/:scheduledEventId"
             component={DeclareShipmentsPage}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Shared auth"
-            path="/shared-auth"
-            component={SharedAuth}
-          />
+
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
             yes={() => <Route component={ProposalPage} />}
