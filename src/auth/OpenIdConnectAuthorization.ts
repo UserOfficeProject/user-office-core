@@ -166,20 +166,12 @@ export abstract class OpenIdConnectAuthorization extends UserAuthorization {
   }
 
   private validateUserProfile(userProfile: UserinfoResponse): ValidUserInfo {
-    if (
-      !userProfile.email ||
-      !userProfile.family_name ||
-      !userProfile.given_name ||
-      !userProfile.sub
-    ) {
-      logger.logError('Invalid user profile', {
-        authorizer: this.constructor.name,
-        userProfile,
-      });
-      throw new Error('Invalid user profile');
-    }
-
-    return userProfile as ValidUserInfo;
+    return {
+      ...userProfile,
+      email: userProfile.email ?? '',
+      family_name: userProfile.family_name ?? '',
+      given_name: userProfile.given_name ?? '',
+    } as ValidUserInfo;
   }
 
   private validateTokenSet(tokenSet: TokenSet): ValidTokenSet {
