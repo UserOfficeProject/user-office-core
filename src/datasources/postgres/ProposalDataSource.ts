@@ -961,4 +961,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     return relatedUsers;
   }
+
+  async getProposalById(proposalId: string): Promise<Proposal | null> {
+    return database
+      .select()
+      .from('proposals')
+      .where('proposal_id', proposalId)
+      .first()
+      .then((proposal: ProposalRecord) => {
+        return proposal ? createProposalObject(proposal) : null;
+      });
+  }
 }

@@ -13,6 +13,7 @@ export const Tokens = {
   InstrumentDataSource: Symbol('InstrumentDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   MailService: Symbol('MailService'),
+  PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   ProposalDataSource: Symbol('ProposalDataSource'),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),

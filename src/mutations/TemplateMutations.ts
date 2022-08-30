@@ -16,6 +16,7 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { PdfTemplateDataSource } from '../datasources/PdfTemplateDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
@@ -46,7 +47,9 @@ import { TemplateExport } from './../models/Template';
 @injectable()
 export default class TemplateMutations {
   constructor(
-    @inject(Tokens.TemplateDataSource) private dataSource: TemplateDataSource
+    @inject(Tokens.TemplateDataSource) private dataSource: TemplateDataSource,
+    @inject(Tokens.PdfTemplateDataSource)
+    private pdfTemplateDataSource: PdfTemplateDataSource
   ) {}
 
   @ValidateArgs(createTemplateValidationSchema)
@@ -122,6 +125,12 @@ export default class TemplateMutations {
           'feedback_basis'
         );
         break;
+      case TemplateGroupId.PDF_TEMPLATE:
+        await this.pdfTemplateDataSource.createPdfTemplate({
+          templateId: newTemplate.templateId,
+          templateData: '',
+          creatorId: (agent as UserWithRole).id,
+        });
     }
 
     const activeTemplateTypes = [
@@ -194,6 +203,13 @@ export default class TemplateMutations {
     const result = await this.dataSource
       .cloneTemplate(templateId)
       .then((result) => result);
+
+    if (result && result.groupId === TemplateGroupId.PDF_TEMPLATE) {
+      await this.pdfTemplateDataSource.clonePdfTemplate(
+        templateId,
+        result.templateId
+      );
+    }
 
     return result;
   }

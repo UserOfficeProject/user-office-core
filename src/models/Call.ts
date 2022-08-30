@@ -25,7 +25,8 @@ export class Call {
     public esiTemplateId: number | undefined,
     public allocationTimeUnit: AllocationTimeUnits,
     public title: string,
-    public description: string
+    public description: string,
+    public pdfTemplateId: number | undefined
   ) {}
 }
 
