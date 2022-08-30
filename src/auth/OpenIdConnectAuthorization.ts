@@ -109,7 +109,15 @@ export abstract class OpenIdConnectAuthorization extends UserAuthorization {
     tokenSet: ValidTokenSet
   ): Promise<User> {
     const institutionId = await this.getUserInstitutionId(userInfo);
-    const user = await this.userDataSource.getByOIDCSub(userInfo.sub);
+    const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
+      userInfo.sub
+    );
+    const userWithEmailMatch = await this.userDataSource.getByEmail(
+      userInfo.email
+    );
+
+    const user = userWithOAuthSubMatch ?? userWithEmailMatch;
+
     if (user) {
       await this.userDataSource.update({
         ...user,
@@ -127,13 +135,6 @@ export abstract class OpenIdConnectAuthorization extends UserAuthorization {
 
       return user;
     } else {
-      const userWithEmailExists =
-        (await this.userDataSource.getByEmail(userInfo.email)) !== null;
-
-      if (userWithEmailExists) {
-        throw new Error(`User with email ${userInfo.email} already exists`);
-      }
-
       const newUser = await this.userDataSource.create(
         'unspecified',
         userInfo.given_name,
