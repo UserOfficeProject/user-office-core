@@ -4,6 +4,7 @@ BEGIN
   IF register_patch('AddPredefinedMessagesTable.sql', 'Martin Trajanovski', 'Add predefined_messages database table', '2022-07-07') THEN
   BEGIN
 
+    -- Table used for storring predefined messages. This table is storing messages that will be reused in the comments, feedback and message areas throughout the app.
     CREATE TABLE predefined_messages (
       predefined_message_id SERIAL PRIMARY KEY,
       title TEXT,
