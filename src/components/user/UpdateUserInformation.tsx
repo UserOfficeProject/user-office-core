@@ -34,7 +34,8 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
-import { useGetFields } from 'hooks/user/useGetFields';
+import { useCountries } from 'hooks/user/useCountries';
+import { useNationalities } from 'hooks/user/useNationalities';
 import { useUserData } from 'hooks/user/useUserData';
 import orcid from 'images/orcid.png';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -79,7 +80,8 @@ export default function UpdateUserInformation(
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { api } = useDataApiWithFeedback();
-  const fieldsContent = useGetFields();
+  const nationalities = useNationalities();
+  const countries = useCountries();
   const { institutions, loadingInstitutions } = useInstitutionsData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
@@ -140,17 +142,17 @@ export default function UpdateUserInformation(
     );
   }
 
-  if (!nationalitiesList.length && fieldsContent) {
+  if (!nationalitiesList.length && nationalities) {
     setNationalitiesList(
-      fieldsContent.nationalities.map((nationality) => {
+      nationalities.map((nationality) => {
         return { text: nationality.value, value: nationality.id };
       })
     );
   }
 
-  if (!countriesList.length && fieldsContent) {
+  if (!countriesList.length && countries) {
     setCountriesList(
-      fieldsContent.countries.map((country) => {
+      countries.map((country) => {
         return { text: country.value, value: country.id };
       })
     );
@@ -363,7 +365,7 @@ export default function UpdateUserInformation(
                   items={nationalitiesList}
                   data-cy="nationality"
                   required
-                  loading={!fieldsContent}
+                  loading={!nationalities}
                   noOptionsText="No nationalities"
                 />
 
@@ -441,7 +443,7 @@ export default function UpdateUserInformation(
                     items={countriesList}
                     data-cy="organizationCountry"
                     required
-                    loading={!fieldsContent}
+                    loading={!countries}
                     noOptionsText="No countries"
                   />
                 </>

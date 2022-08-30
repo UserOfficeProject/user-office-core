@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { GetFieldsQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useGetFields() {
-  const [fieldContent, setFieldContent] = useState<
-    GetFieldsQuery['getFields'] | null
+import { GetNationalitiesQuery } from '../../generated/sdk';
+
+export function useNationalities() {
+  const [nationalities, setNationalities] = useState<
+    GetNationalitiesQuery['nationalities'] | null
   >(null);
 
   const api = useDataApi();
@@ -14,13 +15,13 @@ export function useGetFields() {
     let unmounted = false;
 
     api()
-      .getFields()
+      .getNationalities()
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        setFieldContent(data.getFields);
+        setNationalities(data.nationalities);
       });
 
     return () => {
@@ -28,5 +29,5 @@ export function useGetFields() {
     };
   }, [api]);
 
-  return fieldContent;
+  return nationalities;
 }
