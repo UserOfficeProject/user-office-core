@@ -203,7 +203,12 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
           dispatch({ type: ActionType.LOGOFFUSER, payload: null });
           clearSession();
           if (logoutUrl) {
-            window.location.assign(logoutUrl);
+            const logoutUrlWithRedirect = new URL(logoutUrl);
+            logoutUrlWithRedirect.searchParams.set(
+              'post_logout_redirect_uri',
+              window.location.href
+            );
+            window.location.assign(logoutUrlWithRedirect);
           }
         });
     }
