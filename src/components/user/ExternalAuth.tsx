@@ -47,7 +47,10 @@ function ExternalAuth() {
             color="inherit"
             size="small"
             variant="outlined"
-            onClick={() => history.push('/')}
+            onClick={() => {
+              localStorage.clear();
+              window.location.assign('/');
+            }}
           >
             Return to frontpage
           </Button>
