@@ -2038,10 +2038,12 @@ export type Query = {
   myShipments: Maybe<Array<Shipment>>;
   myVisits: Array<Visit>;
   nationalities: Maybe<Array<Entry>>;
+  pageContent: Maybe<Scalars['String']>;
   pdfTemplate: Maybe<PdfTemplate>;
   pdfTemplates: Maybe<Array<PdfTemplate>>;
   previousCollaborators: Maybe<UserQueryResult>;
   proposal: Maybe<Proposal>;
+  proposalById: Maybe<Proposal>;
   proposalEvents: Maybe<Array<ProposalEvent>>;
   proposalReviews: Maybe<Array<Review>>;
   proposalStatus: Maybe<ProposalStatus>;
@@ -2053,6 +2055,7 @@ export type Query = {
   proposalsView: Maybe<ProposalsViewQueryResult>;
   quantities: Array<Quantity>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
+  questionByNaturalKey: Question;
   questionary: Maybe<Questionary>;
   questions: Array<QuestionWithUsage>;
   review: Maybe<Review>;
@@ -2245,6 +2248,11 @@ export type QueryIsNaturalKeyPresentArgs = {
 };
 
 
+export type QueryPageContentArgs = {
+  pageId: PageName;
+};
+
+
 export type QueryPdfTemplateArgs = {
   pdfTemplateId: Scalars['Int'];
 };
@@ -2269,6 +2277,11 @@ export type QueryPreviousCollaboratorsArgs = {
 
 export type QueryProposalArgs = {
   primaryKey: Scalars['Int'];
+};
+
+
+export type QueryProposalByIdArgs = {
+  proposalId: Scalars['String'];
 };
 
 
@@ -2306,6 +2319,11 @@ export type QueryProposalsViewArgs = {
   searchText?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<Scalars['String']>;
   sortField?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryQuestionByNaturalKeyArgs = {
+  naturalKey: Scalars['String'];
 };
 
 
