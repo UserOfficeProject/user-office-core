@@ -2042,6 +2042,7 @@ export type Query = {
   pdfTemplates: Maybe<Array<PdfTemplate>>;
   previousCollaborators: Maybe<UserQueryResult>;
   proposal: Maybe<Proposal>;
+  proposalById: Maybe<Proposal>;
   proposalEvents: Maybe<Array<ProposalEvent>>;
   proposalReviews: Maybe<Array<Review>>;
   proposalStatus: Maybe<ProposalStatus>;
@@ -2053,6 +2054,7 @@ export type Query = {
   proposalsView: Maybe<ProposalsViewQueryResult>;
   quantities: Array<Quantity>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
+  questionByNaturalKey: Question;
   questionary: Maybe<Questionary>;
   questions: Array<QuestionWithUsage>;
   review: Maybe<Review>;
@@ -2272,6 +2274,11 @@ export type QueryProposalArgs = {
 };
 
 
+export type QueryProposalByIdArgs = {
+  proposalId: Scalars['String'];
+};
+
+
 export type QueryProposalReviewsArgs = {
   proposalPk: Scalars['Int'];
 };
@@ -2306,6 +2313,11 @@ export type QueryProposalsViewArgs = {
   searchText?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<Scalars['String']>;
   sortField?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryQuestionByNaturalKeyArgs = {
+  naturalKey: Scalars['String'];
 };
 
 
