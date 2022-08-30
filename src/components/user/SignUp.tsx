@@ -42,7 +42,8 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
-import { useGetFields } from 'hooks/user/useGetFields';
+import { useCountries } from 'hooks/user/useCountries';
+import { useNationalities } from 'hooks/user/useNationalities';
 import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
 import orcid from 'images/orcid.png';
 import { Option } from 'utils/utilTypes';
@@ -162,7 +163,8 @@ const SignUp: React.FC<SignUpProps> = (props) => {
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, cookiePageContent] = useGetPageContent(PageName.COOKIEPAGE);
 
-  const fieldsContent = useGetFields();
+  const nationalities = useNationalities();
+  const countries = useCountries();
   const { institutions, loadingInstitutions } = useInstitutionsData();
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
@@ -199,7 +201,12 @@ const SignUp: React.FC<SignUpProps> = (props) => {
     history.push('/');
   }
 
-  if (loadingInstitutions || !fieldsContent || (authCodeOrcID && loading)) {
+  if (
+    loadingInstitutions ||
+    !nationalities ||
+    !countries ||
+    (authCodeOrcID && loading)
+  ) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
@@ -265,7 +272,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
 
   if (!nationalitiesList.length) {
     setNationalitiesList(
-      fieldsContent.nationalities.map((nationality) => {
+      nationalities.map((nationality) => {
         return { text: nationality.value, value: nationality.id };
       })
     );
@@ -273,7 +280,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
 
   if (!countriesList.length) {
     setCountriesList(
-      fieldsContent.countries.map((country) => {
+      countries.map((country) => {
         return { text: country.value, value: country.id };
       })
     );
@@ -653,7 +660,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                           items={countriesList}
                           data-cy="organizationCountry"
                           required
-                          loading={!fieldsContent}
+                          loading={!countries}
                           noOptionsText="No countries"
                         />
                       </>
