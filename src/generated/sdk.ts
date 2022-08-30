@@ -2038,7 +2038,6 @@ export type Query = {
   myShipments: Maybe<Array<Shipment>>;
   myVisits: Array<Visit>;
   nationalities: Maybe<Array<Entry>>;
-  pageContent: Maybe<Scalars['String']>;
   pdfTemplate: Maybe<PdfTemplate>;
   pdfTemplates: Maybe<Array<PdfTemplate>>;
   previousCollaborators: Maybe<UserQueryResult>;
@@ -2245,11 +2244,6 @@ export type QueryInstrumentsBySepArgs = {
 
 export type QueryIsNaturalKeyPresentArgs = {
   naturalKey: Scalars['String'];
-};
-
-
-export type QueryPageContentArgs = {
-  pageId: PageName;
 };
 
 
