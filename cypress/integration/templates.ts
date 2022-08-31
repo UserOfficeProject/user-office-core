@@ -994,9 +994,9 @@ context('Template tests', () => {
 
       /* Test good inputs */
       for (const question of questions) {
-        cy.get(`[data-natural-key="${question.id}"] input`).type(
-          question.goodInput
-        );
+        cy.get(`[data-natural-key="${question.id}"] input`)
+          .clear()
+          .type(question.goodInput);
       }
       cy.contains('Save and continue').click();
       for (const question of questions) {
