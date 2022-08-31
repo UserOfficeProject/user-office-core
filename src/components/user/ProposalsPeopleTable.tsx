@@ -115,6 +115,8 @@ const useStyles = makeStyles({
   tableWrapper: {
     '& .MuiToolbar-gutters': {
       paddingLeft: '0',
+      paddingRight: '0',
+      marginRight: '24px',
     },
   },
   verticalCentered: {
@@ -434,6 +436,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                   {props.title}
                 </Typography>
               }
+              style={{ position: 'static' }}
               page={currentPage}
               columns={columns}
               onSelectionChange={(selectedItems, selectedItem) =>

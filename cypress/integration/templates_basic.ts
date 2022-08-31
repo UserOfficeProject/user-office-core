@@ -58,9 +58,6 @@ context('Template tests', () => {
     ],
   };
 
-  const numberQuestion2 = { title: faker.lorem.words(3) };
-  const numberQuestion3 = { title: faker.lorem.words(3) };
-
   const templateSearch = {
     title: faker.lorem.words(3),
     description: faker.lorem.words(3),
@@ -909,8 +906,47 @@ context('Template tests', () => {
     });
 
     it('should render the Number field accepting only positive, negative numbers if set', () => {
-      let numberField1Id: string;
-      let numberField2Id: string;
+      const generateId = () =>
+        `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
+
+      const questions = [
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive numbers',
+          fieldName: 'numberField2',
+          badInput: '1{leftarrow}-',
+          goodInput: '1',
+          failureMessage: 'Value must be a negative number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative numbers',
+          fieldName: 'numberField3',
+          badInput: '1',
+          goodInput: '1{leftarrow}-',
+          failureMessage: 'Value must be a positive number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative integers',
+          fieldName: 'numberField4',
+          badInput: '1.1{leftarrow}{leftarrow}{leftarrow}-',
+          goodInput: '-1',
+          failureMessage: 'Value must be negative whole number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive integers',
+          fieldName: 'numberField5',
+          badInput: '1.1',
+          goodInput: '1',
+          failureMessage: 'Value must be positive whole number',
+        },
+      ];
 
       cy.login('officer');
       cy.visit('/');
@@ -923,95 +959,15 @@ context('Template tests', () => {
         .first()
         .click();
 
-      cy.get('[data-cy=show-more-button]').first().click();
-
-      cy.get('[data-cy=add-question-menu-item]').first().click();
-
-      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-        .first()
-        .click();
-
-      cy.contains('Add Number').click();
-
-      cy.get('[data-cy=question]').clear().type(numberQuestion2.title);
-
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-      cy.contains('celsius').click();
-
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-      cy.contains('kelvin').click();
-
-      cy.get('[data-cy="numberValueConstraint"]').click();
-
-      cy.contains('Only positive numbers').click();
-
-      cy.contains('Save').click();
-
-      cy.contains(numberQuestion2.title)
-        .closest('[data-cy=question-container]')
-        .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          numberField1Id = fieldId;
+      /* Create questions */
+      for (const question of questions) {
+        cy.createNumberInputQuestion(question.title, {
+          key: question.id,
+          units: ['kelvin'],
+          valueConstraint: question.valueConstraint,
+          firstTopic: true,
         });
-
-      cy.contains(numberQuestion2.title)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
-
-      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-        .first()
-        .click();
-
-      cy.contains('Add Number').click();
-
-      cy.get('[data-cy=question]').clear().type(numberQuestion3.title);
-
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-      cy.contains('celsius').click();
-
-      cy.get('[data-cy=units]').find('[aria-label=Open]').click();
-
-      cy.contains('kelvin').click();
-
-      cy.get('[data-cy="numberValueConstraint"]').click();
-
-      cy.contains('Only positive numbers').click();
-
-      cy.contains('Save').click();
-
-      cy.contains(numberQuestion3.title)
-        .closest('[data-cy=question-container]')
-        .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          numberField2Id = fieldId;
-        });
-
-      cy.contains(numberQuestion3.title)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
-
-      cy.finishedLoading();
-
-      cy.contains(numberQuestion3.title).click();
-
-      cy.get('[data-cy=units]').contains('celsius');
-      cy.get('[data-cy=units]').contains('kelvin');
-
-      cy.get('[data-cy="numberValueConstraint"] input').should(
-        'have.value',
-        'Only positive numbers'
-      );
-
-      cy.get('[data-cy="numberValueConstraint"]').click();
-
-      cy.contains('Only negative numbers').click();
-
-      cy.contains('Update').click();
+      }
 
       cy.logout();
 
@@ -1020,25 +976,32 @@ context('Template tests', () => {
 
       cy.contains('New Proposal').click();
 
-      cy.contains(numberQuestion2.title);
-      cy.contains(numberQuestion3.title);
-      cy.get('body').then(() => {
-        cy.get(`[data-cy="${numberField1Id}.value"] input`).as('numberField1');
-        cy.get(`[data-cy="${numberField2Id}.value"] input`).as('numberField2');
+      /* Test questions exist */
+      for (const question of questions) {
+        cy.contains(question.title);
+      }
 
-        cy.get('@numberField1').type('1{leftarrow}-');
-        cy.get('@numberField2').type('1');
+      /* Test bad inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}"] input`).type(
+          question.badInput
+        );
+      }
+      cy.contains('Save and continue').click();
+      for (const question of questions) {
+        cy.contains(question.failureMessage);
+      }
 
-        cy.contains('Save and continue').click();
-        cy.contains('Value must be a negative number');
-        cy.contains('Value must be a positive number');
-
-        cy.get('@numberField1').clear().type('1');
-        cy.get('@numberField2').clear().type('1{leftarrow}-');
-
-        cy.contains('Value must be a negative number').should('not.exist');
-        cy.contains('Value must be a positive number').should('not.exist');
-      });
+      /* Test good inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}"] input`)
+          .clear()
+          .type(question.goodInput);
+      }
+      cy.contains('Save and continue').click();
+      for (const question of questions) {
+        cy.contains(question.failureMessage).should('not.exist');
+      }
     });
 
     it('User officer can add multiple choice question as a dependency', () => {
@@ -1375,500 +1338,6 @@ context('Template tests', () => {
 
       cy.get('[data-cy=max_files] input').clear().type('-1');
       cy.get('[data-cy=submit]').should('be.disabled');
-    });
-  });
-
-  describe('Proposal templates advanced tests', () => {
-    beforeEach(() => {
-      createTopicWithQuestionsAndRelations(true);
-    });
-
-    it('User can create proposal with template', () => {
-      const dateTimeFieldValue = DateTime.fromJSDate(
-        faker.date.past()
-      ).toFormat(initialDBData.getFormats().dateTimeFormat);
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
-        if (createdProposal) {
-          cy.updateProposal({
-            proposalPk: createdProposal.primaryKey,
-            title: proposal.title,
-            abstract: proposal.abstract,
-            proposerId: initialDBData.users.user1.id,
-          });
-        }
-      });
-      cy.login('user');
-      cy.visit('/');
-
-      cy.contains(proposal.title)
-        .parent()
-        .find('[aria-label="Edit proposal"]')
-        .click();
-
-      cy.contains('save and continue', { matchCase: false }).click();
-      cy.finishedLoading();
-
-      cy.get(`[data-cy="${intervalId}.min"]`).click().type('1');
-      cy.get(`[data-cy="${intervalId}.max"]`).click().type('2');
-      cy.get(`[data-cy="${numberId}.value"]`).click().type('1');
-      cy.get(`#${boolId}`).click();
-      cy.get(`#${textId}`).clear().type('this_word_{enter}should_be_multiline');
-      cy.contains('this_word_should_be_multiline').should('not.exist');
-      cy.get(`#${textId}`).clear().type(textQuestion.answer);
-      cy.contains(`${textQuestion.answer.length}/${textQuestion.maxChars}`);
-      cy.get(`[data-cy='${dateId}.value'] button`).click();
-      cy.contains('15').click();
-      cy.get(`[data-cy='${timeId}.value'] input`)
-        .clear()
-        .type(dateTimeFieldValue);
-
-      cy.get(`#${multipleChoiceId}`).click();
-      cy.contains(multipleChoiceQuestion.answers[0]).click();
-      cy.contains(multipleChoiceQuestion.answers[2]).click();
-      cy.get('body').type('{esc}');
-
-      cy.window().then((win) => {
-        return new Cypress.Promise((resolve) => {
-          win.tinyMCE.editors[richTextInputId].setContent(
-            richTextInputQuestion.answer
-          );
-          win.tinyMCE.editors[richTextInputId].fire('blur');
-
-          resolve();
-        });
-      });
-
-      cy.get(`#${richTextInputId}_ifr`)
-        .its('0.contentDocument.body')
-        .should('not.be.empty')
-        .contains(richTextInputQuestion.answer);
-
-      cy.get('[data-cy="rich-text-char-count"]').then((element) => {
-        expect(element.text()).to.be.equal(
-          `Characters: ${richTextInputQuestion.answer.length} / ${richTextInputQuestion.maxChars}`
-        );
-      });
-
-      cy.contains('Save and continue').click();
-
-      cy.contains('Submit').click();
-
-      cy.contains('OK').click();
-
-      cy.contains(proposal.title);
-      cy.contains(proposal.abstract);
-      cy.contains(textQuestion.answer);
-      cy.contains(multipleChoiceQuestion.answers[0]);
-      cy.contains(multipleChoiceQuestion.answers[1]).should('not.exist');
-      cy.contains(multipleChoiceQuestion.answers[2]);
-      cy.contains(dateTimeFieldValue);
-
-      cy.contains(richTextInputQuestion.title);
-      cy.get(`[data-cy="${richTextInputId}_open"]`).click();
-      cy.get('[role="dialog"]').contains(richTextInputQuestion.title);
-      cy.get('[role="dialog"]').contains(richTextInputQuestion.answer);
-      cy.get('[role="dialog"]').contains('Close').click();
-
-      cy.contains('Dashboard').click();
-      cy.contains(proposal.title);
-      cy.contains('submitted');
-    });
-
-    it('File Upload field could be set as required', () => {
-      const fileName = 'file_upload_test.png';
-
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
-
-      cy.contains(fileQuestion).click();
-
-      cy.get('[role="presentation"]').contains('image/*').click();
-
-      cy.get('body').type('{esc}');
-
-      cy.contains('Is required').click();
-
-      cy.contains('Update').click();
-
-      cy.logout();
-
-      cy.login('user');
-      cy.visit('/');
-
-      cy.contains('New Proposal').click();
-
-      cy.get('[data-cy=title] input').type(faker.lorem.words(2));
-      cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
-      cy.contains('Save and continue').click();
-
-      cy.contains(fileQuestion);
-      cy.contains('Save and continue').click();
-      cy.contains(fileQuestion)
-        .parent()
-        .contains('field must have at least 1 items');
-
-      cy.intercept({
-        method: 'POST',
-        url: '/files/upload',
-      }).as('upload');
-
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
-
-      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
-      cy.wait('@upload', { requestTimeout: 30000 });
-
-      cy.contains(fileName);
-
-      cy.contains(fileQuestion)
-        .parent()
-        .should('not.contain.text', 'field must have at least 1 items');
-
-      cy.logout();
-    });
-
-    it('File Upload max files should be required', () => {
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
-
-      cy.contains(fileQuestion).click();
-
-      cy.get('[role="presentation"]').contains('image/*').click();
-
-      cy.get('body').type('{esc}');
-
-      cy.get('[data-cy="max_files"] input').clear().type('-1');
-
-      cy.contains('Update').should('be.disabled');
-
-      cy.get('[data-cy="max_files"] input').clear();
-
-      cy.get('[data-cy="max_files"] input').should('be.focused');
-      cy.get('[data-cy="max_files"] input:invalid').should('have.length', 1);
-
-      cy.get('[data-cy="max_files"] input').clear().type('1');
-
-      cy.contains('Update').click();
-
-      cy.get('[data-cy="question-relation-dialogue"]').should('not.exist');
-
-      cy.logout();
-    });
-
-    it('Officer can delete proposal questions', () => {
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
-
-      cy.contains(textQuestion.title).click();
-      cy.get("[data-cy='remove-from-template']").click();
-
-      cy.contains(booleanQuestion).click();
-      cy.get("[data-cy='remove-from-template']").click();
-
-      cy.contains(dateQuestion.title).click();
-      cy.get("[data-cy='remove-from-template']").click();
-
-      cy.contains(fileQuestion).click();
-      cy.get("[data-cy='remove-from-template']").click();
-    });
-
-    it('User officer can add multiple dependencies on a question', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
-        if (createdProposal) {
-          cy.updateProposal({
-            proposalPk: createdProposal.primaryKey,
-            title: proposal.title,
-            abstract: proposal.abstract,
-            proposerId: initialDBData.users.user1.id,
-          });
-        }
-      });
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
-
-      cy.createTextQuestion(templateDependencies.questions.textQuestion.title);
-
-      cy.contains(templateDependencies.questions.textQuestion.title).click();
-
-      cy.get('[data-cy="add-dependency-button"]').click();
-
-      cy.get('[id="dependency-id"]').click();
-
-      cy.get('[role="presentation"]')
-        .contains(multipleChoiceQuestion.title)
-        .click();
-
-      cy.get('[id="dependencyValue"]').click();
-
-      cy.contains(multipleChoiceQuestion.answers[1]).click();
-
-      cy.get('[data-cy="add-dependency-button"]').click();
-
-      cy.get('[id="dependency-id"]').last().click();
-
-      cy.get('[role="presentation"]').contains(booleanQuestion).click();
-
-      cy.get('[id="dependencyValue"]').last().click();
-
-      cy.contains('true').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.logout();
-
-      cy.login('user');
-      cy.visit('/');
-
-      cy.contains(proposal.title)
-        .parent()
-        .find('[aria-label="Edit proposal"]')
-        .click();
-
-      cy.contains('save and continue', { matchCase: false }).click();
-      cy.finishedLoading();
-
-      cy.get('main form').should(
-        'not.contain.text',
-        templateDependencies.questions.textQuestion.title
-      );
-
-      cy.contains(multipleChoiceQuestion.title).parent().click();
-      cy.contains(multipleChoiceQuestion.answers[1]).click();
-      cy.get('body').type('{esc}');
-      cy.get('main form').should(
-        'not.contain.text',
-        templateDependencies.questions.textQuestion.title
-      );
-
-      cy.contains(booleanQuestion).click();
-
-      cy.get('main form').should(
-        'contain.text',
-        templateDependencies.questions.textQuestion.title
-      );
-
-      cy.contains(multipleChoiceQuestion.title).parent().click();
-      cy.get('[role="presentation"]')
-        .contains(multipleChoiceQuestion.answers[1])
-        .click();
-      cy.contains(multipleChoiceQuestion.answers[2]).click();
-      cy.get('body').type('{esc}');
-
-      cy.get('main form').should(
-        'not.contain.text',
-        templateDependencies.questions.textQuestion.title
-      );
-    });
-
-    it('User officer can change dependency logic operator', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
-        if (createdProposal) {
-          cy.updateProposal({
-            proposalPk: createdProposal.primaryKey,
-            title: proposal.title,
-            abstract: proposal.abstract,
-            proposerId: initialDBData.users.user1.id,
-          });
-        }
-      });
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.get('[aria-label="Edit"]').last().click();
-
-      cy.contains(textQuestion.title).click();
-
-      cy.get('[data-cy="add-dependency-button"]').click();
-
-      cy.get('[id="dependency-id"]').last().click();
-
-      cy.get('[role="presentation"]')
-        .contains(multipleChoiceQuestion.title)
-        .click();
-
-      cy.get('[id="dependencyValue"]').last().click();
-
-      cy.contains(multipleChoiceQuestion.answers[1]).click();
-
-      cy.get('[data-cy="dependencies-operator"]').click();
-
-      cy.get('[data-value="OR"]').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.logout();
-
-      cy.login('user');
-      cy.visit('/');
-
-      cy.contains(proposal.title)
-        .parent()
-        .find('[aria-label="Edit proposal"]')
-        .click();
-
-      cy.contains('save and continue', { matchCase: false }).click();
-      cy.finishedLoading();
-
-      cy.get('main form').should('not.contain.text', textQuestion.title);
-
-      cy.contains(multipleChoiceQuestion.title).parent().click();
-      cy.contains(multipleChoiceQuestion.answers[1]).click();
-      cy.get('body').type('{esc}');
-      cy.contains(textQuestion.title);
-
-      cy.contains(multipleChoiceQuestion.title).parent().click();
-      cy.get('[role="presentation"]')
-        .contains(multipleChoiceQuestion.answers[1])
-        .click();
-      cy.contains(multipleChoiceQuestion.answers[2]).click();
-      cy.get('body').type('{esc}');
-
-      cy.get('main form').should('not.contain.text', textQuestion.title);
-
-      cy.contains(booleanQuestion).click();
-      cy.contains(textQuestion.title);
-    });
-
-    it('Can delete dependee, which will remove the dependency on depender', () => {
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
-
-      cy.contains(textQuestion.title)
-        .closest('[data-cy=question-container]')
-        .find('[data-cy=dependency-list]')
-        .should('exist');
-      cy.contains(booleanQuestion).click();
-      cy.get('[data-cy=remove-from-template]').click();
-      cy.contains(textQuestion.title)
-        .closest('[data-cy=question-container]')
-        .find('[data-cy=dependency-list]')
-        .should('not.exist');
-    });
-
-    it('User can add captions after uploading image/* file', () => {
-      const fileName = 'file_upload_test2.png'; // need to use another file due to bug in cypress, which do not allow the same fixture to be reused
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
-        if (createdProposal) {
-          cy.updateProposal({
-            proposalPk: createdProposal.primaryKey,
-            title: proposal.title,
-            abstract: proposal.abstract,
-            proposerId: initialDBData.users.user1.id,
-          });
-        }
-      });
-
-      cy.login('user');
-      cy.visit('/');
-
-      cy.contains(proposal.title)
-        .parent()
-        .find('[aria-label="Edit proposal"]')
-        .click();
-      cy.finishedLoading();
-
-      cy.contains('Save and continue').click();
-
-      cy.contains(fileQuestion);
-
-      cy.intercept({
-        method: 'POST',
-        url: '/files/upload',
-      }).as('upload');
-
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
-
-      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
-      cy.wait('@upload', { requestTimeout: 30000 });
-
-      cy.contains(fileName);
-
-      cy.get('[aria-label="Add image caption"]').click();
-
-      cy.get('[data-cy="image-figure"] input').type('Fig_test');
-      cy.get('[data-cy="image-caption"] input').type('Test caption');
-
-      cy.get('[data-cy="save-button"]').click();
-
-      cy.notification({ variant: 'success', text: 'Saved' });
-
-      cy.finishedLoading();
-
-      cy.get('.MuiStep-root').contains('Review').click();
-
-      cy.contains(proposal.abstract);
-
-      cy.contains(fileName);
-
-      cy.get('[data-cy="questionary-stepper"]')
-        .contains(initialDBData.template.topic.title)
-        .click();
-
-      cy.finishedLoading();
-      cy.contains('Save and continue');
-
-      cy.contains(fileQuestion)
-        .parent()
-        .should('contain.text', fileName)
-        .find('[data-cy="image-caption"] input')
-        .should('have.value', 'Test caption');
-      cy.contains(fileQuestion)
-        .parent()
-        .find('[data-cy="image-figure"] input')
-        .should('have.value', 'Fig_test');
     });
   });
 

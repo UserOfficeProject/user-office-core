@@ -158,7 +158,13 @@ declare global {
        */
       createNumberInputQuestion: (
         title: string,
-        options?: { key?: string; isRequired?: boolean; units?: string[] }
+        options?: {
+          key?: string;
+          isRequired?: boolean;
+          units?: string[];
+          valueConstraint?: string;
+          firstTopic?: boolean;
+        }
       ) => void;
 
       /**

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLClient } from 'graphql-request';
-import { Variables } from 'graphql-request/dist/types';
+import { ClientError, Variables } from 'graphql-request/dist/types';
 import jwtDecode from 'jwt-decode';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
@@ -11,21 +11,24 @@ import { getSdk, SettingsId } from 'generated/sdk';
 
 const endpoint = '/graphql';
 
-const notificationWithClientLog = async (
+const notifyAndLog = async (
   enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
-  message: string,
-  error = ''
+  userMessage: string,
+  error: ClientError | string,
+  writeToServerLog = true
 ) => {
-  enqueueSnackbar(message, {
+  enqueueSnackbar(userMessage, {
     variant: 'error',
     preventDuplicate: true,
   });
 
-  if (error) {
+  console.error({ userMessage, error });
+
+  if (writeToServerLog) {
     await getSdk(
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar, true)
-    ).addClientLog({ error });
+    ).addClientLog({ error: JSON.stringify({ userMessage, error }) });
   }
 };
 
@@ -38,8 +41,11 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     super(endpoint);
   }
 
-  async request(query: string, variables?: Variables) {
-    return super.request(query, variables).catch((error) => {
+  async request<T = any, V = Variables>(
+    query: string,
+    variables?: V
+  ): Promise<T> {
+    return super.request<T, V>(query, variables).catch((error: ClientError) => {
       // if the `notificationWithClientLog` fails
       // and it fails while reporting an error, it can
       // easily cause an infinite loop
@@ -47,20 +53,22 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
         throw error;
       }
 
-      if (
+      if (!error || !error.response) {
+        notifyAndLog(
+          this.enqueueSnackbar,
+          'No response received from server',
+          error
+        );
+      } else if (
         error.response.error &&
         error.response.error.includes('ECONNREFUSED')
       ) {
-        notificationWithClientLog(this.enqueueSnackbar, 'Connection problem!');
+        notifyAndLog(this.enqueueSnackbar, 'Connection problem!', error, false);
       } else {
-        notificationWithClientLog(
-          this.enqueueSnackbar,
-          'Something went wrong!',
-          error.response.errors[0].message
-        );
+        notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
       }
 
-      return error;
+      throw error;
     });
   }
 }
@@ -73,7 +81,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     private endpoint: string,
     private token: string,
     private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
-    private error?: (reason: string) => void,
+    private onSessionExpired: () => void,
     private tokenRenewed?: (newToken: string) => void,
     private externalAuthLoginUrl?: string
   ) {
@@ -83,14 +91,22 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     this.externalToken = this.getExternalToken(token);
   }
 
-  async request(query: string, variables?: Variables) {
+  async request<T = any, V = Variables>(
+    query: string,
+    variables?: V
+  ): Promise<T> {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
       const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
         token: this.token,
       });
       if (data.token.rejection) {
-        this.error && this.error(data.token.rejection.reason);
+        notifyAndLog(
+          this.enqueueSnackbar,
+          'Server rejected user credentials',
+          data.token.rejection.reason
+        );
+        this.onSessionExpired();
       } else {
         const newToken = data.token.token;
         this.setHeader('authorization', `Bearer ${newToken}`);
@@ -98,44 +114,43 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       }
     }
 
-    return super.request(query, variables).catch((error) => {
-      if (
+    return super.request<T, V>(query, variables).catch((error: ClientError) => {
+      if (!error || !error.response) {
+        notifyAndLog(
+          this.enqueueSnackbar,
+          'No response received from server',
+          error
+        );
+      } else if (
         error.response.error &&
         error.response.error.includes('ECONNREFUSED')
       ) {
-        notificationWithClientLog(this.enqueueSnackbar, 'Connection problem!');
+        notifyAndLog(this.enqueueSnackbar, 'Connection problem!', error, false);
       } else if (
         error.response.errors &&
         error.response.errors[0].message === 'EXTERNAL_TOKEN_INVALID' &&
         this.externalAuthLoginUrl
       ) {
-        notificationWithClientLog(
+        notifyAndLog(
           this.enqueueSnackbar,
-          'Your session has expired, you will need to log in again through the external homepage'
+          'Your session has expired, you will need to log in again through the external homepage',
+          error,
+          false
         );
-
-        this.error && this.error(error);
-
-        return { data: null };
+        this.onSessionExpired();
       } else if ((jwtDecode(this.token) as any).exp < nowTimestampSeconds) {
-        this.enqueueSnackbar(
-          'Your session has expired, you will need to log in again.',
-          {
-            variant: 'error',
-            preventDuplicate: true,
-          }
-        );
-      } else {
-        notificationWithClientLog(
+        notifyAndLog(
           this.enqueueSnackbar,
-          'Something went wrong!',
-          error?.response?.errors?.[0].message
+          'Your session has expired, you will need to log in again.',
+          error,
+          false
         );
+        this.onSessionExpired();
+      } else {
+        notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
       }
 
-      this.error && this.error(error);
-
-      return error;
+      throw error;
     });
   }
 
@@ -166,8 +181,7 @@ export function useDataApi() {
               endpoint,
               token,
               enqueueSnackbar,
-              (reason) => {
-                console.log(reason);
+              () => {
                 handleLogout();
               },
               handleNewToken,
