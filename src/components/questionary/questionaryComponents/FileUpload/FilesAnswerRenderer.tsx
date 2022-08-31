@@ -4,7 +4,7 @@ import React from 'react';
 
 import { FileIdWithCaptionAndFigure } from 'components/common/FileUploadComponent';
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
-import { useFileMetadata } from 'hooks/file/useFileMetadata';
+import { useFilesMetadata } from 'hooks/file/useFilesMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
 
 const useStyles = makeStyles((theme) => ({
@@ -22,7 +22,7 @@ function DownloadableFileList(props: { fileIds: string[] }) {
   const { fileIds } = props;
 
   const classes = useStyles();
-  const { files } = useFileMetadata(fileIds);
+  const { files } = useFilesMetadata({ fileIds });
 
   const downloadLink = (file: FileMetaData) => (
     <Link href={`/files/download/${file.fileId}`} download>
