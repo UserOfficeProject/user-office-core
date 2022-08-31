@@ -108,6 +108,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     userInfo: ValidUserInfo,
     tokenSet: ValidTokenSet
   ): Promise<User> {
+    const client = await OpenIdClient.getInstance();
     const institutionId = await this.getUserInstitutionId(userInfo);
     const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
       userInfo.sub
@@ -127,6 +128,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         oidcAccessToken: tokenSet.access_token,
         oidcRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
+        oidcIssuer: client.issuer.metadata.issuer,
         department: userInfo.department as string,
         gender: userInfo.gender as string,
         user_title: userInfo.title as string,

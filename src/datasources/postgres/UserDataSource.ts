@@ -100,6 +100,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       oidcSub,
       oidcRefreshToken,
       oidcAccessToken,
+      oidcIssuer,
     } = user;
 
     const [userRecord]: UserRecord[] = await database

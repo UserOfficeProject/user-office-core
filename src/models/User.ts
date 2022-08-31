@@ -36,6 +36,7 @@ export class User {
     public oidcSub: string | null,
     public oidcRefreshToken: string | null,
     public oidcAccessToken: string | null,
+    public oidcIssuer: string | null,
     public gender: string,
     public nationality: number,
     public birthdate: Date,
