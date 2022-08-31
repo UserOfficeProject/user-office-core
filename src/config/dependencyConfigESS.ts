@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
-import { OpenIdConnectAuthorization } from '../auth/OpenIdConnectAuthorization';
+import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -62,7 +62,7 @@ mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
 
-mapClass(Tokens.UserAuthorization, OpenIdConnectAuthorization);
+mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 

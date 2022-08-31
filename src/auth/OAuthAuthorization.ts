@@ -20,7 +20,7 @@ type ValidUser = NonNullableField<
   'oidcSub' | 'oidcAccessToken' | 'oidcRefreshToken'
 >;
 
-export abstract class OpenIdConnectAuthorization extends UserAuthorization {
+export abstract class OAuthAuthorization extends UserAuthorization {
   public async externalTokenLogin(
     code: string,
     redirectUri: string

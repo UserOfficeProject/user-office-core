@@ -11,7 +11,8 @@ BEGIN
 
     DELETE FROM features WHERE feature_id = 'EXTERNAL_AUTH';
 
-
+    INSERT INTO features(feature_id, description) VALUES ('OAUTH', 'Is OAuth enabled');
+    
     END IF;
 END;
 $$
