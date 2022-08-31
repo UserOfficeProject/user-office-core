@@ -965,6 +965,7 @@ context('Template tests', () => {
           key: question.id,
           units: ['kelvin'],
           valueConstraint: question.valueConstraint,
+          firstTopic: true,
         });
       }
 

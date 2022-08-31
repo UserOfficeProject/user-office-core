@@ -163,6 +163,7 @@ declare global {
           isRequired?: boolean;
           units?: string[];
           valueConstraint?: string;
+          firstTopic?: boolean;
         }
       ) => void;
 

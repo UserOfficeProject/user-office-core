@@ -81,12 +81,24 @@ function createGenericTemplate(
   return cy.wrap(request);
 }
 
-function openQuestionsMenu() {
-  cy.get('[data-cy=show-more-button]').last().click();
+function openQuestionsMenu({
+  firstTopic,
+}: Partial<{
+  firstTopic: boolean;
+}> = {}) {
+  if (firstTopic) {
+    cy.get('[data-cy=show-more-button]').first().click();
 
-  cy.get('[data-cy=add-question-menu-item]').last().click();
+    cy.get('[data-cy=add-question-menu-item]').first().click();
 
-  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+  } else {
+    cy.get('[data-cy=show-more-button]').last().click();
+
+    cy.get('[data-cy=add-question-menu-item]').last().click();
+
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+  }
 }
 
 function closeQuestionsMenu() {
@@ -342,9 +354,12 @@ function createNumberInputQuestion(
     isRequired?: boolean;
     units?: string[];
     valueConstraint?: string;
+    firstTopic?: boolean;
   }
 ) {
-  openQuestionsMenu();
+  openQuestionsMenu({
+    firstTopic: options.firstTopic,
+  });
 
   cy.contains('Add Number').click();
 
