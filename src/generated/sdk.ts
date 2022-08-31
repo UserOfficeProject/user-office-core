@@ -414,6 +414,7 @@ export enum FeatureId {
   EMAIL_INVITE = 'EMAIL_INVITE',
   EMAIL_SEARCH = 'EMAIL_SEARCH',
   INSTRUMENT_MANAGEMENT = 'INSTRUMENT_MANAGEMENT',
+  OAUTH = 'OAUTH',
   RISK_ASSESSMENT = 'RISK_ASSESSMENT',
   SAMPLE_SAFETY = 'SAMPLE_SAFETY',
   SCHEDULER = 'SCHEDULER',
@@ -697,7 +698,6 @@ export type Mutation = {
   importProposal: ProposalResponseWrap;
   importTemplate: TemplateResponseWrap;
   importUnits: UnitsResponseWrap;
-  login: TokenResponseWrap;
   logout: TokenResponseWrap;
   mergeInstitutions: InstitutionResponseWrap;
   moveProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
@@ -1223,12 +1223,6 @@ export type MutationImportTemplateArgs = {
 export type MutationImportUnitsArgs = {
   conflictResolutions: Array<ConflictResolution>;
   json: Scalars['String'];
-};
-
-
-export type MutationLoginArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
 };
 
 
@@ -2008,7 +2002,6 @@ export type Query = {
   filesMetadata: Array<FileMetadata>;
   genericTemplate: Maybe<GenericTemplate>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
-  getOrcIDInformation: Maybe<OrcIdInformation>;
   getPageContent: Maybe<Scalars['String']>;
   institutions: Maybe<Array<Institution>>;
   instrument: Maybe<Instrument>;
@@ -4943,13 +4936,6 @@ export type GetNationalitiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetNationalitiesQuery = { nationalities: Array<{ id: number, value: string }> | null };
 
-export type GetOrcIdInformationQueryVariables = Exact<{
-  authorizationCode: Scalars['String'];
-}>;
-
-
-export type GetOrcIdInformationQuery = { getOrcIDInformation: { firstname: string | null, lastname: string | null, orcid: string | null, orcidHash: string | null, refreshToken: string | null, token: string | null } | null };
-
 export type GetPreviousCollaboratorsQueryVariables = Exact<{
   userId: Scalars['Int'];
   filter?: InputMaybe<Scalars['String']>;
@@ -5017,14 +5003,6 @@ export type GetUsersQueryVariables = Exact<{
 
 
 export type GetUsersQuery = { users: { totalCount: number, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> } | null };
-
-export type LoginMutationVariables = Exact<{
-  email: Scalars['String'];
-  password: Scalars['String'];
-}>;
-
-
-export type LoginMutation = { login: { token: string | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type LogoutMutationVariables = Exact<{
   token: Scalars['String'];
@@ -8828,18 +8806,6 @@ export const GetNationalitiesDocument = gql`
   }
 }
     `;
-export const GetOrcIdInformationDocument = gql`
-    query getOrcIDInformation($authorizationCode: String!) {
-  getOrcIDInformation(authorizationCode: $authorizationCode) {
-    firstname
-    lastname
-    orcid
-    orcidHash
-    refreshToken
-    token
-  }
-}
-    `;
 export const GetPreviousCollaboratorsDocument = gql`
     query getPreviousCollaborators($userId: Int!, $filter: String, $first: Int, $offset: Int, $userRole: UserRole, $subtractUsers: [Int!]) {
   previousCollaborators(
@@ -8994,16 +8960,6 @@ export const GetUsersDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
-export const LoginDocument = gql`
-    mutation login($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
-}
-    ${RejectionFragmentDoc}`;
 export const LogoutDocument = gql`
     mutation logout($token: String!) {
   logout(token: $token) {
@@ -9874,9 +9830,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getNationalities(variables?: GetNationalitiesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNationalitiesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetNationalitiesQuery>(GetNationalitiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNationalities', 'query');
     },
-    getOrcIDInformation(variables: GetOrcIdInformationQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetOrcIdInformationQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetOrcIdInformationQuery>(GetOrcIdInformationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getOrcIDInformation', 'query');
-    },
     getPreviousCollaborators(variables: GetPreviousCollaboratorsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPreviousCollaboratorsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetPreviousCollaboratorsQuery>(GetPreviousCollaboratorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPreviousCollaborators', 'query');
     },
@@ -9903,9 +9856,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getUsers(variables?: GetUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUsersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetUsersQuery>(GetUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUsers', 'query');
-    },
-    login(variables: LoginMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LoginMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<LoginMutation>(LoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'login', 'mutation');
     },
     logout(variables: LogoutMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LogoutMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<LogoutMutation>(LogoutDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'logout', 'mutation');

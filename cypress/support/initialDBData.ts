@@ -206,17 +206,19 @@ export default {
       email: 'nils@ess.se',
       password: 'Test1234!',
     },
-    userOfficer: {
+    officer: {
       id: 2,
       firstName: 'Anders',
       lastName: 'Andersson',
       email: 'Aaron_Harris49@gmail.com',
+      password: 'Test1234!',
     },
-    placeholder: {
+    placeholderUser: {
       id: 5,
       firstName: 'Unverified email',
       lastName: 'Placeholder',
       email: 'unverified-user@example.com',
+      password: '',
     },
   },
   proposalStatuses: {

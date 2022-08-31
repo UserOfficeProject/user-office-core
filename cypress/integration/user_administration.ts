@@ -14,7 +14,7 @@ context('User administration tests', () => {
   const newTelephone = faker.phone.phoneNumber('0##########');
   const newTelephoneAlt = faker.phone.phoneNumber('0##########');
   const newOrganisation = faker.company.companyName();
-  const placeholderUser = initialDBData.users.placeholder;
+  const placeholderUser = initialDBData.users.placeholderUser;
 
   beforeEach(() => {
     cy.getAndStoreFeaturesEnabled();

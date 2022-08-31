@@ -42,7 +42,7 @@ context('Shipments tests', () => {
   });
 
   it('Co-proposer should see that he can declare shipment', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.testActionButton(declareShipmentIconCyTag, 'neutral');
@@ -100,7 +100,7 @@ context('Shipments tests', () => {
     });
 
     cy.logout();
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.testActionButton(declareShipmentIconCyTag, 'neutral');

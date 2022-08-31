@@ -19,7 +19,7 @@ context('Event log tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
-      cy.login('user');
+      cy.login('user1');
       cy.createProposal({ callId: initialDBData.call.id }).then((response) => {
         if (response.createProposal.proposal) {
           createdProposalPk = response.createProposal.proposal.primaryKey;
@@ -54,7 +54,7 @@ context('Event log tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
       }
-      cy.login('user');
+      cy.login('user1');
     });
 
     it('If user uptates his info, officer should be able to see the event logs for that update', () => {

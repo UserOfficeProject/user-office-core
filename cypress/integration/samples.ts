@@ -228,7 +228,7 @@ context('Samples tests', () => {
     });
     it('Should be able to create proposal with sample', () => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
@@ -299,7 +299,7 @@ context('Samples tests', () => {
 
     it('Should be able to modify sample declaration question and all other questions without loosing information', () => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
@@ -489,7 +489,7 @@ context('Samples tests', () => {
     });
 
     it('User should not be able to submit proposal with unfinished sample', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposalTitle)

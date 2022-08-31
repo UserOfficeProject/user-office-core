@@ -48,7 +48,7 @@ context('Instrument tests', () => {
 
   // TODO: Maybe this should be moved to permission testing.
   it('User should not be able to see Instruments page', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -68,7 +68,7 @@ context('Instrument tests', () => {
     });
 
     it('User officer should be able to create instrument', function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
       cy.contains('Instruments').click();
@@ -537,7 +537,7 @@ context('Instrument tests', () => {
     let createdProposalId: string;
 
     beforeEach(function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
       cy.updateUserRoles({

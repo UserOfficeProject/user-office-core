@@ -4,8 +4,8 @@ import {
   CreateUserMutation,
   CreateUserMutationVariables,
   ExternalTokenLoginMutation,
+  FeatureId,
   GetFeaturesQuery,
-  LoginMutation,
   Role,
   SetUserEmailVerifiedMutation,
   SetUserEmailVerifiedMutationVariables,
@@ -14,7 +14,11 @@ import {
   UpdateUserRolesMutationVariables,
   User,
 } from '../../src/generated/sdk';
+import featureFlags from './featureFlags';
+import initialDBData from './initialDBData';
 import { getE2EApi } from './utils';
+
+export type TestUserId = keyof typeof initialDBData.users;
 
 type DecodedTokenData = {
   user: User;
@@ -22,39 +26,21 @@ type DecodedTokenData = {
   exp: number;
 };
 
-const testCredentialStoreStfc = {
-  user: {
-    externalToken: 'user',
-  },
-  officer: {
-    externalToken: 'officer',
-  },
-  user2: {
-    externalToken: 'user',
-  },
-  placeholderUser: {
-    externalToken: 'user',
-  },
-};
+const tokenStoreStfc = new Map<TestUserId, string>([
+  ['user1', 'user'],
+  ['user2', 'user'],
+  ['user3', 'user'],
+  ['officer', 'officer'],
+  ['placeholderUser', 'user'],
+]);
 
-const testCredentialStore = {
-  user: {
-    email: 'Javon4@hotmail.com',
-    password: 'Test1234!',
-  },
-  officer: {
-    email: 'Aaron_Harris49@gmail.com',
-    password: 'Test1234!',
-  },
-  user2: {
-    email: 'ben@inbox.com',
-    password: 'Test1234!',
-  },
-  placeholderUser: {
-    email: 'unverified-user@example.com',
-    password: 'Test1234!',
-  },
-};
+const tokenStoreOAuth = new Map<TestUserId, string>([
+  ['user1', initialDBData.users.user1.email],
+  ['user2', initialDBData.users.user2.email],
+  ['user3', initialDBData.users.user3.email],
+  ['officer', initialDBData.users.officer.email],
+  ['placeholderUser', initialDBData.users.placeholderUser.email],
+]);
 
 const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
   const api = getE2EApi();
@@ -100,15 +86,34 @@ function changeActiveRole(selectedRoleId: number) {
   cy.wrap(request);
 }
 
-const externalTokenLogin = (
-  roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
-): Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation> => {
-  const credentials = testCredentialStoreStfc[roleOrCredentials];
+const login = (
+  idOrCredentials: TestUserId | { email: string; password: string }
+): Cypress.Chainable<ExternalTokenLoginMutation> => {
+  let testUserId: TestUserId;
+  const isCredentials = typeof idOrCredentials !== 'string';
+  if (isCredentials) {
+    const credentials = idOrCredentials;
+    testUserId = Object.keys(initialDBData.users).find(
+      (key) =>
+        initialDBData.users[key as TestUserId].email === credentials.email &&
+        initialDBData.users[key as TestUserId].password === credentials.password
+    ) as TestUserId;
+
+    if (!testUserId) {
+      throw new Error('Invalid credentials');
+    }
+  } else {
+    testUserId = idOrCredentials as TestUserId;
+  }
+  const isOauth = featureFlags.getEnabledFeatures().get(FeatureId.OAUTH);
+
+  const credentialStore = isOauth ? tokenStoreOAuth : tokenStoreStfc;
+  const token = credentialStore.get(testUserId)!;
 
   const api = getE2EApi();
   const request = api
     .externalTokenLogin({
-      externalToken: credentials.externalToken,
+      externalToken: token,
       redirectUri: '',
     })
     .then((resp) => {
@@ -116,15 +121,22 @@ const externalTokenLogin = (
         return resp;
       }
 
-      const { user, exp } = jwtDecode(
+      const { user, exp, currentRole } = jwtDecode(
         resp.externalTokenLogin.token
       ) as DecodedTokenData;
 
       window.localStorage.setItem('token', resp.externalTokenLogin.token);
-      window.localStorage.setItem(
-        'currentRole',
-        roleOrCredentials === 'officer' ? 'USER_OFFICER' : 'USER'
-      );
+      if (isOauth) {
+        window.localStorage.setItem(
+          'currentRole',
+          currentRole.shortCode.toUpperCase()
+        );
+      } else {
+        window.localStorage.setItem(
+          'currentRole',
+          testUserId === 'officer' ? 'USER_OFFICER' : 'USER'
+        );
+      }
       window.localStorage.setItem('expToken', `${exp}`);
       window.localStorage.setItem('user', JSON.stringify(user));
 
@@ -134,46 +146,8 @@ const externalTokenLogin = (
   return cy.wrap(request);
 };
 
-const login = (
-  roleOrCredentials:
-    | 'user'
-    | 'officer'
-    | 'user2'
-    | 'placeholderUser'
-    | { email: string; password: string }
-): Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation> => {
-  const credentials =
-    typeof roleOrCredentials === 'string'
-      ? testCredentialStore[roleOrCredentials]
-      : roleOrCredentials;
-
-  const api = getE2EApi();
-  const request = api.login(credentials).then((resp) => {
-    if (!resp.login.token) {
-      return resp;
-    }
-
-    const { currentRole, user, exp } = jwtDecode(
-      resp.login.token
-    ) as DecodedTokenData;
-
-    window.localStorage.setItem('token', resp.login.token);
-    window.localStorage.setItem(
-      'currentRole',
-      currentRole.shortCode.toUpperCase()
-    );
-    window.localStorage.setItem('expToken', `${exp}`);
-    window.localStorage.setItem('user', JSON.stringify(user));
-
-    return resp;
-  });
-
-  return cy.wrap(request);
-};
-
 const logout = () => {
   localStorage.removeItem('token');
-  localStorage.removeItem('currentRole');
   localStorage.removeItem('user');
   localStorage.removeItem('expToken');
   localStorage.removeItem('impersonatingUserId');
@@ -218,7 +192,6 @@ function updateUserRoles(
 }
 
 Cypress.Commands.add('login', login);
-Cypress.Commands.add('externalTokenLogin', externalTokenLogin);
 
 Cypress.Commands.add('logout', logout);
 Cypress.Commands.add('createUser', createUser);

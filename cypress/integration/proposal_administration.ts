@@ -203,11 +203,11 @@ context('Proposal administration tests', () => {
 
       cy.contains(proposalName1).parent().contains('No');
 
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         cy.logout();
       }
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposalName1)
@@ -280,7 +280,7 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to download proposal pdf', function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until issue is fixed on github actions
         this.skip();
       }

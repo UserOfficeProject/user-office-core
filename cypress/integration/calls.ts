@@ -100,7 +100,7 @@ context('Calls tests', () => {
 
   // TODO: Maybe this should be moved to another file called permissions because its testing more call permissions than calls.
   it('A user should not be able to see/visit calls', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -663,7 +663,7 @@ context('Calls tests', () => {
       The time remaining is rounded down to the nearest min, hour or day.
       No time remaining is displayed if over 30 days or under one minute.
     */
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     // Create a future call, so that there is always two calls to choose from
