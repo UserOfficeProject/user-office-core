@@ -6,7 +6,6 @@ import {
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   resetPasswordByEmailValidationSchema,
-  signInValidationSchema,
   updatePasswordValidationSchema,
   updateUserRolesValidationSchema,
   updateUserValidationSchema,
@@ -353,42 +352,6 @@ export default class UserMutations {
           err
         );
       });
-  }
-
-  @ValidateArgs(signInValidationSchema)
-  async login(
-    agent: UserWithRole | null,
-    args: { email: string; password: string }
-  ): Promise<string | Rejection> {
-    const user = await this.dataSource.getByEmail(args.email);
-
-    if (!user) {
-      return rejection('Wrong username or password');
-    }
-    const roles = await this.dataSource.getUserRoles(user.id);
-    const result = await this.dataSource.getPasswordByEmail(args.email);
-
-    if (!result) {
-      return rejection('Wrong username or password');
-    }
-
-    const valid = bcrypt.compareSync(args.password, result);
-
-    if (!valid) {
-      return rejection('Wrong email or password');
-    }
-
-    if (!user.emailVerified) {
-      return rejection('Email is not verified');
-    }
-
-    const token = signToken<AuthJwtPayload>({
-      user,
-      roles,
-      currentRole: roles[0],
-    });
-
-    return token;
   }
 
   @ValidateArgs(getTokenForUserValidationSchema)
