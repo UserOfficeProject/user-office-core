@@ -358,7 +358,7 @@ function createNumberInputQuestion(
   }
 ) {
   openQuestionsMenu({
-    firstTopic: options.firstTopic,
+    firstTopic: options?.firstTopic,
   });
 
   cy.contains('Add Number').click();

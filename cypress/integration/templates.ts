@@ -935,7 +935,7 @@ context('Template tests', () => {
           fieldName: 'numberField4',
           badInput: '1.1{leftarrow}{leftarrow}{leftarrow}-',
           goodInput: '-1',
-          failureMessage: 'Value must be a negative whole number',
+          failureMessage: 'Value must be negative whole number',
         },
         {
           id: generateId(),
@@ -944,7 +944,7 @@ context('Template tests', () => {
           fieldName: 'numberField5',
           badInput: '1.1',
           goodInput: '1',
-          failureMessage: 'Value must be a positive whole number',
+          failureMessage: 'Value must be positive whole number',
         },
       ];
 
