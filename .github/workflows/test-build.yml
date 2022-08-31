@@ -48,11 +48,11 @@ jobs:
 
           BE_TAGS=$(check_feature ${{ github.head_ref }} \
             https://registry.hub.docker.com/v2/repositories/dmsc/duo-backend/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-backend/branches
+            https://api.github.com/repos/UserOfficeProject/user-office-backend/branches?per_page=100
           )
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
             https://registry.hub.docker.com/v2/repositories/dmsc/duo-factory/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
           BE_TAG=develop
