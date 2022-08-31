@@ -48,11 +48,11 @@ jobs:
 
           BE_TAGS=$(check_feature ${{ github.head_ref }} \
             https://registry.hub.docker.com/v2/repositories/dmsc/duo-backend/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-backend/branches
+            https://api.github.com/repos/UserOfficeProject/user-office-backend/branches?per_page=100
           )
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
             https://registry.hub.docker.com/v2/repositories/dmsc/duo-factory/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
           BE_TAG=develop
@@ -253,9 +253,13 @@ jobs:
           [
             "cypress/integration/[a-e]*.ts",
             "cypress/integration/[f-i]*.ts",
-            "cypress/integration/[j-p]*.ts",
+            "cypress/integration/[j-o]*.ts",
+            "cypress/integration/p[a-m]*.ts",
+            "cypress/integration/p[n-z]*.ts",
             "cypress/integration/[r-s]*.ts",
-            "cypress/integration/[t-z]*.ts",
+            "cypress/integration/templates_basic.ts",
+            "cypress/integration/templates_advanced.ts",
+            "cypress/integration/[u-z]*.ts",
             "cypress/integration/[A-Z]*.ts",
           ]
 
