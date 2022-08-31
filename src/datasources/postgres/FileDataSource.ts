@@ -6,6 +6,7 @@ import { Client } from 'pg';
 import { LargeObjectManager } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
+import { FilesMetadataFilter } from '../../resolvers/queries/FilesMetadataQuery';
 import { FileDataSource } from '../IFileDataSource';
 import database from './database';
 import { FileRecord, createFileMetadata } from './records';
@@ -22,25 +23,37 @@ export default class PostgresFileDataSource implements FileDataSource {
     return fileId;
   }
 
-  public async getMetadata(fileIds: string[]): Promise<FileMetadata[]> {
-    if (fileIds.length === 0) {
-      return [];
+  async getMetadata(fileId: string): Promise<FileMetadata>;
+  async getMetadata(filter: FilesMetadataFilter): Promise<FileMetadata[]>;
+  async getMetadata(param: unknown): Promise<FileMetadata | FileMetadata[]> {
+    if (param instanceof FilesMetadataFilter) {
+      const filter = param as FilesMetadataFilter;
+
+      if (!filter.fileIds || filter.fileIds.length === 0) {
+        return [];
+      }
+
+      return database('files')
+        .select('*')
+        .whereIn('file_id', filter.fileIds)
+        .then((records: FileRecord[]) => {
+          return records.map((record) => createFileMetadata(record));
+        });
     }
 
-    return database('files')
-      .select([
-        'file_id',
-        'oid',
-        'file_name',
-        'file_name',
-        'mime_type',
-        'size_in_bytes',
-        'created_at',
-      ])
-      .whereIn('file_id', fileIds)
-      .then((records: FileRecord[]) => {
-        return records.map((record) => createFileMetadata(record));
-      });
+    if (typeof param === 'string') {
+      const fileId = param as string;
+
+      return database('files')
+        .select('*')
+        .where('file_id', fileId)
+        .first()
+        .then((record: FileRecord) => {
+          return createFileMetadata(record);
+        });
+    }
+
+    throw new Error('Unsupported input for getMetaData');
   }
 
   public async put(

@@ -71,4 +71,9 @@ export default class TemplateQueries {
   ) {
     return this.dataSource.getActiveTemplateId(templateCategoryId);
   }
+
+  @Authorized()
+  async getQuestionByNaturalKey(user: UserWithRole | null, naturalKey: string) {
+    return this.dataSource.getQuestionByNaturalKey(naturalKey);
+  }
 }

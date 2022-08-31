@@ -11,7 +11,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { ProposalPublicStatus } from '../models/Proposal';
+import { Proposal, ProposalPublicStatus } from '../models/Proposal';
 import { omit } from '../utils/helperFunctions';
 import ProposalQueries from './ProposalQueries';
 
@@ -71,4 +71,22 @@ test('User should see the right status for submitted proposal', async () => {
   return expect(
     proposalQueries.getPublicStatus(dummyUserWithRole, 2)
   ).resolves.toBe(ProposalPublicStatus.accepted);
+});
+
+test('User on proposal should get the proposal', async () => {
+  return expect(
+    proposalQueries.getProposalById(dummyUserWithRole, 'shortCode')
+  ).resolves.toBeInstanceOf(Proposal);
+});
+
+test('User not on proposal should not get the proposal', async () => {
+  return expect(
+    proposalQueries.getProposalById(dummyUserNotOnProposalWithRole, 'shortCode')
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test('User officer should get the proposal', async () => {
+  return expect(
+    proposalQueries.getProposalById(dummyUserOfficerWithRole, 'shortCode')
+  ).resolves.toBeInstanceOf(Proposal);
 });
