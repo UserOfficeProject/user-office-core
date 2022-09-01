@@ -126,17 +126,11 @@ const login = (
       ) as DecodedTokenData;
 
       window.localStorage.setItem('token', resp.externalTokenLogin.token);
-      if (isOauth) {
-        window.localStorage.setItem(
-          'currentRole',
-          currentRole.shortCode.toUpperCase()
-        );
-      } else {
-        window.localStorage.setItem(
-          'currentRole',
-          testUserId === 'officer' ? 'USER_OFFICER' : 'USER'
-        );
-      }
+      cy.log(currentRole.shortCode);
+      window.localStorage.setItem(
+        'currentRole',
+        currentRole.shortCode.toUpperCase()
+      );
       window.localStorage.setItem('expToken', `${exp}`);
       window.localStorage.setItem('user', JSON.stringify(user));
 
