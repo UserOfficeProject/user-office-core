@@ -74,7 +74,7 @@
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
-    "sanitize-html": "^2.7.0",
+    "sanitize-html": "^2.7.1",
     "simple-oauth2": "^4.3.0",
     "soap": "^0.40.0",
     "sparkpost": "^2.1.4",
