@@ -126,7 +126,6 @@ const login = (
       ) as DecodedTokenData;
 
       window.localStorage.setItem('token', resp.externalTokenLogin.token);
-      cy.log(currentRole.shortCode);
       window.localStorage.setItem(
         'currentRole',
         currentRole.shortCode.toUpperCase()

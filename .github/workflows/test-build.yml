@@ -330,36 +330,6 @@ jobs:
                 - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads, /gateway, /graphql"
           EOF
 
-      - name: Run docker-compose
-        env:
-          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-        run: |
-          cd "$GITHUB_WORKSPACE/.."
-
-          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
-          export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
-          export USER_OFFICE_BACKEND_DIR=user-office-backend
-          export USER_OFFICE_BACKEND=http://backend:4000/graphql
-          export USER_OFFICE_ENDPOINT=$USER_OFFICE_BACKEND
-
-          export USER_OFFICE_FACTORY_TAG=${{ needs.resolve_dep.outputs.FACTORY_TAG }}
-          export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
-
-          export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
-          export BUILD_TAG=${{ github.sha }}
-
-          export USER_OFFICE_DEVELOPMENT_AUTHORIZATION_SERVER_TAG=${{ needs.resolve_dep.outputs.USER_OFFICE_DEVELOPMENT_AUTHORIZATION_SERVER_TAG }}
-
-          export CYPRES_SPEC_PATTERN=${{ matrix.pattern }}
-
-          docker-compose --project-directory $PWD \
-            -f user-office-backend/docker-compose.e2e.yml \
-            -f user-office-factory/docker-compose.e2e.yml \
-            -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
-            -f docker-compose.all.yml \
-            up --exit-code-from cypress
-
       - name: Run docker-compose stfc
         env:
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
@@ -389,6 +359,37 @@ jobs:
 
           docker-compose --project-directory $PWD \
             -f "$REPO_DIR_NAME/docker-compose-stfc.e2e.yml" \
+            up --exit-code-from cypress
+
+
+      - name: Run docker-compose
+        env:
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
+          export USER_OFFICE_BACKEND_DIR=user-office-backend
+          export USER_OFFICE_BACKEND=http://backend:4000/graphql
+          export USER_OFFICE_ENDPOINT=$USER_OFFICE_BACKEND
+
+          export USER_OFFICE_FACTORY_TAG=${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
+
+          export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
+          export BUILD_TAG=${{ github.sha }}
+
+          export USER_OFFICE_DEVELOPMENT_AUTHORIZATION_SERVER_TAG=${{ needs.resolve_dep.outputs.USER_OFFICE_DEVELOPMENT_AUTHORIZATION_SERVER_TAG }}
+
+          export CYPRES_SPEC_PATTERN=${{ matrix.pattern }}
+
+          docker-compose --project-directory $PWD \
+            -f user-office-backend/docker-compose.e2e.yml \
+            -f user-office-factory/docker-compose.e2e.yml \
+            -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
+            -f docker-compose.all.yml \
             up --exit-code-from cypress
 
       - name: Upload cypres screenshots
