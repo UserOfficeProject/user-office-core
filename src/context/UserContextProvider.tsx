@@ -177,9 +177,18 @@ const reducer = (
 
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
-  const [, setCookie] = useCookies();
+  const [cookies, setCookie] = useCookies();
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);
+
+  useEffect(() => {
+    if (cookies.token && cookies.token !== state.token) {
+      dispatch({
+        type: ActionType.SETTOKEN,
+        payload: cookies.token,
+      });
+    }
+  }, [cookies, state.token]);
 
   checkLocalStorage(dispatch, state);
   useEffect(() => {

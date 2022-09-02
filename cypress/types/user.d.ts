@@ -22,7 +22,8 @@ declare global {
        *    cy.login('user')
        */
       login: (
-        idOrCredentials: TestUserId | { email: string; password: string }
+        idOrCredentials: TestUserId | { email: string; password: string },
+        role?: number
       ) => Cypress.Chainable<ExternalTokenLoginMutation>;
 
       /**

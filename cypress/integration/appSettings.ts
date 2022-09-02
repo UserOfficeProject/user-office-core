@@ -96,13 +96,9 @@ context('App settings tests', () => {
         roles: [initialDBData.roles.instrumentScientist],
       });
 
-      cy.login(scientist2);
+      cy.login(scientist2, initialDBData.roles.instrumentScientist);
 
       cy.visit('/');
-
-      cy.log(
-        'hello' + JSON.stringify(initialDBData.getFormats().reviewerFilter)
-      );
 
       cy.contains('Proposals');
 
