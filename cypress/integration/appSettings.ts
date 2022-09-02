@@ -84,7 +84,7 @@ context('App settings tests', () => {
     });
 
     it('Instrument Scientist filter should differ based on setting value', function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until instr sci login is enabled
         this.skip();
       }

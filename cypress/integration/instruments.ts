@@ -68,7 +68,7 @@ context('Instrument tests', () => {
     });
 
     it('User officer should be able to create instrument', function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
       cy.contains('Instruments').click();
@@ -537,7 +537,7 @@ context('Instrument tests', () => {
     let createdProposalId: string;
 
     beforeEach(function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
       cy.updateUserRoles({

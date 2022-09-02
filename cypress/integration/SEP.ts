@@ -202,7 +202,7 @@ context('SEP reviews tests', () => {
   describe('User officer role', () => {
     it('Officer should be able to assign proposal to existing SEP', function () {
       cy.getAndStoreFeaturesEnabled();
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
       cy.login('officer');
