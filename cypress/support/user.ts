@@ -35,9 +35,11 @@ const userStoreStfc = new Map<
   ['user3', { extToken: 'user', primaryRole: 1 }],
   ['officer', { extToken: 'officer', primaryRole: 2 }],
   ['placeholderUser', { extToken: 'user', primaryRole: 1 }],
+  ['reviewer', { extToken: 'user', primaryRole: 6 }],
 ]);
 
-const { user1, user2, user3, officer, placeholderUser } = initialDBData.users;
+const { user1, user2, user3, officer, placeholderUser, reviewer } =
+  initialDBData.users;
 const userStoreOAuth = new Map<
   TestUserId,
   { extToken: string; primaryRole: number }
@@ -47,6 +49,7 @@ const userStoreOAuth = new Map<
   ['user3', { extToken: user3.email, primaryRole: 1 }],
   ['officer', { extToken: officer.email, primaryRole: 2 }],
   ['placeholderUser', { extToken: placeholderUser.email, primaryRole: 1 }],
+  ['reviewer', { extToken: reviewer.email, primaryRole: 6 }],
 ]);
 
 const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
@@ -151,14 +154,15 @@ const login = (
       redirectUri: '',
     })
     .then(async (resp) => {
-      if (!resp.externalTokenLogin.token) {
+      let token = resp.externalTokenLogin.token;
+
+      if (!token) {
         return resp;
       }
 
-      const token = await selectRole(
-        resp.externalTokenLogin.token,
-        role ?? userData.primaryRole
-      );
+      if (role) {
+        token = await selectRole(token, role);
+      }
 
       const { user, exp, currentRole } = jwtDecode(token) as DecodedTokenData;
 
