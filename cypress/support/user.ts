@@ -126,10 +126,17 @@ const login = (
       ) as DecodedTokenData;
 
       window.localStorage.setItem('token', resp.externalTokenLogin.token);
-      window.localStorage.setItem(
-        'currentRole',
-        currentRole.shortCode.toUpperCase()
-      );
+      if (isOauth) {
+        window.localStorage.setItem(
+          'currentRole',
+          currentRole.shortCode.toUpperCase()
+        );
+      } else {
+        window.localStorage.setItem(
+          'currentRole',
+          testUserId === 'officer' ? 'USER_OFFICER' : 'USER'
+        );
+      }
       window.localStorage.setItem('expToken', `${exp}`);
       window.localStorage.setItem('user', JSON.stringify(user));
 
