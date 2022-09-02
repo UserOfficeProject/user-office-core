@@ -26,30 +26,24 @@ type DecodedTokenData = {
   exp: number;
 };
 
-const userStoreStfc = new Map<
-  TestUserId,
-  { extToken: string; primaryRole: number }
->([
-  ['user1', { extToken: 'user', primaryRole: 1 }],
-  ['user2', { extToken: 'user', primaryRole: 1 }],
-  ['user3', { extToken: 'user', primaryRole: 1 }],
-  ['officer', { extToken: 'officer', primaryRole: 2 }],
-  ['placeholderUser', { extToken: 'user', primaryRole: 1 }],
-  ['reviewer', { extToken: 'user', primaryRole: 6 }],
+const extTokenStoreStfc = new Map<TestUserId, string>([
+  ['user1', 'user'],
+  ['user2', 'user'],
+  ['user3', 'user'],
+  ['officer', 'officer'],
+  ['placeholderUser', 'user'],
+  ['reviewer', 'user'],
 ]);
 
 const { user1, user2, user3, officer, placeholderUser, reviewer } =
   initialDBData.users;
-const userStoreOAuth = new Map<
-  TestUserId,
-  { extToken: string; primaryRole: number }
->([
-  ['user1', { extToken: user1.email, primaryRole: 1 }],
-  ['user2', { extToken: user2.email, primaryRole: 1 }],
-  ['user3', { extToken: user3.email, primaryRole: 1 }],
-  ['officer', { extToken: officer.email, primaryRole: 2 }],
-  ['placeholderUser', { extToken: placeholderUser.email, primaryRole: 1 }],
-  ['reviewer', { extToken: reviewer.email, primaryRole: 6 }],
+const extTokenStoreOAuth = new Map<TestUserId, string>([
+  ['user1', user1.email],
+  ['user2', user2.email],
+  ['user3', user3.email],
+  ['officer', officer.email],
+  ['placeholderUser', placeholderUser.email],
+  ['reviewer', reviewer.email],
 ]);
 
 const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
@@ -144,13 +138,13 @@ const login = (
 
   const isOauth = featureFlags.getEnabledFeatures().get(FeatureId.OAUTH);
 
-  const userStore = isOauth ? userStoreOAuth : userStoreStfc;
-  const userData = userStore.get(testUserId)!;
+  const extTokenStore = isOauth ? extTokenStoreOAuth : extTokenStoreStfc;
+  const externalToken = extTokenStore.get(testUserId)!;
 
   const api = getE2EApi();
   const request = api
     .externalTokenLogin({
-      externalToken: userData.extToken,
+      externalToken,
       redirectUri: '',
     })
     .then(async (resp) => {
@@ -162,6 +156,10 @@ const login = (
 
       if (role) {
         token = await selectRole(token, role);
+      }
+
+      if (!isOauth && !role && testUserId === 'officer') {
+        token = await selectRole(token, 2); // STFC has special logic for officer role
       }
 
       const { user, exp, currentRole } = jwtDecode(token) as DecodedTokenData;
