@@ -177,7 +177,7 @@ const reducer = (
 
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
-  const [cookies, setCookie] = useCookies();
+  const [cookies] = useCookies();
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);
 
@@ -191,14 +191,6 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
   }, [cookies, state.token]);
 
   checkLocalStorage(dispatch, state);
-  useEffect(() => {
-    // NOTE: Cookies are used for scheduler authorization.
-    setCookie('token', state.token, {
-      path: '/',
-      secure: false,
-      sameSite: 'lax',
-    });
-  }, [setCookie, state]);
 
   async function userLogoutHandler() {
     const token = localStorage.getItem('token');
