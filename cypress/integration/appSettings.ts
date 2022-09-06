@@ -30,7 +30,7 @@ context('App settings tests', () => {
         initialDBData.getFormats().dateTimeFormat
       );
 
-      cy.get('body').type('{esc}');
+      cy.get('[data-cy="close-modal-btn"]').click();
 
       cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
       cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();

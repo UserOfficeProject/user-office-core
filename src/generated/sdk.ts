@@ -1705,7 +1705,9 @@ export type NumberInputConfig = {
 export enum NumberValueConstraint {
   NONE = 'NONE',
   ONLY_NEGATIVE = 'ONLY_NEGATIVE',
-  ONLY_POSITIVE = 'ONLY_POSITIVE'
+  ONLY_NEGATIVE_INTEGER = 'ONLY_NEGATIVE_INTEGER',
+  ONLY_POSITIVE = 'ONLY_POSITIVE',
+  ONLY_POSITIVE_INTEGER = 'ONLY_POSITIVE_INTEGER'
 }
 
 export type OrcIdInformation = {
