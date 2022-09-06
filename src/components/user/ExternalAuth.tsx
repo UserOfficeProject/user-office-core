@@ -39,7 +39,7 @@ function ExternalAuth() {
 
     isFirstRun.current = false;
 
-    const ErrorMessage = (props: { message: string }) => (
+    const ErrorMessage = (props: { message?: string }) => (
       <CenteredAlert
         severity="error"
         action={
@@ -57,7 +57,7 @@ function ExternalAuth() {
         }
         icon={<BugReportIcon fontSize="medium" />}
       >
-        {props.message}
+        {props.message || 'Unknown error occurred'}
       </CenteredAlert>
     );
 
@@ -116,12 +116,7 @@ function ExternalAuth() {
             window.location.href = '/';
           } else {
             setView(
-              <ErrorMessage
-                message={
-                  externalTokenLogin.rejection?.reason ||
-                  'Unknown error occurred'
-                }
-              />
+              <ErrorMessage message={externalTokenLogin.rejection?.reason} />
             );
           }
         })

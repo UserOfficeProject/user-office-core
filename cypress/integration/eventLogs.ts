@@ -1,13 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 
-import {
-  FeatureId,
-  UpdateUserMutationVariables,
-  User,
-} from '../../src/generated/sdk';
+import { FeatureId } from '../../src/generated/sdk';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { UserJwt } from './../../src/generated/sdk';
 
 context('Event log tests', () => {
   beforeEach(() => {
@@ -57,7 +54,7 @@ context('Event log tests', () => {
       cy.login('user1');
     });
 
-    it('If user uptates his info, officer should be able to see the event logs for that update', () => {
+    it('If user updates his info, officer should be able to see the event logs for that update', () => {
       const newFirstName = faker.name.firstName();
       // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
       const updateProfileDate = DateTime.now().toFormat(
@@ -69,12 +66,23 @@ context('Event log tests', () => {
         throw new Error('No logged in user');
       }
 
-      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+      const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       cy.updateUserDetails({
         ...loggedInUserParsed,
         firstname: newFirstName,
-      } as UpdateUserMutationVariables);
+        lastname: loggedInUserParsed.lastname,
+        user_title: 'Mr.',
+        preferredname: '',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('1990/01/01').toISOString(),
+        organisation: 1,
+        department: 'TEST',
+        position: 'test',
+        email: faker.internet.email(),
+        telephone: '123456789',
+      });
 
       cy.login('officer');
       cy.visit('/');

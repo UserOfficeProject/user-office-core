@@ -569,7 +569,6 @@ const Dashboard: React.FC = () => {
             path="/DeclareShipments/:scheduledEventId"
             component={DeclareShipmentsPage}
           />
-
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
             yes={() => <Route component={ProposalPage} />}

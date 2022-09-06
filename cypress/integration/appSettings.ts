@@ -96,7 +96,7 @@ context('App settings tests', () => {
         roles: [initialDBData.roles.instrumentScientist],
       });
 
-      cy.login(scientist2, initialDBData.roles.instrumentScientist);
+      cy.login(scientist2);
 
       cy.visit('/');
 
