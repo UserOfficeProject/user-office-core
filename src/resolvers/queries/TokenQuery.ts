@@ -9,25 +9,8 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import {
-  AuthJwtPayload as AuthJwtPayloadBase,
-  AuthJwtApiTokenPayload as AuthJwtApiTokenPayloadBase,
-} from '../../models/User';
-import { User } from '../../models/User';
-import { Role } from '../types/Role';
-import { User as UserGQLType } from '../types/User';
-
-@ObjectType()
-class AuthJwtPayload implements AuthJwtPayloadBase {
-  @Field(() => UserGQLType)
-  user: User;
-
-  @Field(() => Role)
-  currentRole: Role;
-
-  @Field(() => [Role])
-  roles: Role[];
-}
+import { AuthJwtApiTokenPayload as AuthJwtApiTokenPayloadBase } from '../../models/User';
+import { AuthJwtPayload } from '../types/AuthJwtPayload';
 
 @ObjectType()
 class AuthJwtApiTokenPayload implements AuthJwtApiTokenPayloadBase {

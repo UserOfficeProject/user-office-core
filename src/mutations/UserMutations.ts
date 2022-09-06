@@ -91,12 +91,16 @@ export default class UserMutations {
   ): Promise<EmailInviteResponse | Rejection> {
     let userId: number | null = null;
     let role: UserRole = args.userRole;
+
+    if (!agent) {
+      return rejection('Agent is not defined', { agent, args });
+    }
     // Check if email exist in database and if user has been invited before
     const user = await this.dataSource.getByEmail(args.email);
     if (user && user.placeholder) {
       userId = user.id;
 
-      return this.createEmailInviteResponse(userId, (agent as User).id, role);
+      return this.createEmailInviteResponse(userId, agent.id, role);
     } else if (user) {
       return rejection(
         'Can not create account because account already exists',
@@ -151,7 +155,7 @@ export default class UserMutations {
         args,
       });
     } else {
-      return this.createEmailInviteResponse(userId, (agent as User).id, role);
+      return this.createEmailInviteResponse(userId, agent.id, role);
     }
   }
 
@@ -179,13 +183,10 @@ export default class UserMutations {
     }
 
     //Check if email exist in database and if user has been invited
-    let user = (await this.dataSource.getByEmail(args.email)) as UserWithRole;
+    let user = await this.dataSource.getByEmail(args.email);
 
     if (user && user.placeholder) {
-      user.currentRole = await this.dataSource.getRoleByShortCode(
-        UserRoleShortCodeMap[UserRole.USER]
-      );
-      const changePassword = await this.updatePassword(user, {
+      const changePassword = await this.updatePassword(agent, {
         id: user.id,
         password: args.password,
       });
@@ -196,7 +197,7 @@ export default class UserMutations {
           ...args,
           placeholder: false,
         })
-        .then((user) => user as UserWithRole)
+        .then((user) => user)
         .catch((err) => {
           return rejection('Could not update user', { user }, err);
         });
@@ -214,7 +215,7 @@ export default class UserMutations {
       });
     } else {
       try {
-        user = (await this.dataSource.create(
+        user = await this.dataSource.create(
           args.user_title,
           args.firstname,
           args.middlename,
@@ -234,7 +235,7 @@ export default class UserMutations {
           args.email,
           args.telephone,
           args.telephone_alt
-        )) as UserWithRole;
+        );
       } catch (error) {
         // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
         const errorCode = (error as { code: string }).code;
@@ -247,6 +248,10 @@ export default class UserMutations {
           );
         }
       }
+    }
+
+    if (!user) {
+      return rejection('Can not create user', { args });
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -442,7 +447,14 @@ export default class UserMutations {
       const roles = await this.dataSource.getUserRoles(user.id);
 
       const uosToken = signToken<AuthJwtPayload>({
-        user: user,
+        user: {
+          id: user.id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          oidcSub: user.oidcSub,
+          placeholder: user.placeholder,
+        },
         roles,
         currentRole: roles[0],
         externalToken: externalToken,

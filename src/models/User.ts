@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { Role, Roles } from './Role';
 
 export type AuthJwtPayload = {
-  user: User;
+  user: UserJWT;
   roles: Role[];
   currentRole: Role;
   externalToken?: string;
@@ -53,7 +53,7 @@ export class User {
   ) {}
 }
 
-export interface UserWithRole extends User {
+export interface UserWithRole extends UserJWT {
   currentRole: Role | undefined;
   impersonatingUserId?: number;
   accessPermissions?: any;
@@ -96,3 +96,8 @@ export class BasicUserDetails {
     public email: string
   ) {}
 }
+
+export type UserJWT = Pick<
+  User,
+  'id' | 'firstname' | 'lastname' | 'email' | 'oidcSub' | 'placeholder'
+>;

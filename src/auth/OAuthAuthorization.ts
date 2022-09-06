@@ -66,12 +66,16 @@ export abstract class OAuthAuthorization extends UserAuthorization {
 
   async logout(uosToken: AuthJwtPayload): Promise<void | Rejection> {
     // validate user in token
-    const userFromToken = this.validateUser(uosToken.user);
+    const oidcSub = uosToken.user.oidcSub;
+
+    if (!oidcSub) {
+      return rejection('INVALID_USER');
+    }
 
     try {
       // get and validate user form datasource
       const user = this.validateUser(
-        await this.userDataSource.getByOIDCSub(userFromToken.oidcSub)
+        await this.userDataSource.getByOIDCSub(oidcSub)
       );
 
       const client = await OpenIdClient.getInstance();
