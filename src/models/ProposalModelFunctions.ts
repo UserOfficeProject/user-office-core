@@ -1,4 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
 import {
   ConditionEvaluator,
   DependenciesLogicOperator,
