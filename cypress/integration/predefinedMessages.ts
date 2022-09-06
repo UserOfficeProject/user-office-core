@@ -4,6 +4,7 @@ import initialDBData from '../support/initialDBData';
 
 context('Predefined messages tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
   });
 
