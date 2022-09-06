@@ -102,7 +102,7 @@ export type AuthJwtApiTokenPayload = {
 export type AuthJwtPayload = {
   currentRole: Role;
   roles: Array<Role>;
-  user: User;
+  user: UserJwt;
 };
 
 export type BasicUserDetails = {
@@ -3231,6 +3231,15 @@ export type UserReviewsArgs = {
   instrumentId?: InputMaybe<Scalars['Int']>;
   reviewer?: InputMaybe<ReviewerFilter>;
   status?: InputMaybe<ReviewStatus>;
+};
+
+export type UserJwt = {
+  email: Scalars['String'];
+  firstname: Scalars['String'];
+  id: Scalars['Int'];
+  lastname: Scalars['String'];
+  oidcSub: Maybe<Scalars['String']>;
+  placeholder: Scalars['Boolean'];
 };
 
 export type UserProposalsFilter = {
