@@ -116,6 +116,14 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
                   text: 'Only negative numbers',
                   value: NumberValueConstraint.ONLY_NEGATIVE,
                 },
+                {
+                  text: 'Only positive integers',
+                  value: NumberValueConstraint.ONLY_POSITIVE_INTEGER,
+                },
+                {
+                  text: 'Only negative integers',
+                  value: NumberValueConstraint.ONLY_NEGATIVE_INTEGER,
+                },
               ]}
             />
           </TitledContainer>
