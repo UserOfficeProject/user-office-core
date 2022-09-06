@@ -159,7 +159,7 @@ const login = (
       }
 
       if (!isOauth && !role && testUserId === 'officer') {
-        token = await selectRole(token, 2); // STFC has special logic for officer role
+        token = await selectRole(token, 2); // It appears that the officer user in UOWS has 2 roles, once the second role is removed this can be removed
       }
 
       const { user, exp, currentRole } = jwtDecode(token) as DecodedTokenData;
