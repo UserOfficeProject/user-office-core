@@ -16,12 +16,8 @@ services:
       TZ: Europe/Stockholm
       DATE_FORMAT: dd-MM-yyyy
       DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-      AUTH_DISCOVERY_URL: http://development-authorization-server:5000/.well-known/openid-configuration
-      AUTH_CLIENT_ID: useroffice
-      AUTH_CLIENT_SECRET: useroffice
     depends_on:
       - db
-      - development-authorization-server
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
@@ -39,12 +35,3 @@ services:
       - 5432:5432
     volumes:
       - "./${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/"
-  development-authorization-server:
-    image: dmsc/duo-development-authorization-server:${USER_OFFICE_DEVELOPMENT_AUTHORIZATION_SERVER_TAG}
-    ports:
-      - 5000:5000
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
-      PORT: 5000
