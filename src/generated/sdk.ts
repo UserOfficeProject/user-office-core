@@ -229,6 +229,12 @@ export type CreateCallInput = {
   title?: InputMaybe<Scalars['String']>;
 };
 
+export type CreatePredefinedMessageInput = {
+  key: Scalars['String'];
+  message: Scalars['String'];
+  title: Scalars['String'];
+};
+
 export type CreateProposalStatusInput = {
   description: Scalars['String'];
   name: Scalars['String'];
@@ -281,6 +287,10 @@ export type DeleteApiAccessTokenInput = {
   accessTokenId: Scalars['String'];
 };
 
+export type DeletePredefinedMessageInput = {
+  id: Scalars['Int'];
+};
+
 export type DeleteProposalWorkflowStatusInput = {
   proposalStatusId: Scalars['Int'];
   proposalWorkflowId: Scalars['Int'];
@@ -325,6 +335,9 @@ export enum Event {
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
   EMAIL_INVITE = 'EMAIL_INVITE',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
+  PREDEFINED_MESSAGE_CREATED = 'PREDEFINED_MESSAGE_CREATED',
+  PREDEFINED_MESSAGE_DELETED = 'PREDEFINED_MESSAGE_DELETED',
+  PREDEFINED_MESSAGE_UPDATED = 'PREDEFINED_MESSAGE_UPDATED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
   PROPOSAL_ALL_SEP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_SEP_REVIEWERS_SELECTED',
   PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
@@ -653,6 +666,7 @@ export type Mutation = {
   createInstitution: InstitutionResponseWrap;
   createInstrument: InstrumentResponseWrap;
   createPdfTemplate: PdfTemplateResponseWrap;
+  createPredefinedMessage: PredefinedMessageResponseWrap;
   createProposal: ProposalResponseWrap;
   createProposalStatus: ProposalStatusResponseWrap;
   createProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -677,6 +691,7 @@ export type Mutation = {
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deletePdfTemplate: PdfTemplateResponseWrap;
+  deletePredefinedMessage: PredefinedMessageResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteProposalStatus: ProposalStatusResponseWrap;
   deleteProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -738,6 +753,7 @@ export type Mutation = {
   updateInstrument: InstrumentResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
   updatePdfTemplate: PdfTemplateResponseWrap;
+  updatePredefinedMessage: PredefinedMessageResponseWrap;
   updateProposal: ProposalResponseWrap;
   updateProposalStatus: ProposalStatusResponseWrap;
   updateProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -946,6 +962,11 @@ export type MutationCreatePdfTemplateArgs = {
 };
 
 
+export type MutationCreatePredefinedMessageArgs = {
+  createPredefinedMessageInput: CreatePredefinedMessageInput;
+};
+
+
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int'];
 };
@@ -1106,6 +1127,11 @@ export type MutationDeleteInstrumentArgs = {
 
 export type MutationDeletePdfTemplateArgs = {
   pdfTemplateId: Scalars['Int'];
+};
+
+
+export type MutationDeletePredefinedMessageArgs = {
+  deletePredefinedMessageInput: DeletePredefinedMessageInput;
 };
 
 
@@ -1457,6 +1483,11 @@ export type MutationUpdatePdfTemplateArgs = {
 };
 
 
+export type MutationUpdatePredefinedMessageArgs = {
+  updatePredefinedMessageInput: UpdatePredefinedMessageInput;
+};
+
+
 export type MutationUpdateProposalArgs = {
   abstract?: InputMaybe<Scalars['String']>;
   proposalPk: Scalars['Int'];
@@ -1710,6 +1741,24 @@ export type PermissionsWithAccessToken = {
   accessToken: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+};
+
+export type PredefinedMessage = {
+  dateModified: Scalars['DateTime'];
+  id: Scalars['Int'];
+  lastModifiedBy: Scalars['Int'];
+  message: Scalars['String'];
+  modifiedBy: BasicUserDetails;
+  title: Scalars['String'];
+};
+
+export type PredefinedMessageResponseWrap = {
+  predefinedMessage: Maybe<PredefinedMessage>;
+  rejection: Maybe<Rejection>;
+};
+
+export type PredefinedMessagesFilter = {
+  key?: InputMaybe<Scalars['String']>;
 };
 
 export type PrepareDbResponseWrap = {
@@ -2017,6 +2066,8 @@ export type Query = {
   nationalities: Maybe<Array<Entry>>;
   pdfTemplate: Maybe<PdfTemplate>;
   pdfTemplates: Maybe<Array<PdfTemplate>>;
+  predefinedMessage: Maybe<PredefinedMessage>;
+  predefinedMessages: Array<PredefinedMessage>;
   previousCollaborators: Maybe<UserQueryResult>;
   proposal: Maybe<Proposal>;
   proposalById: Maybe<Proposal>;
@@ -2226,6 +2277,16 @@ export type QueryPdfTemplateArgs = {
 
 export type QueryPdfTemplatesArgs = {
   filter?: InputMaybe<PdfTemplatesFilter>;
+};
+
+
+export type QueryPredefinedMessageArgs = {
+  predefinedMessageId: Scalars['Int'];
+};
+
+
+export type QueryPredefinedMessagesArgs = {
+  filter?: InputMaybe<PredefinedMessagesFilter>;
 };
 
 
@@ -3170,6 +3231,13 @@ export type UpdateFeaturesInput = {
   featureIds: Array<FeatureId>;
 };
 
+export type UpdatePredefinedMessageInput = {
+  id: Scalars['Int'];
+  key: Scalars['String'];
+  message: Scalars['String'];
+  title: Scalars['String'];
+};
+
 export type UpdateProposalStatusInput = {
   description: Scalars['String'];
   id: Scalars['Int'];
@@ -3952,6 +4020,36 @@ export type UpdateInstrumentMutationVariables = Exact<{
 
 
 export type UpdateInstrumentMutation = { updateInstrument: { instrument: { id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+
+export type CreatePredefinedMessageMutationVariables = Exact<{
+  input: CreatePredefinedMessageInput;
+}>;
+
+
+export type CreatePredefinedMessageMutation = { createPredefinedMessage: { predefinedMessage: { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+
+export type DeletePredefinedMessageMutationVariables = Exact<{
+  input: DeletePredefinedMessageInput;
+}>;
+
+
+export type DeletePredefinedMessageMutation = { deletePredefinedMessage: { predefinedMessage: { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+
+export type PredefinedMessageFragment = { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } };
+
+export type GetPredefinedMessagesQueryVariables = Exact<{
+  filter?: InputMaybe<PredefinedMessagesFilter>;
+}>;
+
+
+export type GetPredefinedMessagesQuery = { predefinedMessages: Array<{ id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } }> };
+
+export type UpdatePredefinedMessageMutationVariables = Exact<{
+  input: UpdatePredefinedMessageInput;
+}>;
+
+
+export type UpdatePredefinedMessageMutation = { updatePredefinedMessage: { predefinedMessage: { id: number, title: string, message: string, lastModifiedBy: number, dateModified: any, modifiedBy: { id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type AdministrationProposalMutationVariables = Exact<{
   proposalPk: Scalars['Int'];
@@ -5311,6 +5409,18 @@ export const InstrumentFragmentDoc = gql`
   description
   managerUserId
   scientists {
+    ...basicUserDetails
+  }
+}
+    ${BasicUserDetailsFragmentDoc}`;
+export const PredefinedMessageFragmentDoc = gql`
+    fragment predefinedMessage on PredefinedMessage {
+  id
+  title
+  message
+  lastModifiedBy
+  dateModified
+  modifiedBy {
     ...basicUserDetails
   }
 }
@@ -6913,6 +7023,52 @@ export const UpdateInstrumentDocument = gql`
   }
 }
     ${InstrumentFragmentDoc}
+${RejectionFragmentDoc}`;
+export const CreatePredefinedMessageDocument = gql`
+    mutation createPredefinedMessage($input: CreatePredefinedMessageInput!) {
+  createPredefinedMessage(createPredefinedMessageInput: $input) {
+    predefinedMessage {
+      ...predefinedMessage
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${PredefinedMessageFragmentDoc}
+${RejectionFragmentDoc}`;
+export const DeletePredefinedMessageDocument = gql`
+    mutation deletePredefinedMessage($input: DeletePredefinedMessageInput!) {
+  deletePredefinedMessage(deletePredefinedMessageInput: $input) {
+    predefinedMessage {
+      ...predefinedMessage
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${PredefinedMessageFragmentDoc}
+${RejectionFragmentDoc}`;
+export const GetPredefinedMessagesDocument = gql`
+    query getPredefinedMessages($filter: PredefinedMessagesFilter) {
+  predefinedMessages(filter: $filter) {
+    ...predefinedMessage
+  }
+}
+    ${PredefinedMessageFragmentDoc}`;
+export const UpdatePredefinedMessageDocument = gql`
+    mutation updatePredefinedMessage($input: UpdatePredefinedMessageInput!) {
+  updatePredefinedMessage(updatePredefinedMessageInput: $input) {
+    predefinedMessage {
+      ...predefinedMessage
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${PredefinedMessageFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const AdministrationProposalDocument = gql`
     mutation administrationProposal($proposalPk: Int!, $finalStatus: ProposalEndStatus, $statusId: Int, $commentForUser: String, $commentForManagement: String, $managementTimeAllocation: Int, $managementDecisionSubmitted: Boolean) {
@@ -9503,6 +9659,18 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateInstrument(variables: UpdateInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateInstrumentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateInstrumentMutation>(UpdateInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateInstrument', 'mutation');
+    },
+    createPredefinedMessage(variables: CreatePredefinedMessageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreatePredefinedMessageMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreatePredefinedMessageMutation>(CreatePredefinedMessageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createPredefinedMessage', 'mutation');
+    },
+    deletePredefinedMessage(variables: DeletePredefinedMessageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeletePredefinedMessageMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DeletePredefinedMessageMutation>(DeletePredefinedMessageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deletePredefinedMessage', 'mutation');
+    },
+    getPredefinedMessages(variables?: GetPredefinedMessagesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPredefinedMessagesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetPredefinedMessagesQuery>(GetPredefinedMessagesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPredefinedMessages', 'query');
+    },
+    updatePredefinedMessage(variables: UpdatePredefinedMessageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdatePredefinedMessageMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdatePredefinedMessageMutation>(UpdatePredefinedMessageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updatePredefinedMessage', 'mutation');
     },
     administrationProposal(variables: AdministrationProposalMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AdministrationProposalMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<AdministrationProposalMutation>(AdministrationProposalDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'administrationProposal', 'mutation');

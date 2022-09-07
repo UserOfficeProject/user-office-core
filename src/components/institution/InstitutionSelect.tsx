@@ -29,7 +29,7 @@ const InstitutionSelect = (props: InstitutionSelectProps) => {
       }}
       value={props.value}
       style={{ marginTop: '16px' }}
-    ></Autocomplete>
+    />
   );
 };
 
