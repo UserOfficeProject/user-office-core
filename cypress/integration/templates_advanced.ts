@@ -361,7 +361,7 @@ context('Template tests', () => {
           });
         }
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposal.title)
@@ -464,7 +464,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -616,7 +616,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposal.title)
@@ -701,7 +701,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposal.title)
@@ -770,7 +770,7 @@ context('Template tests', () => {
         }
       });
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposal.title)
