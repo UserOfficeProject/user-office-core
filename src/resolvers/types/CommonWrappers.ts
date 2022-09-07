@@ -15,6 +15,7 @@ import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { PdfTemplate } from './PdfTemplate';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
+import { PredefinedMessage } from './PredefinedMessage';
 import { Proposal } from './Proposal';
 import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
@@ -63,6 +64,13 @@ export class UserResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => User, { nullable: true })
   public user: User;
+}
+
+@ObjectType()
+export class PredefinedMessageResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => PredefinedMessage, { nullable: true })
+  public predefinedMessage: PredefinedMessage;
 }
 
 @ObjectType()
