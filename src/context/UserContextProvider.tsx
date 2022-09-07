@@ -4,27 +4,14 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Role, UserRole, User, SettingsId } from 'generated/sdk';
+import { Role, UserRole, SettingsId, UserJwt } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import clearSession from 'utils/clearSession';
 
 import { SettingsContext } from './SettingsContextProvider';
 
-export type BasicUser = Pick<
-  User,
-  | 'id'
-  | 'email'
-  | 'firstname'
-  | 'lastname'
-  | 'organisation'
-  | 'preferredname'
-  | 'placeholder'
-  | 'created'
-  | 'position'
->;
-
 interface UserContextData {
-  user: BasicUser;
+  user: UserJwt;
   token: string;
   roles: Role[];
   currentRole: UserRole | null;
@@ -56,6 +43,7 @@ const initUserData: UserContextData = {
     email: '',
     firstname: '',
     lastname: '',
+    oidcSub: '',
     organisation: 0,
     created: '',
     placeholder: false,
@@ -177,18 +165,9 @@ const reducer = (
 
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
-  const [cookies, setCookie] = useCookies();
+  const [, setCookie] = useCookies();
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);
-
-  useEffect(() => {
-    if (cookies.token) {
-      dispatch({
-        type: ActionType.SETTOKEN,
-        payload: cookies.token,
-      });
-    }
-  }, [cookies.token]);
 
   useEffect(() => {
     if (state.token) {

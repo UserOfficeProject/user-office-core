@@ -3234,12 +3234,16 @@ export type UserReviewsArgs = {
 };
 
 export type UserJwt = {
+  created: Scalars['String'];
   email: Scalars['String'];
   firstname: Scalars['String'];
   id: Scalars['Int'];
   lastname: Scalars['String'];
   oidcSub: Maybe<Scalars['String']>;
+  organisation: Scalars['Float'];
   placeholder: Scalars['Boolean'];
+  position: Scalars['String'];
+  preferredname: Maybe<Scalars['String']>;
 };
 
 export type UserProposalsFilter = {
