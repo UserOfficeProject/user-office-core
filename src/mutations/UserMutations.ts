@@ -448,12 +448,16 @@ export default class UserMutations {
 
       const uosToken = signToken<AuthJwtPayload>({
         user: {
-          id: user.id,
-          firstname: user.firstname,
-          lastname: user.lastname,
+          created: user.created,
           email: user.email,
+          firstname: user.firstname,
+          id: user.id,
+          lastname: user.lastname,
           oidcSub: user.oidcSub,
+          organisation: user.organisation,
           placeholder: user.placeholder,
+          position: user.position,
+          preferredname: user.preferredname,
         },
         roles,
         currentRole: roles[0],

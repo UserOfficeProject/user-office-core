@@ -99,5 +99,14 @@ export class BasicUserDetails {
 
 export type UserJWT = Pick<
   User,
-  'id' | 'firstname' | 'lastname' | 'email' | 'oidcSub' | 'placeholder'
+  | 'created'
+  | 'email'
+  | 'firstname'
+  | 'id'
+  | 'lastname'
+  | 'oidcSub'
+  | 'organisation'
+  | 'placeholder'
+  | 'position'
+  | 'preferredname'
 >;
