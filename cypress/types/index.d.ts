@@ -1,6 +1,7 @@
 import './admin';
 import './call';
 import './instrument';
+import './predefinedMessage';
 import './proposal';
 import './template';
 import './user';

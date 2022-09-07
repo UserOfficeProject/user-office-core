@@ -11,6 +11,9 @@ import React from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
+import FormikUIPredefinedMessagesTextField, {
+  PredefinedMessageKey,
+} from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
 import { ProposalEndStatus, UserRole } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
@@ -142,7 +145,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <FormikUIPredefinedMessagesTextField
                   name="commentForUser"
                   label="Comment for user"
                   type="text"
@@ -152,12 +155,13 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   autoComplete="off"
                   data-cy="commentForUser"
                   multiline
-                  rows="4"
+                  rows={4}
                   disabled={!isUserOfficer || isSubmitting}
+                  message-key={PredefinedMessageKey.USER}
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <FormikUIPredefinedMessagesTextField
                   name="commentForManagement"
                   label="Comment for management"
                   type="text"
@@ -167,8 +171,9 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   autoComplete="off"
                   data-cy="commentForManagement"
                   multiline
-                  rows="4"
+                  rows={4}
                   disabled={!isUserOfficer || isSubmitting}
+                  message-key={PredefinedMessageKey.MANAGER}
                 />
               </Grid>
               <Grid item xs={12}>

@@ -1,0 +1,10 @@
+mutation createPredefinedMessage($input: CreatePredefinedMessageInput!) {
+  createPredefinedMessage(createPredefinedMessageInput: $input) {
+    predefinedMessage {
+      ...predefinedMessage
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
