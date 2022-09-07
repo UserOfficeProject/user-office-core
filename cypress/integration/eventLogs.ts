@@ -71,17 +71,6 @@ context('Event log tests', () => {
       cy.updateUserDetails({
         ...loggedInUserParsed,
         firstname: newFirstName,
-        lastname: loggedInUserParsed.lastname,
-        user_title: 'Mr.',
-        preferredname: '',
-        gender: 'male',
-        nationality: 1,
-        birthdate: new Date('1990/01/01').toISOString(),
-        organisation: 1,
-        department: 'TEST',
-        position: 'test',
-        email: faker.internet.email(),
-        telephone: '123456789',
       });
 
       cy.login('officer');

@@ -5072,18 +5072,18 @@ export type UpdatePasswordMutation = { updatePassword: { rejection: { reason: st
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['Int'];
   user_title?: InputMaybe<Scalars['String']>;
-  firstname: Scalars['String'];
+  firstname?: InputMaybe<Scalars['String']>;
   middlename?: InputMaybe<Scalars['String']>;
-  lastname: Scalars['String'];
+  lastname?: InputMaybe<Scalars['String']>;
   preferredname?: InputMaybe<Scalars['String']>;
-  gender: Scalars['String'];
-  nationality: Scalars['Int'];
-  birthdate: Scalars['DateTime'];
-  organisation: Scalars['Int'];
-  department: Scalars['String'];
-  position: Scalars['String'];
-  email: Scalars['String'];
-  telephone: Scalars['String'];
+  gender?: InputMaybe<Scalars['String']>;
+  nationality?: InputMaybe<Scalars['Int']>;
+  birthdate?: InputMaybe<Scalars['DateTime']>;
+  organisation?: InputMaybe<Scalars['Int']>;
+  department?: InputMaybe<Scalars['String']>;
+  position?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']>;
+  telephone?: InputMaybe<Scalars['String']>;
   telephone_alt?: InputMaybe<Scalars['String']>;
   otherOrganisation?: InputMaybe<Scalars['String']>;
   organizationCountry?: InputMaybe<Scalars['Int']>;
@@ -9040,7 +9040,7 @@ export const UpdatePasswordDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateUserDocument = gql`
-    mutation updateUser($id: Int!, $user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $preferredname: String, $gender: String!, $nationality: Int!, $birthdate: DateTime!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String, $organizationCountry: Int) {
+    mutation updateUser($id: Int!, $user_title: String, $firstname: String, $middlename: String, $lastname: String, $preferredname: String, $gender: String, $nationality: Int, $birthdate: DateTime, $organisation: Int, $department: String, $position: String, $email: String, $telephone: String, $telephone_alt: String, $otherOrganisation: String, $organizationCountry: Int) {
   updateUser(
     id: $id
     user_title: $user_title
