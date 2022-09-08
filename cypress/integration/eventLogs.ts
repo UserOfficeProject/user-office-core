@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import { FeatureId } from '../../src/generated/sdk';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
-import { UserJwt } from './../../src/generated/sdk';
+import { TestUserId } from './../support/user';
 
 context('Event log tests', () => {
   beforeEach(() => {
@@ -47,11 +47,13 @@ context('Event log tests', () => {
   });
 
   describe('User event logs', () => {
+    const testUserId: TestUserId = 'user1';
+    const user = initialDBData.users[testUserId];
     beforeEach(function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
       }
-      cy.login('user1');
+      cy.login(testUserId);
     });
 
     it('If user updates his info, officer should be able to see the event logs for that update', () => {
@@ -60,17 +62,21 @@ context('Event log tests', () => {
       const updateProfileDate = DateTime.now().toFormat(
         initialDBData.getFormats().dateFormat + ' HH'
       );
-      const loggedInUser = window.localStorage.getItem('user');
-
-      if (!loggedInUser) {
-        throw new Error('No logged in user');
-      }
-
-      const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       cy.updateUserDetails({
-        ...loggedInUserParsed,
+        id: user.id,
         firstname: newFirstName,
+        user_title: 'Dr.',
+        lastname: 'Doe',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('2000/01/01'),
+        organisation: 1,
+        department: 'IT',
+        position: 'Dirrector',
+        email: faker.internet.email(),
+        telephone: '555-123-4567',
+        organizationCountry: 1,
       });
 
       cy.login('officer');
@@ -78,9 +84,9 @@ context('Event log tests', () => {
 
       cy.contains('People').click();
 
-      cy.get('[aria-label="Search"]').type(loggedInUserParsed.lastname);
+      cy.get('[aria-label="Search"]').type(user.lastName);
 
-      cy.contains(loggedInUserParsed.lastname)
+      cy.contains(user.firstName)
         .parent()
         .find('button[aria-label="Edit user"]')
         .click();
