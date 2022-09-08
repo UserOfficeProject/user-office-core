@@ -47,13 +47,15 @@ export class SMTPMailService extends MailService {
           relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
         },
       },
-      getPath: (type, template) => {
-        return path.join(
-          process.env.EMAIL_TEMPLATE_PATH || '',
-          `${template}.${type}`
-        );
-      },
+      getPath: this.getEmailTemplatePath,
     });
+  }
+
+  private getEmailTemplatePath(type: string, template: string): string {
+    return path.join(
+      process.env.EMAIL_TEMPLATE_PATH || '',
+      `${template}.${type}`
+    );
   }
 
   async sendMail(options: EmailSettings): Promise<{
@@ -71,10 +73,8 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    const template = path.join(
-      process.env.EMAIL_TEMPLATE_PATH || '',
-      `${options.content.template_id}.html.pug`
-    );
+    const template =
+      this.getEmailTemplatePath('html', options.content.template_id) + '.pug';
 
     if (
       !(await (this._email as any).templateExists(template)) &&
