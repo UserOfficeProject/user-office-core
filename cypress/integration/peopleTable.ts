@@ -9,12 +9,15 @@ context('PageTable component tests', () => {
   const title = faker.random.words(3);
   const abstract = faker.random.words(8);
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
-  });
   beforeEach(function () {
-    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
+    const isUserManagementEnabled = featureFlags
+      .getEnabledFeatures()
+      .get(FeatureId.USER_MANAGEMENT);
+
+    if (!isUserManagementEnabled) {
+      // false or undefined
       this.skip();
     }
   });
