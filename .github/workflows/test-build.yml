@@ -327,7 +327,7 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          npm run e2e:after:dev
+          npm run e2e:after:dev:stfc
 
       - name: Upload cypres screenshots
         if: failure()
