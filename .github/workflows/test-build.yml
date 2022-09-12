@@ -23,21 +23,35 @@ jobs:
             local branch=$1
             local found=0
             shift
-            for endpoint in $@; do
-              local json=$(curl -s $endpoint)
-              local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
-              # to track what we found
-              >&2 echo "$endpoint -> $branch_found"
-              if [[ $branch_found != "" ]]; then
-                found=$((found += 1))
-              fi
-            done
+
+            local dockerhub_endpoint=$1
+            local dockerhub_json=$(curl -s $dockerhub_endpoint)
+            local dockerhub_branch_found=$(echo $dockerhub_json | jq -c ".results[] | select(.name==\"$branch\") | .name")
+            # to track what we found
+            >&2 echo "$dockerhub_endpoint -> $dockerhub_branch_found"
+            if [[ $dockerhub_branch_found != "" ]]; then
+              found=$((found += 1))
+            fi
+
+            local github_endpoint=$2
+            local github_json=$(curl -s $github_endpoint)
+            local github_branch_found=$(echo $github_json | jq -c ".[] | select(.name==\"$branch\") | .name")
+            # to track what we found
+            >&2 echo "$github_endpoint -> $github_branch_found"
+            if [[ $github_branch_found != "" ]]; then
+              found=$((found += 1))
+            fi
+
             echo $found
           }
 
+          BE_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v2/repositories/dmsc/duo-backend/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-backend/branches?per_page=100
+          )
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+            https://registry.hub.docker.com/v2/repositories/dmsc/duo-factory/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
           FACTORY_TAG=develop
@@ -187,12 +201,16 @@ jobs:
       matrix:
         pattern:
           [
-            'cypress/integration/[a-e]*.ts',
-            'cypress/integration/[f-i]*.ts',
-            'cypress/integration/[j-p]*.ts',
-            'cypress/integration/[r-s]*.ts',
-            'cypress/integration/[t-z]*.ts',
-            'cypress/integration/[A-Z]*.ts',
+            "cypress/integration/[a-e]*.ts",
+            "cypress/integration/[f-i]*.ts",
+            "cypress/integration/[j-o]*.ts",
+            "cypress/integration/p[a-m]*.ts",
+            "cypress/integration/p[n-z]*.ts",
+            "cypress/integration/[r-s]*.ts",
+            "cypress/integration/templates_basic.ts",
+            "cypress/integration/templates_advanced.ts",
+            "cypress/integration/[u-z]*.ts",
+            "cypress/integration/[A-Z]*.ts",
           ]
 
     steps:
@@ -282,6 +300,52 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run e2e:after:dev
+
+          export USER_OFFICE_FACTORY_TAG=${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
+
+          export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
+          export BUILD_TAG=${{ github.sha }}
+
+          export CYPRES_SPEC_PATTERN=${{ matrix.pattern }}
+
+          docker-compose --project-directory $PWD \
+            -f user-office-backend/docker-compose.e2e.yml \
+            -f user-office-factory/docker-compose.e2e.yml \
+            -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
+            -f docker-compose.all.yml \
+            up --exit-code-from cypress
+
+      - name: Run docker-compose stfc
+        env:
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
+          export USER_OFFICE_BACKEND_DIR=user-office-backend
+          export USER_OFFICE_BACKEND=http://backend:4000/graphql
+          export USER_OFFICE_ENDPOINT=$USER_OFFICE_BACKEND
+
+          export USER_OFFICE_FACTORY_TAG=${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
+
+          export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
+          export BUILD_TAG=${{ github.sha }}
+
+          export CYPRES_SPEC_PATTERN=${{ matrix.pattern }}
+
+          docker-compose --project-directory $PWD \
+            -f "$REPO_DIR_NAME/docker-compose-stfc.e2e.yml" \
+            up -d mockServer
+
+            sleep 10
+
+          docker-compose --project-directory $PWD \
+            -f "$REPO_DIR_NAME/docker-compose-stfc.e2e.yml" \
+            up --exit-code-from cypress
 
       - name: Upload cypres screenshots
         if: failure()

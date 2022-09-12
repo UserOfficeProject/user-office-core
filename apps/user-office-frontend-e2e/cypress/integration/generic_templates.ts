@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+
 import {
-  AllocationTimeUnits,
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
@@ -8,6 +8,7 @@ import {
 import { DateTime } from 'luxon';
 
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 function twoFakes(numberWords: number) {
   return [faker.lorem.words(numberWords), faker.lorem.words(numberWords)];
@@ -28,33 +29,13 @@ context('GenericTemplates tests', () => {
     description: faker.random.words(5),
   };
 
-  const currentDayStart = DateTime.now().startOf('day');
-
-  const updatedCall = {
-    id: initialDBData.call.id,
-    shortCode: faker.random.alphaNumeric(15),
-    startCall: DateTime.fromJSDate(faker.date.past()),
-    endCall: DateTime.fromJSDate(faker.date.future()),
-    startReview: currentDayStart,
-    endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
-    startNotify: currentDayStart,
-    endNotify: currentDayStart,
-    startCycle: currentDayStart,
-    endCycle: currentDayStart,
-    templateName: initialDBData.template.name,
-    allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
-  };
-
   let createdTemplateId: number;
   let createdGenericTemplateId: number;
   let workflowId: number;
   let createdQuestion1Id: string;
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -307,6 +288,7 @@ context('GenericTemplates tests', () => {
 
     it('Should have different Question lables for different tables', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
@@ -336,6 +318,7 @@ context('GenericTemplates tests', () => {
 
     it('Should be able to create proposal with genericTemplate', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
@@ -407,11 +390,12 @@ context('GenericTemplates tests', () => {
 
     it('Should be able to clone proposal with GenericTemplates', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: updatedCall.id }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,
@@ -471,11 +455,12 @@ context('GenericTemplates tests', () => {
 
     it('User should not be able to submit proposal with unfinished genericTemplate', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: updatedCall.id });
+      cy.createProposal({ callId: initialDBData.call.id });
       cy.login('user');
       cy.visit('/');
 
@@ -532,11 +517,12 @@ context('GenericTemplates tests', () => {
 
     it('Officer should able to delete proposal with genericTemplate', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: updatedCall.id }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,

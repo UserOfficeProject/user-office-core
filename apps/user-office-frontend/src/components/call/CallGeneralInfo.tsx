@@ -41,6 +41,7 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 const CallGeneralInfo: React.FC<{
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
+  pdfTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
@@ -49,6 +50,7 @@ const CallGeneralInfo: React.FC<{
   proposalWorkflows,
   templates,
   esiTemplates,
+  pdfTemplates,
   loadingTemplates,
 }) => {
   const { featuresMap } = useContext(FeatureContext);
@@ -64,6 +66,12 @@ const CallGeneralInfo: React.FC<{
 
   const esiTemplateOptions =
     esiTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const pdfTemplateOptions =
+    pdfTemplates?.map((template) => ({
       text: template.name,
       value: template.templateId,
     })) || [];
@@ -148,7 +156,7 @@ const CallGeneralInfo: React.FC<{
     <>
       <Field
         name="shortCode"
-        label="Short Code"
+        label="Short Code (public)"
         id="short-code-input"
         type="text"
         component={TextField}
@@ -297,6 +305,14 @@ const CallGeneralInfo: React.FC<{
           required
         />
       )}
+      <FormikUIAutocomplete
+        name="pdfTemplateId"
+        label="PDF template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={pdfTemplateOptions}
+        InputProps={{ 'data-cy': 'call-pdf-template' }}
+      />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
         label="Proposal workflow"

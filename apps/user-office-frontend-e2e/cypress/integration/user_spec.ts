@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 
+import { FeatureId } from '../../src/generated/sdk';
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('User tests', () => {
@@ -22,7 +24,14 @@ context('User tests', () => {
   const telephone = faker.phone.phoneNumber('0##########');
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+  });
+
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
 
     cy.visit('/SignUp?code=WRMVXa');
   });

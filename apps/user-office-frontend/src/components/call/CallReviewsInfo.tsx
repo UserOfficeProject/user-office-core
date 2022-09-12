@@ -6,15 +6,25 @@ import { TextField } from 'formik-mui';
 import { DatePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { SettingsContext } from 'context/SettingsContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import {
   CreateCallMutationVariables,
   SettingsId,
   UpdateCallMutationVariables,
+  UserRole,
 } from 'generated/sdk';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
 
 const CallReviewAndNotification: React.FC = () => {
   const theme = useTheme();
+  const { currentRole } = useContext(UserContext);
+  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+  });
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
   const mask = dateFormat?.replace(/[a-zA-Z]/g, '_');
@@ -22,6 +32,12 @@ const CallReviewAndNotification: React.FC = () => {
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
   const { startReview, startSEPReview } = formik.values;
+
+  const sepOptions =
+    allActiveSeps?.map((sep) => ({
+      text: sep.code,
+      value: sep.id,
+    })) || [];
 
   return (
     <>
@@ -94,6 +110,15 @@ const CallReviewAndNotification: React.FC = () => {
           desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
       </LocalizationProvider>
+      <FormikUIAutocomplete
+        name="seps"
+        label="Call SEPs"
+        multiple
+        loading={loadingSEPs}
+        noOptionsText="No SEPs"
+        data-cy="call-seps"
+        items={sepOptions}
+      />
       <Field
         name="surveyComment"
         label="Survey Comment"

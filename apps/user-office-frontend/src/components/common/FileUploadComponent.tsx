@@ -26,7 +26,7 @@ import React, { ChangeEvent, useState } from 'react';
 
 import { Maybe } from 'generated/sdk';
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
-import { useFileMetadata } from 'hooks/file/useFileMetadata';
+import { useFilesMetadata } from 'hooks/file/useFilesMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -371,7 +371,7 @@ export function FileUploadComponent(props: {
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
 }) {
   const fileIds = props.value.map((fileItem) => fileItem.id);
-  const { files, setFiles } = useFileMetadata(fileIds);
+  const { files, setFiles } = useFilesMetadata({ fileIds });
 
   const classes = useStyles();
 
