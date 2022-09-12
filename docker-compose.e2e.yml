@@ -7,7 +7,6 @@ services:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
       tokenLife: 7d
-      protocol: http
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
