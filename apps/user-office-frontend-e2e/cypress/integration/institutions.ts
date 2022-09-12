@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 
-import { FeatureId } from '../../src/generated/sdk';
 import featureFlags from '../support/featureFlags';
 
 context('Institution tests', () => {

@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
-import { FeatureId } from '../../src/generated/sdk';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
