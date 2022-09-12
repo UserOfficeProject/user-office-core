@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
@@ -5,6 +6,10 @@ import {
   ApolloServerPluginUsageReporting,
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
+import type {
+  ApolloServerPlugin,
+  BaseContext,
+} from 'apollo-server-plugin-base';
 import { Express } from 'express';
 import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
@@ -42,6 +47,18 @@ const apolloServer = async (app: Express) => {
     }
   );
 
+  const errorLoggingPlugin: ApolloServerPlugin<BaseContext> = {
+    async requestDidStart() {
+      return {
+        async didEncounterErrors({ errors }) {
+          logger.logInfo('GraphQL response contained error(s)', {
+            errors,
+          });
+        },
+      };
+    },
+  };
+
   const plugins = [
     ApolloServerPluginInlineTraceDisabled(),
     // Explicitly disable playground in prod
@@ -50,6 +67,7 @@ const apolloServer = async (app: Express) => {
       : ApolloServerPluginLandingPageGraphQLPlayground({
           settings: { 'schema.polling.enable': false },
         }),
+    errorLoggingPlugin,
   ];
   /*
   Only use the usage reporting plugin if apollo studio connection settings are

@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -12,6 +13,7 @@ import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
+  //test for null
   if (event.isRejection) {
     return;
   }
@@ -22,6 +24,9 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   );
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
+  );
+  const InstrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
   );
 
   switch (event.type) {
@@ -34,17 +39,32 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
       const call = await callDataSource.getCall(event.proposal.callId);
 
-      const isIsis = call?.shortCode?.toLowerCase().includes('isis');
+      const instruments = await InstrumentDataSource.getInstrumentsByCallId([
+        event.proposal.callId,
+      ]);
+
+      if (instruments.length == 0) {
+        logger.logWarn(
+          'Could not send email beacause no instrument was assigned to this call.',
+          { event, call }
+        );
+
+        return;
+      }
+
+      const instrument = instruments[0].name;
+
+      let piEmailTemplate: string;
+
+      const isIsis = instrument === 'ISIS';
 
       const isRapidAccess =
         isIsis && call?.shortCode?.toLowerCase().includes('rapid');
 
-      let piEmailTemplate: string;
-
-      if (isRapidAccess) {
-        piEmailTemplate = 'isis-rapid-proposal-submitted-pi';
-      } else if (isIsis) {
+      if (isIsis) {
         piEmailTemplate = 'isis-proposal-submitted-pi';
+      } else if (isRapidAccess) {
+        piEmailTemplate = 'isis-rapid-proposal-submitted-pi';
       } else {
         piEmailTemplate = 'clf-proposal-submitted-pi';
       }
@@ -111,6 +131,48 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
       return;
     }
+
+    case Event.CALL_CREATED: {
+      if (event?.call) {
+        if (!(process.env && process.env.FBS_EMAIL)) {
+          logger.logError(
+            'Could not send email(s) on call creation, environmental variable (FBS_EMAIL) not found',
+            {}
+          );
+
+          return;
+        }
+        const templateID = 'call-created-email';
+        const notificationEmailAddress = process.env.FBS_EMAIL;
+        const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
+          shortCode,
+          startCall,
+          endCall,
+        }))(event.call);
+        const emailSettings = callCreationEmail<typeof eventCallPartial>(
+          eventCallPartial,
+          templateID,
+          notificationEmailAddress
+        );
+
+        mailService
+          .sendMail(emailSettings)
+          .then((res: any) => {
+            logger.logInfo('Emails sent on call creation:', {
+              result: res,
+              event,
+            });
+          })
+          .catch((err: string) => {
+            logger.logError('Could not send email(s) on call creation:', {
+              error: err,
+              event,
+            });
+          });
+      }
+
+      return;
+    }
   }
 }
 
@@ -173,3 +235,25 @@ const uoRapidSubmissionEmail = (
   },
   recipients: [{ address: uoAddress }],
 });
+
+const callCreationEmail = function createNotificationEmail<T>(
+  notificationInput: T,
+  templateID: string,
+  notificationEmailAddress: string
+): EmailSettings {
+  const emailSettings: EmailSettings = {
+    content: {
+      template_id: templateID,
+    },
+    substitution_data: {
+      ...notificationInput,
+    },
+    recipients: [
+      {
+        address: notificationEmailAddress,
+      },
+    ],
+  };
+
+  return emailSettings;
+};

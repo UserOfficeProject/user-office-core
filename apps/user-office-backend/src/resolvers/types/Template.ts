@@ -15,6 +15,7 @@ import {
   Template as TemplateOrigin,
   TemplateGroupId,
 } from '../../models/Template';
+import { PdfTemplate } from './PdfTemplate';
 import { Question } from './Question';
 import { TemplateGroup } from './TemplateGroup';
 import { TemplateStep } from './TemplateStep';
@@ -88,5 +89,20 @@ export class TemplateResolver {
       context.user,
       template.templateId
     );
+  }
+
+  @FieldResolver(() => PdfTemplate, { nullable: true })
+  async pdfTemplate(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<PdfTemplate | null> {
+    const templates = await context.queries.pdfTemplate.getPdfTemplates(
+      context.user,
+      {
+        filter: { templateIds: [template.templateId] },
+      }
+    );
+
+    return templates?.length ? templates[0] : null;
   }
 }
