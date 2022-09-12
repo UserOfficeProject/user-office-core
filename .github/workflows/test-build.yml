@@ -318,7 +318,7 @@ jobs:
           EMAIL_TEMPLATE_PATH: /config/emails/
           EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
           EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
-          EXTERNAL_AUTH_SERVICE_URL: http://mockServer:1080/ws/UserOfficeWebService?wsdl
+          EXTERNAL_AUTH_SERVICE_URL: http://localhost:1080/ws/UserOfficeWebService?wsdl
           ANTIVIRUS_HOST: clam-antivirus
           ANTIVIRUS_PORT: 3310
           ISIS_UO_EMAIL: isisuo@stfc.ac.uk
