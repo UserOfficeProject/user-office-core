@@ -1,7 +1,8 @@
 import {
   CreatePredefinedMessageInput,
   CreatePredefinedMessageMutation,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+
 import { getE2EApi } from './utils';
 
 const createPredefinedMessage = (

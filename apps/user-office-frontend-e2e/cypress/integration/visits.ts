@@ -1,8 +1,10 @@
 import { faker } from '@faker-js/faker';
-import { TemplateGroupId } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  TemplateGroupId,
+} from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
-import { FeatureId, TemplateGroupId } from '../../src/generated/sdk';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 

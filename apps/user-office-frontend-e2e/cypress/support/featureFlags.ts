@@ -1,4 +1,4 @@
-import { Feature, FeatureId } from '../../src/generated/sdk';
+import { FeatureId, Feature } from '@user-office-software-libs/shared-types';
 
 export default {
   getEnabledFeatures: () => {

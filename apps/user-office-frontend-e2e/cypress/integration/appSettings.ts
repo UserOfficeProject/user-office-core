@@ -1,4 +1,8 @@
-import { FeatureId, ReviewerFilter } from '../../src/generated/sdk';
+import {
+  FeatureId,
+  ReviewerFilter,
+} from '@user-office-software-libs/shared-types';
+
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 

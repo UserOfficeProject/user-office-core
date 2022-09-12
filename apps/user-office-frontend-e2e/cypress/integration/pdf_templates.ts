@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
-
-import { TemplateGroupId } from '../../src/generated/sdk';
+import { TemplateGroupId } from '@user-office-software-libs/shared-types';
 
 context('PDF template tests', () => {
   const templateName = faker.lorem.words(3);
