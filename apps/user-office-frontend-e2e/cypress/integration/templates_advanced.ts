@@ -1,12 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { DateTime } from 'luxon';
-
 import {
+  TemplateCategoryId,
   DataType,
   DependenciesLogicOperator,
   EvaluatorOperator,
-  TemplateCategoryId,
-} from '../../src/generated/sdk';
+} from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
+
 import initialDBData from '../support/initialDBData';
 
 context('Template tests', () => {
