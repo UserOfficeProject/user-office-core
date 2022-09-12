@@ -1,0 +1,54 @@
+version: "3.1"
+services:
+  clam-antivirus:
+    image: clamav/clamav:0.104
+    ports:
+      - "3310:3310"
+
+  db:
+    image: postgres:11-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: duopassword
+      POSTGRES_USER: duouser
+      POSTGRES_DB: duo
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db_patches/:/docker-entrypoint-initdb.d/
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+
+  factory:
+    image: dmsc/duo-factory:${USER_OFFICE_FACTORY_TAG}
+    depends_on:
+      - db
+    environment:
+      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      EXTERNAL_AUTH_TOKEN: abc
+      NODE_ENV: development
+      DATABASE_CONNECTION_STRING: postgres://duouser:duopassword@db:5432/duo
+      UO_FEATURE_ALLOW_NO_SANDBOX: 1
+      HEADER_LOGO_PATH: /config/logos/STFC-Logo.png
+    ports:
+      - "4500:4500"
+    cap_add:
+      - SYS_ADMIN
+ 
+  mockServer:
+    image: mockserver/mockserver:5.13.0
+    command: -logLevel ERROR -serverPort 1080
+    ports:
+      - 1080:1080
+  
+  mockserver-client:
+    image: "dmsc/stfc-mockserver-client:master"
+    command: sh -c "sleep 5 && node src/mockserver.js"
+    depends_on:
+      - mockServer
