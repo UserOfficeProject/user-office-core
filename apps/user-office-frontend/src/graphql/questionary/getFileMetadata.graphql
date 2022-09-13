@@ -1,9 +1,5 @@
-query getFileMetadata($fileIds: [String!]!) {
-  fileMetadata(fileIds: $fileIds) {
-    fileId
-    originalFileName
-    mimeType
-    sizeInBytes
-    createdDate
+query getFileMetadata($fileId: String!) {
+  fileMetadata(fileId: $fileId) {
+    ...fileMetadata
   }
 }

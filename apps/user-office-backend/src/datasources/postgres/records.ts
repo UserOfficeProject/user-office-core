@@ -1,3 +1,5 @@
+import { PdfTemplateRecord } from 'knex/types/tables';
+
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -10,6 +12,8 @@ import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
+import { PdfTemplate } from '../../models/PdfTemplate';
+import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
@@ -47,6 +51,21 @@ import {
 } from '../../resolvers/types/ProposalBooking';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
+
+// Adds types to datasources: https://knexjs.org/guide/#typescript
+declare module 'knex/types/tables' {
+  export interface PdfTemplateRecord {
+    readonly pdf_template_id: number;
+    readonly template_id: number;
+    readonly template_data: string;
+    readonly creator_id: number;
+    readonly created_at: Date;
+  }
+
+  interface Tables {
+    pdf_templates: PdfTemplateRecord;
+  }
+}
 
 // Interfaces corresponding exactly to database tables
 
@@ -289,6 +308,7 @@ export interface CallRecord {
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly title: string;
   readonly description: string;
+  readonly pdf_template_id: number;
   readonly is_active: boolean;
 }
 
@@ -316,6 +336,15 @@ export interface UnitRecord {
   readonly symbol: string;
   readonly si_conversion_formula: string;
 }
+
+export interface PredefinedMessageRecord {
+  readonly predefined_message_id: number;
+  readonly title: string;
+  readonly message: string;
+  readonly date_modified: Date;
+  readonly last_modified_by: number;
+}
+
 export interface CountryRecord {
   readonly country_id: number;
   readonly country: string;
@@ -847,6 +876,7 @@ export const createCallObject = (call: CallRecord) => {
     call.allocation_time_unit,
     call.title,
     call.description,
+    call.pdf_template_id,
     call.is_active
   );
 };
@@ -1087,5 +1117,26 @@ export const createUnitObject = (unit: UnitRecord) =>
     unit.si_conversion_formula
   );
 
+export const createPredefinedMessageObject = (
+  predefinedMessage: PredefinedMessageRecord
+) =>
+  new PredefinedMessage(
+    predefinedMessage.predefined_message_id,
+    predefinedMessage.title,
+    predefinedMessage.message,
+    predefinedMessage.date_modified,
+    predefinedMessage.last_modified_by
+  );
+
 export const createQuantityObject = (quantity: QuantityRecord) =>
   new Quantity(quantity.quantity_id);
+
+export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
+  return new PdfTemplate(
+    pdfTemplate.pdf_template_id,
+    pdfTemplate.template_id,
+    pdfTemplate.template_data,
+    pdfTemplate.creator_id,
+    pdfTemplate.created_at
+  );
+};

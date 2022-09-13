@@ -2,13 +2,14 @@ import { Ctx, Query, Resolver, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { FileMetadata } from '../types/FileMetaData';
+
 @Resolver()
 export class FileMetadataQuery {
-  @Query(() => [FileMetadata], { nullable: true })
+  @Query(() => FileMetadata, { nullable: true })
   fileMetadata(
-    @Arg('fileIds', () => [String]) fileIds: string[],
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('fileId', () => String) fileId: string
   ) {
-    return context.queries.file.getFileMetadata(fileIds);
+    return context.queries.file.getFileMetadata(fileId);
   }
 }

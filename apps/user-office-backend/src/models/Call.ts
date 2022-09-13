@@ -26,6 +26,7 @@ export class Call {
     public allocationTimeUnit: AllocationTimeUnits,
     public title: string,
     public description: string,
+    public pdfTemplateId: number | undefined,
     public isActive: boolean
   ) {}
 }

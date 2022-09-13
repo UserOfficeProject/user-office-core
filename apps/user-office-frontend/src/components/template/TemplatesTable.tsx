@@ -198,9 +198,10 @@ const TemplatesTable = ({
     }
   };
 
-  const editTemplate = (templateId: number) => {
-    history.push(`/QuestionaryEditor/${templateId}`);
-  };
+  const editTemplate = (templateId: number) =>
+    templateGroup === TemplateGroupId.PDF_TEMPLATE
+      ? history.push(`/PdfTemplateEditor/${templateId}`)
+      : history.push(`/QuestionaryEditor/${templateId}`);
 
   const customActions = actions || [];
   const EditIconComponent = () => <Edit />;

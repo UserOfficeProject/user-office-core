@@ -1,15 +1,17 @@
 import { faker } from '@faker-js/faker';
 import {
-  AllocationTimeUnits,
+  FeatureId,
   TechnicalReviewStatus,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
-import { DateTime } from 'luxon';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -132,26 +134,6 @@ context('Settings tests', () => {
     let createdWorkflowId: number;
     let prevProposalStatusId: number;
     let createdEsiTemplateId: number;
-
-    const currentDayStart = DateTime.now().startOf('day');
-
-    const updatedCall = {
-      shortCode: faker.random.alphaNumeric(15),
-      startCall: faker.date.past().toISOString().slice(0, 10),
-      endCall: faker.date.future().toISOString().slice(0, 10),
-      startReview: currentDayStart,
-      endReview: currentDayStart,
-      startSEPReview: currentDayStart,
-      endSEPReview: currentDayStart,
-      startNotify: currentDayStart,
-      endNotify: currentDayStart,
-      startCycle: currentDayStart,
-      endCycle: currentDayStart,
-      allocationTimeUnit: AllocationTimeUnits.DAY,
-      cycleComment: faker.lorem.word(10),
-      surveyComment: faker.lorem.word(10),
-      templateId: initialDBData.template.id,
-    };
 
     const addMultipleStatusesToProposalWorkflowWithChangingEvents = () => {
       cy.addProposalWorkflowStatus({
@@ -299,6 +281,7 @@ context('Settings tests', () => {
                 ...updatedCall,
                 proposalWorkflowId: workflow.id,
                 esiTemplateId: createdEsiTemplateId,
+                seps: [initialDBData.sep.id],
               });
             }
           });
@@ -503,7 +486,10 @@ context('Settings tests', () => {
       cy.contains('PROPOSAL_SUBMITTED & PROPOSAL_FEASIBLE');
     });
 
-    it('Proposal should follow the selected workflow', () => {
+    it('Proposal should follow the selected workflow', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
@@ -645,7 +631,10 @@ context('Settings tests', () => {
       cy.contains('SEP_REVIEW');
     });
 
-    it('Proposal status should update immediately after all SEP reviews submitted', () => {
+    it('Proposal status should update immediately after all SEP reviews submitted', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
@@ -887,7 +876,10 @@ context('Settings tests', () => {
       ).should('have.length', 2);
     });
 
-    it('Proposal should follow multi-column workflow', () => {
+    it('Proposal should follow multi-column workflow', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       const firstProposalTitle = faker.random.words(2);
       const firstProposalAbstract = faker.random.words(5);
       const secondProposalTitle = faker.random.words(2);

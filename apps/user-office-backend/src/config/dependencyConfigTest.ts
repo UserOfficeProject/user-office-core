@@ -10,6 +10,7 @@ import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSourc
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
 import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTemplateDataSource';
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
+import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
@@ -23,6 +24,7 @@ import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
@@ -42,6 +44,7 @@ mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);
 mapClass(Tokens.FileDataSource, FileDataSourceMock);
 mapClass(Tokens.GenericTemplateDataSource, GenericTemplateDataSourceMock);
 mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
+mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);
 mapClass(Tokens.ProposalSettingsDataSource, ProposalSettingsDataSourceMock);
@@ -57,6 +60,10 @@ mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
+mapClass(
+  Tokens.PredefinedMessageDataSource,
+  PostgresPredefinedMessageDataSource
+);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 

@@ -106,6 +106,11 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
       title: '#proposals',
       field: 'proposalCount',
     },
+    {
+      title: '#seps',
+      field: 'seps.length',
+      emptyValue: '-',
+    },
   ];
 
   const assignInstrumentsToCall = (

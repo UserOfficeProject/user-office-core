@@ -6,7 +6,10 @@ import { Call } from '../types/Call';
 @Resolver()
 export class CallQuery {
   @Query(() => Call, { nullable: true })
-  call(@Arg('id', () => Int) id: number, @Ctx() context: ResolverContext) {
-    return context.queries.call.get(context.user, id);
+  call(
+    @Arg('callId', () => Int) callId: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.call.get(context.user, callId);
   }
 }

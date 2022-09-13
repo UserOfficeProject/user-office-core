@@ -6,8 +6,11 @@ import { User } from '../types/User';
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  user(@Arg('id', () => Int) id: number, @Ctx() context: ResolverContext) {
-    return context.queries.user.get(context.user, id);
+  user(
+    @Arg('userId', () => Int) userId: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.user.get(context.user, userId);
   }
 
   @Query(() => User, { nullable: true })

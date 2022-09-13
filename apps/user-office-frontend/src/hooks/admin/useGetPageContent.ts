@@ -15,7 +15,7 @@ export function useGetPageContent(pageName: PageName) {
     setLoading(true);
     api()
       .getPageContent({
-        id: pageName,
+        pageId: pageName,
       })
       .then((data) => {
         if (unmounted) {

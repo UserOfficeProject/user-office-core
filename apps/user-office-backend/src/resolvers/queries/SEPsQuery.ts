@@ -2,18 +2,18 @@ import {
   Query,
   Ctx,
   Resolver,
-  Args,
-  ArgsType,
+  InputType,
   Field,
   Int,
   ObjectType,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { SEP } from '../types/SEP';
 
-@ArgsType()
-export class SEPsArgs {
+@InputType()
+export class SEPsFilter {
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
 
@@ -25,6 +25,9 @@ export class SEPsArgs {
 
   @Field(() => Int, { nullable: true })
   offset?: number;
+
+  @Field(() => [Int], { nullable: true })
+  public callIds?: number[];
 }
 
 @ObjectType()
@@ -40,15 +43,9 @@ class SEPsQueryResult {
 export class SEPsQuery {
   @Query(() => SEPsQueryResult, { nullable: true })
   async seps(
-    @Args() { active, filter, first, offset }: SEPsArgs,
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('filter', () => SEPsFilter, { nullable: true }) filter: SEPsFilter
   ): Promise<SEPsQueryResult | null> {
-    return context.queries.sep.getAll(
-      context.user,
-      active,
-      filter,
-      first,
-      offset
-    );
+    return context.queries.sep.getAll(context.user, filter);
   }
 }
