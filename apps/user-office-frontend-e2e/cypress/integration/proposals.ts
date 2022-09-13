@@ -6,9 +6,10 @@ import {
   TemplateGroupId,
   FeatureId,
 } from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
+
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
-import { DateTime } from 'luxon';
 
 context('Proposal tests', () => {
   const title = faker.lorem.words(2);
