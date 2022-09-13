@@ -188,8 +188,8 @@ jobs:
         pattern:
           [
             "cypress/integration/[a-e]*.ts",
-            "cypress/integration/[f-i]*.ts",
-            "cypress/integration/[j-o]*.ts",
+            "cypress/integration/[f-h]*.ts",
+            "cypress/integration/[i-o]*.ts",
             "cypress/integration/p[a-m]*.ts",
             "cypress/integration/p[n-z]*.ts",
             "cypress/integration/[r-s]*.ts",
