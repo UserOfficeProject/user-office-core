@@ -8,7 +8,9 @@ import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
+import useTheme from '@mui/styles/useTheme';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
 
@@ -78,6 +80,9 @@ const useStyles = makeStyles({
   verticalCentered: {
     display: 'flex',
     alignItems: 'center',
+  },
+  mobileUpdateButton: {
+    paddingBottom: '10px',
   },
 });
 
@@ -172,6 +177,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
 
+  const theme = useTheme();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
   const api = useDataApi();
   const { isLoading } = props;
   const { usersData, loadingUsersData } = useUsersData(query);
@@ -355,6 +362,12 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     ? ((query.offset as number) + invitedUsers.length) / (query.first as number)
     : 0;
 
+  const onClickHandlerUpdateBtn = () => {
+    if (props.onUpdate) {
+      props.onUpdate(selectedParticipants);
+    }
+  };
+
   return (
     <Formik
       initialValues={{
@@ -445,6 +458,26 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             />
           </DialogContent>
         </Dialog>
+
+        {!isLargeScreen && (
+          <div className={classes.mobileUpdateButton}>
+            {props.selection && (
+              <ActionButtonContainer>
+                <div className={classes.verticalCentered}>
+                  {selectedParticipants.length} user(s) selected
+                </div>
+                <Button
+                  type="button"
+                  onClick={onClickHandlerUpdateBtn}
+                  disabled={selectedParticipants.length === 0}
+                  data-cy="assign-selected-users"
+                >
+                  Update
+                </Button>
+              </ActionButtonContainer>
+            )}
+          </div>
+        )}
         <MaterialTable
           icons={tableIcons}
           title={
@@ -519,18 +552,14 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             Toolbar: isEmailSearchEnabled ? EmailSearchBar : MTableToolbar,
           }}
         />
-        {props.selection && (
+        {isLargeScreen && props.selection && (
           <ActionButtonContainer>
             <div className={classes.verticalCentered}>
               {selectedParticipants.length} user(s) selected
             </div>
             <Button
               type="button"
-              onClick={() => {
-                if (props.onUpdate) {
-                  props.onUpdate(selectedParticipants);
-                }
-              }}
+              onClick={onClickHandlerUpdateBtn}
               disabled={selectedParticipants.length === 0}
               data-cy="assign-selected-users"
             >

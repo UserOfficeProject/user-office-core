@@ -1,0 +1,5 @@
+query getPredefinedMessages($filter: PredefinedMessagesFilter) {
+  predefinedMessages(filter: $filter) {
+    ...predefinedMessage
+  }
+}

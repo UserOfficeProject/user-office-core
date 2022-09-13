@@ -1,10 +1,14 @@
+import 'cypress-file-upload';
+import { faker } from '@faker-js/faker';
 import {
+  AllocationTimeUnits,
   CreateApiAccessTokenMutation,
   CreateApiAccessTokenMutationVariables,
   getSdk,
 } from '@user-office-software-libs/shared-types';
 import 'cypress-file-upload';
 import { GraphQLClient } from 'graphql-request';
+import { DateTime } from 'luxon';
 
 import initialDBData from './initialDBData';
 
@@ -14,6 +18,26 @@ const KEY_CODES = {
   up: 38,
   right: 39,
   down: 40,
+};
+
+const currentDayStart = DateTime.now().startOf('day');
+
+export const updatedCall = {
+  shortCode: faker.random.alphaNumeric(15),
+  startCall: faker.date.past().toISOString().slice(0, 10),
+  endCall: faker.date.future().toISOString().slice(0, 10),
+  startReview: currentDayStart,
+  endReview: currentDayStart,
+  startSEPReview: currentDayStart,
+  endSEPReview: currentDayStart,
+  startNotify: currentDayStart,
+  endNotify: currentDayStart,
+  startCycle: currentDayStart,
+  endCycle: currentDayStart,
+  allocationTimeUnit: AllocationTimeUnits.DAY,
+  cycleComment: faker.lorem.word(10),
+  surveyComment: faker.lorem.word(10),
+  templateId: initialDBData.template.id,
 };
 
 export const getE2EApi = (token?: string | null) => {

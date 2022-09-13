@@ -263,7 +263,7 @@ const ProposalWorkflowEditorModel = (
 
   useEffect(() => {
     api()
-      .getProposalWorkflow({ id: parseInt(workflowId) })
+      .getProposalWorkflow({ proposalWorkflowId: parseInt(workflowId) })
       .then((data) => {
         // NOTE: Push at least one group to have initial droppable if new proposal workflow
         if (

@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { TemplateGroupId } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  TemplateGroupId,
+} from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 faker.seed(1);
@@ -15,7 +19,14 @@ context('visits tests', () => {
   const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+  });
+
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
+      this.skip();
+    }
     cy.updateProposal({
       proposalPk: existingProposalId,
       proposerId: PI.id,

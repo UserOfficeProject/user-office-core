@@ -1,4 +1,7 @@
-import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import {
+  DependenciesLogicOperator,
+  EvaluatorOperator,
+} from '../../models/ConditionEvaluator';
 import {
   Answer,
   AnswerBasic,
@@ -71,7 +74,8 @@ export const dummyQuestionTemplateRelationFactory = (
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
     values?.config || new BooleanConfig(),
-    values?.dependencies as FieldDependency[]
+    values?.dependencies as FieldDependency[],
+    values?.dependenciesOperator as DependenciesLogicOperator
   );
 
   return relation;
@@ -159,6 +163,206 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
             ],
           }),
           'https://example.com'
+        ),
+
+        new Answer(
+          4,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'multiple_choice',
+              naturalKey: 'multiple_choice',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'dropdown',
+                }
+              ),
+            }),
+          }),
+          ['A', 'B']
+        ),
+
+        new Answer(
+          5,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'multiple_choice_depender',
+              naturalKey: 'multiple_choice_depender',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'dropdown',
+                }
+              ),
+            }),
+            dependencies: [
+              new FieldDependency(
+                'multiple_choice_depender',
+                'multiple_choice',
+                'multiple_choice',
+                new FieldCondition(EvaluatorOperator.eq, 'B')
+              ),
+            ],
+          }),
+          ['A', 'B']
+        ),
+
+        // OR questions
+        new Answer(
+          6,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'or_dependee_1',
+              naturalKey: 'or_dependee_1',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'radio',
+                }
+              ),
+            }),
+          }),
+          'A'
+        ),
+
+        new Answer(
+          7,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'or_dependee_2',
+              naturalKey: 'or_dependee_2',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'radio',
+                }
+              ),
+            }),
+            dependencies: [
+              new FieldDependency(
+                'multiple_choice_depender',
+                'multiple_choice',
+                'multiple_choice',
+                new FieldCondition(EvaluatorOperator.eq, 'B')
+              ),
+            ],
+          }),
+          'B'
+        ),
+
+        new Answer(
+          8,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'or_depender',
+              naturalKey: 'or_depender',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'dropdown',
+                }
+              ),
+            }),
+            dependenciesOperator: DependenciesLogicOperator.OR,
+            dependencies: [
+              new FieldDependency(
+                'or_depender',
+                'or_dependee_1',
+                'or_dependee_1',
+                new FieldCondition(EvaluatorOperator.eq, 'B')
+              ),
+              new FieldDependency(
+                'or_depender',
+                'or_dependee_2',
+                'or_dependee_2',
+                new FieldCondition(EvaluatorOperator.eq, 'B')
+              ),
+            ],
+          }),
+          ['A', 'B']
+        ),
+
+        // AND questions
+        new Answer(
+          9,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'and_dependee_1',
+              naturalKey: 'and_dependee_1',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'radio',
+                }
+              ),
+            }),
+          }),
+          'A'
+        ),
+
+        new Answer(
+          10,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'and_dependee_2',
+              naturalKey: 'and_dependee_2',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'radio',
+                }
+              ),
+            }),
+          }),
+          'B'
+        ),
+
+        new Answer(
+          11,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'and_depender',
+              naturalKey: 'and_depender',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                DataType.SELECTION_FROM_OPTIONS,
+                {
+                  options: ['A', 'B', 'C'],
+                  variant: 'dropdown',
+                }
+              ),
+            }),
+            dependenciesOperator: DependenciesLogicOperator.AND,
+            dependencies: [
+              new FieldDependency(
+                'and_depender',
+                'and_dependee_1',
+                'and_dependee_1',
+                new FieldCondition(EvaluatorOperator.eq, 'B')
+              ),
+              new FieldDependency(
+                'and_depender',
+                'and_dependee_2',
+                'and_dependee_2',
+                new FieldCondition(EvaluatorOperator.eq, 'B')
+              ),
+            ],
+          }),
+          ['A', 'B']
         ),
       ]
     ),

@@ -382,4 +382,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {
     return [basicDummyUser.id];
   }
+
+  async getProposalById(proposalId: string): Promise<Proposal | null> {
+    return dummyProposal.proposalId === proposalId ? dummyProposal : null;
+  }
 }

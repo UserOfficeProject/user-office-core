@@ -66,3 +66,12 @@ test('User officer should get a list of templates', async () => {
   expect(templates.length).toBeGreaterThan(0);
   expect(templates[0].isArchived).toEqual(false);
 });
+
+test('User officer should be able to get question by natural key', async () => {
+  const question = await templateQueries.getQuestionByNaturalKey(
+    dummyUserOfficerWithRole,
+    'proposal_basis'
+  );
+
+  return expect(question).not.toBe(null);
+});

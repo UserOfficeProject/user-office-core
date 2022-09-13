@@ -36,8 +36,8 @@ jobs:
           }
 
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+            https://registry.hub.docker.com/v2/repositories/dmsc/duo-factory/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
           FACTORY_TAG=develop
@@ -187,12 +187,16 @@ jobs:
       matrix:
         pattern:
           [
-            'cypress/integration/[a-e]*.ts',
-            'cypress/integration/[f-i]*.ts',
-            'cypress/integration/[j-p]*.ts',
-            'cypress/integration/[r-s]*.ts',
-            'cypress/integration/[t-z]*.ts',
-            'cypress/integration/[A-Z]*.ts',
+            "cypress/integration/[a-e]*.ts",
+            "cypress/integration/[f-h]*.ts",
+            "cypress/integration/[i-o]*.ts",
+            "cypress/integration/p[a-m]*.ts",
+            "cypress/integration/p[n-z]*.ts",
+            "cypress/integration/[r-s]*.ts",
+            "cypress/integration/templates_basic.ts",
+            "cypress/integration/templates_advanced.ts",
+            "cypress/integration/[u-z]*.ts",
+            "cypress/integration/[A-Z]*.ts",
           ]
 
     steps:
@@ -247,6 +251,48 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+
+      - name: Run e2e tests stfc
+        env:
+          USER_OFFICE_BACKEND_DIR: apps/user-office-backend
+          USER_OFFICE_FRONTEND_DIR: apps/user-office-frontend
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/user-office-frontend-e2e
+          USER_OFFICE_BACKEND: http://localhost:4000/graphql
+          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
+          TZ: Europe/London
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          DEPENDENCY_CONFIG: stfc
+          secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          NODE_ENV: development
+          baseURL: localhost:3000
+          tokenLife: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          SCHEMA_URL: http://localhost:4000/graphql
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+          CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
+          BUILD_TAG: ${{ github.sha }}
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+          EXTERNAL_AUTH_TOKEN: abc
+          SINK_EMAIL: BISAPPSSINK@stfc.ac.uk
+          EMAIL_SENDER: '"STFC User Office" <users@stfc.ac.uk>'
+          EMAIL_AUTH_HOST: exchsmtp.stfc.ac.uk
+          EMAIL_TEMPLATE_PATH: /config/emails/
+          EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
+          EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
+          EXTERNAL_AUTH_SERVICE_URL: http://localhost:1080/ws/UserOfficeWebService?wsdl
+          ANTIVIRUS_HOST: clam-antivirus
+          ANTIVIRUS_PORT: 3310
+          ISIS_UO_EMAIL: isisuo@stfc.ac.uk
+          FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
+          PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run e2e:after:dev:stfc
 
       - name: Run e2e tests
         env:

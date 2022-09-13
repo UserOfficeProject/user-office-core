@@ -57,6 +57,8 @@ import ProposalEsiPage from './template/EsiPage';
 import FeedbackTemplatesPage from './template/FeedbackTemplatesPage';
 import GenericTemplatesPage from './template/GenericTemplatesPage';
 import ImportTemplatePage from './template/import/ImportTemplatePage';
+import PdfTemplateEditor from './template/PdfTemplateEditor';
+import PdfTemplatesPage from './template/PdfTemplatesPage';
 import ProposalTemplatesPage from './template/ProposalTemplatesPage';
 import QuestionsPage from './template/QuestionsPage';
 import SampleEsiPage from './template/SampleEsiPage';
@@ -369,6 +371,18 @@ const Dashboard: React.FC = () => {
             title="Template Editor"
             path="/QuestionaryEditor/:templateId"
             component={TemplateEditor}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="PDF Template Editor"
+            path="/PdfTemplateEditor/:templateId"
+            component={PdfTemplateEditor}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="PDF Template"
+            path="/PdfTemplates"
+            component={PdfTemplatesPage}
           />
           <TitledRoute
             setHeader={setHeader}

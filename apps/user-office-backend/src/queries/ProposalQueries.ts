@@ -185,4 +185,15 @@ export default class ProposalQueries {
       filter
     );
   }
+
+  @Authorized()
+  async getProposalById(agent: UserWithRole | null, proposalId: string) {
+    const proposal = await this.dataSource.getProposalById(proposalId);
+
+    if ((await this.hasReadRights(agent, proposal)) === true) {
+      return proposal;
+    } else {
+      return null;
+    }
+  }
 }

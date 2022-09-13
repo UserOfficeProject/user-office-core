@@ -8,6 +8,9 @@ export class CallsFilter {
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
 
+  @Field(() => [Int], { nullable: true })
+  public sepIds?: number[];
+
   @Field(() => Boolean, { nullable: true })
   public isActive?: boolean;
 

@@ -15,9 +15,13 @@ import RoleModal from './RoleModal';
 
 const columns = [{ title: 'Name', field: 'title' }];
 
-export default function UpdateUserRoles(props: { id: number }) {
+interface UpdateUserRolesProps {
+  id: number;
+}
+
+export default function UpdateUserRoles(props: UpdateUserRolesProps) {
   const { userData, setUserData, loading } = useUserWithRolesData({
-    id: props.id,
+    userId: props.id,
   });
   const [modalOpen, setOpen] = useState(false);
   const { api, isExecutingCall } = useDataApiWithFeedback();

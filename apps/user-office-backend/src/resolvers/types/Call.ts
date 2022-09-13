@@ -15,6 +15,7 @@ import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { ProposalWorkflow } from './ProposalWorkflow';
+import { SEP } from './SEP';
 import { Template } from './Template';
 
 @ObjectType()
@@ -83,6 +84,9 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Int, { nullable: true })
   public esiTemplateId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public pdfTemplateId?: number;
+
   @Field({ nullable: true })
   public title: string;
 
@@ -100,6 +104,11 @@ export class CallInstrumentsResolver {
     return context.queries.instrument.dataSource.getInstrumentsByCallId([
       call.id,
     ]);
+  }
+
+  @FieldResolver(() => [SEP], { nullable: true })
+  async seps(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.sep.dataSource.getSepsByCallId(call.id);
   }
 
   @FieldResolver(() => ProposalWorkflow, { nullable: true })

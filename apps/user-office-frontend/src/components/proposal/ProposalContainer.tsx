@@ -27,11 +27,14 @@ interface ProposalContainerProps {
   proposal: ProposalWithQuestionary;
   proposalUpdated?: (proposal: ProposalWithQuestionary) => void;
   elevation?: PaperProps['elevation'];
+  previewMode?: boolean;
 }
 export default function ProposalContainer(props: ProposalContainerProps) {
-  const { proposal, proposalUpdated, elevation } = props;
+  const { proposal, proposalUpdated, elevation, previewMode } = props;
 
-  const [initialState] = useState(new ProposalSubmissionState(proposal));
+  const [initialState] = useState(
+    new ProposalSubmissionState(proposal, previewMode)
+  );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.PROPOSAL);
 
@@ -48,10 +51,30 @@ export default function ProposalContainer(props: ProposalContainerProps) {
     }
   );
 
-  const { state, dispatch } = QuestionarySubmissionModel(initialState, [
-    eventHandlers,
-    customEventHandlers,
-  ]);
+  const customReducers = (
+    state: ProposalSubmissionState,
+    draftState: ProposalSubmissionState,
+    action: Event
+  ) => {
+    switch (action.type) {
+      case 'SAMPLE_DECLARATION_ITEMS_MODIFIED':
+        draftState.proposal.samples = action.newItems;
+        draftState.isDirty = true;
+        break;
+      case 'GENERIC_TEMPLATE_ITEMS_MODIFIED':
+        draftState.proposal.genericTemplates = action.newItems;
+        draftState.isDirty = true;
+        break;
+    }
+
+    return draftState;
+  };
+
+  const { state, dispatch } = QuestionarySubmissionModel(
+    initialState,
+    [eventHandlers, customEventHandlers],
+    customReducers
+  );
 
   const hasReferenceNumberFormat = !!state.proposal.call?.referenceNumberFormat;
 
@@ -88,6 +111,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
           <Questionary
             title={state.proposal.title || 'New Proposal'}
             info={info}
+            previewMode={previewMode}
           />
         </StyledPaper>
       </StyledContainer>

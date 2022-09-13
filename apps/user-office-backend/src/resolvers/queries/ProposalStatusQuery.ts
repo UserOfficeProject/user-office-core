@@ -7,10 +7,13 @@ import { ProposalStatus } from '../types/ProposalStatus';
 export class ProposalStatusQuery {
   @Query(() => ProposalStatus, { nullable: true })
   proposalStatus(
-    @Arg('id', () => Int) id: number,
+    @Arg('proposalStatusId', () => Int) proposalStatusId: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.proposalSettings.getProposalStatus(context.user, id);
+    return context.queries.proposalSettings.getProposalStatus(
+      context.user,
+      proposalStatusId
+    );
   }
 
   @Query(() => [ProposalStatus], { nullable: true })

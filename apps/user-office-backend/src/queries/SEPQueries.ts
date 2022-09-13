@@ -7,6 +7,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { SEPsFilter } from '../resolvers/queries/SEPsQuery';
 
 @injectable()
 export default class SEPQueries {
@@ -41,14 +42,8 @@ export default class SEPQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getAll(
-    agent: UserWithRole | null,
-    active?: boolean,
-    filter?: string,
-    first?: number,
-    offset?: number
-  ) {
-    return this.dataSource.getSEPs(active, filter, first, offset);
+  async getAll(agent: UserWithRole | null, filter?: SEPsFilter) {
+    return this.dataSource.getSEPs(filter);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])

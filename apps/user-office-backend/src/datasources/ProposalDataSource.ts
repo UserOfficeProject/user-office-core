@@ -94,6 +94,6 @@ export interface ProposalDataSource {
   updateProposalBookingScheduledEvent(
     eventMessage: ScheduledEventCore
   ): Promise<void>;
-
   getRelatedUsersOnProposals(id: number): Promise<number[]>;
+  getProposalById(proposalId: string): Promise<Proposal | null>;
 }
