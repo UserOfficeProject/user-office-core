@@ -131,6 +131,7 @@ describe('Test Call Mutations', () => {
       esiTemplateId: 2,
       title: 'Title',
       description: 'Description',
+      pdfTemplateId: 1,
     };
 
     return expect(

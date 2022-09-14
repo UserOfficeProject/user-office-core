@@ -36,6 +36,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
     values?.title || 'Title',
     values?.description || 'Description',
+    values?.pdfTemplateId || 1,
     values?.isActive || true
   );
 };
@@ -67,6 +68,7 @@ export const dummyCall = new Call(
   AllocationTimeUnits.Day,
   '',
   '',
+  1,
   true
 );
 
@@ -97,6 +99,7 @@ export const anotherDummyCall = new Call(
   AllocationTimeUnits.Day,
   '',
   '',
+  1,
   true
 );
 

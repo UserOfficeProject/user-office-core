@@ -1,6 +1,9 @@
 import MaterialTable, { MaterialTableProps } from '@material-table/core';
+import CloseIcon from '@mui/icons-material/Close';
 import Edit from '@mui/icons-material/Edit';
+import { IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { SetStateAction, useState } from 'react';
 import {
   DecodedValueMap,
@@ -17,6 +20,14 @@ import InputDialog from 'components/common/InputDialog';
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
+
+const useStyles = makeStyles((theme) => ({
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+  },
+}));
 
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
@@ -73,6 +84,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
 }: MaterialTableProps<Entry> & SuperProps<Entry>) {
   const [show, setShow] = useState(false);
   const [editObject, setEditObject] = useState<Entry | null>(null);
+  const classes = useStyles();
 
   let { data, columns } = props;
   const {
@@ -181,11 +193,19 @@ export function SuperMaterialTable<Entry extends EntryID>({
         open={show}
         maxWidth={props.createModalSize}
         fullWidth={!!props.createModalSize}
-        onClose={() => {
+        onClose={(_, reason) => {
+          if (reason && reason == 'backdropClick') return;
           setShow(false);
           setEditObject(null);
         }}
       >
+        <IconButton
+          data-cy="close-modal-btn"
+          className={classes.closeButton}
+          onClick={() => setShow(false)}
+        >
+          <CloseIcon />
+        </IconButton>
         {createModal?.(onUpdated, onCreated, editObject)}
       </InputDialog>
       <MaterialTable

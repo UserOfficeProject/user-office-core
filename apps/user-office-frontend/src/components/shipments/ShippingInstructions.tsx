@@ -30,6 +30,7 @@ const steps = [
     description: (
       <ul>
         <li>Print and cut the label;</li>
+        <li>Place the label inside a plastic wallet for extra protection;</li>
         <li>Stick the label to both sides of the parcel;</li>
         <li>If using tape not tape over the barcodes.</li>
       </ul>
@@ -97,18 +98,18 @@ export default function ShippingInstructions() {
               <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                   variant="text"
-                  onClick={handleNext}
-                  sx={{ mt: 1, mr: 1 }}
-                >
-                  {index === steps.length - 1 ? 'Finish' : 'Next'}
-                </Button>
-                <Button
-                  variant="text"
                   disabled={index === 0}
                   onClick={handleBack}
                   sx={{ mt: 1, mr: 1 }}
                 >
                   Back
+                </Button>
+                <Button
+                  variant="text"
+                  onClick={handleNext}
+                  sx={{ mt: 1, mr: 1 }}
+                >
+                  {index === steps.length - 1 ? 'Finish' : 'Next'}
                 </Button>
               </Box>
             </StepContent>
@@ -121,7 +122,7 @@ export default function ShippingInstructions() {
             You might want to inform your local contact to expect parcel!
           </Typography>
           <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
-            Reset
+            Read again
           </Button>
         </Paper>
       )}

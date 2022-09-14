@@ -5,6 +5,8 @@ import FeedbackMutations from '../mutations/FeedbackMutations';
 import FileMutations from '../mutations/FileMutations';
 import GenericTemplateMutations from '../mutations/GenericTemplateMutations';
 import InstrumentMutations from '../mutations/InstrumentMutations';
+import PdfTemplateMutations from '../mutations/PdfTemplateMutations';
+import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalSettingsMutations from '../mutations/ProposalSettingsMutations';
@@ -25,6 +27,8 @@ import FeedbackQueries from '../queries/FeedbackQueries';
 import FileQueries from '../queries/FileQueries';
 import GenericTemplateQueries from '../queries/GenericTemplateQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
+import PdfTemplateQueries from '../queries/PdfTemplateQueries';
+import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalEsiQueries from '../queries/ProposalEsiQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import ProposalSettingsQueries from '../queries/ProposalSettingsQueries';
@@ -49,6 +53,7 @@ interface ResolverContextQueries {
   file: FileQueries;
   genericTemplate: GenericTemplateQueries;
   instrument: InstrumentQueries;
+  pdfTemplate: PdfTemplateQueries;
   proposal: ProposalQueries;
   proposalEsi: ProposalEsiQueries;
   proposalSettings: ProposalSettingsQueries;
@@ -64,6 +69,7 @@ interface ResolverContextQueries {
   unit: UnitQueries;
   user: UserQueries;
   visit: VisitQueries;
+  predefinedMessage: PredefinedMessageQueries;
 }
 
 interface ResolverContextMutations {
@@ -73,6 +79,7 @@ interface ResolverContextMutations {
   file: FileMutations;
   genericTemplate: GenericTemplateMutations;
   instrument: InstrumentMutations;
+  pdfTemplate: PdfTemplateMutations;
   proposal: ProposalMutations;
   proposalEsi: ProposalEsiMutations;
   proposalSettings: ProposalSettingsMutations;
@@ -86,6 +93,7 @@ interface ResolverContextMutations {
   unit: UnitMutations;
   user: UserMutations;
   visit: VisitMutations;
+  predefinedMessage: PredefinedMessageMutations;
 }
 
 export interface BasicResolverContext {

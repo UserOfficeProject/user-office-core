@@ -16,9 +16,10 @@ import { QuestionaryStepButton } from './QuestionaryStepButton';
 interface QuestionaryProps {
   title: string;
   info?: JSX.Element | string;
+  previewMode?: boolean;
 }
 
-function Questionary({ title, info }: QuestionaryProps) {
+function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
   const isMobile = useMediaQuery('(max-width: 500px)');
 
   const useStyles = makeStyles((theme) => ({
@@ -119,7 +120,7 @@ function Questionary({ title, info }: QuestionaryProps) {
 
     return displayElementFactory.getDisplayElement(
       currentStep,
-      stepMetadata.isReadonly && !isUserOfficer
+      (stepMetadata.isReadonly && !isUserOfficer) || previewMode
     );
   };
 

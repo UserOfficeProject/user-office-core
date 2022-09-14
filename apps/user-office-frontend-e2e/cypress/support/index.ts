@@ -27,3 +27,4 @@ import './utils';
 import './visits';
 import './workflow';
 import './sep';
+import './predefinedMessages';

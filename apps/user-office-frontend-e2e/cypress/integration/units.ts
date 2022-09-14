@@ -8,6 +8,7 @@ import initialDBData from '../support/initialDBData';
 context('Units tests', () => {
   describe('Template basic unit tests', () => {
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
     });
 
@@ -146,6 +147,7 @@ context('Units tests', () => {
 
   describe('Template advanced unit tests', () => {
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
       cy.resetDB(true);
     });
 

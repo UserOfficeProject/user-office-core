@@ -20,6 +20,7 @@ import {
 } from '../../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalsToSepArgs } from '../../resolvers/mutations/AssignProposalsToSep';
 import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
+import { SEPsFilter } from '../../resolvers/queries/SEPsQuery';
 import { SEPDataSource } from '../SEPDataSource';
 
 export const dummySEP = new SEP(
@@ -255,12 +256,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     return [dummySEP];
   }
 
-  async getSEPs(
-    active: boolean,
-    filter?: string,
-    first?: number,
-    offset?: number
-  ) {
+  async getSEPs({ active, filter, first, offset }: SEPsFilter) {
     // NOTE: Copy sorted by id 'desc'
     let dummySEPsCopy = [...dummySEPs.sort((a, b) => b.id - a.id)];
 
@@ -318,6 +314,10 @@ export class SEPDataSourceMock implements SEPDataSource {
 
   async getSEPByProposalPk(proposalPk: number) {
     return dummySEP;
+  }
+
+  async getSepsByCallId(callId: number): Promise<SEP[]> {
+    return [dummySEP];
   }
 
   async getSEPProposalAssignments(

@@ -10,7 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Institution as InstitutionOrigin } from '../../models/Institution';
-import { Entry } from './Fields';
+import { Entry } from './Entry';
 
 @ObjectType()
 export class Institution implements Partial<InstitutionOrigin> {

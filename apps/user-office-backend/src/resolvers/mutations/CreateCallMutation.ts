@@ -80,6 +80,12 @@ export class CreateCallInput {
 
   @Field({ nullable: true })
   public description: string;
+
+  @Field(() => [Int], { nullable: true })
+  public seps?: number[];
+
+  @Field(() => Int, { nullable: true })
+  public pdfTemplateId?: number;
 }
 
 @Resolver()

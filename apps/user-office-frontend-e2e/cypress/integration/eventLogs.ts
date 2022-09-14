@@ -2,13 +2,16 @@ import { faker } from '@faker-js/faker';
 import {
   UpdateUserMutationVariables,
   User,
+  FeatureId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Event log tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -47,7 +50,10 @@ context('Event log tests', () => {
   });
 
   describe('User event logs', () => {
-    beforeEach(() => {
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
       cy.login('user');
     });
 

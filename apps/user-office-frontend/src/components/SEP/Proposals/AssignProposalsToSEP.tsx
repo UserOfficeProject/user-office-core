@@ -30,16 +30,23 @@ type AssignProposalToSEPProps = {
   close: () => void;
   assignProposalsToSEP: (sep: Sep | null) => Promise<void>;
   sepIds: (number | null)[];
+  callIds?: number[];
 };
 
 const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
   close,
   assignProposalsToSEP,
   sepIds,
+  callIds,
 }) => {
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
-  const { SEPs, loadingSEPs } = useSEPsData('', true, currentRole as UserRole);
+  const { SEPs, loadingSEPs } = useSEPsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+    callIds: callIds,
+  });
   const allSelectedProposalsHaveSameSep = sepIds.every(
     (item) => item === sepIds[0]
   );

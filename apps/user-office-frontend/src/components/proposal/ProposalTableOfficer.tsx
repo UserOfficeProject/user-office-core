@@ -623,6 +623,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             sepIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.sepId
             )}
+            callIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.callId
+            )}
           />
         </DialogContent>
       </Dialog>

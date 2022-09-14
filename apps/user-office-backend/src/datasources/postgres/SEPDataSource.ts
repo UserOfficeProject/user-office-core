@@ -22,6 +22,7 @@ import {
 } from '../../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalsToSepArgs } from '../../resolvers/mutations/AssignProposalsToSep';
 import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
+import { SEPsFilter } from '../../resolvers/queries/SEPsQuery';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
 import {
@@ -141,6 +142,20 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return sepRecords.map(createSEPObject);
   }
 
+  async getSepsByCallId(callId: number): Promise<SEP[]> {
+    return database
+      .select('*')
+      .from('SEPs as s')
+      .join('call_has_seps as chs', {
+        's.sep_id': 'chs.sep_id',
+      })
+      .where('chs.call_id', callId)
+      .distinct('s.sep_id')
+      .then((seps: SEPRecord[]) => {
+        return seps.map(createSEPObject);
+      });
+  }
+
   async getUserSeps(userId: number, role: Role): Promise<SEP[]> {
     const qb = database<SEPRecord>('SEPs').select<SEPRecord[]>('SEPs.*');
 
@@ -169,16 +184,17 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return sepRecords.map(createSEPObject);
   }
 
-  async getSEPs(
-    active?: boolean,
-    filter?: string,
-    first?: number,
-    offset?: number
-  ): Promise<{ totalCount: number; seps: SEP[] }> {
+  async getSEPs({
+    active,
+    callIds,
+    filter,
+    first,
+    offset,
+  }: SEPsFilter): Promise<{ totalCount: number; seps: SEP[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('SEPs')
-      .orderBy('sep_id', 'desc')
+      .orderBy('SEPs.sep_id', 'desc')
       .modify((query) => {
         if (filter) {
           query
@@ -193,6 +209,11 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         }
         if (active !== undefined) {
           query.where('active', active);
+        }
+        if (callIds?.length) {
+          query
+            .leftJoin('call_has_seps as chs', 'chs.sep_id', 'SEPs.sep_id')
+            .whereIn('chs.call_id', callIds);
         }
       })
       .then((allSeps: SEPRecord[]) => {

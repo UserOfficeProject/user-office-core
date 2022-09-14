@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -21,10 +22,19 @@ import TemplateMutations from './TemplateMutations';
 const QUESTION_ID = 'links_to_field';
 const NON_EXISTING_QUESTION_ID = 'non_existing_question_id';
 
+const mockCloneTemplate = jest.spyOn(
+  TemplateDataSourceMock.prototype,
+  'cloneTemplate'
+);
+
 const mutations = container.resolve(TemplateMutations);
 
 beforeEach(() => {
+  container
+    .resolve<PdfTemplateDataSourceMock>(Tokens.PdfTemplateDataSource)
+    .init();
   container.resolve<TemplateDataSourceMock>(Tokens.TemplateDataSource).init();
+  mockCloneTemplate.mockClear();
 });
 
 test('An userofficer can update topic', async () => {
@@ -41,7 +51,7 @@ test('An userofficer can update topic', async () => {
   expect(isRejection(result)).toBeFalsy();
 
   const template = result as Template;
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
 });
 
 test('An userofficer can create template', async () => {
@@ -53,10 +63,33 @@ test('An userofficer can create template', async () => {
     name,
     description,
   });
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
   expect((template as Template).name).toEqual(name);
   expect((template as Template).description).toEqual(description);
 });
+
+test('A userofficer can create PDF template', async () => {
+  const mockCreatePdfTemplate = jest.spyOn(
+    PdfTemplateDataSourceMock.prototype,
+    'createPdfTemplate'
+  );
+
+  const name = 'The name';
+  const description = 'The description';
+  const groupId = TemplateGroupId.PDF_TEMPLATE;
+
+  const template = await mutations.createTemplate(dummyUserOfficerWithRole, {
+    groupId,
+    name,
+    description,
+  });
+
+  expect(template).toBeInstanceOf(Template);
+  expect((template as Template).name).toEqual(name);
+  expect((template as Template).description).toEqual(description);
+  expect(mockCreatePdfTemplate).toBeCalledTimes(1);
+});
+
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
@@ -66,7 +99,7 @@ test('An user cannot create template', async () => {
     name,
     description,
   });
-  expect(template instanceof Template).toBe(false);
+  expect(template).not.toBeInstanceOf(Template);
 });
 
 test('An userofficer can delete template', async () => {
@@ -74,7 +107,7 @@ test('An userofficer can delete template', async () => {
   const template = await mutations.deleteTemplate(dummyUserOfficerWithRole, {
     templateId,
   });
-  expect(template instanceof Template).toBe(true);
+  expect(template).toBeInstanceOf(Template);
   expect((template as Template).templateId).toEqual(templateId);
 });
 
@@ -83,7 +116,7 @@ test('An user can not delete template', async () => {
   const template = await mutations.deleteTemplate(dummyUserWithRole, {
     templateId,
   });
-  expect(template instanceof Template).toBe(false);
+  expect(template).not.toBeInstanceOf(Template);
 });
 
 test('Can not delete non-existing template', async () => {
@@ -256,6 +289,37 @@ test('User officer can clone template', async () => {
     }
   );
   expect(clonedTemplate.templateId).toBeGreaterThan(0);
+});
+
+test('User officer can clone PDF template', async () => {
+  const mockCreatePdfTemplate = jest.spyOn(
+    PdfTemplateDataSourceMock.prototype,
+    'createPdfTemplate'
+  );
+  const mockClonePdfTemplate = jest.spyOn(
+    PdfTemplateDataSourceMock.prototype,
+    'clonePdfTemplate'
+  );
+  mockCloneTemplate.mockImplementation((templateId: number) =>
+    Promise.resolve({
+      templateId: templateId,
+      groupId: TemplateGroupId.PDF_TEMPLATE,
+      name: 'PDF Template',
+      description: 'PDF Template',
+      isArchived: false,
+    })
+  );
+
+  const clonedTemplate = await mutations.cloneTemplate(
+    dummyUserOfficerWithRole,
+    {
+      templateId: 1,
+    }
+  );
+
+  expect(clonedTemplate.templateId).toBeGreaterThan(0);
+  expect(mockClonePdfTemplate).toBeCalledTimes(1);
+  expect(mockCreatePdfTemplate).toBeCalledTimes(1);
 });
 
 test('User officer can add question to template', async () => {
