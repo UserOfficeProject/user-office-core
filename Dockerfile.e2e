@@ -1,13 +1,14 @@
 FROM cypress/included:9.7.0
 
+# Copy and install node modules needed for frontend
 WORKDIR /e2e
-
 COPY apps/user-office-frontend/src/generated user-office-frontend/src/generated
 COPY apps/user-office-frontend/package* user-office-frontend/
 
 WORKDIR /e2e/user-office-frontend
 RUN npm ci --silent
 
+# Copy e2e tests to container. Install node modules needed for e2e tests
 WORKDIR /e2e
 COPY apps/user-office-frontend-e2e/cypress.json ./user-office-frontend-e2e/
 COPY apps/user-office-frontend-e2e/package* ./user-office-frontend-e2e/
