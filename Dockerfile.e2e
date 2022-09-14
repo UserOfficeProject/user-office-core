@@ -13,7 +13,7 @@ WORKDIR /e2e
 COPY apps/user-office-frontend-e2e/cypress.json ./user-office-frontend-e2e/
 COPY apps/user-office-frontend-e2e/package* ./user-office-frontend-e2e/
 COPY apps/user-office-frontend-e2e/tsconfig.json ./user-office-frontend-e2e/tsconfig.json
-COPY --chmod=755 apps/user-office-frontend-e2e/wait-for-frontend.sh ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/wait-for-frontend.sh ./user-office-frontend-e2e/
 COPY apps/user-office-frontend-e2e/cypress ./user-office-frontend-e2e/cypress/
 
 WORKDIR /e2e/user-office-frontend-e2e
