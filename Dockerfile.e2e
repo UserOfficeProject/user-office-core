@@ -1,14 +1,21 @@
 FROM cypress/included:9.7.0
 
-COPY apps/user-office-frontend-e2e/cypress.json .
-COPY apps/user-office-frontend-e2e/package* .
-COPY apps/user-office-frontend-e2e/tsconfig.json .
-COPY apps/user-office-frontend-e2e/wait-for-frontend.sh .
-COPY apps/user-office-frontend-e2e/cypress ./cypress/
-COPY --chmod=755 apps/user-office-frontend-e2e/wait-for-frontend.sh .
+WORKDIR /e2e
 
-COPY apps/user-office-frontend/src/generated ../user-office-frontend/src/generated
+COPY apps/user-office-frontend/src/generated user-office-frontend/src/generated
+COPY apps/user-office-frontend/package* user-office-frontend/
 
-RUN npm ci
+WORKDIR /e2e/user-office-frontend
+RUN npm ci --silent
+
+WORKDIR /e2e
+COPY apps/user-office-frontend-e2e/cypress.json ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/package* ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/tsconfig.json ./user-office-frontend-e2e/tsconfig.json
+COPY --chmod=755 apps/user-office-frontend-e2e/wait-for-frontend.sh ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/cypress ./user-office-frontend-e2e/cypress/
+
+WORKDIR /e2e/user-office-frontend-e2e
+RUN npm ci --silent
 
 ENTRYPOINT ["npm", "run", "cy:run"]
