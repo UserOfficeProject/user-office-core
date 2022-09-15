@@ -7,7 +7,10 @@ import { UserAuthorization } from '../UserAuthorization';
 
 @injectable()
 export class UserAuthorizationMock extends UserAuthorization {
-  async externalTokenLogin(token: string): Promise<User | null> {
+  async externalTokenLogin(
+    token: string,
+    _redirectUri: string
+  ): Promise<User | null> {
     if (token === 'valid') {
       return dummyUser;
     }
