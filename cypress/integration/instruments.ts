@@ -68,9 +68,9 @@ context('Instrument tests', () => {
     });
 
     it('User officer should be able to create instrument', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-        this.skip();
-      }
+      // if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      //   this.skip();
+      // }
       cy.contains('Instruments').click();
       cy.contains('Create').click();
       cy.get('#name').type(instrument1.name);
@@ -537,9 +537,9 @@ context('Instrument tests', () => {
     let createdProposalId: string;
 
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-        this.skip();
-      }
+      // if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      //   this.skip();
+      // }
       cy.updateUserRoles({
         id: scientist2.id,
         roles: [initialDBData.roles.instrumentScientist],
