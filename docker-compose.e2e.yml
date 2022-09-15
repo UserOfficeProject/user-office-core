@@ -15,6 +15,7 @@ services:
       TZ: Europe/Stockholm
       DATE_FORMAT: dd-MM-yyyy
       DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+      EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION: true
     depends_on:
       - db
     labels:
