@@ -99,7 +99,7 @@ function ExternalAuth() {
       </CenteredAlert>
     );
 
-    const handleCode = (code: string) => {
+    const handleAuthorizationCode = (authorizationCode: string) => {
       const { protocol, host, pathname } = window.location;
       const currentUrlWithoutParams = [protocol, '//', host, pathname].join('');
 
@@ -107,7 +107,7 @@ function ExternalAuth() {
 
       unauthorizedApi()
         .externalTokenLogin({
-          externalToken: code,
+          externalToken: authorizationCode,
           redirectUri: currentUrlWithoutParams,
         })
         .then(({ externalTokenLogin }) => {
@@ -125,7 +125,7 @@ function ExternalAuth() {
         });
     };
 
-    const handleNoCode = () => {
+    const handleNoAuthorizationCode = () => {
       const externalAuthLoginUrl = settingsMap.get(
         SettingsId.EXTERNAL_AUTH_LOGIN_URL
       )?.settingsValue;
@@ -146,14 +146,14 @@ function ExternalAuth() {
     setView(<LoadingMessage />);
 
     const errorDescription = urlQueryParams.error_description;
-    const code = urlQueryParams.sessionid ?? urlQueryParams.code;
+    const authorizationCode = urlQueryParams.sessionid ?? urlQueryParams.code;
 
     if (errorDescription) {
       handleError(errorDescription);
-    } else if (code) {
-      handleCode(code);
+    } else if (authorizationCode) {
+      handleAuthorizationCode(authorizationCode);
     } else {
-      handleNoCode();
+      handleNoAuthorizationCode();
     }
   }, [
     handleLogin,
