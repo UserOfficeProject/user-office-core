@@ -1,10 +1,14 @@
+import 'reflect-metadata';
 import { logger } from '@user-office-software/duo-logger';
 import { TokenSet, UserinfoResponse } from 'openid-client';
+import { container } from 'tsyringe';
 
-import 'reflect-metadata';
+import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { rejection, Rejection } from '../models/Rejection';
+import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { RequiredField, NonNullableField } from '../utils/helperFunctions';
+import { NonNullableField, RequiredField } from '../utils/helperFunctions';
 import { OpenIdClient } from './OpenIdClient';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -21,6 +25,19 @@ type ValidUser = NonNullableField<
 >;
 
 export abstract class OAuthAuthorization extends UserAuthorization {
+  private db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  constructor() {
+    super();
+
+    if (OpenIdClient.hasConfiguration()) {
+      this.initialize();
+    } else {
+      throw new Error(
+        'OpenIdClient has no configuration. Please check your environment variables!'
+      );
+    }
+  }
   public async externalTokenLogin(
     code: string,
     redirectUri: string
@@ -92,6 +109,31 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   public async isExternalTokenValid(code: string): Promise<boolean> {
     // No need to check external token validity, because we check UOS JWT token
     return true;
+  }
+
+  async initialize() {
+    const client = await OpenIdClient.getInstance();
+    const scopes = OpenIdClient.getScopes().join(' ');
+
+    const authUrl = client.authorizationUrl({ scope: scopes });
+
+    let endSessionUrl;
+    try {
+      endSessionUrl = client.endSessionUrl(); // try obtaining the end session url the standard way
+    } catch (e) {
+      endSessionUrl =
+        (client.issuer.ping_end_session_endpoint as string) ?? '/'; // try using PING ping_end_session_endpoint
+    }
+
+    await this.db.updateSettings({
+      settingsId: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
+      settingsValue: authUrl,
+    });
+
+    await this.db.updateSettings({
+      settingsId: SettingsId.EXTERNAL_AUTH_LOGOUT_URL,
+      settingsValue: endSessionUrl,
+    });
   }
 
   private async getUserInstitutionId(userInfo: UserinfoResponse) {

@@ -73,12 +73,12 @@ export class OpenIdClient {
     const clientId = process.env.AUTH_CLIENT_ID;
     const clientSecret = process.env.AUTH_CLIENT_SECRET;
     if (!discoveryUrl || !clientId || !clientSecret) {
-      logger.logError('One or more ENV variables not defined', {
+      logger.logError('One or more ENV variables for OAUTH not defined', {
         discoveryUrl,
         clientId,
         clientSecret: clientSecret ? '******' : undefined,
       });
-      throw new Error('One or more ENV variables not defined');
+      throw new Error('One or more ENV variables for OAUTH not defined');
     }
 
     return {
