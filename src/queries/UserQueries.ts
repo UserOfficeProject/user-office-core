@@ -1,5 +1,4 @@
 import { logger } from '@user-office-software/duo-logger';
-// TODO: Try to replace request-promise with axios. request-promise depends on request which is deprecated.
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
