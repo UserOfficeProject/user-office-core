@@ -1,3 +1,8 @@
+******
+# Notice: this project is archived
+For future development please use https://github.com/UserOfficeProject/user-office-core/
+******
+
 ## Getting started
 
 To be able to start both backend and frontend locally you will need to:
