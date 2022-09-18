@@ -1,4 +1,4 @@
-query getUserInstruments {
+query getMyInstruments {
   me {
     instruments {
       ...instrument
