@@ -74,7 +74,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}
 
       - name: Install root dependencies
         if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
@@ -85,7 +85,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Install backend dependencies
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
@@ -96,7 +96,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
       - name: Install frontend dependencies
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
@@ -121,21 +121,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
       - run: npm run build
         env:
@@ -161,7 +161,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Run backend unit tests
         env:
@@ -212,21 +212,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
