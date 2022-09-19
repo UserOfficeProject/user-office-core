@@ -78,7 +78,8 @@ jobs:
 
       - name: Install root dependencies
         if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
-        run: npm install
+        # We use --ignore-scripts flag to ignore the postinstall script which is actually installing dependencies in all other apps.
+        run: npm install --ignore-scripts
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
