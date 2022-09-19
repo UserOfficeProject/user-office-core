@@ -16,7 +16,6 @@ import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
-import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 
 type ProposalMessageData = {
@@ -145,25 +144,14 @@ export function createPostToRabbitMQHandler() {
         const proposalStatus =
           await proposalSettingsDataSource.getProposalStatus(proposal.statusId);
 
-        // if the new status isn't 'SCHEDULING' ignore the event
-        if (
-          proposalStatus?.shortCode !==
-          ProposalStatusDefaultShortCodes.SCHEDULING
-        ) {
-          return;
-        }
-
         const instrument = await instrumentDataSource.getInstrumentByProposalPk(
           proposal.primaryKey
         );
 
-        if (!instrument) {
-          logger.logWarn(
-            `Proposal '${proposal.primaryKey}' has no instrument`,
-            {
-              proposal,
-            }
-          );
+        if (!proposalStatus) {
+          logger.logError(`Unknown proposalStatus '${proposal.statusId}'`, {
+            proposal,
+          });
 
           return;
         }
@@ -171,7 +159,7 @@ export function createPostToRabbitMQHandler() {
         const call = await callDataSource.getCall(proposal.callId);
 
         if (!call) {
-          logger.logWarn(`Proposal '${proposal.primaryKey}' has no call`, {
+          logger.logError(`Proposal '${proposal.primaryKey}' has no call`, {
             proposal,
           });
 
@@ -186,9 +174,11 @@ export function createPostToRabbitMQHandler() {
         // NOTE: maybe use shared types?
         const message = {
           proposalPk: proposal.primaryKey,
+          proposalId: proposal.proposalId,
           callId: proposal.callId,
           allocatedTime: proposalAllocatedTime,
-          instrumentId: instrument.id,
+          instrumentId: instrument?.id,
+          newStatus: proposalStatus.shortCode,
         };
 
         const json = JSON.stringify(message);
