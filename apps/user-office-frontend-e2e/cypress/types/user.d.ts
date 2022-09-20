@@ -1,5 +1,4 @@
 import {
-  LoginMutation,
   ExternalTokenLoginMutation,
   UpdateUserRolesMutationVariables,
   UpdateUserMutationVariables,
@@ -9,6 +8,7 @@ import {
   SetUserEmailVerifiedMutationVariables,
   SetUserEmailVerifiedMutation,
 } from '@user-office-software-libs/shared-types';
+import { TestUserId } from './../support/user';
 
 declare global {
   namespace Cypress {
@@ -22,25 +22,18 @@ declare global {
        *    cy.login('user')
        */
       login: (
-        roleOrCredentials:
-          | 'user'
-          | 'officer'
-          | 'user2'
-          | 'placeholderUser'
-          | { email: string; password: string }
-      ) => Cypress.Chainable<LoginMutation | ExternalTokenLoginMutation>;
+        idOrCredentials: TestUserId | { email: string; password: string },
+        role?: number
+      ) => Cypress.Chainable<ExternalTokenLoginMutation>;
 
       /**
-       * Logs in user with provided credentials
+       * Gets settings
        *
-       * @returns {typeof login}
+       * @returns {typeof getSettings}
        * @memberof Chainable
        * @example
-       *    cy.login('user')
+       *    cy.getSettings(SettingsId.ABC)
        */
-      externalTokenLogin: (
-        roleOrCredentials: 'user' | 'officer' | 'user2' | 'placeholderUser'
-      ) => Cypress.Chainable<ExternalTokenLoginMutation | LoginMutation>;
 
       /**
        * Logs user out

@@ -13,6 +13,7 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import { updatedCall } from '../support/utils';
+import { UserJwt } from './../../src/generated/sdk';
 
 const sepMembers = {
   chair: initialDBData.users.user2,
@@ -202,7 +203,7 @@ context('SEP reviews tests', () => {
   describe('User officer role', () => {
     it('Officer should be able to assign proposal to existing SEP', function () {
       cy.getAndStoreFeaturesEnabled();
-      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
       cy.login('officer');
@@ -516,7 +517,7 @@ context('SEP reviews tests', () => {
         throw new Error('No logged in user');
       }
 
-      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+      const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
       cy.updateUserDetails({
@@ -645,7 +646,7 @@ context('SEP reviews tests', () => {
         throw new Error('No logged in user');
       }
 
-      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+      const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
       cy.updateUserDetails({

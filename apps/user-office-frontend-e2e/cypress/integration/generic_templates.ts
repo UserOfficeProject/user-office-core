@@ -291,7 +291,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -321,7 +321,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -459,7 +459,7 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
