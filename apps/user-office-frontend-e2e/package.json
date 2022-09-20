@@ -1,6 +1,6 @@
 {
-  "name": "duo-frontend",
-  "version": "0.1.0",
+  "name": "user-office-frontend-e2e",
+  "version": "1.0.0",
   "private": true,
   "proxy": "http://localhost:4000",
   "dependencies": {
