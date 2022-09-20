@@ -58,21 +58,21 @@ beforeEach(() => {
 
 test('When an invalid external token is supplied, no user is found', async () => {
   return expect(
-    userAuthorization.externalTokenLogin('invalid')
+    userAuthorization.externalTokenLogin('invalid', '')
   ).rejects.toThrow(
     'Failed to fetch user details for STFC external authentication'
   );
 });
 
 test('When a valid external token is supplied, valid user is returned', async () => {
-  const result = await userAuthorization.externalTokenLogin('valid');
+  const result = await userAuthorization.externalTokenLogin('valid', '');
 
   expect(result?.id).toBe(dummyUser.id);
   expect(result?.email).toBe(dummyUser.email);
 });
 
 test('When getting instruments for roles, duplicate roles are filtered out before', async () => {
-  await userAuthorization.externalTokenLogin('valid');
+  await userAuthorization.externalTokenLogin('valid', '');
 
   // Duplicate 'User Officer' and 'ISIS Instrument Scientist' roles removed
   expect(mockGetRequiredInstrumentForRole).toBeCalledWith([
