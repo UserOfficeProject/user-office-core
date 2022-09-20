@@ -4,16 +4,15 @@ import {
   ReviewStatus,
   TechnicalReviewStatus,
   UserRole,
-  User,
   UpdateUserMutationVariables,
   TemplateGroupId,
   FeatureId,
+  UserJwt,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import { updatedCall } from '../support/utils';
-import { UserJwt } from './../../src/generated/sdk';
 
 const sepMembers = {
   chair: initialDBData.users.user2,

@@ -1,9 +1,5 @@
 import { faker } from '@faker-js/faker';
-import {
-  UpdateUserMutationVariables,
-  User,
-  FeatureId,
-} from '@user-office-software-libs/shared-types';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
