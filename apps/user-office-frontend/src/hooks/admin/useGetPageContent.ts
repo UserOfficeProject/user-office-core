@@ -22,8 +22,8 @@ export function useGetPageContent(pageName: PageName) {
           return;
         }
 
-        if (data.getPageContent) {
-          setPageContent(data.getPageContent);
+        if (data.pageContent) {
+          setPageContent(data.pageContent);
         }
         setLoading(false);
       });

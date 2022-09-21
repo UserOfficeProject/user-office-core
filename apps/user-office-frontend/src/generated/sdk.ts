@@ -2076,7 +2076,6 @@ export type Query = {
   genericTemplate: Maybe<GenericTemplate>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
   getOrcIDInformation: Maybe<OrcIdInformation>;
-  getPageContent: Maybe<Scalars['String']>;
   institutions: Maybe<Array<Institution>>;
   instrument: Maybe<Instrument>;
   instrumentScientistHasAccess: Maybe<Scalars['Boolean']>;
@@ -2089,6 +2088,7 @@ export type Query = {
   myShipments: Maybe<Array<Shipment>>;
   myVisits: Array<Visit>;
   nationalities: Maybe<Array<Entry>>;
+  pageContent: Maybe<Scalars['String']>;
   pdfTemplate: Maybe<PdfTemplate>;
   pdfTemplates: Maybe<Array<PdfTemplate>>;
   predefinedMessage: Maybe<PredefinedMessage>;
@@ -2251,11 +2251,6 @@ export type QueryGetOrcIdInformationArgs = {
 };
 
 
-export type QueryGetPageContentArgs = {
-  pageId: PageName;
-};
-
-
 export type QueryInstitutionsArgs = {
   filter?: InputMaybe<InstitutionsFilter>;
 };
@@ -2297,6 +2292,11 @@ export type QueryInstrumentsBySepArgs = {
 
 export type QueryIsNaturalKeyPresentArgs = {
   naturalKey: Scalars['String'];
+};
+
+
+export type QueryPageContentArgs = {
+  pageId: PageName;
 };
 
 
@@ -3673,7 +3673,7 @@ export type GetPageContentQueryVariables = Exact<{
 }>;
 
 
-export type GetPageContentQuery = { getPageContent: string | null };
+export type GetPageContentQuery = { pageContent: string | null };
 
 export type GetQuantitiesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3988,10 +3988,10 @@ export type GetInstrumentsQueryVariables = Exact<{
 
 export type GetInstrumentsQuery = { instruments: { totalCount: number, instruments: Array<{ id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }> } | null };
 
-export type GetUserInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetMyInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserInstrumentsQuery = { me: { instruments: Array<{ id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }> } | null };
+export type GetMyInstrumentsQuery = { me: { instruments: Array<{ id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> }> } | null };
 
 export type InstrumentFragment = { id: number, name: string, shortCode: string, description: string, managerUserId: number, scientists: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null, organisation: string, organizationId: number, position: string, created: any | null, placeholder: boolean | null, email: string | null }> };
 
@@ -6464,7 +6464,7 @@ export const GetInstitutionsWithCountryDocument = gql`
     ${CountryFragmentDoc}`;
 export const GetPageContentDocument = gql`
     query getPageContent($pageId: PageName!) {
-  getPageContent(pageId: $pageId)
+  pageContent(pageId: $pageId)
 }
     `;
 export const GetQuantitiesDocument = gql`
@@ -6985,8 +6985,8 @@ export const GetInstrumentsDocument = gql`
   }
 }
     ${InstrumentFragmentDoc}`;
-export const GetUserInstrumentsDocument = gql`
-    query getUserInstruments {
+export const GetMyInstrumentsDocument = gql`
+    query getMyInstruments {
   me {
     instruments {
       ...instrument
@@ -9709,8 +9709,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getInstruments(variables?: GetInstrumentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetInstrumentsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetInstrumentsQuery>(GetInstrumentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getInstruments', 'query');
     },
-    getUserInstruments(variables?: GetUserInstrumentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserInstrumentsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserInstrumentsQuery>(GetUserInstrumentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserInstruments', 'query');
+    getMyInstruments(variables?: GetMyInstrumentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMyInstrumentsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetMyInstrumentsQuery>(GetMyInstrumentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMyInstruments', 'query');
     },
     removeProposalsFromInstrument(variables: RemoveProposalsFromInstrumentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveProposalsFromInstrumentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<RemoveProposalsFromInstrumentMutation>(RemoveProposalsFromInstrumentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeProposalsFromInstrument', 'mutation');
