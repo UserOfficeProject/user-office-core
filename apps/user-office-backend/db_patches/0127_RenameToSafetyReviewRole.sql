@@ -12,8 +12,6 @@ BEGIN
       short_code='sample_safety_reviewer';
 
     END;
-
-    END;
 	END IF;
 END;
 $$
