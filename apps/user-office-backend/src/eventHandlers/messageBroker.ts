@@ -23,6 +23,7 @@ type ProposalMessageData = {
   shortCode: string;
   title: string;
   abstract: string;
+  newStatus?: string;
   members: { firstName: string; lastName: string; email: string; id: string }[];
   proposer?: { firstName: string; lastName: string; email: string; id: string };
 };
@@ -67,6 +68,13 @@ const getProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
+  const proposalSettingsDataSource =
+    container.resolve<ProposalSettingsDataSource>(
+      Tokens.ProposalSettingsDataSource
+    );
+  const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
+    proposal.statusId
+  );
 
   const proposalUsers = await userDataSource.getProposalUsersFull(
     proposal.primaryKey
@@ -83,6 +91,7 @@ const getProposalMessageData = async (proposal: Proposal) => {
       email: proposalUser.email,
       id: proposalUser.id.toString(),
     })),
+    newStatus: proposalStatus?.shortCode,
   };
 
   const proposer = await userDataSource.getUser(proposal.proposerId);
@@ -181,16 +190,34 @@ export function createPostToRabbitMQHandler() {
           newStatus: proposalStatus.shortCode,
         };
 
-        const json = JSON.stringify(message);
+        const schedulerMessage = JSON.stringify(message);
+
+        const fullProposalMessage = await getProposalMessageData(
+          event.proposal
+        );
 
         // NOTE: This message is consumed by scichat
-        await rabbitMQ.sendMessage(Queue.PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessage(
+          Queue.SCICHAT_PROPOSAL,
+          event.type,
+          fullProposalMessage
+        );
+        // NOTE: This message is consumed by scicat
+        await rabbitMQ.sendMessage(
+          Queue.SCICAT_PROPOSAL,
+          event.type,
+          fullProposalMessage
+        );
         // NOTE: Send message for scheduler in a separate queue
-        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessage(
+          Queue.SCHEDULING_PROPOSAL,
+          event.type,
+          schedulerMessage
+        );
 
         logger.logDebug(
           'Proposal event successfully sent to the message broker',
-          { eventType: event.type, json }
+          { eventType: event.type, fullProposalMessage }
         );
 
         break;
