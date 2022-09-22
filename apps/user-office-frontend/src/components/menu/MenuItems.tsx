@@ -139,7 +139,7 @@ const SettingsMenuListItem = () => {
   );
 };
 
-const SamplesMenuListItem = () => {
+const SampleSafetyMenuListItem = () => {
   return (
     <Tooltip title="Sample safety">
       <ListItem component={NavLink} to="/SampleSafety" button>
@@ -147,6 +147,19 @@ const SamplesMenuListItem = () => {
           <BoxIcon />
         </ListItemIcon>
         <ListItemText primary="Sample safety" />
+      </ListItem>
+    </Tooltip>
+  );
+};
+
+const ExperimentSafetyMenuListItem = () => {
+  return (
+    <Tooltip title="Proposal safety">
+      <ListItem component={NavLink} to="/ExperimentSafety" button>
+        <ListItemIcon>
+          <BoxIcon />
+        </ListItemIcon>
+        <ListItemText primary="Proposal safety" />
       </ListItem>
     </Tooltip>
   );
@@ -167,7 +180,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isSampleSafetyEnabled = context.featuresMap.get(
+  const isSafetyReviewEnabled = context.featuresMap.get(
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
 
@@ -311,7 +324,8 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="Questions" />
         </ListItem>
       </Tooltip>
-      {isSampleSafetyEnabled && <SamplesMenuListItem />}
+      {isSafetyReviewEnabled && <SampleSafetyMenuListItem />}
+      {isSafetyReviewEnabled && <ExperimentSafetyMenuListItem />}
       <SettingsMenuListItem />
     </div>
   );
@@ -362,9 +376,10 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     </div>
   );
 
-  const sampleSafetyReviewer = (
+  const safetyReviewer = (
     <div data-cy="reviewer-menu-items">
-      <SamplesMenuListItem />
+      <SampleSafetyMenuListItem />
+      <ExperimentSafetyMenuListItem />
     </div>
   );
 
@@ -380,7 +395,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     case UserRole.SEP_REVIEWER:
       return SEPRoles;
     case UserRole.SAFETY_REVIEWER:
-      return sampleSafetyReviewer;
+      return safetyReviewer;
     default:
       return null;
   }

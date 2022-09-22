@@ -42,6 +42,7 @@ import InstrSciUpcomingExperimentTimesTable from './proposalBooking/InstrSciUpco
 import UserExperimentTimesTable from './proposalBooking/UserExperimentsTable';
 import CreateProposalEsiPage from './proposalEsi/CreateProposalEsiPage';
 import UpdateProposalEsiPage from './proposalEsi/UpdateProposalEsiPage';
+import ExperimentSafetyPage from './experimentSafety/ExperimentSafetyPage';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
@@ -167,9 +168,7 @@ const Dashboard: React.FC = () => {
       : !isTabletOrMobile
   );
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isSampleSafetyReviewer = useCheckAccess([
-    UserRole.SAFETY_REVIEWER,
-  ]);
+  const isSampleSafetyReviewer = useCheckAccess([UserRole.SAFETY_REVIEWER]);
 
   const featureContext = useContext(FeatureContext);
   const isSchedulerEnabled = featureContext.featuresMap.get(
@@ -466,15 +465,22 @@ const Dashboard: React.FC = () => {
               component={ProposalWorkflowEditor}
             />
           )}
-          {isSampleSafetyEnabled &&
-            (isSampleSafetyReviewer || isUserOfficer) && (
+          {isSampleSafetyEnabled && (isSampleSafetyReviewer || isUserOfficer) && (
+            <>
+              <TitledRoute
+                setHeader={setHeader}
+                title="Proposal Safety"
+                path="/ExperimentSafety"
+                component={ExperimentSafetyPage}
+              />
               <TitledRoute
                 setHeader={setHeader}
                 title="Samples Safety"
                 path="/SampleSafety"
                 component={SampleSafetyPage}
               />
-            )}
+            </>
+          )}
           {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
