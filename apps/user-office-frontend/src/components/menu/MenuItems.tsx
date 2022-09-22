@@ -379,7 +379,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     case UserRole.SEP_SECRETARY:
     case UserRole.SEP_REVIEWER:
       return SEPRoles;
-    case UserRole.SAMPLE_SAFETY_REVIEWER:
+    case UserRole.SAFETY_REVIEWER:
       return sampleSafetyReviewer;
     default:
       return null;

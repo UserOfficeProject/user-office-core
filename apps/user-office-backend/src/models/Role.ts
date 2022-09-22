@@ -13,5 +13,5 @@ export enum Roles {
   SEP_SECRETARY = 'sep_secretary',
   SEP_REVIEWER = 'sep_reviewer',
   INSTRUMENT_SCIENTIST = 'instrument_scientist',
-  SAMPLE_SAFETY_REVIEWER = 'sample_safety_reviewer',
+  SAFETY_REVIEWER = 'safety_reviewer',
 }

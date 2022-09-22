@@ -35,7 +35,7 @@ export class SampleAuthorization {
       return false;
     }
 
-    return agent?.currentRole?.shortCode === Roles.SAMPLE_SAFETY_REVIEWER;
+    return agent?.currentRole?.shortCode === Roles.SAFETY_REVIEWER;
   }
 
   async hasReadRights(

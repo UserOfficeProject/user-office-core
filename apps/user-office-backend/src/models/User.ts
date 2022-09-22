@@ -67,7 +67,7 @@ export enum UserRole {
   SEP_SECRETARY,
   SEP_REVIEWER,
   INSTRUMENT_SCIENTIST,
-  SAMPLE_SAFETY_REVIEWER,
+  SAFETY_REVIEWER,
 }
 
 export const UserRoleShortCodeMap = {
@@ -77,7 +77,7 @@ export const UserRoleShortCodeMap = {
   [UserRole.SEP_SECRETARY]: Roles.SEP_SECRETARY,
   [UserRole.SEP_REVIEWER]: Roles.SEP_REVIEWER,
   [UserRole.INSTRUMENT_SCIENTIST]: Roles.INSTRUMENT_SCIENTIST,
-  [UserRole.SAMPLE_SAFETY_REVIEWER]: Roles.SAMPLE_SAFETY_REVIEWER,
+  [UserRole.SAFETY_REVIEWER]: Roles.SAFETY_REVIEWER,
 } as const;
 
 export class BasicUserDetails {

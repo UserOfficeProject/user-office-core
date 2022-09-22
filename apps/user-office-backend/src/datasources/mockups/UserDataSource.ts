@@ -117,7 +117,7 @@ export const dummySampleReviewer: UserWithRole = {
   currentRole: {
     id: 1,
     title: 'Sample Reviewer',
-    shortCode: 'sample_safety_reviewer',
+    shortCode: 'safety_reviewer',
   },
 };
 

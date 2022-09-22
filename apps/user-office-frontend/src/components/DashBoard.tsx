@@ -168,7 +168,7 @@ const Dashboard: React.FC = () => {
   );
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isSampleSafetyReviewer = useCheckAccess([
-    UserRole.SAMPLE_SAFETY_REVIEWER,
+    UserRole.SAFETY_REVIEWER,
   ]);
 
   const featureContext = useContext(FeatureContext);
