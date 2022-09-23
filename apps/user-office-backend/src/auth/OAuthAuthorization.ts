@@ -21,7 +21,7 @@ type ValidTokenSet = RequiredField<TokenSet, 'access_token'>;
 
 type ValidUser = NonNullableField<
   User,
-  'oidcSub' | 'oidcAccessToken' | 'oidcRefreshToken'
+  'oidcSub' | 'oauthAccessToken' | 'oauthRefreshToken'
 >;
 
 export abstract class OAuthAuthorization extends UserAuthorization {
@@ -96,7 +96,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
       );
 
       const client = await OpenIdClient.getInstance();
-      await client.revoke(user.oidcAccessToken);
+      await client.revoke(user.oauthAccessToken);
 
       return;
     } catch (error) {
@@ -171,10 +171,10 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         firstname: userInfo.given_name,
         lastname: userInfo.family_name,
         email: userInfo.email,
-        oidcAccessToken: tokenSet.access_token,
-        oidcRefreshToken: tokenSet.refresh_token ?? '',
+        oauthAccessToken: tokenSet.access_token,
+        oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
-        oidcIssuer: client.issuer.metadata.issuer,
+        oauthIssuer: client.issuer.metadata.issuer,
         department: userInfo.department as string,
         gender: userInfo.gender as string,
         user_title: userInfo.title as string,
@@ -236,7 +236,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
 
   private validateUser(user: User | null): ValidUser {
-    if (!user?.oidcSub || !user?.oidcAccessToken) {
+    if (!user?.oidcSub || !user?.oauthAccessToken) {
       logger.logError('Invalid user', {
         authorizer: this.constructor.name,
         user,
