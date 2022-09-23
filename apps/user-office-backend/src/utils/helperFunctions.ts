@@ -52,3 +52,15 @@ export const checkAllReviewsSubmittedOnProposal = (
 
   return allOtherReviewsSubmitted;
 };
+
+export function removeDuplicates<T>(obj: T): T {
+  if (Array.isArray(obj) && obj.length > 1) {
+    return obj.reduce(function (carrResult, currValue) {
+      return carrResult.includes(currValue)
+        ? carrResult
+        : [...carrResult, currValue];
+    }, []);
+  }
+
+  return obj;
+}
