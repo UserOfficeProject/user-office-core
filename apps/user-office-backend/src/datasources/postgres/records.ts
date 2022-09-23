@@ -286,6 +286,7 @@ export interface CallRecord {
   readonly call_short_code: string;
   readonly start_call: Date;
   readonly end_call: Date;
+  readonly end_call_internal: Date;
   readonly start_review: Date;
   readonly end_review: Date;
   readonly start_sep_review: Date;
@@ -301,6 +302,7 @@ export interface CallRecord {
   readonly proposal_sequence: number;
   readonly proposal_workflow_id: number;
   readonly call_ended: boolean;
+  readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
   readonly call_sep_review_ended: boolean;
   readonly template_id: number;
@@ -522,6 +524,7 @@ export interface ProposalEventsRecord {
   readonly proposal_feasible: boolean;
   readonly proposal_unfeasible: boolean;
   readonly call_ended: boolean;
+  readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
   readonly proposal_sep_selected: boolean;
   readonly proposal_instrument_selected: boolean;
@@ -854,6 +857,7 @@ export const createCallObject = (call: CallRecord) => {
     call.call_short_code,
     call.start_call,
     call.end_call,
+    call.end_call_internal,
     call.start_review,
     call.end_review,
     call.start_sep_review,
@@ -869,6 +873,7 @@ export const createCallObject = (call: CallRecord) => {
     call.proposal_sequence,
     call.proposal_workflow_id,
     call.call_ended,
+    call.call_ended_internal,
     call.call_review_ended,
     call.call_sep_review_ended,
     call.template_id,

@@ -24,7 +24,14 @@ export default class CallQueries {
 
   @Authorized()
   async getAll(agent: UserWithRole | null, filter?: CallsFilter) {
+    if (filter?.isActiveInternal && agent?.isInternalUser) {
+      if (!(await this.userAuth.isInternalUser(agent))) {
+        delete filter?.isActiveInternal;
+      }
+    }
     const calls = await this.dataSource.getCalls(filter);
+    // eslint-disable-next-line no-console
+    console.log(calls);
 
     return calls;
   }
