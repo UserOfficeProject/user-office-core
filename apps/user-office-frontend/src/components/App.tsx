@@ -137,6 +137,7 @@ class App extends React.Component {
     localStorage.removeItem('user');
     localStorage.removeItem('expToken');
     localStorage.removeItem('impersonatingUserId');
+    localStorage.removeItem('isInternalUser');
 
     return { errorUserInformation };
   }
