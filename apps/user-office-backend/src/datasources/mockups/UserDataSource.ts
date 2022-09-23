@@ -8,6 +8,7 @@ import {
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
+import { stfcRole } from '../stfc/StfcUserDataSource';
 import { UserDataSource } from '../UserDataSource';
 
 export const basicDummyUser = new BasicUserDetails(
@@ -187,6 +188,9 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
 };
 
 export class UserDataSourceMock implements UserDataSource {
+  getRolesForUser(id: number): Promise<stfcRole[]> {
+    throw new Error('Method not implemented.');
+  }
   async delete(id: number): Promise<User | null> {
     return dummyUser;
   }

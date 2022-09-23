@@ -26,6 +26,9 @@ class AuthJwtPayload implements AuthJwtPayloadBase {
 
   @Field(() => [Role])
   roles: Role[];
+
+  @Field(() => Boolean)
+  isInternalUser: boolean;
 }
 
 @ObjectType()

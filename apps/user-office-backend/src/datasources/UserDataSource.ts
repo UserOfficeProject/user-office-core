@@ -3,6 +3,7 @@ import { User, BasicUserDetails, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
+import { stfcRole } from './stfc/StfcUserDataSource';
 
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
@@ -22,6 +23,7 @@ export interface UserDataSource {
   getByEmail(email: string): Promise<User | null>;
   getByOrcID(orcID: string): Promise<User | null>;
   getPasswordByEmail(email: string): Promise<string | null>;
+  getRolesForUser(id: number): Promise<stfcRole[]>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
     args: UsersArgs

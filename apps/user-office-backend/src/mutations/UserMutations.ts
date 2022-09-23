@@ -402,6 +402,7 @@ export default class UserMutations {
       user,
       roles,
       currentRole: roles[0],
+      isInternalUser: false,
     });
 
     return token;
@@ -454,6 +455,7 @@ export default class UserMutations {
       user,
       roles,
       currentRole: roles[0],
+      isInternalUser: false,
       impersonatingUserId:
         isUserOfficer && shouldImpersonateUser ? agent?.id : undefined,
     });
@@ -469,6 +471,7 @@ export default class UserMutations {
         user: decoded.user,
         roles,
         currentRole: decoded.currentRole,
+        isInternalUser: decoded.isInternalUser,
         externalToken: decoded.externalToken,
       });
 
@@ -487,11 +490,15 @@ export default class UserMutations {
       }
 
       const roles = await this.dataSource.getUserRoles(user.id);
+      const isInternalUser = await this.userAuth.isInternalUser(
+        user as UserWithRole
+      );
 
       const uosToken = signToken<AuthJwtPayload>({
         user: user,
         roles,
         currentRole: roles[0],
+        isInternalUser: isInternalUser,
         externalToken: externalToken,
       });
 
@@ -542,6 +549,7 @@ export default class UserMutations {
         user: decoded.user,
         roles: decoded.roles,
         currentRole,
+        isInternalUser: decoded.isInternalUser,
         externalToken: decoded.externalToken,
         impersonatingUserId: decoded.impersonatingUserId,
       });

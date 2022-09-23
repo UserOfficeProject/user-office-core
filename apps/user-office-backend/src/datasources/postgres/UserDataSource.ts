@@ -12,6 +12,7 @@ import {
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
+import { stfcRole } from '../stfc/StfcUserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
@@ -707,5 +708,8 @@ export default class PostgresUserDataSource implements UserDataSource {
         (role: RoleRecord) =>
           new Role(role.role_id, role.short_code, role.title)
       );
+  }
+  getRolesForUser(id: number): Promise<stfcRole[]> {
+    throw new Error('Method not implemented.');
   }
 }

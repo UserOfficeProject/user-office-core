@@ -22,6 +22,20 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
+  async isInternalUser(agent: UserWithRole | null): Promise<boolean> {
+    return agent
+      ? agent?.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST ||
+          agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
+          this.userDataSource.getRolesForUser(agent.id).then((roles) => {
+            return roles.some(
+              (role) =>
+                role.name === 'Internal proposal submitter' ||
+                role.name === 'ISIS Instrument Scientist' ||
+                role.name === 'User Officer'
+            );
+          })
+      : false;
+  }
   isUser(agent: UserWithRole | null) {
     return agent?.currentRole?.shortCode === Roles.USER;
   }
