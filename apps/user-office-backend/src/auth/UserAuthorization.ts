@@ -30,7 +30,7 @@ export abstract class UserAuthorization {
     return agent?.isApiAccessToken;
   }
 
-  async hasRole(agent: UserWithRole | null, role: string): Promise<boolean> {
+  async hasRole(agent: UserWithRole | null, role: Roles): Promise<boolean> {
     if (!agent) {
       return false;
     }

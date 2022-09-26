@@ -1,7 +1,7 @@
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Rejection } from '../../models/Rejection';
-import { GetProposalEsisFilter } from '../../queries/ProposalEsiQueries';
 import { UpdateEsiArgs } from '../../resolvers/mutations/UpdateEsiMutation';
+import { GetProposalEsisFilter } from '../../resolvers/queries/EsisQuery';
 import { ProposalEsiDataSource } from '../ProposalEsiDataSource';
 import database from './database';
 import { createEsiObject, EsiRecord } from './records';
@@ -40,16 +40,16 @@ class PostgresProposalEsiDataSource implements ProposalEsiDataSource {
   }
 
   async getEsis(
-    filter: GetProposalEsisFilter
+    filter?: GetProposalEsisFilter
   ): Promise<ExperimentSafetyInput[]> {
     const esis: EsiRecord[] = await database
       .select('*')
       .from('experiment_safety_inputs')
       .modify((query) => {
-        if (filter.scheduledEventId) {
+        if (filter?.scheduledEventId) {
           query.where('scheduled_event_id', filter.scheduledEventId);
         }
-        if (filter.questionaryId) {
+        if (filter?.questionaryId) {
           query.where('questionary_id', filter.questionaryId);
         }
       });

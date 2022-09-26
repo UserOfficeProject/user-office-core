@@ -6,6 +6,7 @@ import { Answer } from './Answer';
 import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { ExperimentSafetyDocument } from './ExperimentSafetyDocument';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { Feature } from './Feature';
 import { Feedback } from './Feedback';
@@ -371,6 +372,13 @@ export class EsiResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ExperimentSafetyInput, { nullable: true })
   public esi: ExperimentSafetyInput;
+}
+
+@ObjectType()
+export class EsdResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => ExperimentSafetyDocument, { nullable: true })
+  public esd: ExperimentSafetyDocument;
 }
 
 @ObjectType()

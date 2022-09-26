@@ -6,12 +6,8 @@ import { Authorized } from '../decorators';
 import { ExperimentSafetyInput } from '../models/ExperimentSafetyInput';
 import { Questionary } from '../models/Questionary';
 import { UserWithRole } from '../models/User';
+import { GetProposalEsisFilter } from '../resolvers/queries/EsisQuery';
 import { QuestionaryDataSource } from './../datasources/QuestionaryDataSource';
-
-export interface GetProposalEsisFilter {
-  scheduledEventId?: number;
-  questionaryId?: number;
-}
 
 @injectable()
 export default class ProposalEsiQueries {
@@ -36,7 +32,7 @@ export default class ProposalEsiQueries {
   @Authorized()
   async getEsis(
     user: UserWithRole | null,
-    filter: GetProposalEsisFilter
+    filter?: GetProposalEsisFilter
   ): Promise<ExperimentSafetyInput[] | null> {
     const esis = await this.dataSource.getEsis(filter);
 

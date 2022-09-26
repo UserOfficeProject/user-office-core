@@ -17,6 +17,7 @@ export const Tokens = {
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   ProposalDataSource: Symbol('ProposalDataSource'),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),
+  ProposalEsdDataSource: Symbol('ProposalEsdDataSource'),
   ProposalSettingsDataSource: Symbol('ProposalSettingsDataSource'),
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),

@@ -13,9 +13,11 @@ import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import ScheduledEventDataSource from '../../datasources/postgres/ScheduledEventDataSource';
 import { ExperimentSafetyInput as ExperimentSafetyInputOrigin } from '../../models/ExperimentSafetyInput';
+import { ExperimentSafetyDocument } from './ExperimentSafetyDocument';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
+import { User } from './User';
 
 @ObjectType()
 export class ExperimentSafetyInput
@@ -63,6 +65,19 @@ export class ExperimentSafetyInputResolver {
     );
   }
 
+  @FieldResolver(() => User)
+  async creator(
+    @Root() esi: ExperimentSafetyInput,
+    @Ctx() context: ResolverContext
+  ): Promise<User> {
+    const user = await context.queries.user.get(context.user, esi.creatorId);
+    if (!user) {
+      throw new Error('Unexpected error. User does not exist');
+    }
+
+    return user;
+  }
+
   @FieldResolver(() => Proposal)
   async proposal(
     @Root() esi: ExperimentSafetyInput,
@@ -93,5 +108,15 @@ export class ExperimentSafetyInputResolver {
     }
 
     return proposal;
+  }
+
+  @FieldResolver(() => ExperimentSafetyDocument, { nullable: true })
+  async esi(
+    @Root() esi: ExperimentSafetyInput,
+    @Ctx() context: ResolverContext
+  ): Promise<ExperimentSafetyDocument | null> {
+    const esd = await context.queries.proposalEsd.getEsd(context.user, esi.id);
+
+    return esd;
   }
 }

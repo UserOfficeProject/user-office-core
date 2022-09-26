@@ -1,7 +1,7 @@
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Rejection } from '../../models/Rejection';
-import { GetProposalEsisFilter } from '../../queries/ProposalEsiQueries';
 import { UpdateEsiArgs } from '../../resolvers/mutations/UpdateEsiMutation';
+import { GetProposalEsisFilter } from '../../resolvers/queries/EsisQuery';
 import { ProposalEsiDataSource } from '../ProposalEsiDataSource';
 
 export class ProposalEsiDataSourceMock implements ProposalEsiDataSource {
@@ -38,13 +38,13 @@ export class ProposalEsiDataSourceMock implements ProposalEsiDataSource {
     return this.esis.find((esi) => esi.id === esiId) || null;
   }
   async getEsis(
-    filter: GetProposalEsisFilter
+    filter?: GetProposalEsisFilter
   ): Promise<ExperimentSafetyInput[]> {
     return this.esis.filter((esi) => {
-      const isVisitMatch = filter.scheduledEventId
+      const isVisitMatch = filter?.scheduledEventId
         ? esi.scheduledEventId === filter.scheduledEventId
         : true;
-      const isQuestionaryMatch = filter.questionaryId
+      const isQuestionaryMatch = filter?.questionaryId
         ? esi.questionaryId === filter.questionaryId
         : true;
 

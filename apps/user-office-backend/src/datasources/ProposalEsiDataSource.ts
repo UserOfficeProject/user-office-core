@@ -1,7 +1,7 @@
 import { ExperimentSafetyInput } from '../models/ExperimentSafetyInput';
 import { Rejection } from '../models/Rejection';
-import { GetProposalEsisFilter } from '../queries/ProposalEsiQueries';
 import { UpdateEsiArgs } from '../resolvers/mutations/UpdateEsiMutation';
+import { GetProposalEsisFilter } from '../resolvers/queries/EsisQuery';
 
 export interface ProposalEsiDataSource {
   // Create
@@ -13,7 +13,7 @@ export interface ProposalEsiDataSource {
 
   // Read
   getEsi(esiId: number): Promise<ExperimentSafetyInput | null>;
-  getEsis(filter: GetProposalEsisFilter): Promise<ExperimentSafetyInput[]>;
+  getEsis(filter?: GetProposalEsisFilter): Promise<ExperimentSafetyInput[]>;
 
   // Update
   updateEsi(args: UpdateEsiArgs): Promise<ExperimentSafetyInput>;

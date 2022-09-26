@@ -26,6 +26,7 @@ import {
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { TrainingStatus } from '../models/VisitRegistration';
+import { EsdEvaluation } from './../models/EsdEvaluation';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
   EquipmentAssignmentStatus,
@@ -88,5 +89,8 @@ export const registerEnums = () => {
   });
   registerEnumType(FeatureUpdateAction, {
     name: 'FeatureUpdateAction',
+  });
+  registerEnumType(EsdEvaluation, {
+    name: 'EsdEvaluation',
   });
 };

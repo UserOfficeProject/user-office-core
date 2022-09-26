@@ -12,6 +12,7 @@ import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTem
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
+import { ProposalEsdDataSourceMock } from '../datasources/mockups/ProposalEsdDataSource';
 import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
@@ -47,6 +48,7 @@ mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);
+mapClass(Tokens.ProposalEsdDataSource, ProposalEsdDataSourceMock);
 mapClass(Tokens.ProposalSettingsDataSource, ProposalSettingsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
 mapClass(Tokens.ReviewDataSource, ReviewDataSourceMock);

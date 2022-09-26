@@ -9,6 +9,7 @@ import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
+import ProposalEsdMutations from './mutations/ProposalEsdMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ProposalSettingsMutations from './mutations/ProposalSettingsMutations';
@@ -31,6 +32,7 @@ import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
+import ProposalEsdQueries from './queries/ProposalEsdQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import ProposalSettingsQueries from './queries/ProposalSettingsQueries';
@@ -59,6 +61,7 @@ const context: BasicResolverContext = {
     pdfTemplate: container.resolve(PdfTemplateQueries),
     proposal: container.resolve(ProposalQueries),
     proposalEsi: container.resolve(ProposalEsiQueries),
+    proposalEsd: container.resolve(ProposalEsdQueries),
     proposalSettings: container.resolve(ProposalSettingsQueries),
     questionary: container.resolve(QuestionaryQueries),
     review: container.resolve(ReviewQueries),
@@ -84,6 +87,7 @@ const context: BasicResolverContext = {
     pdfTemplate: container.resolve(PdfTemplateMutations),
     proposal: container.resolve(ProposalMutations),
     proposalEsi: container.resolve(ProposalEsiMutations),
+    proposalEsd: container.resolve(ProposalEsdMutations),
     proposalSettings: container.resolve(ProposalSettingsMutations),
     questionary: container.resolve(QuestionaryMutations),
     review: container.resolve(ReviewMutations),

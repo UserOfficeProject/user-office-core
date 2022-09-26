@@ -7,6 +7,8 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
+import { EsdEvaluation } from '../../models/EsdEvaluation';
+import { ExperimentSafetyDocument } from '../../models/ExperimentSafetyDocument';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
@@ -587,6 +589,15 @@ export interface EsiRecord {
   readonly created_at: Date;
 }
 
+export interface EsdRecord {
+  readonly esd_id: number;
+  readonly esi_id: number;
+  readonly reviewer_user_id: number;
+  readonly evaluation: EsdEvaluation;
+  readonly created_at: Date;
+  readonly evaluated_at: Date;
+}
+
 export interface GenericTemplateRecord {
   readonly generic_template_id: number;
   readonly title: string;
@@ -1032,6 +1043,17 @@ export const createEsiObject = (esi: EsiRecord) => {
     esi.questionary_id,
     esi.is_submitted,
     esi.created_at
+  );
+};
+
+export const createEsdObject = (esd: EsdRecord) => {
+  return new ExperimentSafetyDocument(
+    esd.esd_id,
+    esd.esi_id,
+    esd.reviewer_user_id,
+    esd.evaluation,
+    esd.created_at,
+    esd.evaluated_at
   );
 };
 
