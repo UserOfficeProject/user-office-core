@@ -77,16 +77,12 @@ export default class PostgresCallDataSource implements CallDataSource {
       query
         .where('start_call', '<=', currentDate)
         .andWhere('end_call', '>=', currentDate);
-    }
-
-    if (filter?.isEndedInternal === true) {
+    } else if (filter?.isActiveInternal === true) {
       query
         .where('end_call', '<', currentDate)
         .andWhere('end_call_internal', '>=', currentDate);
     } else if (filter?.isActiveInternal === false) {
-      query
-        .where('end_call', '<', currentDate)
-        .andWhere('end_call_internal', '<', currentDate);
+      query.where('call_ended_internal', '=', true);
     }
 
     if (filter?.isReviewEnded === true) {

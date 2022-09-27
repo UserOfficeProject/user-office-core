@@ -24,10 +24,9 @@ export default class CallQueries {
 
   @Authorized()
   async getAll(agent: UserWithRole | null, filter?: CallsFilter) {
-    if (filter?.isActiveInternal && agent?.isInternalUser) {
+    if (filter?.isActiveInternal && !agent?.isInternalUser) {
       delete filter?.isActiveInternal;
     }
-
     const calls = await this.dataSource.getCalls(filter);
 
     return calls;
