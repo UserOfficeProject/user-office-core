@@ -50,4 +50,5 @@ fragment call on Call {
   description
   submissionMessage
   isActive
+  isActiveInternal
 }

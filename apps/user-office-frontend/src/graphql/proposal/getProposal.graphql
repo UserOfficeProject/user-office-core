@@ -54,6 +54,7 @@ query getProposal($primaryKey: Int!) {
       referenceNumberFormat
       startCall
       endCall
+      endCallInternal
     }
     sep {
       id
