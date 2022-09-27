@@ -67,9 +67,7 @@ export default class ProposalMutations {
     { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    const checkIfInternalCallActive =
-      (agent?.isInternalUser && (await this.userAuth.isInternalUser(agent))) ||
-      false;
+    const checkIfInternalCallActive = agent?.isInternalUser || false;
     if (
       await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
     ) {
@@ -210,9 +208,7 @@ export default class ProposalMutations {
     }
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    const checkIsInternalActive =
-      (agent?.isInternalUser && (await this.userAuth.isInternalUser(agent))) ||
-      false;
+    const checkIsInternalActive = agent?.isInternalUser || false;
     if (
       !isUserOfficer &&
       !(await this.proposalAuth.isMemberOfProposal(agent, proposal))
@@ -509,9 +505,7 @@ export default class ProposalMutations {
       );
     }
 
-    const checkIfInternalCallActive =
-      (agent?.isInternalUser && (await this.userAuth.isInternalUser(agent))) ||
-      false;
+    const checkIfInternalCallActive = agent?.isInternalUser || false;
     false;
     // Check if there is an open call
     if (

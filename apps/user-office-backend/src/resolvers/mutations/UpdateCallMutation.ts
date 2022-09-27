@@ -78,7 +78,7 @@ export class UpdateCallInput {
   @Field(() => Int, { nullable: true })
   public callEnded?: boolean;
 
-  @Field(() => Int, { nullable: true })
+  @Field({ nullable: true })
   public callEndedInternal?: boolean;
 
   @Field(() => Int, { nullable: true })
