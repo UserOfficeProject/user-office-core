@@ -3,6 +3,7 @@ fragment call on Call {
   shortCode
   startCall
   endCall
+  endCallInternal
   startReview
   endReview
   startSEPReview
