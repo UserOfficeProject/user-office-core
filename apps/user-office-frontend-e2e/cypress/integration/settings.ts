@@ -371,6 +371,98 @@ context('Settings tests', () => {
       cy.contains(editedProposalTitle);
     });
 
+    it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED_INTERNAL status', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+        this.skip();
+      }
+      const proposalTitle = faker.random.words(3);
+      const editedProposalTitle = faker.random.words(3);
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...updatedCall,
+        proposalWorkflowId: createdWorkflowId,
+        endCallInternal: faker.date.future(),
+      });
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: prevProposalStatusId,
+      }).then((result) => {
+        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId:
+              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+          });
+        }
+      });
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalTitle,
+            proposerId: initialDBData.users.user1.id,
+          });
+        }
+      });
+
+      cy.login('user');
+      cy.visit('/');
+      window.localStorage.isInternalUser = true;
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .click();
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submit').click();
+
+      cy.on('window:confirm', (str) => {
+        expect(str).to.equal(
+          'Submit proposal? The proposal can be edited after submission.'
+        );
+
+        return true;
+      });
+
+      cy.contains('OK').click();
+
+      cy.contains('Submitted');
+
+      cy.contains('Dashboard').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=proposal-table]')
+        .contains(proposalTitle)
+        .parent()
+        .contains('submitted');
+
+      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
+        .first()
+        .then((element) => expect(element.text()).to.contain('submitted'));
+
+      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
+        .first()
+        .find('[aria-label="Edit proposal"]')
+        .click();
+
+      cy.get('[name="proposal_basis.title"]').clear().type(editedProposalTitle);
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submitted');
+
+      cy.contains('Dashboard').click();
+
+      cy.contains(editedProposalTitle);
+    });
+
     it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
       cy.login('officer');
       cy.visit('/ProposalWorkflows');
