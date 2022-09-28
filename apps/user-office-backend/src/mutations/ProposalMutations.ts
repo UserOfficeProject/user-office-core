@@ -506,13 +506,9 @@ export default class ProposalMutations {
     }
 
     const checkIfInternalCallActive = agent?.isInternalUser || false;
-    false;
     // Check if there is an open call
     if (
-      !(await this.callDataSource.isCallEnded(
-        callId,
-        checkIfInternalCallActive
-      ))
+      await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
     ) {
       return rejection(
         'Can not clone proposal because the call is not active',
