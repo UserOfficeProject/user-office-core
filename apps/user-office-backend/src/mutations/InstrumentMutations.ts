@@ -58,16 +58,13 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: CreateInstrumentArgs
   ): Promise<Instrument | Rejection> {
-    return this.dataSource
-      .create(args)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not create instrument',
-          { agent, shortCode: args.shortCode },
-          error
-        );
-      });
+    return this.dataSource.create(args).catch((error) => {
+      return rejection(
+        'Could not create instrument',
+        { agent, shortCode: args.shortCode },
+        error
+      );
+    });
   }
 
   @ValidateArgs(updateInstrumentValidationSchema)
@@ -76,16 +73,13 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: UpdateInstrumentArgs
   ): Promise<Instrument | Rejection> {
-    return this.dataSource
-      .update(args)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not update instrument',
-          { agent, instrumentId: args.id },
-          error
-        );
-      });
+    return this.dataSource.update(args).catch((error) => {
+      return rejection(
+        'Could not update instrument',
+        { agent, instrumentId: args.id },
+        error
+      );
+    });
   }
 
   @EventBus(Event.INSTRUMENT_DELETED)
@@ -95,16 +89,13 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<Instrument | Rejection> {
-    return this.dataSource
-      .delete(args.id)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not delete instrument',
-          { agent, instrumentId: args.id },
-          error
-        );
-      });
+    return this.dataSource.delete(args.id).catch((error) => {
+      return rejection(
+        'Could not delete instrument',
+        { agent, instrumentId: args.id },
+        error
+      );
+    });
   }
 
   async checkIfProposalsAreOnSameCallAsInstrument(
@@ -192,7 +183,6 @@ export default class InstrumentMutations {
 
     return this.dataSource
       .assignProposalsToInstrument(proposalPks, args.instrumentId)
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not assign proposal/s to instrument',
@@ -209,7 +199,6 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeProposalsFromInstrument(args.proposalPks)
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not remove assigned proposal/s from instrument',
@@ -227,7 +216,6 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .assignScientistsToInstrument(args.scientistIds, args.instrumentId)
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not assign scientist/s to instrument',
@@ -245,7 +233,6 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeScientistFromInstrument(args.scientistId, args.instrumentId)
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not remove assigned scientist/s from instrument',
@@ -267,7 +254,6 @@ export default class InstrumentMutations {
         args.instrumentId,
         args.availabilityTime
       )
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not set availability time on instrument',
@@ -342,7 +328,6 @@ export default class InstrumentMutations {
 
     return this.dataSource
       .submitInstrument(submittedInstrumentProposalPks, args.instrumentId)
-      .then((result) => result)
       .catch((error) => {
         return rejection('Could not submit instrument', { agent, args }, error);
       });

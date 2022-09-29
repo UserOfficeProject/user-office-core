@@ -239,29 +239,13 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
   ): Promise<ProposalPksWithNextStatus | Rejection> {
-    return this.dataSource
-      .assignProposalsToSep(args)
-      .then(async (result) => {
-        const nextProposalStatus =
-          await this.proposalSettingsDataSource.getProposalNextStatus(
-            args.proposals[0].primaryKey,
-            Event.PROPOSAL_SEP_SELECTED
-          );
-
-        return new ProposalPksWithNextStatus(
-          result.proposalPks,
-          nextProposalStatus?.id,
-          nextProposalStatus?.shortCode,
-          nextProposalStatus?.name
-        );
-      })
-      .catch((err) => {
-        return rejection(
-          'Could not assign proposal to scientific evaluation panel',
-          { agent },
-          err
-        );
-      });
+    return this.dataSource.assignProposalsToSep(args).catch((err) => {
+      return rejection(
+        'Could not assign proposal to scientific evaluation panel',
+        { agent },
+        err
+      );
+    });
   }
 
   @Authorized([Roles.USER_OFFICER])
