@@ -81,34 +81,32 @@ export default function createHandler() {
       case Event.PROPOSAL_STATUS_UPDATED:
         try {
           await Promise.all(
-            event.proposalpkswithnextstatus.proposalPks.map(
-              async (proposalPk) => {
-                const proposal = await proposalDataSource.get(proposalPk);
+            event.proposalpks.proposalPks.map(async (proposalPk) => {
+              const proposal = await proposalDataSource.get(proposalPk);
 
-                if (proposal?.primaryKey) {
-                  await markProposalEventAsDoneAndCallWorkflowEngine(
-                    event.type,
-                    proposal
-                  );
+              if (proposal?.primaryKey) {
+                await markProposalEventAsDoneAndCallWorkflowEngine(
+                  event.type,
+                  proposal
+                );
 
-                  // only if the status changed
-                  // trigger and individual event for the proposal status change
-                  if (event.type === Event.PROPOSAL_STATUS_UPDATED) {
-                    eventBus.publish({
-                      type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
-                      proposal: proposal,
-                      isRejection: false,
-                      key: 'proposal',
-                      loggedInUserId: event.loggedInUserId,
-                    });
-                  }
+                // only if the status changed
+                // trigger and individual event for the proposal status change
+                if (event.type === Event.PROPOSAL_STATUS_UPDATED) {
+                  eventBus.publish({
+                    type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
+                    proposal: proposal,
+                    isRejection: false,
+                    key: 'proposal',
+                    loggedInUserId: event.loggedInUserId,
+                  });
                 }
               }
-            )
+            })
           );
         } catch (error) {
           logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposalpkswithnextstatus.proposalPks}: `,
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposalpks.proposalPks}: `,
             error
           );
         }
@@ -385,21 +383,19 @@ export default function createHandler() {
       case Event.PROPOSAL_SEP_REVIEW_UPDATED:
         try {
           const proposal = await proposalDataSource.get(
-            event.reviewwithnextproposalstatus.proposalPk
+            event.review.proposalPk
           );
 
           if (!proposal) {
             throw new Error(
-              `Proposal with id ${event.reviewwithnextproposalstatus.proposalPk} not found`
+              `Proposal with id ${event.review.proposalPk} not found`
             );
           }
 
-          if (
-            event.reviewwithnextproposalstatus.status === ReviewStatus.SUBMITTED
-          ) {
+          if (event.review.status === ReviewStatus.SUBMITTED) {
             eventBus.publish({
               type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED,
-              review: event.reviewwithnextproposalstatus,
+              review: event.review,
               isRejection: false,
               key: 'review',
               loggedInUserId: event.loggedInUserId,
@@ -412,7 +408,7 @@ export default function createHandler() {
           );
         } catch (error) {
           logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.reviewwithnextproposalstatus.proposalPk}: `,
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalPk}: `,
             error
           );
         }

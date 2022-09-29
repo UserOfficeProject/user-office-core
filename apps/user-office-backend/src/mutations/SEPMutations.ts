@@ -15,12 +15,11 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
@@ -52,8 +51,6 @@ export default class SEPMutations {
     private instrumentDataSource: InstrumentDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
@@ -238,7 +235,7 @@ export default class SEPMutations {
   async assignProposalsToSep(
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
-  ): Promise<ProposalPksWithNextStatus | Rejection> {
+  ): Promise<ProposalPks | Rejection> {
     return this.dataSource.assignProposalsToSep(args).catch((err) => {
       return rejection(
         'Could not assign proposal to scientific evaluation panel',

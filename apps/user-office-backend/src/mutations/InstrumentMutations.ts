@@ -18,7 +18,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -128,7 +128,7 @@ export default class InstrumentMutations {
   async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
-  ): Promise<ProposalPksWithNextStatus | Rejection> {
+  ): Promise<ProposalPks | Rejection> {
     const allProposalsAreOnSameCallAsInstrument =
       await this.checkIfProposalsAreOnSameCallAsInstrument(args);
 

@@ -652,7 +652,7 @@ export type Mutation = {
   assignChairOrSecretary: SepResponseWrap;
   assignInstrumentsToCall: CallResponseWrap;
   assignProposalsToInstrument: SuccessResponseWrap;
-  assignProposalsToSep: NextProposalStatusResponseWrap;
+  assignProposalsToSep: SuccessResponseWrap;
   assignReviewersToSEP: SepResponseWrap;
   assignScientistsToInstrument: SuccessResponseWrap;
   assignSepReviewersToProposal: SepResponseWrap;
@@ -765,7 +765,7 @@ export type Mutation = {
   updateQuestion: QuestionResponseWrap;
   updateQuestionTemplateRelation: TemplateResponseWrap;
   updateQuestionTemplateRelationSettings: TemplateResponseWrap;
-  updateReview: ReviewWithNextStatusResponseWrap;
+  updateReview: ReviewResponseWrap;
   updateSEP: SepResponseWrap;
   updateSEPTimeAllocation: SepProposalResponseWrap;
   updateSample: SampleResponseWrap;
@@ -1679,19 +1679,6 @@ export type MutationValidateTemplateImportArgs = {
 
 export type MutationValidateUnitsImportArgs = {
   unitsAsJson: Scalars['String'];
-};
-
-export type NextProposalStatus = {
-  description: Maybe<Scalars['String']>;
-  id: Maybe<Scalars['Int']>;
-  isDefault: Maybe<Scalars['Boolean']>;
-  name: Maybe<Scalars['String']>;
-  shortCode: Maybe<Scalars['String']>;
-};
-
-export type NextProposalStatusResponseWrap = {
-  nextProposalStatus: Maybe<NextProposalStatus>;
-  rejection: Maybe<Rejection>;
 };
 
 export type NumberInputConfig = {
@@ -2656,23 +2643,6 @@ export enum ReviewStatus {
   SUBMITTED = 'SUBMITTED'
 }
 
-export type ReviewWithNextProposalStatus = {
-  comment: Maybe<Scalars['String']>;
-  grade: Maybe<Scalars['Int']>;
-  id: Scalars['Int'];
-  nextProposalStatus: Maybe<NextProposalStatus>;
-  proposal: Maybe<Proposal>;
-  reviewer: Maybe<BasicUserDetails>;
-  sepID: Scalars['Int'];
-  status: ReviewStatus;
-  userID: Scalars['Int'];
-};
-
-export type ReviewWithNextStatusResponseWrap = {
-  rejection: Maybe<Rejection>;
-  review: Maybe<ReviewWithNextProposalStatus>;
-};
-
 export enum ReviewerFilter {
   ALL = 'ALL',
   ME = 'ME'
@@ -3424,7 +3394,7 @@ export type AssignProposalsToSepMutationVariables = Exact<{
 }>;
 
 
-export type AssignProposalsToSepMutation = { assignProposalsToSep: { rejection: { reason: string, context: string | null, exception: string | null } | null, nextProposalStatus: { id: number | null, shortCode: string | null, name: string | null } | null } };
+export type AssignProposalsToSepMutation = { assignProposalsToSep: { isSuccess: boolean | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type AssignReviewersToSepMutationVariables = Exact<{
   memberIds: Array<Scalars['Int']> | Scalars['Int'];
@@ -4330,7 +4300,7 @@ export type UpdateReviewMutationVariables = Exact<{
 }>;
 
 
-export type UpdateReviewMutation = { updateReview: { rejection: { reason: string, context: string | null, exception: string | null } | null, review: { id: number, userID: number, status: ReviewStatus, comment: string | null, grade: number | null, sepID: number, nextProposalStatus: { id: number | null, shortCode: string | null, name: string | null } | null } | null } };
+export type UpdateReviewMutation = { updateReview: { rejection: { reason: string, context: string | null, exception: string | null } | null, review: { id: number, userID: number, status: ReviewStatus, comment: string | null, grade: number | null, sepID: number } | null } };
 
 export type UserWithReviewsQueryVariables = Exact<{
   callId?: InputMaybe<Scalars['Int']>;
@@ -5935,11 +5905,7 @@ export const AssignProposalsToSepDocument = gql`
     rejection {
       ...rejection
     }
-    nextProposalStatus {
-      id
-      shortCode
-      name
-    }
+    isSuccess
   }
 }
     ${RejectionFragmentDoc}`;
@@ -7762,11 +7728,6 @@ export const UpdateReviewDocument = gql`
       comment
       grade
       sepID
-      nextProposalStatus {
-        id
-        shortCode
-        name
-      }
     }
   }
 }

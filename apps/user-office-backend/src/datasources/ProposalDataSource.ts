@@ -1,6 +1,6 @@
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
+import { Proposal, ProposalPks } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
@@ -76,7 +76,7 @@ export interface ProposalDataSource {
   changeProposalsStatus(
     statusId: number,
     proposalPks: number[]
-  ): Promise<ProposalPksWithNextStatus>;
+  ): Promise<ProposalPks>;
   getProposalBookingByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter

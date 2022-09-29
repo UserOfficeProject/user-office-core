@@ -1,8 +1,8 @@
 import { Call } from '../models/Call';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
+import { Proposal, ProposalPks } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
-import { Review, ReviewWithNextProposalStatus } from '../models/Review';
+import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { SEP } from '../models/SEP';
@@ -106,7 +106,7 @@ interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalSEPReviewUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_REVIEW_UPDATED;
-  reviewwithnextproposalstatus: ReviewWithNextProposalStatus;
+  review: Review;
 }
 
 interface ProposalAllSEPReviewsSubmittedEvent extends GeneralEvent {
@@ -121,17 +121,17 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposalpkswithnextstatus: ProposalPksWithNextStatus;
+  proposalpks: ProposalPks;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
-  proposalpkswithnextstatus: ProposalPksWithNextStatus;
+  proposalpks: ProposalPks;
 }
 
 interface ProposalStatusUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_UPDATED;
-  proposalpkswithnextstatus: ProposalPksWithNextStatus;
+  proposalpks: ProposalPks;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {

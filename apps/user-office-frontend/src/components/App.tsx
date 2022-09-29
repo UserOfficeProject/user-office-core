@@ -16,7 +16,6 @@ import { QueryParamProvider } from 'use-query-params';
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
@@ -181,13 +180,11 @@ class App extends React.Component {
                 <FeatureContextProvider>
                   <UserContextProvider>
                     <DownloadContextProvider>
-                      <ReviewAndAssignmentContextProvider>
-                        <Router>
-                          <QueryParamProvider ReactRouterRoute={Route}>
-                            <Routes />
-                          </QueryParamProvider>
-                        </Router>
-                      </ReviewAndAssignmentContextProvider>
+                      <Router>
+                        <QueryParamProvider ReactRouterRoute={Route}>
+                          <Routes />
+                        </QueryParamProvider>
+                      </Router>
                     </DownloadContextProvider>
                   </UserContextProvider>
                 </FeatureContextProvider>
