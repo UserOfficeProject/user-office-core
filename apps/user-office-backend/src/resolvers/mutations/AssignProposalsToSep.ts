@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../models/Rejection';
 import { SuccessResponseWrap, SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 import { ProposalPkWithCallId } from './ChangeProposalsStatusMutation';
@@ -38,8 +39,13 @@ export class AssignProposalsToSEPMutation {
     @Args() args: AssignProposalsToSepArgs,
     @Ctx() context: ResolverContext
   ) {
+    const res = await context.mutations.sep.assignProposalsToSep(
+      context.user,
+      args
+    );
+
     return wrapResponse(
-      context.mutations.sep.assignProposalsToSep(context.user, args),
+      isRejection(res) ? Promise.resolve(res) : Promise.resolve(true),
       SuccessResponseWrap
     );
   }
