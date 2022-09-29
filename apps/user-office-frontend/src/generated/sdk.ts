@@ -5131,7 +5131,7 @@ export type GetUserMeQuery = { me: { user_title: string, username: string, first
 export type GetUserProposalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserProposalsQuery = { me: { proposals: Array<{ primaryKey: number, proposalId: string, title: string, publicStatus: ProposalPublicStatus, statusId: number, created: any, finalStatus: ProposalEndStatus | null, notified: boolean, submitted: boolean, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, proposer: { id: number } | null, call: { id: number, shortCode: string, isActive: boolean, isActiveInternal: boolean, referenceNumberFormat: string | null, startCall: any, endCall: any } | null }> } | null };
+export type GetUserProposalsQuery = { me: { proposals: Array<{ primaryKey: number, proposalId: string, title: string, publicStatus: ProposalPublicStatus, statusId: number, created: any, finalStatus: ProposalEndStatus | null, notified: boolean, submitted: boolean, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null, proposer: { id: number } | null, call: { id: number, shortCode: string, isActive: boolean, isActiveInternal: boolean, referenceNumberFormat: string | null, startCall: any, endCall: any, endCallInternal: any | null } | null }> } | null };
 
 export type GetUserWithRolesQueryVariables = Exact<{
   userId: Scalars['Int'];
@@ -9174,6 +9174,7 @@ export const GetUserProposalsDocument = gql`
         referenceNumberFormat
         startCall
         endCall
+        endCallInternal
       }
     }
   }
