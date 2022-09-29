@@ -22,6 +22,7 @@ type DecodedTokenData = {
   user: User;
   currentRole: Role;
   exp: number;
+  isInternalUser: boolean;
 };
 
 const testCredentialStoreStfc = {
@@ -86,7 +87,7 @@ function changeActiveRole(selectedRoleId: number) {
       return;
     }
 
-    const { currentRole, user, exp } = jwtDecode(
+    const { currentRole, user, exp, isInternalUser } = jwtDecode(
       resp.selectRole.token
     ) as DecodedTokenData;
 
@@ -97,6 +98,7 @@ function changeActiveRole(selectedRoleId: number) {
     );
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
+    window.localStorage.isInternalUser = isInternalUser;
   });
 
   cy.wrap(request);
@@ -113,7 +115,7 @@ const externalTokenLogin = (
       return resp;
     }
 
-    const { user, exp } = jwtDecode(
+    const { user, exp, isInternalUser } = jwtDecode(
       resp.externalTokenLogin.token
     ) as DecodedTokenData;
 
@@ -124,6 +126,7 @@ const externalTokenLogin = (
     );
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
+    window.localStorage.isInternalUser = isInternalUser;
 
     return resp;
   });

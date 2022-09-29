@@ -293,7 +293,7 @@ context('Calls tests', () => {
     it('A user-officer should not be able to create a call with intenal end date before call end date', function () {
       // will be enabled after @user-office-software/duo-validation new version
       this.skip();
-      // will only test when in stfc
+
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
         this.skip();
       }
@@ -416,7 +416,6 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to create a call with internal date', function () {
-      // will only test when in stfc
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
         this.skip();
       }
@@ -599,7 +598,6 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to edit a call internal close date', function () {
-      // will only test when in stfc
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
         this.skip();
       }
@@ -935,6 +933,35 @@ context('Calls tests', () => {
       cy.get(
         '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
       ).should('have.length', 3);
+    });
+
+    it('User officer can filter active internal calls by their status', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+        this.skip();
+      }
+      cy.createCall({
+        ...newInactiveCall,
+        esiTemplateId: esiTemplateId,
+        proposalWorkflowId: workflowId,
+      }).then((result) => {
+        if (result.createCall.call?.id) {
+          cy.updateCall({
+            ...result.createCall.call,
+            isActive: false,
+          } as UpdateCallInput);
+        }
+      });
+
+      cy.contains('Calls').click();
+
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.finishedLoading();
+
+      cy.get(
+        '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
+      ).should('have.length', 3);
       cy.contains(newCall.shortCode);
       cy.contains(newInactiveCall.shortCode);
       cy.updateCall({
@@ -1080,7 +1107,7 @@ context('Calls tests', () => {
       The time remaining is rounded down to the nearest min, hour or day.
       No time remaining is displayed if over 30 days or under one minute.
     */
-    // will only test when in stfc
+
     if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
       this.skip();
     }
