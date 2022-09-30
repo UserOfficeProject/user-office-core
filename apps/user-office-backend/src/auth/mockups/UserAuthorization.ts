@@ -7,7 +7,7 @@ import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { SEPDataSource } from '../../datasources/SEPDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { VisitDataSource } from '../../datasources/VisitDataSource';
-import { User } from '../../models/User';
+import { User, UserWithRole } from '../../models/User';
 import { UserAuthorization } from '../UserAuthorization';
 
 @injectable()
@@ -28,6 +28,10 @@ export class UserAuthorizationMock extends UserAuthorization {
     }
 
     return null;
+  }
+
+  async isInternalUser(user: UserWithRole): Promise<boolean> {
+    return true;
   }
 
   async logout(token: string): Promise<void> {

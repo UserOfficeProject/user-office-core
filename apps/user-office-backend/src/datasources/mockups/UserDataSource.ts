@@ -188,8 +188,12 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
 };
 
 export class UserDataSourceMock implements UserDataSource {
-  getRolesForUser(id: number): Promise<stfcRole[]> {
-    throw new Error('Method not implemented.');
+  async getRolesForUser(id: number): Promise<stfcRole[]> {
+    return [
+      { name: 'Internal proposal submitter' },
+      { name: 'ISIS Instrument Scientist' },
+      { name: 'User Officer' },
+    ];
   }
   async delete(id: number): Promise<User | null> {
     return dummyUser;
@@ -405,6 +409,10 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async isExternalTokenValid(token: string): Promise<boolean> {
+    return true;
+  }
+
+  async isInternalUser(user: UserWithRole): Promise<boolean> {
     return true;
   }
 }
