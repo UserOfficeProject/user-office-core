@@ -144,6 +144,7 @@ describe('Test Call Mutations', () => {
       id: 1,
       ...callToCreate,
       callEnded: false,
+      callEndedInternal: false,
       callReviewEnded: false,
       callSEPReviewEnded: false,
       templateId: 1,
