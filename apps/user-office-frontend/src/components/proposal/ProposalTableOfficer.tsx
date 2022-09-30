@@ -170,13 +170,14 @@ const ToolbarWithSelectAllPrefetched: React.FC<{
     props.selectedRows.length === props.data.length;
 
   return (
-    <>
+    <div data-cy="select-all-toolbar">
       <MTableToolbar {...props} />
       {tableHasData && !!selectAllAction && allItemsSelectedOnThePage && (
         <Box
           textAlign="center"
           padding={1}
           bgcolor={(theme) => theme.palette.background.default}
+          data-cy="select-all-proposals"
         >
           {selectAllAction.iconProps?.hidden ? (
             <>
@@ -184,6 +185,7 @@ const ToolbarWithSelectAllPrefetched: React.FC<{
               <Button
                 variant="text"
                 onClick={() => selectAllAction.onClick(null, props.data)}
+                data-cy="clear-all-selection"
               >
                 Clear selection
               </Button>
@@ -195,6 +197,7 @@ const ToolbarWithSelectAllPrefetched: React.FC<{
               <Button
                 variant="text"
                 onClick={() => selectAllAction.onClick(null, props.data)}
+                data-cy="select-all-prefetched-proposals"
               >
                 Select all {selectAllAction.iconProps?.defaultValue} proposals
               </Button>
@@ -202,7 +205,7 @@ const ToolbarWithSelectAllPrefetched: React.FC<{
           )}
         </Box>
       )}
-    </>
+    </div>
   );
 };
 
