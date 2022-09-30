@@ -85,6 +85,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       type: 'numeric',
       emptyValue: '-',
       editComponent: availabilityTimeInput,
+      align: 'left',
     },
   ];
 
@@ -147,6 +148,25 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
                 instrumentUpdatedData.availabilityTime &&
                 +instrumentUpdatedData.availabilityTime > 0
               ) {
+                // NOTE: Preventing inputs grater than 32-bit integer.
+                const max32BitInteger = Math.pow(2, 31);
+                if (
+                  +instrumentUpdatedData.availabilityTime >= max32BitInteger
+                ) {
+                  enqueueSnackbar(
+                    `Availability time can not be grater than ${
+                      max32BitInteger - 1
+                    }`,
+                    {
+                      variant: 'error',
+                      className: 'snackbar-error',
+                    }
+                  );
+                  reject();
+
+                  return;
+                }
+
                 await updateInstrument({
                   id: instrumentUpdatedData.id,
                   availabilityTime: instrumentUpdatedData.availabilityTime,

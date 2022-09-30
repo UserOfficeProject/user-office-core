@@ -532,7 +532,7 @@ context('Calls tests', () => {
       cy.get('[data-cy="calls-table"]').should('contain', newCall.shortCode);
     });
 
-    it('A user-officer should not be able to set negative availability time on instrument per call', () => {
+    it('A user-officer should not be able to set negative or too high availability time on instrument per call', () => {
       cy.assignInstrumentToCall({
         callId: createdCallId,
         instrumentIds: [createdInstrumentId],
@@ -559,6 +559,17 @@ context('Calls tests', () => {
         .click();
 
       cy.notification({ variant: 'error', text: 'must be positive number' });
+      cy.get('[data-cy="availability-time"]').type('2147483648');
+
+      cy.contains(instrumentAssignedToCall.shortCode)
+        .parent()
+        .find('[aria-label="Save"]')
+        .click();
+
+      cy.notification({
+        variant: 'error',
+        text: 'Availability time can not be grater than 2147483647',
+      });
     });
 
     it('A user-officer should be able to set availability time on instrument per call', () => {
