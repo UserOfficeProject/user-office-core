@@ -109,7 +109,7 @@ export const getQuestionDefinition = (dataType: DataType) => {
 /**
  * Convenience function to create config for datatype with initial data
  */
-export function createConfig<T>(
+export function createConfig<T extends object>(
   dataType: DataType,
   init: Partial<T> | string = {}
 ): T {

@@ -15,6 +15,7 @@ import {
   QuestionarySubmissionModel,
 } from 'models/questionary/QuestionarySubmissionState';
 import useEventHandlers from 'models/questionary/useEventHandlers';
+import { truncateString } from 'utils/truncateString';
 
 export interface GenericTemplateContextType extends QuestionaryContextType {
   state: GenericTemplateSubmissionState | null;
@@ -63,7 +64,9 @@ export function GenericTemplateContainer(props: {
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <Questionary title={state.genericTemplate.title || props.title} />
+      <Questionary
+        title={truncateString(state.genericTemplate.title || props.title, 30)}
+      />
     </QuestionaryContext.Provider>
   );
 }
