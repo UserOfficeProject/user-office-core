@@ -87,7 +87,7 @@ test('A userofficer can create PDF template', async () => {
   expect(template).toBeInstanceOf(Template);
   expect((template as Template).name).toEqual(name);
   expect((template as Template).description).toEqual(description);
-  expect(mockCreatePdfTemplate).toBeCalledTimes(1);
+  expect(mockCreatePdfTemplate).toHaveBeenCalledTimes(1);
 });
 
 test('An user cannot create template', async () => {
@@ -318,8 +318,8 @@ test('User officer can clone PDF template', async () => {
   );
 
   expect(clonedTemplate.templateId).toBeGreaterThan(0);
-  expect(mockClonePdfTemplate).toBeCalledTimes(1);
-  expect(mockCreatePdfTemplate).toBeCalledTimes(1);
+  expect(mockClonePdfTemplate).toHaveBeenCalledTimes(1);
+  expect(mockCreatePdfTemplate).toHaveBeenCalledTimes(1);
 });
 
 test('User officer can add question to template', async () => {
