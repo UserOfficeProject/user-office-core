@@ -543,6 +543,12 @@ export interface ProposalEventsRecord {
   readonly proposal_reserved: boolean;
   readonly proposal_rejected: boolean;
   readonly proposal_notified: boolean;
+  readonly proposal_booking_time_activated: boolean;
+  readonly proposal_booking_time_updated: boolean;
+  readonly proposal_booking_time_slot_added: boolean;
+  readonly proposal_booking_time_slots_removed: boolean;
+  readonly proposal_booking_time_completed: boolean;
+  readonly proposal_booking_time_reopened: boolean;
 }
 
 export interface FeatureRecord {

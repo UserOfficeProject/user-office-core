@@ -60,6 +60,9 @@ const ProposalWorkflowConnectionsEditor: React.FC<
     dialogActions: {
       padding: 0,
     },
+    dialogContent: {
+      overflow: 'hidden',
+    },
     removeButton: {
       position: 'absolute',
       marginLeft: '5px',
@@ -381,7 +384,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<
         onClose={(): void => setWorkflowConnection(null)}
         data-cy="status-changing-events-modal"
       >
-        <DialogContent>
+        <DialogContent className={classes.dialogContent}>
           <AddStatusChangingEventsToConnection
             close={(): void => setWorkflowConnection(null)}
             statusChangingEvents={

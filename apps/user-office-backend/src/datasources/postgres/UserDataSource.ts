@@ -20,6 +20,7 @@ import {
   createBasicUserObject,
   RoleRecord,
   RoleUserRecord,
+  InstitutionRecord,
 } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -644,16 +645,16 @@ export default class PostgresUserDataSource implements UserDataSource {
     verified: boolean,
     countryId: number | null = null
   ): Promise<number> {
-    const [institutionId]: number[] = await database
+    const [institution]: InstitutionRecord[] = await database
       .insert({
         institution: name,
         verified,
         country_id: countryId,
       })
       .into('institutions')
-      .returning('institution_id');
+      .returning('*');
 
-    return institutionId;
+    return institution.institution_id;
   }
 
   async checkScientistToProposal(
