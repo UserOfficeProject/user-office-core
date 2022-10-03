@@ -533,6 +533,7 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should not be able to set negative or too high availability time on instrument per call', () => {
+      const MAX_32_BIT_INTEGER = Math.pow(2, 31);
       cy.assignInstrumentToCall({
         callId: createdCallId,
         instrumentIds: [createdInstrumentId],
@@ -552,24 +553,25 @@ context('Calls tests', () => {
         .click();
 
       cy.get('[data-cy="availability-time"]').type('-10');
-
+      cy.get('[data-cy="availability-time"]').contains(
+        'Availability time must be a positive number'
+      );
       cy.contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[aria-label="Save"]')
-        .click();
+        .find('[aria-label="Save"] button')
+        .should('be.disabled');
 
-      cy.notification({ variant: 'error', text: 'must be positive number' });
-      cy.get('[data-cy="availability-time"]').type('2147483648');
+      cy.get('[data-cy="availability-time"]')
+        .clear()
+        .type(MAX_32_BIT_INTEGER.toString());
 
+      cy.get('[data-cy="availability-time"]').contains(
+        `Availability time can not be grater than ${MAX_32_BIT_INTEGER - 1}`
+      );
       cy.contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[aria-label="Save"]')
-        .click();
-
-      cy.notification({
-        variant: 'error',
-        text: 'Availability time can not be grater than 2147483647',
-      });
+        .find('[aria-label="Save"] button')
+        .should('be.disabled');
     });
 
     it('A user-officer should be able to set availability time on instrument per call', () => {

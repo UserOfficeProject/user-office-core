@@ -1,13 +1,17 @@
-import MaterialTable, { Column } from '@material-table/core';
+import MaterialTable, {
+  Column,
+  EditComponentProps,
+} from '@material-table/core';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { ChangeEvent } from 'react';
 
 import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+const MAX_32_BIT_INTEGER = Math.pow(2, 31);
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -42,23 +46,25 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
 }) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
-  const { enqueueSnackbar } = useSnackbar();
 
-  const availabilityTimeInput = ({
-    onChange,
-    value,
-  }: {
-    onChange: (e: string) => void;
-    value: string;
-  }) => (
+  const availabilityTimeInput = (
+    props: EditComponentProps<InstrumentWithAvailabilityTime> & {
+      helperText?: string;
+    }
+  ) => (
     <TextField
       type="number"
       data-cy="availability-time"
       placeholder={`Availability time (${call.allocationTimeUnit}s)`}
-      value={value || ''}
-      onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+      value={props.value || ''}
+      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+        props.onChange(e.target.value)
+      }
+      InputProps={{ inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } }}
       required
       fullWidth
+      error={props.error}
+      helperText={props.helperText}
     />
   );
 
@@ -86,6 +92,39 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       emptyValue: '-',
       editComponent: availabilityTimeInput,
       align: 'left',
+      validate: (
+        rowData: InstrumentWithAvailabilityTime & {
+          tableData?: { editing: string };
+        }
+      ) => {
+        // NOTE: Return valid state if the action is delete and not update
+        if (rowData.tableData?.editing !== 'update') {
+          return { isValid: true };
+        }
+
+        if (
+          rowData &&
+          rowData.availabilityTime &&
+          +rowData.availabilityTime > 0
+        ) {
+          // NOTE: Preventing inputs grater than 32-bit integer.
+          if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {
+            return {
+              isValid: false,
+              helperText: `Availability time can not be grater than ${
+                MAX_32_BIT_INTEGER - 1
+              }`,
+            };
+          }
+
+          return { isValid: true };
+        } else {
+          return {
+            isValid: false,
+            helperText: 'Availability time must be a positive number',
+          };
+        }
+      },
     },
   ];
 
@@ -145,38 +184,14 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
             new Promise<void>(async (resolve, reject) => {
               if (
                 instrumentUpdatedData &&
-                instrumentUpdatedData.availabilityTime &&
-                +instrumentUpdatedData.availabilityTime > 0
+                instrumentUpdatedData.availabilityTime
               ) {
-                // NOTE: Preventing inputs grater than 32-bit integer.
-                const max32BitInteger = Math.pow(2, 31);
-                if (
-                  +instrumentUpdatedData.availabilityTime >= max32BitInteger
-                ) {
-                  enqueueSnackbar(
-                    `Availability time can not be grater than ${
-                      max32BitInteger - 1
-                    }`,
-                    {
-                      variant: 'error',
-                      className: 'snackbar-error',
-                    }
-                  );
-                  reject();
-
-                  return;
-                }
-
                 await updateInstrument({
                   id: instrumentUpdatedData.id,
                   availabilityTime: instrumentUpdatedData.availabilityTime,
                 });
                 resolve();
               } else {
-                enqueueSnackbar('Availability time must be positive number', {
-                  variant: 'error',
-                  className: 'snackbar-error',
-                });
                 reject();
               }
             }),
