@@ -54,6 +54,7 @@ function QuestionaryComponentGenericTemplateBasis(props: BasicComponentProps) {
           },
         }}
         required
+        multiline
         fullWidth
         component={TextFieldNoSubmit}
         data-cy="title-input"

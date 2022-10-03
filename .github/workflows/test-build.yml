@@ -170,6 +170,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
           secret: dummysecret
           NODE_ENV: development
@@ -264,6 +265,7 @@ jobs:
           TZ: Europe/London
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: stfc
           secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
@@ -306,6 +308,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
           secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
