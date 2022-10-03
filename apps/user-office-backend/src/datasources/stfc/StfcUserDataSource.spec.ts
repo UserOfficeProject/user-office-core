@@ -96,9 +96,11 @@ describe('Email search tests', () => {
   test('When getting basic user details, the basic user is created and returned', async () => {
     const result = await userdataSource.getBasicUserDetailsByEmail('valid');
 
-    expect(mockGetBasicPersonDetailsFromEmail).toBeCalledTimes(0);
-    expect(mockGetSearchableBasicPersonDetailsFromEmail).toBeCalledTimes(1);
-    expect(mockEnsureDummyUserExists).toBeCalledTimes(1);
+    expect(mockGetBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(0);
+    expect(mockGetSearchableBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(
+      1
+    );
+    expect(mockEnsureDummyUserExists).toHaveBeenCalledTimes(1);
 
     expect(result).toHaveProperty('id', 12345);
   });
@@ -106,9 +108,11 @@ describe('Email search tests', () => {
   test('When getting non-basic user details, the non-basic user is created and returned', async () => {
     const result = await userdataSource.getByEmail('valid');
 
-    expect(mockGetBasicPersonDetailsFromEmail).toBeCalledTimes(1);
-    expect(mockGetSearchableBasicPersonDetailsFromEmail).toBeCalledTimes(0);
-    expect(mockEnsureDummyUserExists).toBeCalledTimes(1);
+    expect(mockGetBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(1);
+    expect(mockGetSearchableBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(
+      0
+    );
+    expect(mockEnsureDummyUserExists).toHaveBeenCalledTimes(1);
 
     expect(result).toHaveProperty('id', 12345);
   });
@@ -116,7 +120,7 @@ describe('Email search tests', () => {
   test('When a user is not found by the UOWS, a dummy user is not created', async () => {
     const result = await userdataSource.getByEmail('invalid');
 
-    expect(mockEnsureDummyUserExists).toBeCalledTimes(0);
+    expect(mockEnsureDummyUserExists).toHaveBeenCalledTimes(0);
 
     expect(result).toBeNull();
   });
@@ -131,7 +135,7 @@ describe('Email search tests', () => {
 
     const result = await userdataSource.getByEmail('valid');
 
-    expect(mockEnsureDummyUserExists).toBeCalledTimes(0);
+    expect(mockEnsureDummyUserExists).toHaveBeenCalledTimes(0);
 
     expect(result).toBeNull();
   });

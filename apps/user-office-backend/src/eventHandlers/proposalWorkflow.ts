@@ -12,7 +12,10 @@ import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
-import { workflowEngine, WorkflowEngineProposalType } from '../workflowEngine';
+import {
+  markProposalEventAsDoneAndCallWorkflowEngine,
+  WorkflowEngineProposalType,
+} from '../workflowEngine';
 
 export default function createHandler() {
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -31,21 +34,12 @@ export default function createHandler() {
       return;
     }
 
-    const markProposalEventAsDoneAndCallWorkflowEngine = async (
+    const handleWorkflowEngineChange = async (
       eventType: Event,
       proposal: WorkflowEngineProposalType
     ) => {
-      const allProposalEvents =
-        await proposalDataSource.markEventAsDoneOnProposal(
-          eventType,
-          proposal.primaryKey
-        );
-
-      const updatedProposals = await workflowEngine({
-        ...proposal,
-        proposalEvents: allProposalEvents,
-        currentEvent: eventType,
-      });
+      const updatedProposals =
+        await markProposalEventAsDoneAndCallWorkflowEngine(eventType, proposal);
 
       if (updatedProposals) {
         updatedProposals.forEach(
@@ -85,10 +79,7 @@ export default function createHandler() {
               const proposal = await proposalDataSource.get(proposalPk);
 
               if (proposal?.primaryKey) {
-                await markProposalEventAsDoneAndCallWorkflowEngine(
-                  event.type,
-                  proposal
-                );
+                await handleWorkflowEngineChange(event.type, proposal);
 
                 // only if the status changed
                 // trigger and individual event for the proposal status change
@@ -123,10 +114,7 @@ export default function createHandler() {
       case Event.PROPOSAL_SEP_MEETING_SUBMITTED:
       case Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED:
         try {
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            event.proposal
-          );
+          await handleWorkflowEngineChange(event.type, event.proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
@@ -147,10 +135,7 @@ export default function createHandler() {
             });
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            event.proposal
-          );
+          await handleWorkflowEngineChange(event.type, event.proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
@@ -194,10 +179,7 @@ export default function createHandler() {
               break;
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            event.proposal
-          );
+          await handleWorkflowEngineChange(event.type, event.proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
@@ -227,10 +209,7 @@ export default function createHandler() {
             });
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          await handleWorkflowEngineChange(event.type, proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalPk}: `,
@@ -274,10 +253,7 @@ export default function createHandler() {
               break;
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          await handleWorkflowEngineChange(event.type, proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalPk}: `,
@@ -312,10 +288,7 @@ export default function createHandler() {
               break;
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          await handleWorkflowEngineChange(event.type, proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sample.proposalPk}: `,
@@ -336,10 +309,7 @@ export default function createHandler() {
             );
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          await handleWorkflowEngineChange(event.type, proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalPk}: `,
@@ -369,10 +339,7 @@ export default function createHandler() {
             });
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          await handleWorkflowEngineChange(event.type, proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalPk}: `,
@@ -402,10 +369,7 @@ export default function createHandler() {
             });
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          await handleWorkflowEngineChange(event.type, proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalPk}: `,
@@ -444,10 +408,7 @@ export default function createHandler() {
             });
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          await handleWorkflowEngineChange(event.type, proposal);
         } catch (error) {
           logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalPk}: `,
@@ -468,10 +429,7 @@ export default function createHandler() {
             await Promise.all(
               allProposalsOnCall.proposalViews.map(
                 async (proposalOnCall) =>
-                  await markProposalEventAsDoneAndCallWorkflowEngine(
-                    event.type,
-                    proposalOnCall
-                  )
+                  await handleWorkflowEngineChange(event.type, proposalOnCall)
               )
             );
           }
@@ -491,10 +449,7 @@ export default function createHandler() {
               const proposal = await proposalDataSource.get(proposalPk);
 
               if (proposal?.primaryKey) {
-                return await markProposalEventAsDoneAndCallWorkflowEngine(
-                  event.type,
-                  proposal
-                );
+                return await handleWorkflowEngineChange(event.type, proposal);
               }
             })
           );

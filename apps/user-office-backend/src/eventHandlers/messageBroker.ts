@@ -16,14 +16,15 @@ import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
-import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
+import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 type ProposalMessageData = {
   proposalPk: number;
   shortCode: string;
   title: string;
   abstract: string;
+  newStatus?: string;
   members: { firstName: string; lastName: string; email: string; id: string }[];
   proposer?: { firstName: string; lastName: string; email: string; id: string };
 };
@@ -68,6 +69,13 @@ const getProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
+  const proposalSettingsDataSource =
+    container.resolve<ProposalSettingsDataSource>(
+      Tokens.ProposalSettingsDataSource
+    );
+  const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
+    proposal.statusId
+  );
 
   const proposalUsers = await userDataSource.getProposalUsersFull(
     proposal.primaryKey
@@ -84,6 +92,7 @@ const getProposalMessageData = async (proposal: Proposal) => {
       email: proposalUser.email,
       id: proposalUser.id.toString(),
     })),
+    newStatus: proposalStatus?.shortCode,
   };
 
   const proposer = await userDataSource.getUser(proposal.proposerId);
@@ -145,25 +154,14 @@ export function createPostToRabbitMQHandler() {
         const proposalStatus =
           await proposalSettingsDataSource.getProposalStatus(proposal.statusId);
 
-        // if the new status isn't 'SCHEDULING' ignore the event
-        if (
-          proposalStatus?.shortCode !==
-          ProposalStatusDefaultShortCodes.SCHEDULING
-        ) {
-          return;
-        }
-
         const instrument = await instrumentDataSource.getInstrumentByProposalPk(
           proposal.primaryKey
         );
 
-        if (!instrument) {
-          logger.logWarn(
-            `Proposal '${proposal.primaryKey}' has no instrument`,
-            {
-              proposal,
-            }
-          );
+        if (!proposalStatus) {
+          logger.logError(`Unknown proposalStatus '${proposal.statusId}'`, {
+            proposal,
+          });
 
           return;
         }
@@ -171,7 +169,7 @@ export function createPostToRabbitMQHandler() {
         const call = await callDataSource.getCall(proposal.callId);
 
         if (!call) {
-          logger.logWarn(`Proposal '${proposal.primaryKey}' has no call`, {
+          logger.logError(`Proposal '${proposal.primaryKey}' has no call`, {
             proposal,
           });
 
@@ -186,21 +184,41 @@ export function createPostToRabbitMQHandler() {
         // NOTE: maybe use shared types?
         const message = {
           proposalPk: proposal.primaryKey,
+          proposalId: proposal.proposalId,
           callId: proposal.callId,
           allocatedTime: proposalAllocatedTime,
-          instrumentId: instrument.id,
+          instrumentId: instrument?.id,
+          newStatus: proposalStatus.shortCode,
         };
 
-        const json = JSON.stringify(message);
+        const schedulerMessage = JSON.stringify(message);
+
+        const fullProposalMessage = await getProposalMessageData(
+          event.proposal
+        );
 
         // NOTE: This message is consumed by scichat
-        await rabbitMQ.sendMessage(Queue.PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessage(
+          Queue.SCICHAT_PROPOSAL,
+          event.type,
+          fullProposalMessage
+        );
+        // NOTE: This message is consumed by scicat
+        await rabbitMQ.sendMessage(
+          Queue.SCICAT_PROPOSAL,
+          event.type,
+          fullProposalMessage
+        );
         // NOTE: Send message for scheduler in a separate queue
-        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessage(
+          Queue.SCHEDULING_PROPOSAL,
+          event.type,
+          schedulerMessage
+        );
 
         logger.logDebug(
           'Proposal event successfully sent to the message broker',
-          { eventType: event.type, json }
+          { eventType: event.type, fullProposalMessage }
         );
 
         break;
@@ -288,57 +306,125 @@ export function createListenToRabbitMQHandler() {
     Tokens.ProposalDataSource
   );
 
+  const handleWorkflowEngineChange = async (
+    eventType: Event,
+    proposalPk: number | null
+  ) => {
+    if (!proposalPk) {
+      throw new Error('Proposal id not found in the message');
+    }
+    const proposal = await proposalDataSource.get(proposalPk);
+
+    if (!proposal) {
+      throw new Error(`Proposal with id ${proposalPk} not found`);
+    }
+
+    const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
+      eventType,
+      proposal
+    );
+
+    if (updatedProposals) {
+      for (const updatedProposal of updatedProposals) {
+        if (!updatedProposal) {
+          return;
+        }
+
+        const fullProposalMessage = await getProposalMessageData(
+          updatedProposal
+        );
+
+        /**
+         * NOTE: After running the workflow engine send back messages to all the queues with updated data.
+         */
+        rabbitMQ.sendMessage(
+          Queue.SCICHAT_PROPOSAL,
+          Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+          fullProposalMessage
+        );
+        rabbitMQ.sendMessage(
+          Queue.SCICAT_PROPOSAL,
+          Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+          fullProposalMessage
+        );
+        rabbitMQ.sendMessage(
+          Queue.SCHEDULING_PROPOSAL,
+          Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+          fullProposalMessage
+        );
+      }
+    }
+  };
+
   rabbitMQ.listenOn(Queue.SCHEDULED_EVENTS, async (type, message) => {
     switch (type) {
       case Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED:
-        logger.logDebug(
-          `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
-          {
+        try {
+          logger.logDebug(
+            `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+            {
+              type,
+              message,
+            }
+          );
+
+          const scheduledEventToAdd = {
+            id: message.id,
+            bookingType: message.bookingType,
+            startsAt: message.startsAt,
+            endsAt: message.endsAt,
+            proposalBookingId: message.proposalBookingId,
+            proposalPk: message.proposalPk,
+            status: message.status,
+            localContactId: message.localContact,
+          } as ScheduledEventCore;
+
+          await proposalDataSource.addProposalBookingScheduledEvent(
+            scheduledEventToAdd
+          );
+
+          await handleWorkflowEngineChange(
             type,
-            message,
-          }
-        );
-
-        const scheduledEventToAdd = {
-          id: message.id,
-          bookingType: message.bookingType,
-          startsAt: message.startsAt,
-          endsAt: message.endsAt,
-          proposalBookingId: message.proposalBookingId,
-          proposalPk: message.proposalPk,
-          status: message.status,
-          localContactId: message.localContact,
-        } as ScheduledEventCore;
-
-        await proposalDataSource.addProposalBookingScheduledEvent(
-          scheduledEventToAdd
-        );
+            scheduledEventToAdd.proposalPk
+          );
+        } catch (error) {
+          logger.logException(`Error while handling event ${type}: `, error);
+        }
 
         return;
       case Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED:
-        logger.logDebug(
-          `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
-          {
-            type,
-            message,
-          }
-        );
-        const scheduledEventsToRemove = (
-          message.scheduledevents as ScheduledEventCore[]
-        ).map((scheduledEvent) => ({
-          id: scheduledEvent.id,
-          bookingType: scheduledEvent.bookingType,
-          startsAt: scheduledEvent.startsAt,
-          endsAt: scheduledEvent.endsAt,
-          proposalBookingId: scheduledEvent.proposalBookingId,
-          proposalPk: scheduledEvent.proposalPk,
-          status: scheduledEvent.status,
-          localContactId: scheduledEvent.localContactId,
-        }));
+        try {
+          logger.logDebug(
+            `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+            {
+              type,
+              message,
+            }
+          );
+          const scheduledEventsToRemove = (
+            message.scheduledevents as ScheduledEventCore[]
+          ).map((scheduledEvent) => ({
+            id: scheduledEvent.id,
+            bookingType: scheduledEvent.bookingType,
+            startsAt: scheduledEvent.startsAt,
+            endsAt: scheduledEvent.endsAt,
+            proposalBookingId: scheduledEvent.proposalBookingId,
+            proposalPk: scheduledEvent.proposalPk,
+            status: scheduledEvent.status,
+            localContactId: scheduledEvent.localContactId,
+          }));
 
-        await proposalDataSource.removeProposalBookingScheduledEvents(
-          scheduledEventsToRemove
-        );
+          await proposalDataSource.removeProposalBookingScheduledEvents(
+            scheduledEventsToRemove
+          );
+
+          await handleWorkflowEngineChange(
+            type,
+            scheduledEventsToRemove[0].proposalPk
+          );
+        } catch (error) {
+          logger.logException(`Error while handling event ${type}: `, error);
+        }
 
         return;
 
@@ -346,25 +432,35 @@ export function createListenToRabbitMQHandler() {
       case Event.PROPOSAL_BOOKING_TIME_COMPLETED:
       case Event.PROPOSAL_BOOKING_TIME_UPDATED:
       case Event.PROPOSAL_BOOKING_TIME_REOPENED:
-        logger.logDebug(
-          `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
-          {
-            type,
-            message,
-          }
-        );
-        const scheduledEventToUpdate = {
-          id: message.id,
-          proposalBookingId: message.proposalBookingId,
-          startsAt: message.startsAt,
-          endsAt: message.endsAt,
-          status: message.status,
-          localContactId: message.localContactId,
-        } as ScheduledEventCore;
+        try {
+          logger.logDebug(
+            `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+            {
+              type,
+              message,
+            }
+          );
+          const scheduledEventToUpdate = {
+            id: message.id,
+            proposalBookingId: message.proposalBookingId,
+            startsAt: message.startsAt,
+            endsAt: message.endsAt,
+            status: message.status,
+            localContactId: message.localContactId,
+            proposalPk: message.proposalPk,
+          } as ScheduledEventCore;
 
-        await proposalDataSource.updateProposalBookingScheduledEvent(
-          scheduledEventToUpdate
-        );
+          await proposalDataSource.updateProposalBookingScheduledEvent(
+            scheduledEventToUpdate
+          );
+
+          await handleWorkflowEngineChange(
+            type,
+            scheduledEventToUpdate.proposalPk
+          );
+        } catch (error) {
+          logger.logException(`Error while handling event ${type}: `, error);
+        }
 
         return;
       default:
