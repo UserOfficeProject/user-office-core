@@ -11,6 +11,7 @@ export enum PredefinedMessageKey {
   MANAGER = 'manager',
   USER = 'user',
   GENERAL = 'general',
+  SAFETY_EVAL_COMMENT = 'safety_eval_comment',
 }
 
 /**

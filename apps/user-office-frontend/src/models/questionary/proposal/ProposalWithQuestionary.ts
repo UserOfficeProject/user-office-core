@@ -1,10 +1,10 @@
 import {
-  Proposal,
-  Maybe,
   Call,
+  GenericTemplateFragment,
+  Maybe,
+  Proposal,
   Questionary,
   SampleFragment,
-  GenericTemplateFragment,
 } from 'generated/sdk';
 
 export type ProposalWithQuestionary = Pick<
@@ -17,12 +17,12 @@ export type ProposalWithQuestionary = Pick<
   | 'users'
   | 'title'
   | 'proposalId'
-  | 'callId'
   | 'questionaryId'
   | 'submitted'
 > & {
-  call?: Maybe<
-    Pick<Call, 'isActive' | 'referenceNumberFormat' | 'startCall' | 'endCall'>
+  call: Pick<
+    Call,
+    'id' | 'isActive' | 'referenceNumberFormat' | 'startCall' | 'endCall'
   >;
 } & {
   samples: Maybe<

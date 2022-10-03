@@ -10,17 +10,20 @@ export class ProposalEsdDataSourceMock implements ProposalEsdDataSource {
   constructor() {
     this.init();
   }
-  updateEsd(
-    args: UpdateEsdArgs & { reviewerUserId: number }
-  ): Promise<Rejection | ExperimentSafetyDocument> {
-    throw new Error('Method not implemented.');
-  }
   createEsd(
     args: CreateEsdArgs & { reviewerUserId: number }
   ): Promise<ExperimentSafetyDocument | Rejection> {
     throw new Error('Method not implemented.');
   }
   getEsd(esdId: number): Promise<ExperimentSafetyDocument | null> {
+    throw new Error('Method not implemented.');
+  }
+  getEsdByEsiId(esiId: number): Promise<ExperimentSafetyDocument | null> {
+    throw new Error('Method not implemented.');
+  }
+  updateEsd(
+    args: UpdateEsdArgs & { reviewerUserId: number }
+  ): Promise<Rejection | ExperimentSafetyDocument> {
     throw new Error('Method not implemented.');
   }
 

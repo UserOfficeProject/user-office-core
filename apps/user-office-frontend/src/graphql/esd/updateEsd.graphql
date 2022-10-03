@@ -1,0 +1,14 @@
+mutation updateEsd(
+  $esdId: Int!
+  $evaluation: EsdEvaluation!
+  $comment: String!
+) {
+  updateEsd(esdId: $esdId, evaluation: $evaluation, comment: $comment) {
+    esd {
+      ...esd
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

@@ -8,7 +8,7 @@ import UOLoader from 'components/common/UOLoader';
 import ProposalContainer from 'components/proposal/ProposalContainer';
 import { createProposalStub } from 'components/proposal/ProposalCreate';
 import { UserContext } from 'context/UserContextProvider';
-import { BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, Call } from 'generated/sdk';
 import { useBlankQuestionaryStepsData } from 'hooks/questionary/useBlankQuestionaryStepsData';
 
 type PreviewTemplateModalProps = {
@@ -47,7 +47,8 @@ const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({
             proposal={createProposalStub(
               templateId,
               questionarySteps,
-              user as unknown as BasicUserDetails
+              user as unknown as BasicUserDetails,
+              {} as unknown as Call
             )}
             previewMode={true}
           />

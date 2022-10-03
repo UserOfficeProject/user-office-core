@@ -36,7 +36,9 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
   const classes = useStyles();
   const downloadPDFProposal = useDownloadPDFProposal();
 
-  const getReadonlyView = () => <ProposalQuestionaryReview data={data} />;
+  const getReadonlyView = () => (
+    <ProposalQuestionaryReview proposalPk={data.primaryKey} />
+  );
   const getEditableView = () => (
     <ProposalContainer proposal={data} proposalUpdated={onProposalChanged} />
   );

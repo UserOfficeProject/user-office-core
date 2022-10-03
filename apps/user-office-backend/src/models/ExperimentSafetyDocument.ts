@@ -7,6 +7,7 @@ export class ExperimentSafetyDocument {
     public esiId: number,
     public reviewerUserId: number,
     public evaluation: EsdEvaluation,
+    public comment: string,
     public createdAt: Date,
     public evaluatedAt: Date
   ) {}

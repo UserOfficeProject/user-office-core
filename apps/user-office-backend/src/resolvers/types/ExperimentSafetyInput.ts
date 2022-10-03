@@ -13,11 +13,12 @@ import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import ScheduledEventDataSource from '../../datasources/postgres/ScheduledEventDataSource';
 import { ExperimentSafetyInput as ExperimentSafetyInputOrigin } from '../../models/ExperimentSafetyInput';
+import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafetyDocument } from './ExperimentSafetyDocument';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
-import { User } from './User';
+import { ScheduledEventCore } from './ScheduledEvent';
 
 @ObjectType()
 export class ExperimentSafetyInput
@@ -65,12 +66,15 @@ export class ExperimentSafetyInputResolver {
     );
   }
 
-  @FieldResolver(() => User)
+  @FieldResolver(() => BasicUserDetails)
   async creator(
     @Root() esi: ExperimentSafetyInput,
     @Ctx() context: ResolverContext
-  ): Promise<User> {
-    const user = await context.queries.user.get(context.user, esi.creatorId);
+  ): Promise<BasicUserDetails> {
+    const user = await context.queries.user.getBasic(
+      context.user,
+      esi.creatorId
+    );
     if (!user) {
       throw new Error('Unexpected error. User does not exist');
     }
@@ -111,12 +115,33 @@ export class ExperimentSafetyInputResolver {
   }
 
   @FieldResolver(() => ExperimentSafetyDocument, { nullable: true })
-  async esi(
+  async esd(
     @Root() esi: ExperimentSafetyInput,
     @Ctx() context: ResolverContext
   ): Promise<ExperimentSafetyDocument | null> {
-    const esd = await context.queries.proposalEsd.getEsd(context.user, esi.id);
+    const esd = await context.queries.proposalEsd.getEsdByEsi(
+      context.user,
+      esi.id
+    );
 
     return esd;
+  }
+
+  @FieldResolver(() => ScheduledEventCore, { nullable: true })
+  async scheduledEvent(
+    @Root() esi: ExperimentSafetyInput,
+    @Ctx() context: ResolverContext
+  ): Promise<ScheduledEventCore> {
+    const scheduledEvent =
+      await context.queries.scheduledEvent.getScheduledEventCore(
+        context.user,
+        esi.scheduledEventId
+      );
+
+    if (!scheduledEvent) {
+      throw new Error('Unexpected error. Scheduled event does not exist');
+    }
+
+    return scheduledEvent;
   }
 }

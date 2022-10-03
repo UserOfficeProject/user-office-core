@@ -11,6 +11,7 @@ export interface ProposalEsdDataSource {
 
   // Read
   getEsd(esdId: number): Promise<ExperimentSafetyDocument | null>;
+  getEsdByEsiId(esiId: number): Promise<ExperimentSafetyDocument | null>;
 
   // Update
   updateEsd(

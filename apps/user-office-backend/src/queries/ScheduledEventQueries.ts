@@ -25,7 +25,7 @@ export default class ScheduledEventQueries {
     return scheduledEvents;
   }
 
-  @Authorized([Roles.USER])
+  @Authorized([Roles.USER_OFFICER, Roles.SAFETY_REVIEWER, Roles.USER])
   async getScheduledEventCore(
     user: UserWithRole | null,
     scheduledEventId: number

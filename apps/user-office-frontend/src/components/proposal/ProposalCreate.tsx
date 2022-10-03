@@ -15,14 +15,12 @@ export function createProposalStub(
   templateId: number,
   questionarySteps: QuestionaryStep[],
   proposer: BasicUserDetails,
-  callId?: number,
-  call?: Call | null
+  call: Call
 ): ProposalWithQuestionary {
   return {
     primaryKey: 0,
     title: '',
     abstract: '',
-    callId: callId || 0,
     proposer: proposer,
     questionary: {
       questionaryId: 0,
@@ -71,7 +69,6 @@ export default function ProposalCreate() {
         parseInt(templateId),
         questionarySteps,
         userData,
-        parseInt(callId),
         call
       )}
     />

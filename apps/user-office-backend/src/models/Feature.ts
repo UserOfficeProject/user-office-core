@@ -18,7 +18,7 @@ export enum FeatureId {
   SEP_REVIEW = 'SEP_REVIEW',
   USER_MANAGEMENT = 'USER_MANAGEMENT',
   VISIT_MANAGEMENT = 'VISIT_MANAGEMENT',
-  SAMPLE_SAFETY = 'SAMPLE_SAFETY',
+  SAFETY = 'SAFETY',
 }
 
 export enum FeatureUpdateAction {

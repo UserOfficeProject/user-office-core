@@ -1,5 +1,6 @@
 # /node_modules/* in the project root is ignored by default
 # build artefacts
+node_modules
 build/*
 coverage/*
 # data definition files

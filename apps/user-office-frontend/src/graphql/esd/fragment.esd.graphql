@@ -1,0 +1,8 @@
+fragment esd on ExperimentSafetyDocument {
+  id
+  reviewerUserId
+  evaluation
+  comment
+  createdAt
+  evaluatedAt
+}

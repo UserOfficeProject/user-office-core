@@ -11,6 +11,13 @@ BEGIN
     WHERE 
       short_code='sample_safety_reviewer';
 
+    UPDATE
+      features
+    SET
+      feature_id='SAFETY'
+    WHERE
+      feature_id='SAMPLE_SAFETY';
+      
     END;
 	END IF;
 END;

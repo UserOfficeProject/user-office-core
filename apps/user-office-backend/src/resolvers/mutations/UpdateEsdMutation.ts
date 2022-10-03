@@ -20,6 +20,9 @@ export class UpdateEsdArgs {
 
   @Field(() => EsdEvaluation)
   evaluation: EsdEvaluation;
+
+  @Field(() => String)
+  comment: string;
 }
 
 @Resolver()

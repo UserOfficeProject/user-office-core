@@ -146,7 +146,7 @@ const proposalBasisPreSubmit =
   () =>
   async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
     const proposal = (state as ProposalSubmissionState).proposal;
-    const { primaryKey, title, abstract, users, proposer, callId } = proposal;
+    const { primaryKey, title, abstract, users, proposer, call } = proposal;
 
     let returnValue = state.questionary.questionaryId;
 
@@ -170,7 +170,7 @@ const proposalBasisPreSubmit =
       }
     } else {
       const createResult = await api.createProposal({
-        callId: callId,
+        callId: call?.id,
       });
 
       if (createResult.createProposal.proposal) {

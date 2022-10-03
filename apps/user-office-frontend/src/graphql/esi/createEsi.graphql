@@ -16,15 +16,17 @@ mutation createEsi($scheduledEventId: Int!) {
         }
       }
       proposal {
-        primaryKey
-        proposalId
-        title
+        ...proposal
         samples {
           ...sample
         }
         questionary {
+          isCompleted
           ...questionary
         }
+      }
+      scheduledEvent {
+        ...scheduledEventCore
       }
     }
 

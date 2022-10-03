@@ -52,6 +52,38 @@ class PostgresProposalEsiDataSource implements ProposalEsiDataSource {
         if (filter?.questionaryId) {
           query.where('questionary_id', filter.questionaryId);
         }
+        if (filter?.isSubmitted) {
+          query.where('is_submitted', filter.isSubmitted);
+        }
+        if (filter?.callId) {
+          query.join(
+            'scheduled_events',
+            'scheduled_events.scheduled_event_id',
+            '=',
+            'experiment_safety_inputs.scheduled_event_id'
+          );
+          query.join(
+            'proposals',
+            'proposals.proposal_pk',
+            '=',
+            'scheduled_events.proposal_pk'
+          );
+          query.join('call', 'proposals.call_id', '=', 'call.call_id');
+          query.where('call.call_id', filter.callId);
+        }
+        if (filter?.hasEvaluation !== undefined) {
+          query.join(
+            'experiment_safety_documents',
+            'experiment_safety_documents.esi_id',
+            '=',
+            'experiment_safety_inputs.esi_id'
+          );
+          if (filter.hasEvaluation === true) {
+            query.whereNot('experiment_safety_documents.esd_id', null);
+          } else if (filter.hasEvaluation === false) {
+            query.where('experiment_safety_documents.esd_id', null);
+          }
+        }
       });
 
     return esis.map((esi) => createEsiObject(esi));

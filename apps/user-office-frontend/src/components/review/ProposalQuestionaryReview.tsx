@@ -1,40 +1,46 @@
-import { TableProps } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import ProposalQuestionaryDetails from 'components/proposal/ProposalQuestionaryDetails';
 import { TableRowData } from 'components/questionary/QuestionaryDetails';
 import { BasicUserDetails } from 'generated/sdk';
-import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 import { getFullUserNameWithEmail } from 'utils/user';
 
-export default function ProposalQuestionaryReview(
-  props: {
-    data: ProposalWithQuestionary;
-  } & TableProps<FunctionComponent<unknown>>
-) {
-  const { data, ...restProps } = props;
+interface ProposalQuestionaryReviewProps {
+  proposalPk: number;
+}
 
-  if (!data.questionaryId) {
+export default function ProposalQuestionaryReview(
+  props: ProposalQuestionaryReviewProps
+) {
+  const { proposalPk, ...restProps } = props;
+  const { proposalData } = useProposalData(proposalPk);
+
+  if (!proposalData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
-  const users = data.users || [];
+  const users = proposalData.users || [];
 
-  const hasReferenceNumberFormat = !!data.call?.referenceNumberFormat;
+  const hasReferenceNumberFormat = !!proposalData.call?.referenceNumberFormat;
   const additionalDetails: TableRowData[] = [
     {
       label: 'Proposal ID',
       value:
-        !data.submitted && hasReferenceNumberFormat
-          ? data.proposalId + ' (Pre-submission)'
-          : data.proposalId,
+        !proposalData.submitted && hasReferenceNumberFormat
+          ? proposalData.proposalId + ' (Pre-submission)'
+          : proposalData.proposalId,
     },
-    { label: 'Title', value: data.title },
-    { label: 'Abstract', value: data.abstract },
+    { label: 'Title', value: proposalData.title },
+    { label: 'Abstract', value: proposalData.abstract },
+    {
+      label: 'Instrument',
+      value: proposalData.instrument?.shortCode ?? 'None',
+    },
     {
       label: 'Principal Investigator',
-      value: getFullUserNameWithEmail(data.proposer),
+      value: getFullUserNameWithEmail(proposalData.proposer),
     },
     {
       label: 'Co-Proposers',
@@ -46,10 +52,10 @@ export default function ProposalQuestionaryReview(
 
   return (
     <ProposalQuestionaryDetails
-      questionaryId={data.questionaryId}
+      questionaryId={proposalData.questionary.questionaryId}
       additionalDetails={additionalDetails}
       title="Proposal information"
-      proposalPk={data.primaryKey}
+      proposalPk={proposalData.primaryKey}
       {...restProps}
     />
   );

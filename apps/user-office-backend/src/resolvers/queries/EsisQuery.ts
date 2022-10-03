@@ -5,11 +5,20 @@ import { ExperimentSafetyInput } from '../types/ExperimentSafetyInput';
 
 @InputType()
 export class GetProposalEsisFilter {
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   scheduledEventId?: number;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   questionaryId?: number;
+
+  @Field(() => Boolean, { nullable: true })
+  isSubmitted?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  callId?: number;
+
+  @Field(() => Boolean, { nullable: true })
+  hasEvaluation?: boolean;
 }
 
 @Resolver()

@@ -540,7 +540,7 @@ context('Samples tests', () => {
     });
 
     it('Officer should be able to evaluate sample', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAFETY)) {
         this.skip();
       }
       cy.createSample({
@@ -606,7 +606,7 @@ context('Samples tests', () => {
     });
 
     it('Download samples is working with dialog window showing up', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAFETY)) {
         this.skip();
       }
       cy.createSample({
@@ -634,7 +634,7 @@ context('Samples tests', () => {
     });
 
     it('Should be able to download sample pdf', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAFETY)) {
         this.skip();
       }
       cy.createSample({

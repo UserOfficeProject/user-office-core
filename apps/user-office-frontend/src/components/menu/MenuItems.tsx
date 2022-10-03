@@ -181,7 +181,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
   const isSafetyReviewEnabled = context.featuresMap.get(
-    FeatureId.SAMPLE_SAFETY
+    FeatureId.SAFETY
   )?.isEnabled;
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);

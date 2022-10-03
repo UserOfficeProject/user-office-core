@@ -177,12 +177,17 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => Call, { nullable: true })
+  @FieldResolver(() => Call)
   async call(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Call | null> {
-    return await context.queries.call.dataSource.getCall(proposal.callId);
+  ): Promise<Call> {
+    const call = await context.queries.call.dataSource.getCall(proposal.callId);
+    if (!call) {
+      throw new Error('Proposal has no call');
+    }
+
+    return call;
   }
 
   @FieldResolver(() => Questionary)

@@ -16,11 +16,11 @@ class PostgresProposalEsdDataSource implements ProposalEsdDataSource {
         esi_id: args.esiId,
         evaluation: args.evaluation,
         reviewer_user_id: args.reviewerUserId,
+        comment: args.comment,
       })
-      .into('experiment_safety_inputs')
+      .into('experiment_safety_documents')
       .returning('*')
-      .first()
-      .then((result) => createEsdObject(result));
+      .then((result) => createEsdObject(result[0]));
   }
 
   // Read
@@ -38,19 +38,32 @@ class PostgresProposalEsdDataSource implements ProposalEsdDataSource {
     return createEsdObject(result);
   }
 
+  async getEsdByEsiId(esiId: number): Promise<ExperimentSafetyDocument | null> {
+    const result = await database
+      .select('*')
+      .from('experiment_safety_documents')
+      .where('esi_id', esiId)
+      .first();
+
+    if (!result) {
+      return null;
+    }
+
+    return createEsdObject(result);
+  }
+
   // Update
   updateEsd(
     args: UpdateEsdArgs & { reviewerUserId: number }
   ): Promise<ExperimentSafetyDocument | Rejection> {
-    return database('experiment_safety_inputs')
+    return database('experiment_safety_documents')
       .update({
         evaluation: args.evaluation,
         reviewer_user_id: args.reviewerUserId,
+        comment: args.comment,
       })
-      .into('experiment_safety_inputs')
       .returning('*')
-      .first()
-      .then((result) => createEsdObject(result));
+      .then((result) => createEsdObject(result[0]));
   }
 }
 

@@ -1,0 +1,22 @@
+query getEsis($filter: GetProposalEsisFilter) {
+  esis(filter: $filter) {
+    ...esi
+    creator {
+      ...basicUserDetails
+    }
+    proposal {
+      primaryKey
+      proposalId
+      title
+    }
+    scheduledEvent {
+      ...scheduledEventCore
+    }
+    esd {
+      ...esd
+      reviewer {
+        ...basicUserDetails
+      }
+    }
+  }
+}

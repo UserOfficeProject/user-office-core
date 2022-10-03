@@ -79,7 +79,7 @@ async function enableDefaultEssFeatures() {
       FeatureId.SEP_REVIEW,
       FeatureId.USER_MANAGEMENT,
       FeatureId.VISIT_MANAGEMENT,
-      FeatureId.SAMPLE_SAFETY,
+      FeatureId.SAFETY,
     ],
     true
   );

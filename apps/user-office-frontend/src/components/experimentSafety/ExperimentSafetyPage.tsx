@@ -1,274 +1,159 @@
+import MaterialTable from '@material-table/core';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
+import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
-import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
+import { BooleanParam, NumberParam, useQueryParams } from 'use-query-params';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import EsiStatusFilter from 'components/common/EsiStatusFilter';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import SampleDetails from 'components/sample/SampleDetails';
-import SamplesTable from 'components/sample/SamplesTable';
-import { Maybe, SampleStatus } from 'generated/sdk';
+import { GetEsisQuery } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
-import { SampleWithProposalData } from 'models/questionary/sample/SampleWithProposalData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
+import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 
-function SampleEvaluationDialog(props: {
-  sample: SampleWithProposalData;
-  onClose: (sample: Maybe<SampleWithProposalData>) => void;
-}) {
-  const { sample, onClose } = props;
-  const { api } = useDataApiWithFeedback();
+import { EsiEvaluationDialog } from './EsiEvaluationDialog';
 
-  const initialValues: SampleWithProposalData = {
-    ...sample,
-  };
-
-  return (
-    <InputDialog
-      open={sample !== null}
-      onClose={() => onClose(null)}
-      fullWidth={true}
-    >
-      <SampleDetails sampleId={sample.id} />
-      <Formik
-        initialValues={initialValues}
-        onSubmit={async (values): Promise<void> => {
-          if (!values) {
-            return;
-          }
-
-          const { id, safetyComment, safetyStatus } = values;
-          const result = await api({
-            toastSuccessMessage: `Review for '${sample?.title}' submitted`,
-          }).updateSample({ sampleId: id, safetyComment, safetyStatus });
-
-          const updatedSample = result.updateSample.sample;
-          onClose({ ...values, ...updatedSample } || null);
-        }}
-      >
-        {({ isSubmitting, dirty }) => (
-          <Form>
-            <Field
-              type="text"
-              name="safetyStatus"
-              label="Status"
-              select
-              component={TextField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{ 'data-cy': 'safety-status' }}
-              fullWidth
-              required={true}
-              disabled={isSubmitting}
-            >
-              <MenuItem
-                key={SampleStatus.PENDING_EVALUATION}
-                value={SampleStatus.PENDING_EVALUATION}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Not evaluated</Typography>
-              </MenuItem>
-
-              <MenuItem
-                key={SampleStatus.LOW_RISK}
-                value={SampleStatus.LOW_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#88C100' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Low risk</Typography>
-              </MenuItem>
-
-              <MenuItem
-                key={SampleStatus.ELEVATED_RISK}
-                value={SampleStatus.ELEVATED_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF8A00' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Elevated risk</Typography>
-              </MenuItem>
-
-              <MenuItem
-                key={SampleStatus.HIGH_RISK}
-                value={SampleStatus.HIGH_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF003C' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">High risk</Typography>
-              </MenuItem>
-            </Field>
-
-            <Field
-              name="safetyComment"
-              id="safetyComment"
-              label="Comment"
-              type="text"
-              component={TextField}
-              multiline
-              fullWidth
-              disabled={isSubmitting}
-              InputProps={{
-                minRows: 4,
-                maxRows: 10,
-                'data-cy': 'safety-comment',
-              }}
-            />
-
-            <ActionButtonContainer>
-              <Button type="submit" data-cy="submit" disabled={!dirty}>
-                Submit
-              </Button>
-            </ActionButtonContainer>
-          </Form>
-        )}
-      </Formik>
-    </InputDialog>
-  );
-}
-
-const columns = [
-  {
-    title: 'Actions',
-    sorting: false,
-    removable: false,
-    field: 'rowActions',
-  },
-  {
-    title: 'Proposal ID',
-    field: 'proposal.proposalId',
-  },
-  { title: 'Title', field: 'title' },
-  { title: 'Status', field: 'safetyStatus' },
-  { title: 'Created', field: 'created' },
-];
+export type EsiRowData = NonNullable<GetEsisQuery['esis']>[0];
 
 function ExperimentSafetyPage() {
-  const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { api } = useDataApiWithFeedback();
   const { calls, loadingCalls } = useCallsData({ isActive: true });
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     call: NumberParam,
-    search: StringParam,
+    hasEvaluation: BooleanParam,
   });
-
+  const { timezone, toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+  });
   const [selectedCallId, setSelectedCallId] = useState<number>(
     urlQueryParams.call ? urlQueryParams.call : 0
   );
-  const [samples, setSamples] = useState<SampleWithProposalData[]>([]);
-  const [selectedSample, setSelectedSample] =
-    useState<SampleWithProposalData | null>(null);
+  const [hasEvaluation, setHasEvaluation] = useState<boolean | undefined>(
+    urlQueryParams.hasEvaluation ? urlQueryParams.hasEvaluation : false
+  );
+  const [esis, setEsis] = useState<EsiRowData[]>([]);
+  const [selectedEsi, setSelectedEsi] = useState<EsiRowData | null>(null);
 
   useEffect(() => {
-    if (selectedCallId === null) {
-      return;
-    }
+    api()
+      .getEsis({
+        filter: {
+          isSubmitted: true,
+          callId: selectedCallId ?? undefined,
+          hasEvaluation,
+        },
+      })
+      .then((result) => {
+        setEsis(result.esis || []);
+      });
+  }, [api, selectedCallId, hasEvaluation]);
 
-    if (selectedCallId === 0) {
-      api()
-        .getSamplesWithProposalData()
-        .then((result) => {
-          setSamples(result.samples || []);
-        });
-    } else {
-      api()
-        .getSamplesByCallId({ callId: selectedCallId })
-        .then((result) => {
-          setSamples(result.samplesByCallId || []);
-        });
-    }
-  }, [api, selectedCallId]);
+  const columns = [
+    {
+      title: 'Actions',
+      sorting: false,
+      removable: false,
+      field: 'rowActions',
+    },
+    {
+      title: 'Proposal ID',
+      field: 'proposal.proposalId',
+    },
+    { title: 'Proposal title', field: 'proposal.title' },
 
-  const downloadPDFSample = useDownloadPDFSample();
-  const RowActionButtons = (rowData: SampleWithProposalData) => (
+    {
+      title: 'Created by',
+      render: (esi: EsiRowData) => getFullUserName(esi.creator),
+    },
+    {
+      title: 'Evaluated by',
+      render: (esi: EsiRowData) => getFullUserName(esi.esd?.reviewer),
+    },
+    {
+      title: 'Safety evaluation',
+      field: 'esd.evaluation',
+      render: (rowData: EsiRowData) =>
+        rowData.esd?.evaluation ?? 'Not evaluated yet',
+    },
+
+    {
+      title: `Experiment start date (${timezone})`,
+      field: 'formattedEventStartsAt',
+    },
+  ];
+
+  const RowActionButtons = (rowData: EsiRowData) => (
     <>
-      <Tooltip title="Review sample">
-        <IconButton onClick={() => setSelectedSample(rowData)}>
+      <Tooltip title="Review Experiment Safety Input">
+        <IconButton onClick={() => setSelectedEsi(rowData)}>
           <VisibilityIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download sample as pdf">
-        <IconButton
-          data-cy="download-sample"
-          onClick={() => downloadPDFSample([rowData.id], rowData.title)}
-        >
+      <Tooltip title="Download ESI as pdf">
+        <IconButton data-cy="download-esi" onClick={() => {}}>
           <GetAppIcon />
         </IconButton>
       </Tooltip>
     </>
   );
 
-  const samplesWithRowActions = samples.map((sample) => ({
-    ...sample,
-    rowActions: RowActionButtons(sample),
+  const samplesWithRowActions = esis.map((esi) => ({
+    ...esi,
+    rowActions: RowActionButtons(esi),
+    formattedEventStartsAt: toFormattedDateTime(esi.scheduledEvent?.startsAt),
   }));
 
   return (
     <>
-      {selectedSample && (
-        <SampleEvaluationDialog
-          sample={selectedSample}
-          onClose={(newSample) => {
-            if (newSample) {
-              const newSamples = samples.map((sample) =>
-                sample.id === newSample.id ? newSample : sample
+      {selectedEsi && (
+        <EsiEvaluationDialog
+          esi={selectedEsi}
+          onClose={(updatedEsi) => {
+            if (updatedEsi) {
+              const newObjectsArray = esis.map((esi) =>
+                updatedEsi.id === esi.id ? updatedEsi : esi
               );
-
-              setSamples(newSamples);
+              setEsis(newObjectsArray);
             }
-            setSelectedSample(null);
+            setSelectedEsi(null);
           }}
         />
       )}
       <StyledContainer>
         <StyledPaper>
-          <CallFilter
-            callId={selectedCallId}
-            calls={calls}
-            isLoading={loadingCalls}
-            onChange={(callId) => {
-              setSelectedCallId(callId);
-            }}
-            shouldShowAll={true}
-          />
-          <SamplesTable
-            data={samplesWithRowActions}
-            isLoading={isExecutingCall}
-            urlQueryParams={urlQueryParams}
-            setUrlQueryParams={setUrlQueryParams}
+          <Box display={'flex'}>
+            <CallFilter
+              callId={selectedCallId}
+              calls={calls}
+              isLoading={loadingCalls}
+              onChange={(callId) => {
+                setSelectedCallId(callId);
+              }}
+              shouldShowAll={true}
+            />
+            <EsiStatusFilter
+              value={hasEvaluation ?? false}
+              onChange={(status) => {
+                setHasEvaluation(status);
+              }}
+            />
+          </Box>
+          <MaterialTable
             columns={columns}
-            options={{
-              selection: true,
-              headerSelectionProps: {
-                inputProps: { 'aria-label': 'Select All Rows' },
-              },
-            }}
-            actions={[
-              {
-                icon: GetAppIcon,
-                tooltip: 'Download sample',
-                onClick: (event, rowData) =>
-                  downloadPDFSample(
-                    (rowData as SampleWithProposalData[]).map(({ id }) => id),
-                    (rowData as SampleWithProposalData[])[0].title
-                  ),
-              },
-            ]}
+            icons={tableIcons}
+            title={
+              <Typography variant="h6" component="h2">
+                Experiment safety inputs
+              </Typography>
+            }
+            data={samplesWithRowActions}
           />
         </StyledPaper>
       </StyledContainer>

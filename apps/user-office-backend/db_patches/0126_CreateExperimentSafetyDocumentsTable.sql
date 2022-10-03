@@ -9,6 +9,7 @@ BEGIN
       esi_id INT UNIQUE REFERENCES experiment_safety_inputs(esi_id) ON UPDATE CASCADE,
       reviewer_user_id INT REFERENCES users (user_id) ON UPDATE CASCADE,
       evaluation VARCHAR(255) NOT NULL CHECK (evaluation IN ('ACCEPTED', 'REJECTED')),
+      comment TEXT NOT NULL DEFAULT '',
       created_at TIMESTAMP NOT NULL DEFAULT NOW(),
       evaluated_at TIMESTAMP DEFAULT NOW()
     );

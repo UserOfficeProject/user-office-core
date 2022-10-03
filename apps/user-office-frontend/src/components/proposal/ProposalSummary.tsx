@@ -63,12 +63,12 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   // EDITABLE_SUBMITTED is an upcoming status
   useEffect(() => {
     async function initializeSubmissionMessage() {
-      if (!proposal.callId || submitDisabled) {
+      if (!proposal.call || submitDisabled) {
         setLoadingSubmitMessage(false);
 
         return;
       }
-      const { call } = await api().getCall({ callId: proposal.callId });
+      const { call } = await api().getCall({ callId: proposal.call.id });
       const workflowId = call?.proposalWorkflowId;
       if (workflowId) {
         const connections = (
@@ -106,7 +106,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
       setLoadingSubmitMessage(false);
     }
     initializeSubmissionMessage();
-  }, [api, proposal.callId, proposal.status, submitDisabled]);
+  }, [api, proposal.call?.id, proposal.status, submitDisabled]);
 
   if (loadingSubmitMessage) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -114,7 +114,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   return (
     <>
-      <ProposalQuestionaryReview data={proposal} />
+      <ProposalQuestionaryReview proposalPk={proposal.primaryKey} />
       <NavigationFragment
         disabled={proposal.status?.id === 0}
         isLoading={isSubmitting}

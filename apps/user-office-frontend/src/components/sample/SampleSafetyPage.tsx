@@ -1,12 +1,9 @@
 import GetAppIcon from '@mui/icons-material/GetApp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import React, { useEffect, useState } from 'react';
@@ -22,6 +19,7 @@ import { SampleWithProposalData } from 'models/questionary/sample/SampleWithProp
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import { ListShadedItem } from '../common/ListShadedItem';
 import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 
@@ -79,40 +77,28 @@ function SampleEvaluationDialog(props: {
                 key={SampleStatus.PENDING_EVALUATION}
                 value={SampleStatus.PENDING_EVALUATION}
               >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Not evaluated</Typography>
+                <ListShadedItem shade={'#CCC'} title="Not evaluated" />
               </MenuItem>
 
               <MenuItem
                 key={SampleStatus.LOW_RISK}
                 value={SampleStatus.LOW_RISK}
               >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#88C100' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Low risk</Typography>
+                <ListShadedItem shade={'#88C100'} title="Low risk" />
               </MenuItem>
 
               <MenuItem
                 key={SampleStatus.ELEVATED_RISK}
                 value={SampleStatus.ELEVATED_RISK}
               >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF8A00' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Elevated risk</Typography>
+                <ListShadedItem shade={'#FF8A00'} title="Elevated risk" />
               </MenuItem>
 
               <MenuItem
                 key={SampleStatus.HIGH_RISK}
                 value={SampleStatus.HIGH_RISK}
               >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF003C' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">High risk</Typography>
+                <ListShadedItem shade={'#FF003C'} title="High risk" />
               </MenuItem>
             </Field>
 
@@ -157,7 +143,6 @@ const columns = [
   },
   { title: 'Title', field: 'title' },
   { title: 'Status', field: 'safetyStatus' },
-  { title: 'Created', field: 'created' },
 ];
 
 function SampleSafetyPage() {

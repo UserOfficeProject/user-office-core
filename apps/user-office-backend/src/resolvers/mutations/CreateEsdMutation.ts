@@ -20,12 +20,15 @@ export class CreateEsdArgs {
 
   @Field(() => EsdEvaluation)
   evaluation: EsdEvaluation;
+
+  @Field(() => String)
+  comment: string;
 }
 
 @Resolver()
 export class CreateEsdMutation {
   @Mutation(() => EsdResponseWrap)
-  createEdi(@Args() args: CreateEsdArgs, @Ctx() context: ResolverContext) {
+  createEsd(@Args() args: CreateEsdArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.proposalEsd.createEsd(context.user, args),
       EsdResponseWrap

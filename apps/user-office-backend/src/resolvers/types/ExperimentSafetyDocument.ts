@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { EsdEvaluation } from '../../models/EsdEvaluation';
 import { ExperimentSafetyDocument as ExperimentSafetyDocumentOrigin } from '../../models/ExperimentSafetyDocument';
+import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 
 @ObjectType()
@@ -28,6 +29,9 @@ export class ExperimentSafetyDocument
 
   @Field(() => EsdEvaluation)
   public evaluation: EsdEvaluation;
+
+  @Field(() => String)
+  public comment: string;
 
   @Field(() => Date)
   public createdAt: Date;
@@ -52,5 +56,21 @@ export class ExperimentSafetyDocumentResolver {
     }
 
     return esi;
+  }
+
+  @FieldResolver(() => BasicUserDetails)
+  async reviewer(
+    @Root() esd: ExperimentSafetyDocument,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails> {
+    const reviewer = await context.queries.user.getBasic(
+      context.user,
+      esd.reviewerUserId
+    );
+    if (!reviewer) {
+      throw new Error('Reviewer must be defined');
+    }
+
+    return reviewer;
   }
 }

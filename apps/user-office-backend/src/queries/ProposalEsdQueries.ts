@@ -21,4 +21,12 @@ export default class ProposalEsdQueries {
   ): Promise<ExperimentSafetyDocument | null> {
     return this.dataSource.getEsd(id);
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SAFETY_REVIEWER])
+  async getEsdByEsi(
+    user: UserWithRole | null,
+    esiId: number
+  ): Promise<ExperimentSafetyDocument | null> {
+    return this.dataSource.getEsdByEsiId(esiId);
+  }
 }

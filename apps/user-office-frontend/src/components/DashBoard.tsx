@@ -187,7 +187,7 @@ const Dashboard: React.FC = () => {
     FeatureId.VISIT_MANAGEMENT
   )?.isEnabled;
   const isSampleSafetyEnabled = featureContext.featuresMap.get(
-    FeatureId.SAMPLE_SAFETY
+    FeatureId.SAFETY
   )?.isEnabled;
 
   const { currentRole } = useContext(UserContext);

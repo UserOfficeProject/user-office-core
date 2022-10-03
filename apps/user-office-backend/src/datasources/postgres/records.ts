@@ -594,6 +594,7 @@ export interface EsdRecord {
   readonly esi_id: number;
   readonly reviewer_user_id: number;
   readonly evaluation: EsdEvaluation;
+  readonly comment: string;
   readonly created_at: Date;
   readonly evaluated_at: Date;
 }
@@ -1052,6 +1053,7 @@ export const createEsdObject = (esd: EsdRecord) => {
     esd.esi_id,
     esd.reviewer_user_id,
     esd.evaluation,
+    esd.comment,
     esd.created_at,
     esd.evaluated_at
   );
