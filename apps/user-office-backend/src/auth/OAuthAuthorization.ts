@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { logger } from '@user-office-software/duo-logger';
-import { TokenSet, UserinfoResponse } from 'openid-client';
+import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -9,15 +9,12 @@ import { rejection, Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
 import { NonNullableField, RequiredField } from '../utils/helperFunctions';
-import { OpenIdClient } from './OpenIdClient';
 import { UserAuthorization } from './UserAuthorization';
-
-type ValidUserInfo = RequiredField<
-  UserinfoResponse,
-  'sub' | 'given_name' | 'family_name' | 'email'
->;
-
-type ValidTokenSet = RequiredField<TokenSet, 'access_token'>;
+import {
+  OpenIdClient,
+  ValidTokenSet,
+  ValidUserInfo,
+} from '@user-office-software/openid';
 
 type ValidUser = NonNullableField<
   User,
@@ -30,7 +27,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   constructor() {
     super();
 
-    if (OpenIdClient.hasConfiguration()) {
+    if (OpenIdClient.hasConfig()) {
       this.initialize();
     } else {
       throw new Error(
@@ -43,31 +40,10 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     redirectUri: string
   ): Promise<User | null> {
     try {
-      const client = await OpenIdClient.getInstance();
-
-      /**
-       * Requesting Authorization server to exchange the code for a tokenset,
-       ** and validating the return value that it has both - access_token and id_token
-       */
-      const callbackParams = new URLSearchParams();
-      callbackParams.append('code', code);
-
-      const params = client.callbackParams(`?${callbackParams.toString()}`);
-
-      const tokenSet = this.validateTokenSet(
-        await client.callback(redirectUri, params)
+      const { userProfile, tokenSet } = await OpenIdClient.login(
+        code,
+        redirectUri
       );
-
-      /**
-       * Getting and validating the userProfile from the previously obtained tokenset
-       */
-      const userProfile = this.validateUserProfile(
-        await client.userinfo<UserinfoResponse>(tokenSet)
-      );
-
-      /**
-       * If the user profile is valid, then we upsert the user and return it
-       */
       const user = await this.upsertUser(userProfile, tokenSet);
 
       return user;
@@ -76,13 +52,11 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         error: (error as Error)?.message,
         stack: (error as Error)?.stack,
       });
-
-      throw new Error('Error ocurred while logging in with external token');
+      return null;
     }
   }
 
   async logout(uosToken: AuthJwtPayload): Promise<void | Rejection> {
-    // validate user in token
     const oidcSub = uosToken.user.oidcSub;
 
     if (!oidcSub) {
@@ -95,8 +69,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         await this.userDataSource.getByOIDCSub(oidcSub)
       );
 
-      const client = await OpenIdClient.getInstance();
-      await client.revoke(user.oauthAccessToken);
+      await OpenIdClient.logout(user.oauthAccessToken);
 
       return;
     } catch (error) {
@@ -112,27 +85,17 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
 
   async initialize() {
-    const client = await OpenIdClient.getInstance();
-    const scopes = OpenIdClient.getScopes().join(' ');
-
-    const authUrl = client.authorizationUrl({ scope: scopes });
-
-    let endSessionUrl;
-    try {
-      endSessionUrl = client.endSessionUrl(); // try obtaining the end session url the standard way
-    } catch (e) {
-      endSessionUrl =
-        (client.issuer.ping_end_session_endpoint as string) ?? '/'; // try using PING ping_end_session_endpoint
-    }
+    const loginUrl = await OpenIdClient.loginUrl();
+    const logoutUrl = await OpenIdClient.logoutUrl();
 
     await this.db.updateSettings({
       settingsId: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
-      settingsValue: authUrl,
+      settingsValue: loginUrl,
     });
 
     await this.db.updateSettings({
       settingsId: SettingsId.EXTERNAL_AUTH_LOGOUT_URL,
-      settingsValue: endSessionUrl,
+      settingsValue: logoutUrl,
     });
   }
 
@@ -212,27 +175,6 @@ export abstract class OAuthAuthorization extends UserAuthorization {
 
       return newUser;
     }
-  }
-
-  private validateUserProfile(userProfile: UserinfoResponse): ValidUserInfo {
-    return {
-      ...userProfile,
-      email: userProfile.email ?? '',
-      family_name: userProfile.family_name ?? '',
-      given_name: userProfile.given_name ?? '',
-    } as ValidUserInfo;
-  }
-
-  private validateTokenSet(tokenSet: TokenSet): ValidTokenSet {
-    if (!tokenSet.access_token) {
-      logger.logError('Invalid tokenSet', {
-        authorizer: this.constructor.name,
-        tokenSet,
-      });
-      throw new Error('Invalid tokenSet');
-    }
-
-    return tokenSet as ValidTokenSet;
   }
 
   private validateUser(user: User | null): ValidUser {
