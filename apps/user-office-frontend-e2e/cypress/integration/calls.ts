@@ -292,8 +292,6 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able to create a call with intenal end date before call end date', function () {
       // will be enabled after @user-office-software/duo-validation new version
-      this.skip();
-
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
         this.skip();
       }
@@ -345,7 +343,7 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=end-call-internal-date]').should(
         'include.text',
-        'Internal call end date can not be before  call end date'
+        'Internal call end date can not be before call end date'
       );
     });
 
@@ -429,9 +427,9 @@ context('Calls tests', () => {
         initialDBData.getFormats().dateTimeFormat
       );
 
-      const callInternalEndDate = DateTime.fromJSDate(
-        faker.date.future()
-      ).toFormat(initialDBData.getFormats().dateTimeFormat);
+      const callInternalEndDate = endCall
+        .plus({ days: 7 })
+        .toFormat(initialDBData.getFormats().dateTimeFormat);
 
       const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
@@ -608,9 +606,9 @@ context('Calls tests', () => {
       const updatedCallEndDate = endDate.toFormat(
         initialDBData.getFormats().dateTimeFormat
       );
-      const callInternalEndDate = DateTime.fromJSDate(
-        faker.date.future()
-      ).toFormat(initialDBData.getFormats().dateTimeFormat);
+      const callInternalEndDate = endDate
+        .plus({ days: 7 })
+        .toFormat(initialDBData.getFormats().dateTimeFormat);
 
       const refNumFormat = '211{digits:5}';
 

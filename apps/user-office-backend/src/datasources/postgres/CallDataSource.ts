@@ -48,9 +48,9 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     if (filter?.isEndedInternal === true) {
-      query.where('call_ended_internal', false);
-    } else if (filter?.isEndedInternal === false) {
       query.where('call_ended_internal', true);
+    } else if (filter?.isEndedInternal === false) {
+      query.where('call_ended_internal', false);
     }
 
     /**
