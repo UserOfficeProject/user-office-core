@@ -24,7 +24,7 @@
     "prod": "tsc && node ./build/index.js",
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --fix --quiet",
-    "start": "tsc && node ./build/index.js",
+    "start": "npm run dev",
     "apitest": "newman run api_tests/tests.json --environment api_tests/environment.json",
     "debug": "ts-node-dev --inspect --respawn -T ./index.ts",
     "populate": "ts-node-dev --respawn -T ./src/populate/index.ts",
