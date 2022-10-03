@@ -140,3 +140,21 @@ export const workflowEngine = async (
     })
   );
 };
+
+export const markProposalEventAsDoneAndCallWorkflowEngine = async (
+  eventType: Event,
+  proposal: WorkflowEngineProposalType
+) => {
+  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposal(
+    eventType,
+    proposal.primaryKey
+  );
+
+  const updatedProposals = await workflowEngine({
+    ...proposal,
+    proposalEvents: allProposalEvents,
+    currentEvent: eventType,
+  });
+
+  return updatedProposals;
+};
