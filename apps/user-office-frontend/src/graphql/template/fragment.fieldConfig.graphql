@@ -95,6 +95,18 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
   }
+
+  ... on MultiPartSelectionConfig {
+    small_label
+    tooltip
+    partOneQuestion
+    partTwoQuestion
+    selectionPairs {
+      key
+      value
+    }
+  }
+
   ... on TextInputConfig {
     min
     max
