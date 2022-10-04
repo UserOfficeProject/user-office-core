@@ -33,7 +33,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/subgraph": "^0.3.1",
+    "@apollo/subgraph": "^0.5.1",
     "@user-office-software/duo-localisation": "^1.2.0",
     "@user-office-software/duo-logger": "^2.0.2",
     "@user-office-software/duo-message-broker": "^1.4.0",
