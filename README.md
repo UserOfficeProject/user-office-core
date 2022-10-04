@@ -11,17 +11,11 @@
 To be able to start both backend and frontend locally you will need to:
 
 1. Install all needed dependencies with `npm install`
-2. Make sure that `.env` files exist (if they are not added automatically) inside `apps/user-office-backend` and `apps/user-office-frontend` accordingly. There are example env files that could help.
-3. Start the application using `npm run dev` or `npm run start`
+2. Start the application using `npm run dev` or `npm run start`
 
-## How to pull latest changes from separate the repositories
-
-> **_NOTE:_** This is just temporary part until we fully switch to the monorepo.
-
-All you need to do is run two commands:
-
-1. Pull latest changes from the backend repository: `git pull https://github.com/UserOfficeProject/user-office-backend.git develop`. It uses develop branch to pull from. If you want another branch just change that part.
-2. Pull latest changes from the frontend repository: `git pull https://github.com/UserOfficeProject/user-office-frontend.git develop`. It uses develop branch to pull from. If you want another branch just change that part.
+## Check the .env file
+If .env file is not preset during startup of the project, it will be created using example.env file template
+The `example.env` and `.env` files are located in `apps/user-office-backend` and `apps/user-office-frontend` accordingly.
 
 ## Monorepo future plans
 
