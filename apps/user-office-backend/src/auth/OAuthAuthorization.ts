@@ -1,5 +1,10 @@
 import 'reflect-metadata';
 import { logger } from '@user-office-software/duo-logger';
+import {
+  OpenIdClient,
+  ValidTokenSet,
+  ValidUserInfo,
+} from '@user-office-software/openid';
 import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';
 
@@ -8,13 +13,8 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { rejection, Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { NonNullableField, RequiredField } from '../utils/helperFunctions';
+import { NonNullableField } from '../utils/helperFunctions';
 import { UserAuthorization } from './UserAuthorization';
-import {
-  OpenIdClient,
-  ValidTokenSet,
-  ValidUserInfo,
-} from '@user-office-software/openid';
 
 type ValidUser = NonNullableField<
   User,
@@ -52,6 +52,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         error: (error as Error)?.message,
         stack: (error as Error)?.stack,
       });
+
       return null;
     }
   }
