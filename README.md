@@ -1,3 +1,11 @@
+
+# User Office Core
+
+[![Build Status](https://github.com/UserOfficeProject/user-office-core/actions/workflows/test-build.yml/badge.svg?branch=master)](https://github.com/UserOfficeProject/user-office-core/actions)
+[![DeepScan grade](https://deepscan.io/api/teams/19157/projects/22488/branches/665548/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=19157&pid=22488&bid=665548)
+[![Known Vulnerabilities](https://snyk.io/test/github/UserOfficeProject/user-office-core/master/badge.svg?targetFile=package.json)](https://snyk.io/test/github/UserOfficeProject/user-office-core/master?targetFile=package.json)
+
+---
 ## Getting started
 
 To be able to start both backend and frontend locally you will need to:
