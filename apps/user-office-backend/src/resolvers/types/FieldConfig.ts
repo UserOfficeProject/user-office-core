@@ -1,5 +1,6 @@
 import { createUnionType, Field, Int, ObjectType } from 'type-graphql';
 
+import { MultiPartSelectionPair } from './MultiPartSelectionPairs';
 import { Unit } from './Unit';
 
 @ObjectType()
@@ -190,6 +191,18 @@ export class SampleEsiBasisConfig {
 export class RichTextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   max: number | null;
+}
+
+@ObjectType()
+export class MultiPartSelectionConfig extends ConfigBase {
+  @Field(() => [MultiPartSelectionPair])
+  selectionPairs: MultiPartSelectionPair[];
+
+  @Field(() => String)
+  partOneQuestion: string;
+
+  @Field(() => String)
+  partTwoQuestion: string;
 }
 
 export const FieldConfigType = createUnionType({
