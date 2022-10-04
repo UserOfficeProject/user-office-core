@@ -329,6 +329,7 @@ jobs:
           EAM_AUTH_PASS: dummyAuthPass
           EAM_API_URL: https://ios.esss.lu.se:7443
           EAM_PART_CODE: 12413
+          EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION: "true"
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
