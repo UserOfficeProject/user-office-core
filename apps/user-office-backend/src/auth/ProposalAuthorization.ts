@@ -250,7 +250,7 @@ export class ProposalAuthorization {
       return true;
     }
 
-    const checkIfInternalEditable = agent?.isInternalUser || false;
+    const checkIfInternalEditable = agent.isInternalUser || false;
     const isMemberOfProposal = await this.isMemberOfProposal(agent, proposal);
     const isProposalEditable = await this.isProposalEditable(
       proposal,

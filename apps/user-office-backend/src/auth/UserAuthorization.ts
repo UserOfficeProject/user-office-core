@@ -24,8 +24,8 @@ export abstract class UserAuthorization {
 
   async isInternalUser(agent: UserWithRole | null): Promise<boolean> {
     return agent
-      ? agent?.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST ||
-          agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
+      ? agent.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST ||
+          agent.currentRole?.shortCode === Roles.USER_OFFICER ||
           this.userDataSource.getRolesForUser(agent.id).then((roles) => {
             return roles.some(
               (role) =>
