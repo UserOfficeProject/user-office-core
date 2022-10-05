@@ -281,7 +281,7 @@ describe('Submit proposal', () => {
 
     expect(async () => {
       await proposalDataSource.submitProposal(proposal.primaryKey);
-    }).rejects.toThrowError('Failed to submit');
+    }).rejects.toThrow('Failed to submit');
     expect(getProposal(proposal.primaryKey)).resolves.toEqual(
       expect.objectContaining({
         proposalId: proposal.proposalId,
@@ -297,7 +297,7 @@ describe('Submit proposal', () => {
 
     expect(async () => {
       await proposalDataSource.submitProposal(proposal.primaryKey);
-    }).rejects.toThrowError('Failed to submit');
+    }).rejects.toThrow('Failed to submit');
     expect(getProposal(proposal.primaryKey)).resolves.toEqual(
       expect.objectContaining({
         proposalId: proposal.proposalId,

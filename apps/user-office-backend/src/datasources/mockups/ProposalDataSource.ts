@@ -123,6 +123,12 @@ const dummyProposalEvents = {
   proposal_reserved: false,
   proposal_rejected: false,
   proposal_notified: false,
+  proposal_booking_time_activated: false,
+  proposal_booking_time_updated: false,
+  proposal_booking_time_slot_added: false,
+  proposal_booking_time_slots_removed: false,
+  proposal_booking_time_completed: false,
+  proposal_booking_time_reopened: false,
 };
 
 export class ProposalDataSourceMock implements ProposalDataSource {
