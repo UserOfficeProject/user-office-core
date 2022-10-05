@@ -230,29 +230,7 @@ const CallGeneralInfo: React.FC<{
           minDate={startCall}
           required
         />
-        {showInternalCall && (
-          <Field
-            name="endCallInternal"
-            label={`End Internal (${timezone})`}
-            id="end-call-internal-input"
-            inputFormat={dateTimeFormat}
-            mask={mask}
-            ampm={false}
-            allowSameDateSelection
-            component={DateTimePicker}
-            inputProps={{ placeholder: dateTimeFormat }}
-            textField={{
-              fullWidth: true,
-              required: true,
-              'data-cy': 'end-call-internal-date',
-            }}
-            // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
-            // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
-            desktopModeMediaQuery={theme.breakpoints.up('sm')}
-            minDate={endCall}
-            required
-          />
-        )}
+
         <Field
           name="referenceNumberFormat"
           validate={validateRefNumFormat}
@@ -370,6 +348,31 @@ const CallGeneralInfo: React.FC<{
         }}
         required
       />
+      <LocalizationProvider dateAdapter={DateAdapter}>
+        {showInternalCall && (
+          <Field
+            name="endCallInternal"
+            label={`End Internal (${timezone})`}
+            id="end-call-internal-input"
+            inputFormat={dateTimeFormat}
+            mask={mask}
+            ampm={false}
+            allowSameDateSelection
+            component={DateTimePicker}
+            inputProps={{ placeholder: dateTimeFormat }}
+            textField={{
+              fullWidth: true,
+              required: true,
+              'data-cy': 'end-call-internal-date',
+            }}
+            // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
+            // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
+            desktopModeMediaQuery={theme.breakpoints.up('sm')}
+            minDate={endCall}
+            required
+          />
+        )}
+      </LocalizationProvider>
       <FormikUIAutocomplete
         name="allocationTimeUnit"
         label="Allocation time unit"

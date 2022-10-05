@@ -295,12 +295,14 @@ context('Calls tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
         this.skip();
       }
-      const shortCode = faker.random.alphaNumeric(15);
       const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
       const today = DateTime.fromJSDate(todayJsDate); // set date to specific date to easier test the validation
       cy.clock(todayJsDate);
 
-      const yesterday = today.minus({ days: 1 }).day;
+      const yesterday = today
+        .minus({ days: 1 })
+        .toFormat(initialDBData.getFormats().dateTimeFormat)
+        .toString();
       const tomorrow = today
         .plus({ days: 1 })
         .startOf('day')
@@ -321,25 +323,15 @@ context('Calls tests', () => {
         .contains(proposalInternalWorkflow.name)
         .click();
 
-      cy.get('[data-cy=short-code] input')
-        .type(shortCode)
-        .should('have.value', shortCode);
-
-      cy.get('[data-cy=end-call-internal-date]')
-        .find('[data-testid="CalendarIcon"]')
-        .click();
-
-      cy.get('[role="dialog"] .MuiCalendarPicker-root .MuiPickersDay-root')
-        .contains(yesterday)
-        .closest('button')
-        .should('be.disabled');
-
-      cy.get('[data-cy=end-date] input').click();
-
       cy.get('[data-cy=end-date] input')
         .clear()
         .type(tomorrow)
         .should('have.value', tomorrow);
+
+      cy.get('[data-cy=end-call-internal-date] input')
+        .clear()
+        .type(yesterday)
+        .should('have.value', yesterday);
 
       cy.get('[data-cy=end-call-internal-date]').should(
         'include.text',
