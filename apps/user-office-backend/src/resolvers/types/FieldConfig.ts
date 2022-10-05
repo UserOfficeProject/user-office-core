@@ -227,5 +227,6 @@ export const FieldConfigType = createUnionType({
     VisitBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
+    MultiPartSelectionConfig,
   ], // function that returns array of object types classes
 });
