@@ -43,7 +43,7 @@
     "apollo-server-express": "^3.10.2",
     "apollo-server-plugin-base": "^3.6.2",
     "await-to-js": "^2.1.1",
-    "axios": "^0.26.0",
+    "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "clamscan": "^2.1.2",
