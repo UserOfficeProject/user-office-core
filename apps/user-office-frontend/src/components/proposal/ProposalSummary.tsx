@@ -16,7 +16,7 @@ import { isCallEnded } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import { ProposalContextType } from './ProposalContainer';
+import * as ProposalContainer from './ProposalContainer';
 
 type ProposalSummaryProps = {
   confirm: WithConfirmType;
@@ -25,7 +25,7 @@ type ProposalSummaryProps = {
 function ProposalReview({ confirm }: ProposalSummaryProps) {
   const { state, dispatch } = useContext(
     QuestionaryContext
-  ) as ProposalContextType;
+  ) as ProposalContainer.ProposalContextType;
 
   if (!dispatch || !state) {
     throw new Error(createMissingContextErrorMessage());
@@ -132,7 +132,8 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               async () => {
                 setIsSubmitting(true);
                 const result = await api({
-                  toastSuccessMessage: 'Proposal submitted successfully',
+                  toastSuccessMessage:
+                    'Your proposal has been submitted successfully. You will receive a confirmation email in due course.',
                 }).submitProposal({
                   proposalPk: state.proposal.primaryKey,
                 });
