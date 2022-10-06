@@ -16,7 +16,7 @@ import { isCallEnded } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import * as ProposalContainer from './ProposalContainer';
+import { ProposalContextType } from './ProposalContainer';
 
 type ProposalSummaryProps = {
   confirm: WithConfirmType;
@@ -25,7 +25,7 @@ type ProposalSummaryProps = {
 function ProposalReview({ confirm }: ProposalSummaryProps) {
   const { state, dispatch } = useContext(
     QuestionaryContext
-  ) as ProposalContainer.ProposalContextType;
+  ) as ProposalContextType;
 
   if (!dispatch || !state) {
     throw new Error(createMissingContextErrorMessage());
