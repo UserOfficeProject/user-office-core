@@ -133,7 +133,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                 setIsSubmitting(true);
                 const result = await api({
                   toastSuccessMessage:
-                    'Your proposal has been submitted successfully. You will receive a confirmation email in due course.',
+                    'Your proposal has been submitted successfully. You will receive a confirmation email soon.',
                 }).submitProposal({
                   proposalPk: state.proposal.primaryKey,
                 });
