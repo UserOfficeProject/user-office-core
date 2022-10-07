@@ -102,11 +102,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
           return { isValid: true };
         }
 
-        if (
-          rowData &&
-          rowData.availabilityTime &&
-          +rowData.availabilityTime > 0
-        ) {
+        if (rowData.availabilityTime && +rowData.availabilityTime > 0) {
           // NOTE: Preventing inputs grater than 32-bit integer.
           if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {
             return {
