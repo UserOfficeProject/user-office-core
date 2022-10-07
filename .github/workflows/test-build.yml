@@ -108,7 +108,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/generated
+          path: apps/user-office-frontend/src/generated
           key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/genereated/sdk.ts') }}
 
       - name: Generate frontend SDK
