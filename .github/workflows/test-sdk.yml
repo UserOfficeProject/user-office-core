@@ -93,6 +93,9 @@ jobs:
         with:
           path: apps/user-office-frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          
+      - name: Generate SDK
+        run:  cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
 
       - name: Generate SDK
         run: npm run generate:sdk
