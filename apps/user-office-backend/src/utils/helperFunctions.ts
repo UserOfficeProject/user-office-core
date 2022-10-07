@@ -52,3 +52,27 @@ export const checkAllReviewsSubmittedOnProposal = (
 
   return allOtherReviewsSubmitted;
 };
+
+export const searchObjectByKey = (
+  object: object,
+  originalKey: string
+): object | null => {
+  if (object !== null) {
+    for (const key of Object.keys(object)) {
+      if (key === originalKey) {
+        return object;
+      } else if (typeof object[key as keyof object] === 'object') {
+        const found = searchObjectByKey(
+          object[key as keyof object],
+          originalKey
+        );
+
+        if (found !== null) {
+          return found;
+        }
+      }
+    }
+  }
+
+  return null;
+};
