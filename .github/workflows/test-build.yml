@@ -157,7 +157,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
 
 
       - run: npm run build
@@ -257,7 +257,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
 
 
       # TODO: See how to proceed with e2e caching because there is some error:
