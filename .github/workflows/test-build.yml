@@ -103,6 +103,17 @@ jobs:
       - name: Install frontend dependencies
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
         run: npm run install:frontend
+        
+      - name: Cache frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/generated
+          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/genereated/sdk.ts) }}
+
+      - name: Generate frontend SDK
+        if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
+        run: npm run generate:sdk
 
   build:
     # The type of runner that the job will run on
@@ -138,6 +149,14 @@ jobs:
         with:
           path: apps/user-office-frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          
+      - name: Restore frontend SDK
+        id: cached-node-modules-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated/
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
+
 
       - run: npm run build
         env:
@@ -230,6 +249,14 @@ jobs:
         with:
           path: apps/user-office-frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          
+      - name: Restore frontend SDK
+        id: cached-node-modules-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated/
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
+
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
