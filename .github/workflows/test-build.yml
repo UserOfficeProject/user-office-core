@@ -151,11 +151,11 @@ jobs:
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
           
       - name: Restore frontend SDK
-        id: cached-node-modules-frontend
+        id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated/
-          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
+          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
 
 
       - run: npm run build
@@ -251,11 +251,11 @@ jobs:
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
           
       - name: Restore frontend SDK
-        id: cached-node-modules-frontend
+        id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated/
-          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
+          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
 
 
       # TODO: See how to proceed with e2e caching because there is some error:
