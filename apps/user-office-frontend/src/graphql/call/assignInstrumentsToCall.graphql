@@ -1,6 +1,6 @@
 mutation assignInstrumentsToCall($instrumentIds: [Int!]!, $callId: Int!) {
   assignInstrumentsToCall(
-    assignInstrumentsToCallInput: {
+    assignInstasdadrumentsToCallInput: {
       instrumentIds: $instrumentIds
       callId: $callId
     }
