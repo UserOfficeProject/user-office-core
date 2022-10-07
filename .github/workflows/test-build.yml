@@ -109,7 +109,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/generated
-          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/genereated/sdk.ts) }}
+          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/genereated/sdk.ts') }}
 
       - name: Generate frontend SDK
         if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
