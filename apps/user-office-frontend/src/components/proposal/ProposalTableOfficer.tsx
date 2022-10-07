@@ -645,6 +645,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     })
   );
 
+  const shouldShowSelectAllAction =
+    totalCount <= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
   const allPrefetchedProposalsSelected =
     preselectedProposalsData.length === urlQueryParams.selection.length;
 
@@ -894,7 +896,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
           {
-            tooltip: SELECT_ALL_ACTION_TOOLTIP,
+            tooltip: shouldShowSelectAllAction,
             icon: DoneAllIcon,
             hidden: true,
             iconProps: {
