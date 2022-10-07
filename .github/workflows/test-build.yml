@@ -109,7 +109,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
-          key: sdk-frontend
+          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
 
       - name: Generate frontend SDK
         if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
@@ -157,7 +157,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
-          key: sdk-frontend
+          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
 
 
       - run: npm run build
@@ -257,7 +257,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
-          key: sdk-frontend
+          key: sdk-frontend-${{ hashFiles('apps/user-office-frontend/src/generated/sdk.ts') }}
 
 
       # TODO: See how to proceed with e2e caching because there is some error:
