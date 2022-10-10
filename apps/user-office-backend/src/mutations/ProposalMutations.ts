@@ -428,6 +428,7 @@ export default class ProposalMutations {
     return result || rejection('Can not administer proposal', { result });
   }
 
+  // TODO: Instead of having two events like: PROPOSAL_STATUS_UPDATED and PROPOSAL_STATUS_CHANGED_BY_USER we can have only one and refactor a bit to contain the right information.
   @EventBus(Event.PROPOSAL_STATUS_UPDATED)
   @Authorized([Roles.USER_OFFICER])
   async changeProposalsStatus(
