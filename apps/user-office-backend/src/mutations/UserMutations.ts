@@ -226,6 +226,7 @@ export default class UserMutations {
           '',
           '',
           '',
+          '',
           args.gender,
           args.nationality,
           args.birthdate,

@@ -2143,23 +2143,19 @@ export default class UOWSSoapClient {
 
   private setClient() {
     logger.logInfo('Attempting to create UOWS client', {});
-    soap.createClient(
-      this.wsdlUrl,
-      (error, client) => {
-        if (error) {
-          logger.logError('An error occurred while creating the UOWS client', {
-            error: error,
-          });
-          setTimeout(() => {
-            this.setClient();
-          }, 10000);
-          return;
-        }
-        logger.logInfo('Created UOWS client', {});
-        this.client = client;
-      },
-      'http://localhost:1080/ws/UserOfficeWebService'
-    );
+    soap.createClient(this.wsdlUrl, (error, client) => {
+      if (error) {
+        logger.logError('An error occurred while creating the UOWS client', {
+          error: error,
+        });
+        setTimeout(() => {
+          this.setClient();
+        }, 10000);
+        return;
+      }
+      logger.logInfo('Created UOWS client', {});
+      this.client = client;
+    });
   }
 
   public async getBasicPeopleDetailsFromSurname(

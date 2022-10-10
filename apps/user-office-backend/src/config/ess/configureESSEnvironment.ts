@@ -84,7 +84,6 @@ async function enableDefaultEssFeatures() {
     ],
     true
   );
-
   await db.updateSettings({
     settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
     settingsValue: 'ME',

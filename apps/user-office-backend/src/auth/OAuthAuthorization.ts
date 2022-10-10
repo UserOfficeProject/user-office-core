@@ -158,6 +158,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         userInfo.sub,
         tokenSet.access_token,
         tokenSet.refresh_token ?? '',
+        client.issuer.metadata.issuer,
         'unspecified',
         1,
         new Date(),
