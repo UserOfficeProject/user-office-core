@@ -70,7 +70,7 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'Title',
     field: 'title',
-    ...{ width: 'auto' },
+    ...{ width: 'center' },
   },
   {
     title: 'Submitted',
@@ -83,6 +83,11 @@ let columns: Column<ProposalViewData>[] = [
     field: 'callShortCode',
     emptyValue: '-',
     hidden: true,
+  },
+  {
+    title: 'Principal Investigator',
+    render: (rowData): string =>
+      `${rowData.proposer.firstname} ${rowData.proposer.lastname}`,
   },
 ];
 

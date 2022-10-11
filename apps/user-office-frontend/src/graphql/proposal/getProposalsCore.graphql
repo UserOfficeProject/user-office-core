@@ -40,6 +40,10 @@ query getProposalsCore(
       callId
       submitted
       allocationTimeUnit
+      proposer {
+        firstname
+        lastname
+      }
     }
     totalCount
   }

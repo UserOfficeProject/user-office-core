@@ -27,6 +27,10 @@ query getInstrumentScientistProposals(
       callShortCode
       statusName
       sepCode
+      proposer {
+        firstname
+        lastname
+      }
     }
     totalCount
   }
