@@ -165,7 +165,7 @@ export default class UserMutations {
     agent: UserWithRole | null,
     args: CreateUserArgs
   ): Promise<UserLinkResponse | Rejection> {
-    if (!(process.env.NODE_ENV === 'development')) {
+    if (process.env.NODE_ENV !== 'development') {
       return rejection('Users can only be created on development env', {
         args,
       });
