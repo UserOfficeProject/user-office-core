@@ -8,7 +8,7 @@ WORKDIR /home/node/app
 
 COPY --chown=node:node package*.json ./
 
-RUN npm ci --loglevel error --no-fund
+RUN npm ci --only=production --loglevel error --no-fund
 
 COPY --chown=node:node . .
 
