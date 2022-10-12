@@ -67,7 +67,7 @@ context('visits tests', () => {
   });
 
   it('Should be able to complete ESI', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.get('[data-cy=upcoming-experiments]')

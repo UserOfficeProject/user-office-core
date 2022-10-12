@@ -1,6 +1,0 @@
-package-lock.json
-.next
-node_modules/
-.github/workflows/
-README.md
-/src/datasources/stfc/UOWSSoapInterface.ts

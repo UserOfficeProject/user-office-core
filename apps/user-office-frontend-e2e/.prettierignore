@@ -1,9 +1,0 @@
-package-lock.json
-.next
-node_modules/
-src/generated/
-.github/workflows/
-README.md
-.vscode/
-cypress/fixtures/
-docker-compose-stfc.e2e.yml

@@ -7,6 +7,9 @@ import { Institution } from '../types/Institution';
 export class InstitutionsFilter {
   @Field(() => Boolean, { nullable: true })
   public isVerified?: boolean;
+
+  @Field(() => String, { nullable: true })
+  public name?: string;
 }
 
 @Resolver()

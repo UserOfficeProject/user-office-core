@@ -1,13 +1,16 @@
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { LogoutTokenWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
+import { TokenResponseWrap } from './../types/CommonWrappers';
 
 @Resolver()
 export class LogoutMutation {
-  @Mutation(() => LogoutTokenWrap)
+  @Mutation(() => TokenResponseWrap)
   logout(@Arg('token') token: string, @Ctx() context: ResolverContext) {
-    return wrapResponse(context.mutations.user.logout(token), LogoutTokenWrap);
+    return wrapResponse(
+      context.mutations.user.logout(token),
+      TokenResponseWrap
+    );
   }
 }
