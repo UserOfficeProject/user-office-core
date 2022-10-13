@@ -80,6 +80,7 @@ async function enableDefaultEssFeatures() {
       FeatureId.USER_MANAGEMENT,
       FeatureId.VISIT_MANAGEMENT,
       FeatureId.SAFETY,
+      FeatureId.OAUTH,
     ],
     true
   );

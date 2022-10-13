@@ -9,10 +9,11 @@ export class CheckExternalMutation {
   @Mutation(() => ExternalTokenLoginWrap)
   externalTokenLogin(
     @Arg('externalToken') externalToken: string,
+    @Arg('redirectUri') redirectUri: string,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.externalTokenLogin(externalToken),
+      context.mutations.user.externalTokenLogin(externalToken, redirectUri),
       ExternalTokenLoginWrap
     );
   }

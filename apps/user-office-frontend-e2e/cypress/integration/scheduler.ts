@@ -47,7 +47,7 @@ context('Scheduler tests', () => {
       ],
     });
 
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
   });
 

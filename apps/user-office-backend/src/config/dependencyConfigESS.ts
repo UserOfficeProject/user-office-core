@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
-import { EssUserAuthorization } from '../auth/EssUserAuthorization';
+import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -69,7 +69,7 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 
-mapClass(Tokens.UserAuthorization, EssUserAuthorization);
+mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 

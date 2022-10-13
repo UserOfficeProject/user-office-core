@@ -223,7 +223,10 @@ export interface UserRecord {
   readonly lastname: string;
   readonly username: string;
   readonly preferredname: string;
-  readonly orcid: string;
+  readonly oidc_sub: string | null;
+  readonly oauth_refresh_token: string | null;
+  readonly oauth_access_token: string | null;
+  readonly oauth_issuer: string | null;
   readonly gender: string;
   readonly nationality: number;
   readonly birthdate: Date;
@@ -241,7 +244,6 @@ export interface UserRecord {
   readonly full_count: number;
   readonly institution: string;
   readonly placeholder: boolean;
-  readonly orcid_refreshtoken: string;
 }
 
 export interface VisitRegistrationRecord {
@@ -543,6 +545,12 @@ export interface ProposalEventsRecord {
   readonly proposal_reserved: boolean;
   readonly proposal_rejected: boolean;
   readonly proposal_notified: boolean;
+  readonly proposal_booking_time_activated: boolean;
+  readonly proposal_booking_time_updated: boolean;
+  readonly proposal_booking_time_slot_added: boolean;
+  readonly proposal_booking_time_slots_removed: boolean;
+  readonly proposal_booking_time_completed: boolean;
+  readonly proposal_booking_time_reopened: boolean;
 }
 
 export interface FeatureRecord {
@@ -813,8 +821,10 @@ export const createUserObject = (user: UserRecord) => {
     user.lastname,
     user.username,
     user.preferredname,
-    user.orcid,
-    user.orcid_refreshtoken,
+    user.oidc_sub,
+    user.oauth_refresh_token,
+    user.oauth_access_token,
+    user.oauth_issuer,
     user.gender,
     user.nationality,
     user.birthdate,

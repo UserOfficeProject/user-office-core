@@ -13,7 +13,7 @@
     "graphql-tag": "2.12.6",
     "jwt-decode": "^3.1.2",
     "luxon": "^2.5.0",
-    "typescript": "^4.8.2"
+    "typescript": "^4.8.3"
   },
   "devDependencies": {
     "@types/eslint": "^8.4.3",
@@ -30,6 +30,7 @@
   },
   "scripts": {
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
+    "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --quiet --fix",
     "cy:open": "cypress open --config defaultCommandTimeout=15000",
     "cy:run": "cypress run --config defaultCommandTimeout=15000",
     "cy:run:action": "cypress run --spec ${CYPRES_SPEC_PATTERN} --browser chrome --config defaultCommandTimeout=15000"

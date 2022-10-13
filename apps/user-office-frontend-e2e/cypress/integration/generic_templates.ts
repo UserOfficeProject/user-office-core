@@ -291,7 +291,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -321,7 +321,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -338,7 +338,7 @@ context('GenericTemplates tests', () => {
 
       cy.contains(genericTemplateQuestions[0]);
 
-      cy.get('[data-cy=title-input] input').clear();
+      cy.get('[data-cy=title-input] textarea').first().clear();
 
       cy.get(
         '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
@@ -346,10 +346,14 @@ context('GenericTemplates tests', () => {
 
       cy.contains('This is a required field');
 
-      cy.get('[data-cy=title-input] input')
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
         .clear()
-        .type(genericTemplateTitle)
-        .should('have.value', genericTemplateTitle);
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
 
       cy.get(
         '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
@@ -459,7 +463,7 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -474,7 +478,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains(addButtonLabel[0]).click();
 
-      cy.get('[data-cy=title-input] input')
+      cy.get('[data-cy=title-input] textarea')
+        .first()
         .clear()
         .type(genericTemplateTitle)
         .should('have.value', genericTemplateTitle)

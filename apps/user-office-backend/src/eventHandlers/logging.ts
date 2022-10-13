@@ -98,8 +98,9 @@ export default function createHandler() {
           break;
         default:
           const changedObjectId =
-            (event as any)[event.key].id ||
-            (event as any)[event.key].primaryKey;
+            typeof (event as any)[event.key].id === 'number'
+              ? (event as any)[event.key].id
+              : (event as any)[event.key].primaryKey;
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,

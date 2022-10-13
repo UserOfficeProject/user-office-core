@@ -58,24 +58,24 @@ beforeEach(() => {
 
 test('When an invalid external token is supplied, no user is found', async () => {
   return expect(
-    userAuthorization.externalTokenLogin('invalid')
+    userAuthorization.externalTokenLogin('invalid', '')
   ).rejects.toThrow(
     'Failed to fetch user details for STFC external authentication'
   );
 });
 
 test('When a valid external token is supplied, valid user is returned', async () => {
-  const result = await userAuthorization.externalTokenLogin('valid');
+  const result = await userAuthorization.externalTokenLogin('valid', '');
 
   expect(result?.id).toBe(dummyUser.id);
   expect(result?.email).toBe(dummyUser.email);
 });
 
 test('When getting instruments for roles, duplicate roles are filtered out before', async () => {
-  await userAuthorization.externalTokenLogin('valid');
+  await userAuthorization.externalTokenLogin('valid', '');
 
   // Duplicate 'User Officer' and 'ISIS Instrument Scientist' roles removed
-  expect(mockGetRequiredInstrumentForRole).toBeCalledWith([
+  expect(mockGetRequiredInstrumentForRole).toHaveBeenCalledWith([
     {
       name: 'ISIS Instrument Scientist',
     },
@@ -219,17 +219,17 @@ test('When a user requires an instrument but does not have it, the instrument is
     []
   );
 
-  expect(mockAssignScientistToInstruments).toBeCalledWith(0, [
+  expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
     isisInstrument.id,
   ]);
-  expect(mockRemoveScientistFromInstruments).toBeCalledTimes(0);
+  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledTimes(0);
 });
 
 test('When a user does not require an instrument but has it, no instrument is assigned and the instrument is removed', async () => {
   await userAuthorization.autoAssignRemoveInstruments(0, [], [isisInstrument]);
 
-  expect(mockAssignScientistToInstruments).toBeCalledTimes(0);
-  expect(mockRemoveScientistFromInstruments).toBeCalledWith(0, [
+  expect(mockAssignScientistToInstruments).toHaveBeenCalledTimes(0);
+  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledWith(0, [
     isisInstrument.id,
   ]);
 });
@@ -241,10 +241,10 @@ test('When a user requires an instrument but has a different one, the requested 
     [lsfInstrument]
   );
 
-  expect(mockAssignScientistToInstruments).toBeCalledWith(0, [
+  expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
     isisInstrument.id,
   ]);
-  expect(mockRemoveScientistFromInstruments).toBeCalledWith(0, [
+  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledWith(0, [
     lsfInstrument.id,
   ]);
 });

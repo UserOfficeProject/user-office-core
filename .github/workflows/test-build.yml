@@ -170,6 +170,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
           secret: dummysecret
           NODE_ENV: development
@@ -189,16 +190,16 @@ jobs:
       matrix:
         pattern:
           [
-            'cypress/integration/[a-e]*.ts',
-            'cypress/integration/[f-h]*.ts',
-            'cypress/integration/[i-o]*.ts',
-            'cypress/integration/p[a-m]*.ts',
-            'cypress/integration/p[n-z]*.ts',
-            'cypress/integration/[r-s]*.ts',
-            'cypress/integration/templates_basic.ts',
-            'cypress/integration/templates_advanced.ts',
-            'cypress/integration/[u-z]*.ts',
-            'cypress/integration/[A-Z]*.ts',
+            "cypress/integration/[a-e]*.ts",
+            "cypress/integration/[f-h]*.ts",
+            "cypress/integration/[i-o]*.ts",
+            "cypress/integration/p[a-m]*.ts",
+            "cypress/integration/p[n-z]*.ts",
+            "cypress/integration/[r-s]*.ts",
+            "cypress/integration/templates_basic.ts",
+            "cypress/integration/templates_advanced.ts",
+            "cypress/integration/[u-z]*.ts",
+            "cypress/integration/[A-Z]*.ts",
           ]
 
     steps:
@@ -264,6 +265,7 @@ jobs:
           TZ: Europe/London
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: stfc
           secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
@@ -306,6 +308,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
           secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
@@ -326,6 +329,7 @@ jobs:
           EAM_AUTH_PASS: dummyAuthPass
           EAM_API_URL: https://ios.esss.lu.se:7443
           EAM_PART_CODE: 12413
+          EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION: "true"
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
