@@ -24,16 +24,13 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
         callEnded: true,
       });
 
-      if (!isTestingMode) {
-        // NOTE: Fire the "CALL_ENDED" event if not in testing mode.
-        eventBus.publish({
-          type: Event.CALL_ENDED,
-          call: updatedCall,
-          isRejection: false,
-          key: 'call',
-          loggedInUserId: 0,
-        });
-      }
+      eventBus.publish({
+        type: Event.CALL_ENDED,
+        call: updatedCall,
+        isRejection: false,
+        key: 'call',
+        loggedInUserId: 0,
+      });
 
       updatedCalls.push(updatedCall);
     }
