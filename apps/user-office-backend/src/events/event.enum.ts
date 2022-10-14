@@ -160,7 +160,7 @@ export const EventLabel = new Map<Event, string>([
   ],
   [
     Event.CALL_ENDED_INTERNAL,
-    'Event occurs on a specific call  internal end date set on the call',
+    'Event occurs on a specific call internal end date set on the call',
   ],
   [Event.CALL_CREATED, 'Event occurs on a when a call is created'],
   [
