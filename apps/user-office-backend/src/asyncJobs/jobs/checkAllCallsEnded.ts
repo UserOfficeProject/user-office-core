@@ -6,7 +6,6 @@ import { Event } from '../../events/event.enum';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
 const checkCallsEnded = async (dataSource: CallDataSource) => {
-  const isTestingMode = process.env.NODE_ENV === 'test';
   const updatedCalls = [];
   try {
     const notEndedCalls = await dataSource.getCalls({
