@@ -598,7 +598,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe.only('Proposal internal  basic tests', () => {
+  describe('Proposal internal  basic tests', () => {
     beforeEach(() => {
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
