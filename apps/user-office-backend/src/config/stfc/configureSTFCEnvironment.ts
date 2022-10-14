@@ -70,11 +70,7 @@ async function setStfcColourTheme() {
 async function enableDefaultStfcFeatures() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
   await db.setFeatures(
-    [
-      FeatureId.EXTERNAL_AUTH,
-      FeatureId.EMAIL_SEARCH,
-      FeatureId.INSTRUMENT_MANAGEMENT,
-    ],
+    [FeatureId.EMAIL_SEARCH, FeatureId.INSTRUMENT_MANAGEMENT],
     true
   );
   await db.updateSettings({

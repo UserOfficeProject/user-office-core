@@ -4,10 +4,10 @@ import {
   ReviewStatus,
   TechnicalReviewStatus,
   UserRole,
-  User,
   UpdateUserMutationVariables,
   TemplateGroupId,
   FeatureId,
+  UserJwt,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -202,7 +202,7 @@ context('SEP reviews tests', () => {
   describe('User officer role', () => {
     it('Officer should be able to assign proposal to existing SEP', function () {
       cy.getAndStoreFeaturesEnabled();
-      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
       cy.login('officer');
@@ -516,7 +516,7 @@ context('SEP reviews tests', () => {
         throw new Error('No logged in user');
       }
 
-      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+      const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
       cy.updateUserDetails({
@@ -645,7 +645,7 @@ context('SEP reviews tests', () => {
         throw new Error('No logged in user');
       }
 
-      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
+      const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
       cy.updateUserDetails({

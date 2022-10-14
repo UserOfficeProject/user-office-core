@@ -34,7 +34,7 @@ context('General scientific evaluation panel tests', () => {
   });
 
   it('User should not be able to see SEPs page', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');

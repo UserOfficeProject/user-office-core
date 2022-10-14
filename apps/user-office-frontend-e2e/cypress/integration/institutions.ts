@@ -15,7 +15,7 @@ context('Institution tests', () => {
   });
 
   it('User should not be able to see Institutions page', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
