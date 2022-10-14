@@ -372,7 +372,7 @@ context('Settings tests', () => {
     });
 
     it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED_INTERNAL status', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       const proposalTitle = faker.random.words(3);
@@ -409,7 +409,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
       window.localStorage.isInternalUser = true;
 

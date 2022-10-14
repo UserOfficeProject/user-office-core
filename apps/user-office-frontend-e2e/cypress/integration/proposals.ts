@@ -626,10 +626,10 @@ context('Proposal tests', () => {
     });
 
     it('Internal user should be able to create and clone  and delete an internal  proposal', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
 
@@ -750,13 +750,13 @@ context('Proposal tests', () => {
     });
 
     it('User should not be able to create and submit proposal with inactive internal call', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
       createTopicAndQuestionToExistingTemplate();
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
 
@@ -851,10 +851,10 @@ context('Proposal tests', () => {
     });
 
     it('User cannot select inactive internal call for new proposal', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
       let createdCallId: number;
       const createdCallTitle = 'Created call';
