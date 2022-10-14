@@ -146,8 +146,7 @@ function ExternalAuth() {
     setView(<LoadingMessage />);
 
     const errorDescription = urlQueryParams.error_description;
-    const authorizationCode =
-      urlQueryParams.sessionid ?? urlQueryParams.code ?? urlQueryParams.token;
+    const authorizationCode = urlQueryParams.sessionid ?? urlQueryParams.code;
 
     if (errorDescription) {
       handleError(errorDescription);
