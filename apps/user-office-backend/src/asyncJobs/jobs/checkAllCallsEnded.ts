@@ -44,7 +44,6 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
   }
 };
 const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
-  const isTestingMode = process.env.NODE_ENV === 'test';
   const updatedCalls = [];
   try {
     const notEndedInternalCalls = await dataSource.getCalls({
