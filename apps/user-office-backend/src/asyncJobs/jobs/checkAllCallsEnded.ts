@@ -63,16 +63,13 @@ const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
         callEndedInternal: true,
       });
 
-      if (!isTestingMode) {
-        // NOTE: Fire the "CALL_ENDED_INTERNAL" event if not in testing mode.
-        eventBus.publish({
-          type: Event.CALL_ENDED_INTERNAL,
-          call: updatedCall,
-          isRejection: false,
-          key: 'call',
-          loggedInUserId: 0,
-        });
-      }
+      eventBus.publish({
+        type: Event.CALL_ENDED_INTERNAL,
+        call: updatedCall,
+        isRejection: false,
+        key: 'call',
+        loggedInUserId: 0,
+      });
 
       updatedCalls.push(updatedCall);
     }
