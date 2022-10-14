@@ -14,17 +14,18 @@ import ActionButton, {
 } from 'components/proposalBooking/ActionButton';
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
-import { UserContext, BasicUser } from 'context/UserContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
   ProposalBookingStatusCore,
   ProposalEndStatus,
+  UserJwt,
 } from 'generated/sdk';
 
 import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
 
 const getParticipationRole = (
-  user: BasicUser,
+  user: UserJwt,
   event: ProposalScheduledEvent
 ): 'PI' | 'co-proposer' | 'visitor' | null => {
   if (event.proposal.proposer?.id === user.id) {
@@ -42,13 +43,13 @@ const getParticipationRole = (
   }
 };
 
-const isPiOrCoProposer = (user: BasicUser, event: ProposalScheduledEvent) => {
+const isPiOrCoProposer = (user: UserJwt, event: ProposalScheduledEvent) => {
   const role = getParticipationRole(user, event);
 
   return role === 'PI' || role === 'co-proposer';
 };
 
-const isTeamlead = (user: BasicUser, event: ProposalScheduledEvent) =>
+const isTeamlead = (user: UserJwt, event: ProposalScheduledEvent) =>
   event.visit && event.visit.teamLead.id === user.id;
 
 const createActionButton = (
