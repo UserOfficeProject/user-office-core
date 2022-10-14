@@ -18,11 +18,9 @@ export class UserAuthorizationMock extends UserAuthorization {
 
     return null;
   }
-
   async isInternalUser(userId: number, currentRole: Role): Promise<boolean> {
     return true;
   }
-
   async logout(token: AuthJwtPayload): Promise<void> {
     return;
   }
