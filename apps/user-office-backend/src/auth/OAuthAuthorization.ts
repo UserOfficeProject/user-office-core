@@ -1,0 +1,193 @@
+import 'reflect-metadata';
+import { logger } from '@user-office-software/duo-logger';
+import {
+  OpenIdClient,
+  ValidTokenSet,
+  ValidUserInfo,
+} from '@user-office-software/openid';
+import { UserinfoResponse } from 'openid-client';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
+import { rejection, Rejection } from '../models/Rejection';
+import { SettingsId } from '../models/Settings';
+import { AuthJwtPayload, User, UserRole } from '../models/User';
+import { NonNullableField } from '../utils/helperFunctions';
+import { UserAuthorization } from './UserAuthorization';
+
+type ValidUser = NonNullableField<
+  User,
+  'oidcSub' | 'oauthAccessToken' | 'oauthRefreshToken'
+>;
+
+export abstract class OAuthAuthorization extends UserAuthorization {
+  private db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  constructor() {
+    super();
+
+    if (OpenIdClient.hasConfig()) {
+      this.initialize();
+    } else {
+      throw new Error(
+        'OpenIdClient has no configuration. Please check your environment variables!'
+      );
+    }
+  }
+  public async externalTokenLogin(
+    code: string,
+    redirectUri: string
+  ): Promise<User | null> {
+    try {
+      const { userProfile, tokenSet } = await OpenIdClient.login(
+        code,
+        redirectUri
+      );
+      const user = await this.upsertUser(userProfile, tokenSet);
+
+      return user;
+    } catch (error) {
+      logger.logError('Error ocurred while logging in with external token', {
+        error: (error as Error)?.message,
+        stack: (error as Error)?.stack,
+      });
+
+      return null;
+    }
+  }
+
+  async logout(uosToken: AuthJwtPayload): Promise<void | Rejection> {
+    const oidcSub = uosToken.user.oidcSub;
+
+    if (!oidcSub) {
+      return rejection('INVALID_USER');
+    }
+
+    try {
+      // get and validate user form datasource
+      const user = this.validateUser(
+        await this.userDataSource.getByOIDCSub(oidcSub)
+      );
+
+      await OpenIdClient.logout(user.oauthAccessToken);
+
+      return;
+    } catch (error) {
+      return rejection('Error ocurred while logging out', {
+        error: (error as Error)?.message,
+      });
+    }
+  }
+
+  public async isExternalTokenValid(code: string): Promise<boolean> {
+    // No need to check external token validity, because we check UOS JWT token
+    return true;
+  }
+
+  async initialize() {
+    const loginUrl = await OpenIdClient.loginUrl();
+    const logoutUrl = await OpenIdClient.logoutUrl();
+
+    await this.db.updateSettings({
+      settingsId: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
+      settingsValue: loginUrl,
+    });
+
+    await this.db.updateSettings({
+      settingsId: SettingsId.EXTERNAL_AUTH_LOGOUT_URL,
+      settingsValue: logoutUrl,
+    });
+  }
+
+  private async getUserInstitutionId(userInfo: UserinfoResponse) {
+    if (userInfo.organisation) {
+      const institutions = await this.adminDataSource.getInstitutions({
+        name: userInfo.organisation as string,
+      });
+
+      if (institutions.length === 1) {
+        return institutions[0].id;
+      }
+    }
+
+    return undefined;
+  }
+
+  private async upsertUser(
+    userInfo: ValidUserInfo,
+    tokenSet: ValidTokenSet
+  ): Promise<User> {
+    const client = await OpenIdClient.getInstance();
+    const institutionId = await this.getUserInstitutionId(userInfo);
+    const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
+      userInfo.sub
+    );
+    const userWithEmailMatch = await this.userDataSource.getByEmail(
+      userInfo.email
+    );
+
+    const user = userWithOAuthSubMatch ?? userWithEmailMatch;
+
+    if (user) {
+      await this.userDataSource.update({
+        ...user,
+        firstname: userInfo.given_name,
+        lastname: userInfo.family_name,
+        email: userInfo.email,
+        oauthAccessToken: tokenSet.access_token,
+        oauthRefreshToken: tokenSet.refresh_token ?? '',
+        oidcSub: userInfo.sub,
+        oauthIssuer: client.issuer.metadata.issuer,
+        department: userInfo.department as string,
+        gender: userInfo.gender as string,
+        user_title: userInfo.title as string,
+        organisation: institutionId ?? user.organisation,
+      });
+
+      return user;
+    } else {
+      const newUser = await this.userDataSource.create(
+        'unspecified',
+        userInfo.given_name,
+        undefined,
+        userInfo.family_name,
+        userInfo.email,
+        '',
+        userInfo.given_name,
+        userInfo.sub,
+        tokenSet.access_token,
+        tokenSet.refresh_token ?? '',
+        client.issuer.metadata.issuer,
+        'unspecified',
+        1,
+        new Date(),
+        1,
+        '',
+        '',
+        userInfo.email,
+        '',
+        undefined
+      );
+
+      await this.userDataSource.addUserRole({
+        userID: newUser.id,
+        roleID: UserRole.USER,
+      });
+
+      return newUser;
+    }
+  }
+
+  private validateUser(user: User | null): ValidUser {
+    if (!user?.oidcSub || !user?.oauthAccessToken) {
+      logger.logError('Invalid user', {
+        authorizer: this.constructor.name,
+        user,
+      });
+      throw new Error('Invalid user');
+    }
+
+    return user as ValidUser;
+  }
+}
