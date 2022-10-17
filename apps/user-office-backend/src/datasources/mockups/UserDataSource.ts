@@ -8,7 +8,6 @@ import {
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
-import { stfcRole } from '../stfc/StfcUserDataSource';
 import { UserDataSource } from '../UserDataSource';
 
 export const basicDummyUser = new BasicUserDetails(
@@ -410,7 +409,10 @@ export class UserDataSourceMock implements UserDataSource {
     return true;
   }
 
-  async isInternalUser(user: UserWithRole): Promise<boolean> {
+  async isInternalUser(
+    userId: number,
+    currentRole: Role | null
+  ): Promise<boolean> {
     return true;
   }
 }

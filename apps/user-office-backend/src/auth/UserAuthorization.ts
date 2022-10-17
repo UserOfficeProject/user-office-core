@@ -33,7 +33,10 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
-  async isInternalUser(agent: UserWithRole | null): Promise<boolean> {
+  async isInternalUser(
+    userId: number,
+    currentRole: Role | null
+  ): Promise<boolean> {
     return false;
   }
   isUser(agent: UserWithRole | null) {

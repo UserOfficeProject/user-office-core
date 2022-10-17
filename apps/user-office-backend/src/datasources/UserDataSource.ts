@@ -3,7 +3,6 @@ import { User, BasicUserDetails, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
-import { stfcRole } from './stfc/StfcUserDataSource';
 
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;

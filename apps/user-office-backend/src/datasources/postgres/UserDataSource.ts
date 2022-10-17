@@ -12,7 +12,6 @@ import {
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
-import { stfcRole } from '../stfc/StfcUserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
