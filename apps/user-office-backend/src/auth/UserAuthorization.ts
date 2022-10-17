@@ -1,22 +1,33 @@
 import 'reflect-metadata';
-import { inject } from 'tsyringe';
+import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
-import { Roles } from '../models/Role';
-import { User, UserWithRole } from '../models/User';
+import { Rejection } from '../models/Rejection';
+import { Role, Roles } from '../models/Role';
+import { AuthJwtPayload, User, UserWithRole } from '../models/User';
+import { AdminDataSource } from './../datasources/AdminDataSource';
 
 export abstract class UserAuthorization {
-  constructor(
-    @inject(Tokens.UserDataSource) protected userDataSource: UserDataSource,
-    @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
-    @inject(Tokens.ProposalDataSource)
-    protected proposalDataSource: ProposalDataSource,
-    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource
-  ) {}
+  protected userDataSource: UserDataSource = container.resolve(
+    Tokens.UserDataSource
+  );
+  protected sepDataSource: SEPDataSource = container.resolve(
+    Tokens.SEPDataSource
+  );
+  protected proposalDataSource: ProposalDataSource = container.resolve(
+    Tokens.ProposalDataSource
+  );
+  protected visitDataSource: VisitDataSource = container.resolve(
+    Tokens.VisitDataSource
+  );
+
+  protected adminDataSource: AdminDataSource = container.resolve(
+    Tokens.AdminDataSource
+  );
 
   isUserOfficer(agent: UserWithRole | null) {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
@@ -134,9 +145,12 @@ export abstract class UserAuthorization {
     return readableUsers.includes(id);
   }
 
-  abstract externalTokenLogin(token: string): Promise<User | null>;
+  abstract externalTokenLogin(
+    token: string,
+    redirectUri: string
+  ): Promise<User | null>;
 
-  abstract logout(token: string): Promise<void>;
+  abstract logout(token: AuthJwtPayload): Promise<void | Rejection>;
 
   abstract isExternalTokenValid(externalToken: string): Promise<boolean>;
 }

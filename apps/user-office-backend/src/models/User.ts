@@ -2,11 +2,11 @@ import 'reflect-metadata';
 import { Role, Roles } from './Role';
 
 export type AuthJwtPayload = {
-  user: User;
+  user: UserJWT;
   roles: Role[];
   currentRole: Role;
   externalToken?: string;
-  isInternalUser: boolean;
+  isInternalUser?: boolean;
   impersonatingUserId?: number;
 };
 
@@ -34,8 +34,10 @@ export class User {
     public lastname: string,
     public username: string,
     public preferredname: string | undefined,
-    public orcid: string,
-    public refreshToken: string,
+    public oidcSub: string | null,
+    public oauthRefreshToken: string | null,
+    public oauthAccessToken: string | null,
+    public oauthIssuer: string | null,
     public gender: string,
     public nationality: number,
     public birthdate: Date,
@@ -52,7 +54,7 @@ export class User {
   ) {}
 }
 
-export interface UserWithRole extends User {
+export interface UserWithRole extends UserJWT {
   currentRole: Role | undefined;
   impersonatingUserId?: number;
   accessPermissions?: any;
@@ -96,3 +98,17 @@ export class BasicUserDetails {
     public email: string
   ) {}
 }
+
+export type UserJWT = Pick<
+  User,
+  | 'created'
+  | 'email'
+  | 'firstname'
+  | 'id'
+  | 'lastname'
+  | 'oidcSub'
+  | 'organisation'
+  | 'placeholder'
+  | 'position'
+  | 'preferredname'
+>;

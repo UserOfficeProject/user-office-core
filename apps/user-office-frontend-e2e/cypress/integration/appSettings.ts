@@ -88,7 +88,7 @@ context('App settings tests', () => {
     });
 
     it('Instrument Scientist filter should differ based on setting value', function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until instr sci login is enabled
         this.skip();
       }
@@ -103,10 +103,6 @@ context('App settings tests', () => {
       cy.login(scientist2);
 
       cy.visit('/');
-
-      cy.log(
-        'hello' + JSON.stringify(initialDBData.getFormats().reviewerFilter)
-      );
 
       cy.contains('Proposals');
 

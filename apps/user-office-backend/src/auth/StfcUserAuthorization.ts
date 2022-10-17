@@ -1,21 +1,18 @@
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { logger } from '@user-office-software/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { injectable, container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import {
   StfcBasicPersonDetails,
   stfcRole,
 } from '../datasources/stfc/StfcUserDataSource';
 import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
-import { UserDataSource } from '../datasources/UserDataSource';
-import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Instrument } from '../models/Instrument';
 import { Roles } from '../models/Role';
-import { User, UserWithRole } from '../models/User';
+import { Rejection, rejection } from '../models/Rejection';
+import { AuthJwtPayload, User , UserWithRole } from '../models/User';
 import { LRUCache } from '../utils/LRUCache';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -42,17 +39,9 @@ export class StfcUserAuthorization extends UserAuthorization {
     StfcUserAuthorization.tokenCacheSecondsToLive
   ).enableStatsLogging('uowsTokenCache');
 
-  constructor(
-    @inject(Tokens.UserDataSource) protected userDataSource: UserDataSource,
-    @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,
-    @inject(Tokens.ProposalDataSource)
-    protected proposalDataSource: ProposalDataSource,
-    @inject(Tokens.VisitDataSource) protected visitDataSource: VisitDataSource,
-    @inject(Tokens.InstrumentDataSource)
-    protected instrumentDataSource: InstrumentDataSource
-  ) {
-    super(userDataSource, sepDataSource, proposalDataSource, visitDataSource);
-  }
+  protected instrumentDataSource: InstrumentDataSource = container.resolve(
+    Tokens.InstrumentDataSource
+  );
 
   getRequiredInstrumentForRole(roles: stfcRole[]) {
     return roles
@@ -163,7 +152,10 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
   }
 
-  async externalTokenLogin(token: string): Promise<User | null> {
+  async externalTokenLogin(
+    token: string,
+    _redirecturi: string
+  ): Promise<User | null> {
     const stfcUser: StfcBasicPersonDetails | null = await client
       .getPersonDetailsFromSessionId(token)
       .then((rawStfcUser) => rawStfcUser?.return)
@@ -228,15 +220,23 @@ export class StfcUserAuthorization extends UserAuthorization {
     return dummyUser;
   }
 
-  async logout(token: string): Promise<void> {
-    this.uowsTokenCache.remove(token);
+  async logout(uosToken: AuthJwtPayload): Promise<void | Rejection> {
+    try {
+      const token = uosToken.externalToken;
+      if (token) {
+        this.uowsTokenCache.remove(token);
 
-    await client.logout(token).catch(() => {
-      logger.logWarn('Failed to log out user', { token });
-      throw new Error(`Failed to logout ${token}`);
-    });
+        await client.logout(token).catch(() => {
+          logger.logWarn('Failed to log out user', { token });
 
-    return;
+          return rejection('Failed to log out user', { token });
+        });
+      } else {
+        return rejection('No external token found in JWT', { token });
+      }
+    } catch (error) {
+      return rejection('Error occurred during external logout', {}, error);
+    }
   }
 
   async isExternalTokenValid(token: string): Promise<boolean> {

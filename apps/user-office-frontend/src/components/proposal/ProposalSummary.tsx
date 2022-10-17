@@ -156,7 +156,8 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               async () => {
                 setIsSubmitting(true);
                 const result = await api({
-                  toastSuccessMessage: 'Proposal submitted successfully',
+                  toastSuccessMessage:
+                    'Your proposal has been submitted successfully. You will receive a confirmation email soon.',
                 }).submitProposal({
                   proposalPk: state.proposal.primaryKey,
                 });

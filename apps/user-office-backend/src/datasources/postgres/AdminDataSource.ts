@@ -197,6 +197,9 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         if (filter?.isVerified) {
           query.where('verified', filter.isVerified);
         }
+        if (filter?.name) {
+          query.where('institution', filter.name);
+        }
       })
       .then((intDB: InstitutionRecord[]) =>
         intDB.map((int) => {

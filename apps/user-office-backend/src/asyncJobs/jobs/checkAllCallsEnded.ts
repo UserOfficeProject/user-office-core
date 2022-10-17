@@ -6,7 +6,6 @@ import { Event } from '../../events/event.enum';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
 const checkCallsEnded = async (dataSource: CallDataSource) => {
-  const isTestingMode = process.env.NODE_ENV === 'test';
   const updatedCalls = [];
   try {
     const notEndedCalls = await dataSource.getCalls({
@@ -25,16 +24,13 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
         callEnded: true,
       });
 
-      if (!isTestingMode) {
-        // NOTE: Fire the "CALL_ENDED" event if not in testing mode.
-        eventBus.publish({
-          type: Event.CALL_ENDED,
-          call: updatedCall,
-          isRejection: false,
-          key: 'call',
-          loggedInUserId: 0,
-        });
-      }
+      eventBus.publish({
+        type: Event.CALL_ENDED,
+        call: updatedCall,
+        isRejection: false,
+        key: 'call',
+        loggedInUserId: 0,
+      });
 
       updatedCalls.push(updatedCall);
     }
@@ -45,7 +41,6 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
   }
 };
 const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
-  const isTestingMode = process.env.NODE_ENV === 'test';
   const updatedCalls = [];
   try {
     const notEndedInternalCalls = await dataSource.getCalls({
@@ -65,16 +60,13 @@ const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
         callEndedInternal: true,
       });
 
-      if (!isTestingMode) {
-        // NOTE: Fire the "CALL_ENDED_INTERNAL" event if not in testing mode.
-        eventBus.publish({
-          type: Event.CALL_ENDED_INTERNAL,
-          call: updatedCall,
-          isRejection: false,
-          key: 'call',
-          loggedInUserId: 0,
-        });
-      }
+      eventBus.publish({
+        type: Event.CALL_ENDED_INTERNAL,
+        call: updatedCall,
+        isRejection: false,
+        key: 'call',
+        loggedInUserId: 0,
+      });
 
       updatedCalls.push(updatedCall);
     }

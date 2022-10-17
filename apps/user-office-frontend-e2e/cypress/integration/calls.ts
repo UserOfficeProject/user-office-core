@@ -127,7 +127,7 @@ context('Calls tests', () => {
 
   // TODO: Maybe this should be moved to another file called permissions because its testing more call permissions than calls.
   it('A user should not be able to see/visit calls', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -292,7 +292,7 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able to create a call with intenal end date before call end date', function () {
       // will be enabled after @user-office-software/duo-validation new version
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
@@ -406,7 +406,7 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to create a call with internal date', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       const { shortCode, startCall, endCall, templateName, esiTemplateName } =
@@ -588,7 +588,7 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to edit a call internal close date', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       const { shortCode, startDate, endDate } = updatedCall;
@@ -926,7 +926,7 @@ context('Calls tests', () => {
     });
 
     it('User officer can filter active internal calls by their status', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       cy.createCall({
@@ -995,7 +995,7 @@ context('Calls tests', () => {
       The time remaining is rounded down to the nearest min, hour or day.
       No time remaining is displayed if over 30 days or under one minute.
     */
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     // Create a future call, so that there is always two calls to choose from
@@ -1098,10 +1098,10 @@ context('Calls tests', () => {
       No time remaining is displayed if over 30 days or under one minute.
     */
 
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+    if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
       this.skip();
     }
-    cy.login('user');
+    cy.login('user1');
 
     cy.visit('/');
 
