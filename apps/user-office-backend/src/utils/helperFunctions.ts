@@ -52,3 +52,23 @@ export const checkAllReviewsSubmittedOnProposal = (
 
   return allOtherReviewsSubmitted;
 };
+
+/**
+ * @description Makes all fields non-nullable
+ */
+export type NonNullableFields<T> = {
+  [P in keyof T]: NonNullable<T[P]>;
+};
+
+/**
+ * @description Makes subset fields non-nullable
+ */
+
+export type NonNullableField<T, K extends keyof T> = T &
+  NonNullableFields<Pick<T, K>>;
+
+/**
+ * @description Makes subset fields required
+ */
+export type RequiredField<T, K extends keyof T> = T &
+  NonNullableFields<Required<Pick<T, K>>>;
