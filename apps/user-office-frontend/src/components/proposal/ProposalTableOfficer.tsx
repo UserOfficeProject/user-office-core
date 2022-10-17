@@ -450,6 +450,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const isError = !!response.assignProposalsToSep.rejection;
 
       if (!isError) {
+        // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
         setTimeout(fetchProposalsData, 500);
       }
     } else {
@@ -501,6 +502,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const isError = !!result.assignProposalsToInstrument.rejection;
 
       if (!isError) {
+        // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
         setTimeout(fetchProposalsData, 500);
       }
     } else {
