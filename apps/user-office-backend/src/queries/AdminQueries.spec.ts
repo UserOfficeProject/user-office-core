@@ -26,7 +26,7 @@ describe('Test Admin Queries', () => {
   });
 
   test('A user can get features', () => {
-    return expect(adminQueries.getFeatures()).resolves.toHaveLength(2);
+    return expect(adminQueries.getFeatures()).resolves.toHaveLength(1);
   });
 
   test('A user can get settings', () => {

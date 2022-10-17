@@ -114,7 +114,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able create proposal', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -382,7 +382,7 @@ context('Proposal tests', () => {
       });
       cy.submitProposal({ proposalPk: createdProposalPk });
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(newProposalTitle);
@@ -544,7 +544,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able to delete proposal', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -559,7 +559,7 @@ context('Proposal tests', () => {
 
     it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -601,7 +601,7 @@ context('Proposal tests', () => {
       let createdCallId: number;
       const createdCallTitle = 'Created call';
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.createCall({
@@ -639,7 +639,7 @@ context('Proposal tests', () => {
     });
 
     it('User officer should reopen proposal', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
       cy.get('[aria-label="View proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -654,7 +654,7 @@ context('Proposal tests', () => {
       cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
       cy.get('[aria-label="Edit proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();

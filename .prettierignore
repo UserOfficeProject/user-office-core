@@ -1,0 +1,14 @@
+# all
+**/package-lock.json
+**/node_modules/
+**/.github/workflows/
+**/README.md
+**/.vscode/
+**/src/generated/
+
+# backend
+/apps/user-office/backend/src/datasources/stfc/UOWSSoapInterface.ts
+/apps/user-office-backend/docker-compose-stfc.e2e.yml
+
+# frontend-e2e
+/apps/user-office-frontend-e2e/cypress/fixtures/

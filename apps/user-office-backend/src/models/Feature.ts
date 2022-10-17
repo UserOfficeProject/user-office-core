@@ -9,7 +9,6 @@ export class Feature {
 export enum FeatureId {
   SHIPPING = 'SHIPPING',
   SCHEDULER = 'SCHEDULER',
-  EXTERNAL_AUTH = 'EXTERNAL_AUTH',
   RISK_ASSESSMENT = 'RISK_ASSESSMENT',
   EMAIL_INVITE = 'EMAIL_INVITE',
   EMAIL_SEARCH = 'EMAIL_SEARCH',
@@ -19,6 +18,7 @@ export enum FeatureId {
   USER_MANAGEMENT = 'USER_MANAGEMENT',
   VISIT_MANAGEMENT = 'VISIT_MANAGEMENT',
   SAMPLE_SAFETY = 'SAMPLE_SAFETY',
+  OAUTH = 'OAUTH',
 }
 
 export enum FeatureUpdateAction {

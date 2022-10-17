@@ -7,10 +7,11 @@ import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
-import { User, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { UserDataSource } from './../datasources/UserDataSource';
+import { UserJWT } from './../models/User';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
@@ -48,7 +49,7 @@ export class ProposalAuthorization {
   }
 
   isPrincipalInvestigatorOfProposal(
-    agent: User | null,
+    agent: UserJWT | null,
     proposal: Proposal | null
   ) {
     if (agent == null || proposal == null) {
@@ -60,15 +61,15 @@ export class ProposalAuthorization {
   }
 
   async isMemberOfProposal(
-    agent: User | null,
+    agent: UserJWT | null,
     proposalPk: number
   ): Promise<boolean>;
   async isMemberOfProposal(
-    agent: User | null,
+    agent: UserJWT | null,
     proposal: Proposal | null
   ): Promise<boolean>;
   async isMemberOfProposal(
-    agent: User | null,
+    agent: UserJWT | null,
     proposalOrPk: Proposal | number | null
   ) {
     if (agent == null || proposalOrPk == null) {
@@ -117,7 +118,7 @@ export class ProposalAuthorization {
       });
   }
 
-  async isScientistToProposal(agent: User | null, proposalPk: number) {
+  async isScientistToProposal(agent: UserJWT | null, proposalPk: number) {
     if (agent == null || !agent.id) {
       return false;
     }
@@ -129,7 +130,10 @@ export class ProposalAuthorization {
       });
   }
 
-  async isInstrumentManagerToProposal(agent: User | null, proposalPk: number) {
+  async isInstrumentManagerToProposal(
+    agent: UserJWT | null,
+    proposalPk: number
+  ) {
     if (agent == null || !agent.id) {
       return false;
     }
@@ -148,7 +152,10 @@ export class ProposalAuthorization {
     return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
 
-  async isChairOrSecretaryOfProposal(agent: User | null, proposalPk: number) {
+  async isChairOrSecretaryOfProposal(
+    agent: UserJWT | null,
+    proposalPk: number
+  ) {
     if (agent == null || !agent.id || !proposalPk) {
       return false;
     }

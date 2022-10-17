@@ -12,7 +12,7 @@ import {
   transformAnswerValueIfNeeded,
 } from '../models/ProposalModelFunctions';
 import { rejection } from '../models/Rejection';
-import { User, UserWithRole } from '../models/User';
+import { UserJWT, UserWithRole } from '../models/User';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
@@ -148,7 +148,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  async updateAnswer(agent: User | null, args: UpdateAnswerArgs) {
+  async updateAnswer(agent: UserJWT | null, args: UpdateAnswerArgs) {
     const hasRights = await this.questionaryAuth.hasWriteRights(
       agent,
       args.questionaryId
@@ -172,7 +172,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  async create(agent: User | null, args: CreateQuestionaryArgs) {
+  async create(agent: UserJWT | null, args: CreateQuestionaryArgs) {
     return this.dataSource.create(agent!.id, args.templateId).catch((error) => {
       return rejection('Failed to create questionary', { args }, error);
     });
