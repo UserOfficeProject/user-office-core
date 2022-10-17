@@ -22,7 +22,6 @@ export interface UserDataSource {
   getByEmail(email: string): Promise<User | null>;
   getByOIDCSub(sub: string): Promise<User | null>;
   getPasswordByEmail(email: string): Promise<string | null>;
-  getRolesForUser(id: number): Promise<stfcRole[]>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
     args: UsersArgs

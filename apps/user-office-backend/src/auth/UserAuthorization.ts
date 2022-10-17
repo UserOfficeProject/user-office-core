@@ -33,26 +33,8 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
-  async isInternalUser(userId: number, currentRole: Role): Promise<boolean> {
-    if (currentRole) {
-      if (
-        currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST ||
-        currentRole?.shortCode === Roles.USER_OFFICER
-      ) {
-        return true;
-      }
-    }
-
-    return userId
-      ? this.userDataSource.getRolesForUser(userId).then((roles) => {
-          return roles.some(
-            (role) =>
-              role.name === 'Internal proposal submitter' ||
-              role.name === 'ISIS Instrument Scientist' ||
-              role.name === 'User Officer'
-          );
-        })
-      : false;
+  async isInternalUser(agent: UserWithRole | null): Promise<boolean> {
+    return false;
   }
   isUser(agent: UserWithRole | null) {
     return agent?.currentRole?.shortCode === Roles.USER;

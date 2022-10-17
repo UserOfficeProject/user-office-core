@@ -196,13 +196,6 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
 };
 
 export class UserDataSourceMock implements UserDataSource {
-  async getRolesForUser(id: number): Promise<stfcRole[]> {
-    return [
-      { name: 'Internal proposal submitter' },
-      { name: 'ISIS Instrument Scientist' },
-      { name: 'User Officer' },
-    ];
-  }
   async delete(id: number): Promise<User | null> {
     return dummyUser;
   }

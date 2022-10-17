@@ -711,7 +711,4 @@ export default class PostgresUserDataSource implements UserDataSource {
           new Role(role.role_id, role.short_code, role.title)
       );
   }
-  getRolesForUser(id: number): Promise<stfcRole[]> {
-    throw new Error('Method not implemented.');
-  }
 }

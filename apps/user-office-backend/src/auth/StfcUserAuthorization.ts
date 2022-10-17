@@ -1,3 +1,4 @@
+import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { logger } from '@user-office-software/duo-logger';
 import { injectable, container } from 'tsyringe';
 
@@ -9,8 +10,9 @@ import {
 } from '../datasources/stfc/StfcUserDataSource';
 import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { Instrument } from '../models/Instrument';
+import { Roles } from '../models/Role';
 import { Rejection, rejection } from '../models/Rejection';
-import { AuthJwtPayload, User } from '../models/User';
+import { AuthJwtPayload, User , UserWithRole } from '../models/User';
 import { LRUCache } from '../utils/LRUCache';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -250,5 +252,22 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
 
     return isValid;
+  }
+
+  override async isInternalUser(agent: UserWithRole | null): Promise<boolean> {
+    return agent
+      ? agent.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST ||
+          agent.currentRole?.shortCode === Roles.USER_OFFICER ||
+          (this.userDataSource as StfcUserDataSource)
+            .getRolesForUser(agent.id)
+            .then((roles) => {
+              return roles.some(
+                (role) =>
+                  role.name === 'Internal proposal submitter' ||
+                  role.name === 'ISIS Instrument Scientist' ||
+                  role.name === 'User Officer'
+              );
+            })
+      : false;
   }
 }
