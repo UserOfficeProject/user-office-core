@@ -413,7 +413,14 @@ jobs:
           tags: |
             dmsc/duo-backend:${{ github.head_ref }}
             ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
-
+            
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          
       - name: Build and push frontend
         uses: docker/build-push-action@v3
         with:
