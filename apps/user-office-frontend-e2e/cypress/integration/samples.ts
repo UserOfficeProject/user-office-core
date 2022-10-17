@@ -138,17 +138,17 @@ context('Samples tests', () => {
     });
   };
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow.proposalWorkflow) {
-        createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
-      }
-    });
-  });
-
   describe('Samples basic tests', () => {
+    beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB(true);
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+    });
+
     it('Should be able to create proposal template with sample', () => {
       cy.login('officer');
       cy.visit('/');
@@ -398,6 +398,14 @@ context('Samples tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB(true);
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
