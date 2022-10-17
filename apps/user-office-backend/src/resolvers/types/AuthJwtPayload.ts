@@ -14,8 +14,4 @@ export class AuthJwtPayload implements AuthJwtPayloadBase {
 
   @Field(() => [Role])
   roles: Role[];
-
-  externalToken?: string | undefined;
-  isInternalUser: boolean;
-  impersonatingUserId?: number | undefined;
 }

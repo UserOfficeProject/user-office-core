@@ -6,7 +6,7 @@ export type AuthJwtPayload = {
   roles: Role[];
   currentRole: Role;
   externalToken?: string;
-  isInternalUser: boolean;
+  isInternalUser?: boolean;
   impersonatingUserId?: number;
 };
 
