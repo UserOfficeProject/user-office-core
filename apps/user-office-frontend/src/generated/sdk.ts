@@ -172,6 +172,7 @@ export type CallResponseWrap = {
 export type CallsFilter = {
   isActive?: InputMaybe<Scalars['Boolean']>;
   isActiveInternal?: InputMaybe<Scalars['Boolean']>;
+  isCallEndedByEvent?: InputMaybe<Scalars['Boolean']>;
   isEnded?: InputMaybe<Scalars['Boolean']>;
   isEndedInternal?: InputMaybe<Scalars['Boolean']>;
   isReviewEnded?: InputMaybe<Scalars['Boolean']>;
