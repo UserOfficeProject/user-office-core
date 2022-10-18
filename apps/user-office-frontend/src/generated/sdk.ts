@@ -1955,7 +1955,6 @@ export type ProposalView = {
   notified: Scalars['Boolean'];
   primaryKey: Scalars['Int'];
   proposalId: Scalars['String'];
-  proposer: BasicUserDetails;
   rankOrder: Maybe<Scalars['Int']>;
   reviewAverage: Maybe<Scalars['Float']>;
   reviewDeviation: Maybe<Scalars['Float']>;
@@ -4124,7 +4123,7 @@ export type GetInstrumentScientistProposalsQueryVariables = Exact<{
 }>;
 
 
-export type GetInstrumentScientistProposalsQuery = { instrumentScientistProposals: { totalCount: number, proposals: Array<{ primaryKey: number, proposalId: string, title: string, submitted: boolean, finalStatus: ProposalEndStatus | null, technicalReviewAssigneeId: number | null, technicalReviewAssigneeFirstName: string | null, technicalReviewAssigneeLastName: string | null, technicalStatus: TechnicalReviewStatus | null, technicalTimeAllocation: number | null, statusName: string, technicalReviewSubmitted: number | null, instrumentId: number | null, instrumentName: string | null, allocationTimeUnit: AllocationTimeUnits, callShortCode: string | null, sepCode: string | null, proposer: { firstname: string, lastname: string } }> } | null };
+export type GetInstrumentScientistProposalsQuery = { instrumentScientistProposals: { totalCount: number, proposals: Array<{ primaryKey: number, proposalId: string, title: string, submitted: boolean, finalStatus: ProposalEndStatus | null, technicalReviewAssigneeId: number | null, technicalReviewAssigneeFirstName: string | null, technicalReviewAssigneeLastName: string | null, technicalStatus: TechnicalReviewStatus | null, technicalTimeAllocation: number | null, statusName: string, technicalReviewSubmitted: number | null, instrumentId: number | null, instrumentName: string | null, allocationTimeUnit: AllocationTimeUnits, callShortCode: string | null, sepCode: string | null }> } | null };
 
 export type GetMyProposalsQueryVariables = Exact<{
   filter?: InputMaybe<UserProposalsFilter>;
@@ -4157,7 +4156,7 @@ export type GetProposalsCoreQueryVariables = Exact<{
 }>;
 
 
-export type GetProposalsCoreQuery = { proposalsView: { totalCount: number, proposalViews: Array<{ primaryKey: number, title: string, statusId: number, statusName: string, statusDescription: string, proposalId: string, rankOrder: number | null, finalStatus: ProposalEndStatus | null, notified: boolean, managementTimeAllocation: number | null, technicalTimeAllocation: number | null, technicalReviewAssigneeId: number | null, technicalReviewAssigneeFirstName: string | null, technicalReviewAssigneeLastName: string | null, technicalStatus: TechnicalReviewStatus | null, instrumentName: string | null, callShortCode: string | null, sepCode: string | null, sepId: number | null, reviewAverage: number | null, reviewDeviation: number | null, instrumentId: number | null, callId: number, submitted: boolean, allocationTimeUnit: AllocationTimeUnits, proposer: { firstname: string, lastname: string } }> } | null };
+export type GetProposalsCoreQuery = { proposalsView: { totalCount: number, proposalViews: Array<{ primaryKey: number, title: string, statusId: number, statusName: string, statusDescription: string, proposalId: string, rankOrder: number | null, finalStatus: ProposalEndStatus | null, notified: boolean, managementTimeAllocation: number | null, technicalTimeAllocation: number | null, technicalReviewAssigneeId: number | null, technicalReviewAssigneeFirstName: string | null, technicalReviewAssigneeLastName: string | null, technicalStatus: TechnicalReviewStatus | null, instrumentName: string | null, callShortCode: string | null, sepCode: string | null, sepId: number | null, reviewAverage: number | null, reviewDeviation: number | null, instrumentId: number | null, callId: number, submitted: boolean, allocationTimeUnit: AllocationTimeUnits }> } | null };
 
 export type NotifyProposalMutationVariables = Exact<{
   proposalPk: Scalars['Int'];
@@ -7274,10 +7273,6 @@ export const GetInstrumentScientistProposalsDocument = gql`
       callShortCode
       statusName
       sepCode
-      proposer {
-        firstname
-        lastname
-      }
     }
     totalCount
   }
@@ -7458,10 +7453,6 @@ export const GetProposalsCoreDocument = gql`
       callId
       submitted
       allocationTimeUnit
-      proposer {
-        firstname
-        lastname
-      }
     }
     totalCount
   }

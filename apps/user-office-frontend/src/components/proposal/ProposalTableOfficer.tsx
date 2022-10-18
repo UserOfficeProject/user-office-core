@@ -108,11 +108,6 @@ let columns: Column<ProposalViewData>[] = [
     title: 'Call',
     field: 'callShortCode',
   },
-  {
-    title: 'Principal Investigator',
-    render: (rowData): string =>
-      `${rowData.proposer.firstname} ${rowData.proposer.lastname}`,
-  },
 ];
 
 const technicalReviewColumns = [

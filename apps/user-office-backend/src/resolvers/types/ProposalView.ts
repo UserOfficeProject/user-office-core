@@ -1,22 +1,11 @@
-import {
-  Ctx,
-  Field,
-  FieldResolver,
-  Float,
-  Int,
-  ObjectType,
-  Resolver,
-  Root,
-} from 'type-graphql';
+import { Field, Float, Int, ObjectType } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
 import { AllocationTimeUnits } from '../../models/Call';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
@@ -97,24 +86,4 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
-}
-
-@Resolver((of) => ProposalView)
-export class ProposalViewResolver {
-  @FieldResolver(() => BasicUserDetails)
-  async proposer(
-    @Root() proposalView: ProposalView,
-    @Ctx() context: ResolverContext
-  ): Promise<BasicUserDetails | null> {
-    const proposal = await context.queries.proposal.getProposalById(
-      context.user,
-      proposalView.proposalId
-    );
-
-    if (!proposal) {
-      return null;
-    }
-
-    return context.queries.user.getBasic(context.user, proposal.proposerId);
-  }
 }
