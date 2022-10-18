@@ -1,3 +1,4 @@
+import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
@@ -99,6 +100,9 @@ interface ResolverContextMutations {
 export interface BasicResolverContext {
   mutations: ResolverContextMutations;
   queries: ResolverContextQueries;
+  clients: {
+    scheduler: () => Promise<Sdk | undefined>;
+  };
 }
 
 export interface ResolverContext extends BasicResolverContext {

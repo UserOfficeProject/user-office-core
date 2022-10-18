@@ -97,6 +97,11 @@ const context: BasicResolverContext = {
     visit: container.resolve(VisitMutations),
     predefinedMessage: container.resolve(PredefinedMessageMutations),
   },
+  clients: {
+    scheduler: async () => {
+      return undefined;
+    },
+  },
 };
 
 export default context;

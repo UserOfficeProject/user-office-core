@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -104,6 +105,31 @@ export default class AdminQueries {
 
       allMutationMethods.push(...classNamesWithMethod);
     });
+
+    try {
+      // NOTE: If scheduler is disabled we get undefined as scheduler client
+      const schedulerQueriesAndMutations = await (
+        await context.clients.scheduler()
+      )?.getQueriesAndMutations();
+
+      if (schedulerQueriesAndMutations) {
+        return {
+          queries: allQueryMethods.concat(
+            schedulerQueriesAndMutations.schedulerQueriesAndMutations
+              ?.queries || []
+          ),
+          mutations: allMutationMethods.concat(
+            schedulerQueriesAndMutations.schedulerQueriesAndMutations
+              ?.mutations || []
+          ),
+        };
+      }
+    } catch (error) {
+      logger.logException(
+        'Failed while getting scheduler queries and mutations',
+        error
+      );
+    }
 
     return { queries: allQueryMethods, mutations: allMutationMethods };
   }
