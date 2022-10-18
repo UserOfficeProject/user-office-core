@@ -53,3 +53,13 @@ services:
       - 4500:4500
     cap_add:
       - SYS_ADMIN
+
+  duo-development-authorization-server:
+    image: "dmsc/duo-development-authorization-server:develop"
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
+      PORT: 5000

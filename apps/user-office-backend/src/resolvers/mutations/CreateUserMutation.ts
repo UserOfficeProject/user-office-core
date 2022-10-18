@@ -34,15 +34,6 @@ export class CreateUserArgs {
   public preferredname?: string;
 
   @Field()
-  public orcid: string;
-
-  @Field()
-  public orcidHash: string;
-
-  @Field()
-  public refreshToken: string;
-
-  @Field()
   public gender: string;
 
   @Field(() => Int)

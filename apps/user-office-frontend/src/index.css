@@ -216,6 +216,35 @@ h6 {
   height: 64px;
 }
 
+.ellipsisAnimation {
+  position: relative;
+}
+
+.ellipsisAnimation::after {
+  position: absolute;
+  display: inline-block;
+  animation: dotty steps(1, end) 1s infinite;
+  content: '';
+}
+
+@keyframes dotty {
+  0% {
+    content: '';
+  }
+  25% {
+    content: '.';
+  }
+  50% {
+    content: '..';
+  }
+  75% {
+    content: '...';
+  }
+  100% {
+    content: '';
+  }
+}
+
 /*------ Mobile view improvements ------*/
 
 div.MuiToolbar-root[class*='MTableToolbar-highlight'] {

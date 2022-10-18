@@ -189,23 +189,6 @@ test('A userofficer can update users roles', () => {
   ).resolves.toBe(dummyUser);
 });
 
-test('A user should be able to login with credentials and get a token', () => {
-  return expect(
-    userMutations
-      .login(null, { email: dummyUser.email, password: 'Test1234!' })
-      .then((data) => typeof data)
-  ).resolves.toBe('string');
-});
-
-test('A user should not be able to login with invalid credentials', () => {
-  return expect(
-    userMutations.login(null, {
-      email: dummyUser.email,
-      password: 'WrongPassword!',
-    })
-  ).resolves.toHaveProperty('reason', 'Wrong email or password');
-});
-
 test('A user should not be able to update a token if it is unvalid', () => {
   return expect(
     userMutations.token('this_is_a_invalid_token')
@@ -321,7 +304,7 @@ test('A user officer can must be able to delete another user', async () => {
 });
 
 test('externalTokenLogin supplies a new JWT', async () => {
-  const result = await userMutations.externalTokenLogin('valid');
+  const result = await userMutations.externalTokenLogin('valid', '');
 
   expect(typeof result).toBe('string');
 
