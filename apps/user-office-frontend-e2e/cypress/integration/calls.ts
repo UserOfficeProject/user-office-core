@@ -524,13 +524,13 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to edit a call', () => {
-      const { shortCode, startDate, endDate } = updatedCall;
-      const updatedCallStartDate = startDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const updatedCallEndDate = endDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
+      const { shortCode, startDate } = updatedCall;
+      const updatedCallStartDate = startDate
+        .plus({ days: 7 })
+        .toFormat(initialDBData.getFormats().dateTimeFormat);
+      const updatedCallEndDate = startDate
+        .plus({ days: 14 })
+        .toFormat(initialDBData.getFormats().dateTimeFormat);
 
       const refNumFormat = '211{digits:5}';
 
@@ -554,6 +554,11 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
+      cy.get('#proposalWorkflowId-input').should(
+        'have.value',
+        proposalWorkflow.name
+      );
+
       cy.get('[data-cy=start-date] input')
         .clear()
         .type(updatedCallStartDate)
@@ -569,6 +574,8 @@ context('Calls tests', () => {
       });
 
       cy.get('[data-cy="next-step"]').click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy=survey-comment] input').type(
         faker.random.word().split(' ')[0]
