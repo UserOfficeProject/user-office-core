@@ -16,6 +16,7 @@ import {
   ProposalBookingScheduledEventFilterCore,
 } from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import { ProposalDataSource } from '../ProposalDataSource';
 import {
   ProposalsFilter,
@@ -755,12 +756,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     ).rows;
 
     if (proposalEventsToReset?.length) {
-      const dataToUpdate = proposalEventsToReset
-        .map(
+      const dataToUpdate = removeDuplicates(
+        proposalEventsToReset.map(
           (event) =>
             `${event.status_changing_event.toLocaleLowerCase()} = false`
         )
-        .join(', ');
+      ).join(', ');
 
       const [updatedProposalEvents]: ProposalEventsRecord[] = (
         await database.raw(`

@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { injectable } from 'tsyringe';
 
 import { dummyUser } from '../../datasources/mockups/UserDataSource';
+import { Role } from '../../models/Role';
 import { AuthJwtPayload, User } from '../../models/User';
 import { UserAuthorization } from '../UserAuthorization';
 
@@ -17,7 +18,9 @@ export class UserAuthorizationMock extends UserAuthorization {
 
     return null;
   }
-
+  async isInternalUser(userId: number, currentRole: Role): Promise<boolean> {
+    return true;
+  }
   async logout(token: AuthJwtPayload): Promise<void> {
     return;
   }

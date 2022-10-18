@@ -72,3 +72,15 @@ export type NonNullableField<T, K extends keyof T> = T &
  */
 export type RequiredField<T, K extends keyof T> = T &
   NonNullableFields<Required<Pick<T, K>>>;
+
+export function removeDuplicates<T>(obj: T): T {
+  if (Array.isArray(obj) && obj.length > 1) {
+    return obj.reduce(function (carrResult, currValue) {
+      return carrResult.includes(currValue)
+        ? carrResult
+        : [...carrResult, currValue];
+    }, []);
+  }
+
+  return obj;
+}

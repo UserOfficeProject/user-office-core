@@ -201,14 +201,23 @@ export class ProposalAuthorization {
     );
   }
 
-  private async isProposalEditable(proposal: Proposal): Promise<boolean> {
+  private async isProposalEditable(
+    proposal: Proposal,
+    checkIfInternalEditable: boolean = false
+  ): Promise<boolean> {
     const callId = proposal.callId;
-    const isCallEnded = await this.callDataSource.isCallEnded(callId);
+    const isCallEnded = await this.callDataSource.isCallEnded(
+      callId,
+      checkIfInternalEditable
+    );
     const proposalStatus = (
       await this.proposalSettingsDataSource.getProposalStatus(proposal.statusId)
     )?.shortCode;
-
-    if (proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED) {
+    if (
+      proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
+      proposalStatus ===
+        ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+    ) {
       return true;
     }
 
@@ -248,8 +257,12 @@ export class ProposalAuthorization {
       return true;
     }
 
+    const checkIfInternalEditable = agent.isInternalUser || false;
     const isMemberOfProposal = await this.isMemberOfProposal(agent, proposal);
-    const isProposalEditable = await this.isProposalEditable(proposal);
+    const isProposalEditable = await this.isProposalEditable(
+      proposal,
+      checkIfInternalEditable
+    );
 
     if (isMemberOfProposal && isProposalEditable) {
       return true;
