@@ -223,7 +223,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
       const userDataUpdated = {
         ...userData,
         reviews: userData?.reviews.map((review) => {
-          if (review.id === freshReview?.id) {
+          if (review.id === freshReview.id) {
             return {
               ...review,
               grade: freshReview.grade,
