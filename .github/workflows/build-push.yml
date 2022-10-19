@@ -12,7 +12,10 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    
+    strategy:
+      matrix:
+        node-version: [16.x]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -51,6 +54,15 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Node.js dependencies
+        run: npm ci
+        
+      - name: Set environment variables
+        run:  cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+
+      - name: Generate SDK
+        run: npm run generate:sdk
 
       - name: Build and push backend
         uses: docker/build-push-action@v3
