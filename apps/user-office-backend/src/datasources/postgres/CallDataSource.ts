@@ -103,6 +103,12 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_sep_review_ended', false);
     }
 
+    if (filter?.isCallEndedByEvent === true) {
+      query.where('call_ended', true);
+    } else if (filter?.isCallEndedByEvent === false) {
+      query.where('call_ended', false);
+    }
+
     return query.then((callDB: CallRecord[]) =>
       callDB.map((call) => createCallObject(call))
     );
