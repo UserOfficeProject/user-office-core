@@ -117,7 +117,7 @@ export default function UpdateUserInformation(
     telephone: userData.telephone,
     telephone_alt: userData.telephone_alt || '',
     user_title: userData.user_title,
-    orcid: userData.orcid,
+    oidcSub: userData.oidcSub,
   };
 
   const userTitleOptions: Option[] = [
@@ -397,12 +397,12 @@ export default function UpdateUserInformation(
                   />
                 </InputLabel>
                 <Link
-                  href={'https://orcid.org/' + values.orcid}
+                  href={'https://orcid.org/' + values.oidcSub}
                   target="_blank"
                   rel="noreferrer noopener"
                   className={classes.orcIdLink}
                 >
-                  https://orcid.org/{values.orcid}
+                  https://orcid.org/{values.oidcSub}
                 </Link>
               </FormControl>
               <Field

@@ -14,7 +14,7 @@ context('User administration tests', () => {
   const newTelephone = faker.phone.phoneNumber('0##########');
   const newTelephoneAlt = faker.phone.phoneNumber('0##########');
   const newOrganisation = faker.company.companyName();
-  const placeholderUser = initialDBData.users.placeholder;
+  const placeholderUser = initialDBData.users.placeholderUser;
 
   beforeEach(() => {
     cy.getAndStoreFeaturesEnabled();
@@ -225,27 +225,5 @@ context('User administration tests', () => {
     cy.get("[data-cy=co-proposers] [aria-label='Save']").click();
 
     cy.notification({ variant: 'success', text: 'User removed successfully' });
-  });
-
-  it('Should be able to send email for password reset', () => {
-    cy.logout();
-    cy.visit('/SignIn');
-    cy.contains('Forgot password?').click();
-
-    cy.get('[data-cy="reset-password-email"] input').type(
-      'Aaron_Harris49@gmail.com'
-    );
-
-    cy.get('[type="submit"]').click();
-
-    cy.contains('A mail has been sent to the provided email.');
-
-    cy.get('[data-cy="reset-password-email"] input')
-      .clear()
-      .type('test@test.com');
-
-    cy.get('[type="submit"]').click();
-
-    cy.contains('No account found for this email address.');
   });
 });

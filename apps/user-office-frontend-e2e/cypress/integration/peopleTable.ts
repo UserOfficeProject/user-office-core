@@ -9,19 +9,22 @@ context('PageTable component tests', () => {
   const title = faker.random.words(3);
   const abstract = faker.random.words(8);
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
-  });
   beforeEach(function () {
-    if (featureFlags.getEnabledFeatures().get(FeatureId.EXTERNAL_AUTH)) {
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
+    const isUserManagementEnabled = featureFlags
+      .getEnabledFeatures()
+      .get(FeatureId.USER_MANAGEMENT);
+
+    if (!isUserManagementEnabled) {
+      // false or undefined
       this.skip();
     }
   });
 
   describe('ProposalPeopleTable component Preserve selected users', () => {
     it('Should add a new collaborator and that collaborator should stay as suggestion in the collaborators list', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -45,7 +48,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('[data-cy="email"]').type(initialDBData.users.userOfficer.email);
+      cy.get('[data-cy="email"]').type(initialDBData.users.officer.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
@@ -89,7 +92,7 @@ context('PageTable component tests', () => {
     });
 
     it('Should preserve the selected users', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -100,7 +103,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').contains('0 user(s) selected');
 
-      cy.get('[data-cy=email]').type(initialDBData.users.placeholder.email);
+      cy.get('[data-cy=email]').type(initialDBData.users.placeholderUser.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
@@ -141,13 +144,13 @@ context('PageTable component tests', () => {
 
       cy.get('@modal')
         .find('[aria-label="Search"]')
-        .type(initialDBData.users.placeholder.firstName);
+        .type(initialDBData.users.placeholderUser.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(initialDBData.users.placeholder.firstName)
+        .contains(initialDBData.users.placeholderUser.firstName)
         .parent()
         .find('input[type="checkbox"]')
         .should('not.be.checked');
@@ -177,9 +180,6 @@ context('PageTable component tests', () => {
           firstname: faker.name.firstName(),
           lastname: faker.name.lastName(),
           password: 'Test1234!',
-          orcid: '0000-0000-0000-0000',
-          orcidHash: 'WRMVXa',
-          refreshToken: '-',
           gender: '-',
           nationality: 1,
           birthdate: faker.date.between('1950', '1990').toISOString(),
@@ -191,7 +191,7 @@ context('PageTable component tests', () => {
         });
       });
 
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.finishedLoading();
@@ -307,13 +307,13 @@ context('PageTable component tests', () => {
 
       cy.get('@modal')
         .find('[aria-label="Search"]')
-        .type(initialDBData.users.placeholder.firstName);
+        .type(initialDBData.users.placeholderUser.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(initialDBData.users.placeholder.firstName)
+        .contains(initialDBData.users.placeholderUser.firstName)
         .parent()
         .find('input')
         .should('not.be.checked');
@@ -343,9 +343,6 @@ context('PageTable component tests', () => {
           firstname: faker.name.firstName(),
           lastname: faker.name.lastName(),
           password: 'Test1234!',
-          orcid: '0000-0000-0000-0000',
-          orcidHash: 'WRMVXa',
-          refreshToken: '-',
           gender: '-',
           nationality: 1,
           birthdate: faker.date.between('1950', '1990').toISOString(),
@@ -416,9 +413,6 @@ context('PageTable component tests', () => {
           firstname: faker.name.firstName(),
           lastname: faker.name.lastName(),
           password: 'Test1234!',
-          orcid: '0000-0000-0000-0000',
-          orcidHash: 'WRMVXa',
-          refreshToken: '-',
           gender: '-',
           nationality: 1,
           birthdate: faker.date.between('1950', '1990').toISOString(),

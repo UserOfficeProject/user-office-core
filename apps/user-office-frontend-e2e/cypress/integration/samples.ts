@@ -138,17 +138,17 @@ context('Samples tests', () => {
     });
   };
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow.proposalWorkflow) {
-        createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
-      }
-    });
-  });
-
   describe('Samples basic tests', () => {
+    beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB(true);
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+    });
+
     it('Should be able to create proposal template with sample', () => {
       cy.login('officer');
       cy.visit('/');
@@ -228,7 +228,7 @@ context('Samples tests', () => {
     });
     it('Should be able to create proposal with sample', () => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
@@ -299,7 +299,7 @@ context('Samples tests', () => {
 
     it('Should be able to modify sample declaration question and all other questions without loosing information', () => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
@@ -398,6 +398,14 @@ context('Samples tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB(true);
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
@@ -489,7 +497,7 @@ context('Samples tests', () => {
     });
 
     it('User should not be able to submit proposal with unfinished sample', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposalTitle)

@@ -1,14 +1,14 @@
+import { logger } from '@user-office-software/duo-logger';
 import {
-  deleteUserValidationSchema,
+  addUserRoleValidationSchema,
   createUserByEmailInviteValidationSchema,
   createUserValidationSchema,
-  updateUserValidationSchema,
-  updateUserRolesValidationSchema,
-  signInValidationSchema,
+  deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   resetPasswordByEmailValidationSchema,
-  addUserRoleValidationSchema,
   updatePasswordValidationSchema,
+  updateUserRolesValidationSchema,
+  updateUserValidationSchema,
   userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
@@ -16,24 +16,22 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { AdminDataSource } from '../datasources/AdminDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { EventBus, Authorized, ValidateArgs } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { FeatureId } from '../models/Feature';
 import { isRejection, rejection, Rejection } from '../models/Rejection';
-import { Roles, Role } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import {
-  User,
-  BasicUserDetails,
-  UserWithRole,
-  EmailVerificationJwtPayload,
   AuthJwtPayload,
+  BasicUserDetails,
+  EmailVerificationJwtPayload,
   PasswordResetJwtPayload,
+  User,
+  UserRole,
   UserRoleShortCodeMap,
+  UserWithRole,
 } from '../models/User';
-import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
@@ -46,20 +44,10 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserMutations {
-  //Set as a class variable to avoid excessive calls to database
-  private externalAuth: boolean;
-
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
-    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
-  ) {
-    adminDataSource.getFeatures().then((features) => {
-      this.externalAuth = features.filter(
-        (feature) => feature.id == FeatureId.EXTERNAL_AUTH
-      )[0].isEnabled;
-    });
-  }
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
+  ) {}
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -103,12 +91,16 @@ export default class UserMutations {
   ): Promise<EmailInviteResponse | Rejection> {
     let userId: number | null = null;
     let role: UserRole = args.userRole;
+
+    if (!agent) {
+      return rejection('Agent is not defined', { agent, args });
+    }
     // Check if email exist in database and if user has been invited before
     const user = await this.dataSource.getByEmail(args.email);
     if (user && user.placeholder) {
       userId = user.id;
 
-      return this.createEmailInviteResponse(userId, (agent as User).id, role);
+      return this.createEmailInviteResponse(userId, agent.id, role);
     } else if (user) {
       return rejection(
         'Can not create account because account already exists',
@@ -163,7 +155,7 @@ export default class UserMutations {
         args,
       });
     } else {
-      return this.createEmailInviteResponse(userId, (agent as User).id, role);
+      return this.createEmailInviteResponse(userId, agent.id, role);
     }
   }
 
@@ -173,11 +165,8 @@ export default class UserMutations {
     agent: UserWithRole | null,
     args: CreateUserArgs
   ): Promise<UserLinkResponse | Rejection> {
-    if (
-      this.createHash(args.orcid) !== args.orcidHash &&
-      !(process.env.NODE_ENV === 'development')
-    ) {
-      return rejection('Can not create user because of ORCID hash mismatch', {
+    if (process.env.NODE_ENV !== 'development') {
+      return rejection('Users can only be created on development env', {
         args,
       });
     }
@@ -194,13 +183,10 @@ export default class UserMutations {
     }
 
     //Check if email exist in database and if user has been invited
-    let user = (await this.dataSource.getByEmail(args.email)) as UserWithRole;
+    let user = await this.dataSource.getByEmail(args.email);
 
     if (user && user.placeholder) {
-      user.currentRole = await this.dataSource.getRoleByShortCode(
-        UserRoleShortCodeMap[UserRole.USER]
-      );
-      const changePassword = await this.updatePassword(user, {
+      const changePassword = await this.updatePassword(agent, {
         id: user.id,
         password: args.password,
       });
@@ -211,7 +197,7 @@ export default class UserMutations {
           ...args,
           placeholder: false,
         })
-        .then((user) => user as UserWithRole)
+        .then((user) => user)
         .catch((err) => {
           return rejection('Could not update user', { user }, err);
         });
@@ -229,16 +215,18 @@ export default class UserMutations {
       });
     } else {
       try {
-        user = (await this.dataSource.create(
+        user = await this.dataSource.create(
           args.user_title,
           args.firstname,
           args.middlename,
           args.lastname,
-          `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+          `${args.firstname}.${args.lastname}`, // This is just for now, while we decide on the final format
           hash,
           args.preferredname,
-          args.orcid,
-          args.refreshToken,
+          '',
+          '',
+          '',
+          '',
           args.gender,
           args.nationality,
           args.birthdate,
@@ -248,7 +236,7 @@ export default class UserMutations {
           args.email,
           args.telephone,
           args.telephone_alt
-        )) as UserWithRole;
+        );
       } catch (error) {
         // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
         const errorCode = (error as { code: string }).code;
@@ -261,6 +249,10 @@ export default class UserMutations {
           );
         }
       }
+    }
+
+    if (!user) {
+      return rejection('Can not create user', { args });
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -326,9 +318,6 @@ export default class UserMutations {
       );
     }
 
-    delete args.orcid;
-    delete args.refreshToken;
-
     user = {
       ...user,
       ...args,
@@ -369,42 +358,6 @@ export default class UserMutations {
           err
         );
       });
-  }
-
-  @ValidateArgs(signInValidationSchema)
-  async login(
-    agent: UserWithRole | null,
-    args: { email: string; password: string }
-  ): Promise<string | Rejection> {
-    const user = await this.dataSource.getByEmail(args.email);
-
-    if (!user) {
-      return rejection('Wrong username or password');
-    }
-    const roles = await this.dataSource.getUserRoles(user.id);
-    const result = await this.dataSource.getPasswordByEmail(args.email);
-
-    if (!result) {
-      return rejection('Wrong username or password');
-    }
-
-    const valid = bcrypt.compareSync(args.password, result);
-
-    if (!valid) {
-      return rejection('Wrong email or password');
-    }
-
-    if (!user.emailVerified) {
-      return rejection('Email is not verified');
-    }
-
-    const token = signToken<AuthJwtPayload>({
-      user,
-      roles,
-      currentRole: roles[0],
-    });
-
-    return token;
   }
 
   @ValidateArgs(getTokenForUserValidationSchema)
@@ -454,6 +407,7 @@ export default class UserMutations {
       user,
       roles,
       currentRole: roles[0],
+      isInternalUser: false,
       impersonatingUserId:
         isUserOfficer && shouldImpersonateUser ? agent?.id : undefined,
     });
@@ -469,6 +423,7 @@ export default class UserMutations {
         user: decoded.user,
         roles,
         currentRole: decoded.currentRole,
+        isInternalUser: decoded.isInternalUser,
         externalToken: decoded.externalToken,
       });
 
@@ -478,20 +433,41 @@ export default class UserMutations {
     }
   }
 
-  async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
+  async externalTokenLogin(
+    externalToken: string,
+    redirecturi: string
+  ): Promise<string | Rejection> {
     try {
-      const user = await this.userAuth.externalTokenLogin(externalToken);
+      const user = await this.userAuth.externalTokenLogin(
+        externalToken,
+        redirecturi
+      );
 
       if (!user) {
         return rejection('User not found', { externalToken });
       }
 
       const roles = await this.dataSource.getUserRoles(user.id);
-
+      const isInternalUser = await this.userAuth.isInternalUser(
+        user.id,
+        roles[0]
+      );
       const uosToken = signToken<AuthJwtPayload>({
-        user: user,
+        user: {
+          created: user.created,
+          email: user.email,
+          firstname: user.firstname,
+          id: user.id,
+          lastname: user.lastname,
+          oidcSub: user.oidcSub,
+          organisation: user.organisation,
+          placeholder: user.placeholder,
+          position: user.position,
+          preferredname: user.preferredname,
+        },
         roles,
         currentRole: roles[0],
+        isInternalUser: isInternalUser,
         externalToken: externalToken,
       });
 
@@ -509,17 +485,11 @@ export default class UserMutations {
     try {
       const decodedToken = verifyToken<AuthJwtPayload>(token);
 
-      if (this.externalAuth) {
-        if (decodedToken.externalToken) {
-          this.userAuth.logout(decodedToken.externalToken);
-        } else {
-          return rejection('No external token found in JWT', { token });
-        }
-      }
-
-      return;
+      return this.userAuth.logout(decodedToken);
     } catch (error) {
-      return rejection('Error occurred during external logout', {}, error);
+      logger.logException('Error occurred during logout', error);
+
+      return rejection('Error occurred during logout', {}, error);
     }
   }
 
@@ -542,6 +512,7 @@ export default class UserMutations {
         user: decoded.user,
         roles: decoded.roles,
         currentRole,
+        isInternalUser: decoded.isInternalUser,
         externalToken: decoded.externalToken,
         impersonatingUserId: decoded.impersonatingUserId,
       });

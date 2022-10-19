@@ -32,11 +32,6 @@ context('GenericTemplates tests', () => {
   let workflowId: number;
   let createdQuestion1Id: string;
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
-  });
-
   const createTemplateAndAllQuestions = () => {
     cy.createTemplate({
       name: proposalTemplateName,
@@ -157,6 +152,10 @@ context('GenericTemplates tests', () => {
   };
 
   describe('Generic templates basic tests', () => {
+    beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB();
+    });
     it('Should be able to create proposal template with genericTemplate', () => {
       cy.createTemplate({
         name: proposalTemplateName,
@@ -273,6 +272,8 @@ context('GenericTemplates tests', () => {
 
   describe('Generic templates advanced tests', () => {
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB();
       createTemplateAndAllQuestions();
 
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
@@ -291,7 +292,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -321,7 +322,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -463,7 +464,7 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();

@@ -221,7 +221,10 @@ export interface UserRecord {
   readonly lastname: string;
   readonly username: string;
   readonly preferredname: string;
-  readonly orcid: string;
+  readonly oidc_sub: string | null;
+  readonly oauth_refresh_token: string | null;
+  readonly oauth_access_token: string | null;
+  readonly oauth_issuer: string | null;
   readonly gender: string;
   readonly nationality: number;
   readonly birthdate: Date;
@@ -239,7 +242,6 @@ export interface UserRecord {
   readonly full_count: number;
   readonly institution: string;
   readonly placeholder: boolean;
-  readonly orcid_refreshtoken: string;
 }
 
 export interface VisitRegistrationRecord {
@@ -286,6 +288,7 @@ export interface CallRecord {
   readonly call_short_code: string;
   readonly start_call: Date;
   readonly end_call: Date;
+  readonly end_call_internal: Date;
   readonly start_review: Date;
   readonly end_review: Date;
   readonly start_sep_review: Date;
@@ -301,6 +304,7 @@ export interface CallRecord {
   readonly proposal_sequence: number;
   readonly proposal_workflow_id: number;
   readonly call_ended: boolean;
+  readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
   readonly call_sep_review_ended: boolean;
   readonly template_id: number;
@@ -522,6 +526,7 @@ export interface ProposalEventsRecord {
   readonly proposal_feasible: boolean;
   readonly proposal_unfeasible: boolean;
   readonly call_ended: boolean;
+  readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
   readonly proposal_sep_selected: boolean;
   readonly proposal_instrument_selected: boolean;
@@ -807,8 +812,10 @@ export const createUserObject = (user: UserRecord) => {
     user.lastname,
     user.username,
     user.preferredname,
-    user.orcid,
-    user.orcid_refreshtoken,
+    user.oidc_sub,
+    user.oauth_refresh_token,
+    user.oauth_access_token,
+    user.oauth_issuer,
     user.gender,
     user.nationality,
     user.birthdate,
@@ -860,6 +867,7 @@ export const createCallObject = (call: CallRecord) => {
     call.call_short_code,
     call.start_call,
     call.end_call,
+    call.end_call_internal,
     call.start_review,
     call.end_review,
     call.start_sep_review,
@@ -875,6 +883,7 @@ export const createCallObject = (call: CallRecord) => {
     call.proposal_sequence,
     call.proposal_workflow_id,
     call.call_ended,
+    call.call_ended_internal,
     call.call_review_ended,
     call.call_sep_review_ended,
     call.template_id,
