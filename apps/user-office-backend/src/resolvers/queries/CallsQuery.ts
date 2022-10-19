@@ -15,13 +15,22 @@ export class CallsFilter {
   public isActive?: boolean;
 
   @Field(() => Boolean, { nullable: true })
+  public isActiveInternal?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
   public isEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isEndedInternal?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   public isReviewEnded?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   public isSEPReviewEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isCallEndedByEvent?: boolean;
 }
 
 @Resolver()

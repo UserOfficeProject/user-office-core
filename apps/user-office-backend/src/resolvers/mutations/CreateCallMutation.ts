@@ -24,6 +24,9 @@ export class CreateCallInput {
   @Field()
   public endCall: Date;
 
+  @Field(() => Date, { nullable: true })
+  public endCallInternal?: Date;
+
   @Field()
   public startReview: Date;
 

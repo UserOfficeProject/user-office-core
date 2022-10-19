@@ -27,6 +27,9 @@ export class UpdateCallInput {
   @Field()
   public endCall: Date;
 
+  @Field(() => Date, { nullable: true })
+  public endCallInternal?: Date;
+
   @Field()
   public startReview: Date;
 
@@ -74,6 +77,9 @@ export class UpdateCallInput {
 
   @Field(() => Int, { nullable: true })
   public callEnded?: boolean;
+
+  @Field({ nullable: true })
+  public callEndedInternal?: boolean;
 
   @Field(() => Int, { nullable: true })
   public callReviewEnded?: boolean;

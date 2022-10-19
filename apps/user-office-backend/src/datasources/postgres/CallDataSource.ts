@@ -47,13 +47,29 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('is_active', false);
     }
 
+    if (filter?.isEndedInternal === true) {
+      query.where('call_ended_internal', true);
+    } else if (filter?.isEndedInternal === false) {
+      query.where('call_ended_internal', false);
+    }
+
     /**
      * NOTE: We are comparing dates instead of using the call_ended flag,
      * because the flag is set once per hour and we could have a gap.
      * TODO: Maybe there is a need to use the timezone setting here but not quite sure about it. Discussion is needed here!
      */
     const currentDate = new Date().toISOString();
-    if (filter?.isEnded === true) {
+
+    // if filter is explicitly set for internal filter of calls
+    if (
+      filter?.isActive === true &&
+      filter?.isActiveInternal === true &&
+      filter?.isEnded === false
+    ) {
+      query
+        .where('start_call', '<=', currentDate)
+        .andWhere('end_call_internal', '>=', currentDate);
+    } else if (filter?.isEnded === true) {
       query
         .where('start_call', '>=', currentDate)
         .andWhere('end_call', '<=', currentDate);
@@ -61,6 +77,12 @@ export default class PostgresCallDataSource implements CallDataSource {
       query
         .where('start_call', '<=', currentDate)
         .andWhere('end_call', '>=', currentDate);
+    } else if (filter?.isActiveInternal === true) {
+      query
+        .where('end_call', '<', currentDate)
+        .andWhere('end_call_internal', '>=', currentDate);
+    } else if (filter?.isActiveInternal === false) {
+      query.where('call_ended_internal', '=', true);
     }
 
     if (filter?.isReviewEnded === true) {
@@ -81,6 +103,12 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_sep_review_ended', false);
     }
 
+    if (filter?.isCallEndedByEvent === true) {
+      query.where('call_ended', true);
+    } else if (filter?.isCallEndedByEvent === false) {
+      query.where('call_ended', false);
+    }
+
     return query.then((callDB: CallRecord[]) =>
       callDB.map((call) => createCallObject(call))
     );
@@ -94,6 +122,7 @@ export default class PostgresCallDataSource implements CallDataSource {
             call_short_code: args.shortCode,
             start_call: args.startCall,
             end_call: args.endCall,
+            end_call_internal: args.endCallInternal || args.endCall,
             start_review: args.startReview,
             end_review: args.endReview,
             start_sep_review: args.startSEPReview,
@@ -217,6 +246,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               call_short_code: args.shortCode,
               start_call: args.startCall,
               end_call: args.endCall,
+              end_call_internal: args.endCallInternal || args.endCall,
               reference_number_format: args.referenceNumberFormat,
               start_review: args.startReview,
               end_review: args.endReview,
@@ -231,6 +261,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
               call_ended: args.callEnded,
+              call_ended_internal: args.callEndedInternal,
               call_review_ended: args.callReviewEnded,
               call_sep_review_ended: args.callSEPReviewEnded,
               template_id: args.templateId,
@@ -321,15 +352,26 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     return records.map(createCallObject);
   }
-
-  public async isCallEnded(callId: number): Promise<boolean> {
+  public async isCallEnded(callId: number): Promise<boolean>;
+  public async isCallEnded(
+    callId: number,
+    checkIfInternalEnded: boolean
+  ): Promise<boolean>;
+  public async isCallEnded(
+    callId: number,
+    checkIfInternalEnded: boolean = false
+  ): Promise<boolean> {
     const currentDate = new Date().toISOString();
 
     return database
       .select()
       .from('call')
       .where('start_call', '<=', currentDate)
-      .andWhere('end_call', '>=', currentDate)
+      .andWhere(
+        checkIfInternalEnded ? 'end_call_internal' : 'end_call',
+        '>=',
+        currentDate
+      )
       .andWhere('call_id', '=', callId)
       .first()
       .then((call: CallRecord) => (call ? false : true));

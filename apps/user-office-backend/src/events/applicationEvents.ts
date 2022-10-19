@@ -258,6 +258,10 @@ interface CallEndedEvent extends GeneralEvent {
   type: Event.CALL_ENDED;
   call: Call;
 }
+interface CallEndedInternalEvent extends GeneralEvent {
+  type: Event.CALL_ENDED_INTERNAL;
+  call: Call;
+}
 
 interface CallReviewEndedEvent extends GeneralEvent {
   type: Event.CALL_REVIEW_ENDED;
@@ -320,6 +324,7 @@ export type ApplicationEvent =
   | ProposalNotifiedEvent
   | CallCreatedEvent
   | CallEndedEvent
+  | CallEndedInternalEvent
   | CallReviewEndedEvent
   | CallSEPReviewEndedEvent
   | ProposalFeasibilityReviewUpdatedEvent

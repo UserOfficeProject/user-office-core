@@ -130,6 +130,9 @@ export const isCallEnded = (
   startDate: Scalars['DateTime'],
   endDate: Scalars['DateTime']
 ) => {
+  if (!startDate || !endDate) {
+    return true;
+  }
   const now = new Date();
   const startCall = new Date(startDate);
   const endCall = new Date(endDate);

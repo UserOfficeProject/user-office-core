@@ -417,6 +417,7 @@ export default function createHandler() {
         }
         break;
       case Event.CALL_ENDED:
+      case Event.CALL_ENDED_INTERNAL:
       case Event.CALL_REVIEW_ENDED:
       case Event.CALL_SEP_REVIEW_ENDED:
         try {

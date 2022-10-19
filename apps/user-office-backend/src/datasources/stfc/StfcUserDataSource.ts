@@ -286,7 +286,9 @@ export class StfcUserDataSource implements UserDataSource {
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     throw new Error('Method not implemented.');
   }
-
+  async getRolesForUser(id: number): Promise<stfcRole[]> {
+    return (await client.getRolesForUser(token, id))?.return;
+  }
   async getUserRoles(id: number): Promise<Role[]> {
     const cachedRoles = this.uowsRolesCache.get(String(id));
     if (cachedRoles) {
