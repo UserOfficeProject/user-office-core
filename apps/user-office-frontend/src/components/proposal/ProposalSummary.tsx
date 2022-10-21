@@ -10,6 +10,7 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
+import { UserContext } from 'context/UserContextProvider';
 import { UserRole } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -17,6 +18,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
+import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
 
 type ProposalSummaryProps = {
   confirm: WithConfirmType;
@@ -33,12 +35,12 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-
+  const { isInternalUser } = useContext(UserContext);
   const callHasEnded = isCallEnded(
     state.proposal.call?.startCall,
     state.proposal.call?.endCall
   );
-
+  const isCallActiveInternal = state.proposal?.call?.isActiveInternal ?? true;
   const [loadingSubmitMessage, setLoadingSubmitMessage] =
     useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,10 +56,23 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     proposal.questionary &&
     proposal.questionary.steps.every((step) => step.isCompleted);
 
-  const submitDisabled =
-    (!isUserOfficer && callHasEnded) || // disallow submit for non user officers if the call ended
-    !allStepsComplete ||
-    proposal.submitted;
+  const [submitDisabled] = useState(() => {
+    const submitionDisabled =
+      (!isUserOfficer && callHasEnded) || // disallow submit for non user officers if the call ended
+      !allStepsComplete ||
+      proposal.submitted;
+
+    if (
+      !proposal.submitted &&
+      submitionDisabled &&
+      isInternalUser &&
+      isCallActiveInternal
+    ) {
+      return false; // allow submit for intenal users if the call ended
+    }
+
+    return submitionDisabled;
+  });
 
   // Show a different submit confirmation if
   // EDITABLE_SUBMITTED is an upcoming status
@@ -68,25 +83,34 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
         return;
       }
-      const { call } = await api().getCall({ id: proposal.callId });
+      const { call } = await api().getCall({ callId: proposal.callId });
       const workflowId = call?.proposalWorkflowId;
       if (workflowId) {
         const connections = (
-          await api().getProposalWorkflow({ id: workflowId })
+          await api().getProposalWorkflow({ proposalWorkflowId: workflowId })
         ).proposalWorkflow?.proposalWorkflowConnectionGroups;
 
         if (connections) {
           const statuses = (await api().getProposalStatuses()).proposalStatuses;
-          const editableStatus = statuses?.find(
-            (s) => s.name === 'EDITABLE_SUBMITTED'
-          );
-
+          const editableStatuses = statuses
+            ?.filter(
+              //needs to be provided
+              (s) =>
+                s.shortCode ===
+                  ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
+                s.shortCode ===
+                  ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+            )
+            .map((status) => status.id);
           const hasUpcomingEditableStatus =
-            connections?.some((group) =>
+            connections &&
+            connections.some((group) =>
               group.connections.find(
-                (conn) => conn.nextProposalStatusId === editableStatus?.id
+                (conn) =>
+                  conn.nextProposalStatusId &&
+                  editableStatuses?.includes(conn.nextProposalStatusId)
               )
-            ) || false;
+            );
 
           if (proposal.status != null && hasUpcomingEditableStatus) {
             setSubmitButtonMessage(
@@ -132,7 +156,8 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               async () => {
                 setIsSubmitting(true);
                 const result = await api({
-                  toastSuccessMessage: 'Proposal submitted successfully',
+                  toastSuccessMessage:
+                    'Your proposal has been submitted successfully. You will receive a confirmation email soon.',
                 }).submitProposal({
                   proposalPk: state.proposal.primaryKey,
                 });

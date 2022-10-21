@@ -20,6 +20,7 @@ import {
   createBasicUserObject,
   RoleRecord,
   RoleUserRecord,
+  InstitutionRecord,
 } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -62,15 +63,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  async checkOrcIDExist(orcID: string): Promise<boolean> {
-    return database
-      .select()
-      .from('users')
-      .where('orcid', orcID)
-      .first()
-      .then((user: UserRecord) => (user ? true : false));
-  }
-
   async getPasswordByEmail(email: string): Promise<string | null> {
     return database
       .select('password')
@@ -106,8 +98,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       telephone,
       telephone_alt,
       placeholder,
-      orcid,
-      refreshToken,
+      oidcSub,
+      oauthRefreshToken,
+      oauthAccessToken,
+      oauthIssuer,
     } = user;
 
     const [userRecord]: UserRecord[] = await database
@@ -127,8 +121,10 @@ export default class PostgresUserDataSource implements UserDataSource {
         telephone,
         telephone_alt,
         placeholder,
-        orcid,
-        orcid_refreshtoken: refreshToken,
+        oidc_sub: oidcSub,
+        oauth_refresh_token: oauthRefreshToken,
+        oauth_access_token: oauthAccessToken,
+        oauth_issuer: oauthIssuer,
       })
       .from('users')
       .where('user_id', user.id)
@@ -148,8 +144,10 @@ export default class PostgresUserDataSource implements UserDataSource {
         username: email,
         password: '',
         preferredname: firstname,
-        orcid: '',
-        orcid_refreshtoken: '',
+        oidc_sub: '',
+        oauth_refresh_token: '',
+        oauth_access_token: '',
+        oauth_issuer: '',
         gender: '',
         nationality: null,
         birthdate: '2000-01-01',
@@ -275,15 +273,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
-  async getByOrcID(orcID: string): Promise<User | null> {
-    if (!orcID) {
+  async getByOIDCSub(oidcSub: string): Promise<User | null> {
+    if (!oidcSub) {
       return null;
     }
 
     return database
       .select()
       .from('users')
-      .where('orcid', orcID)
+      .where('oidc_sub', oidcSub)
       .first()
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
@@ -305,8 +303,10 @@ export default class PostgresUserDataSource implements UserDataSource {
     username: string,
     password: string,
     preferredname: string | undefined,
-    orcid: string,
-    orcid_refreshtoken: string,
+    oidc_sub: string,
+    oauth_access_token: string,
+    oauth_refresh_token: string,
+    oauth_issuer: string,
     gender: string,
     nationality: number,
     birthdate: Date,
@@ -326,8 +326,10 @@ export default class PostgresUserDataSource implements UserDataSource {
         username,
         password,
         preferredname,
-        orcid,
-        orcid_refreshtoken,
+        oidc_sub,
+        oauth_access_token,
+        oauth_refresh_token,
+        oauth_issuer,
         gender,
         nationality,
         birthdate,
@@ -401,8 +403,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       username: userId.toString(),
       password: '',
       preferredname: '',
-      orcid: '',
-      orcid_refreshtoken: '',
+      oidc_sub: '',
+      oauth_refresh_token: '',
       gender: '',
       nationality: 1,
       birthdate: '2000-01-01',
@@ -647,16 +649,16 @@ export default class PostgresUserDataSource implements UserDataSource {
     verified: boolean,
     countryId: number | null = null
   ): Promise<number> {
-    const [institutionId]: number[] = await database
+    const [institution]: InstitutionRecord[] = await database
       .insert({
         institution: name,
         verified,
         country_id: countryId,
       })
       .into('institutions')
-      .returning('institution_id');
+      .returning('*');
 
-    return institutionId;
+    return institution.institution_id;
   }
 
   async checkScientistToProposal(

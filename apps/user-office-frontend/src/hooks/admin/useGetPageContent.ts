@@ -15,15 +15,15 @@ export function useGetPageContent(pageName: PageName) {
     setLoading(true);
     api()
       .getPageContent({
-        id: pageName,
+        pageId: pageName,
       })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.getPageContent) {
-          setPageContent(data.getPageContent);
+        if (data.pageContent) {
+          setPageContent(data.pageContent);
         }
         setLoading(false);
       });

@@ -20,9 +20,10 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import ReviewerFilterComponent, {
-  defaultReviewerQueryFilter,
+  reviewFilter,
 } from 'components/review/ReviewerFilter';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeatureId,
@@ -30,6 +31,7 @@ import {
   ProposalsFilter,
   ReviewerFilter,
   SubmitTechnicalReviewInput,
+  SettingsId,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -111,24 +113,44 @@ const SEPReviewColumns = [
   { title: 'SEP', field: 'sepCode', emptyValue: '-', hidden: true },
 ];
 
+const proposalStatusFilter: Record<string, number> = {
+  ALL: 0,
+  FEASIBILITY_REVIEW: 2,
+};
+
 const ProposalTableInstrumentScientist: React.FC<{
   confirm: WithConfirmType;
 }> = ({ confirm }) => {
   const { user } = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
+  const { settingsMap } = useContext(SettingsContext);
+  const statusFilterValue =
+    settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)?.settingsValue ||
+    2;
+  let statusFilter = proposalStatusFilter[statusFilterValue];
+  if (statusFilter === undefined || statusFilter === null) {
+    statusFilter = 2;
+  }
+  const reviewFilterValue =
+    settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
+      ?.settingsValue || 'ME';
+  let reviewerFilter = reviewFilter[reviewFilterValue];
+  if (!reviewerFilter) {
+    reviewerFilter = ReviewerFilter.ME;
+  }
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,
-    proposalStatus: withDefault(NumberParam, 2),
+    proposalStatus: withDefault(NumberParam, statusFilter),
     questionId: StringParam,
     compareOperator: StringParam,
     value: StringParam,
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    reviewer: defaultReviewerQueryFilter,
+    reviewer: withDefault(StringParam, reviewerFilter),
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({

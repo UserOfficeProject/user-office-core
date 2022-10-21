@@ -1,4 +1,7 @@
-import { ConditionEvaluator } from './ConditionEvaluator';
+import {
+  ConditionEvaluator,
+  DependenciesLogicOperator,
+} from './ConditionEvaluator';
 import { Answer, QuestionaryStep } from './Questionary';
 import { getQuestionDefinition } from './questionTypes/QuestionRegistry';
 import {
@@ -81,9 +84,15 @@ export function areDependenciesSatisfied(
     return true;
   }
 
-  return field.dependencies.every((dependency) =>
-    isDependencySatisfied(questionary, dependency)
-  );
+  if (field.dependenciesOperator === DependenciesLogicOperator.OR) {
+    return field.dependencies.some((dependency) =>
+      isDependencySatisfied(questionary, dependency)
+    );
+  } else {
+    return field.dependencies.every((dependency) =>
+      isDependencySatisfied(questionary, dependency)
+    );
+  }
 }
 
 export async function isMatchingConstraints(

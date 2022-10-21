@@ -5,7 +5,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateGroupId } from '../models/Template';
-import { User } from '../models/User';
+import { UserJWT } from '../models/User';
 import { FeedbackQuestionaryAuthorizer } from './questionary/FeedbackQuestionaryAuthorizer';
 import { GenericTemplateQuestionaryAuthorizer } from './questionary/GenericTemplateQuestionaryAuthorizer';
 import { ProposalEsiQuestionaryAuthorizer } from './questionary/ProposalEsiQuestionaryAuthorizer';
@@ -16,8 +16,11 @@ import { ShipmentDeclarationQuestionaryAuthorizer } from './questionary/Shipment
 import { VisitQuestionaryAuthorizer } from './questionary/VisitQuestionaryAuthorizer';
 
 export interface QuestionaryAuthorizer {
-  hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;
-  hasWriteRights(agent: User | null, questionaryId: number): Promise<boolean>;
+  hasReadRights(agent: UserJWT | null, questionaryId: number): Promise<boolean>;
+  hasWriteRights(
+    agent: UserJWT | null,
+    questionaryId: number
+  ): Promise<boolean>;
 }
 
 @injectable()
@@ -87,7 +90,7 @@ export class QuestionaryAuthorization {
     return this.authorizers.get(categoryId);
   }
 
-  async hasReadRights(agent: User | null, questionaryId: number) {
+  async hasReadRights(agent: UserJWT | null, questionaryId: number) {
     return (
       (await this.getAuthorizer(questionaryId))?.hasReadRights(
         agent,
@@ -96,7 +99,7 @@ export class QuestionaryAuthorization {
     );
   }
 
-  async hasWriteRights(agent: User | null, questionaryId: number) {
+  async hasWriteRights(agent: UserJWT | null, questionaryId: number) {
     return (
       (await this.getAuthorizer(questionaryId))?.hasWriteRights(
         agent,

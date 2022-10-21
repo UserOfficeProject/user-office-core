@@ -2,8 +2,10 @@ import { faker } from '@faker-js/faker';
 import {
   ReviewerFilter,
   TechnicalReviewStatus,
+  FeatureId,
 } from '@user-office-software-libs/shared-types';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 const selectAllProposalsFilterStatus = () => {
@@ -40,12 +42,13 @@ context('Instrument tests', () => {
   };
 
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
   // TODO: Maybe this should be moved to permission testing.
   it('User should not be able to see Instruments page', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -64,7 +67,10 @@ context('Instrument tests', () => {
       });
     });
 
-    it('User officer should be able to create instrument', () => {
+    it('User officer should be able to create instrument', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        this.skip();
+      }
       cy.contains('Instruments').click();
       cy.contains('Create').click();
       cy.get('#name').type(instrument1.name);
@@ -278,7 +284,10 @@ context('Instrument tests', () => {
       });
     });
 
-    it('User Officer should be able to see who submitted the technical review', () => {
+    it('User Officer should be able to see who submitted the technical review', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
@@ -323,7 +332,10 @@ context('Instrument tests', () => {
       );
     });
 
-    it('User Officer should be able to re-open submitted technical review', () => {
+    it('User Officer should be able to re-open submitted technical review', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
@@ -408,7 +420,10 @@ context('Instrument tests', () => {
       );
     });
 
-    it('User Officer should be able to see proposal instrument scientist and re-assign technical reviewer', () => {
+    it('User Officer should be able to see proposal instrument scientist and re-assign technical reviewer', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
       const numberOfScientistsAndManagerAssignedToCreatedInstrument = 2;
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
@@ -521,7 +536,10 @@ context('Instrument tests', () => {
     let createdProposalPk: number;
     let createdProposalId: string;
 
-    beforeEach(() => {
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        this.skip();
+      }
       cy.updateUserRoles({
         id: scientist2.id,
         roles: [initialDBData.roles.instrumentScientist],
@@ -823,6 +841,39 @@ context('Instrument tests', () => {
       selectAllProposalsFilterStatus();
 
       cy.contains('20');
+    });
+
+    it('Instrument scientists should be able to see but not modify the management decision', () => {
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .click();
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Admin').click();
+
+      cy.get('@dialog')
+        .find('[data-cy="proposal-final-status"] input')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="managementTimeAllocation"] input')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="commentForUser"] textarea')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="commentForManagement"] textarea')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="is-management-decision-submitted"] input')
+        .should('be.disabled');
+      cy.get('@dialog')
+        .find('[data-cy="save-admin-decision"]')
+        .should('be.disabled');
     });
 
     it('Technical review assignee should see edit icon if assigned to review a proposal and review is not submitted', () => {

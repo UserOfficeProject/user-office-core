@@ -36,8 +36,8 @@ jobs:
           }
 
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+            https://registry.hub.docker.com/v2/repositories/dmsc/duo-factory/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
           FACTORY_TAG=develop
@@ -74,18 +74,20 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}
 
       - name: Install root dependencies
         if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
-        run: npm install
+        # We use --ignore-scripts flag to ignore the postinstall script which is actually installing dependencies in all other apps.
+        # Caution! The option --ignore-scripts disables ALL scripts - even from the dependencies. If the dependencies need to run scripts to e.g. install some binaries they may break / be incomplete. For now this works and if we experience some issues we can try to find better solution.
+        run: npm install --ignore-scripts
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Install backend dependencies
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
@@ -96,11 +98,24 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
 
       - name: Install frontend dependencies
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
         run: npm run install:frontend
+        
+      - name: Cache frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+
+      - name: Generate frontend SDK
+        if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
+        run: |
+          cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+          npm run generate:sdk
 
   build:
     # The type of runner that the job will run on
@@ -121,21 +136,29 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+
 
       - run: npm run build
         env:
@@ -161,13 +184,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Run backend unit tests
         env:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
           secret: dummysecret
           NODE_ENV: development
@@ -187,12 +211,16 @@ jobs:
       matrix:
         pattern:
           [
-            'cypress/integration/[a-e]*.ts',
-            'cypress/integration/[f-i]*.ts',
-            'cypress/integration/[j-p]*.ts',
-            'cypress/integration/[r-s]*.ts',
-            'cypress/integration/[t-z]*.ts',
-            'cypress/integration/[A-Z]*.ts',
+            "cypress/integration/[a-e]*.ts",
+            "cypress/integration/[f-h]*.ts",
+            "cypress/integration/[i-o]*.ts",
+            "cypress/integration/p[a-m]*.ts",
+            "cypress/integration/p[n-z]*.ts",
+            "cypress/integration/[r-s]*.ts",
+            "cypress/integration/templates_basic.ts",
+            "cypress/integration/templates_advanced.ts",
+            "cypress/integration/[u-z]*.ts",
+            "cypress/integration/[A-Z]*.ts",
           ]
 
     steps:
@@ -208,21 +236,29 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
@@ -248,6 +284,50 @@ jobs:
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
 
+      - name: Run e2e tests stfc
+        env:
+          USER_OFFICE_BACKEND_DIR: apps/user-office-backend
+          USER_OFFICE_FRONTEND_DIR: apps/user-office-frontend
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/user-office-frontend-e2e
+          USER_OFFICE_BACKEND: http://localhost:4000/graphql
+          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
+          TZ: Europe/London
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
+          DEPENDENCY_CONFIG: stfc
+          secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          NODE_ENV: development
+          baseURL: localhost:3000
+          tokenLife: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          SCHEMA_URL: http://localhost:4000/graphql
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+          CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
+          BUILD_TAG: ${{ github.sha }}
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+          EXTERNAL_AUTH_TOKEN: abc
+          SINK_EMAIL: BISAPPSSINK@stfc.ac.uk
+          EMAIL_SENDER: '"STFC User Office" <users@stfc.ac.uk>'
+          EMAIL_AUTH_HOST: exchsmtp.stfc.ac.uk
+          EMAIL_TEMPLATE_PATH: /config/emails/
+          EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
+          EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
+          EXTERNAL_AUTH_LOGOUT_URL: http://localhost:9003/auth/Login.aspx
+          EXTERNAL_AUTH_SERVICE_URL: http://localhost:1080/ws/UserOfficeWebService?wsdl
+          ANTIVIRUS_HOST: clam-antivirus
+          ANTIVIRUS_PORT: 3310
+          ISIS_UO_EMAIL: isisuo@stfc.ac.uk
+          FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
+          PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run e2e:after:dev:stfc
+
       - name: Run e2e tests
         env:
           USER_OFFICE_BACKEND_DIR: apps/user-office-backend
@@ -258,6 +338,7 @@ jobs:
           TZ: Europe/Stockholm
           DATE_FORMAT: dd-MM-yyyy
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
           secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
@@ -278,6 +359,7 @@ jobs:
           EAM_AUTH_PASS: dummyAuthPass
           EAM_API_URL: https://ios.esss.lu.se:7443
           EAM_PART_CODE: 12413
+          EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION: "true"
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
@@ -303,6 +385,18 @@ jobs:
       - name: Branch
         run: echo "Branch ${{ github.head_ref }}"
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -311,20 +405,32 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
-        env:
-          BUILD_VERSION: ${{ github.sha }}
-        run: |
-          cd ./apps/user-office-backend
-          docker build -t user-office-backend:${{ github.sha }} .
-          docker tag user-office-backend:${{ github.sha }} ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
-          docker push ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
-
+        uses: docker/build-push-action@v3
+        with:
+          context: ./apps/user-office-backend
+          file: ./apps/user-office-backend/Dockerfile
+          push: true
+          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
+          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
+          tags: |
+            dmsc/duo-backend:${{ github.head_ref }}
+            ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
+            
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          
       - name: Build and push frontend
-        env:
-          BUILD_VERSION: ${{ github.sha }}
-          ORCID_REDIRECT: ${{ secrets.REACT_APP_ORCID_REDIRECT }}
-        run: |
-          cd ./apps/user-office-frontend
-          docker build -t user-office-frontend:${{ github.sha }} .
-          docker tag user-office-frontend:${{ github.sha }} ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}
-          docker push ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}
+        uses: docker/build-push-action@v3
+        with:
+          context: ./apps/user-office-frontend
+          file: ./apps/user-office-frontend/Dockerfile
+          push: true
+          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
+          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
+          tags: |
+            dmsc/duo-frontend:${{ github.head_ref }}
+            ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}

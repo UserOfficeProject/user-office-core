@@ -1,3 +1,5 @@
+import { PdfTemplateRecord } from 'knex/types/tables';
+
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -10,6 +12,8 @@ import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
+import { PdfTemplate } from '../../models/PdfTemplate';
+import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
@@ -47,6 +51,21 @@ import {
 } from '../../resolvers/types/ProposalBooking';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
+
+// Adds types to datasources: https://knexjs.org/guide/#typescript
+declare module 'knex/types/tables' {
+  export interface PdfTemplateRecord {
+    readonly pdf_template_id: number;
+    readonly template_id: number;
+    readonly template_data: string;
+    readonly creator_id: number;
+    readonly created_at: Date;
+  }
+
+  interface Tables {
+    pdf_templates: PdfTemplateRecord;
+  }
+}
 
 // Interfaces corresponding exactly to database tables
 
@@ -202,7 +221,10 @@ export interface UserRecord {
   readonly lastname: string;
   readonly username: string;
   readonly preferredname: string;
-  readonly orcid: string;
+  readonly oidc_sub: string | null;
+  readonly oauth_refresh_token: string | null;
+  readonly oauth_access_token: string | null;
+  readonly oauth_issuer: string | null;
   readonly gender: string;
   readonly nationality: number;
   readonly birthdate: Date;
@@ -220,7 +242,6 @@ export interface UserRecord {
   readonly full_count: number;
   readonly institution: string;
   readonly placeholder: boolean;
-  readonly orcid_refreshtoken: string;
 }
 
 export interface VisitRegistrationRecord {
@@ -267,6 +288,7 @@ export interface CallRecord {
   readonly call_short_code: string;
   readonly start_call: Date;
   readonly end_call: Date;
+  readonly end_call_internal: Date;
   readonly start_review: Date;
   readonly end_review: Date;
   readonly start_sep_review: Date;
@@ -282,6 +304,7 @@ export interface CallRecord {
   readonly proposal_sequence: number;
   readonly proposal_workflow_id: number;
   readonly call_ended: boolean;
+  readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
   readonly call_sep_review_ended: boolean;
   readonly template_id: number;
@@ -289,6 +312,7 @@ export interface CallRecord {
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly title: string;
   readonly description: string;
+  readonly pdf_template_id: number;
   readonly is_active: boolean;
 }
 
@@ -316,6 +340,15 @@ export interface UnitRecord {
   readonly symbol: string;
   readonly si_conversion_formula: string;
 }
+
+export interface PredefinedMessageRecord {
+  readonly predefined_message_id: number;
+  readonly title: string;
+  readonly message: string;
+  readonly date_modified: Date;
+  readonly last_modified_by: number;
+}
+
 export interface CountryRecord {
   readonly country_id: number;
   readonly country: string;
@@ -493,6 +526,7 @@ export interface ProposalEventsRecord {
   readonly proposal_feasible: boolean;
   readonly proposal_unfeasible: boolean;
   readonly call_ended: boolean;
+  readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
   readonly proposal_sep_selected: boolean;
   readonly proposal_instrument_selected: boolean;
@@ -512,6 +546,12 @@ export interface ProposalEventsRecord {
   readonly proposal_reserved: boolean;
   readonly proposal_rejected: boolean;
   readonly proposal_notified: boolean;
+  readonly proposal_booking_time_activated: boolean;
+  readonly proposal_booking_time_updated: boolean;
+  readonly proposal_booking_time_slot_added: boolean;
+  readonly proposal_booking_time_slots_removed: boolean;
+  readonly proposal_booking_time_completed: boolean;
+  readonly proposal_booking_time_reopened: boolean;
 }
 
 export interface FeatureRecord {
@@ -772,8 +812,10 @@ export const createUserObject = (user: UserRecord) => {
     user.lastname,
     user.username,
     user.preferredname,
-    user.orcid,
-    user.orcid_refreshtoken,
+    user.oidc_sub,
+    user.oauth_refresh_token,
+    user.oauth_access_token,
+    user.oauth_issuer,
     user.gender,
     user.nationality,
     user.birthdate,
@@ -825,6 +867,7 @@ export const createCallObject = (call: CallRecord) => {
     call.call_short_code,
     call.start_call,
     call.end_call,
+    call.end_call_internal,
     call.start_review,
     call.end_review,
     call.start_sep_review,
@@ -840,6 +883,7 @@ export const createCallObject = (call: CallRecord) => {
     call.proposal_sequence,
     call.proposal_workflow_id,
     call.call_ended,
+    call.call_ended_internal,
     call.call_review_ended,
     call.call_sep_review_ended,
     call.template_id,
@@ -847,6 +891,7 @@ export const createCallObject = (call: CallRecord) => {
     call.allocation_time_unit,
     call.title,
     call.description,
+    call.pdf_template_id,
     call.is_active
   );
 };
@@ -1087,5 +1132,26 @@ export const createUnitObject = (unit: UnitRecord) =>
     unit.si_conversion_formula
   );
 
+export const createPredefinedMessageObject = (
+  predefinedMessage: PredefinedMessageRecord
+) =>
+  new PredefinedMessage(
+    predefinedMessage.predefined_message_id,
+    predefinedMessage.title,
+    predefinedMessage.message,
+    predefinedMessage.date_modified,
+    predefinedMessage.last_modified_by
+  );
+
 export const createQuantityObject = (quantity: QuantityRecord) =>
   new Quantity(quantity.quantity_id);
+
+export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
+  return new PdfTemplate(
+    pdfTemplate.pdf_template_id,
+    pdfTemplate.template_id,
+    pdfTemplate.template_data,
+    pdfTemplate.creator_id,
+    pdfTemplate.created_at
+  );
+};

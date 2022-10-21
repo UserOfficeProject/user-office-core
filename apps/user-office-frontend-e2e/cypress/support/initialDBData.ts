@@ -26,8 +26,14 @@ export default {
     const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT) || 'dd-MM-yyyy';
     const dateTimeFormat =
       settingsMap.get(SettingsId.DATE_TIME_FORMAT) || 'dd-MM-yyyy HH:mm';
+    const statusFilter = settingsMap.get(
+      SettingsId.DEFAULT_INST_SCI_STATUS_FILTER
+    );
+    const reviewerFilter = settingsMap.get(
+      SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER
+    );
 
-    return { dateFormat, dateTimeFormat };
+    return { dateFormat, dateTimeFormat, statusFilter, reviewerFilter };
   },
   call: {
     id: 1,
@@ -200,17 +206,19 @@ export default {
       email: 'nils@ess.se',
       password: 'Test1234!',
     },
-    userOfficer: {
+    officer: {
       id: 2,
       firstName: 'Anders',
       lastName: 'Andersson',
       email: 'Aaron_Harris49@gmail.com',
+      password: 'Test1234!',
     },
-    placeholder: {
+    placeholderUser: {
       id: 5,
       firstName: 'Unverified email',
       lastName: 'Placeholder',
       email: 'unverified-user@example.com',
+      password: '',
     },
   },
   proposalStatuses: {
@@ -232,6 +240,9 @@ export default {
     },
     editableSubmitted: {
       id: 14,
+    },
+    editableSubmittedInternal: {
+      id: 15,
     },
   },
   scheduledEvents: {

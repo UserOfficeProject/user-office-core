@@ -1,16 +1,18 @@
 import { faker } from '@faker-js/faker';
 import {
-  AllocationTimeUnits,
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
+  FeatureId,
 } from '@user-office-software-libs/shared-types';
-import { DateTime } from 'luxon';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 context('Samples tests', () => {
   const existingUser = initialDBData.users.user1;
+  const booleanQuestion = faker.lorem.words(3);
   const proposalTemplateName = faker.lorem.words(2);
   const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
@@ -24,25 +26,6 @@ context('Samples tests', () => {
     description: faker.random.words(5),
   };
 
-  const currentDayStart = DateTime.now().startOf('day');
-
-  const updatedCall = {
-    id: initialDBData.call.id,
-    shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 10),
-    endCall: faker.date.future().toISOString().slice(0, 10),
-    startReview: currentDayStart,
-    endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
-    startNotify: currentDayStart,
-    endNotify: currentDayStart,
-    startCycle: currentDayStart,
-    endCycle: currentDayStart,
-    allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
-  };
   let createdWorkflowId: number;
   let createdSampleTemplateId: number;
   let createdSampleQuestionId: string;
@@ -119,10 +102,32 @@ context('Samples tests', () => {
                     });
                   }
                 });
+
+                cy.createQuestion({
+                  categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+                  dataType: DataType.BOOLEAN,
+                }).then((questionResult) => {
+                  const createdQuestion =
+                    questionResult.createQuestion.question;
+                  if (createdQuestion) {
+                    cy.updateQuestion({
+                      id: createdQuestion.id,
+                      question: booleanQuestion,
+                    });
+
+                    cy.createQuestionTemplateRelation({
+                      questionId: createdQuestion.id,
+                      templateId: templateId,
+                      sortOrder: 0,
+                      topicId: topicId,
+                    });
+                  }
+                });
               }
             });
 
             cy.updateCall({
+              id: initialDBData.call.id,
               ...updatedCall,
               proposalWorkflowId: createdWorkflowId,
               templateId: templateId,
@@ -133,16 +138,17 @@ context('Samples tests', () => {
     });
   };
 
-  beforeEach(() => {
-    cy.resetDB(true);
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow.proposalWorkflow) {
-        createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
-      }
-    });
-  });
-
   describe('Samples basic tests', () => {
+    beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB(true);
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+    });
+
     it('Should be able to create proposal template with sample', () => {
       cy.login('officer');
       cy.visit('/');
@@ -222,7 +228,7 @@ context('Samples tests', () => {
     });
     it('Should be able to create proposal with sample', () => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
@@ -290,6 +296,101 @@ context('Samples tests', () => {
 
       cy.contains('OK').click();
     });
+
+    it('Should be able to modify sample declaration question and all other questions without loosing information', () => {
+      createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('new proposal', { matchCase: false }).click();
+      cy.get('[data-cy=title] input').type(proposalTitle);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=add-button]').click();
+
+      cy.get('[data-cy=title-input] input').clear();
+
+      cy.get(
+        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.contains('This is a required field');
+
+      cy.get('[data-cy=title-input] input')
+        .clear()
+        .type(sampleTitle)
+        .should('have.value', sampleTitle);
+
+      cy.get(
+        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get(
+        '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains(booleanQuestion)
+        .parent()
+        .find('input')
+        .should('have.value', 'false')
+        .click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="clone"]').click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        2
+      );
+
+      cy.contains(booleanQuestion)
+        .parent()
+        .find('input')
+        .should('have.value', 'true')
+        .click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
+
+      cy.get('[data-cy="delete"]').eq(1).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains(booleanQuestion)
+        .parent()
+        .find('input')
+        .should('have.value', 'false')
+        .click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy=add-button]').should('not.be.disabled');
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+    });
   });
 
   describe('Samples advanced tests', () => {
@@ -297,6 +398,14 @@ context('Samples tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB(true);
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
@@ -388,7 +497,7 @@ context('Samples tests', () => {
     });
 
     it('User should not be able to submit proposal with unfinished sample', () => {
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -438,7 +547,10 @@ context('Samples tests', () => {
       cy.contains('OK').click();
     });
 
-    it('Officer should be able to evaluate sample', () => {
+    it('Officer should be able to evaluate sample', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+        this.skip();
+      }
       cy.createSample({
         proposalPk: createdProposalPk,
         templateId: createdSampleTemplateId,
@@ -501,7 +613,10 @@ context('Samples tests', () => {
       cy.contains('HIGH_RISK'); // test if status has changed
     });
 
-    it('Download samples is working with dialog window showing up', () => {
+    it('Download samples is working with dialog window showing up', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+        this.skip();
+      }
       cy.createSample({
         proposalPk: createdProposalPk,
         templateId: createdSampleTemplateId,
@@ -526,7 +641,10 @@ context('Samples tests', () => {
       );
     });
 
-    it('Should be able to download sample pdf', () => {
+    it('Should be able to download sample pdf', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+        this.skip();
+      }
       cy.createSample({
         proposalPk: createdProposalPk,
         templateId: createdSampleTemplateId,

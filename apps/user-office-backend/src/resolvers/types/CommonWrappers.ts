@@ -13,7 +13,9 @@ import { FeedbackRequest } from './FeedbackRequest';
 import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
+import { PdfTemplate } from './PdfTemplate';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
+import { PredefinedMessage } from './PredefinedMessage';
 import { Proposal } from './Proposal';
 import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
@@ -62,6 +64,13 @@ export class UserResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => User, { nullable: true })
   public user: User;
+}
+
+@ObjectType()
+export class PredefinedMessageResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => PredefinedMessage, { nullable: true })
+  public predefinedMessage: PredefinedMessage;
 }
 
 @ObjectType()
@@ -239,13 +248,6 @@ export class ExternalTokenLoginWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class LogoutTokenWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => String, { nullable: true })
-  public token: string;
-}
-
-@ObjectType()
 export class PrepareDBResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => String, { nullable: true })
@@ -411,4 +413,11 @@ export class UnitsImportWithValidationWrap extends ResponseWrapBase {
   @Response()
   @Field(() => UnitsImportWithValidation, { nullable: true })
   public validationResult: UnitsImportWithValidation;
+}
+
+@ObjectType()
+export class PdfTemplateResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => PdfTemplate, { nullable: true })
+  public pdfTemplate: PdfTemplate;
 }

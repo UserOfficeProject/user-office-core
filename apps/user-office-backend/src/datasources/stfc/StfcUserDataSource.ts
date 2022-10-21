@@ -80,6 +80,8 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     '',
     '',
     '',
+    '',
+    '',
     1,
     new Date('2000-01-01'),
     1,
@@ -158,7 +160,7 @@ export class StfcUserDataSource implements UserDataSource {
         ?.return;
 
       if (usersFromUows) {
-        this.ensureDummyUsersExist(
+        await this.ensureDummyUsersExist(
           usersFromUows.map((stfcUser) => parseInt(stfcUser.userNumber))
         );
         usersFromUows.map((user) => cache.put(user.userNumber, user));
@@ -191,7 +193,7 @@ export class StfcUserDataSource implements UserDataSource {
       return null;
     }
 
-    this.ensureDummyUserExists(parseInt(stfcUser.userNumber));
+    await this.ensureDummyUserExists(parseInt(stfcUser.userNumber));
     cache.put(email, stfcUser);
 
     return stfcUser;
@@ -205,7 +207,7 @@ export class StfcUserDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
 
-  getByOrcID(orcID: string): Promise<User | null> {
+  getByOIDCSub(oidcSub: string): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
 
@@ -241,10 +243,6 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getStfcBasicPersonByEmail(email, true).then((stfcUser) =>
       stfcUser ? toEssBasicUserDetails(stfcUser) : null
     );
-  }
-
-  async checkOrcIDExist(orcID: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
   }
 
   async checkEmailExist(email: string): Promise<boolean> {
@@ -288,7 +286,9 @@ export class StfcUserDataSource implements UserDataSource {
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     throw new Error('Method not implemented.');
   }
-
+  async getRolesForUser(id: number): Promise<stfcRole[]> {
+    return (await client.getRolesForUser(token, id))?.return;
+  }
   async getUserRoles(id: number): Promise<Role[]> {
     const cachedRoles = this.uowsRolesCache.get(String(id));
     if (cachedRoles) {
@@ -498,8 +498,10 @@ export class StfcUserDataSource implements UserDataSource {
     username: string,
     password: string,
     preferredname: string | undefined,
-    orcid: string,
-    orcid_refreshtoken: string,
+    oidc_sub: string,
+    oauth_access_token: string,
+    oauth_refresh_token: string,
+    oauth_issuer: string,
     gender: string,
     nationality: number,
     birthdate: Date,

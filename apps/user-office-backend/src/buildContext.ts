@@ -7,6 +7,8 @@ import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
+import PdfTemplateMutations from './mutations/PdfTemplateMutations';
+import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ProposalSettingsMutations from './mutations/ProposalSettingsMutations';
@@ -27,6 +29,8 @@ import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
 import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
+import PdfTemplateQueries from './queries/PdfTemplateQueries';
+import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import ProposalSettingsQueries from './queries/ProposalSettingsQueries';
@@ -52,6 +56,7 @@ const context: BasicResolverContext = {
     file: container.resolve(FileQueries),
     genericTemplate: container.resolve(GenericTemplateQueries),
     instrument: container.resolve(InstrumentQueries),
+    pdfTemplate: container.resolve(PdfTemplateQueries),
     proposal: container.resolve(ProposalQueries),
     proposalEsi: container.resolve(ProposalEsiQueries),
     proposalSettings: container.resolve(ProposalSettingsQueries),
@@ -67,6 +72,7 @@ const context: BasicResolverContext = {
     unit: container.resolve(UnitQueries),
     user: container.resolve(UserQueries),
     visit: container.resolve(VisitQueries),
+    predefinedMessage: container.resolve(PredefinedMessageQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -75,6 +81,7 @@ const context: BasicResolverContext = {
     file: container.resolve(FileMutations),
     genericTemplate: container.resolve(GenericTemplateMutations),
     instrument: container.resolve(InstrumentMutations),
+    pdfTemplate: container.resolve(PdfTemplateMutations),
     proposal: container.resolve(ProposalMutations),
     proposalEsi: container.resolve(ProposalEsiMutations),
     proposalSettings: container.resolve(ProposalSettingsMutations),
@@ -88,6 +95,7 @@ const context: BasicResolverContext = {
     unit: container.resolve(UnitMutations),
     user: container.resolve(UserMutations),
     visit: container.resolve(VisitMutations),
+    predefinedMessage: container.resolve(PredefinedMessageMutations),
   },
 };
 

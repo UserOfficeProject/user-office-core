@@ -15,6 +15,7 @@ import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { ProposalWorkflow } from './ProposalWorkflow';
+import { SEP } from './SEP';
 import { Template } from './Template';
 
 @ObjectType()
@@ -31,6 +32,9 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Date)
   public endCall: Date;
+
+  @Field(() => Date, { nullable: true })
+  public endCallInternal: Date;
 
   @Field(() => Date)
   public startReview: Date;
@@ -83,6 +87,9 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Int, { nullable: true })
   public esiTemplateId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public pdfTemplateId?: number;
+
   @Field({ nullable: true })
   public title: string;
 
@@ -102,6 +109,11 @@ export class CallInstrumentsResolver {
     ]);
   }
 
+  @FieldResolver(() => [SEP], { nullable: true })
+  async seps(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.sep.dataSource.getSepsByCallId(call.id);
+  }
+
   @FieldResolver(() => ProposalWorkflow, { nullable: true })
   async proposalWorkflow(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.proposalSettings.dataSource.getProposalWorkflow(
@@ -119,6 +131,15 @@ export class CallInstrumentsResolver {
   @FieldResolver(() => Int)
   async proposalCount(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.proposal.dataSource.getCount(call.id);
+  }
+
+  @FieldResolver(() => Boolean)
+  isActiveInternal(@Root() call: Call): boolean {
+    const now = new Date();
+    const startCall = new Date(call.startCall);
+    const endCallInternal = new Date(call.endCallInternal);
+
+    return startCall <= now && endCallInternal >= now;
   }
 }
 

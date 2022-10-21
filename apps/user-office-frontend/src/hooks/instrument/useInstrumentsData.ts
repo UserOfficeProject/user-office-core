@@ -57,7 +57,7 @@ export function useInstrumentsData(callIds?: number[]): {
         });
     } else {
       api()
-        .getUserInstruments()
+        .getMyInstruments()
         .then((data) => {
           if (unmounted) {
             return;

@@ -13,6 +13,7 @@ import {
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
+  Scalars,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
@@ -41,6 +42,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     TemplateGroupId.PROPOSAL_ESI,
     call?.esiTemplateId
   );
+
+  const { templates: pdfTemplates } = useActiveTemplates(
+    TemplateGroupId.PDF_TEMPLATE,
+    call?.pdfTemplateId
+  );
+
   const { proposalWorkflows, loadingProposalWorkflows } =
     useProposalWorkflowsData();
 
@@ -50,6 +57,18 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const currentDayEnd = DateTime.now()
     .setZone(timezone || undefined)
     .endOf('day');
+
+  const setInternalCallEnd = (
+    callEndDate: Scalars['DateTime'],
+    callEndInternalDate: Scalars['DateTime']
+  ) => {
+    const endCallDate = new Date(callEndDate);
+    const endCallInternalData = new Date(callEndInternalDate);
+
+    return endCallDate > endCallInternalData
+      ? callEndDate
+      : callEndInternalDate;
+  };
 
   const getDateTimeFromISO = (value: string) =>
     DateTime.fromISO(value, {
@@ -67,6 +86,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         description: call.description || '',
         templateId: call.templateId,
         esiTemplateId: call.esiTemplateId,
+        pdfTemplateId: call.pdfTemplateId,
         proposalWorkflowId: call.proposalWorkflowId,
         referenceNumberFormat: call.referenceNumberFormat || '',
         startCall: getDateTimeFromISO(call.startCall),
@@ -80,6 +100,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         startCycle: getDateTimeFromISO(call.startCycle),
         endCycle: getDateTimeFromISO(call.endCycle),
         submissionMessage: call.submissionMessage || '',
+        seps: call.seps?.map((sep) => sep.id),
       }
     : {
         shortCode: '',
@@ -99,10 +120,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         proposalWorkflowId: null,
         templateId: null,
         esiTemplateId: null,
+        pdfTemplateId: null,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
         submissionMessage: '',
+        seps: [],
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {
@@ -120,6 +143,10 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         initialValues={initialValues}
         onSubmit={async (values) => {
           if (call) {
+            values.endCallInternal = setInternalCallEnd(
+              values.endCall,
+              values.endCallInternal
+            );
             const data = await api({
               toastSuccessMessage: 'Call updated successfully!',
             }).updateCall(values as UpdateCallInput);
@@ -151,6 +178,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           <CallGeneralInfo
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
+            pdfTemplates={pdfTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}

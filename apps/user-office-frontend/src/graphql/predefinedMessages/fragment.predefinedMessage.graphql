@@ -1,0 +1,10 @@
+fragment predefinedMessage on PredefinedMessage {
+  id
+  title
+  message
+  lastModifiedBy
+  dateModified
+  modifiedBy {
+    ...basicUserDetails
+  }
+}

@@ -1,13 +1,12 @@
 import { faker } from '@faker-js/faker';
 import {
-  AllocationTimeUnits,
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
-import { DateTime } from 'luxon';
 
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 function twoFakes(numberWords: number) {
   return [faker.lorem.words(numberWords), faker.lorem.words(numberWords)];
@@ -28,35 +27,10 @@ context('GenericTemplates tests', () => {
     description: faker.random.words(5),
   };
 
-  const currentDayStart = DateTime.now().startOf('day');
-
-  const updatedCall = {
-    id: initialDBData.call.id,
-    shortCode: faker.random.alphaNumeric(15),
-    startCall: DateTime.fromJSDate(faker.date.past()),
-    endCall: DateTime.fromJSDate(faker.date.future()),
-    startReview: currentDayStart,
-    endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
-    startNotify: currentDayStart,
-    endNotify: currentDayStart,
-    startCycle: currentDayStart,
-    endCycle: currentDayStart,
-    templateName: initialDBData.template.name,
-    allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
-  };
-
   let createdTemplateId: number;
   let createdGenericTemplateId: number;
   let workflowId: number;
   let createdQuestion1Id: string;
-
-  beforeEach(() => {
-    cy.resetDB();
-  });
 
   const createTemplateAndAllQuestions = () => {
     cy.createTemplate({
@@ -178,6 +152,10 @@ context('GenericTemplates tests', () => {
   };
 
   describe('Generic templates basic tests', () => {
+    beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB();
+    });
     it('Should be able to create proposal template with genericTemplate', () => {
       cy.createTemplate({
         name: proposalTemplateName,
@@ -294,6 +272,8 @@ context('GenericTemplates tests', () => {
 
   describe('Generic templates advanced tests', () => {
     beforeEach(() => {
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB();
       createTemplateAndAllQuestions();
 
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
@@ -307,11 +287,12 @@ context('GenericTemplates tests', () => {
 
     it('Should have different Question lables for different tables', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -336,11 +317,12 @@ context('GenericTemplates tests', () => {
 
     it('Should be able to create proposal with genericTemplate', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user');
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -357,7 +339,7 @@ context('GenericTemplates tests', () => {
 
       cy.contains(genericTemplateQuestions[0]);
 
-      cy.get('[data-cy=title-input] input').clear();
+      cy.get('[data-cy=title-input] textarea').first().clear();
 
       cy.get(
         '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
@@ -365,10 +347,14 @@ context('GenericTemplates tests', () => {
 
       cy.contains('This is a required field');
 
-      cy.get('[data-cy=title-input] input')
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
         .clear()
-        .type(genericTemplateTitle)
-        .should('have.value', genericTemplateTitle);
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
 
       cy.get(
         '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
@@ -407,11 +393,12 @@ context('GenericTemplates tests', () => {
 
     it('Should be able to clone proposal with GenericTemplates', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: updatedCall.id }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,
@@ -471,12 +458,13 @@ context('GenericTemplates tests', () => {
 
     it('User should not be able to submit proposal with unfinished genericTemplate', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: updatedCall.id });
-      cy.login('user');
+      cy.createProposal({ callId: initialDBData.call.id });
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -491,7 +479,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains(addButtonLabel[0]).click();
 
-      cy.get('[data-cy=title-input] input')
+      cy.get('[data-cy=title-input] textarea')
+        .first()
         .clear()
         .type(genericTemplateTitle)
         .should('have.value', genericTemplateTitle)
@@ -532,11 +521,12 @@ context('GenericTemplates tests', () => {
 
     it('Officer should able to delete proposal with genericTemplate', () => {
       cy.updateCall({
+        id: initialDBData.call.id,
         ...updatedCall,
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: updatedCall.id }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,

@@ -29,6 +29,7 @@ export enum Event {
   PROPOSAL_STATUS_UPDATED = 'PROPOSAL_STATUS_UPDATED',
   CALL_CREATED = 'CALL_CREATED',
   CALL_ENDED = 'CALL_ENDED',
+  CALL_ENDED_INTERNAL = 'CALL_ENDED_INTERNAL',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
   USER_CREATED = 'USER_CREATED',
@@ -57,6 +58,9 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
   PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
+  PREDEFINED_MESSAGE_CREATED = 'PREDEFINED_MESSAGE_CREATED',
+  PREDEFINED_MESSAGE_UPDATED = 'PREDEFINED_MESSAGE_UPDATED',
+  PREDEFINED_MESSAGE_DELETED = 'PREDEFINED_MESSAGE_DELETED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -154,6 +158,10 @@ export const EventLabel = new Map<Event, string>([
     Event.CALL_ENDED,
     'Event occurs on a specific call end date set on the call',
   ],
+  [
+    Event.CALL_ENDED_INTERNAL,
+    'Event occurs on a specific call internal end date set on the call',
+  ],
   [Event.CALL_CREATED, 'Event occurs on a when a call is created'],
   [
     Event.CALL_REVIEW_ENDED,
@@ -234,4 +242,16 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when the time slot booking is re-opened in the scheduler',
   ],
   [Event.INSTRUMENT_DELETED, 'Event occurs when the instrument is removed'],
+  [
+    Event.PREDEFINED_MESSAGE_CREATED,
+    'Event occurs when predefined message is created',
+  ],
+  [
+    Event.PREDEFINED_MESSAGE_UPDATED,
+    'Event occurs when predefined message is updated',
+  ],
+  [
+    Event.PREDEFINED_MESSAGE_DELETED,
+    'Event occurs when predefined message is removed',
+  ],
 ]);

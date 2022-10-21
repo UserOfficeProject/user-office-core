@@ -1,28 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jwtDecode from 'jwt-decode';
 import PropTypes from 'prop-types';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Role, UserRole, User } from 'generated/sdk';
+import { Role, UserRole, SettingsId, UserJwt } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import clearSession from 'utils/clearSession';
 
-export type BasicUser = Pick<User, 'id' | 'email'>;
+import { SettingsContext } from './SettingsContextProvider';
 
 interface UserContextData {
-  user: BasicUser;
+  user: UserJwt;
   token: string;
   roles: Role[];
   currentRole: UserRole | null;
   impersonatingUserId: number | undefined;
+  isInternalUser: boolean;
   handleLogin: React.Dispatch<string | null | undefined>;
   handleNewToken: React.Dispatch<string | null | undefined>;
-  handleLogout: () => void;
+  handleLogout: () => Promise<void>;
   handleRole: React.Dispatch<string | null | undefined>;
 }
 
 interface DecodedTokenData
-  extends Pick<UserContextData, 'user' | 'token' | 'roles'> {
+  extends Pick<
+    UserContextData,
+    'user' | 'token' | 'isInternalUser' | 'roles' | 'impersonatingUserId'
+  > {
   exp: number;
   currentRole: Role;
   impersonatingUserId: number | undefined;
@@ -37,14 +42,28 @@ enum ActionType {
 }
 
 const initUserData: UserContextData = {
-  user: { id: 0, email: '' },
+  user: {
+    id: 0,
+    email: '',
+    firstname: '',
+    lastname: '',
+    oidcSub: '',
+    organisation: 0,
+    created: '',
+    placeholder: false,
+    preferredname: '',
+    position: '',
+  },
   token: '',
   roles: [],
   currentRole: null,
+  isInternalUser: false,
   impersonatingUserId: undefined,
   handleLogin: (value) => value,
   handleNewToken: (value) => value,
-  handleLogout: () => null,
+  handleLogout: async () => {
+    return;
+  },
   handleRole: (value) => value,
 };
 
@@ -68,14 +87,14 @@ const checkLocalStorage = (
           user: decoded.user,
           roles: decoded.roles,
           currentRole: localStorage.currentRole,
+          isInternalUser: decoded.isInternalUser,
           token: localStorage.token,
           expToken: decoded.exp,
           impersonatingUserId: decoded.impersonatingUserId,
         },
       });
     } else {
-      localStorage.removeItem('token');
-      localStorage.removeItem('impersonatingUserId');
+      clearSession();
     }
   }
 };
@@ -92,18 +111,18 @@ const reducer = (
         currentRole: action.payload.currentRole,
         user: action.payload.user,
         roles: action.payload.roles,
+        isInternalUser: action.payload.isInternalUser,
         token: action.payload.token,
         expToken: action.payload.expToken,
         impersonatingUserId: action.payload.impersonatingUserId,
       };
     case ActionType.LOGINUSER: {
-      const { user, exp, roles, impersonatingUserId } = jwtDecode(
-        action.payload
-      ) as DecodedTokenData;
+      const { user, exp, roles, isInternalUser, impersonatingUserId } =
+        jwtDecode(action.payload) as DecodedTokenData;
       localStorage.user = JSON.stringify(user);
       localStorage.token = action.payload;
       localStorage.expToken = exp;
-
+      localStorage.isInternalUser = isInternalUser;
       localStorage.currentRole = roles[0].shortCode.toUpperCase();
       localStorage.impersonatingUserId = impersonatingUserId;
 
@@ -113,22 +132,25 @@ const reducer = (
         user: user,
         expToken: exp,
         roles: roles,
+        isInternalUser: isInternalUser,
         currentRole: roles[0].shortCode.toUpperCase(),
         impersonatingUserId: impersonatingUserId,
       };
     }
     case ActionType.SETTOKEN: {
-      const { currentRole, roles, exp } = jwtDecode(
+      const { currentRole, roles, exp, isInternalUser } = jwtDecode(
         action.payload
       ) as DecodedTokenData;
       localStorage.token = action.payload;
       localStorage.expToken = exp;
       localStorage.currentRole = currentRole.shortCode.toUpperCase();
+      localStorage.isInternalUser = isInternalUser;
 
       return {
         ...state,
         roles: roles,
         token: action.payload,
+        isInternalUser: isInternalUser,
         expToken: exp,
         currentRole: currentRole.shortCode.toUpperCase(),
       };
@@ -141,12 +163,6 @@ const reducer = (
         currentRole: action.payload.toUpperCase(),
       };
     case ActionType.LOGOFFUSER:
-      localStorage.removeItem('token');
-      localStorage.removeItem('currentRole');
-      localStorage.removeItem('user');
-      localStorage.removeItem('expToken');
-      localStorage.removeItem('impersonatingUserId');
-
       return {
         ...initUserData,
       };
@@ -156,36 +172,41 @@ const reducer = (
   }
 };
 
-function getCookieDomain(hostname: string): string {
-  const parts = hostname.split('.');
-  if (parts.length > 2) {
-    // e.g. "www.example.com"
-    const parts = hostname.split('.');
-    parts.shift(); // remove the first part
-
-    return `.${parts.join('.')}`;
-  } else {
-    return hostname; // e.g. localhost
-  }
-}
-
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const [, setCookie] = useCookies();
   const unauthorizedApi = useUnauthorizedApi();
+  const settingsContext = useContext(SettingsContext);
+
+  useEffect(() => {
+    if (state.token) {
+      setCookie('token', state.token, {
+        path: '/',
+        secure: false,
+        sameSite: 'lax',
+      });
+    }
+  }, [setCookie, state.token]);
 
   checkLocalStorage(dispatch, state);
-  useEffect(() => {
-    const hostname = window.location.hostname;
 
-    // NOTE: Cookies are used for scheduler authorization.
-    setCookie('token', state.token, {
-      path: '/',
-      secure: false,
-      domain: getCookieDomain(hostname),
-      sameSite: 'lax',
-    });
-  }, [setCookie, state]);
+  async function userLogoutHandler() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      unauthorizedApi()
+        .logout({ token })
+        .finally(() => {
+          const logoutUrl = settingsContext.settingsMap.get(
+            SettingsId.EXTERNAL_AUTH_LOGOUT_URL
+          )?.settingsValue;
+          clearSession();
+          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
+          if (logoutUrl) {
+            window.location.assign(logoutUrl);
+          }
+        });
+    }
+  }
 
   return (
     <UserContext.Provider
@@ -193,15 +214,7 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
         ...state,
         handleLogin: (data): void =>
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
-        handleLogout: () => {
-          if (localStorage.token) {
-            unauthorizedApi().logout({
-              token: localStorage.token,
-            });
-          }
-
-          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
-        },
+        handleLogout: userLogoutHandler,
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(

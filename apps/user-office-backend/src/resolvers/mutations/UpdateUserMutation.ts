@@ -70,12 +70,6 @@ export class UpdateUserArgs {
   public roles?: number[];
 
   @Field(() => String, { nullable: true })
-  public orcid?: string;
-
-  @Field(() => String, { nullable: true })
-  public refreshToken?: string;
-
-  @Field(() => String, { nullable: true })
   public otherOrganisation?: string;
 
   @Field(() => Int, { nullable: true })

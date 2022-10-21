@@ -1,18 +1,18 @@
 import { Paper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Field, FieldProps, FormikProps } from 'formik';
+import { Field, FieldProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
+import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import {
-  Answer,
   QuestionaryStep,
   SampleStatus,
   SubTemplateConfig,
@@ -75,20 +75,18 @@ function createSampleStub(
   };
 }
 
-type QuestionaryComponentSampleDeclarationProps = {
-  answer: Answer;
-  formikProps: FormikProps<Record<string, unknown>>;
-  confirm: WithConfirmType;
-  prompt: WithPromptType;
-};
-
 function QuestionaryComponentSampleDeclaration(
-  props: QuestionaryComponentSampleDeclarationProps
+  props: BasicComponentProps & {
+    confirm: WithConfirmType;
+    prompt: WithPromptType;
+  }
 ) {
   const { answer, confirm, prompt } = props;
   const answerId = answer.question.id;
   const config = answer.config as SubTemplateConfig;
-  const { state } = useContext(QuestionaryContext) as ProposalContextType;
+  const { state, dispatch } = useContext(
+    QuestionaryContext
+  ) as ProposalContextType;
 
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
@@ -103,13 +101,26 @@ function QuestionaryComponentSampleDeclaration(
   return (
     <Field name={answerId}>
       {({ field, form }: FieldProps<SampleWithQuestionary[]>) => {
+        const updateFieldValueAndState = (
+          updatedItems: SampleCore[] | null
+        ) => {
+          form.setFieldValue(answerId, updatedItems);
+          dispatch({
+            type: 'SAMPLE_DECLARATION_ITEMS_MODIFIED',
+            id: answerId,
+            newItems: updatedItems,
+          });
+        };
+
         const copySample = (id: number, title: string) =>
           api()
             .cloneSample({ sampleId: id, title: title })
             .then((response) => {
               const clonedSample = response.cloneSample.sample;
               if (clonedSample) {
-                form.setFieldValue(answerId, [...field.value, clonedSample]);
+                const newStateItems = [...field.value, clonedSample];
+
+                updateFieldValueAndState(newStateItems);
               }
             });
 
@@ -118,10 +129,11 @@ function QuestionaryComponentSampleDeclaration(
             .deleteSample({ sampleId: id })
             .then((response) => {
               if (!response.deleteSample.rejection) {
-                const newStateValue = field.value.filter(
+                const newStateItems = field.value.filter(
                   (sample) => sample.id !== id
                 );
-                form.setFieldValue(answerId, newStateValue);
+
+                updateFieldValueAndState(newStateItems);
               }
             });
 
@@ -207,14 +219,16 @@ function QuestionaryComponentSampleDeclaration(
                   <SampleDeclarationContainer
                     sample={selectedSample}
                     sampleUpdated={(updatedSample) => {
-                      const newValue = field.value.map((sample) =>
+                      const newStateItems = field.value.map((sample) =>
                         sample.id === updatedSample.id ? updatedSample : sample
                       );
 
-                      form.setFieldValue(answerId, newValue);
+                      updateFieldValueAndState(newStateItems);
                     }}
                     sampleCreated={(newSample) => {
-                      form.setFieldValue(answerId, [...field.value, newSample]);
+                      const newStateItems = [...field.value, newSample];
+
+                      updateFieldValueAndState(newStateItems);
                     }}
                     sampleEditDone={() => {
                       // refresh all samples
@@ -226,7 +240,7 @@ function QuestionaryComponentSampleDeclaration(
                           },
                         })
                         .then((result) => {
-                          form.setFieldValue(answerId, result.samples);
+                          updateFieldValueAndState(result.samples);
                         });
 
                       setSelectedSample(null);

@@ -16,9 +16,15 @@ const useStyles = makeStyles((theme) => ({
 export enum CallStatus {
   ALL = 'all',
   ACTIVE = 'active',
+  ACTIVEINTERNAL = 'activeinternal',
   INACTIVE = 'inactive',
 }
 
+export type CallStatusFilters =
+  | 'all'
+  | 'active'
+  | 'activeinternal'
+  | 'inactive';
 export type CallStatusQueryFilter = { callStatus: QueryParamConfig<string> };
 export const defaultCallStatusQueryFilter = withDefault(
   StringParam,
@@ -48,6 +54,7 @@ const CallStatusFilter: React.FC<CallStatusFilterProps> = ({
       >
         <MenuItem value={CallStatus.ALL}>All</MenuItem>
         <MenuItem value={CallStatus.ACTIVE}>Active</MenuItem>
+        <MenuItem value={CallStatus.ACTIVEINTERNAL}>Active Internal</MenuItem>
         <MenuItem value={CallStatus.INACTIVE}>Inactive</MenuItem>
       </Select>
     </FormControl>

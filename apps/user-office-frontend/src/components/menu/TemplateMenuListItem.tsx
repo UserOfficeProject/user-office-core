@@ -7,6 +7,7 @@ import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import InboxIcon from '@mui/icons-material/Inbox';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import Collapse from '@mui/material/Collapse';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -102,6 +103,15 @@ export function TemplateMenuListItem() {
       </Tooltip>
 
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+        <Tooltip title="PDF">
+          <ListItem component={NavLink} to="/PdfTemplates" button>
+            <ListItemIcon>
+              <PictureAsPdfIcon />
+            </ListItemIcon>
+            <ListItemText primary="PDF" />
+          </ListItem>
+        </Tooltip>
+
         <Tooltip title="Proposal">
           <ListItem component={NavLink} to="/ProposalTemplates" button>
             <ListItemIcon>

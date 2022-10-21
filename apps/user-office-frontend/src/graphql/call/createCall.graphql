@@ -2,6 +2,7 @@ mutation createCall(
   $shortCode: String!
   $startCall: DateTime!
   $endCall: DateTime!
+  $endCallInternal: DateTime
   $startReview: DateTime!
   $endReview: DateTime!
   $startSEPReview: DateTime
@@ -18,14 +19,17 @@ mutation createCall(
   $proposalWorkflowId: Int!
   $templateId: Int!
   $esiTemplateId: Int
+  $pdfTemplateId: Int
   $title: String
   $description: String
+  $seps: [Int!]
 ) {
   createCall(
     createCallInput: {
       shortCode: $shortCode
       startCall: $startCall
       endCall: $endCall
+      endCallInternal: $endCallInternal
       startReview: $startReview
       endReview: $endReview
       startSEPReview: $startSEPReview
@@ -42,8 +46,10 @@ mutation createCall(
       proposalWorkflowId: $proposalWorkflowId
       templateId: $templateId
       esiTemplateId: $esiTemplateId
+      pdfTemplateId: $pdfTemplateId
       title: $title
       description: $description
+      seps: $seps
     }
   ) {
     rejection {

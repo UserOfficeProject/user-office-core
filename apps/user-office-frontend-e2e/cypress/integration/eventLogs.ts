@@ -1,14 +1,14 @@
 import { faker } from '@faker-js/faker';
-import {
-  UpdateUserMutationVariables,
-  User,
-} from '@user-office-software-libs/shared-types';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { TestUserId } from './../support/user';
 
 context('Event log tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
   });
 
@@ -16,7 +16,7 @@ context('Event log tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
-      cy.login('user');
+      cy.login('user1');
       cy.createProposal({ callId: initialDBData.call.id }).then((response) => {
         if (response.createProposal.proposal) {
           createdProposalPk = response.createProposal.proposal.primaryKey;
@@ -47,37 +47,46 @@ context('Event log tests', () => {
   });
 
   describe('User event logs', () => {
-    beforeEach(() => {
-      cy.login('user');
+    const testUserId: TestUserId = 'user1';
+    const user = initialDBData.users[testUserId];
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+      cy.login(testUserId);
     });
 
-    it('If user uptates his info, officer should be able to see the event logs for that update', () => {
+    it('If user updates his info, officer should be able to see the event logs for that update', () => {
       const newFirstName = faker.name.firstName();
       // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
       const updateProfileDate = DateTime.now().toFormat(
         initialDBData.getFormats().dateFormat + ' HH'
       );
-      const loggedInUser = window.localStorage.getItem('user');
-
-      if (!loggedInUser) {
-        throw new Error('No logged in user');
-      }
-
-      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
 
       cy.updateUserDetails({
-        ...loggedInUserParsed,
+        id: user.id,
         firstname: newFirstName,
-      } as UpdateUserMutationVariables);
+        user_title: 'Dr.',
+        lastname: 'Doe',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('2000/01/01'),
+        organisation: 1,
+        department: 'IT',
+        position: 'Dirrector',
+        email: faker.internet.email(),
+        telephone: '555-123-4567',
+        organizationCountry: 1,
+      });
 
       cy.login('officer');
       cy.visit('/');
 
       cy.contains('People').click();
 
-      cy.get('[aria-label="Search"]').type(loggedInUserParsed.lastname);
+      cy.get('[aria-label="Search"]').type(user.lastName);
 
-      cy.contains(loggedInUserParsed.lastname)
+      cy.contains(user.firstName)
         .parent()
         .find('button[aria-label="Edit user"]')
         .click();

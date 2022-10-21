@@ -1,5 +1,5 @@
-query getCall($id: Int!) {
-  call(id: $id) {
+query getCall($callId: Int!) {
+  call(callId: $callId) {
     ...call
   }
 }

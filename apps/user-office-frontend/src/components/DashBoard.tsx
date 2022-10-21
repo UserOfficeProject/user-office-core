@@ -16,7 +16,7 @@ import { Route, Switch } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { FeatureId, PageName, UserRole } from 'generated/sdk';
+import { CallsFilter, FeatureId, PageName, UserRole } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { useCallsData } from 'hooks/call/useCallsData';
 
@@ -57,6 +57,8 @@ import ProposalEsiPage from './template/EsiPage';
 import FeedbackTemplatesPage from './template/FeedbackTemplatesPage';
 import GenericTemplatesPage from './template/GenericTemplatesPage';
 import ImportTemplatePage from './template/import/ImportTemplatePage';
+import PdfTemplateEditor from './template/PdfTemplateEditor';
+import PdfTemplatesPage from './template/PdfTemplatesPage';
 import ProposalTemplatesPage from './template/ProposalTemplatesPage';
 import QuestionsPage from './template/QuestionsPage';
 import SampleEsiPage from './template/SampleEsiPage';
@@ -189,9 +191,20 @@ const Dashboard: React.FC = () => {
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
 
-  const { currentRole } = useContext(UserContext);
-  const { calls } = useCallsData({ isActive: true, isEnded: false });
-
+  const { currentRole, isInternalUser } = useContext(UserContext);
+  function getDashBoardCallFilter(): CallsFilter {
+    return isInternalUser
+      ? {
+          isActive: true,
+          isEnded: false,
+          isActiveInternal: true,
+        }
+      : {
+          isActive: true,
+          isEnded: false,
+        };
+  }
+  const { calls } = useCallsData(getDashBoardCallFilter());
   useEffect(() => {
     if (isTabletOrMobile) {
       setOpen(false);
@@ -369,6 +382,18 @@ const Dashboard: React.FC = () => {
             title="Template Editor"
             path="/QuestionaryEditor/:templateId"
             component={TemplateEditor}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="PDF Template Editor"
+            path="/PdfTemplateEditor/:templateId"
+            component={PdfTemplateEditor}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="PDF Template"
+            path="/PdfTemplates"
+            component={PdfTemplatesPage}
           />
           <TitledRoute
             setHeader={setHeader}

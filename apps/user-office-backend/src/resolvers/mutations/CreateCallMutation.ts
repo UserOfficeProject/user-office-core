@@ -24,6 +24,9 @@ export class CreateCallInput {
   @Field()
   public endCall: Date;
 
+  @Field(() => Date, { nullable: true })
+  public endCallInternal?: Date;
+
   @Field()
   public startReview: Date;
 
@@ -80,6 +83,12 @@ export class CreateCallInput {
 
   @Field({ nullable: true })
   public description: string;
+
+  @Field(() => [Int], { nullable: true })
+  public seps?: number[];
+
+  @Field(() => Int, { nullable: true })
+  public pdfTemplateId?: number;
 }
 
 @Resolver()

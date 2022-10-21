@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 faker.seed(1);
@@ -18,7 +20,14 @@ const shipmentTitle = faker.lorem.words(2);
 
 context('Shipments tests', () => {
   beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+  });
+
+  beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
+      this.skip();
+    }
 
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
@@ -33,7 +42,7 @@ context('Shipments tests', () => {
   });
 
   it('Co-proposer should see that he can declare shipment', () => {
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.testActionButton(declareShipmentIconCyTag, 'neutral');
@@ -91,7 +100,7 @@ context('Shipments tests', () => {
     });
 
     cy.logout();
-    cy.login('user');
+    cy.login('user1');
     cy.visit('/');
 
     cy.testActionButton(declareShipmentIconCyTag, 'neutral');

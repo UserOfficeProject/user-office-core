@@ -80,9 +80,18 @@ async function enableDefaultEssFeatures() {
       FeatureId.USER_MANAGEMENT,
       FeatureId.VISIT_MANAGEMENT,
       FeatureId.SAMPLE_SAFETY,
+      FeatureId.OAUTH,
     ],
     true
   );
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
+    settingsValue: 'ME',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
+    settingsValue: 'FEASIBILITY_REVIEW',
+  });
 }
 
 export async function configureESSDevelopmentEnvironment() {

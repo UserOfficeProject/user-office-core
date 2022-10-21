@@ -8,17 +8,29 @@ export class CallsFilter {
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
 
+  @Field(() => [Int], { nullable: true })
+  public sepIds?: number[];
+
   @Field(() => Boolean, { nullable: true })
   public isActive?: boolean;
 
   @Field(() => Boolean, { nullable: true })
+  public isActiveInternal?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
   public isEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isEndedInternal?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   public isReviewEnded?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   public isSEPReviewEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isCallEndedByEvent?: boolean;
 }
 
 @Resolver()

@@ -104,6 +104,7 @@ const dummyProposalEvents = {
   proposal_feasible: true,
   proposal_unfeasible: false,
   call_ended: false,
+  call_ended_internal: false,
   call_review_ended: false,
   proposal_sep_selected: false,
   proposal_instrument_selected: false,
@@ -123,6 +124,12 @@ const dummyProposalEvents = {
   proposal_reserved: false,
   proposal_rejected: false,
   proposal_notified: false,
+  proposal_booking_time_activated: false,
+  proposal_booking_time_updated: false,
+  proposal_booking_time_slot_added: false,
+  proposal_booking_time_slots_removed: false,
+  proposal_booking_time_completed: false,
+  proposal_booking_time_reopened: false,
 };
 
 export class ProposalDataSourceMock implements ProposalDataSource {
@@ -381,5 +388,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {
     return [basicDummyUser.id];
+  }
+
+  async getProposalById(proposalId: string): Promise<Proposal | null> {
+    return dummyProposal.proposalId === proposalId ? dummyProposal : null;
   }
 }

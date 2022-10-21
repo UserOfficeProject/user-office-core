@@ -14,6 +14,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.shortCode || 'shortCode',
     values?.startCall || new Date(),
     values?.endCall || new Date(),
+    values?.endCallInternal || new Date(),
     values?.startReview || new Date(),
     values?.endReview || new Date(),
     values?.startSEPReview || new Date(),
@@ -29,6 +30,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.proposalSequence || 0,
     values?.proposalWorkflowId || 1,
     values?.callEnded || false,
+    values?.callEndedInternal || false,
     values?.callReviewEnded || false,
     values?.callSEPReviewEnded || false,
     values?.templateId || 1,
@@ -36,6 +38,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
     values?.title || 'Title',
     values?.description || 'Description',
+    values?.pdfTemplateId || 1,
     values?.isActive || true
   );
 };
@@ -43,6 +46,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
 export const dummyCall = new Call(
   1,
   'shortCode',
+  new Date('2019-07-17 08:25:12.23043+00'),
   new Date('2019-07-17 08:25:12.23043+00'),
   new Date('2019-07-17 08:25:12.23043+00'),
   new Date('2019-07-17 08:25:12.23043+00'),
@@ -62,17 +66,20 @@ export const dummyCall = new Call(
   false,
   false,
   false,
+  false,
   1,
   2,
   AllocationTimeUnits.Day,
   '',
   '',
+  1,
   true
 );
 
 export const anotherDummyCall = new Call(
   2,
   'shortCode2',
+  new Date('2019-07-17 08:25:12.23043+00'),
   new Date('2019-07-17 08:25:12.23043+00'),
   new Date('2019-07-17 08:25:12.23043+00'),
   new Date('2019-07-17 08:25:12.23043+00'),
@@ -92,11 +99,13 @@ export const anotherDummyCall = new Call(
   true,
   false,
   false,
+  false,
   1,
   2,
   AllocationTimeUnits.Day,
   '',
   '',
+  1,
   true
 );
 

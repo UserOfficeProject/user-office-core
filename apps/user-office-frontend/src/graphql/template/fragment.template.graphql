@@ -20,4 +20,8 @@ fragment template on Template {
     groupId
     categoryId
   }
+  pdfTemplate {
+    pdfTemplateId
+    templateData
+  }
 }

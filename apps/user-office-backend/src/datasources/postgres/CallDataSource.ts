@@ -21,13 +21,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       .del()
       .from('call')
       .returning('*')
-      .then((call: CallRecord[]) => {
-        if (call === undefined || call.length !== 1) {
-          throw new Error(`Could not delete call with id:${id}`);
-        }
-
-        return createCallObject(call[0]);
-      });
+      .then((call: CallRecord[]) => createCallObject(call[0]));
   }
   async getCall(id: number): Promise<Call | null> {
     return database
@@ -53,13 +47,29 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('is_active', false);
     }
 
+    if (filter?.isEndedInternal === true) {
+      query.where('call_ended_internal', true);
+    } else if (filter?.isEndedInternal === false) {
+      query.where('call_ended_internal', false);
+    }
+
     /**
      * NOTE: We are comparing dates instead of using the call_ended flag,
      * because the flag is set once per hour and we could have a gap.
      * TODO: Maybe there is a need to use the timezone setting here but not quite sure about it. Discussion is needed here!
      */
     const currentDate = new Date().toISOString();
-    if (filter?.isEnded === true) {
+
+    // if filter is explicitly set for internal filter of calls
+    if (
+      filter?.isActive === true &&
+      filter?.isActiveInternal === true &&
+      filter?.isEnded === false
+    ) {
+      query
+        .where('start_call', '<=', currentDate)
+        .andWhere('end_call_internal', '>=', currentDate);
+    } else if (filter?.isEnded === true) {
       query
         .where('start_call', '>=', currentDate)
         .andWhere('end_call', '<=', currentDate);
@@ -67,6 +77,12 @@ export default class PostgresCallDataSource implements CallDataSource {
       query
         .where('start_call', '<=', currentDate)
         .andWhere('end_call', '>=', currentDate);
+    } else if (filter?.isActiveInternal === true) {
+      query
+        .where('end_call', '<', currentDate)
+        .andWhere('end_call_internal', '>=', currentDate);
+    } else if (filter?.isActiveInternal === false) {
+      query.where('call_ended_internal', '=', true);
     }
 
     if (filter?.isReviewEnded === true) {
@@ -75,10 +91,22 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_review_ended', false);
     }
 
+    if (filter?.sepIds?.length) {
+      query
+        .leftJoin('call_has_seps as chs', 'chs.call_id', 'call.call_id')
+        .whereIn('chs.sep_id', filter.sepIds);
+    }
+
     if (filter?.isSEPReviewEnded === true) {
       query.where('call_sep_review_ended', true);
     } else if (filter?.isSEPReviewEnded === false) {
       query.where('call_sep_review_ended', false);
+    }
+
+    if (filter?.isCallEndedByEvent === true) {
+      query.where('call_ended', true);
+    } else if (filter?.isCallEndedByEvent === false) {
+      query.where('call_ended', false);
     }
 
     return query.then((callDB: CallRecord[]) =>
@@ -87,40 +115,65 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async create(args: CreateCallInput): Promise<Call> {
-    return database
-      .insert({
-        call_short_code: args.shortCode,
-        start_call: args.startCall,
-        end_call: args.endCall,
-        start_review: args.startReview,
-        end_review: args.endReview,
-        start_sep_review: args.startSEPReview,
-        end_sep_review: args.endSEPReview,
-        start_notify: args.startNotify,
-        end_notify: args.endNotify,
-        start_cycle: args.startCycle,
-        end_cycle: args.endCycle,
-        cycle_comment: args.cycleComment,
-        submission_message: args.submissionMessage,
-        survey_comment: args.surveyComment,
-        reference_number_format: args.referenceNumberFormat,
-        proposal_sequence: args.proposalSequence,
-        proposal_workflow_id: args.proposalWorkflowId,
-        template_id: args.templateId,
-        esi_template_id: args.esiTemplateId,
-        allocation_time_unit: args.allocationTimeUnit,
-        title: args.title,
-        description: args.description,
-      })
-      .into('call')
-      .returning('*')
-      .then((call: CallRecord[]) => {
-        if (call.length !== 1) {
-          throw new Error('Could not create call');
+    const [call]: CallRecord[] = await database.transaction(async (trx) => {
+      try {
+        const createdCall: CallRecord[] = await database
+          .insert({
+            call_short_code: args.shortCode,
+            start_call: args.startCall,
+            end_call: args.endCall,
+            end_call_internal: args.endCallInternal || args.endCall,
+            start_review: args.startReview,
+            end_review: args.endReview,
+            start_sep_review: args.startSEPReview,
+            end_sep_review: args.endSEPReview,
+            start_notify: args.startNotify,
+            end_notify: args.endNotify,
+            start_cycle: args.startCycle,
+            end_cycle: args.endCycle,
+            cycle_comment: args.cycleComment,
+            submission_message: args.submissionMessage,
+            survey_comment: args.surveyComment,
+            reference_number_format: args.referenceNumberFormat,
+            proposal_sequence: args.proposalSequence,
+            proposal_workflow_id: args.proposalWorkflowId,
+            template_id: args.templateId,
+            esi_template_id: args.esiTemplateId,
+            pdf_template_id: args.pdfTemplateId,
+            allocation_time_unit: args.allocationTimeUnit,
+            title: args.title,
+            description: args.description,
+          })
+          .into('call')
+          .returning('*')
+          .transacting(trx);
+
+        // NOTE: Attach SEPs to a call if they are provided.
+        if (createdCall[0].call_id && args.seps?.length) {
+          const valuesToInsert = args.seps.map((sepId) => ({
+            sep_id: sepId,
+            call_id: createdCall[0].call_id,
+          }));
+
+          await database
+            .insert(valuesToInsert)
+            .into('call_has_seps')
+            .transacting(trx);
         }
 
-        return createCallObject(call[0]);
-      });
+        return await trx.commit(createdCall);
+      } catch (error) {
+        logger.logException(
+          `Could not create call with args: '${JSON.stringify(args)}'`,
+          error
+        );
+        trx.rollback();
+
+        throw new Error('Could not create call');
+      }
+    });
+
+    return createCallObject(call);
   }
 
   async update(args: UpdateCallInput): Promise<Call> {
@@ -167,12 +220,33 @@ export default class PostgresCallDataSource implements CallDataSource {
           );
         }
 
+        // NOTE: Attach SEPs to a call if they are provided.
+        if (args.id && args.seps !== undefined) {
+          const valuesToInsert = args.seps.map((sepId) => ({
+            sep_id: sepId,
+            call_id: args.id,
+          }));
+          // NOTE: Remove all assigned SEPs from a call and then re-assign
+          await database('call_has_seps')
+            .del()
+            .where('call_id', args.id)
+            .transacting(trx);
+
+          if (valuesToInsert.length) {
+            await database
+              .insert(valuesToInsert)
+              .into('call_has_seps')
+              .transacting(trx);
+          }
+        }
+
         const callUpdate = await database
           .update(
             {
               call_short_code: args.shortCode,
               start_call: args.startCall,
               end_call: args.endCall,
+              end_call_internal: args.endCallInternal || args.endCall,
               reference_number_format: args.referenceNumberFormat,
               start_review: args.startReview,
               end_review: args.endReview,
@@ -187,10 +261,12 @@ export default class PostgresCallDataSource implements CallDataSource {
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
               call_ended: args.callEnded,
+              call_ended_internal: args.callEndedInternal,
               call_review_ended: args.callReviewEnded,
               call_sep_review_ended: args.callSEPReviewEnded,
               template_id: args.templateId,
               esi_template_id: args.esiTemplateId,
+              pdf_template_id: args.pdfTemplateId,
               allocation_time_unit: args.allocationTimeUnit,
               title: args.title,
               description: args.description,
@@ -209,12 +285,10 @@ export default class PostgresCallDataSource implements CallDataSource {
           error
         );
         trx.rollback();
+
+        throw new Error('Could not update call');
       }
     });
-
-    if (call?.length !== 1) {
-      throw new Error('Could not update call');
-    }
 
     return createCallObject(call[0]);
   }
@@ -278,15 +352,26 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     return records.map(createCallObject);
   }
-
-  public async isCallEnded(callId: number): Promise<boolean> {
+  public async isCallEnded(callId: number): Promise<boolean>;
+  public async isCallEnded(
+    callId: number,
+    checkIfInternalEnded: boolean
+  ): Promise<boolean>;
+  public async isCallEnded(
+    callId: number,
+    checkIfInternalEnded: boolean = false
+  ): Promise<boolean> {
     const currentDate = new Date().toISOString();
 
     return database
       .select()
       .from('call')
       .where('start_call', '<=', currentDate)
-      .andWhere('end_call', '>=', currentDate)
+      .andWhere(
+        checkIfInternalEnded ? 'end_call_internal' : 'end_call',
+        '>=',
+        currentDate
+      )
       .andWhere('call_id', '=', callId)
       .first()
       .then((call: CallRecord) => (call ? false : true));

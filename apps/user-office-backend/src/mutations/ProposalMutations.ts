@@ -67,7 +67,10 @@ export default class ProposalMutations {
     { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    if (await this.callDataSource.isCallEnded(callId)) {
+    const checkIfInternalCallActive = agent?.isInternalUser || false;
+    if (
+      await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
+    ) {
       return rejection('Call is not active', { callId, agent });
     }
 
@@ -205,6 +208,7 @@ export default class ProposalMutations {
     }
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const checkIsInternalActive = agent?.isInternalUser || false;
     if (
       !isUserOfficer &&
       !(await this.proposalAuth.isMemberOfProposal(agent, proposal))
@@ -216,7 +220,10 @@ export default class ProposalMutations {
     }
 
     // Check if there is an open call
-    const isCallEnded = await this.callDataSource.isCallEnded(proposal.callId);
+    const isCallEnded = await this.callDataSource.isCallEnded(
+      proposal.callId,
+      checkIsInternalActive
+    );
     if (!isUserOfficer && isCallEnded) {
       return rejection('Can not submit proposal because call is not active', {
         agent,
@@ -498,8 +505,11 @@ export default class ProposalMutations {
       );
     }
 
+    const checkIfInternalCallActive = agent?.isInternalUser || false;
     // Check if there is an open call
-    if (await this.callDataSource.isCallEnded(callId)) {
+    if (
+      await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
+    ) {
       return rejection(
         'Can not clone proposal because the call is not active',
         { callId, agent, sourceProposal }
