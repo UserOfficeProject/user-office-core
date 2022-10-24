@@ -98,7 +98,7 @@ export const QuestionFormShell = withConfirm(
                   variant="outlined"
                   data-cy="delete"
                   onClick={deleteHandler}
-                  disabled={definition.creatable === false}
+                  disabled={!definition.creatable}
                 >
                   Delete
                 </Button>
