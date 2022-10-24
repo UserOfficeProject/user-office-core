@@ -5,7 +5,6 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -47,7 +46,7 @@ const AssignProposalsToInstrument: React.FC<
   const selectedProposalsInstrument =
     allSelectedProposalsHaveSameInstrument && instrumentIds[0]
       ? instrumentIds[0]
-      : undefined;
+      : null;
 
   return (
     <Container
@@ -116,11 +115,9 @@ const AssignProposalsToInstrument: React.FC<
   );
 };
 
-AssignProposalsToInstrument.propTypes = {
-  close: PropTypes.func.isRequired,
-  assignProposalsToInstrument: PropTypes.func.isRequired,
-  callIds: PropTypes.array.isRequired,
-  instrumentIds: PropTypes.array.isRequired,
-};
-
-export default AssignProposalsToInstrument;
+// NOTE: This comparison is done to prevent component re-rendering on modal close
+export default React.memo(
+  AssignProposalsToInstrument,
+  (prevProps, nextProps) =>
+    JSON.stringify(prevProps.callIds) === JSON.stringify(nextProps.callIds)
+);

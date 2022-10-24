@@ -11,7 +11,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { ProposalPks } from '../models/Proposal';
 import { Rejection } from '../models/Rejection';
 import { UserRole } from '../models/User';
 import SEPMutations from './SEPMutations';
@@ -211,9 +211,7 @@ describe('Test SEPMutations', () => {
         proposals: [{ primaryKey: 1, callId: 1 }],
         sepId: 1,
       })
-    ).resolves.toStrictEqual(
-      new ProposalPksWithNextStatus([1], 5, 'SEP_REVIEW', 'SEP Review')
-    );
+    ).resolves.toStrictEqual(new ProposalPks([1]));
   });
 
   test('A user can not remove proposal from SEP', async () => {

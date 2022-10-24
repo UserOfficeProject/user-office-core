@@ -51,16 +51,14 @@ export default function createHandler() {
         case Event.PROPOSAL_INSTRUMENT_SELECTED:
         case Event.PROPOSAL_SEP_SELECTED:
         case Event.PROPOSAL_STATUS_UPDATED:
-          event.proposalpkswithnextstatus.proposalPks.forEach(
-            async (proposalPk) => {
-              await eventLogsDataSource.set(
-                event.loggedInUserId,
-                event.type,
-                json,
-                proposalPk.toString()
-              );
-            }
-          );
+          event.proposalpks.proposalPks.forEach(async (proposalPk) => {
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              proposalPk.toString()
+            );
+          });
           break;
         case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
           await eventLogsDataSource.set(
@@ -68,14 +66,6 @@ export default function createHandler() {
             event.type,
             json,
             event.instrumenthasproposals.instrumentId.toString()
-          );
-          break;
-        case Event.PROPOSAL_SEP_REVIEW_UPDATED:
-          await eventLogsDataSource.set(
-            event.loggedInUserId,
-            event.type,
-            json,
-            event.reviewwithnextproposalstatus.id.toString()
           );
           break;
         case Event.PROPOSAL_SEP_MEETING_SAVED:

@@ -140,7 +140,6 @@ context('Calls tests', () => {
 
   describe('Call basic tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
       cy.login('officer');
       cy.visit('/');
     });
@@ -683,7 +682,6 @@ context('Calls tests', () => {
     let createdInstrumentId: number;
 
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
       cy.login('officer');
       cy.createCall({
         ...newCall,

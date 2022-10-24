@@ -1,7 +1,4 @@
-import {
-  ProposalEndStatus,
-  ProposalPksWithNextStatus,
-} from '../../models/Proposal';
+import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
 import { Review, ReviewStatus } from '../../models/Review';
 import { Role } from '../../models/Role';
 import {
@@ -347,7 +344,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
-      return new ProposalPksWithNextStatus([1]);
+      return new ProposalPks([1]);
     }
 
     throw new Error(`SEP not found ${sepId}`);
