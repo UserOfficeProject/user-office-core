@@ -124,7 +124,7 @@ export const QuestionTemplateRelationFormShell = (
                 variant="outlined"
                 data-cy="remove-from-template"
                 onClick={deleteHandler}
-                disabled={definition.creatable === false}
+                disabled={!definition.creatable}
               >
                 Remove from template
               </Button>
