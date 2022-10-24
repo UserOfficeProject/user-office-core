@@ -11,6 +11,7 @@ import {
   DataType,
   EvaluatorOperator,
   FieldDependency,
+  MultiPartSelectionConfig,
   QuestionTemplateRelation,
   SelectionFromOptionsConfig,
   Template,
@@ -106,6 +107,19 @@ const FormikUICustomDependencySelector = ({
             }
           )
         ); // use options
+      } else if (depField.question.dataType === DataType.MULTI_PART_SELECTION) {
+        let options: { value: string; label: string }[] = [];
+        (depField.config as MultiPartSelectionConfig).selectionPairs.forEach(
+          (p) => {
+            let newArray = [];
+            options.push({ value: p.key, label: p.key });
+            newArray = options.concat(
+              p.value.map((v) => ({ value: v, label: v }))
+            );
+            options = newArray;
+          }
+        );
+        setAvailableValues(options);
       }
     }
   }, [dependencyId, template]);
