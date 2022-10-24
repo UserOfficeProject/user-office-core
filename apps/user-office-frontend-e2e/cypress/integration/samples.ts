@@ -138,21 +138,22 @@ context('Samples tests', () => {
     });
   };
 
+  // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+  // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+  afterEach(() => {
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
+    });
+  });
+
   describe('Samples basic tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled().then(() => {
-        cy.resetDB(true).then((result) => {
-          if (result.prepareDB.rejection) {
-            throw new Error('Failed while resetting the database');
-          }
-
-          cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-            if (result.createProposalWorkflow.proposalWorkflow) {
-              createdWorkflowId =
-                result.createProposalWorkflow.proposalWorkflow.id;
-            }
-          });
-        });
+      cy.getAndStoreFeaturesEnabled();
+      cy.resetDB(true);
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
       });
     });
 
