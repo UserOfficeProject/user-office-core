@@ -138,6 +138,11 @@ context('Samples tests', () => {
     });
   };
 
+  beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
+    cy.resetDB(true);
+  });
+
   // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
   // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
   afterEach(() => {
@@ -148,8 +153,6 @@ context('Samples tests', () => {
 
   describe('Samples basic tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB(true);
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
         if (result.createProposalWorkflow.proposalWorkflow) {
           createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
@@ -406,8 +409,6 @@ context('Samples tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB(true);
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
         if (result.createProposalWorkflow.proposalWorkflow) {
           createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;

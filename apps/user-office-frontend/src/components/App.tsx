@@ -3,7 +3,6 @@ import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
 import React, { ErrorInfo } from 'react';
-import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
   Redirect,
@@ -108,34 +107,32 @@ class App extends React.Component {
   render(): JSX.Element {
     return (
       <StyledEngineProvider injectFirst>
-        <CookiesProvider>
-          <SnackbarProvider
-            ref={this.notistackRef}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            maxSnack={1}
-            action={(key) => (
-              <IconButton onClick={this.onClickDismiss(key)}>
-                <Close htmlColor="white" />
-              </IconButton>
-            )}
-          >
-            <SettingsContextProvider>
-              <Theme>
-                <FeatureContextProvider>
-                  <UserContextProvider>
-                    <DownloadContextProvider>
-                      <Router>
-                        <QueryParamProvider ReactRouterRoute={Route}>
-                          <Routes />
-                        </QueryParamProvider>
-                      </Router>
-                    </DownloadContextProvider>
-                  </UserContextProvider>
-                </FeatureContextProvider>
-              </Theme>
-            </SettingsContextProvider>
-          </SnackbarProvider>
-        </CookiesProvider>
+        <SnackbarProvider
+          ref={this.notistackRef}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          maxSnack={1}
+          action={(key) => (
+            <IconButton onClick={this.onClickDismiss(key)}>
+              <Close htmlColor="white" />
+            </IconButton>
+          )}
+        >
+          <SettingsContextProvider>
+            <Theme>
+              <FeatureContextProvider>
+                <UserContextProvider>
+                  <DownloadContextProvider>
+                    <Router>
+                      <QueryParamProvider ReactRouterRoute={Route}>
+                        <Routes />
+                      </QueryParamProvider>
+                    </Router>
+                  </DownloadContextProvider>
+                </UserContextProvider>
+              </FeatureContextProvider>
+            </Theme>
+          </SettingsContextProvider>
+        </SnackbarProvider>
       </StyledEngineProvider>
     );
   }
