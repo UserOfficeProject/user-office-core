@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jwtDecode from 'jwt-decode';
 import PropTypes from 'prop-types';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 
 import { Role, UserRole, SettingsId, UserJwt } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
@@ -173,8 +174,19 @@ const reducer = (
 
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
+  const [, setCookie] = useCookies();
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);
+
+  useEffect(() => {
+    if (state.token) {
+      setCookie('token', state.token, {
+        path: '/',
+        secure: false,
+        sameSite: 'lax',
+      });
+    }
+  }, [setCookie, state.token]);
 
   checkLocalStorage(dispatch, state);
 
