@@ -140,12 +140,19 @@ context('Samples tests', () => {
 
   describe('Samples basic tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB(true);
-      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
-        }
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        cy.resetDB(true).then((result) => {
+          if (result.prepareDB.rejection) {
+            throw new Error('Failed while resetting the database');
+          }
+
+          cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+            if (result.createProposalWorkflow.proposalWorkflow) {
+              createdWorkflowId =
+                result.createProposalWorkflow.proposalWorkflow.id;
+            }
+          });
+        });
       });
     });
 
