@@ -24,6 +24,7 @@ import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUpl
 import { genericTemplateDefinition } from './questionaryComponents/GenericTemplate/GenericTemplateDefinition';
 import { genericTemplateBasisDefinition } from './questionaryComponents/GenericTemplateBasis/GenericTemplateBasisDefinition';
 import { intervalDefinition } from './questionaryComponents/Interval/IntervalDefinition';
+import { multiPartSelectionDefinition } from './questionaryComponents/MultiPartSelection/MultiPartSelectionDefinition';
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
@@ -156,6 +157,7 @@ const registry = [
   genericTemplateDefinition,
   intervalDefinition,
   multiChoiceDefinition,
+  multiPartSelectionDefinition,
   numberInputDefinition,
   proposalBasisDefinition,
   proposalEsiBasisDefinition,
