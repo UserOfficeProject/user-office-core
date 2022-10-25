@@ -286,11 +286,13 @@ context('Proposal administration tests', () => {
       }
       cy.contains('Proposals').click();
 
+      const token = window.localStorage.getItem('token');
+
       cy.request({
         url: '/download/pdf/proposal/1',
         method: 'GET',
         headers: {
-          authorization: `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`,
+          authorization: `Bearer ${token}`,
         },
       }).then((response) => {
         expect(response.headers['content-type']).to.be.equal('application/pdf');

@@ -1085,8 +1085,6 @@ context('Settings tests', () => {
 
   describe('API access tokens tests', () => {
     const accessTokenName = faker.lorem.words(2);
-    beforeEach(() => {});
-
     let removedAccessToken: string;
 
     it('User Officer should be able to create api access token', () => {
