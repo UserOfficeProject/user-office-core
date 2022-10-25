@@ -4,7 +4,9 @@ name: Build && Push
 # events but only for the develop branch
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
+      - staging
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -97,6 +99,7 @@ jobs:
             -F "variables[RUN_DEPLOY]=1" \
             -F "variables[BRANCH]=${{ steps.extract_branch.outputs.branch }}" \
             -F "variables[REPOSITORY]=${REPOSITORY#UserOfficeProject/}" \
+            -F "variables[ENVIRONMENT]=${{ steps.extract_branch.outputs.branch }}" \
             -o /dev/null \
             --silent \
             --write-out '%{http_code}' \
