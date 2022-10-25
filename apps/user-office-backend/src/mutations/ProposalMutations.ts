@@ -20,11 +20,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import {
-  Proposal,
-  ProposalEndStatus,
-  ProposalPksWithNextStatus,
-} from '../models/Proposal';
+import { Proposal, ProposalEndStatus, ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
@@ -67,7 +63,10 @@ export default class ProposalMutations {
     { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    if (await this.callDataSource.isCallEnded(callId)) {
+    const checkIfInternalCallActive = agent?.isInternalUser || false;
+    if (
+      await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
+    ) {
       return rejection('Call is not active', { callId, agent });
     }
 
@@ -205,6 +204,7 @@ export default class ProposalMutations {
     }
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const checkIsInternalActive = agent?.isInternalUser || false;
     if (
       !isUserOfficer &&
       !(await this.proposalAuth.isMemberOfProposal(agent, proposal))
@@ -216,7 +216,10 @@ export default class ProposalMutations {
     }
 
     // Check if there is an open call
-    const isCallEnded = await this.callDataSource.isCallEnded(proposal.callId);
+    const isCallEnded = await this.callDataSource.isCallEnded(
+      proposal.callId,
+      checkIsInternalActive
+    );
     if (!isUserOfficer && isCallEnded) {
       return rejection('Can not submit proposal because call is not active', {
         agent,
@@ -247,7 +250,7 @@ export default class ProposalMutations {
       });
 
       return submitProposal;
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejection(
         'Could not submit proposal',
         {
@@ -434,7 +437,7 @@ export default class ProposalMutations {
   async changeProposalsStatus(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
-  ): Promise<ProposalPksWithNextStatus | Rejection> {
+  ): Promise<ProposalPks | Rejection> {
     const { statusId, proposals } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(
@@ -499,8 +502,11 @@ export default class ProposalMutations {
       );
     }
 
+    const checkIfInternalCallActive = agent?.isInternalUser || false;
     // Check if there is an open call
-    if (await this.callDataSource.isCallEnded(callId)) {
+    if (
+      await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
+    ) {
       return rejection(
         'Can not clone proposal because the call is not active',
         { callId, agent, sourceProposal }

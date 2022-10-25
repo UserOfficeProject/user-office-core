@@ -161,12 +161,10 @@ export default function createCustomHandler() {
         break;
       }
       case Event.PROPOSAL_SEP_REVIEW_UPDATED:
-        if (
-          event.reviewwithnextproposalstatus.status === ReviewStatus.SUBMITTED
-        ) {
+        if (event.review.status === ReviewStatus.SUBMITTED) {
           eventBus.publish({
             type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED,
-            review: event.reviewwithnextproposalstatus,
+            review: event.review,
             isRejection: false,
             key: 'review',
             loggedInUserId: event.loggedInUserId,
@@ -206,6 +204,7 @@ export default function createCustomHandler() {
         }
         break;
       case Event.CALL_ENDED:
+      case Event.CALL_ENDED_INTERNAL:
       case Event.CALL_REVIEW_ENDED:
       case Event.CALL_SEP_REVIEW_ENDED:
         try {

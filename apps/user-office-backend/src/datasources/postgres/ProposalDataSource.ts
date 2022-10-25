@@ -4,7 +4,7 @@ import { Knex } from 'knex';
 import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
-import { Proposal, ProposalPksWithNextStatus } from '../../models/Proposal';
+import { Proposal, ProposalPks } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
@@ -16,6 +16,7 @@ import {
   ProposalBookingScheduledEventFilterCore,
 } from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import { ProposalDataSource } from '../ProposalDataSource';
 import {
   ProposalsFilter,
@@ -755,12 +756,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     ).rows;
 
     if (proposalEventsToReset?.length) {
-      const dataToUpdate = proposalEventsToReset
-        .map(
+      const dataToUpdate = removeDuplicates(
+        proposalEventsToReset.map(
           (event) =>
             `${event.status_changing_event.toLocaleLowerCase()} = false`
         )
-        .join(', ');
+      ).join(', ');
 
       const [updatedProposalEvents]: ProposalEventsRecord[] = (
         await database.raw(`
@@ -783,7 +784,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async changeProposalsStatus(
     statusId: number,
     proposalPks: number[]
-  ): Promise<ProposalPksWithNextStatus> {
+  ): Promise<ProposalPks> {
     const dataToUpdate: { status_id: number; submitted?: boolean } = {
       status_id: statusId,
     };
@@ -804,9 +805,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new Error('Could not change proposals status');
     }
 
-    return new ProposalPksWithNextStatus(
-      result.map((item) => item.proposal_pk)
-    );
+    return new ProposalPks(result.map((item) => item.proposal_pk));
   }
 
   async getProposalBookingByProposalPk(

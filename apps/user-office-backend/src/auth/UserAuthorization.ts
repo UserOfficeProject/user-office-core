@@ -7,7 +7,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Rejection } from '../models/Rejection';
-import { Roles } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { AdminDataSource } from './../datasources/AdminDataSource';
 
@@ -33,6 +33,12 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
+  async isInternalUser(
+    userId: number,
+    currentRole: Role | null
+  ): Promise<boolean> {
+    return false;
+  }
   isUser(agent: UserWithRole | null) {
     return agent?.currentRole?.shortCode === Roles.USER;
   }

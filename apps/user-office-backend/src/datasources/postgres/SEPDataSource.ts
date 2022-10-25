@@ -1,9 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import {
-  ProposalEndStatus,
-  ProposalPksWithNextStatus,
-} from '../../models/Proposal';
+import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
 import { Review, ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
 import {
@@ -629,7 +626,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
        * NOTE: We need to return changed proposalPks because we listen to events and
        * we need to do some changes on proposals based on what is changed.
        */
-      return new ProposalPksWithNextStatus(returnedProposalPks);
+      return new ProposalPks(returnedProposalPks);
     }
 
     throw new Error(

@@ -1,10 +1,10 @@
-import checkCallsEndedJob from './jobs/checkCallsEnded';
+import checkAllCallsEndedJob from './jobs/checkAllCallsEnded';
 import checkCallsReviewEndedJob from './jobs/checkCallsReviewEnded';
 import checkCallsSEPReviewEndedJob from './jobs/checkCallsSEPReviewEnded';
 import { UserOfficeAsyncJob } from './startAsyncJobs';
 
 const ALL_ASYNC_JOBS: UserOfficeAsyncJob[] = [
-  checkCallsEndedJob,
+  checkAllCallsEndedJob,
   checkCallsReviewEndedJob,
   checkCallsSEPReviewEndedJob,
 ];

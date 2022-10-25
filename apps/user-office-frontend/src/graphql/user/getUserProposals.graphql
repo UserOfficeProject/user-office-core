@@ -20,9 +20,11 @@ query getUserProposals {
         id
         shortCode
         isActive
+        isActiveInternal
         referenceNumberFormat
         startCall
         endCall
+        endCallInternal
       }
     }
   }

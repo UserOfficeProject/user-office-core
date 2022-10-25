@@ -1,4 +1,3 @@
-import { Event } from '../../events/event.enum';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
@@ -186,18 +185,5 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     return [dummyStatusChangingEvent];
-  }
-
-  async getProposalNextStatus(
-    proposalPk: number,
-    event: Event
-  ): Promise<ProposalStatus | null> {
-    return new ProposalStatus(
-      5,
-      'SEP_REVIEW',
-      'SEP Review',
-      'Sep review status description',
-      true
-    );
   }
 }

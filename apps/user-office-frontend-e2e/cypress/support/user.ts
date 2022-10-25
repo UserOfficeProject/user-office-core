@@ -24,6 +24,7 @@ type DecodedTokenData = {
   user: User;
   currentRole: Role;
   exp: number;
+  isInternalUser: boolean;
 };
 
 const extTokenStoreStfc = new Map<TestUserId, string>([
@@ -74,7 +75,7 @@ function changeActiveRole(selectedRoleId: number) {
       return;
     }
 
-    const { currentRole, user, exp } = jwtDecode(
+    const { currentRole, user, exp, isInternalUser } = jwtDecode(
       resp.selectRole.token
     ) as DecodedTokenData;
 
@@ -85,6 +86,7 @@ function changeActiveRole(selectedRoleId: number) {
     );
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
+    window.localStorage.isInternalUser = isInternalUser;
   });
 
   cy.wrap(request);

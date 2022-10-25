@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import sinon from 'sinon';
 
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
-import checkCallsEndedJob from './jobs/checkCallsEnded';
+import checkCallsEndedJob from './jobs/checkAllCallsEnded';
 import checkCallsReviewEndedJob from './jobs/checkCallsReviewEnded';
 import checkCallsSEPReviewEndedJob from './jobs/checkCallsSEPReviewEnded';
 import { runAsyncJobs } from './startAsyncJobs';

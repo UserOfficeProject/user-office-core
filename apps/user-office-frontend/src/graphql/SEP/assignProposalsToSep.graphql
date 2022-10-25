@@ -6,10 +6,6 @@ mutation assignProposalsToSep(
     rejection {
       ...rejection
     }
-    nextProposalStatus {
-      id
-      shortCode
-      name
-    }
+    isSuccess
   }
 }

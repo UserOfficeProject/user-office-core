@@ -23,6 +23,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
+import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
 import {
   PartialProposalsDataType,
   UserProposalDataType,
@@ -91,7 +92,7 @@ const ProposalTable = ({
   }, [searchQuery]);
 
   const [editProposalPk, setEditProposalPk] = useState(0);
-
+  const { isInternalUser } = useContext(UserContext);
   if (editProposalPk) {
     return <Redirect push to={`/ProposalEdit/${editProposalPk}`} />;
   }
@@ -104,6 +105,29 @@ const ProposalTable = ({
     });
   };
 
+  const getProposalReadonlyStatus = (
+    proposalData: PartialProposalsDataType
+  ) => {
+    if (!proposalData) {
+      return true;
+    }
+
+    const readonly =
+      proposalData.submitted &&
+      proposalData.status?.shortCode !==
+        ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED;
+    if (readonly && isInternalUser) {
+      if (
+        proposalData.submitted &&
+        proposalData.status?.shortCode !==
+          ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+      ) {
+        return true;
+      }
+    }
+
+    return readonly;
+  };
   const cloneProposalsToCall = async (call: Call) => {
     setProposalToClone(null);
 
@@ -180,13 +204,11 @@ const ProposalTable = ({
           (rowData) => {
             const callHasEnded = isCallEnded(
               rowData.call?.startCall,
-              rowData.call?.endCall
+              isInternalUser
+                ? rowData.call?.endCallInternal
+                : rowData.call?.endCall
             );
-
-            const readOnly =
-              callHasEnded ||
-              (rowData.submitted &&
-                rowData.status?.shortCode !== 'EDITABLE_SUBMITTED');
+            const readOnly = callHasEnded || getProposalReadonlyStatus(rowData);
 
             return {
               icon: readOnly ? () => <Visibility /> : () => <Edit />,
