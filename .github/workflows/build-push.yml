@@ -97,9 +97,8 @@ jobs:
             -F token="${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
             -F ref=master \
             -F "variables[RUN_DEPLOY]=1" \
-            -F "variables[BRANCH]=${{ steps.extract_branch.outputs.branch }}" \
-            -F "variables[REPOSITORY]=${REPOSITORY#UserOfficeProject/}" \
             -F "variables[ENVIRONMENT]=${{ steps.extract_branch.outputs.branch }}" \
+            -F "variables[REPOSITORY]=${REPOSITORY#UserOfficeProject/}" \
             -o /dev/null \
             --silent \
             --write-out '%{http_code}' \
