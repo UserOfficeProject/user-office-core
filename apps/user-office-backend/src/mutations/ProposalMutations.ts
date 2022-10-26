@@ -20,11 +20,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import {
-  Proposal,
-  ProposalEndStatus,
-  ProposalPksWithNextStatus,
-} from '../models/Proposal';
+import { Proposal, ProposalEndStatus, ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
@@ -254,7 +250,7 @@ export default class ProposalMutations {
       });
 
       return submitProposal;
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejection(
         'Could not submit proposal',
         {
@@ -440,7 +436,7 @@ export default class ProposalMutations {
   async changeProposalsStatus(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
-  ): Promise<ProposalPksWithNextStatus | Rejection> {
+  ): Promise<ProposalPks | Rejection> {
     const { statusId, proposals } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(

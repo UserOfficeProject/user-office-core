@@ -151,11 +151,20 @@ context('GenericTemplates tests', () => {
     });
   };
 
-  describe('Generic templates basic tests', () => {
-    beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB();
+  beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
+    cy.resetDB();
+  });
+
+  // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+  // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+  afterEach(() => {
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
     });
+  });
+
+  describe('Generic templates basic tests', () => {
     it('Should be able to create proposal template with genericTemplate', () => {
       cy.createTemplate({
         name: proposalTemplateName,
@@ -272,8 +281,6 @@ context('GenericTemplates tests', () => {
 
   describe('Generic templates advanced tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB();
       createTemplateAndAllQuestions();
 
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
