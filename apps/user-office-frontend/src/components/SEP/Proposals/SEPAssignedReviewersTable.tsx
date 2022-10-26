@@ -2,8 +2,7 @@ import MaterialTable from '@material-table/core';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
 import makeStyles from '@mui/styles/makeStyles';
-import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -11,7 +10,6 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { ReviewStatus, UserRole, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import {
@@ -39,10 +37,7 @@ type SEPAssignedReviewersTableProps = {
     assignedReviewer: SEPProposalAssignmentType,
     proposalPk: number
   ) => Promise<void>;
-  updateView: (
-    currentAssignment: SEPProposalAssignmentType,
-    shouldRefreshProposalAssignments?: boolean
-  ) => Promise<void>;
+  updateView: (proposalPk: number) => Promise<void>;
 };
 
 const assignmentColumns = [
@@ -76,15 +71,12 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     modalTab: NumberParam,
   });
   const classes = useStyles();
-  const { setCurrentAssignment, currentAssignment } = useContext(
-    ReviewAndAssignmentContext
-  );
+  const [openProposalPk, setOpenProposalPk] = useState<number | null>(null);
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.SEP_CHAIR,
     UserRole.SEP_SECRETARY,
   ]);
-  const isSEPReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -106,31 +98,12 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
       })
     ) || [];
   const proposalReviewModalShouldOpen =
-    !!urlQueryParams.reviewerModal &&
-    currentAssignment?.proposalPk === sepProposal.proposalPk;
+    !!urlQueryParams.reviewerModal && openProposalPk === sepProposal.proposalPk;
 
   const onProposalReviewModalClose = () => {
     setUrlQueryParams({ reviewerModal: undefined, modalTab: undefined });
-    const currentAssignmentOldStatus = sepProposal.assignments?.find(
-      (assignment) => assignment.review?.id === currentAssignment?.review?.id
-    )?.review?.status;
-
-    if (
-      currentAssignment?.review?.status === ReviewStatus.SUBMITTED &&
-      isSEPReviewer &&
-      currentAssignmentOldStatus === ReviewStatus.DRAFT
-    ) {
-      const shouldRefreshProposalAssignments =
-        sepProposal.assignments?.find(
-          (assignment) =>
-            assignment.review?.id === currentAssignment?.review?.id
-        )?.review?.status === ReviewStatus.DRAFT;
-
-      updateView(currentAssignment, shouldRefreshProposalAssignments);
-    } else {
-      currentAssignment && updateView(currentAssignment);
-    }
-    setCurrentAssignment(null);
+    openProposalPk && updateView(openProposalPk);
+    setOpenProposalPk(null);
   };
 
   const editableTableRow = hasAccessRights
@@ -183,10 +156,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
                     ),
                 reviewerModal: rowData.review.id,
               });
-              setCurrentAssignment({
-                ...rowData,
-                proposalPk: sepProposal.proposalPk,
-              });
+              setOpenProposalPk(sepProposal.proposalPk);
             },
             tooltip: isDraftStatus(rowData?.review?.status)
               ? 'Grade proposal'
@@ -202,12 +172,6 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
       />
     </div>
   );
-};
-
-SEPAssignedReviewersTable.propTypes = {
-  sepProposal: PropTypes.any.isRequired,
-  removeAssignedReviewer: PropTypes.func.isRequired,
-  updateView: PropTypes.func.isRequired,
 };
 
 export default SEPAssignedReviewersTable;

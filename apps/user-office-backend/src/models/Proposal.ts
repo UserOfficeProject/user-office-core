@@ -50,11 +50,6 @@ export class Proposal {
   ) {}
 }
 
-export class ProposalPksWithNextStatus {
-  constructor(
-    public proposalPks: number[],
-    public id?: number,
-    public shortCode?: string,
-    public name?: string
-  ) {}
+export class ProposalPks {
+  constructor(public proposalPks: number[]) {}
 }

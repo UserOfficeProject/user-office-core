@@ -10,7 +10,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import { Select, CheckboxWithLabel } from 'formik-mui';
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Prompt } from 'react-router';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
@@ -19,13 +19,7 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import NavigationFragment from 'components/questionary/NavigationFragment';
-import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
-import {
-  ReviewStatus,
-  ReviewWithNextProposalStatus,
-  Review,
-  UserRole,
-} from 'generated/sdk';
+import { ReviewStatus, Review, UserRole } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -52,7 +46,6 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   confirm,
 }) => {
   const { api } = useDataApiWithFeedback();
-  const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [numberOfChars, setNumberOfChars] = useState(0);
@@ -107,7 +100,6 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
         grade: updatedReview.grade,
         status: updatedReview.status,
       });
-      setAssignmentReview(updatedReview as ReviewWithNextProposalStatus);
     }
     onChange();
     setIsSubmitting(false);

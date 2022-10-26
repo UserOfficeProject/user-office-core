@@ -4,7 +4,7 @@ import { AllocationTimeUnits, Call } from '../../models/Call';
 import {
   Proposal,
   ProposalEndStatus,
-  ProposalPksWithNextStatus,
+  ProposalPks,
 } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
@@ -350,7 +350,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async changeProposalsStatus(
     statusId: number,
     proposalPks: number[]
-  ): Promise<ProposalPksWithNextStatus> {
+  ): Promise<ProposalPks> {
     return { proposalPks: [1] };
   }
 
