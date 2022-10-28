@@ -1,32 +1,73 @@
-import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { eventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { ProposalEndStatus } from '../models/Proposal';
-import { ReviewStatus } from '../models/Review';
-import { SampleStatus } from '../models/Sample';
-import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
+import { searchObjectByKey } from '../utils/helperFunctions';
 import {
   markProposalEventAsDoneAndCallWorkflowEngine,
   WorkflowEngineProposalType,
 } from '../workflowEngine';
 
+enum ProposalInformationKeys {
+  Proposal = 'proposal',
+  ProposalPk = 'proposalPk',
+  ProposalPKs = 'proposalPks',
+}
+
+export const handleWorkflowEngineChange = async (
+  event: ApplicationEvent,
+  proposal: WorkflowEngineProposalType
+) => {
+  const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
+    event.type,
+    proposal
+  );
+
+  if (updatedProposals) {
+    updatedProposals.forEach(
+      (updatedProposal) =>
+        updatedProposal &&
+        eventBus.publish({
+          type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+          proposal: updatedProposal,
+          isRejection: false,
+          key: 'proposal',
+          loggedInUserId: event.loggedInUserId,
+        })
+    );
+  }
+};
+
+const extractProposalInformationFromEvent = (event: ApplicationEvent) => {
+  let proposalInformationObject, proposalInformationKey;
+  const proposalKeysToLookFor = Object.values(ProposalInformationKeys);
+
+  // NOTE: Go through the event object and try to find some of the ProposalInformationKeys.
+  for (const key of proposalKeysToLookFor) {
+    proposalInformationObject = searchObjectByKey(event, key);
+
+    if (
+      proposalInformationObject &&
+      proposalInformationObject[key as keyof object]
+    ) {
+      proposalInformationKey = key;
+
+      break;
+    }
+  }
+
+  return { proposalInformationObject, proposalInformationKey };
+};
+
 export default function createHandler() {
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
-  const reviewDataSource = container.resolve<ReviewDataSource>(
-    Tokens.ReviewDataSource
-  );
 
   // Handler to align input for workflowEngine
-
   return async function proposalWorkflowHandler(event: ApplicationEvent) {
     // if the original method failed
     // there is no point of moving forward in the workflow
@@ -34,55 +75,29 @@ export default function createHandler() {
       return;
     }
 
-    const handleWorkflowEngineChange = async (
-      eventType: Event,
-      proposal: WorkflowEngineProposalType
-    ) => {
-      const updatedProposals =
-        await markProposalEventAsDoneAndCallWorkflowEngine(eventType, proposal);
+    const { proposalInformationObject, proposalInformationKey } =
+      extractProposalInformationFromEvent(event);
 
-      if (updatedProposals) {
-        updatedProposals.forEach(
-          (updatedProposal) =>
-            updatedProposal &&
-            eventBus.publish({
-              type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-              proposal: updatedProposal,
-              isRejection: false,
-              key: 'proposal',
-              loggedInUserId: event.loggedInUserId,
-            })
-        );
-      }
-    };
+    // If none of the ProposalInformationKeys found then it is not a proposal event
+    if (!proposalInformationObject || !proposalInformationKey) {
+      return;
+    }
 
-    switch (event.type) {
-      case Event.PROPOSAL_CREATED:
-        try {
-          await proposalDataSource.markEventAsDoneOnProposal(
-            event.type,
-            event.proposal.primaryKey
-          );
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
-            error
-          );
-        }
-        break;
-      case Event.PROPOSAL_INSTRUMENT_SELECTED:
-      case Event.PROPOSAL_SEP_SELECTED:
-      case Event.PROPOSAL_STATUS_UPDATED:
-        try {
+    const proposalInformationValue =
+      proposalInformationObject?.[proposalInformationKey as keyof object];
+
+    if (proposalInformationValue) {
+      switch (proposalInformationKey) {
+        case ProposalInformationKeys.ProposalPKs:
           await Promise.all(
-            event.proposalpks.proposalPks.map(async (proposalPk) => {
+            (proposalInformationValue as number[]).map(async (proposalPk) => {
               const proposal = await proposalDataSource.get(proposalPk);
 
               if (proposal?.primaryKey) {
-                await handleWorkflowEngineChange(event.type, proposal);
+                await handleWorkflowEngineChange(event, proposal);
 
-                // only if the status changed
-                // trigger and individual event for the proposal status change
+                // NOTE: If proposal status is updated manually then we need to fire another event.
+                // TODO: This could be refactored and we use only one event instead of two. Ref. changeProposalsStatus inside ProposalMutations.ts
                 if (event.type === Event.PROPOSAL_STATUS_UPDATED) {
                   eventBus.publish({
                     type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
@@ -95,373 +110,28 @@ export default function createHandler() {
               }
             })
           );
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposalpks.proposalPks}: `,
-            error
-          );
-        }
-
-        break;
-      case Event.PROPOSAL_SUBMITTED:
-      case Event.PROPOSAL_FEASIBLE:
-      case Event.PROPOSAL_UNFEASIBLE:
-      case Event.PROPOSAL_SAMPLE_SAFE:
-      case Event.PROPOSAL_NOTIFIED:
-      case Event.PROPOSAL_ACCEPTED:
-      case Event.PROPOSAL_REJECTED:
-      case Event.PROPOSAL_RESERVED:
-      case Event.PROPOSAL_SEP_MEETING_SUBMITTED:
-      case Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED:
-        try {
-          await handleWorkflowEngineChange(event.type, event.proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
-            error
-          );
-        }
-
-        break;
-      case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
-        try {
-          if (event.proposal.managementDecisionSubmitted) {
-            eventBus.publish({
-              type: Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED,
-              proposal: event.proposal,
-              isRejection: false,
-              key: 'proposal',
-              loggedInUserId: event.loggedInUserId,
-            });
-          }
-
-          await handleWorkflowEngineChange(event.type, event.proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
-            error
-          );
-        }
-
-        break;
-      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
-        try {
-          switch (event.proposal.finalStatus) {
-            case ProposalEndStatus.ACCEPTED:
-              eventBus.publish({
-                type: Event.PROPOSAL_ACCEPTED,
-                proposal: event.proposal,
-                isRejection: false,
-                key: 'proposal',
-                loggedInUserId: event.loggedInUserId,
-              });
-              break;
-            case ProposalEndStatus.RESERVED:
-              eventBus.publish({
-                type: Event.PROPOSAL_RESERVED,
-                proposal: event.proposal,
-                isRejection: false,
-                key: 'proposal',
-                loggedInUserId: event.loggedInUserId,
-              });
-              break;
-            case ProposalEndStatus.REJECTED:
-              eventBus.publish({
-                type: Event.PROPOSAL_REJECTED,
-                proposal: event.proposal,
-                isRejection: false,
-                reason: event.proposal.commentForUser,
-                key: 'proposal',
-                loggedInUserId: event.loggedInUserId,
-              });
-              break;
-            default:
-              break;
-          }
-
-          await handleWorkflowEngineChange(event.type, event.proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
-            error
-          );
-        }
-        break;
-      case Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED:
-        try {
-          const proposal = await proposalDataSource.get(
-            event.technicalreview.proposalPk
+          break;
+        case ProposalInformationKeys.ProposalPk:
+          const foundProposal = await proposalDataSource.get(
+            proposalInformationValue
           );
 
-          if (!proposal) {
+          if (!foundProposal) {
             throw new Error(
-              `Proposal with id ${event.technicalreview.proposalPk} not found`
+              `Proposal with id ${proposalInformationValue} not found`
             );
           }
 
-          if (event.technicalreview.submitted) {
-            eventBus.publish({
-              type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED,
-              technicalreview: event.technicalreview,
-              isRejection: false,
-              key: 'technicalreview',
-              loggedInUserId: event.loggedInUserId,
-            });
-          }
+          await handleWorkflowEngineChange(event, foundProposal);
 
-          await handleWorkflowEngineChange(event.type, proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalPk}: `,
-            error
-          );
-        }
+          break;
+        case ProposalInformationKeys.Proposal:
+          await handleWorkflowEngineChange(event, proposalInformationValue);
 
-        break;
-      case Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED:
-        try {
-          const proposal = await proposalDataSource.get(
-            event.technicalreview.proposalPk
-          );
-
-          if (!proposal) {
-            throw new Error(
-              `Proposal with id ${event.technicalreview.proposalPk} not found`
-            );
-          }
-
-          switch (event.technicalreview.status) {
-            case TechnicalReviewStatus.FEASIBLE:
-              eventBus.publish({
-                type: Event.PROPOSAL_FEASIBLE,
-                proposal,
-                isRejection: false,
-                key: 'proposal',
-                loggedInUserId: event.loggedInUserId,
-              });
-              break;
-            case TechnicalReviewStatus.UNFEASIBLE:
-              eventBus.publish({
-                type: Event.PROPOSAL_UNFEASIBLE,
-                proposal,
-                isRejection: false,
-                key: 'proposal',
-                loggedInUserId: event.loggedInUserId,
-              });
-              break;
-            default:
-              break;
-          }
-
-          await handleWorkflowEngineChange(event.type, proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalPk}: `,
-            error
-          );
-        }
-
-        break;
-      case Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED:
-        try {
-          const proposal = await proposalDataSource.get(
-            event.sample.proposalPk
-          );
-
-          if (!proposal) {
-            throw new Error(
-              `Proposal with id ${event.sample.proposalPk} not found`
-            );
-          }
-
-          switch (event.sample.safetyStatus) {
-            case SampleStatus.LOW_RISK:
-              eventBus.publish({
-                type: Event.PROPOSAL_SAMPLE_SAFE,
-                proposal,
-                isRejection: false,
-                key: 'proposal',
-                loggedInUserId: event.loggedInUserId,
-              });
-              break;
-            default:
-              break;
-          }
-
-          await handleWorkflowEngineChange(event.type, proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sample.proposalPk}: `,
-            error
-          );
-        }
-        break;
-      case Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN:
-      case Event.PROPOSAL_SEP_MEETING_REORDER:
-        try {
-          const proposal = await proposalDataSource.get(
-            event.sepmeetingdecision.proposalPk
-          );
-
-          if (!proposal) {
-            throw new Error(
-              `Proposal with id ${event.sepmeetingdecision.proposalPk} not found`
-            );
-          }
-
-          await handleWorkflowEngineChange(event.type, proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalPk}: `,
-            error
-          );
-        }
-        break;
-      case Event.PROPOSAL_SEP_MEETING_SAVED:
-        try {
-          const proposal = await proposalDataSource.get(
-            event.sepmeetingdecision.proposalPk
-          );
-
-          if (!proposal) {
-            throw new Error(
-              `Proposal with id ${event.sepmeetingdecision.proposalPk} not found`
-            );
-          }
-
-          if (event.sepmeetingdecision.submitted) {
-            eventBus.publish({
-              type: Event.PROPOSAL_SEP_MEETING_SUBMITTED,
-              proposal,
-              isRejection: false,
-              key: 'proposal',
-              loggedInUserId: event.loggedInUserId,
-            });
-          }
-
-          await handleWorkflowEngineChange(event.type, proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalPk}: `,
-            error
-          );
-        }
-        break;
-      case Event.PROPOSAL_SEP_REVIEW_UPDATED:
-        try {
-          const proposal = await proposalDataSource.get(
-            event.review.proposalPk
-          );
-
-          if (!proposal) {
-            throw new Error(
-              `Proposal with id ${event.review.proposalPk} not found`
-            );
-          }
-
-          if (event.review.status === ReviewStatus.SUBMITTED) {
-            eventBus.publish({
-              type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED,
-              review: event.review,
-              isRejection: false,
-              key: 'review',
-              loggedInUserId: event.loggedInUserId,
-            });
-          }
-
-          await handleWorkflowEngineChange(event.type, proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalPk}: `,
-            error
-          );
-        }
-        break;
-
-      case Event.PROPOSAL_SEP_REVIEW_SUBMITTED:
-        try {
-          const proposal = await proposalDataSource.get(
-            event.review.proposalPk
-          );
-
-          if (!proposal) {
-            throw new Error(
-              `Proposal with id ${event.review.proposalPk} not found`
-            );
-          }
-          const allProposalReviews = await reviewDataSource.getProposalReviews(
-            proposal?.primaryKey
-          );
-
-          const allOtherReviewsSubmitted = checkAllReviewsSubmittedOnProposal(
-            allProposalReviews,
-            event.review
-          );
-
-          if (allOtherReviewsSubmitted) {
-            eventBus.publish({
-              type: Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED,
-              proposal,
-              isRejection: false,
-              key: 'proposal',
-              loggedInUserId: event.loggedInUserId,
-            });
-          }
-
-          await handleWorkflowEngineChange(event.type, proposal);
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalPk}: `,
-            error
-          );
-        }
-        break;
-      case Event.CALL_ENDED:
-      case Event.CALL_ENDED_INTERNAL:
-      case Event.CALL_REVIEW_ENDED:
-      case Event.CALL_SEP_REVIEW_ENDED:
-        try {
-          const allProposalsOnCall =
-            await proposalDataSource.getProposalsFromView({
-              callId: event.call.id,
-            });
-
-          if (allProposalsOnCall && allProposalsOnCall.proposalViews.length) {
-            await Promise.all(
-              allProposalsOnCall.proposalViews.map(
-                async (proposalOnCall) =>
-                  await handleWorkflowEngineChange(event.type, proposalOnCall)
-              )
-            );
-          }
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine on proposals with callId = ${event.call.id}: `,
-            error
-          );
-        }
-
-        break;
-
-      case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
-        try {
-          await Promise.all(
-            event.instrumenthasproposals.proposalPks.map(async (proposalPk) => {
-              const proposal = await proposalDataSource.get(proposalPk);
-
-              if (proposal?.primaryKey) {
-                return await handleWorkflowEngineChange(event.type, proposal);
-              }
-            })
-          );
-        } catch (error) {
-          logger.logException(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.instrumenthasproposals.proposalPks}: `,
-            error
-          );
-        }
-
-        break;
+          break;
+        default:
+          break;
+      }
     }
   };
 }
