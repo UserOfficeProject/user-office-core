@@ -9,7 +9,7 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
   const updatedCalls = [];
   try {
     const notEndedCalls = await dataSource.getCalls({
-      isEnded: false,
+      isCallEndedByEvent: false,
     });
 
     const currentDate = new Date();

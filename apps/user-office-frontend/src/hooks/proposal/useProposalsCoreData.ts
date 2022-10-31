@@ -2,7 +2,7 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, ProposalView, UserRole } from 'generated/sdk';
@@ -19,6 +19,7 @@ export function useProposalsCoreData(
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const { currentRole } = useContext(UserContext);
+
   const {
     reviewer,
     callId,
@@ -29,111 +30,122 @@ export function useProposalsCoreData(
     questionFilter,
   } = filter;
 
-  useEffect(() => {
-    let unmounted = false;
+  const fetchProposalsData = useCallback(
+    async (componentController?: { unmounted: boolean }) => {
+      setLoading(true);
 
-    setLoading(true);
-
-    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
-      api()
-        .getInstrumentScientistProposals({
-          filter: {
-            reviewer,
-            callId,
-            instrumentId,
-            proposalStatusId,
-            questionaryIds,
-            questionFilter: questionFilter && {
-              ...questionFilter,
-              value:
-                JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+      if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+        api()
+          .getInstrumentScientistProposals({
+            filter: {
+              reviewer,
+              callId,
+              instrumentId,
+              proposalStatusId,
+              questionaryIds,
+              questionFilter: questionFilter && {
+                ...questionFilter,
+                value:
+                  JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+              },
+              text,
             },
-            text,
-          },
-        })
-        .then((data) => {
-          if (unmounted) {
-            return;
-          }
-          if (data.instrumentScientistProposals) {
-            setProposalsData(
-              data.instrumentScientistProposals.proposals.map((proposal) => {
-                return {
-                  ...proposal,
-                  status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalStatus: getTranslation(
-                    proposal.technicalStatus as ResourceId
-                  ),
-                  finalStatus: getTranslation(
-                    proposal.finalStatus as ResourceId
-                  ),
-                } as ProposalViewData;
-              })
-            );
-            setTotalCount(data.instrumentScientistProposals.totalCount);
-          }
-          setLoading(false);
-        });
-    } else {
-      api()
-        .getProposalsCore({
-          filter: {
-            callId,
-            instrumentId,
-            proposalStatusId,
-            questionaryIds,
-            questionFilter: questionFilter && {
-              ...questionFilter,
-              value:
-                JSON.stringify({ value: questionFilter?.value }) ?? undefined,
-            }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
-            text,
-          },
-          ...queryParameters,
-        })
-        .then((data) => {
-          if (unmounted) {
-            return;
-          }
+          })
+          .then((data) => {
+            if (componentController?.unmounted) {
+              return;
+            }
+            if (data.instrumentScientistProposals) {
+              setProposalsData(
+                data.instrumentScientistProposals.proposals.map((proposal) => {
+                  return {
+                    ...proposal,
+                    status: proposal.submitted ? 'Submitted' : 'Open',
+                    technicalStatus: getTranslation(
+                      proposal.technicalStatus as ResourceId
+                    ),
+                    finalStatus: getTranslation(
+                      proposal.finalStatus as ResourceId
+                    ),
+                  } as ProposalViewData;
+                })
+              );
+              setTotalCount(data.instrumentScientistProposals.totalCount);
+            }
+            setLoading(false);
+          });
+      } else {
+        api()
+          .getProposalsCore({
+            filter: {
+              callId,
+              instrumentId,
+              proposalStatusId,
+              questionaryIds,
+              questionFilter: questionFilter && {
+                ...questionFilter,
+                value:
+                  JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+              }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
+              text,
+            },
+            ...queryParameters,
+          })
+          .then((data) => {
+            if (componentController?.unmounted) {
+              return;
+            }
+            if (data.proposalsView) {
+              setProposalsData(
+                data.proposalsView.proposalViews.map((proposal) => {
+                  return {
+                    ...proposal,
+                    status: proposal.submitted ? 'Submitted' : 'Open',
+                    technicalStatus: getTranslation(
+                      proposal.technicalStatus as ResourceId
+                    ),
+                    finalStatus: getTranslation(
+                      proposal.finalStatus as ResourceId
+                    ),
+                  } as ProposalViewData;
+                })
+              );
+              setTotalCount(data.proposalsView.totalCount);
+            }
+            setLoading(false);
+          });
+      }
+    },
+    [
+      reviewer,
+      callId,
+      instrumentId,
+      proposalStatusId,
+      questionaryIds,
+      text,
+      questionFilter,
+      api,
+      currentRole,
+      queryParameters,
+    ]
+  );
 
-          if (data.proposalsView) {
-            setProposalsData(
-              data.proposalsView.proposalViews.map((proposal) => {
-                return {
-                  ...proposal,
-                  status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalStatus: getTranslation(
-                    proposal.technicalStatus as ResourceId
-                  ),
-                  finalStatus: getTranslation(
-                    proposal.finalStatus as ResourceId
-                  ),
-                } as ProposalViewData;
-              })
-            );
-            setTotalCount(data.proposalsView.totalCount);
-          }
-          setLoading(false);
+  useEffect(() => {
+    const componentController = { unmounted: false };
+    fetchProposalsData(componentController);
 
-          return () => {
-            unmounted = true;
-          };
-        });
-    }
-  }, [
-    reviewer,
-    callId,
-    instrumentId,
-    proposalStatusId,
-    questionaryIds,
-    text,
-    questionFilter,
-    api,
-    currentRole,
-    queryParameters,
-  ]);
+    return () => {
+      componentController.unmounted = true;
+    };
+  }, [fetchProposalsData]);
 
-  return { loading, proposalsData, setProposalsData, totalCount };
+  return {
+    loading,
+    proposalsData,
+    setProposalsData,
+    totalCount,
+    fetchProposalsData,
+  };
 }
 
 export interface ProposalViewData

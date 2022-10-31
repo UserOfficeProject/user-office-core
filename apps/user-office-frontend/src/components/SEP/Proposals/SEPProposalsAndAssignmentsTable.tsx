@@ -16,14 +16,7 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import {
-  UserRole,
-  ReviewWithNextProposalStatus,
-  ProposalStatus,
-  Review,
-  SettingsId,
-  Sep,
-} from 'generated/sdk';
+import { UserRole, Review, SettingsId, Sep } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
@@ -414,49 +407,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<
 
   const ReviewersTable = React.useCallback(
     ({ rowData }: Record<'rowData', SEPProposalType>) => {
-      const updateReviewStatusAndGrade = (
-        sepProposalData: SEPProposalType[],
-        editingProposalData: SEPProposalType,
-        currentAssignment: SEPProposalAssignmentType
-      ) => {
-        const newProposalsData =
-          sepProposalData?.map((sepProposalsData) => {
-            if (
-              sepProposalsData.proposalPk === editingProposalData.proposalPk
-            ) {
-              const editingProposalStatus = (
-                currentAssignment.review as ReviewWithNextProposalStatus
-              ).nextProposalStatus
-                ? ((currentAssignment.review as ReviewWithNextProposalStatus)
-                    .nextProposalStatus as ProposalStatus)
-                : editingProposalData.proposal.status;
-
-              return {
-                ...editingProposalData,
-                proposal: {
-                  ...editingProposalData.proposal,
-                  status: editingProposalStatus,
-                },
-                assignments:
-                  editingProposalData.assignments?.map((proposalAssignment) => {
-                    if (
-                      proposalAssignment?.review?.id ===
-                      currentAssignment?.review?.id
-                    ) {
-                      return currentAssignment;
-                    } else {
-                      return proposalAssignment;
-                    }
-                  }) ?? [],
-              };
-            } else {
-              return sepProposalsData;
-            }
-          }) || [];
-
-        return newProposalsData;
-      };
-
       const removeAssignedReviewer = async (
         assignedReviewer: SEPProposalAssignmentType,
         proposalPk: number
@@ -520,31 +470,26 @@ const SEPProposalsAndAssignmentsTable: React.FC<
           });
       };
 
-      const updateSEPProposalAssignmentsView = async (
-        currentAssignment: SEPProposalAssignmentType,
-        shouldRefreshProposalAssignments?: boolean
-      ) => {
-        if (shouldRefreshProposalAssignments) {
-          const refreshedSepProposal = await loadSEPProposal(
-            currentAssignment.proposalPk
-          );
+      const updateSEPProposalAssignmentsView = async (proposalPk: number) => {
+        const refreshedSepProposal = await loadSEPProposal(proposalPk);
+
+        if (refreshedSepProposal) {
           setSEPProposalsData((sepProposalsData) => {
             return sepProposalsData.map((sepProposal) => ({
               ...sepProposal,
+              proposal: {
+                ...sepProposal.proposal,
+                status:
+                  refreshedSepProposal.proposalPk === sepProposal.proposalPk
+                    ? refreshedSepProposal.proposal.status
+                    : sepProposal.proposal.status,
+              },
               assignments:
-                refreshedSepProposal?.proposalPk === sepProposal.proposalPk
-                  ? refreshedSepProposal?.assignments
+                refreshedSepProposal.proposalPk === sepProposal.proposalPk
+                  ? refreshedSepProposal.assignments
                   : sepProposal.assignments,
             }));
           });
-        } else {
-          setSEPProposalsData((sepProposalData) =>
-            updateReviewStatusAndGrade(
-              sepProposalData,
-              rowData,
-              currentAssignment
-            )
-          );
         }
       };
 

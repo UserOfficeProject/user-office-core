@@ -28,6 +28,9 @@ export class CallsFilter {
 
   @Field(() => Boolean, { nullable: true })
   public isSEPReviewEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isCallEndedByEvent?: boolean;
 }
 
 @Resolver()
