@@ -51,24 +51,16 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
         return;
       }
-
-      const instrument = instruments[0].name;
-
       let piEmailTemplate: string;
-
-      const isIsis = instrument === 'ISIS';
-
       const isRapidAccess =
-        isIsis && call?.shortCode?.toLowerCase().includes('rapid');
-
-      if (isIsis) {
-        piEmailTemplate = 'isis-proposal-submitted-pi';
-      } else if (isRapidAccess) {
-        piEmailTemplate = 'isis-rapid-proposal-submitted-pi';
+        call?.shortCode?.toLowerCase().includes('rapid') || false;
+      if (instruments[0].name === 'ISIS') {
+        piEmailTemplate = isRapidAccess
+          ? 'isis-rapid-proposal-submitted-pi'
+          : 'isis-proposal-submitted-pi';
       } else {
         piEmailTemplate = 'clf-proposal-submitted-pi';
       }
-
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
