@@ -47,9 +47,13 @@ export default function initGraphQLClient(token?: string) {
       (feature) => feature.id === FeatureId.SCHEDULER
     )?.isEnabled;
 
-    if (!SCHEDULER_ENDPOINT || !isSchedulerEnabled) {
+    if (!isSchedulerEnabled) {
+      return;
+    }
+
+    if (!SCHEDULER_ENDPOINT) {
       logger.logError(
-        'env `SCHEDULER_ENDPOINT` missing or scheduler not enabled',
+        'Scheduler enabled but env `SCHEDULER_ENDPOINT` is missing',
         {}
       );
 

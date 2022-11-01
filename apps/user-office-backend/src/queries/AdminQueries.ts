@@ -106,31 +106,34 @@ export default class AdminQueries {
       allMutationMethods.push(...classNamesWithMethod);
     });
 
-    try {
-      // NOTE: If scheduler is disabled we get undefined as scheduler client
-      const schedulerQueriesAndMutations = await (
-        await context.clients.scheduler()
-      )?.getQueriesAndMutations();
+    const scheduler = await context.clients.scheduler();
 
-      if (schedulerQueriesAndMutations) {
-        return {
-          queries: allQueryMethods.concat(
-            schedulerQueriesAndMutations.schedulerQueriesAndMutations
-              ?.queries || []
-          ),
-          mutations: allMutationMethods.concat(
-            schedulerQueriesAndMutations.schedulerQueriesAndMutations
-              ?.mutations || []
-          ),
-        };
+    if (!scheduler) {
+      return { queries: allQueryMethods, mutations: allMutationMethods };
+    } else {
+      try {
+        // NOTE: If scheduler is disabled we get undefined as scheduler client
+        const schedulerQueriesAndMutations =
+          await scheduler.getQueriesAndMutations();
+
+        if (schedulerQueriesAndMutations) {
+          return {
+            queries: allQueryMethods.concat(
+              schedulerQueriesAndMutations.schedulerQueriesAndMutations
+                ?.queries || []
+            ),
+            mutations: allMutationMethods.concat(
+              schedulerQueriesAndMutations.schedulerQueriesAndMutations
+                ?.mutations || []
+            ),
+          };
+        }
+      } catch (error) {
+        logger.logException(
+          'Failed while getting scheduler queries and mutations',
+          error
+        );
       }
-    } catch (error) {
-      logger.logException(
-        'Failed while getting scheduler queries and mutations',
-        error
-      );
     }
-
-    return { queries: allQueryMethods, mutations: allMutationMethods };
   }
 }
