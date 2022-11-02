@@ -419,6 +419,7 @@ export default class PostgresUserDataSource implements UserDataSource {
 
   async getUsers({
     filter,
+    userIds,
     first,
     offset,
     userRole,
@@ -439,6 +440,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               .orWhere('preferredname', 'ilike', `%${filter}%`)
               .orWhere('lastname', 'ilike', `%${filter}%`);
           });
+        }
+        if (userIds) {
+          query.whereIn('user_id', userIds)
         }
         if (first) {
           query.limit(first);

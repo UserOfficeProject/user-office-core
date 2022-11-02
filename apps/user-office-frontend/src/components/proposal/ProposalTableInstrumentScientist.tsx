@@ -84,6 +84,10 @@ let columns: Column<ProposalViewData>[] = [
     emptyValue: '-',
     hidden: true,
   },
+  {
+    title: 'Principal Investigator',
+    field: 'proposerId',
+  },
 ];
 
 const technicalReviewColumns: Column<ProposalViewData>[] = [

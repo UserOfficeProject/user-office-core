@@ -370,6 +370,7 @@ export class StfcUserDataSource implements UserDataSource {
 
   async getUsers({
     filter,
+    userIds,
     first,
     offset,
     subtractUsers,
@@ -392,6 +393,7 @@ export class StfcUserDataSource implements UserDataSource {
     } else {
       const { users, totalCount } = await postgresUserDataSource.getUsers({
         filter: undefined,
+        userIds: userIds,
         first: first,
         offset: offset,
         userRole: undefined,

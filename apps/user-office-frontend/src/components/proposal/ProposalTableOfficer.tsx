@@ -108,6 +108,10 @@ let columns: Column<ProposalViewData>[] = [
     title: 'Call',
     field: 'callShortCode',
   },
+  {
+    title: 'Principal Investigator',
+    field: 'proposerId',
+  },
 ];
 
 const technicalReviewColumns = [

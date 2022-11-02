@@ -142,6 +142,7 @@ export interface ProposalViewRecord {
   readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
+  readonly proposer_id: number;
 }
 
 export interface TopicRecord {
@@ -747,7 +748,8 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.submitted
+    proposal.submitted,
+    proposal.proposer_id
   );
 };
 

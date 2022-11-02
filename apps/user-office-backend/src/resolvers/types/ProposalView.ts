@@ -86,4 +86,7 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
+
+  @Field(() => Int, { nullable: true})
+  public proposerId: number;
 }
