@@ -2,13 +2,26 @@ import { Ctx, Field, ObjectType, Query, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 
+export enum QueryAndMutationGroups {
+  CORE = 'core',
+  SCHEDULER = 'scheduler',
+}
+
 @ObjectType()
-export class QueriesAndMutations {
-  @Field(() => [String])
-  public queries: string[];
+export class QueryAndMutationGroup {
+  @Field(() => QueryAndMutationGroups)
+  public groupName: QueryAndMutationGroups;
 
   @Field(() => [String])
-  public mutations: string[];
+  public items: string[];
+}
+@ObjectType()
+export class QueriesAndMutations {
+  @Field(() => [QueryAndMutationGroup])
+  public queries: QueryAndMutationGroup[];
+
+  @Field(() => [QueryAndMutationGroup])
+  public mutations: QueryAndMutationGroup[];
 }
 
 @Resolver()

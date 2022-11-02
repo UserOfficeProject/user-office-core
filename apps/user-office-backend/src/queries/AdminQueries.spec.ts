@@ -66,9 +66,16 @@ describe('Test Admin Queries', () => {
       context
     );
 
-    expect(result.queries.length).toBeGreaterThan(0);
-    expect(result.mutations.length).toBeGreaterThan(0);
+    const coreQueries = result?.queries.find(
+      (queryGroup) => queryGroup.groupName === 'core'
+    );
+    const coreMutations = result?.mutations.find(
+      (mutationGroup) => mutationGroup.groupName === 'core'
+    );
 
-    expect(result.queries).toContain('ProposalQueries.getAll');
+    expect(coreQueries?.items?.length).toBeGreaterThan(0);
+    expect(coreMutations?.items?.length).toBeGreaterThan(0);
+
+    expect(coreQueries?.items).toContain('ProposalQueries.getAll');
   });
 });

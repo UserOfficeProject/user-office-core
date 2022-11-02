@@ -95,37 +95,47 @@ export default class AdminQueries {
         ];
 
       const proto = Object.getPrototypeOf(element);
-      const names = Object.getOwnPropertyNames(proto).filter(
-        (item) => item !== 'constructor'
-      );
+      if (!proto.constructor.name.startsWith('Admin')) {
+        const names = Object.getOwnPropertyNames(proto).filter(
+          (item) => item !== 'constructor'
+        );
 
-      const classNamesWithMethod = names.map(
-        (item) => `${proto.constructor.name}.${item}`
-      );
+        const classNamesWithMethod = names.map(
+          (item) => `${proto.constructor.name}.${item}`
+        );
 
-      allMutationMethods.push(...classNamesWithMethod);
+        allMutationMethods.push(...classNamesWithMethod);
+      }
     });
 
+    // NOTE: If scheduler is disabled we get undefined as scheduler clientF
     const scheduler = await context.clients.scheduler();
 
-    if (!scheduler) {
-      return { queries: allQueryMethods, mutations: allMutationMethods };
-    } else {
+    if (scheduler) {
       try {
-        // NOTE: If scheduler is disabled we get undefined as scheduler client
         const schedulerQueriesAndMutations =
           await scheduler.getQueriesAndMutations();
 
         if (schedulerQueriesAndMutations) {
           return {
-            queries: allQueryMethods.concat(
-              schedulerQueriesAndMutations.schedulerQueriesAndMutations
-                ?.queries || []
-            ),
-            mutations: allMutationMethods.concat(
-              schedulerQueriesAndMutations.schedulerQueriesAndMutations
-                ?.mutations || []
-            ),
+            queries: [
+              { groupName: 'core', items: allQueryMethods },
+              {
+                groupName: 'scheduler',
+                items:
+                  schedulerQueriesAndMutations.schedulerQueriesAndMutations
+                    ?.queries,
+              },
+            ],
+            mutations: [
+              { groupName: 'core', items: allMutationMethods },
+              {
+                groupName: 'scheduler',
+                items:
+                  schedulerQueriesAndMutations.schedulerQueriesAndMutations
+                    ?.mutations,
+              },
+            ],
           };
         }
       } catch (error) {
@@ -134,6 +144,11 @@ export default class AdminQueries {
           error
         );
       }
+
+      return {
+        queries: [{ groupName: 'core', items: allQueryMethods }],
+        mutations: [{ groupName: 'core', items: allMutationMethods }],
+      };
     }
   }
 }

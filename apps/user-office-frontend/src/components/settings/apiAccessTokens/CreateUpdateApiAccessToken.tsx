@@ -1,9 +1,14 @@
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
+import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
+import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
@@ -18,18 +23,23 @@ import React from 'react';
 import ErrorMessage from 'components/common/ErrorMessage';
 import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
-import { PermissionsWithAccessToken } from 'generated/sdk';
+import {
+  PermissionsWithAccessToken,
+  QueryAndMutationGroup,
+  QueryAndMutationGroups,
+} from 'generated/sdk';
 import { useQueriesAndMutationsData } from 'hooks/admin/useQueriesAndMutationsData';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-    minHeight: '350px',
-    marginTop: theme.spacing(1),
-    maxHeight: '550px',
-    overflowY: 'auto',
-    overflowX: 'hidden',
+  formControlGroup: {
+    border: `1px solid ${theme.palette.grey[200]}`,
+    padding: theme.spacing(0, 1),
+
+    '& legend': {
+      textTransform: 'capitalize',
+    },
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
@@ -111,46 +121,99 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
       };
 
   const allAccessPermissions = (
-    items: string[],
+    groups: QueryAndMutationGroup[],
     title: string,
     formValues: FormPermissionsWithAccessToken,
     fieldArrayHelpers: FieldArrayRenderProps
   ) => {
-    return (
-      <Grid className={classes.container} container spacing={1}>
-        {items.map((item, index) => (
-          <Grid
-            item
-            md={6}
-            xs={12}
-            key={index}
-            className={classes.checkBoxLabelText}
+    const corePermissionsForSchedulerAPIAccess =
+      'AdminQueries.getTokenAndPermissionsById';
+    const isCorePermissionEnabled = formValues.accessPermissions.includes(
+      corePermissionsForSchedulerAPIAccess
+    );
+
+    const schedulerAlert = (group: QueryAndMutationGroup) =>
+      group.groupName === QueryAndMutationGroups.SCHEDULER &&
+      !isCorePermissionEnabled && (
+        <Alert severity="warning" data-cy="scheduler-access-alert">
+          For Scheduler API access to work you need to have
+          <b> {corePermissionsForSchedulerAPIAccess}</b> permissions enabled on
+          the core.
+          <Button
+            variant="text"
+            onClick={() =>
+              fieldArrayHelpers.push(corePermissionsForSchedulerAPIAccess)
+            }
           >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  id={item}
-                  name="accessPermissions"
-                  value={item}
-                  checked={formValues.accessPermissions.includes(item)}
-                  data-cy={`permission-${title.toLowerCase()}`}
-                  onChange={(e) => {
-                    if (e.target.checked) fieldArrayHelpers.push(item);
-                    else {
-                      const idx = formValues.accessPermissions.indexOf(item);
-                      fieldArrayHelpers.remove(idx);
-                    }
-                  }}
-                  inputProps={{
-                    'aria-label': 'primary checkbox',
-                  }}
-                />
-              }
-              label={item}
-            />
-          </Grid>
+            Enable it here
+          </Button>
+        </Alert>
+      );
+
+    return (
+      <>
+        {groups.map((group, index) => (
+          <FormControl
+            component="fieldset"
+            variant="standard"
+            key={index}
+            className={classes.formControlGroup}
+          >
+            <FormLabel component="legend">
+              {group.groupName} {title} (
+              <Link
+                component="button"
+                type="button"
+                onClick={() => {
+                  group.items.forEach((item) => fieldArrayHelpers.push(item));
+                }}
+              >
+                Select all
+              </Link>
+              )
+            </FormLabel>
+            <FormGroup>
+              {schedulerAlert(group)}
+              <Grid container spacing={1}>
+                {group.items.map((item, index) => (
+                  <Grid
+                    item
+                    md={6}
+                    xs={12}
+                    key={index}
+                    className={classes.checkBoxLabelText}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          id={item}
+                          name="accessPermissions"
+                          value={item}
+                          checked={formValues.accessPermissions.includes(item)}
+                          data-cy={`permission-${title.toLowerCase()}`}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              fieldArrayHelpers.push(item);
+                            } else {
+                              const idx =
+                                formValues.accessPermissions.indexOf(item);
+                              fieldArrayHelpers.remove(idx);
+                            }
+                          }}
+                          inputProps={{
+                            'aria-label': 'primary checkbox',
+                          }}
+                        />
+                      }
+                      label={item}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </FormGroup>
+          </FormControl>
         ))}
-      </Grid>
+      </>
     );
   };
 

@@ -1,6 +1,12 @@
 query getAllQueriesAndMutations {
   queriesAndMutations {
-    queries
-    mutations
+    queries {
+      groupName
+      items
+    }
+    mutations {
+      groupName
+      items
+    }
   }
 }
