@@ -215,8 +215,9 @@ export class ProposalAuthorization {
     )?.shortCode;
     if (
       proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
-      proposalStatus ===
-        ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+      (checkIfInternalEditable &&
+        proposalStatus ===
+          ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL)
     ) {
       return true;
     }
