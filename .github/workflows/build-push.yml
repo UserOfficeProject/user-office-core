@@ -32,7 +32,7 @@ jobs:
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
 
           # set output variable accessible in the action
-          echo ::set-output name=branch::${BRANCH_NAME}
+          echo "branch=${BRANCH_NAME}" >> $GITHUB_OUTPUT
 
       # For debugging capture the selected branch
       - name: Extracted branch
