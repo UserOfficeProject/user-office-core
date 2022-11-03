@@ -20,14 +20,23 @@ export function useActiveTemplates(
   >(null);
 
   useEffect(() => {
+    let unmounted = false;
+
     api()
       .getTemplates({ filter: { group: groupId, isArchived: false } })
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
         // if we need to include an extra template
         if (includeTemplate) {
           api()
             .getTemplate({ templateId: includeTemplate })
             .then(({ template }) => {
+              if (unmounted) {
+                return;
+              }
+
               if (template && data.templates) {
                 const alreadyContainsExtraTemplate = data.templates.find(
                   (t) => t.templateId === template.templateId
@@ -43,6 +52,10 @@ export function useActiveTemplates(
           setTemplates(data.templates);
         }
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [groupId, includeTemplate, api]);
 
   return { templates, setTemplates };
