@@ -144,11 +144,11 @@ export default class AdminQueries {
           error
         );
       }
-
-      return {
-        queries: [{ groupName: 'core', items: allQueryMethods }],
-        mutations: [{ groupName: 'core', items: allMutationMethods }],
-      };
     }
+
+    return {
+      queries: [{ groupName: 'core', items: allQueryMethods }],
+      mutations: [{ groupName: 'core', items: allMutationMethods }],
+    };
   }
 }
