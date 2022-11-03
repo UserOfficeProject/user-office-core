@@ -1142,6 +1142,26 @@ context('Settings tests', () => {
             });
           });
         });
+
+      cy.get('[data-cy="submit"]').contains('Update').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Api access token updated successfully!',
+      });
+
+      cy.get(
+        '[data-cy="api-access-tokens-table"] table tbody [aria-label="Edit"]'
+      ).should('have.length', 1);
+
+      cy.contains(accessTokenName).parent().find('[aria-label="Edit"]').click();
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+
+      cy.get('[data-cy="create-new-entry"]').click();
+      cy.finishedLoading();
+
+      cy.get('#name').invoke('val').should('be.empty');
     });
 
     it('User Officer should be able to update api access token', () => {
