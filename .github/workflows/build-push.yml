@@ -56,15 +56,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Node.js dependencies
-        run: npm ci
-
-      - name: Set environment variables
-        run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
-
-      - name: Generate SDK
-        run: npm run generate:sdk
-
       - name: Build and push backend
         uses: docker/build-push-action@v3
         with:
