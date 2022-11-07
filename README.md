@@ -36,5 +36,3 @@ Lints typescript code and log if there are any errors.<br>
 Please refer to the [Contribution guide](CONTRIBUTING.md) to get information about contributing and versioning.
 
 Happy coding! 👨‍💻
-
-Trigger build
