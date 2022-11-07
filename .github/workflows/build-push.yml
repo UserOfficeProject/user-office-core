@@ -62,9 +62,6 @@ jobs:
       - name: Set environment variables
         run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
 
-      - name: Generate SDK
-        run: npm run generate:sdk
-
       - name: Build and push backend
         uses: docker/build-push-action@v3
         with:
