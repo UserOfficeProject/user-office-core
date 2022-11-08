@@ -45,7 +45,7 @@ jobs:
             FACTORY_TAG="${{ github.head_ref }}"
           fi
 
-          echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
+          echo "FACTORY_TAG=${FACTORY_TAG}" >> $GITHUB_OUTPUT
 
       - name: Resolved
         run: |
