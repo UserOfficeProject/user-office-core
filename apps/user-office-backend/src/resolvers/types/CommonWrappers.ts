@@ -18,7 +18,7 @@ import { PdfTemplate } from './PdfTemplate';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { PredefinedMessage } from './PredefinedMessage';
 import { Proposal } from './Proposal';
-import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
+import { ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
 import { ProposalWorkflowConnection } from './ProposalWorkflowConnection';
 import { Question } from './Question';
@@ -26,7 +26,6 @@ import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Rejection } from './Rejection';
-import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
@@ -82,24 +81,10 @@ export class ReviewResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class ReviewWithNextStatusResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => ReviewWithNextProposalStatus, { nullable: true })
-  public review: ReviewWithNextProposalStatus;
-}
-
-@ObjectType()
 export class SEPResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SEP, { nullable: true })
   public sep: SEP;
-}
-
-@ObjectType()
-export class NextProposalStatusResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => NextProposalStatus, { nullable: true })
-  public nextProposalStatus: NextProposalStatus;
 }
 
 @ObjectType()

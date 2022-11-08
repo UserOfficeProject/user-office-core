@@ -26,16 +26,8 @@ function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
     stepper: {
       margin: theme.spacing(3, 0),
       padding: theme.spacing(0, 1),
-      overflowX: 'auto',
-      '&::-webkit-scrollbar': {
-        webkitAppearance: 'none',
-        maxWidth: '10px',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        border: '7px solid white',
-        borderRadius: '8px',
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-      },
+      justifyContent: 'center',
+      flexWrap: 'wrap',
     },
     header: {
       textAlign: 'center',

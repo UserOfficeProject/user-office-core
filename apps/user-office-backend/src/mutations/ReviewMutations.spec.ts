@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { dummyReviewWithNextProposalStatus } from '../datasources/mockups/ReviewDataSource';
+import { dummyReview } from '../datasources/mockups/ReviewDataSource';
 import {
   dummySEPChairWithRole,
   dummySEPSecretaryWithRole,
@@ -25,7 +25,7 @@ test('A reviewer can submit a review on a proposal he is on', () => {
       status: ReviewStatus.DRAFT,
       sepID: 1,
     })
-  ).resolves.toEqual(dummyReviewWithNextProposalStatus);
+  ).resolves.toEqual(dummyReview);
 });
 
 test('A user can not submit a review on a proposal', () => {

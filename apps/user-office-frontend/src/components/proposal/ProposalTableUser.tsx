@@ -22,7 +22,14 @@ export type PartialProposalsDataType = {
   proposalId: string;
   created: string | null;
   call?: Maybe<
-    Pick<Call, 'shortCode' | 'id' | 'isActive' | 'referenceNumberFormat'>
+    Pick<
+      Call,
+      | 'shortCode'
+      | 'id'
+      | 'isActive'
+      | 'isActiveInternal'
+      | 'referenceNumberFormat'
+    >
   >;
   proposerId?: number;
 };

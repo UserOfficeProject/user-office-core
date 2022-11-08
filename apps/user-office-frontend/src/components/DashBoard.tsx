@@ -16,7 +16,7 @@ import { Route, Switch } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { FeatureId, PageName, UserRole } from 'generated/sdk';
+import { CallsFilter, FeatureId, PageName, UserRole } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { useCallsData } from 'hooks/call/useCallsData';
 
@@ -190,9 +190,20 @@ const Dashboard: React.FC = () => {
     FeatureId.SAFETY
   )?.isEnabled;
 
-  const { currentRole } = useContext(UserContext);
-  const { calls } = useCallsData({ isActive: true, isEnded: false });
-
+  const { currentRole, isInternalUser } = useContext(UserContext);
+  function getDashBoardCallFilter(): CallsFilter {
+    return isInternalUser
+      ? {
+          isActive: true,
+          isEnded: false,
+          isActiveInternal: true,
+        }
+      : {
+          isActive: true,
+          isEnded: false,
+        };
+  }
+  const { calls } = useCallsData(getDashBoardCallFilter());
   useEffect(() => {
     if (isTabletOrMobile) {
       setOpen(false);

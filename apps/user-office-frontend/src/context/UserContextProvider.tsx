@@ -16,6 +16,7 @@ interface UserContextData {
   roles: Role[];
   currentRole: UserRole | null;
   impersonatingUserId: number | undefined;
+  isInternalUser: boolean;
   handleLogin: React.Dispatch<string | null | undefined>;
   handleNewToken: React.Dispatch<string | null | undefined>;
   handleLogout: () => Promise<void>;
@@ -23,7 +24,10 @@ interface UserContextData {
 }
 
 interface DecodedTokenData
-  extends Pick<UserContextData, 'user' | 'token' | 'roles'> {
+  extends Pick<
+    UserContextData,
+    'user' | 'token' | 'isInternalUser' | 'roles' | 'impersonatingUserId'
+  > {
   exp: number;
   currentRole: Role;
   impersonatingUserId: number | undefined;
@@ -53,6 +57,7 @@ const initUserData: UserContextData = {
   token: '',
   roles: [],
   currentRole: null,
+  isInternalUser: false,
   impersonatingUserId: undefined,
   handleLogin: (value) => value,
   handleNewToken: (value) => value,
@@ -82,6 +87,7 @@ const checkLocalStorage = (
           user: decoded.user,
           roles: decoded.roles,
           currentRole: localStorage.currentRole,
+          isInternalUser: decoded.isInternalUser,
           token: localStorage.token,
           expToken: decoded.exp,
           impersonatingUserId: decoded.impersonatingUserId,
@@ -105,18 +111,18 @@ const reducer = (
         currentRole: action.payload.currentRole,
         user: action.payload.user,
         roles: action.payload.roles,
+        isInternalUser: action.payload.isInternalUser,
         token: action.payload.token,
         expToken: action.payload.expToken,
         impersonatingUserId: action.payload.impersonatingUserId,
       };
     case ActionType.LOGINUSER: {
-      const { user, exp, roles, impersonatingUserId } = jwtDecode(
-        action.payload
-      ) as DecodedTokenData;
+      const { user, exp, roles, isInternalUser, impersonatingUserId } =
+        jwtDecode(action.payload) as DecodedTokenData;
       localStorage.user = JSON.stringify(user);
       localStorage.token = action.payload;
       localStorage.expToken = exp;
-
+      localStorage.isInternalUser = isInternalUser;
       localStorage.currentRole = roles[0].shortCode.toUpperCase();
       localStorage.impersonatingUserId = impersonatingUserId;
 
@@ -126,22 +132,25 @@ const reducer = (
         user: user,
         expToken: exp,
         roles: roles,
+        isInternalUser: isInternalUser,
         currentRole: roles[0].shortCode.toUpperCase(),
         impersonatingUserId: impersonatingUserId,
       };
     }
     case ActionType.SETTOKEN: {
-      const { currentRole, roles, exp } = jwtDecode(
+      const { currentRole, roles, exp, isInternalUser } = jwtDecode(
         action.payload
       ) as DecodedTokenData;
       localStorage.token = action.payload;
       localStorage.expToken = exp;
       localStorage.currentRole = currentRole.shortCode.toUpperCase();
+      localStorage.isInternalUser = isInternalUser;
 
       return {
         ...state,
         roles: roles,
         token: action.payload,
+        isInternalUser: isInternalUser,
         expToken: exp,
         currentRole: currentRole.shortCode.toUpperCase(),
       };
@@ -190,8 +199,8 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
           const logoutUrl = settingsContext.settingsMap.get(
             SettingsId.EXTERNAL_AUTH_LOGOUT_URL
           )?.settingsValue;
-          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
           clearSession();
+          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
           if (logoutUrl) {
             window.location.assign(logoutUrl);
           }

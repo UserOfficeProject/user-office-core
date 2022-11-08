@@ -20,9 +20,17 @@ export type ProposalWithQuestionary = Pick<
   | 'questionaryId'
   | 'submitted'
 > & {
-  call: Pick<
-    Call,
-    'id' | 'isActive' | 'referenceNumberFormat' | 'startCall' | 'endCall'
+  call?: Maybe<
+    Pick<
+      Call,
+      | 'id'
+      | 'isActive'
+      | 'isActiveInternal'
+      | 'referenceNumberFormat'
+      | 'endCallInternal'
+      | 'startCall'
+      | 'endCall'
+    >
   >;
 } & {
   samples: Maybe<

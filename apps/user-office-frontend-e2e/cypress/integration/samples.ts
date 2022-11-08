@@ -141,14 +141,25 @@ context('Samples tests', () => {
   beforeEach(() => {
     cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow.proposalWorkflow) {
-        createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
-      }
+  });
+
+  // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+  // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+  afterEach(() => {
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
     });
   });
 
   describe('Samples basic tests', () => {
+    beforeEach(() => {
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+    });
+
     it('Should be able to create proposal template with sample', () => {
       cy.login('officer');
       cy.visit('/');
@@ -398,6 +409,12 @@ context('Samples tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow.proposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        }
+      });
+
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {

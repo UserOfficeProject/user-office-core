@@ -408,4 +408,11 @@ export class UserDataSourceMock implements UserDataSource {
   async isExternalTokenValid(token: string): Promise<boolean> {
     return true;
   }
+
+  async isInternalUser(
+    userId: number,
+    currentRole: Role | null
+  ): Promise<boolean> {
+    return true;
+  }
 }

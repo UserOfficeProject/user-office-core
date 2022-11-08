@@ -49,10 +49,12 @@ query getProposal($primaryKey: Int!) {
       id
       shortCode
       isActive
+      isActiveInternal
       allocationTimeUnit
       referenceNumberFormat
       startCall
       endCall
+      endCallInternal
     }
     sep {
       id

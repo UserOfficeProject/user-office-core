@@ -1,4 +1,3 @@
-import { Event } from '../../events/event.enum';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
@@ -536,58 +535,5 @@ export default class PostgresProposalSettingsDataSource
           this.createStatusChangingEventObject(statusChangingEvent)
         );
       });
-  }
-
-  async getProposalNextStatus(proposalPk: number, event: Event) {
-    const currentProposalWorkflowConnection: ProposalWorkflowConnectionRecord =
-      await database('proposals')
-        .select(['pwc.*'])
-        .join('call', {
-          'call.call_id': 'proposals.call_id',
-        })
-        .join('proposal_workflow_connections as pwc', {
-          'pwc.proposal_workflow_id': 'call.proposal_workflow_id',
-          'pwc.proposal_status_id': 'proposals.status_id',
-        })
-        .where('proposal_pk', proposalPk)
-        .first();
-
-    if (!currentProposalWorkflowConnection) {
-      return null;
-    }
-
-    const nextProposalStatus: ProposalStatusRecord = await database(
-      'proposal_workflow_connections as pwc'
-    )
-      .select(['ps.*'])
-      .join('proposal_statuses as ps', {
-        'ps.proposal_status_id': 'pwc.proposal_status_id',
-      })
-      .join('status_changing_events as sce', {
-        'sce.proposal_workflow_connection_id':
-          'pwc.proposal_workflow_connection_id',
-      })
-      .where(
-        'pwc.proposal_status_id',
-        currentProposalWorkflowConnection.next_proposal_status_id
-      )
-      .andWhere(
-        'pwc.proposal_workflow_id',
-        currentProposalWorkflowConnection.proposal_workflow_id
-      )
-      .andWhere('sce.status_changing_event', event)
-      .first();
-
-    if (!nextProposalStatus) {
-      return null;
-    }
-
-    return new ProposalStatus(
-      nextProposalStatus.proposal_status_id,
-      nextProposalStatus.short_code,
-      nextProposalStatus.name,
-      nextProposalStatus.description,
-      nextProposalStatus.is_default
-    );
   }
 }

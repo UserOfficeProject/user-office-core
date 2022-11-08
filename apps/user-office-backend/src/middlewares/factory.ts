@@ -64,6 +64,7 @@ export default function factory() {
           req.user = {
             user,
             currentRole: decoded.currentRole,
+            isInternalUser: decoded.isInternalUser,
             roles: [],
           };
           next();

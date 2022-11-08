@@ -10,8 +10,10 @@ import {
 import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
+import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User } from '../models/User';
 import { LRUCache } from '../utils/LRUCache';
+import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
 
 const client = UOWSSoapClient.getInstance();
@@ -250,5 +252,32 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
 
     return isValid;
+  }
+
+  override async isInternalUser(
+    userId: number,
+    currentRole: Role
+  ): Promise<boolean> {
+    if (currentRole) {
+      if (
+        currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST ||
+        currentRole?.shortCode === Roles.USER_OFFICER
+      ) {
+        return true;
+      }
+    }
+
+    return userId
+      ? (this.userDataSource as StfcUserDataSource)
+          .getRolesForUser(userId)
+          .then((roles) => {
+            return roles.some(
+              (role) =>
+                role.name === 'Internal proposal submitter' ||
+                role.name === 'ISIS Instrument Scientist' ||
+                role.name === 'User Officer'
+            );
+          })
+      : false;
   }
 }
