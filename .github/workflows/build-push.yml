@@ -20,19 +20,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Extract branch name
-        id: extract_branch
-        shell: bash
-        run: |
-          # Extract branch name
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
-
-          # set output variable accessible in the action
-          echo ::set-output name=branch::${BRANCH_NAME}
-
-      # For debugging capture the selected branch
-      - name: Extracted branch
-        run: echo "Extracted branch ${{ steps.extract_branch.outputs.branch }}"
+      - id: extract_branch
+        uses: swapActions/get-branch-name@v1
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -84,23 +73,12 @@ jobs:
             ghcr.io/userofficeproject/user-office-frontend:${{ steps.extract_branch.outputs.branch }}
 
       - name: Trigger pipeline
-        run: |
-          REPOSITORY=${{ github.repository }}
-          RESULT=$(curl -X POST \
-            -F token="${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
-            -F ref=master \
-            -F "variables[RUN_DEPLOY]=1" \
-            -F "variables[ENVIRONMENT]=${{ steps.extract_branch.outputs.branch }}" \
-            -F "variables[REPOSITORY]=${REPOSITORY#UserOfficeProject/}" \
-            -o /dev/null \
-            --silent \
-            --write-out '%{http_code}' \
-            ${{ secrets.GITLAB_TRIGGER_URL }})
-
-          if [[ $RESULT != "201" ]]; then
-            echo "Failed to trigger Gitlab pipeline: $RESULT"
-            exit 1
-          fi
+        uses: swapActions/trigger-useroffice-deployment@v1
+        with:
+          repository: ${{ github.repository }}
+          environment: ${{ steps.extract_branch.outputs.branch }}
+          gh-trigger-url: ${{ secrets.GITLAB_TRIGGER_URL }}
+          gh-token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
 
       # Trigger Jenkins pipeline
       - name: Trigger Jenkins
