@@ -149,7 +149,15 @@ context('General scientific evaluation panel tests', () => {
     it('Should be able to download SEP as Excel file', () => {
       cy.contains('SEPs').click();
 
-      cy.request('GET', '/download/xlsx/sep/1/call/1').then((response) => {
+      const token = window.localStorage.getItem('token');
+
+      cy.request({
+        url: '/download/xlsx/sep/1/call/1',
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }).then((response) => {
         expect(response.headers['content-type']).to.be.equal(
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         );

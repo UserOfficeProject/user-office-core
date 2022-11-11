@@ -1,5 +1,4 @@
 import { logger } from '@user-office-software/duo-logger';
-import cookieParser from 'cookie-parser';
 import express from 'express';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
@@ -22,7 +21,6 @@ async function bootstrap() {
   const app = express();
 
   app
-    .use(cookieParser())
     .use(authorization())
     .use(files())
     .use(factory())
