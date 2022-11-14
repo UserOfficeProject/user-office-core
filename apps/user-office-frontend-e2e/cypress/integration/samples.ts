@@ -139,16 +139,14 @@ context('Samples tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-  });
-
-  // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
-  // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
-  afterEach(() => {
+    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+    // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
     cy.window().then((win) => {
       win.location.href = 'about:blank';
     });
+
+    cy.getAndStoreFeaturesEnabled();
+    cy.resetDB(true);
   });
 
   describe('Samples basic tests', () => {
@@ -429,6 +427,8 @@ context('Samples tests', () => {
           });
         }
       });
+
+      cy.login('officer');
     });
 
     it('Officer should able to delete proposal with sample', () => {
@@ -438,8 +438,6 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Proposals').click();
@@ -463,8 +461,6 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Proposals').click();
@@ -566,10 +562,7 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-
       cy.submitProposal({ proposalPk: createdProposalPk });
-
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Sample safety').click();
@@ -632,7 +625,6 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Sample safety').click();
@@ -660,12 +652,19 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Sample safety').click();
 
-      cy.request('GET', '/download/pdf/sample/1').then((response) => {
+      const token = window.localStorage.getItem('token');
+
+      cy.request({
+        url: '/download/pdf/sample/1',
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }).then((response) => {
         expect(response.headers['content-type']).to.be.equal('application/pdf');
         expect(response.status).to.be.equal(200);
       });

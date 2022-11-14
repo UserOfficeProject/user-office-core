@@ -152,16 +152,14 @@ context('GenericTemplates tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
-  });
-
-  // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
-  // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
-  afterEach(() => {
+    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page before each test.
+    // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
     cy.window().then((win) => {
       win.location.href = 'about:blank';
     });
+
+    cy.getAndStoreFeaturesEnabled();
+    cy.resetDB();
   });
 
   describe('Generic templates basic tests', () => {

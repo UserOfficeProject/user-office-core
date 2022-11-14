@@ -208,6 +208,9 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
     const controller = new AbortController();
     const req = crossFetch(generateLink(type, ids), {
       signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then(async (response) => {
         await delayInTest();
