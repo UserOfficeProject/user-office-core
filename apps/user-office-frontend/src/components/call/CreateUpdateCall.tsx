@@ -13,7 +13,6 @@ import {
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
-  Scalars,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
@@ -57,18 +56,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const currentDayEnd = DateTime.now()
     .setZone(timezone || undefined)
     .endOf('day');
-
-  const setInternalCallEnd = (
-    callEndDate: Scalars['DateTime'],
-    callEndInternalDate: Scalars['DateTime']
-  ) => {
-    const endCallDate = new Date(callEndDate);
-    const endCallInternalData = new Date(callEndInternalDate);
-
-    return endCallDate > endCallInternalData
-      ? callEndDate
-      : callEndInternalDate;
-  };
 
   const getDateTimeFromISO = (value: string) =>
     DateTime.fromISO(value, {
@@ -143,10 +130,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         initialValues={initialValues}
         onSubmit={async (values) => {
           if (call) {
-            values.endCallInternal = setInternalCallEnd(
-              values.endCall,
-              values.endCallInternal
-            );
             const data = await api({
               toastSuccessMessage: 'Call updated successfully!',
             }).updateCall(values as UpdateCallInput);
