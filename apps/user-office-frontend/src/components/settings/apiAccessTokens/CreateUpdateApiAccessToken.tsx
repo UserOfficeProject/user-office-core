@@ -230,7 +230,9 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
               name="accessPermissions"
               render={(arrayHelpers) => (
                 <StyledPaper margin={[0]} padding={[0]}>
-                  <SimpleTabs tabNames={['Queries', 'Mutations']}>
+                  <SimpleTabs
+                    tabNames={['Queries', 'Mutations', 'Other Services']}
+                  >
                     {allAccessPermissions(
                       queriesAndMutations.queries,
                       'Queries',
@@ -239,6 +241,12 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
                     )}
                     {allAccessPermissions(
                       queriesAndMutations.mutations,
+                      'Mutations',
+                      values,
+                      arrayHelpers
+                    )}
+                    {allAccessPermissions(
+                      queriesAndMutations.services,
                       'Mutations',
                       values,
                       arrayHelpers

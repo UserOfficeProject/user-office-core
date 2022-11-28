@@ -9,6 +9,9 @@ export class QueriesAndMutations {
 
   @Field(() => [String])
   public mutations: string[];
+
+  @Field(() => [String])
+  public services: string[];
 }
 
 @Resolver()

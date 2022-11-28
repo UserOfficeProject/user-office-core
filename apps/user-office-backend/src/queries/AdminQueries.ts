@@ -70,6 +70,7 @@ export default class AdminQueries {
   ) {
     const allQueryMethods: string[] = [];
     const allMutationMethods: string[] = [];
+    const allServicesMethods: string[] = [];
 
     Object.keys(context.queries).forEach((queryKey) => {
       const element =
@@ -105,6 +106,26 @@ export default class AdminQueries {
       allMutationMethods.push(...classNamesWithMethod);
     });
 
-    return { queries: allQueryMethods, mutations: allMutationMethods };
+    Object.keys(context.services).forEach((servicesKey) => {
+      const element =
+        context.services[servicesKey as keyof BasicResolverContext['services']];
+
+      const proto = Object.getPrototypeOf(element);
+      const names = Object.getOwnPropertyNames(proto).filter(
+        (item) => item !== 'constructor'
+      );
+
+      const classNamesWithMethod = names.map(
+        (item) => `${proto.constructor.name}.${item}`
+      );
+
+      allServicesMethods.push(...classNamesWithMethod);
+    });
+
+    return {
+      queries: allQueryMethods,
+      mutations: allMutationMethods,
+      services: allServicesMethods,
+    };
   }
 }
