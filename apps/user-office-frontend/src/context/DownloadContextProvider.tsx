@@ -173,7 +173,7 @@ async function delayInTest() {
 
 export const DownloadContextProvider: React.FC = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { token } = useContext(UserContext);
+  const { token, handleLogout } = useContext(UserContext);
   const [inProgress, setInProgress] = useState<InProgressItem[]>([]);
   const pendingRequests = useRef<Map<string, PendingRequest>>(new Map());
 
@@ -222,9 +222,18 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
         cleanUpDownload(id);
       })
       .catch((e) => {
-        if (e.name !== 'AbortError') {
+        if (e.includes('EXTERNAL_TOKEN_INVALID')) {
+          enqueueSnackbar(
+            'Your session has expired, you will need to log in again through the external homepage',
+            {
+              variant: 'error',
+              className: 'snackbar-error',
+              autoHideDuration: 10000,
+            }
+          );
+          handleLogout();
+        } else if (e.name !== 'AbortError') {
           enqueueSnackbar('Failed to download file', { variant: 'error' });
-          console.error('Request failed:', e);
         }
 
         cleanUpDownload(id);
