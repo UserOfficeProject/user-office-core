@@ -23,7 +23,7 @@ import {
   GenericTemplatePDFData,
 } from './genericTemplates';
 import { collectSamplePDFData, SamplePDFData } from './sample';
-type ProposalPDFData = {
+export type ProposalPDFData = {
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;
   coProposers: BasicUserDetails[];
@@ -40,7 +40,7 @@ type ProposalPDFData = {
   pdfTemplate: PdfTemplate | null;
 };
 
-const getTechnicalReviewHumanReadableStatus = (
+export const getTechnicalReviewHumanReadableStatus = (
   status: TechnicalReviewStatus | null
 ): string => {
   switch (status) {
@@ -55,7 +55,7 @@ const getTechnicalReviewHumanReadableStatus = (
   }
 };
 
-const getTopicActiveAnswers = (
+export const getTopicActiveAnswers = (
   questionarySteps: QuestionaryStep[],
   topicId: number
 ) => {

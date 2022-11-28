@@ -1,0 +1,62 @@
+import { inject, injectable } from 'tsyringe';
+
+import FactoryServicesAuthorized from '../../decorators/FactoryServicesAuthorized';
+import {
+  collectProposalPDFData,
+  ProposalPDFData,
+} from '../../factory/pdf/proposal';
+import { ProposalTokenAccess } from '../../factory/pdf/proposalTokenAccess';
+import { MetaBase } from '../../factory/service';
+import { UserWithRole } from '../../models/User';
+
+export interface PDFServices {
+  getPdfProposals(
+    user: UserWithRole,
+    proposalPks: number[],
+    proposalFileMeta: MetaBase,
+    proposalFilterType?: string
+  ): Promise<ProposalPDFData[] | null>;
+}
+@injectable()
+export default class FactoryServices implements PDFServices {
+  constructor(
+    @inject(ProposalTokenAccess)
+    private proposalPDFDataGenerator: ProposalTokenAccess
+  ) {}
+  @FactoryServicesAuthorized()
+  async getPdfProposals(
+    agent: UserWithRole | null,
+    proposalPks: number[],
+    proposalFileMeta: MetaBase,
+    proposalFilterType?: string
+  ) {
+    let data = null;
+    if (agent) {
+      data = await Promise.all(
+        proposalPks.map((proposalPk, indx) => {
+          if (agent?.isApiAccessToken)
+            return this.proposalPDFDataGenerator.collectProposalPDFData(
+              agent,
+              proposalPk,
+              proposalFilterType ?? undefined,
+              indx === 0
+                ? (filename: string) =>
+                    (proposalFileMeta.singleFilename = filename)
+                : undefined
+            );
+
+          return collectProposalPDFData(
+            proposalPk,
+            agent,
+            indx === 0
+              ? (filename: string) =>
+                  (proposalFileMeta.singleFilename = filename)
+              : undefined
+          );
+        })
+      );
+    }
+
+    return data;
+  }
+}

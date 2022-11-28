@@ -3,7 +3,7 @@ import {
   getAllFields,
   areDependenciesSatisfied,
 } from '../../models/ProposalModelFunctions';
-import { Answer } from '../../models/Questionary';
+import { Answer, Questionary, QuestionaryStep } from '../../models/Questionary';
 import { Sample, SampleStatus } from '../../models/Sample';
 import { UserWithRole } from '../../models/User';
 import { getFileAttachments, Attachment } from '../util';
@@ -32,21 +32,27 @@ const getHumanReadableStatus = (safetyStatus: SampleStatus): string => {
 export async function collectSamplePDFData(
   sampleId: number,
   user: UserWithRole,
-  notify?: CallableFunction
+  notify?: CallableFunction,
+  newSample?: Sample,
+  newQuestionary?: Questionary,
+  newQuestionarySteps?: QuestionaryStep[]
 ): Promise<SamplePDFData> {
-  const sample = await baseContext.queries.sample.getSample(user, sampleId);
+  const sample =
+    newSample || (await baseContext.queries.sample.getSample(user, sampleId));
   if (!sample) {
     throw new Error(
       `Sample with ID '${sampleId}' not found, or the user has insufficient rights`
     );
   }
 
-  notify?.(`sample_${sample.id}.pdf`);
+  if (notify) notify?.(`sample_${sample.id}.pdf`);
 
-  const questionary = await baseContext.queries.questionary.getQuestionary(
-    user,
-    sample.questionaryId
-  );
+  const questionary =
+    newQuestionary ||
+    (await baseContext.queries.questionary.getQuestionary(
+      user,
+      sample.questionaryId
+    ));
 
   if (!questionary) {
     throw new Error(
@@ -55,10 +61,11 @@ export async function collectSamplePDFData(
   }
 
   const questionarySteps =
-    await baseContext.queries.questionary.getQuestionarySteps(
+    newQuestionarySteps ||
+    (await baseContext.queries.questionary.getQuestionarySteps(
       user,
       sample.questionaryId
-    );
+    ));
 
   if (!questionarySteps) {
     throw new Error(
