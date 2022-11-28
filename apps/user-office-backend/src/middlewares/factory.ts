@@ -1,12 +1,66 @@
 import { logger } from '@user-office-software/duo-logger';
 import express, { Request, Response, NextFunction } from 'express';
+import { container } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
+import { Tokens } from '../config/Tokens';
 import { DownloadType } from '../factory/service';
+import { UserWithRole } from '../models/User';
 import pdfDownload from './factory/pdf';
 import xlsxDownload from './factory/xlsx';
 
 const defaultErrorMessage = 'Failed to generate the requested file(s)';
+
+const getUserWithRoleFromExpressUser = async (
+  user: Express.User
+): Promise<UserWithRole> => {
+  const userAuthorization = container.resolve<UserAuthorization>(
+    Tokens.UserAuthorization
+  );
+
+  return {
+    ...(await baseContext.queries.user.getAgent(user.user.id)),
+    currentRole: user.currentRole || (user.roles ? user.roles[0] : null),
+    externalToken: user.externalToken,
+    externalTokenValid:
+      user.externalToken !== undefined
+        ? await userAuthorization.isExternalTokenValid(user.externalToken)
+        : false,
+    isInternalUser: user.isInternalUser,
+    impersonatingUserId: user.impersonatingUserId,
+  } as UserWithRole;
+};
+
+const getUserWithRoleFromAccessTokenId = async (
+  accessTokenId: string
+): Promise<UserWithRole> => {
+  const { accessPermissions } =
+    await baseContext.queries.admin.getPermissionsByToken(accessTokenId);
+
+  return {
+    accessPermissions: accessPermissions ? JSON.parse(accessPermissions) : null,
+    isApiAccessToken: true,
+  } as UserWithRole;
+};
+const getLogContextFromRequest = (req: Request) => {
+  const userReq = req.user?.accessTokenId
+    ? {
+        accessTokenId: req.user?.accessTokenId,
+        isApiAccessToken: true,
+      }
+    : {
+        id: req.user?.user.id,
+        currentRole: req.user?.currentRole,
+      };
+
+  return req?.user
+    ? {
+        originalUrl: req.originalUrl,
+        user: userReq,
+      }
+    : {};
+};
 
 const router = express.Router();
 
@@ -30,18 +84,19 @@ router.use(
       message = err.message;
     }
 
-    const ctx = {
-      originalUrl: req.originalUrl,
-      user: {
-        id: req.user?.user.id,
-        currentRole: req.user?.currentRole,
-      },
-    };
-
     err instanceof Error
-      ? logger.logException(err.message, err, ctx)
-      : logger.logError(defaultErrorMessage, { err, ...ctx });
+      ? logger.logException(err.message, err, getLogContextFromRequest(req))
+      : logger.logError(defaultErrorMessage, {
+          err,
+          ...getLogContextFromRequest(req),
+        });
 
+    if (
+      message.includes('EXTERNAL_TOKEN_INVALID') ||
+      message.includes('INSUFFICIENT_PERMISSIONS')
+    ) {
+      return res.status(401).send(message);
+    }
     res.status(500).end(message);
   }
 );
@@ -49,31 +104,41 @@ router.use(
 export default function factory() {
   return express.Router().use(
     '/download',
-    (req, res, next) => {
-      const decoded = req.user;
-      if (!decoded) {
+    async (req, res, next) => {
+      const accessTokenId = req.user?.accessTokenId;
+      const decodedUser = req.user;
+      if (decodedUser) {
+        if (accessTokenId) {
+          res.locals.agent = await getUserWithRoleFromAccessTokenId(
+            accessTokenId
+          );
+          next();
+        } else {
+          baseContext.queries.user
+            .getAgent(decodedUser.user.id)
+            .then(async (user) => {
+              if (!user) {
+                return res.status(401).send('Unauthorized token');
+              }
+              req.user = {
+                user,
+                currentRole: decodedUser.currentRole,
+                isInternalUser: decodedUser.isInternalUser,
+                roles: [],
+              };
+              res.locals.agent = await getUserWithRoleFromExpressUser(
+                decodedUser
+              );
+              next();
+            })
+            .catch((e) => {
+              logger.logException(defaultErrorMessage, e);
+              res.status(500).send(defaultErrorMessage);
+            });
+        }
+      } else {
         return res.status(401).send('Unauthorized');
       }
-
-      baseContext.queries.user
-        .getAgent(decoded.user.id)
-        .then((user) => {
-          if (!user) {
-            return res.status(401).send('Unauthorized');
-          }
-
-          req.user = {
-            user,
-            currentRole: decoded.currentRole,
-            isInternalUser: decoded.isInternalUser,
-            roles: [],
-          };
-          next();
-        })
-        .catch((e) => {
-          logger.logException(defaultErrorMessage, e);
-          res.status(500).send(defaultErrorMessage);
-        });
     },
     router
   );
