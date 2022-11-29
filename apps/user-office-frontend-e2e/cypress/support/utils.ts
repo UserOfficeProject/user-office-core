@@ -4,6 +4,8 @@ import {
   AllocationTimeUnits,
   CreateApiAccessTokenMutation,
   CreateApiAccessTokenMutationVariables,
+  DeleteApiAccessTokenMutation,
+  DeleteApiAccessTokenMutationVariables,
   getSdk,
 } from '@user-office-software-libs/shared-types';
 import 'cypress-file-upload';
@@ -56,6 +58,15 @@ const createApiAccessToken = (
 ): Cypress.Chainable<CreateApiAccessTokenMutation> => {
   const api = getE2EApi();
   const request = api.createApiAccessToken(createApiAccessTokenInput);
+
+  return cy.wrap(request);
+};
+
+const deleteApiAccessToken = (
+  deleteApiAccessTokenInput: DeleteApiAccessTokenMutationVariables
+): Cypress.Chainable<DeleteApiAccessTokenMutation> => {
+  const api = getE2EApi();
+  const request = api.deleteApiAccessToken(deleteApiAccessTokenInput);
 
   return cy.wrap(request);
 };
@@ -230,3 +241,4 @@ Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
 Cypress.Commands.add('getTinyMceContent', getTinyMceContent);
 Cypress.Commands.add('testActionButton', testActionButton);
 Cypress.Commands.add('createApiAccessToken', createApiAccessToken);
+Cypress.Commands.add('deleteApiAccessToken', deleteApiAccessToken);

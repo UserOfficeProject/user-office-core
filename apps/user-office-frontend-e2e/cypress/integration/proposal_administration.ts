@@ -730,4 +730,97 @@ context('Proposal administration tests', () => {
       cy.contains(proposal.title).should('exist');
     });
   });
+
+  describe('Proposal administration  API token access', () => {
+    let createdProposalPk: number;
+    let createdProposalId: string;
+    let accessToken: string;
+    let accessTokenId: string;
+    beforeEach(() => {
+      cy.visit('/');
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          createdProposalPk = result.createProposal.proposal.primaryKey;
+          createdProposalId = result.createProposal.proposal.proposalId;
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            proposerId: existingUserId,
+            title: proposalName1,
+            abstract: proposalName1,
+          });
+          cy.answerTopic({
+            answers: [],
+            topicId: existingTopicId,
+            questionaryId: existingQuestionaryId,
+            isPartialSave: false,
+          });
+          cy.submitProposal({
+            proposalPk: createdProposalPk,
+          });
+        }
+      });
+      cy.createApiAccessToken({
+        name: faker.lorem.words(2),
+        accessPermissions: '{"FactoryServices.getPdfProposals":true}',
+      }).then((result) => {
+        if (result) {
+          accessToken =
+            result.createApiAccessToken.apiAccessToken?.accessToken || '';
+          accessTokenId = result.createApiAccessToken.apiAccessToken?.id || '';
+        }
+      });
+    });
+
+    it('Should be able to download proposal pdf with valid  API token', () => {
+      cy.request({
+        url: `/download/pdf/proposal/${createdProposalPk}`,
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      }).then((response) => {
+        expect(response.headers['content-type']).to.be.equal('application/pdf');
+        expect(response.status).to.be.equal(200);
+      });
+
+      cy.request({
+        url: `/download/pdf/proposal/${createdProposalId}?filter=id`,
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      }).then((response) => {
+        expect(response.headers['content-type']).to.be.equal('application/pdf');
+        expect(response.status).to.be.equal(200);
+      });
+    });
+
+    it('Should not be able to download proposal pdf with invalid  API token', () => {
+      cy.deleteApiAccessToken({ accessTokenId }).then((result) => {
+        if (result.deleteApiAccessToken.isSuccess) {
+          cy.request({
+            url: `/download/pdf/proposal/${createdProposalPk}`,
+            method: 'GET',
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+            failOnStatusCode: false,
+          }).then((response) => {
+            expect(response.status).to.be.equal(401);
+          });
+
+          cy.request({
+            url: `/download/pdf/proposal/${createdProposalId}?filter=id`,
+            method: 'GET',
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+            failOnStatusCode: false,
+          }).then((response) => {
+            expect(response.status).to.be.equal(401);
+          });
+        }
+      });
+    });
+  });
 });
