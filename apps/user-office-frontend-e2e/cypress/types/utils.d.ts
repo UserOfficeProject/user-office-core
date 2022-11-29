@@ -1,8 +1,6 @@
 import {
   CreateApiAccessTokenMutation,
   CreateApiAccessTokenMutationVariables,
-  DeleteApiAccessTokenMutation,
-  DeleteApiAccessTokenMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -117,18 +115,6 @@ declare global {
       createApiAccessToken: (
         createApiAccessTokenInput: CreateApiAccessTokenMutationVariables
       ) => Cypress.Chainable<CreateApiAccessTokenMutation>;
-
-      /**
-       * Delete Api access token.
-       *
-       * @returns {typeof deleteApiAccessToken}
-       * @memberof Chainable
-       * @example
-       *    cy.deleteApiAccessToken(deleteApiAccessTokenInput: DeleteApiAccessTokenMutationVariables)
-       */
-      deleteApiAccessToken: (
-        deleteApiAccessTokenInput: DeleteApiAccessTokenMutationVariables
-      ) => Cypress.Chainable<DeleteApiAccessTokenMutation>;
     }
   }
 

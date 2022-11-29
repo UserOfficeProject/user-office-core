@@ -734,8 +734,6 @@ context('Proposal administration tests', () => {
   describe('Proposal administration  API token access', () => {
     let createdProposalPk: number;
     let createdProposalId: string;
-    let accessToken: string;
-    let accessTokenId: string;
     beforeEach(() => {
       cy.visit('/');
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
@@ -759,54 +757,27 @@ context('Proposal administration tests', () => {
           });
         }
       });
+    });
+
+    it('Should be able to download proposal pdf with valid  API token', () => {
       cy.createApiAccessToken({
         name: faker.lorem.words(2),
         accessPermissions: '{"FactoryServices.getPdfProposals":true}',
       }).then((result) => {
         if (result) {
-          accessToken =
+          const accessToken =
             result.createApiAccessToken.apiAccessToken?.accessToken || '';
-          accessTokenId = result.createApiAccessToken.apiAccessToken?.id || '';
-        }
-      });
-    });
-
-    it('Should be able to download proposal pdf with valid  API token', () => {
-      cy.request({
-        url: `/download/pdf/proposal/${createdProposalPk}`,
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-      }).then((response) => {
-        expect(response.headers['content-type']).to.be.equal('application/pdf');
-        expect(response.status).to.be.equal(200);
-      });
-
-      cy.request({
-        url: `/download/pdf/proposal/${createdProposalId}?filter=id`,
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-      }).then((response) => {
-        expect(response.headers['content-type']).to.be.equal('application/pdf');
-        expect(response.status).to.be.equal(200);
-      });
-    });
-
-    it('Should not be able to download proposal pdf with invalid  API token', () => {
-      cy.deleteApiAccessToken({ accessTokenId }).then((result) => {
-        if (result.deleteApiAccessToken.isSuccess) {
           cy.request({
             url: `/download/pdf/proposal/${createdProposalPk}`,
             method: 'GET',
             headers: {
               authorization: `Bearer ${accessToken}`,
             },
-            failOnStatusCode: false,
           }).then((response) => {
-            expect(response.status).to.be.equal(401);
+            expect(response.headers['content-type']).to.be.equal(
+              'application/pdf'
+            );
+            expect(response.status).to.be.equal(200);
           });
 
           cy.request({
@@ -815,11 +786,47 @@ context('Proposal administration tests', () => {
             headers: {
               authorization: `Bearer ${accessToken}`,
             },
-            failOnStatusCode: false,
           }).then((response) => {
-            expect(response.status).to.be.equal(401);
+            expect(response.headers['content-type']).to.be.equal(
+              'application/pdf'
+            );
+            expect(response.status).to.be.equal(200);
           });
         }
+      });
+    });
+
+    it('Should not be able to download proposal pdf with invalid  API token', () => {
+      cy.createApiAccessToken({
+        name: faker.lorem.words(2),
+        accessPermissions: '{"ProposalQueries.getAll":true}',
+      }).then((result) => {
+        const accessToken =
+          result.createApiAccessToken.apiAccessToken?.accessToken || '';
+
+        //Try to download proposal pdf with token with out FactoryServices.getPdfProposals permission
+
+        cy.request({
+          url: `/download/pdf/proposal/${createdProposalPk}`,
+          failOnStatusCode: false,
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(401);
+        });
+
+        cy.request({
+          url: `/download/pdf/proposal/${createdProposalId}?filter=id`,
+          failOnStatusCode: false,
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(401);
+        });
       });
     });
   });
