@@ -814,7 +814,10 @@ context('Proposal administration tests', () => {
             authorization: `Bearer ${accessToken}`,
           },
         }).then((response) => {
-          expect(response.status).to.eq(401);
+          expect(response.headers['content-type']).not.be.equal(
+            'application/pdf'
+          );
+          expect(response.status).not.equal(200);
         });
 
         cy.request({
@@ -825,7 +828,10 @@ context('Proposal administration tests', () => {
             authorization: `Bearer ${accessToken}`,
           },
         }).then((response) => {
-          expect(response.status).to.eq(401);
+          expect(response.headers['content-type']).not.be.equal(
+            'application/pdf'
+          );
+          expect(response.status).not.equal(200);
         });
       });
     });
