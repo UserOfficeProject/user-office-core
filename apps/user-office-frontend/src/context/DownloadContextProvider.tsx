@@ -215,27 +215,28 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
       .then(async (response) => {
         await delayInTest();
         if (response.status !== 200) {
+          if (response.status === 401) {
+            const reason =
+              'Your session has expired, you will need to log in again through the external homepage';
+            enqueueSnackbar(reason, {
+              variant: 'error',
+              className: 'snackbar-error',
+              autoHideDuration: 10000,
+            });
+            handleLogout();
+          }
+
           return Promise.reject(await response.text());
         }
 
         await promptDownload(response);
-        cleanUpDownload(id);
       })
-      .catch((e) => {
-        if (e.includes('EXTERNAL_TOKEN_INVALID')) {
-          enqueueSnackbar(
-            'Your session has expired, you will need to log in again through the external homepage',
-            {
-              variant: 'error',
-              className: 'snackbar-error',
-              autoHideDuration: 10000,
-            }
-          );
-          handleLogout();
-        } else if (e.name !== 'AbortError') {
+      .catch((error) => {
+        if (error !== 'EXTERNAL_TOKEN_INVALID' && error.name !== 'AbortError') {
           enqueueSnackbar('Failed to download file', { variant: 'error' });
         }
-
+      })
+      .finally(() => {
         cleanUpDownload(id);
       });
 

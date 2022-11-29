@@ -109,10 +109,21 @@ export default function factory() {
       const decodedUser = req.user;
       if (decodedUser) {
         if (accessTokenId) {
-          res.locals.agent = await getUserWithRoleFromAccessTokenId(
-            accessTokenId
-          );
-          next();
+          await getUserWithRoleFromAccessTokenId(accessTokenId)
+            .then((accessPermissions) => {
+              if (!accessPermissions) {
+                return res.status(401).send('Unauthorized token');
+              }
+              res.locals.agent = accessPermissions;
+              next();
+            })
+            .catch((e) => {
+              logger.logException(
+                defaultErrorMessage + 'unauthorized token',
+                e
+              );
+              res.status(401).send(defaultErrorMessage + 'unauthorized token');
+            });
         } else {
           baseContext.queries.user
             .getAgent(decodedUser.user.id)
