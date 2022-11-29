@@ -119,10 +119,10 @@ export default function factory() {
             })
             .catch((e) => {
               logger.logException(
-                defaultErrorMessage + 'unauthorized token',
+                `${defaultErrorMessage} unauthorized token`,
                 e
               );
-              res.status(401).send(defaultErrorMessage + 'unauthorized token');
+              res.status(401).send(`${defaultErrorMessage} unauthorized token`);
             });
         } else {
           baseContext.queries.user
