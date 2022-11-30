@@ -125,24 +125,12 @@ context('Proposal tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
         'Carl'
       );
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -150,6 +138,7 @@ context('Proposal tests', () => {
       cy.contains('Abstract is required');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
@@ -157,15 +146,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -701,31 +681,19 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Internal user should be able to create and clone  and delete an internal  proposal', function () {
+    it('Internal user should be able to create and clone and delete an internal proposal', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
         'Carl'
       );
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -733,6 +701,7 @@ context('Proposal tests', () => {
       cy.contains('Abstract is required');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
@@ -740,15 +709,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -835,24 +795,12 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
         'Carl'
       );
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -860,6 +808,7 @@ context('Proposal tests', () => {
       cy.contains('Abstract is required');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input')
         .type(newProposalTitle)
@@ -869,15 +818,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
