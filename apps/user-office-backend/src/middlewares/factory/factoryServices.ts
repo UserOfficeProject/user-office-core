@@ -21,7 +21,7 @@ export interface PDFServices {
 export default class FactoryServices implements PDFServices {
   constructor(
     @inject(ProposalTokenAccess)
-    private proposalPDFDataGenerator: ProposalTokenAccess
+    private proposalTokenAccess: ProposalTokenAccess
   ) {}
   @FactoryServicesAuthorized()
   async getPdfProposals(
@@ -35,7 +35,7 @@ export default class FactoryServices implements PDFServices {
       data = await Promise.all(
         proposalPks.map((proposalPk, indx) => {
           if (agent?.isApiAccessToken)
-            return this.proposalPDFDataGenerator.collectProposalPDFData(
+            return this.proposalTokenAccess.collectProposalPDFData(
               agent,
               proposalPk,
               proposalFilterType ?? undefined,
