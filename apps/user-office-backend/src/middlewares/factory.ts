@@ -110,26 +110,28 @@ export default function factory() {
       if (decodedUser) {
         if (accessTokenId) {
           await getUserWithRoleFromAccessTokenId(accessTokenId)
-            .then((accessPermissions) => {
-              if (!accessPermissions) {
-                return res.status(401).send('Unauthorized token');
+            .then((userWithRole) => {
+              if (!userWithRole || !userWithRole.accessPermissions) {
+                return res.status(401).send('INSUFFICIENT_PERMISSIONS');
               }
-              res.locals.agent = accessPermissions;
+              res.locals.agent = userWithRole;
               next();
             })
             .catch((e) => {
               logger.logException(
-                `${defaultErrorMessage} unauthorized token`,
+                `${defaultErrorMessage} INSUFFICIENT_PERMISSIONS`,
                 e
               );
-              res.status(401).send(`${defaultErrorMessage} unauthorized token`);
+              res
+                .status(401)
+                .send(`${defaultErrorMessage} INSUFFICIENT_PERMISSIONS`);
             });
         } else {
           baseContext.queries.user
             .getAgent(decodedUser.user.id)
             .then(async (user) => {
               if (!user) {
-                return res.status(401).send('Unauthorized token');
+                return res.status(401).send('EXTERNAL_TOKEN_INVALID');
               }
               req.user = {
                 user,
@@ -148,7 +150,7 @@ export default function factory() {
             });
         }
       } else {
-        return res.status(401).send('Unauthorized');
+        return res.status(401).send('EXTERNAL_TOKEN_INVALID');
       }
     },
     router
