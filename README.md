@@ -6,12 +6,12 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/UserOfficeProject/user-office-core/master/badge.svg?targetFile=package.json)](https://snyk.io/test/github/UserOfficeProject/user-office-core/master?targetFile=package.json)
 
 ---
-## Getting started
-
+## Getting started.
+ßßß
 To be able to start both backend and frontend locally you will need to:
 
 1. Install all needed dependencies with `npm install`
-2. Start the application using `npm run dev` or `npm run start`
+2. Start the application using `npm run dev` or `npm run start`ßßß
 
 ## Check the .env file
 If .env file is not preset during startup of the project, it will be created using example.env file template
