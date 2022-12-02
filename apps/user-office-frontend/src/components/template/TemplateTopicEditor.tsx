@@ -221,6 +221,7 @@ export default function QuestionaryEditorTopic(props: {
                 name="title"
                 id="title"
                 type="text"
+                inputProps={{ maxLength: '32' }}
                 component={TextField}
                 className={classes.titleEditMode}
                 value={values.title}
