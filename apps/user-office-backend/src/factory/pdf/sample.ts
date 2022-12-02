@@ -45,7 +45,7 @@ export async function collectSamplePDFData(
     );
   }
 
-  if (notify) notify?.(`sample_${sample.id}.pdf`);
+  notify?.(`sample_${sample.id}.pdf`);
 
   const questionary =
     newQuestionary ||
