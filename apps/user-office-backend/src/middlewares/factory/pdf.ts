@@ -10,7 +10,7 @@ import callFactoryService, {
   PDFType,
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
-import FactoryServices from './factoryServices';
+import FactoryServices, { PDFServices } from './factoryServices';
 
 const router = express.Router();
 
@@ -19,7 +19,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     if (!req.user) {
       throw new Error('Not authorized');
     }
-    const factoryServices = container.resolve<FactoryServices>(FactoryServices);
+    const pdfServices = container.resolve<PDFServices>(FactoryServices);
 
     const userWithRole = {
       ...res.locals.agent,
@@ -34,7 +34,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       singleFilename: '',
     };
 
-    const data = await factoryServices.getPdfProposals(
+    const data = await pdfServices.getPdfProposals(
       userWithRole,
       proposalPks,
       meta,

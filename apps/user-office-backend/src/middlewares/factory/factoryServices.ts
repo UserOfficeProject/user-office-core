@@ -9,8 +9,16 @@ import { ProposalTokenAccess } from '../../factory/pdf/proposalTokenAccess';
 import { MetaBase } from '../../factory/service';
 import { UserWithRole } from '../../models/User';
 
+export interface PDFServices {
+  getPdfProposals(
+    agent: UserWithRole,
+    proposalPks: number[],
+    proposalFileMeta: MetaBase,
+    proposalFilterType?: string
+  ): Promise<ProposalPDFData[] | null>;
+}
 @injectable()
-export default class FactoryServices {
+export default class FactoryServices implements PDFServices {
   constructor(
     @inject(ProposalTokenAccess)
     private proposalTokenAccess: ProposalTokenAccess
