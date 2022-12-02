@@ -44,22 +44,24 @@ const getUserWithRoleFromAccessTokenId = async (
   } as UserWithRole;
 };
 const getLogContextFromRequest = (req: Request) => {
-  const userReq = req.user?.accessTokenId
-    ? {
-        accessTokenId: req.user?.accessTokenId,
-        isApiAccessToken: true,
-      }
-    : {
-        id: req.user?.user.id,
-        currentRole: req.user?.currentRole,
-      };
+  if (req?.user) {
+    const userReq = req.user?.accessTokenId
+      ? {
+          accessTokenId: req.user?.accessTokenId,
+          isApiAccessToken: true,
+        }
+      : {
+          id: req.user?.user.id,
+          currentRole: req.user?.currentRole,
+        };
 
-  return req?.user
-    ? {
-        originalUrl: req.originalUrl,
-        user: userReq,
-      }
-    : {};
+    return {
+      originalUrl: req.originalUrl,
+      user: userReq,
+    };
+  }
+
+  return {};
 };
 
 const router = express.Router();
