@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
-import FactoryServicesAuthorized from '../../decorators/FactoryServicesAuthorized';
+import { FactoryServicesAuthorized } from '../../decorators';
 import {
   collectProposalPDFData,
   ProposalPDFData,
@@ -9,27 +9,20 @@ import { ProposalTokenAccess } from '../../factory/pdf/proposalTokenAccess';
 import { MetaBase } from '../../factory/service';
 import { UserWithRole } from '../../models/User';
 
-export interface PDFServices {
-  getPdfProposals(
-    user: UserWithRole,
-    proposalPks: number[],
-    proposalFileMeta: MetaBase,
-    proposalFilterType?: string
-  ): Promise<ProposalPDFData[] | null>;
-}
 @injectable()
-export default class FactoryServices implements PDFServices {
+export default class FactoryServices {
   constructor(
     @inject(ProposalTokenAccess)
     private proposalTokenAccess: ProposalTokenAccess
   ) {}
+
   @FactoryServicesAuthorized()
   async getPdfProposals(
     agent: UserWithRole | null,
     proposalPks: number[],
     proposalFileMeta: MetaBase,
     proposalFilterType?: string
-  ) {
+  ): Promise<ProposalPDFData[] | null> {
     let data = null;
     if (agent) {
       data = await Promise.all(

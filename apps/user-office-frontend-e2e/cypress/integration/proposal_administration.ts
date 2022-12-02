@@ -731,7 +731,7 @@ context('Proposal administration tests', () => {
     });
   });
 
-  describe('Proposal administration  API token access', () => {
+  describe('Proposal administration API token access', () => {
     let createdProposalPk: number;
     let createdProposalId: string;
     beforeEach(() => {
