@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
 
 import { BasicResolverContext } from './context';
-import PDFServices from './middlewares/factory/factoryServices';
+import FactoryServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
@@ -99,7 +99,7 @@ const context: BasicResolverContext = {
     predefinedMessage: container.resolve(PredefinedMessageMutations),
   },
   services: {
-    pdfServices: container.resolve(PDFServices),
+    factoryServices: container.resolve(FactoryServices),
   },
 };
 

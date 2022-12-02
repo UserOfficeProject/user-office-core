@@ -1,44 +1,50 @@
-import { Roles } from '../models/Role';
+import { logger } from '@user-office-software/duo-logger';
+
 import { UserWithRole } from '../models/User';
-type Descriptor = {
-  value?: (agent: UserWithRole, ...args: any[]) => Promise<any>;
-};
 
-const FactoryServicesAuthorized = (roles: Roles[] = []) => {
-  return (target: any, name: string, descriptor: Descriptor) => {
-    const originalMethod = descriptor.value;
+const FactoryServicesAuthorized = (accessPermission?: string) => {
+  return (
+    target: any,
+    methodName: string,
+    propertyDescriptor: {
+      value?: (userWithRole: UserWithRole, ...args: any[]) => Promise<any>;
+    }
+  ) => {
+    const originalMethod = propertyDescriptor.value;
+    propertyDescriptor.value = async function (...args) {
+      const [userWithRole] = args;
+      if (!userWithRole) {
+        throw new Error('INSUFFICIENT_PERMISSIONS');
+      }
+      if (userWithRole?.isApiAccessToken) {
+        const accessPermissionName =
+          `${target.constructor.name}.${methodName}` as string;
 
-    descriptor.value = async function (...args) {
-      const [agent] = args;
+        // This is access permission name check will be removed next commit
 
-      if (agent?.isApiAccessToken) {
-        if (agent?.accessPermissions?.[`${target.constructor.name}.${name}`]) {
+        logger.logInfo('Access Permission Name check', {
+          message: accessPermissionName,
+        });
+
+        // This is access permissions check will be removed next commit
+
+        logger.logInfo('Access Permissions check', {
+          message: userWithRole?.accessPermissions,
+        });
+
+        if (
+          (accessPermission &&
+            Object.keys(userWithRole?.accessPermissions).includes(
+              accessPermission
+            )) ||
+          Object.keys(userWithRole?.accessPermissions).includes(
+            accessPermissionName
+          )
+        ) {
           return await originalMethod?.apply(this, args);
         } else {
           throw new Error('INSUFFICIENT_PERMISSIONS');
         }
-      }
-
-      if (!agent) {
-        throw new Error('NOT_LOGGED_IN');
-      }
-
-      if (agent.externalToken && !agent.externalTokenValid) {
-        throw new Error('EXTERNAL_TOKEN_INVALID');
-      }
-
-      if (roles.length === 0) {
-        return await originalMethod?.apply(this, args);
-      }
-
-      const hasAccessRights = roles.some(
-        (role) => role === agent.currentRole?.shortCode
-      );
-
-      if (hasAccessRights) {
-        return await originalMethod?.apply(this, args);
-      } else {
-        throw new Error('INSUFFICIENT_PERMISSIONS');
       }
     };
   };
