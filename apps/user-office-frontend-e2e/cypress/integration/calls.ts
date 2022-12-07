@@ -1034,8 +1034,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Application deadline')
+        .should('not.have.text', 'remaining');
     });
 
     cy.updateCall({
@@ -1105,8 +1105,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Application deadline')
+        .should('not.have.text', 'remaining');
     });
   });
 
@@ -1143,8 +1143,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Internal deadline')
+        .should('not.have.text', 'remaining');
     });
 
     cy.updateCall({
@@ -1219,8 +1219,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Internal deadline')
+        .should('not.have.text', 'remaining');
     });
   });
 });
