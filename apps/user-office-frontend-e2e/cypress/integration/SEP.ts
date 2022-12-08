@@ -199,6 +199,21 @@ context('SEP reviews tests', () => {
   });
 
   describe('User officer role', () => {
+    it('Copy to clipboard should work for Code in SEPs page', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(createdProposalId).realClick();
+
+      cy.window().then((win) => {
+        win.navigator.clipboard.readText().then((text) => {
+          cy.get('[role="alert"]').should('contain', text);
+        });
+      });
+    });
+
     it('Officer should be able to assign proposal to existing SEP', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
