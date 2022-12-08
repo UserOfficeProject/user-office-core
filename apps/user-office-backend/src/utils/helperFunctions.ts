@@ -53,6 +53,30 @@ export const checkAllReviewsSubmittedOnProposal = (
   return allOtherReviewsSubmitted;
 };
 
+export const searchObjectByKey = (
+  object: object,
+  originalKey: string
+): object | null => {
+  if (object !== null) {
+    for (const key of Object.keys(object)) {
+      if (key === originalKey) {
+        return object;
+      } else if (typeof object[key as keyof object] === 'object') {
+        const found = searchObjectByKey(
+          object[key as keyof object],
+          originalKey
+        );
+
+        if (found !== null) {
+          return found;
+        }
+      }
+    }
+  }
+
+  return null;
+};
+
 /**
  * @description Makes all fields non-nullable
  */
@@ -72,3 +96,15 @@ export type NonNullableField<T, K extends keyof T> = T &
  */
 export type RequiredField<T, K extends keyof T> = T &
   NonNullableFields<Required<Pick<T, K>>>;
+
+export function removeDuplicates<T>(obj: T): T {
+  if (Array.isArray(obj) && obj.length > 1) {
+    return obj.reduce(function (carrResult, currValue) {
+      return carrResult.includes(currValue)
+        ? carrResult
+        : [...carrResult, currValue];
+    }, []);
+  }
+
+  return obj;
+}

@@ -1,4 +1,3 @@
-import { Event } from '../events/event.enum';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import {
@@ -62,8 +61,4 @@ export interface ProposalSettingsDataSource {
   getStatusChangingEventsByConnectionIds(
     proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
-  getProposalNextStatus(
-    proposalPk: number,
-    event: Event
-  ): Promise<ProposalStatus | null>;
 }

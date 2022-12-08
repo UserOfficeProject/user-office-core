@@ -10,8 +10,8 @@ context('PageTable component tests', () => {
   const abstract = faker.random.words(8);
 
   beforeEach(function () {
-    cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+    cy.resetDB();
     const isUserManagementEnabled = featureFlags
       .getEnabledFeatures()
       .get(FeatureId.USER_MANAGEMENT);

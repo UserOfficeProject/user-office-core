@@ -137,6 +137,8 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
     if (shouldCloseAfterCreation) {
       setShow(false);
+    } else {
+      setEditObject(objectAdded);
     }
   };
 
@@ -152,8 +154,8 @@ export function SuperMaterialTable<Entry extends EntryID>({
     }
 
     if (shouldCloseAfterUpdate) {
-      setShow(false);
       setEditObject(null);
+      setShow(false);
     }
   };
 
@@ -195,14 +197,17 @@ export function SuperMaterialTable<Entry extends EntryID>({
         fullWidth={!!props.createModalSize}
         onClose={(_, reason) => {
           if (reason && reason == 'backdropClick') return;
-          setShow(false);
           setEditObject(null);
+          setShow(false);
         }}
       >
         <IconButton
           data-cy="close-modal-btn"
           className={classes.closeButton}
-          onClick={() => setShow(false)}
+          onClick={() => {
+            setEditObject(null);
+            setShow(false);
+          }}
         >
           <CloseIcon />
         </IconButton>

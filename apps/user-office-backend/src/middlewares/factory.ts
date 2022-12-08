@@ -3,8 +3,6 @@ import express, { Request, Response, NextFunction } from 'express';
 
 import baseContext from '../buildContext';
 import { DownloadType } from '../factory/service';
-import { AuthJwtPayload } from '../models/User';
-import { verifyToken } from '../utils/jwt';
 import pdfDownload from './factory/pdf';
 import xlsxDownload from './factory/xlsx';
 
@@ -52,7 +50,10 @@ export default function factory() {
   return express.Router().use(
     '/download',
     (req, res, next) => {
-      const decoded = verifyToken<AuthJwtPayload>(req.cookies.token);
+      const decoded = req.user;
+      if (!decoded) {
+        return res.status(401).send('Unauthorized');
+      }
 
       baseContext.queries.user
         .getAgent(decoded.user.id)
@@ -64,6 +65,7 @@ export default function factory() {
           req.user = {
             user,
             currentRole: decoded.currentRole,
+            isInternalUser: decoded.isInternalUser,
             roles: [],
           };
           next();

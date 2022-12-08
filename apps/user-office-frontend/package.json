@@ -30,7 +30,11 @@
     "@types/tinymce": "^4.6.5",
     "@types/yup": "^0.29.13",
     "@user-office-software/duo-localisation": "^1.2.0",
+<<<<<<< HEAD
     "@user-office-software/duo-validation": "file:../../../user-office-lib/packages/validation/user-office-software-duo-validation-3.4.2.tgz",
+=======
+    "@user-office-software/duo-validation": "^3.4.2",
+>>>>>>> 222f7811f1eaa20a1096c66709687261c816db25
     "clsx": "^1.1.1",
     "formik": "^2.2.9",
     "formik-mui": "^4.0.0-alpha.3",
@@ -46,7 +50,6 @@
     "query-string": "^6.14.0",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
-    "react-cookie": "^4.1.1",
     "react-dom": "^17.0.2",
     "react-fast-compare": "^3.2.0",
     "react-router": "^5.3.1",

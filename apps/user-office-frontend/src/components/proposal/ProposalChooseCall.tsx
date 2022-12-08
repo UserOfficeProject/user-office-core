@@ -7,9 +7,10 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { useHistory } from 'react-router';
 
+import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -32,6 +33,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   const history = useHistory();
   const classes = useStyles();
   const { toFormattedDateTime } = useFormattedDateTime();
+  const { isInternalUser } = useContext(UserContext);
 
   const handleSelect = (callId: number, templateId: number | null) => {
     const url = `/ProposalCreate/${callId}/${templateId}`;
@@ -46,10 +48,13 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
         </Typography>
         <List data-cy="call-list">
           {callsData.map((call) => {
-            let timeRemainingText = timeRemaining(new Date(call.endCall));
-            if (timeRemainingText != '') {
-              timeRemainingText = `(${timeRemainingText})`;
-            }
+            const timeRemainingText = timeRemaining(new Date(call.endCall));
+            const InternalCalltimeRemainingText = timeRemaining(
+              new Date(call.endCallInternal)
+            );
+
+            const timeRemainFormatter = (timeText: string) =>
+              timeText != '' ? `(${timeText})` : timeText;
 
             const header =
               call.title === null || call.title === '' ? (
@@ -77,8 +82,18 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                       <Typography component="p" className={classes.date}>
                         {`Application deadline: ${toFormattedDateTime(
                           call.endCall
-                        )} ${timeRemainingText}`}
+                        )} ${timeRemainFormatter(timeRemainingText)}`}
                       </Typography>
+
+                      {isInternalUser && (
+                        <Typography component="p" className={classes.date}>
+                          {`Internal deadline:  ${toFormattedDateTime(
+                            call.endCallInternal
+                          )}
+                        ${timeRemainFormatter(InternalCalltimeRemainingText)}
+                        `}
+                        </Typography>
+                      )}
                       <Typography component="p">{call.description}</Typography>
                       <Typography component="p">{call.cycleComment}</Typography>
                     </>

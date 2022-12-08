@@ -5,7 +5,6 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -52,7 +51,7 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
   );
 
   const selectedProposalsSep =
-    allSelectedProposalsHaveSameSep && sepIds[0] ? sepIds[0].toString() : '';
+    allSelectedProposalsHaveSameSep && sepIds[0] ? sepIds[0] : null;
 
   return (
     <Container
@@ -66,7 +65,7 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
         }}
         onSubmit={async (values): Promise<void> => {
           const selectedSEP = SEPs.find(
-            (sep) => sep.id === +values.selectedSEPId
+            (sep) => sep.id === values.selectedSEPId
           );
 
           await assignProposalsToSEP(selectedSEP || null);
@@ -122,10 +121,9 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
   );
 };
 
-AssignProposalsToSEP.propTypes = {
-  close: PropTypes.func.isRequired,
-  assignProposalsToSEP: PropTypes.func.isRequired,
-  sepIds: PropTypes.array.isRequired,
-};
-
-export default AssignProposalsToSEP;
+// NOTE: This comparison is done to prevent component re-rendering on modal close
+export default React.memo(
+  AssignProposalsToSEP,
+  (prevProps, nextProps) =>
+    JSON.stringify(prevProps.callIds) === JSON.stringify(nextProps.callIds)
+);

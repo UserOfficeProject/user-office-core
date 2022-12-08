@@ -241,6 +241,9 @@ export default {
     editableSubmitted: {
       id: 14,
     },
+    editableSubmittedInternal: {
+      id: 15,
+    },
   },
   scheduledEvents: {
     upcoming: {

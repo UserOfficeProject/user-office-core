@@ -5,8 +5,8 @@ import initialDBData from '../support/initialDBData';
 
 context('Experiments tests', () => {
   beforeEach(() => {
-    cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled();
+    cy.resetDB(true);
   });
 
   beforeEach(function () {

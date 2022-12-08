@@ -22,11 +22,6 @@ mutation updateReview(
       comment
       grade
       sepID
-      nextProposalStatus {
-        id
-        shortCode
-        name
-      }
     }
   }
 }

@@ -45,7 +45,7 @@ jobs:
             FACTORY_TAG="${{ github.head_ref }}"
           fi
 
-          echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
+          echo "FACTORY_TAG=${FACTORY_TAG}" >> $GITHUB_OUTPUT
 
       - name: Resolved
         run: |
@@ -103,6 +103,19 @@ jobs:
       - name: Install frontend dependencies
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
         run: npm run install:frontend
+        
+      - name: Cache frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+
+      - name: Generate frontend SDK
+        if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
+        run: |
+          cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+          npm run generate:sdk
 
   build:
     # The type of runner that the job will run on
@@ -138,6 +151,14 @@ jobs:
         with:
           path: apps/user-office-frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+
 
       - run: npm run build
         env:
@@ -230,6 +251,14 @@ jobs:
         with:
           path: apps/user-office-frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
@@ -386,7 +415,14 @@ jobs:
           tags: |
             dmsc/duo-backend:${{ github.head_ref }}
             ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
-
+            
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/user-office-frontend/src/generated
+          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          
       - name: Build and push frontend
         uses: docker/build-push-action@v3
         with:
