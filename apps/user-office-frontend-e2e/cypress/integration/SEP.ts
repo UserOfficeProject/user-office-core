@@ -886,7 +886,7 @@ context('SEP reviews tests', () => {
 
       cy.get('[data-cy="SEPs-table"]')
         .contains(sep1.code)
-        .parent()
+        .closest('tr')
         .find('[aria-label="Edit"]')
         .click();
 
