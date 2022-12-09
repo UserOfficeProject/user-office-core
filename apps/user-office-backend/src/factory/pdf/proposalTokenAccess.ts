@@ -154,10 +154,10 @@ export class ProposalTokenAccess {
       );
     }
     if (isRejection(questionarySteps) || questionarySteps == null) {
-      logger.logError('Could not fetch questionary', {
-        reason: questionarySteps?.reason || 'questionary is null',
+      logger.logError('Could not fetch questionary steps', {
+        reason: questionarySteps?.reason || 'questionary steps is null',
       });
-      throw new Error('Could not fetch questionary');
+      throw new Error('Could not fetch questionary steps');
     }
 
     return questionarySteps;
