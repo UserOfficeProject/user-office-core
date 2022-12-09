@@ -145,7 +145,12 @@ const SEPReviewColumns = [
     hidden: true,
   },
   { title: 'Deviation', field: 'reviewDeviation', emptyValue: '-' },
-  { title: 'Average Score', field: 'reviewAverage', emptyValue: '-' },
+  {
+    title: 'Average Score',
+    field: 'reviewAverage',
+    emptyValue: '-',
+    hidden: true,
+  },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
   { title: 'SEP', field: 'sepCode', emptyValue: '-' },
 ];
