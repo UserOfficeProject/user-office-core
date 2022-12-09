@@ -120,7 +120,7 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Copy to clipboard should work for Proposal ID ', () => {
+    it('Copy to clipboard should work for Proposal ID', () => {
       cy.login('officer');
       cy.visit('/');
 
