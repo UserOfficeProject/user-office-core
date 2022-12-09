@@ -37,11 +37,7 @@
     "@user-office-software/duo-localisation": "^1.2.0",
     "@user-office-software/duo-logger": "^2.0.2",
     "@user-office-software/duo-message-broker": "^1.4.0",
-<<<<<<< HEAD
-    "@user-office-software/duo-validation": "file:../../../user-office-lib/packages/validation/user-office-software-duo-validation-3.4.2.tgz",
-=======
     "@user-office-software/duo-validation": "^3.4.2",
->>>>>>> 222f7811f1eaa20a1096c66709687261c816db25
     "@user-office-software/openid": "^1.2.1",
     "apollo-graphql": "^0.9.7",
     "apollo-server-core": "^3.10.2",
