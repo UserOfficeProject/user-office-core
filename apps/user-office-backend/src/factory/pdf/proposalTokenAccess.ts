@@ -107,7 +107,7 @@ export class ProposalTokenAccess {
     return null;
   }
 
-  private async getprincipalInvestigator(): Promise<BasicUserDetails> {
+  private async getPrincipalInvestigator(): Promise<BasicUserDetails> {
     let principalInvestigator = null;
     const proposerId = this.proposalPDFData.proposal?.proposerId;
 
@@ -154,6 +154,9 @@ export class ProposalTokenAccess {
       );
     }
     if (isRejection(questionarySteps) || questionarySteps == null) {
+      logger.logError('Could not fetch questionary', {
+        reason: questionarySteps?.reason || 'questionary is null',
+      });
       throw new Error('Could not fetch questionary');
     }
 
@@ -320,7 +323,7 @@ export class ProposalTokenAccess {
 
     //Set principal investigator and co-proposers
     this.proposalPDFData.principalInvestigator =
-      await this.getprincipalInvestigator();
+      await this.getPrincipalInvestigator();
     this.proposalPDFData.coProposers = (await this.getCoProposers()) || [];
 
     //  Set sample data
