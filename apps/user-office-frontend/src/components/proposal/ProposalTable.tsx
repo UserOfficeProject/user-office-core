@@ -1,4 +1,4 @@
-import MaterialTable from '@material-table/core';
+import MaterialTable, { Column } from '@material-table/core';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
 import FileCopy from '@mui/icons-material/FileCopy';
@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
 
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -41,8 +42,21 @@ type ProposalTableProps = {
   confirm: WithConfirmType;
 };
 
-const columns = [
-  { title: 'Proposal ID', field: 'proposalId' },
+const columns: Column<PartialProposalsDataType>[] = [
+  {
+    title: 'Proposal ID',
+    field: 'proposalId',
+    render: (rawData) => (
+      <CopyToClipboard
+        text={rawData.proposalId}
+        successMessage={`'${rawData.proposalId}' copied to clipboard`}
+        position="right"
+      >
+        {rawData.proposalId || ''}
+      </CopyToClipboard>
+    ),
+  },
+
   { title: 'Title', field: 'title' },
   { title: 'Status', field: 'publicStatus' },
   {
