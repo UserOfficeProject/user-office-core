@@ -22,6 +22,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
@@ -91,7 +92,19 @@ let columns: Column<ProposalViewData>[] = [
     removable: false,
     field: 'rowActionButtons',
   },
-  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Proposal ID',
+    field: 'proposalId',
+    render: (rawData) => (
+      <CopyToClipboard
+        text={rawData.proposalId}
+        successMessage={`'${rawData.proposalId}' copied to clipboard`}
+        position="right"
+      >
+        {rawData.proposalId || ''}
+      </CopyToClipboard>
+    ),
+  },
   {
     title: 'Title',
     field: 'title',
@@ -145,7 +158,12 @@ const SEPReviewColumns = [
     hidden: true,
   },
   { title: 'Deviation', field: 'reviewDeviation', emptyValue: '-' },
-  { title: 'Average Score', field: 'reviewAverage', emptyValue: '-' },
+  {
+    title: 'Average Score',
+    field: 'reviewAverage',
+    emptyValue: '-',
+    hidden: true,
+  },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
   { title: 'SEP', field: 'sepCode', emptyValue: '-' },
 ];

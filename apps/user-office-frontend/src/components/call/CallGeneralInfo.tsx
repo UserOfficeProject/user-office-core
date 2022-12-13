@@ -56,7 +56,10 @@ const CallGeneralInfo: React.FC<{
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
-  const [showInternalCall, setShowInternalCall] = useState(false);
+  const [internalCallDate, setInternalCallDate] = useState({
+    showField: false,
+    isValueSet: false,
+  });
 
   const theme = useTheme();
 
@@ -95,7 +98,8 @@ const CallGeneralInfo: React.FC<{
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
 
-  const { startCall, endCall, proposalWorkflowId } = formik.values;
+  const { values, setValues } = formik;
+  const { startCall, endCall, proposalWorkflowId } = values;
 
   useEffect(() => {
     const selectedProposalWorkFlow = proposalWorkflows.find(
@@ -104,18 +108,27 @@ const CallGeneralInfo: React.FC<{
     if (selectedProposalWorkFlow) {
       selectedProposalWorkFlow.proposalWorkflowConnectionGroups.map(
         (workGroup) => {
-          setShowInternalCall(
-            workGroup.connections.some((connectionStatus) => {
-              return (
-                connectionStatus.proposalStatus.shortCode ===
-                ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
-              );
-            })
-          );
+          const result = workGroup.connections.some((connectionStatus) => {
+            return (
+              connectionStatus.proposalStatus.shortCode ===
+              ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+            );
+          });
+          setInternalCallDate({ showField: result, isValueSet: true });
         }
       );
     }
   }, [proposalWorkflowId, proposalWorkflows]);
+
+  useEffect(() => {
+    if (internalCallDate.isValueSet && !internalCallDate.showField && endCall) {
+      setValues((prevState) => {
+        const endCallInternal = endCall;
+
+        return { ...prevState, endCallInternal };
+      });
+    }
+  }, [setValues, endCall, setInternalCallDate, internalCallDate]);
 
   function validateRefNumFormat(input: string) {
     let errorMessage;
@@ -349,7 +362,7 @@ const CallGeneralInfo: React.FC<{
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
-        {showInternalCall && (
+        {internalCallDate.showField && (
           <Field
             name="endCallInternal"
             label={`End Internal (${timezone})`}

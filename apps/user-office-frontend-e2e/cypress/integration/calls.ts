@@ -523,13 +523,13 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to edit a call', () => {
-      const { shortCode, startDate } = updatedCall;
-      const updatedCallStartDate = startDate
-        .plus({ days: 7 })
-        .toFormat(initialDBData.getFormats().dateTimeFormat);
-      const updatedCallEndDate = startDate
-        .plus({ days: 14 })
-        .toFormat(initialDBData.getFormats().dateTimeFormat);
+      const { shortCode, startDate, endDate } = updatedCall;
+      const updatedCallStartDate = startDate.toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
+      const updatedCallEndDate = endDate.toFormat(
+        initialDBData.getFormats().dateTimeFormat
+      );
 
       const refNumFormat = '211{digits:5}';
 
@@ -1034,8 +1034,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Application deadline')
+        .should('not.have.text', 'remaining');
     });
 
     cy.updateCall({
@@ -1105,8 +1105,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Application deadline')
+        .should('not.have.text', 'remaining');
     });
   });
 
@@ -1143,8 +1143,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Internal deadline')
+        .should('not.have.text', 'remaining');
     });
 
     cy.updateCall({
@@ -1219,8 +1219,8 @@ context('Calls tests', () => {
 
       cy.contains(initialDBData.call.shortCode)
         .parent()
-        .contains('remaining')
-        .should('not.exist');
+        .contains('Internal deadline')
+        .should('not.have.text', 'remaining');
     });
   });
 });
