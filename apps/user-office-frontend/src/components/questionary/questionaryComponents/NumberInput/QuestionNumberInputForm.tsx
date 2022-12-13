@@ -1,5 +1,10 @@
+import LaunchIcon from '@mui/icons-material/Launch';
 import Autocomplete from '@mui/lab/Autocomplete';
+import FormControl from '@mui/material/FormControl';
+import Link from '@mui/material/Link';
 import MaterialTextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
+// import clsx from 'clsx';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC, useState } from 'react';
@@ -13,11 +18,19 @@ import { NumberInputConfig, NumberValueConstraint } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
+const useStyles = makeStyles((theme) => ({
+  iconVerticalAlign: {
+    verticalAlign: 'middle',
+    marginLeft: theme.spacing(0.5),
+  },
+}));
+
 export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
   const field = props.question;
   const numberConfig = props.question.config as NumberInputConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { units } = useUnitsData();
+  const classes = useStyles();
   const [selectedUnits, setSelectedUnits] = useState(numberConfig.units);
 
   return (
@@ -81,24 +94,37 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
               }}
               InputProps={{ 'data-cy': 'required' }}
             />
+            <FormControl fullWidth>
+              <Autocomplete
+                id="config-units"
+                multiple
+                options={units}
+                getOptionLabel={({ unit, symbol, quantity }) =>
+                  `${symbol} (${unit}) - ${quantity}`
+                }
+                renderInput={(params) => (
+                  <MaterialTextField {...params} label="Units" margin="none" />
+                )}
+                onChange={(_event, newValue) => {
+                  setSelectedUnits(newValue);
+                  setFieldValue('config.units', newValue);
+                }}
+                value={selectedUnits ?? undefined}
+                data-cy="units"
+              />
 
-            <Autocomplete
-              id="config-units"
-              multiple
-              options={units}
-              getOptionLabel={({ unit, symbol, quantity }) =>
-                `${symbol} (${unit}) - ${quantity}`
-              }
-              renderInput={(params) => (
-                <MaterialTextField {...params} label="Units" margin="none" />
-              )}
-              onChange={(_event, newValue) => {
-                setSelectedUnits(newValue);
-                setFieldValue('config.units', newValue);
-              }}
-              value={selectedUnits ?? undefined}
-              data-cy="units"
-            />
+              <Link
+                href="/Units/"
+                target="_blank"
+                style={{ textAlign: 'right' }}
+              >
+                View/Edit all units
+                <LaunchIcon
+                  fontSize="small"
+                  className={classes.iconVerticalAlign}
+                />
+              </Link>
+            </FormControl>
 
             <FormikUIAutocomplete
               name="config.numberValueConstraint"
