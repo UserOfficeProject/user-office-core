@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
     verticalAlign: 'middle',
     marginLeft: theme.spacing(0.5),
   },
+  textRightAlign: {
+    textAlign: 'right',
+  },
 }));
 
 export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
@@ -115,7 +118,7 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
               <Link
                 href="/Units/"
                 target="_blank"
-                style={{ textAlign: 'right' }}
+                className={classes.textRightAlign}
               >
                 View/Edit all units
                 <LaunchIcon
