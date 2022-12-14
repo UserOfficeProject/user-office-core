@@ -132,6 +132,19 @@ context('Proposal tests', () => {
         'Carl'
       );
 
+      cy.get('[data-cy=edit-proposer-button]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=email]').type('ben@inbox.com');
+
+      cy.get('[data-cy=findUser]').click();
+
+      cy.contains('Benjamin')
+        .parent()
+        .find("[aria-label='Select user']")
+        .click();
+
       cy.contains('Save and continue').click();
 
       cy.contains('Title is required');
@@ -695,6 +708,19 @@ context('Proposal tests', () => {
         'Carl'
       );
 
+      cy.get('[data-cy=edit-proposer-button]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=email]').type('ben@inbox.com');
+
+      cy.get('[data-cy=findUser]').click();
+
+      cy.contains('Benjamin')
+        .parent()
+        .find("[aria-label='Select user']")
+        .click();
+
       cy.contains('Save and continue').click();
 
       cy.contains('Title is required');
@@ -801,6 +827,19 @@ context('Proposal tests', () => {
         'contain.value',
         'Carl'
       );
+
+      cy.get('[data-cy=edit-proposer-button]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=email]').type('ben@inbox.com');
+
+      cy.get('[data-cy=findUser]').click();
+
+      cy.contains('Benjamin')
+        .parent()
+        .find("[aria-label='Select user']")
+        .click();
 
       cy.contains('Save and continue').click();
 
