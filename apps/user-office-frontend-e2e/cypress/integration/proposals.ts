@@ -120,6 +120,21 @@ context('Proposal tests', () => {
       });
     });
 
+    it('Copy to clipboard should work for Proposal ID', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-testid="ContentCopyIcon"]').realClick();
+
+      cy.window().then((win) => {
+        win.navigator.clipboard.readText().then((text) => {
+          cy.get('[role="alert"]').should('contain', text);
+        });
+      });
+    });
+
     it('Should be able create proposal', () => {
       cy.login('user1');
       cy.visit('/');

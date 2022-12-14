@@ -131,7 +131,10 @@ context('General scientific evaluation panel tests', () => {
       const newDescription = faker.random.words(8);
 
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
       cy.get('#code').type(newCode);
       cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
@@ -201,7 +204,10 @@ context('General scientific evaluation panel tests', () => {
       let selectedSecretaryUserLastName = '';
 
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 
@@ -310,7 +316,10 @@ context('General scientific evaluation panel tests', () => {
         },
       });
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 
@@ -337,7 +346,10 @@ context('General scientific evaluation panel tests', () => {
 
     it('Officer should be able to assign SEP Reviewers to existing SEP', () => {
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 
@@ -369,7 +381,10 @@ context('General scientific evaluation panel tests', () => {
         memberIds: [sepMembers.reviewer.id],
       });
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 
@@ -444,7 +459,10 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 
@@ -464,7 +482,10 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 
@@ -559,7 +580,10 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 
@@ -579,7 +603,10 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
+      cy.contains(sep1.code)
+        .closest('tr')
+        .find('button[aria-label="Edit"]')
+        .click();
 
       cy.contains('Members').click();
 

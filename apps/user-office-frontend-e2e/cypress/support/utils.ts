@@ -1,4 +1,6 @@
 import 'cypress-file-upload';
+import 'cypress-real-events';
+
 import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
@@ -6,7 +8,6 @@ import {
   CreateApiAccessTokenMutationVariables,
   getSdk,
 } from '@user-office-software-libs/shared-types';
-import 'cypress-file-upload';
 import { GraphQLClient } from 'graphql-request';
 import { DateTime } from 'luxon';
 

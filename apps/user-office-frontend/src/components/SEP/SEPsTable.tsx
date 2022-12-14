@@ -1,3 +1,4 @@
+import { Column } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
 import { Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
@@ -5,6 +6,7 @@ import { Redirect, useHistory } from 'react-router';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -23,8 +25,20 @@ import SEPStatusFilter, {
   SEPStatus,
 } from './SEPStatusFilter';
 
-const columns = [
-  { title: 'Code', field: 'code' },
+const columns: Column<Sep>[] = [
+  {
+    title: 'Code',
+    field: 'code',
+    render: (rawData) => (
+      <CopyToClipboard
+        text={rawData.code}
+        successMessage={`'${rawData.code}' copied to clipboard`}
+        position="right"
+      >
+        {rawData.code || ''}
+      </CopyToClipboard>
+    ),
+  },
   { title: 'Description', field: 'description' },
   {
     title: 'Active',
