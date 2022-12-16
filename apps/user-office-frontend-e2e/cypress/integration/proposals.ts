@@ -135,7 +135,7 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Should be able create proposal', () => {
+    it.only('Should be able create proposal', () => {
       cy.login('user1');
       cy.visit('/');
 
@@ -158,6 +158,14 @@ context('Proposal tests', () => {
         .parent()
         .find("[aria-label='Select user']")
         .click();
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Title is required');
+      cy.contains('Abstract is required');
+
+      cy.get('[data-cy=title]').type(' ').should('have.value', ' ');
+      cy.get('[data-cy=abstract]').type(' ').should('have.value', ' ');
 
       cy.contains('Save and continue').click();
 

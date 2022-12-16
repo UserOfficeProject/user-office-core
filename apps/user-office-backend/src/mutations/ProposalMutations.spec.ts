@@ -42,6 +42,19 @@ test('A user on the proposal can update its title if it is in edit mode', () => 
   ).resolves.toHaveProperty('title', newTitle);
 });
 
+test('A user can not create a proposal with blank title and abstract', () => {
+  const newTitle = '';
+  const newAbstract = '';
+
+  return expect(
+    proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: newTitle,
+      abstract: newAbstract,
+    })
+  ).resolves.toBeInstanceOf(Rejection);
+});
+
 test('A user on the proposal can not update its title if it is not in edit mode', async () => {
   return expect(
     proposalMutations.update(dummyUserWithRole, {
