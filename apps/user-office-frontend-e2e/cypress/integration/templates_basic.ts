@@ -884,6 +884,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.contains(dateQuestion.title);
       cy.get('body').then(() => {
@@ -975,6 +976,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       /* Test questions exist */
       for (const question of questions) {
@@ -1468,6 +1470,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(faker.lorem.words(2));
       cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
@@ -1854,6 +1857,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type('title');
 
