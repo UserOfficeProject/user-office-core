@@ -356,7 +356,8 @@ function createNumberInputQuestion(
     units?: string[];
     valueConstraint?: string;
     firstTopic?: boolean;
-  }
+  },
+  testingText?: string
 ) {
   openQuestionsMenu({
     firstTopic: options?.firstTopic,
@@ -371,6 +372,20 @@ function createNumberInputQuestion(
   }
 
   if (options?.units && options.units.length > 0) {
+    cy.get('[data-cy=units]')
+      .find('#config-units')
+      .type('test_cannot_be_found');
+    cy.get('[data-cy=add-button]').click();
+    cy.get('[data-cy="unit-id"]').clear().type(testingText!);
+    cy.get('[data-cy="unit-name"]').clear().type(testingText!);
+    cy.get('[data-cy="unit-quantity"]').click();
+    cy.get('[role="presentation"] [role="option"]').first().click();
+
+    cy.get('[data-cy="unit-symbol"]').clear().type(testingText!);
+    cy.get('[data-cy="unit-siConversionFormula"]').clear().type('x');
+    cy.get('[data-cy=unit-modal] [data-cy=submit]').click();
+    cy.get('[data-tag-index=0] > span').should('include.text', testingText!);
+
     for (const unit of options.units) {
       cy.get('[data-cy=units]').find('[aria-label=Open]').click();
       cy.contains(unit).click();

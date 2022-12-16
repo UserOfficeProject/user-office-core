@@ -206,6 +206,7 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
           <InputDialog
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
+            data-cy="unit-modal"
             open={show}
             fullWidth={true}
             onClose={(_, reason) => {

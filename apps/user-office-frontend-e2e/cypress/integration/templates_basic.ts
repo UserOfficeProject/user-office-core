@@ -36,7 +36,14 @@ context('Template tests', () => {
   const timeQuestion = faker.lorem.words(3);
   const fileQuestion = faker.lorem.words(3);
   const intervalQuestion = faker.lorem.words(3);
-  const numberQuestion = faker.lorem.words(3);
+  const numberQuestion = {
+    title: faker.lorem.words(3),
+    options: {
+      units: ['celsius', 'kelvin'],
+    },
+    testingText: 'test',
+  };
+
   const textQuestion = {
     title: faker.lorem.words(3),
     maxChars: 1000,
@@ -194,7 +201,7 @@ context('Template tests', () => {
 
         cy.updateQuestion({
           id: createdQuestion.id,
-          question: numberQuestion,
+          question: numberQuestion.title,
           config: `{"units":[
             {
               "id": "celsius",
@@ -427,11 +434,13 @@ context('Template tests', () => {
 
       /* Number */
 
-      cy.createNumberInputQuestion(numberQuestion, {
-        units: ['celsius', 'kelvin'],
-      });
+      cy.createNumberInputQuestion(
+        numberQuestion.title,
+        numberQuestion.options,
+        numberQuestion.testingText
+      );
 
-      cy.contains(numberQuestion)
+      cy.contains(numberQuestion.title)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
         .invoke('html')
@@ -485,7 +494,7 @@ context('Template tests', () => {
       ).contains(intervalQuestion);
       cy.get(
         '[aria-labelledby="preview-questionary-template-modal"] form'
-      ).contains(numberQuestion);
+      ).contains(numberQuestion.title);
       cy.get(
         '[aria-labelledby="preview-questionary-template-modal"] form'
       ).contains(textQuestion.title);

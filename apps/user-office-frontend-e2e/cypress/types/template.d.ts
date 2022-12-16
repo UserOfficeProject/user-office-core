@@ -164,7 +164,8 @@ declare global {
           units?: string[];
           valueConstraint?: string;
           firstTopic?: boolean;
-        }
+        },
+        testingText?: string
       ) => void;
 
       /**
