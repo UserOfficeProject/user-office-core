@@ -135,7 +135,7 @@ context('Proposal tests', () => {
       });
     });
 
-    it.only('Should be able create proposal', () => {
+    it('Should be able create proposal', () => {
       cy.login('user1');
       cy.visit('/');
 
