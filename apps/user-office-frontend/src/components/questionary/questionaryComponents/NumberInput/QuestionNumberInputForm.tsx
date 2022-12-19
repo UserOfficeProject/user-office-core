@@ -46,7 +46,7 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
   const { units, setUnitsWithLoading } = useUnitsData();
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
-  const [selectedUnits, setSelectedUnits] = useState<any>(numberConfig.units);
+  const [selectedUnits, setSelectedUnits] = useState(numberConfig.units);
 
   const onCreated = (unitAdded: Unit | null): void => {
     api()
@@ -60,7 +60,7 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
       });
     // .catch((err) => console.log(err));
     const newUnits = [...selectedUnits, unitAdded];
-    setSelectedUnits(newUnits);
+    setSelectedUnits(newUnits as Unit[]);
   };
 
   return (
