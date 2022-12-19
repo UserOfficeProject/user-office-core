@@ -142,6 +142,15 @@ context('visits tests', () => {
     cy.testActionButton(cyTagRegisterVisit, 'active');
     cy.testActionButton(cyTagFinishTraining, 'active');
     cy.testActionButton(cyTagDeclareShipment, 'neutral');
+
+    //test for title and abstract
+    cy.get('[data-cy=title]').type(' ').should('have.value', ' ');
+    cy.get('[data-cy=abstract]').type(' ').should('have.value', ' ');
+
+    cy.contains('Save and continue').click();
+
+    cy.contains('Title is required');
+    cy.contains('Abstract is required');
   });
 
   it('Visitor should only see permitted actions', () => {
