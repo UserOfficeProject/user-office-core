@@ -103,12 +103,6 @@ context('visits tests', () => {
 
     cy.contains(/Upcoming experiments/i).should('exist');
 
-    // test that that actions has correct state
-    cy.testActionButton(cyTagDefineVisit, 'active');
-    cy.testActionButton(cyTagRegisterVisit, 'inactive');
-    cy.testActionButton(cyTagFinishTraining, 'inactive');
-    cy.testActionButton(cyTagDeclareShipment, 'neutral');
-
     // create visit
     cy.get(`[data-cy="${cyTagDefineVisit}"]`).closest('button').first().click();
 
