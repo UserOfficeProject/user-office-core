@@ -1,8 +1,11 @@
+/* eslint-disable */
+
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import LaunchIcon from '@mui/icons-material/Launch';
 import Autocomplete from '@mui/lab/Autocomplete';
 import { Button, IconButton } from '@mui/material';
+import { createFilterOptions } from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import MaterialTextField from '@mui/material/TextField';
@@ -38,29 +41,49 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+interface UnitEdit extends Unit {
+  addNew?: string;
+}
+
+const filter = createFilterOptions();
+
 export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
-  const [show, setShow] = useState(false);
   const field = props.question;
   const numberConfig = props.question.config as NumberInputConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { units, setUnitsWithLoading } = useUnitsData();
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
+  const [show, setShow] = useState(false);
   const [selectedUnits, setSelectedUnits] = useState(numberConfig.units);
+  const [unitData, SetUnitData] = useState({
+    id: '',
+    unit: '',
+    quantity: null,
+    symbol: '',
+    siConversionFormula: '',
+  });
 
   const onCreated = (unitAdded: Unit | null): void => {
     api()
       .getUnits()
       .then((result) => {
-        if (!result.units) return;
-
-        setUnitsWithLoading(result.units);
-
-        setShow(false);
+        if (result.units) {
+          setUnitsWithLoading(result.units);
+          setShow(false);
+        }
+      })
+      .catch((err) => console.log(err));
+    const newUnits = [...selectedUnits, unitAdded] as Unit[];
+    if (unitAdded) {
+      SetUnitData({
+        id: unitAdded.id,
+        unit: unitAdded.unit,
+        quantity: unitAdded.quantity as any,
+        symbol: unitAdded.symbol,
+        siConversionFormula: unitAdded.siConversionFormula,
       });
-    // .catch((err) => console.log(err));
-    const newUnits = [...selectedUnits, unitAdded];
-    setSelectedUnits(newUnits as Unit[]);
+    }
   };
 
   return (
@@ -143,8 +166,8 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
                     </Button>
                   </>
                 }
-                getOptionLabel={({ unit, symbol, quantity }) =>
-                  `${symbol} (${unit}) - ${quantity}`
+                getOptionLabel={({ unit, symbol, quantity, addNew }) =>
+                  !addNew ? `${symbol} (${unit}) - ${quantity}` : `${addNew}`
                 }
                 renderInput={(params) => {
                   return (
@@ -155,9 +178,34 @@ export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
                     />
                   );
                 }}
+                filterOptions={(options: UnitEdit[], params: any) => {
+                  const filtered = filter(options, params);
+
+                  const isExisting = options.some((option) => {
+                    Object.values(option).filter((val) =>
+                      val.includes(params.inputValue)
+                    );
+                  });
+
+                  if (params.inputValue !== '' && !isExisting) {
+                    filtered.push({
+                      addNew: `Add "${params.inputValue}" Units`,
+                    });
+                  }
+
+                  return filtered as UnitEdit[];
+                }}
                 onChange={(_event, newValue) => {
-                  setSelectedUnits(newValue);
-                  setFieldValue('config.units', newValue);
+                  console.log('newValue.slice(-1)[0]', newValue.slice(-1)[0]);
+                  if (newValue.slice(-1)[0] && newValue.slice(-1)[0].addNew) {
+                    setShow(true);
+                    console.log(newValue);
+                    //TODO fix here
+                    setSelectedUnits([...selectedUnits, unitData as any]);
+                  } else {
+                    setSelectedUnits(newValue);
+                    setFieldValue('config.units', newValue);
+                  }
                 }}
                 value={selectedUnits ?? undefined}
                 data-cy="units"
