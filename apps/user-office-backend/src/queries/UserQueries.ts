@@ -32,6 +32,11 @@ export default class UserQueries {
     return this.dataSource.getUser(id);
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async getByOidcSub(agent: UserWithRole | null, oidcSub: string) {
+    return this.dataSource.getByOIDCSub(oidcSub);
+  }
+
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.getUser(id);
