@@ -165,8 +165,8 @@ context('Proposal tests', () => {
       cy.contains('Title is required');
       cy.contains('Abstract is required');
 
-      cy.get('[data-cy=title]').type(' ').should('have.value', ' ');
-      cy.get('[data-cy=abstract]').type(' ').should('have.value', ' ');
+      cy.get('[data-cy=title]').type(' ');
+      cy.get('[data-cy=abstract]').type(' ');
 
       cy.contains('Save and continue').click();
 
