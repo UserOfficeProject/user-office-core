@@ -36,14 +36,7 @@ context('Template tests', () => {
   const timeQuestion = faker.lorem.words(3);
   const fileQuestion = faker.lorem.words(3);
   const intervalQuestion = faker.lorem.words(3);
-  const numberQuestion = {
-    title: faker.lorem.words(3),
-    options: {
-      units: ['celsius', 'kelvin'],
-    },
-    testingText: 'test',
-  };
-
+  const numberQuestion = faker.lorem.words(3);
   const textQuestion = {
     title: faker.lorem.words(3),
     maxChars: 1000,
@@ -201,7 +194,7 @@ context('Template tests', () => {
 
         cy.updateQuestion({
           id: createdQuestion.id,
-          question: numberQuestion.title,
+          question: numberQuestion,
           config: `{"units":[
             {
               "id": "celsius",
@@ -434,19 +427,19 @@ context('Template tests', () => {
 
       /* Number */
 
-      cy.createNumberInputQuestion(
-        numberQuestion.title,
-        numberQuestion.options,
-        numberQuestion.testingText
-      );
+      cy.createNumberInputQuestion(numberQuestion, {
+        units: ['celsius', 'kelvin'],
+      });
 
-      cy.contains(numberQuestion.title)
+      cy.contains(numberQuestion)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
         .invoke('html')
         .then((fieldId) => {
           numberId = fieldId;
         });
+
+      cy.pause();
 
       /* --- */
 
@@ -494,7 +487,7 @@ context('Template tests', () => {
       ).contains(intervalQuestion);
       cy.get(
         '[aria-labelledby="preview-questionary-template-modal"] form'
-      ).contains(numberQuestion.title);
+      ).contains(numberQuestion);
       cy.get(
         '[aria-labelledby="preview-questionary-template-modal"] form'
       ).contains(textQuestion.title);
@@ -914,7 +907,45 @@ context('Template tests', () => {
       });
     });
 
-    it('should render the Number field accepting only positive, negative numbers if set', () => {
+    it('should be able to create unit from the Number field', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.get('[data-cy=show-more-button]').first().click();
+
+      cy.get('[data-cy=add-question-menu-item]').first().click();
+
+      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+        .first()
+        .click();
+
+      cy.contains('Add Number').click();
+
+      cy.get('[data-cy=units]')
+        .find('#config-units')
+        .type('test_cannot_be_found');
+      cy.get('[data-cy=add-button]').click();
+      cy.get('[data-cy="unit-id"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-name"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-quantity"]').click();
+      cy.get('[role="presentation"] [role="option"]').first().click();
+      cy.get('[data-cy="unit-symbol"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-siConversionFormula"]').clear().type('x');
+      cy.get('[data-cy=unit-modal] [data-cy=submit]').click();
+      cy.get('[data-tag-index=0] > span').should(
+        'include.text',
+        numberQuestion
+      );
+    });
+
+    it.only('should render the Number field accepting only positive, negative numbers if set', () => {
       const generateId = () =>
         `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
 
