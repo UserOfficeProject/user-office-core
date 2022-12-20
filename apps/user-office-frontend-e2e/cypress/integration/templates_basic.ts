@@ -439,8 +439,6 @@ context('Template tests', () => {
           numberId = fieldId;
         });
 
-      cy.pause();
-
       /* --- */
 
       /* Text input */
@@ -945,7 +943,7 @@ context('Template tests', () => {
       );
     });
 
-    it.only('should render the Number field accepting only positive, negative numbers if set', () => {
+    it('should render the Number field accepting only positive, negative numbers if set', () => {
       const generateId = () =>
         `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
 
