@@ -906,7 +906,7 @@ context('Template tests', () => {
       });
     });
 
-    it('should be able to create unit from the Number field', () => {
+    it('should be able to create new unit from the Unit field', () => {
       cy.login('officer');
       cy.visit('/');
 
