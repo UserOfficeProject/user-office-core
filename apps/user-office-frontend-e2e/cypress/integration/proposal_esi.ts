@@ -17,12 +17,19 @@ const sampleTitle = /My sample title/i;
 const newSampleTitle = faker.lorem.words(2);
 const clonedSampleTitle = faker.lorem.words(2);
 
+const proposal = {
+  title: faker.random.words(3),
+  abstract: faker.random.words(5),
+};
+
 context('visits tests', () => {
   beforeEach(() => {
     cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
     cy.updateProposal({
       proposalPk: existingProposalId,
+      title: proposal.title,
+      abstract: proposal.abstract,
       proposerId: PI.id,
       users: [coProposer.id],
     });
