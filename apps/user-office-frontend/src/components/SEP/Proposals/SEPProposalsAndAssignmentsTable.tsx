@@ -1,4 +1,4 @@
-import MaterialTable, { Action, Options } from '@material-table/core';
+import MaterialTable, { Action, Column, Options } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
@@ -57,7 +58,7 @@ const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
     .map((assignment) => assignment.review)
     .filter((review): review is Review => !!review);
 
-const SEPProposalColumns = [
+const SEPProposalColumns: Column<SEPProposalType>[] = [
   {
     title: 'Actions',
     cellStyle: { padding: 0, minWidth: 80 },
@@ -65,7 +66,19 @@ const SEPProposalColumns = [
     removable: false,
     field: 'rowActionButtons',
   },
-  { title: 'ID', field: 'proposal.proposalId' },
+  {
+    title: 'ID',
+    field: 'proposal.proposalId',
+    render: (rawData) => (
+      <CopyToClipboard
+        text={rawData.proposal.proposalId}
+        successMessage={`'${rawData.proposal.proposalId}' copied to clipboard`}
+        position="right"
+      >
+        {rawData.proposal.proposalId || ''}
+      </CopyToClipboard>
+    ),
+  },
   {
     title: 'Title',
     field: 'proposal.title',
@@ -85,7 +98,7 @@ const SEPProposalColumns = [
   },
   {
     title: 'Average grade',
-    render: (rowData: SEPProposalType): string => {
+    render: (rowData) => {
       const avgGrade = average(
         getGradesFromReviews(
           getReviewsFromAssignments(rowData.assignments ?? [])
@@ -94,7 +107,7 @@ const SEPProposalColumns = [
 
       return avgGrade === 0 ? '-' : `${avgGrade}`;
     },
-    customSort: (a: SEPProposalType, b: SEPProposalType) =>
+    customSort: (a, b) =>
       average(
         getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
       ) -
@@ -105,7 +118,7 @@ const SEPProposalColumns = [
   {
     title: 'Deviation',
     field: 'deviation',
-    render: (rowData: SEPProposalType): string => {
+    render: (rowData) => {
       const stdDeviation = standardDeviation(
         getGradesFromReviews(
           getReviewsFromAssignments(rowData.assignments ?? [])
@@ -114,7 +127,7 @@ const SEPProposalColumns = [
 
       return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
     },
-    customSort: (a: SEPProposalType, b: SEPProposalType) =>
+    customSort: (a, b) =>
       standardDeviation(
         getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
       ) -
