@@ -1078,6 +1078,7 @@ context('SEP meeting components tests', () => {
                 cy.updateProposal({
                   proposalPk: createdProposal.primaryKey,
                   title: proposal2.title,
+                  abstract: proposal2.abstract,
                   proposerId: initialDBData.users.user1.id,
                 });
 
@@ -1143,6 +1144,7 @@ context('SEP meeting components tests', () => {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal2.title,
+            abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
 
@@ -1246,6 +1248,7 @@ context('SEP meeting components tests', () => {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal2.title,
+            abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
 
@@ -1410,6 +1413,7 @@ context('SEP meeting components tests', () => {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
               title: proposal2.title,
+              abstract: proposal2.abstract,
             });
             cy.createSep({
               code: sep2.code,
@@ -1763,6 +1767,7 @@ context('SEP meeting components tests', () => {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
               title: proposal2.title,
+              abstract: proposal2.abstract,
             });
             cy.createSep({
               code: sep2.code,
