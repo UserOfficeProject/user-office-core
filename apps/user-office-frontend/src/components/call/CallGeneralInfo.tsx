@@ -353,7 +353,7 @@ const CallGeneralInfo: React.FC<{
           target="_blank"
           className={classes.textRightAlign}
         >
-          View/Edit Call templates
+          Edit selected template
           <LaunchIcon fontSize="small" className={classes.iconVerticalAlign} />
         </Link>
       </FormControl>
@@ -377,7 +377,7 @@ const CallGeneralInfo: React.FC<{
             target="_blank"
             className={classes.textRightAlign}
           >
-            View/Edit ESI templates
+            Edit selected template
             <LaunchIcon
               fontSize="small"
               className={classes.iconVerticalAlign}
