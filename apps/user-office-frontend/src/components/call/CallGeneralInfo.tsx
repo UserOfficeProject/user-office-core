@@ -40,6 +40,10 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 const CallGeneralInfo: React.FC<{
+  reLoadTemplates: () => void;
+  reloadEsi: () => void;
+  reloadPdfTemplates: () => void;
+  reloadProposalWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
@@ -53,6 +57,10 @@ const CallGeneralInfo: React.FC<{
   esiTemplates,
   pdfTemplates,
   loadingTemplates,
+  reLoadTemplates,
+  reloadEsi,
+  reloadPdfTemplates,
+  reloadProposalWorkflows,
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
@@ -329,6 +337,7 @@ const CallGeneralInfo: React.FC<{
         noOptionsText="No templates"
         items={templateOptions}
         InputProps={{ 'data-cy': 'call-template' }}
+        reload={reLoadTemplates}
         required
       />
       {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
@@ -339,6 +348,7 @@ const CallGeneralInfo: React.FC<{
           noOptionsText="No templates"
           items={esiTemplateOptions}
           InputProps={{ 'data-cy': 'call-esi-template' }}
+          reload={reloadEsi}
           required
         />
       )}
@@ -349,6 +359,7 @@ const CallGeneralInfo: React.FC<{
         noOptionsText="No templates"
         items={pdfTemplateOptions}
         InputProps={{ 'data-cy': 'call-pdf-template' }}
+        reload={reloadPdfTemplates}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -359,6 +370,7 @@ const CallGeneralInfo: React.FC<{
         InputProps={{
           'data-cy': 'call-workflow',
         }}
+        reload={reloadProposalWorkflows}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>

@@ -1,10 +1,12 @@
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { IconButton, InputAdornment } from '@mui/material';
 import { InputProps } from '@mui/material/Input';
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
 import { Field } from 'formik';
 import { Autocomplete } from 'formik-mui';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Option } from 'utils/utilTypes';
 
@@ -20,6 +22,7 @@ type FormikUIAutocompleteProps = {
   InputProps?: Partial<InputProps> & { 'data-cy': string };
   multiple?: boolean;
   'data-cy'?: string;
+  reload?: () => void;
 };
 
 const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
@@ -33,8 +36,10 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
   InputProps,
   TextFieldProps,
   multiple = false,
+  reload,
   ...props
 }) => {
+  const [adornmentVisible, setAdornmentVisible] = useState(false);
   const options = items.map((item) => item.value);
 
   return (
@@ -58,7 +63,30 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
           label={label}
           required={required}
           disabled={disabled}
-          InputProps={{ ...params.InputProps, ...InputProps }}
+          InputProps={{
+            ...params.InputProps,
+            ...InputProps,
+            endAdornment: (
+              <InputAdornment position="start">
+                {adornmentVisible && reload ? (
+                  <IconButton
+                    edge="end"
+                    title="Refresh"
+                    aria-label="Refresh the list"
+                  >
+                    <RefreshIcon fontSize="small" onClick={reload} />
+                  </IconButton>
+                ) : null}
+                {params.InputProps?.endAdornment}
+              </InputAdornment>
+            ),
+          }}
+          onFocus={() => {
+            setAdornmentVisible(true);
+          }}
+          onBlur={() => {
+            setAdornmentVisible(false);
+          }}
         />
       )}
       ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
