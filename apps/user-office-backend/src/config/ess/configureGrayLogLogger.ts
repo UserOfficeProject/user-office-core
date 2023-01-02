@@ -1,7 +1,6 @@
 import {
   ConsoleLogger,
   GrayLogLogger,
-  MultiLogg,
   setLogger,
 } from '@user-office-software/duo-logger';
 
@@ -11,17 +10,16 @@ export function configureGraylogLogger() {
 
   if (server && port) {
     const env = process.env.NODE_ENV || 'unset';
-    setLogger(
-      new MultiLogg([
-        new GrayLogLogger(
-          server,
-          parseInt(port),
-          { facility: 'DMSC', environment: env, service: 'duo-backend' },
-          ['QueryName', 'UserID']
-        ),
-      ])
-    );
+    setLogger([
+      new ConsoleLogger(), // Log to console
+      new GrayLogLogger( // Log to Graylog
+        server,
+        parseInt(port),
+        { facility: 'DMSC', environment: env, service: 'duo-backend' },
+        ['QueryName', 'UserID']
+      ),
+    ]);
   } else {
-    setLogger(new ConsoleLogger());
+    setLogger(new ConsoleLogger()); // Log to console
   }
 }
