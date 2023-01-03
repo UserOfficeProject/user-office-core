@@ -156,7 +156,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           }
         >
           <CallGeneralInfo
-            reLoadTemplates={reloadProposal}
+            reloadTemplates={reloadProposal}
             reloadEsi={reloadEsi}
             reloadPdfTemplates={reloadPdfTemplates}
             reloadProposalWorkflows={reloadProposalWorkflows}

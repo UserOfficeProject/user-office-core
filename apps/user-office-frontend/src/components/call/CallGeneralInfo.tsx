@@ -1,4 +1,5 @@
 import HelpIcon from '@mui/icons-material/Help';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
@@ -39,8 +40,12 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
+type InsertIconProps = {
+  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+};
+
 const CallGeneralInfo: React.FC<{
-  reLoadTemplates: () => void;
+  reloadTemplates: () => void;
   reloadEsi: () => void;
   reloadPdfTemplates: () => void;
   reloadProposalWorkflows: () => void;
@@ -57,7 +62,7 @@ const CallGeneralInfo: React.FC<{
   esiTemplates,
   pdfTemplates,
   loadingTemplates,
-  reLoadTemplates,
+  reloadTemplates,
   reloadEsi,
   reloadPdfTemplates,
   reloadProposalWorkflows,
@@ -186,6 +191,19 @@ const CallGeneralInfo: React.FC<{
       },
     })
   )(TableRow);
+
+  const InsertIcon = (props: InsertIconProps) => {
+    return (
+      <IconButton
+        edge="end"
+        title="Refresh"
+        aria-label="Refresh the list"
+        onClick={props.onClick}
+      >
+        <RefreshIcon fontSize="small" />
+      </IconButton>
+    );
+  };
 
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
@@ -337,7 +355,7 @@ const CallGeneralInfo: React.FC<{
         noOptionsText="No templates"
         items={templateOptions}
         InputProps={{ 'data-cy': 'call-template' }}
-        reload={reLoadTemplates}
+        insertIcon={<InsertIcon onClick={reloadTemplates} />}
         required
       />
       {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
@@ -348,7 +366,7 @@ const CallGeneralInfo: React.FC<{
           noOptionsText="No templates"
           items={esiTemplateOptions}
           InputProps={{ 'data-cy': 'call-esi-template' }}
-          reload={reloadEsi}
+          insertIcon={<InsertIcon onClick={reloadEsi} />}
           required
         />
       )}
@@ -359,7 +377,7 @@ const CallGeneralInfo: React.FC<{
         noOptionsText="No templates"
         items={pdfTemplateOptions}
         InputProps={{ 'data-cy': 'call-pdf-template' }}
-        reload={reloadPdfTemplates}
+        insertIcon={<InsertIcon onClick={reloadPdfTemplates} />}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -370,7 +388,7 @@ const CallGeneralInfo: React.FC<{
         InputProps={{
           'data-cy': 'call-workflow',
         }}
-        reload={reloadProposalWorkflows}
+        insertIcon={<InsertIcon onClick={reloadProposalWorkflows} />}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>

@@ -1,5 +1,4 @@
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { IconButton, InputAdornment } from '@mui/material';
+import { InputAdornment } from '@mui/material';
 import { InputProps } from '@mui/material/Input';
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
@@ -22,7 +21,7 @@ type FormikUIAutocompleteProps = {
   InputProps?: Partial<InputProps> & { 'data-cy': string };
   multiple?: boolean;
   'data-cy'?: string;
-  reload?: () => void;
+  insertIcon?: MUITextFieldProps;
 };
 
 const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
@@ -36,7 +35,7 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
   InputProps,
   TextFieldProps,
   multiple = false,
-  reload,
+  insertIcon,
   ...props
 }) => {
   const [adornmentVisible, setAdornmentVisible] = useState(false);
@@ -68,15 +67,7 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
             ...InputProps,
             endAdornment: (
               <InputAdornment position="start">
-                {adornmentVisible && reload ? (
-                  <IconButton
-                    edge="end"
-                    title="Refresh"
-                    aria-label="Refresh the list"
-                  >
-                    <RefreshIcon fontSize="small" onClick={reload} />
-                  </IconButton>
-                ) : null}
+                {insertIcon && adornmentVisible ? { ...insertIcon } : null}
                 {params.InputProps?.endAdornment}
               </InputAdornment>
             ),
