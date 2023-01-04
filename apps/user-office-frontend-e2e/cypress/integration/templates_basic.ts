@@ -906,6 +906,44 @@ context('Template tests', () => {
       });
     });
 
+    it('should be able to create new unit from the Unit field', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.get('[data-cy=show-more-button]').first().click();
+
+      cy.get('[data-cy=add-question-menu-item]').first().click();
+
+      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+        .first()
+        .click();
+
+      cy.contains('Add Number').click();
+
+      cy.get('[data-cy=units]')
+        .find('#config-units')
+        .type('test_cannot_be_found');
+      cy.get('[data-cy=add-button]').click();
+      cy.get('[data-cy="unit-id"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-name"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-quantity"]').click();
+      cy.get('[role="presentation"] [role="option"]').first().click();
+      cy.get('[data-cy="unit-symbol"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-siConversionFormula"]').clear().type('x');
+      cy.get('[data-cy=unit-modal] [data-cy=submit]').click();
+      cy.get('[data-tag-index=0] > span').should(
+        'include.text',
+        numberQuestion
+      );
+    });
+
     it('should render the Number field accepting only positive, negative numbers if set', () => {
       const generateId = () =>
         `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
