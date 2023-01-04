@@ -179,12 +179,18 @@ export default class PostgresCallDataSource implements CallDataSource {
   async update(args: UpdateCallInput): Promise<Call> {
     const call = await database.transaction(async (trx) => {
       try {
+        const currentDate = new Date();
         /*
          * Check if the reference number format has been changed,
          * in which case all proposals in the call need to be updated.
          */
         const preUpdateCall = await database
-          .select('c.call_id', 'c.reference_number_format')
+          .select(
+            'c.call_id',
+            'c.reference_number_format',
+            'c.call_ended_internal',
+            'c.call_ended'
+          )
           .from('call as c')
           .where('c.call_id', args.id)
           .first()
@@ -260,8 +266,13 @@ export default class PostgresCallDataSource implements CallDataSource {
               submission_message: args.submissionMessage,
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
-              call_ended: args.callEnded,
-              call_ended_internal: args.callEndedInternal,
+              call_ended:
+                preUpdateCall.call_ended &&
+                args.endCall.getTime() < currentDate.getTime(),
+              call_ended_internal:
+                preUpdateCall.call_ended_internal &&
+                args?.endCallInternal &&
+                args.endCallInternal.getTime() < currentDate.getTime(),
               call_review_ended: args.callReviewEnded,
               call_sep_review_ended: args.callSEPReviewEnded,
               template_id: args.templateId,
