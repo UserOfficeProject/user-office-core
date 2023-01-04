@@ -1,14 +1,16 @@
+import { FormControl, FormHelperText } from '@mui/material';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
+import UnitConverter from 'components/settings/unitList/UnitConverter';
 import { Unit } from 'generated/sdk';
 import { useQuantities } from 'hooks/admin/useQuantities';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -28,6 +30,13 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { quantities, loadingQuantities } = useQuantities();
+  const [debounceTimeout, setDebounceTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const [debouncedUnit, setDebouncedUnit] = useState({
+    symbol: '',
+    SIformula: '',
+  });
 
   const initialValues = unit
     ? unit
@@ -67,12 +76,11 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
         ),
       })}
     >
-      {() => (
+      {({ values, setFieldValue }) => (
         <Form>
           <Typography variant="h6" component="h1">
             Create new units
           </Typography>
-
           <Field
             name="id"
             label="ID"
@@ -83,7 +91,6 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
             disabled={isExecutingCall}
             required
           />
-
           <Field
             name="unit"
             label="Name"
@@ -103,16 +110,35 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
             InputProps={{ 'data-cy': 'unit-quantity' }}
             required
           />
-          <Field
-            name="symbol"
-            label="Symbol"
-            type="text"
-            component={TextField}
-            fullWidth
-            InputProps={{ 'data-cy': 'unit-symbol' }}
-            disabled={isExecutingCall}
-            required
-          />
+          <FormControl fullWidth>
+            <Field
+              name="symbol"
+              label="Symbol"
+              type="text"
+              component={TextField}
+              fullWidth
+              InputProps={{ 'data-cy': 'unit-symbol' }}
+              disabled={isExecutingCall}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setFieldValue('symbol', e.target.value);
+                if (debounceTimeout) {
+                  clearTimeout(debounceTimeout);
+                }
+                setDebounceTimeout(
+                  setTimeout(() => {
+                    setDebouncedUnit({
+                      ...debouncedUnit,
+                      symbol: e.target.value,
+                    });
+                  }, 500)
+                );
+              }}
+              required
+            />
+            <FormHelperText>
+              <UnitConverter symbol={debouncedUnit.symbol} />
+            </FormHelperText>
+          </FormControl>
           <Field
             name="siConversionFormula"
             label="SI conversion formula"
