@@ -269,10 +269,10 @@ export default class PostgresCallDataSource implements CallDataSource {
               call_ended:
                 preUpdateCall.call_ended &&
                 args.endCall.getTime() < currentDate.getTime(),
-              call_ended_internal:
-                preUpdateCall.call_ended_internal &&
-                args?.endCallInternal &&
-                args.endCallInternal.getTime() < currentDate.getTime(),
+              call_ended_internal: args?.endCallInternal
+                ? preUpdateCall.call_ended_internal &&
+                  args.endCallInternal.getTime() < currentDate.getTime()
+                : args.callEndedInternal,
               call_review_ended: args.callReviewEnded,
               call_sep_review_ended: args.callSEPReviewEnded,
               template_id: args.templateId,
