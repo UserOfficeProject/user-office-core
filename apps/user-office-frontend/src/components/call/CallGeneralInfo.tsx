@@ -171,8 +171,10 @@ const CallGeneralInfo: React.FC<{
     custom: () => setOpen({ ...open, proposalWorkflowModal: false }),
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onCreated = (proposalWorkFlowAdded: ProposalWorkflow | null): void => {
     //NOTE: default selection for added new proposal workflow can put in here.
+    //then eslint-disable-next-line can be removed.
 
     setOpen({ ...open, proposalWorkflowModal: false });
   };
