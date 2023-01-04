@@ -1,3 +1,4 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HelpIcon from '@mui/icons-material/Help';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -20,6 +21,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import withStyles from '@mui/styles/withStyles';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
@@ -27,7 +29,9 @@ import { DateTimePicker } from 'formik-mui-lab';
 import React, { useContext, useEffect, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import InputDialog from 'components/common/InputDialog';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';
+import CreateProposalWorkflow from 'components/settings/proposalWorkflow/CreateProposalWorkflow';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   AllocationTimeUnits,
@@ -38,6 +42,7 @@ import {
   UpdateCallMutationVariables,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 
 const CallGeneralInfo: React.FC<{
   templates: GetTemplatesQuery['templates'];
@@ -149,12 +154,27 @@ const CallGeneralInfo: React.FC<{
     return errorMessage;
   }
 
-  const [open, setOpen] = React.useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
+  const [open, setOpen] = React.useState({
+    default: false,
+    proposalWorkflowModal: false,
+  });
+
+  const handleClickOpen = {
+    default: () => setOpen({ ...open, default: true }),
+    custom: (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      setOpen({ ...open, proposalWorkflowModal: true });
+    },
   };
-  const handleClose = () => {
-    setOpen(false);
+  const handleClose = {
+    default: () => setOpen({ ...open, default: false }),
+    custom: () => setOpen({ ...open, proposalWorkflowModal: false }),
+  };
+
+  const onCreated = (proposalWorkFlowAdded: ProposalWorkflow | null): void => {
+    //NOTE: default selection for added new proposal workflow can put in here.
+
+    setOpen({ ...open, proposalWorkflowModal: false });
   };
 
   const StyledTableCell = withStyles((theme: Theme) =>
@@ -254,13 +274,13 @@ const CallGeneralInfo: React.FC<{
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={handleClickOpen}>
+                <IconButton onClick={handleClickOpen.default}>
                   <HelpIcon />
                 </IconButton>
                 <Dialog
-                  onClose={handleClose}
+                  onClose={handleClose.default}
                   aria-labelledby="customized-dialog-title"
-                  open={open}
+                  open={open.default}
                 >
                   <DialogContent dividers>
                     <Typography gutterBottom color="inherit" variant="body1">
@@ -309,7 +329,11 @@ const CallGeneralInfo: React.FC<{
                     </Typography>
                   </DialogContent>
                   <DialogActions>
-                    <Button autoFocus variant="text" onClick={handleClose}>
+                    <Button
+                      autoFocus
+                      variant="text"
+                      onClick={handleClose.default}
+                    >
                       Close
                     </Button>
                   </DialogActions>
@@ -350,17 +374,41 @@ const CallGeneralInfo: React.FC<{
         items={pdfTemplateOptions}
         InputProps={{ 'data-cy': 'call-pdf-template' }}
       />
-      <FormikUIAutocomplete
-        name="proposalWorkflowId"
-        label="Proposal workflow"
-        loading={loadingProposalWorkflows}
-        noOptionsText="No proposal workflows"
-        items={proposalWorkflowOptions}
-        InputProps={{
-          'data-cy': 'call-workflow',
-        }}
-        required
-      />
+      <FormControl fullWidth>
+        <FormikUIAutocomplete
+          name="proposalWorkflowId"
+          label="Proposal workflow"
+          loading={loadingProposalWorkflows}
+          noOptionsText="No proposal workflows"
+          items={proposalWorkflowOptions}
+          InputProps={{
+            'data-cy': 'call-workflow',
+          }}
+          required
+        />
+        <StyledButtonContainer>
+          <Button
+            variant="outlined"
+            type="button"
+            size="small"
+            onClick={handleClickOpen.custom}
+            data-cy="open-proposal-workflow-modal-btn"
+            startIcon={<AddCircleOutlineIcon />}
+            sx={{ lineHeight: 1.5 }}
+          >
+            Create new workflow
+          </Button>
+        </StyledButtonContainer>
+        <InputDialog
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+          data-cy="proposal-workflow-modal"
+          open={open.proposalWorkflowModal}
+          onClose={handleClose.custom}
+        >
+          <CreateProposalWorkflow close={onCreated} />
+        </InputDialog>
+      </FormControl>
       <LocalizationProvider dateAdapter={DateAdapter}>
         {internalCallDate.showField && (
           <Field
