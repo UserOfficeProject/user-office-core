@@ -1,5 +1,6 @@
+import {} from '@apollo/server/';
 import { logger } from '@user-office-software/duo-logger';
-import { AuthenticationError } from 'apollo-server-core';
+import { GraphQLError } from 'graphql';
 
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -41,9 +42,16 @@ const Authorized = (roles: Roles[] = []) => {
 
         return isMutation
           ? rejection('EXTERNAL_TOKEN_INVALID')
-          : new AuthenticationError('EXTERNAL_TOKEN_INVALID', {
-              externalToken: agent.externalToken,
+          : new GraphQLError('EXTERNAL_TOKEN_INVALID', {
+              extensions: {
+                code: 'EXTERNAL_TOKEN_INVALID',
+                value: agent.externalToken,
+              },
             });
+
+        // new AuthenticationError('EXTERNAL_TOKEN_INVALID', {
+        //     externalToken: agent.externalToken,
+        //   });
       }
 
       if (roles.length === 0) {

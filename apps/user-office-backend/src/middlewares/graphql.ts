@@ -1,15 +1,22 @@
-import { logger } from '@user-office-software/duo-logger';
+import {
+  ApolloServerPlugin,
+  BaseContext,
+  ApolloServer,
+  ContextFunction,
+} from '@apollo/server';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
+import {
+  ExpressContextFunctionArgument,
+  expressMiddleware,
+} from '@apollo/server/express4';
 import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
-  ApolloServerPluginLandingPageGraphQLPlayground,
-  ApolloServerPluginUsageReporting,
-} from 'apollo-server-core';
-import { ApolloServer } from 'apollo-server-express';
-import type {
-  ApolloServerPlugin,
-  BaseContext,
-} from 'apollo-server-plugin-base';
+} from '@apollo/server/plugin/disabled';
+import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
+import { logger } from '@user-office-software/duo-logger';
+import { json } from 'body-parser';
+import cors from 'cors';
 import { Express } from 'express';
 import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
@@ -24,6 +31,51 @@ import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 
+export const context: ContextFunction<
+  [ExpressContextFunctionArgument],
+  BaseContext
+> = async ({ req }) => {
+  let user = null;
+  const userId = req.user?.user?.id as number;
+  const accessTokenId = req.user?.accessTokenId;
+  const userAuthorization = container.resolve<UserAuthorization>(
+    Tokens.UserAuthorization
+  );
+
+  if (req.user) {
+    if (accessTokenId) {
+      const { accessPermissions } =
+        await baseContext.queries.admin.getPermissionsByToken(accessTokenId);
+
+      user = {
+        accessPermissions: accessPermissions
+          ? JSON.parse(accessPermissions)
+          : null,
+        isApiAccessToken: true,
+      } as UserWithRole;
+    } else {
+      user = {
+        ...(await baseContext.queries.user.getAgent(userId)),
+        currentRole:
+          req.user.currentRole || (req.user.roles ? req.user.roles[0] : null),
+        externalToken: req.user.externalToken,
+        externalTokenValid:
+          req.user.externalToken !== undefined
+            ? await userAuthorization.isExternalTokenValid(
+                req.user.externalToken
+              )
+            : false,
+        isInternalUser: req.user.isInternalUser,
+        impersonatingUserId: req.user.impersonatingUserId,
+      } as UserWithRole;
+    }
+  }
+
+  const context: ResolverContext = { ...baseContext, user };
+
+  return context;
+};
+
 const apolloServer = async (app: Express) => {
   const PATH = '/graphql';
 
@@ -31,12 +83,15 @@ const apolloServer = async (app: Express) => {
 
   const { orphanedTypes, referenceResolvers } = federationSources();
 
+  // NOTE: glob package that is used in type-graphql for resolvers pattern is expecting only forward slashes.(https://www.npmjs.com/package/glob#:~:text=Please%20only%20use%20forward%2Dslashes%20in%20glob%20expressions.)
+  const fixedPath = __dirname.split('\\').join('/');
+
   const schema = await buildFederatedSchema(
     {
       resolvers: [
-        __dirname + '/../resolvers/**/*Query.{ts,js}',
-        __dirname + '/../resolvers/**/*Mutation.{ts,js}',
-        __dirname + '/../resolvers/**/*Resolver.{ts,js}',
+        fixedPath + '/../resolvers/**/*Query.{ts,js}',
+        fixedPath + '/../resolvers/**/*Mutation.{ts,js}',
+        fixedPath + '/../resolvers/**/*Resolver.{ts,js}',
       ],
       dateScalarMode: 'isoDate',
       orphanedTypes: [...orphanedTypes],
@@ -78,10 +133,12 @@ const apolloServer = async (app: Express) => {
   if (process.env.APOLLO_KEY) {
     plugins.push(
       ApolloServerPluginUsageReporting({
-        rewriteError: (err: GraphQLError) => {
-          err.message = 'Error Redacted';
+        sendErrors: {
+          transform: (err: GraphQLError) => {
+            err.message = 'Error Redacted';
 
-          return err;
+            return err;
+          },
         },
       })
     );
@@ -90,55 +147,33 @@ const apolloServer = async (app: Express) => {
   const server = new ApolloServer({
     schema: schema,
     plugins: plugins,
-    context: async ({ req }) => {
-      let user = null;
-      const userId = req.user?.user?.id as number;
-      const accessTokenId = req.user?.accessTokenId;
-      const userAuthorization = container.resolve<UserAuthorization>(
-        Tokens.UserAuthorization
-      );
+    formatError: (formattedError, error) => {
+      const env = process.env.NODE_ENV;
 
-      if (req.user) {
-        if (accessTokenId) {
-          const { accessPermissions } =
-            await baseContext.queries.admin.getPermissionsByToken(
-              accessTokenId
-            );
+      // console.log(formattedError, error);
 
-          user = {
-            accessPermissions: accessPermissions
-              ? JSON.parse(accessPermissions)
-              : null,
-            isApiAccessToken: true,
-          } as UserWithRole;
-        } else {
-          user = {
-            ...(await baseContext.queries.user.getAgent(userId)),
-            currentRole:
-              req.user.currentRole ||
-              (req.user.roles ? req.user.roles[0] : null),
-            externalToken: req.user.externalToken,
-            externalTokenValid:
-              req.user.externalToken !== undefined
-                ? await userAuthorization.isExternalTokenValid(
-                    req.user.externalToken
-                  )
-                : false,
-            isInternalUser: req.user.isInternalUser,
-            impersonatingUserId: req.user.impersonatingUserId,
-          } as UserWithRole;
-        }
-      }
+      // NOTE: applyMiddleware must be before addResolversToSchema as a workaround for the issue: https://github.com/maticzav/graphql-middleware/issues/395
+      // if (env === 'production') {
+      //   // prevent exposing too much information when running in production
+      //   federatedSchema = applyMiddleware(federatedSchema, rejectionSanitizer);
+      // } else {
+      //   federatedSchema = applyMiddleware(federatedSchema, rejectionLogger);
+      // }
 
-      const context: ResolverContext = { ...baseContext, user };
-
-      return context;
+      return formattedError;
     },
   });
 
   await server.start();
 
-  server.applyMiddleware({ app: app, path: PATH });
+  app.use(
+    PATH,
+    cors<cors.CorsRequest>(),
+    json(),
+    expressMiddleware(server, {
+      context,
+    })
+  );
 };
 
 export default apolloServer;
