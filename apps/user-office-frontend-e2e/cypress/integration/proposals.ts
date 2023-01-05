@@ -165,6 +165,14 @@ context('Proposal tests', () => {
       cy.contains('Title is required');
       cy.contains('Abstract is required');
 
+      cy.get('[data-cy=title]').type(' ');
+      cy.get('[data-cy=abstract]').type(' ');
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Title is required');
+      cy.contains('Abstract is required');
+
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
