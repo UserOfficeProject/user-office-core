@@ -1,4 +1,5 @@
 import HelpIcon from '@mui/icons-material/Help';
+import LaunchIcon from '@mui/icons-material/Launch';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
@@ -7,8 +8,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  FormControl,
   IconButton,
   InputAdornment,
+  Link,
   Paper,
   Table,
   TableBody,
@@ -20,7 +23,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles, makeStyles } from '@mui/styles';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
 import { DateTimePicker } from 'formik-mui-lab';
@@ -39,6 +42,16 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
+const useStyles = makeStyles((theme) => ({
+  iconVerticalAlign: {
+    verticalAlign: 'middle',
+    marginLeft: theme.spacing(0.5),
+  },
+  textRightAlign: {
+    marginLeft: 'auto',
+    marginRight: 0,
+  },
+}));
 const CallGeneralInfo: React.FC<{
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
@@ -62,6 +75,7 @@ const CallGeneralInfo: React.FC<{
   });
 
   const theme = useTheme();
+  const classes = useStyles();
 
   const templateOptions =
     templates?.map((template) => ({
@@ -99,7 +113,8 @@ const CallGeneralInfo: React.FC<{
   >();
 
   const { values, setValues } = formik;
-  const { startCall, endCall, proposalWorkflowId } = values;
+  const { startCall, endCall, proposalWorkflowId, templateId, esiTemplateId } =
+    values;
 
   useEffect(() => {
     const selectedProposalWorkFlow = proposalWorkflows.find(
@@ -321,26 +336,54 @@ const CallGeneralInfo: React.FC<{
           data-cy="reference-number-format"
         />
       </LocalizationProvider>
-
-      <FormikUIAutocomplete
-        name="templateId"
-        label="Call template"
-        loading={loadingTemplates}
-        noOptionsText="No templates"
-        items={templateOptions}
-        InputProps={{ 'data-cy': 'call-template' }}
-        required
-      />
-      {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+      <FormControl fullWidth>
         <FormikUIAutocomplete
-          name="esiTemplateId"
-          label="ESI template"
+          name="templateId"
+          label="Call template"
           loading={loadingTemplates}
           noOptionsText="No templates"
-          items={esiTemplateOptions}
-          InputProps={{ 'data-cy': 'call-esi-template' }}
+          items={templateOptions}
+          InputProps={{ 'data-cy': 'call-template' }}
           required
         />
+        <Link
+          href={
+            templateId ? `QuestionaryEditor/${templateId}` : 'ProposalTemplates'
+          }
+          target="_blank"
+          className={classes.textRightAlign}
+        >
+          Edit selected template
+          <LaunchIcon fontSize="small" className={classes.iconVerticalAlign} />
+        </Link>
+      </FormControl>
+      {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+        <FormControl fullWidth>
+          <FormikUIAutocomplete
+            name="esiTemplateId"
+            label="ESI template"
+            loading={loadingTemplates}
+            noOptionsText="No templates"
+            items={esiTemplateOptions}
+            InputProps={{ 'data-cy': 'call-esi-template' }}
+            required
+          />
+          <Link
+            href={
+              esiTemplateId
+                ? `QuestionaryEditor/${esiTemplateId}`
+                : 'EsiTemplates'
+            }
+            target="_blank"
+            className={classes.textRightAlign}
+          >
+            Edit selected template
+            <LaunchIcon
+              fontSize="small"
+              className={classes.iconVerticalAlign}
+            />
+          </Link>
+        </FormControl>
       )}
       <FormikUIAutocomplete
         name="pdfTemplateId"
