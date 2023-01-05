@@ -169,20 +169,23 @@ const CallGeneralInfo: React.FC<{
   }
 
   const [open, setOpen] = React.useState({
-    default: false,
+    referenceNumberFormatModal: false,
     proposalWorkflowModal: false,
   });
 
   const handleClickOpen = {
-    default: () => setOpen({ ...open, default: true }),
-    custom: (event: React.MouseEvent<HTMLButtonElement>) => {
+    referenceNumberFormatModal: () =>
+      setOpen({ ...open, referenceNumberFormatModal: true }),
+    proposalWorkflowModal: (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       setOpen({ ...open, proposalWorkflowModal: true });
     },
   };
   const handleClose = {
-    default: () => setOpen({ ...open, default: false }),
-    custom: () => setOpen({ ...open, proposalWorkflowModal: false }),
+    referenceNumberFormatModal: () =>
+      setOpen({ ...open, referenceNumberFormatModal: false }),
+    proposalWorkflowModal: () =>
+      setOpen({ ...open, proposalWorkflowModal: false }),
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -290,13 +293,15 @@ const CallGeneralInfo: React.FC<{
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={handleClickOpen.default}>
+                <IconButton
+                  onClick={handleClickOpen.referenceNumberFormatModal}
+                >
                   <HelpIcon />
                 </IconButton>
                 <Dialog
-                  onClose={handleClose.default}
+                  onClose={handleClose.referenceNumberFormatModal}
                   aria-labelledby="customized-dialog-title"
-                  open={open.default}
+                  open={open.referenceNumberFormatModal}
                 >
                   <DialogContent dividers>
                     <Typography gutterBottom color="inherit" variant="body1">
@@ -348,7 +353,7 @@ const CallGeneralInfo: React.FC<{
                     <Button
                       autoFocus
                       variant="text"
-                      onClick={handleClose.default}
+                      onClick={handleClose.referenceNumberFormatModal}
                     >
                       Close
                     </Button>
@@ -435,7 +440,7 @@ const CallGeneralInfo: React.FC<{
             variant="outlined"
             type="button"
             size="small"
-            onClick={handleClickOpen.custom}
+            onClick={handleClickOpen.proposalWorkflowModal}
             data-cy="open-proposal-workflow-modal-btn"
             startIcon={<AddCircleOutlineIcon />}
             sx={{ lineHeight: 1.5 }}
@@ -448,7 +453,7 @@ const CallGeneralInfo: React.FC<{
           aria-describedby="simple-modal-description"
           data-cy="proposal-workflow-modal"
           open={open.proposalWorkflowModal}
-          onClose={handleClose.custom}
+          onClose={handleClose.proposalWorkflowModal}
         >
           <CreateProposalWorkflow close={onCreated} />
         </InputDialog>
