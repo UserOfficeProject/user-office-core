@@ -884,6 +884,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.contains(dateQuestion.title);
       cy.get('body').then(() => {
@@ -903,6 +904,44 @@ context('Template tests', () => {
         cy.contains('Save and continue').click();
         cy.contains('Date must be no').should('not.exist');
       });
+    });
+
+    it('should be able to create new unit from the Unit field', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.get('[data-cy=show-more-button]').first().click();
+
+      cy.get('[data-cy=add-question-menu-item]').first().click();
+
+      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+        .first()
+        .click();
+
+      cy.contains('Add Number').click();
+
+      cy.get('[data-cy=units]')
+        .find('#config-units')
+        .type('test_cannot_be_found');
+      cy.get('[data-cy=add-button]').click();
+      cy.get('[data-cy="unit-id"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-name"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-quantity"]').click();
+      cy.get('[role="presentation"] [role="option"]').first().click();
+      cy.get('[data-cy="unit-symbol"]').clear().type(numberQuestion);
+      cy.get('[data-cy="unit-siConversionFormula"]').clear().type('x');
+      cy.get('[data-cy=unit-modal] [data-cy=submit]').click();
+      cy.get('[data-tag-index=0] > span').should(
+        'include.text',
+        numberQuestion
+      );
     });
 
     it('should render the Number field accepting only positive, negative numbers if set', () => {
@@ -975,6 +1014,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       /* Test questions exist */
       for (const question of questions) {
@@ -1468,6 +1508,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(faker.lorem.words(2));
       cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
@@ -1854,6 +1895,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type('title');
 

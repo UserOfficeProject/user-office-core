@@ -18,12 +18,9 @@ context('visits tests', () => {
   const existingProposalId = initialDBData.proposal.id;
   const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
-  beforeEach(() => {
+  beforeEach(function () {
     cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
-  });
-
-  beforeEach(function () {
     if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
       this.skip();
     }
