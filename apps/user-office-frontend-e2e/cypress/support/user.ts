@@ -1,7 +1,6 @@
 import {
   CreateUserMutation,
   CreateUserMutationVariables,
-  ExternalTokenLoginMutation,
   FeatureId,
   GetFeaturesQuery,
   Role,
@@ -117,6 +116,15 @@ const getUserIdFromIdOrCredentials = (
   }
 };
 
+const getCredentialsFromUserId = (testUserId: TestUserId) => {
+  const user = initialDBData.users[testUserId];
+
+  return {
+    email: user.email,
+    password: user.password,
+  };
+};
+
 const selectRole = async (token: string, selectedRoleId: number) => {
   const api = getE2EApi();
   const response = await api.selectRole({
@@ -132,53 +140,78 @@ const selectRole = async (token: string, selectedRoleId: number) => {
   return response.selectRole.token;
 };
 
+const getOauthExternalToken = async (testUserId: TestUserId) => {
+  const DEV_AUTH_SERVER_URL = 'http://localhost:5000';
+  const { email, password } = getCredentialsFromUserId(testUserId);
+  const params = {
+    login: email,
+    password: password,
+    scopes: 'openid email profile',
+  };
+
+  const options = {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  };
+
+  return fetch(`${DEV_AUTH_SERVER_URL}/get-code`, options)
+    .then((response) => response.json())
+    .then((response) => {
+      return response.code;
+    });
+};
+
+const getExternalToken = async (testUserId: TestUserId) => {
+  const isOauth = featureFlags.getEnabledFeatures().get(FeatureId.OAUTH);
+  if (isOauth) {
+    return getOauthExternalToken(testUserId);
+  } else {
+    return extTokenStoreStfc.get(testUserId)!;
+  }
+};
+
 const login = (
   idOrCredentials: TestUserId | { email: string; password: string },
   role?: number
-): Cypress.Chainable<ExternalTokenLoginMutation> => {
+) => {
   const testUserId = getUserIdFromIdOrCredentials(idOrCredentials);
 
-  const isOauth = featureFlags.getEnabledFeatures().get(FeatureId.OAUTH);
+  cy.wrap(getExternalToken(testUserId)).then((externalToken) => {
+    const api = getE2EApi();
+    api
+      .externalTokenLogin({
+        externalToken: externalToken as string,
+        redirectUri: 'http://localhost:3000/external-auth', // has to be set because it is a required field
+      })
+      .then(async (resp) => {
+        let token = resp.externalTokenLogin.token;
+        if (!token) {
+          return resp;
+        }
+        if (role) {
+          token = await selectRole(token, role);
+        }
 
-  const extTokenStore = isOauth ? extTokenStoreOAuth : extTokenStoreStfc;
-  const externalToken = extTokenStore.get(testUserId)!;
+        const isOauth = featureFlags.getEnabledFeatures().get(FeatureId.OAUTH);
+        if (!isOauth && !role && testUserId === 'officer') {
+          token = await selectRole(token, 2); // It appears that the officer user in UOWS has 2 roles, once the second role is removed this can be removed
+        }
+        const { user, exp, currentRole } = jwtDecode(token) as DecodedTokenData;
+        window.localStorage.setItem('token', token);
+        window.localStorage.setItem(
+          'currentRole',
+          currentRole.shortCode.toUpperCase()
+        );
+        window.localStorage.setItem('expToken', `${exp}`);
+        window.localStorage.setItem('user', JSON.stringify(user));
 
-  const api = getE2EApi();
-  const request = api
-    .externalTokenLogin({
-      externalToken,
-      redirectUri: '',
-    })
-    .then(async (resp) => {
-      let token = resp.externalTokenLogin.token;
-
-      if (!token) {
         return resp;
-      }
-
-      if (role) {
-        token = await selectRole(token, role);
-      }
-
-      if (!isOauth && !role && testUserId === 'officer') {
-        token = await selectRole(token, 2); // It appears that the officer user in UOWS has 2 roles, once the second role is removed this can be removed
-      }
-
-      const { user, exp, currentRole } = jwtDecode(token) as DecodedTokenData;
-
-      window.localStorage.setItem('token', token);
-      window.localStorage.setItem(
-        'currentRole',
-        currentRole.shortCode.toUpperCase()
-      );
-
-      window.localStorage.setItem('expToken', `${exp}`);
-      window.localStorage.setItem('user', JSON.stringify(user));
-
-      return resp;
-    });
-
-  return cy.wrap(request);
+      });
+  });
 };
 
 const logout = () => {
