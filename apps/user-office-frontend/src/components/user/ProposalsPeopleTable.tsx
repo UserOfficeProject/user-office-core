@@ -364,11 +364,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
             }
           }
 
-          console.log(selectedParticipants);
-          console.log(invitedUsers);
-          console.log(props.selectedUsers);
-          console.log('poop');
-
           if (!invitedUsers.some((user) => user.id === userDetails.id)) {
             //Add users to the table
             setInvitedUsers([userDetails].concat(invitedUsers));
