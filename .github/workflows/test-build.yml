@@ -358,7 +358,7 @@ jobs:
           EAM_API_URL: https://ios.esss.lu.se:7443
           EAM_PART_CODE: 12413
           EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION: "true"
-          AUTH_DISCOVERY_URL: http://dev-auth-server:5000/.well-known/openid-configuration
+          AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
           AUTH_CLIENT_ID: useroffice
           AUTH_CLIENT_SECRET: useroffice
         run: |
