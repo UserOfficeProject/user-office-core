@@ -64,7 +64,7 @@ export default class AdminQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getAllQueryAndMutationMethods(
+  async getAllQueryMutationAndServicesMethods(
     agent: UserWithRole | null,
     context: BasicResolverContext
   ) {

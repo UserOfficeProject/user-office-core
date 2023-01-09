@@ -19,7 +19,7 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import { PermissionsWithAccessToken } from 'generated/sdk';
-import { useQueriesAndMutationsData } from 'hooks/admin/useQueriesAndMutationsData';
+import { useQueriesMutationsAndServicesData } from 'hooks/admin/useQueriesMutationsAndServicesData';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -79,8 +79,8 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
 }) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { queriesAndMutations, loadingQueriesAndMutations } =
-    useQueriesAndMutationsData();
+  const { queriesMutationsAndServices, loadingQueriesMutationsAndServices } =
+    useQueriesMutationsAndServicesData();
 
   const normalizeAccessPermissions = (data: string | undefined) => {
     const permissionsArray: string[] = [];
@@ -223,7 +223,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             required
           />
 
-          {loadingQueriesAndMutations ? (
+          {loadingQueriesMutationsAndServices ? (
             <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
           ) : (
             <FieldArray
@@ -234,19 +234,19 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
                     tabNames={['Queries', 'Mutations', 'Other Services']}
                   >
                     {allAccessPermissions(
-                      queriesAndMutations.queries,
+                      queriesMutationsAndServices.queries,
                       'Queries',
                       values,
                       arrayHelpers
                     )}
                     {allAccessPermissions(
-                      queriesAndMutations.mutations,
+                      queriesMutationsAndServices.mutations,
                       'Mutations',
                       values,
                       arrayHelpers
                     )}
                     {allAccessPermissions(
-                      queriesAndMutations.services,
+                      queriesMutationsAndServices.services,
                       'Mutations',
                       values,
                       arrayHelpers
@@ -294,7 +294,9 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
               <Button
                 type="submit"
                 disabled={
-                  isSubmitting || loadingQueriesAndMutations || isExecutingCall
+                  isSubmitting ||
+                  loadingQueriesMutationsAndServices ||
+                  isExecutingCall
                 }
                 data-cy="submit"
               >

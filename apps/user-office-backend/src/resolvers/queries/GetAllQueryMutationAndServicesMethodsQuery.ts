@@ -3,7 +3,7 @@ import { Ctx, Field, ObjectType, Query, Resolver } from 'type-graphql';
 import { ResolverContext } from '../../context';
 
 @ObjectType()
-export class QueriesAndMutations {
+export class QueriesMutationsAndServices {
   @Field(() => [String])
   public queries: string[];
 
@@ -15,10 +15,10 @@ export class QueriesAndMutations {
 }
 
 @Resolver()
-export class GetAllQueryAndMutationMethodsQuery {
-  @Query(() => QueriesAndMutations, { nullable: true })
-  queriesAndMutations(@Ctx() context: ResolverContext) {
-    return context.queries.admin.getAllQueryAndMutationMethods(
+export class GetAllQueryMutationAndServicesMethodsQuery {
+  @Query(() => QueriesMutationsAndServices, { nullable: true })
+  queriesMutationsAndServices(@Ctx() context: ResolverContext) {
+    return context.queries.admin.getAllQueryMutationAndServicesMethods(
       context.user,
       context
     );
