@@ -21,7 +21,7 @@ type FormikUIAutocompleteProps = {
   InputProps?: Partial<InputProps> & { 'data-cy': string };
   multiple?: boolean;
   'data-cy'?: string;
-  insertIcon?: MUITextFieldProps;
+  AdornmentIcon?: MUITextFieldProps;
 };
 
 const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
@@ -35,7 +35,7 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
   InputProps,
   TextFieldProps,
   multiple = false,
-  insertIcon,
+  AdornmentIcon,
   ...props
 }) => {
   const [adornmentVisible, setAdornmentVisible] = useState(false);
@@ -67,7 +67,9 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
             ...InputProps,
             endAdornment: (
               <InputAdornment position="start">
-                {insertIcon && adornmentVisible ? { ...insertIcon } : null}
+                {AdornmentIcon && adornmentVisible
+                  ? { ...AdornmentIcon }
+                  : null}
                 {params.InputProps?.endAdornment}
               </InputAdornment>
             ),

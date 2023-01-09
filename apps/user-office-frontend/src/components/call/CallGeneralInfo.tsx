@@ -43,7 +43,7 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
-type InsertIconProps = {
+type AdornmentIconProps = {
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
 };
 
@@ -207,7 +207,7 @@ const CallGeneralInfo: React.FC<{
     })
   )(TableRow);
 
-  const InsertIcon = (props: InsertIconProps) => {
+  const AdornmentIcon = (props: AdornmentIconProps) => {
     return (
       <IconButton
         edge="end"
@@ -370,7 +370,7 @@ const CallGeneralInfo: React.FC<{
           noOptionsText="No templates"
           items={templateOptions}
           InputProps={{ 'data-cy': 'call-template' }}
-          insertIcon={<InsertIcon onClick={reloadTemplates} />}
+          AdornmentIcon={<AdornmentIcon onClick={reloadTemplates} />}
           required
         />
         <Link
@@ -393,7 +393,7 @@ const CallGeneralInfo: React.FC<{
             noOptionsText="No templates"
             items={esiTemplateOptions}
             InputProps={{ 'data-cy': 'call-esi-template' }}
-            insertIcon={<InsertIcon onClick={reloadEsi} />}
+            AdornmentIcon={<AdornmentIcon onClick={reloadEsi} />}
             required
           />
           <Link
@@ -420,7 +420,7 @@ const CallGeneralInfo: React.FC<{
         noOptionsText="No templates"
         items={pdfTemplateOptions}
         InputProps={{ 'data-cy': 'call-pdf-template' }}
-        insertIcon={<InsertIcon onClick={reloadPdfTemplates} />}
+        AdornmentIcon={<AdornmentIcon onClick={reloadPdfTemplates} />}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -431,7 +431,7 @@ const CallGeneralInfo: React.FC<{
         InputProps={{
           'data-cy': 'call-workflow',
         }}
-        insertIcon={<InsertIcon onClick={reloadProposalWorkflows} />}
+        AdornmentIcon={<AdornmentIcon onClick={reloadProposalWorkflows} />}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
