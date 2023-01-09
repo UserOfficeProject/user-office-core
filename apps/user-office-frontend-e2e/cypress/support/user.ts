@@ -1,6 +1,7 @@
 import {
   CreateUserMutation,
   CreateUserMutationVariables,
+  ExternalTokenLoginMutation,
   FeatureId,
   GetFeaturesQuery,
   Role,
@@ -33,17 +34,6 @@ const extTokenStoreStfc = new Map<TestUserId, string>([
   ['officer', 'officer'],
   ['placeholderUser', 'user'],
   ['reviewer', 'user'],
-]);
-
-const { user1, user2, user3, officer, placeholderUser, reviewer } =
-  initialDBData.users;
-const extTokenStoreOAuth = new Map<TestUserId, string>([
-  ['user1', user1.email],
-  ['user2', user2.email],
-  ['user3', user3.email],
-  ['officer', officer.email],
-  ['placeholderUser', placeholderUser.email],
-  ['reviewer', reviewer.email],
 ]);
 
 const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
@@ -177,12 +167,12 @@ const getExternalToken = async (testUserId: TestUserId) => {
 const login = (
   idOrCredentials: TestUserId | { email: string; password: string },
   role?: number
-) => {
+): Cypress.Chainable<ExternalTokenLoginMutation> => {
   const testUserId = getUserIdFromIdOrCredentials(idOrCredentials);
-
-  cy.wrap(getExternalToken(testUserId)).then((externalToken) => {
+  const request = getExternalToken(testUserId).then(async (externalToken) => {
     const api = getE2EApi();
-    api
+
+    return api
       .externalTokenLogin({
         externalToken: externalToken as string,
         redirectUri: 'http://localhost:3000/external-auth', // has to be set because it is a required field
@@ -212,6 +202,8 @@ const login = (
         return resp;
       });
   });
+
+  return cy.wrap(request);
 };
 
 const logout = () => {
