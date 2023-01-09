@@ -17,15 +17,9 @@ export async function buildFederatedSchema(
 ) {
   const schema = await buildSchema({
     ...options,
-    // directives: [
-    //   ...specifiedDirectives,
-    //   ...federationDirectives,
-    //   ...(options.directives || []),
-    // ],
     skipCheck: true,
     authChecker: customAuthChecker,
     authMode: 'null',
-    emitSchemaFile: true,
   });
 
   const federatedSchema = buildSubgraphSchema({

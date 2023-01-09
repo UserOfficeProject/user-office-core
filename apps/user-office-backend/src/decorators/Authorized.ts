@@ -1,4 +1,3 @@
-import {} from '@apollo/server/';
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
@@ -48,10 +47,6 @@ const Authorized = (roles: Roles[] = []) => {
                 value: agent.externalToken,
               },
             });
-
-        // new AuthenticationError('EXTERNAL_TOKEN_INVALID', {
-        //     externalToken: agent.externalToken,
-        //   });
       }
 
       if (roles.length === 0) {
