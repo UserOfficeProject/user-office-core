@@ -1,6 +1,5 @@
 import {
   ApolloServerPlugin,
-  BaseContext,
   ApolloServer,
   ContextFunction,
 } from '@apollo/server';
@@ -33,7 +32,7 @@ import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 
 export const context: ContextFunction<
   [ExpressContextFunctionArgument],
-  BaseContext
+  ResolverContext
 > = async ({ req }) => {
   let user = null;
   const userId = req.user?.user?.id as number;
@@ -71,7 +70,7 @@ export const context: ContextFunction<
     }
   }
 
-  const context: ResolverContext = { ...baseContext, user };
+  const context = { ...baseContext, user };
 
   return context;
 };
@@ -102,12 +101,18 @@ const apolloServer = async (app: Express) => {
     }
   );
 
-  const errorLoggingPlugin: ApolloServerPlugin<BaseContext> = {
+  const errorLoggingPlugin: ApolloServerPlugin<ResolverContext> = {
     async requestDidStart() {
       return {
-        async didEncounterErrors({ errors }) {
-          logger.logInfo('GraphQL response contained error(s)', {
+        async didEncounterErrors({ errors, contextValue: { user }, request }) {
+          const context = {
+            requestUserId: user?.id,
+            request,
+          };
+
+          logger.logError('GraphQL response contained error(s)', {
             errors,
+            context,
           });
         },
       };
@@ -147,18 +152,13 @@ const apolloServer = async (app: Express) => {
   const server = new ApolloServer({
     schema: schema,
     plugins: plugins,
-    formatError: (formattedError, error) => {
-      const env = process.env.NODE_ENV;
+    formatError(formattedError) {
+      const isProd = process.env.NODE_ENV === 'production';
 
-      // console.log(formattedError, error);
-
-      // NOTE: applyMiddleware must be before addResolversToSchema as a workaround for the issue: https://github.com/maticzav/graphql-middleware/issues/395
-      // if (env === 'production') {
-      //   // prevent exposing too much information when running in production
-      //   federatedSchema = applyMiddleware(federatedSchema, rejectionSanitizer);
-      // } else {
-      //   federatedSchema = applyMiddleware(federatedSchema, rejectionLogger);
-      // }
+      // NOTE: Prevent exposing some sensitive data to the client in production.
+      if (isProd) {
+        delete formattedError.extensions?.exception;
+      }
 
       return formattedError;
     },

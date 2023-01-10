@@ -31,8 +31,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .returning('*')
       .then((user: UserRecord[]) => {
-        if (user === undefined || user.length !== 1) {
-          throw new Error(`Could not delete user with id:${id}`);
+        if (!user?.length) {
+          return null;
         }
 
         return createUserObject(user[0]);
@@ -316,7 +316,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     email: string,
     telephone: string,
     telephone_alt: string | undefined
-  ): Promise<User> {
+  ): Promise<User | null> {
     return database
       .insert({
         user_title,
@@ -343,8 +343,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .returning(['*'])
       .into('users')
       .then((user: UserRecord[]) => {
-        if (!user || user.length == 0) {
-          throw new Error('Could not create user');
+        if (!user?.length) {
+          return null;
         }
 
         return createUserObject(user[0]);
