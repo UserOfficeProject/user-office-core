@@ -73,7 +73,7 @@ async function enableDefaultEssFeatures() {
       FeatureId.SCHEDULER,
       FeatureId.SHIPPING,
       FeatureId.RISK_ASSESSMENT,
-      FeatureId.EMAIL_INVITE,
+      //FeatureId.EMAIL_INVITE,
       FeatureId.INSTRUMENT_MANAGEMENT,
       FeatureId.TECHNICAL_REVIEW,
       FeatureId.SEP_REVIEW,

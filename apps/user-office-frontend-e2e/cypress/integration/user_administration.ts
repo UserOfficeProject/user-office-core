@@ -30,7 +30,10 @@ context('User administration tests', () => {
     cy.visit('/');
   });
 
-  it('should be able to verify email manually', () => {
+  it('should be able to verify email manually', function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+      this.skip();
+    }
     cy.contains('People').click();
 
     cy.contains(placeholderUser.firstName)
@@ -57,7 +60,10 @@ context('User administration tests', () => {
     cy.contains('Placeholder').should('exist');
   });
 
-  it('should be able to remove the placeholder flag', () => {
+  it('should be able to remove the placeholder flag', function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+      this.skip();
+    }
     cy.setUserEmailVerified({ id: placeholderUser.id });
     cy.contains('People').click();
 
@@ -139,7 +145,10 @@ context('User administration tests', () => {
     cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
   });
 
-  it('Should be able to invite user or sep reviewer by email', () => {
+  it('Should be able to invite user or sep reviewer by email', function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+      this.skip();
+    }
     const userFirstName = faker.name.firstName();
     const userLastName = faker.name.lastName();
     const userEmail = faker.internet.email();
@@ -215,7 +224,10 @@ context('User administration tests', () => {
       .contains('SEP Reviewer');
   });
 
-  it('Should be able to delete user information', () => {
+  it('Should be able to delete user information', function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+      this.skip();
+    }
     cy.contains('People').click();
     cy.contains(placeholderUser.firstName)
       .parent()
