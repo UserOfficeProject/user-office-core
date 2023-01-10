@@ -380,7 +380,11 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 
   async createSetting(setting: Settings): Promise<Settings> {
     return database
-      .insert(setting)
+      .insert({
+        settings_id: setting.id,
+        settings_value: setting.settingsValue,
+        description: setting.description,
+      })
       .into('settings')
       .returning('*')
       .then((settings: SettingsRecord[]) => createSettingsObject(settings[0]));
