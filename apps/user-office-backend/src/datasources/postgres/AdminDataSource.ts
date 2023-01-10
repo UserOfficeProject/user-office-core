@@ -263,6 +263,9 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         GRANT ALL ON SCHEMA public TO public;
       `);
 
+      await database.destroy();
+      await database.initialize(initSettings);
+
       const applyPatchesOutput = await this.applyPatches();
 
       if (process.env.INCLUDE_SEEDS === '1' || includeSeeds) {
