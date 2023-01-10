@@ -1,10 +1,11 @@
+import { InputAdornment } from '@mui/material';
 import { InputProps } from '@mui/material/Input';
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
 import { Field } from 'formik';
 import { Autocomplete } from 'formik-mui';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Option } from 'utils/utilTypes';
 
@@ -20,6 +21,7 @@ type FormikUIAutocompleteProps = {
   InputProps?: Partial<InputProps> & { 'data-cy': string };
   multiple?: boolean;
   'data-cy'?: string;
+  AdornmentIcon?: MUITextFieldProps;
 };
 
 const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
@@ -33,8 +35,10 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
   InputProps,
   TextFieldProps,
   multiple = false,
+  AdornmentIcon,
   ...props
 }) => {
+  const [adornmentVisible, setAdornmentVisible] = useState(false);
   const options = items.map((item) => item.value);
 
   return (
@@ -58,7 +62,24 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
           label={label}
           required={required}
           disabled={disabled}
-          InputProps={{ ...params.InputProps, ...InputProps }}
+          InputProps={{
+            ...params.InputProps,
+            ...InputProps,
+            endAdornment: (
+              <InputAdornment position="start">
+                {AdornmentIcon && adornmentVisible
+                  ? { ...AdornmentIcon }
+                  : null}
+                {params.InputProps?.endAdornment}
+              </InputAdornment>
+            ),
+          }}
+          onFocus={() => {
+            setAdornmentVisible(true);
+          }}
+          onBlur={() => {
+            setAdornmentVisible(false);
+          }}
         />
       )}
       ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}

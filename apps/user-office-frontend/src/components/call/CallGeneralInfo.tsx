@@ -1,5 +1,6 @@
 import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
@@ -42,6 +43,10 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
+type AdornmentIconProps = {
+  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+};
+
 const useStyles = makeStyles((theme) => ({
   iconVerticalAlign: {
     verticalAlign: 'middle',
@@ -53,6 +58,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const CallGeneralInfo: React.FC<{
+  reloadTemplates: () => void;
+  reloadEsi: () => void;
+  reloadPdfTemplates: () => void;
+  reloadProposalWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
@@ -66,6 +75,10 @@ const CallGeneralInfo: React.FC<{
   esiTemplates,
   pdfTemplates,
   loadingTemplates,
+  reloadTemplates,
+  reloadEsi,
+  reloadPdfTemplates,
+  reloadProposalWorkflows,
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
@@ -193,6 +206,19 @@ const CallGeneralInfo: React.FC<{
       },
     })
   )(TableRow);
+
+  const AdornmentIcon = (props: AdornmentIconProps) => {
+    return (
+      <IconButton
+        edge="end"
+        title="Refresh"
+        aria-label="Refresh the list"
+        onClick={props.onClick}
+      >
+        <RefreshIcon fontSize="small" />
+      </IconButton>
+    );
+  };
 
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
@@ -344,6 +370,7 @@ const CallGeneralInfo: React.FC<{
           noOptionsText="No templates"
           items={templateOptions}
           InputProps={{ 'data-cy': 'call-template' }}
+          AdornmentIcon={<AdornmentIcon onClick={reloadTemplates} />}
           required
         />
         <Link
@@ -366,6 +393,7 @@ const CallGeneralInfo: React.FC<{
             noOptionsText="No templates"
             items={esiTemplateOptions}
             InputProps={{ 'data-cy': 'call-esi-template' }}
+            AdornmentIcon={<AdornmentIcon onClick={reloadEsi} />}
             required
           />
           <Link
@@ -392,6 +420,7 @@ const CallGeneralInfo: React.FC<{
         noOptionsText="No templates"
         items={pdfTemplateOptions}
         InputProps={{ 'data-cy': 'call-pdf-template' }}
+        AdornmentIcon={<AdornmentIcon onClick={reloadPdfTemplates} />}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -402,6 +431,7 @@ const CallGeneralInfo: React.FC<{
         InputProps={{
           'data-cy': 'call-workflow',
         }}
+        AdornmentIcon={<AdornmentIcon onClick={reloadProposalWorkflows} />}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
