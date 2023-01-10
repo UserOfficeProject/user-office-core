@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 import { GetTemplatesQuery, TemplateGroupId } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -13,11 +13,14 @@ export function useActiveTemplates(
   groupId: TemplateGroupId,
   includeTemplate?: number | null
 ) {
-  const api = useDataApi();
-
+  const [update, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [templates, setTemplates] = useState<
     GetTemplatesQuery['templates'] | null
   >(null);
+
+  const api = useDataApi();
+
+  const refreshTemplates = () => forceUpdate();
 
   useEffect(() => {
     let unmounted = false;
@@ -56,7 +59,7 @@ export function useActiveTemplates(
     return () => {
       unmounted = true;
     };
-  }, [groupId, includeTemplate, api]);
+  }, [groupId, includeTemplate, api, update]);
 
-  return { templates, setTemplates };
+  return { templates, setTemplates, refreshTemplates };
 }
