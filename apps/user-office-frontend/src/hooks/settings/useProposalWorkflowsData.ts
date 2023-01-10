@@ -1,4 +1,10 @@
-import { useEffect, useState, SetStateAction, Dispatch } from 'react';
+import {
+  useEffect,
+  useState,
+  SetStateAction,
+  Dispatch,
+  useReducer,
+} from 'react';
 
 import { ProposalWorkflow } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -7,7 +13,9 @@ export function useProposalWorkflowsData(): {
   loadingProposalWorkflows: boolean;
   proposalWorkflows: ProposalWorkflow[];
   setProposalWorkflowsWithLoading: Dispatch<SetStateAction<ProposalWorkflow[]>>;
+  refreshProposalWorkflows: () => void;
 } {
+  const [update, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const [proposalWorkflows, setProposalWorkflows] = useState<
     ProposalWorkflow[]
   >([]);
@@ -15,6 +23,8 @@ export function useProposalWorkflowsData(): {
     useState(true);
 
   const api = useDataApi();
+
+  const refreshProposalWorkflows = () => forceUpdate();
 
   const setProposalWorkflowsWithLoading = (
     data: SetStateAction<ProposalWorkflow[]>
@@ -44,11 +54,12 @@ export function useProposalWorkflowsData(): {
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, update]);
 
   return {
     loadingProposalWorkflows,
     proposalWorkflows,
     setProposalWorkflowsWithLoading,
+    refreshProposalWorkflows,
   };
 }
