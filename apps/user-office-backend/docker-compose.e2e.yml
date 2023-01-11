@@ -18,8 +18,6 @@ services:
       - 5432:5432
     volumes:
       - ./db_patches/:/docker-entrypoint-initdb.d/
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
 
   rabbitmq:
     image: "rabbitmq:3-management"
