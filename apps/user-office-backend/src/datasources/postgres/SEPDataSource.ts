@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
 import { Review, ReviewStatus } from '../../models/Review';
@@ -50,7 +51,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .returning('*')
       .then((sep: SEPRecord[]) => {
         if (sep === undefined || sep.length !== 1) {
-          throw new Error(`Could not delete sep with id:${id}`);
+          throw new GraphQLError(`Could not delete sep with id:${id}`);
         }
 
         return createSEPObject(sep[0]);
@@ -97,7 +98,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .where('sep_id', id)
       .then((records: SEPRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`SEP not found ${id}`);
+          throw new GraphQLError(`SEP not found ${id}`);
         }
 
         return createSEPObject(records[0]);
@@ -328,7 +329,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .andWhere('proposal_pk', proposalPk)
       .then((records: ReviewRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`SEP review not found ${reviewId}`);
+          throw new GraphQLError(`SEP review not found ${reviewId}`);
         }
 
         return true;
@@ -391,7 +392,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     const sep = await this.getSEP(sepId);
 
     if (!sep) {
-      throw new Error(`SEP not found ${sepId}`);
+      throw new GraphQLError(`SEP not found ${sepId}`);
     }
 
     sep.sepChairUserId !== null &&
@@ -421,7 +422,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     const sep = await this.getSEP(sepId);
 
     if (!sep) {
-      throw new Error(`SEP not found ${sepId}`);
+      throw new GraphQLError(`SEP not found ${sepId}`);
     }
 
     let shortCode: Roles;
@@ -439,7 +440,9 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .first();
 
     if (!roleRecord) {
-      throw new Error(`Role with short code ${shortCode} does not exist`);
+      throw new GraphQLError(
+        `Role with short code ${shortCode} does not exist`
+      );
     }
 
     if (shortCode === Roles.SEP_REVIEWER) {
@@ -497,7 +500,9 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .first();
 
       if (!roleRecord) {
-        throw new Error(`Could not find role with short code ${shortCode}`);
+        throw new GraphQLError(
+          `Could not find role with short code ${shortCode}`
+        );
       }
 
       await trx<RoleUserRecord>('role_user')
@@ -515,7 +520,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       return sepUpdated;
     }
 
-    throw new Error(`SEP not found ${args.sepId}`);
+    throw new GraphQLError(`SEP not found ${args.sepId}`);
   }
 
   async assignReviewersToSEP(args: AssignReviewersToSEPArgs): Promise<SEP> {
@@ -532,7 +537,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       return sepUpdated;
     }
 
-    throw new Error(`SEP not found ${args.sepId}`);
+    throw new GraphQLError(`SEP not found ${args.sepId}`);
   }
 
   async removeMemberFromSEP(
@@ -552,7 +557,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .where('sep_id', args.sepId);
 
       if (!updateResult) {
-        throw new Error(
+        throw new GraphQLError(
           `Failed to remove sep member ${args.memberId} (${field}), sep id ${args.sepId}`
         );
       }
@@ -563,7 +568,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .del();
 
       if (!updateResult) {
-        throw new Error(
+        throw new GraphQLError(
           `Failed to remove sep member ${args.memberId}, sep id ${args.sepId}`
         );
       }
@@ -575,7 +580,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       return sepUpdated;
     }
 
-    throw new Error(`SEP not found ${args.sepId}`);
+    throw new GraphQLError(`SEP not found ${args.sepId}`);
   }
 
   async assignProposalsToSep({ proposals, sepId }: AssignProposalsToSepArgs) {
@@ -611,7 +616,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
 
         return await trx.commit(result);
       } catch (error) {
-        throw new Error(
+        throw new GraphQLError(
           `Could not assign proposals ${proposals} to SEP with id: ${sepId}`
         );
       }
@@ -629,7 +634,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       return new ProposalPks(returnedProposalPks);
     }
 
-    throw new Error(
+    throw new GraphQLError(
       `Could not assign proposals ${proposals} to SEP with id: ${sepId}`
     );
   }
@@ -655,7 +660,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     const sepUpdated = await this.getSEP(sepId);
 
     if (!sepUpdated) {
-      throw new Error(`SEP not found ${sepId}`);
+      throw new GraphQLError(`SEP not found ${sepId}`);
     }
 
     return sepUpdated;
@@ -695,7 +700,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       return updatedSep;
     }
 
-    throw new Error(`SEP not found ${sepId}`);
+    throw new GraphQLError(`SEP not found ${sepId}`);
   }
 
   async removeMemberFromSepProposal(
@@ -715,7 +720,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       return sepUpdated;
     }
 
-    throw new Error(`SEP not found ${sepId}`);
+    throw new GraphQLError(`SEP not found ${sepId}`);
   }
 
   async updateTimeAllocation(
@@ -734,7 +739,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .where('proposal_pk', proposalPk);
 
     if (!updatedRecord) {
-      throw new Error(
+      throw new GraphQLError(
         `SEP_Proposal not found, sepId: ${sepId}, proposalPk: ${proposalPk}`
       );
     }
@@ -841,7 +846,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         dataToUpsert,
       });
 
-      throw new Error('Could not update/insert sep meeting decision');
+      throw new GraphQLError('Could not update/insert sep meeting decision');
     }
 
     return createSepMeetingDecisionObject(sepMeetingDecisionRecord);

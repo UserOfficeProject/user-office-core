@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 import {
   Ctx,
@@ -76,7 +77,7 @@ export class ExperimentSafetyInputResolver {
       esi.scheduledEventId
     );
     if (scheduledEvent === null || scheduledEvent.proposalPk === null) {
-      throw new Error(
+      throw new GraphQLError(
         'Unexpected error. Scheduled event must have an associated proposal'
       );
     }
@@ -87,7 +88,7 @@ export class ExperimentSafetyInputResolver {
     );
 
     if (proposal === null) {
-      throw new Error(
+      throw new GraphQLError(
         'Unexpected error. Scheduled event proposal does not exist'
       );
     }

@@ -1,18 +1,23 @@
 import { ApolloServerErrorCode } from '@apollo/server/errors';
 import { GraphQLError } from 'graphql';
 
+import { omit } from '../utils/helperFunctions';
 import { ApolloServerAdditionalErrorCodes } from '../utils/utilTypes';
 
 export class Rejection extends GraphQLError {
   constructor(
     public reason: string,
-    public context?: {
+    public context: Record<string, unknown> & {
       code?: ApolloServerErrorCode | ApolloServerAdditionalErrorCodes;
-      exception?: Error | unknown;
-    }
+    } = {},
+    public exception?: Error | unknown
   ) {
     super(reason, {
-      extensions: { code: context?.code, exception: context?.exception },
+      extensions: {
+        code: context.code,
+        context: omit(context, 'code'),
+        exception: exception,
+      },
     });
   }
 
@@ -32,12 +37,12 @@ export class Rejection extends GraphQLError {
 
 export function rejection(
   reason: string,
-  context?: {
+  context?: Record<string, unknown> & {
     code?: ApolloServerErrorCode | ApolloServerAdditionalErrorCodes;
-    exception?: Error | unknown;
-  }
+  },
+  exception?: Error | unknown
 ) {
-  return new Rejection(reason, context);
+  return new Rejection(reason, context, exception);
 }
 
 export function isRejection(value: unknown): value is Rejection {

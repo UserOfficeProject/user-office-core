@@ -2,6 +2,7 @@
 import fs from 'fs';
 
 import to from 'await-to-js';
+import { GraphQLError } from 'graphql';
 import { Client } from 'pg';
 import { LargeObjectManager } from 'pg-large-object';
 
@@ -53,7 +54,7 @@ export default class PostgresFileDataSource implements FileDataSource {
         });
     }
 
-    throw new Error('Unsupported input for getMetaData');
+    throw new GraphQLError('Unsupported input for getMetaData');
   }
 
   public async put(
@@ -76,7 +77,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       .returning(['*']);
 
     if (!resultSet || resultSet.length !== 1) {
-      throw new Error('Expected to receive entry');
+      throw new GraphQLError('Expected to receive entry');
     }
 
     return createFileMetadata(resultSet[0]);
@@ -87,11 +88,13 @@ export default class PostgresFileDataSource implements FileDataSource {
       database.client.acquireConnection()
     );
     if (err) {
-      throw new Error(`Could not establish connection with database \n ${err}`);
+      throw new GraphQLError(
+        `Could not establish connection with database \n ${err}`
+      );
     }
 
     if (!connection) {
-      throw new Error('Could not obtain connection');
+      throw new GraphQLError('Could not obtain connection');
     }
 
     return new Promise<number>(async (resolve, reject) => {

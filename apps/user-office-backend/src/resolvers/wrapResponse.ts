@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 
 import { Rejection, isRejection } from '../models/Rejection';
 import { getResponseField } from './Decorators';
@@ -14,7 +15,9 @@ export async function wrapResponse(
     const result = await executor;
     const responseFieldName = getResponseField(wrapper);
     if (!responseFieldName) {
-      throw new Error(`No response fields found in '${ResponseWrapper.name}'`);
+      throw new GraphQLError(
+        `No response fields found in '${ResponseWrapper.name}'`
+      );
     }
     if (isRejection(result)) {
       wrapper.rejection = result;

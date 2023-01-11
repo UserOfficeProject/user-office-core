@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
 import { Role, Roles } from '../../models/Role';
@@ -31,8 +32,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .returning('*')
       .then((user: UserRecord[]) => {
-        if (!user?.length) {
-          return null;
+        if (user === undefined || user.length !== 1) {
+          throw new GraphQLError(`Could not delete user with id:${id}`);
         }
 
         return createUserObject(user[0]);
@@ -316,7 +317,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     email: string,
     telephone: string,
     telephone_alt: string | undefined
-  ): Promise<User | null> {
+  ): Promise<User> {
     return database
       .insert({
         user_title,
@@ -343,8 +344,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .returning(['*'])
       .into('users')
       .then((user: UserRecord[]) => {
-        if (!user?.length) {
-          return null;
+        if (!user || user.length == 0) {
+          throw new GraphQLError('Could not create user');
         }
 
         return createUserObject(user[0]);
@@ -387,7 +388,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       logger.logError('Failed to create dummy users', {
         usersIds: failedUsers,
       });
-      throw new Error(`Could not create users ${failedUsers}`);
+      throw new GraphQLError(`Could not create users ${failedUsers}`);
     }
 
     return users.map(createUserObject);

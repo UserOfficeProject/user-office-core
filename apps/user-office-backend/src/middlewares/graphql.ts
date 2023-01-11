@@ -157,6 +157,7 @@ const apolloServer = async (app: Express) => {
 
       // NOTE: Prevent exposing some sensitive data to the client in production.
       if (isProd) {
+        delete formattedError.extensions?.context;
         delete formattedError.extensions?.exception;
       }
 

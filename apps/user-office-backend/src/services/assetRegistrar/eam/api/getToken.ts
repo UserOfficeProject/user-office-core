@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { ModuleOptions, ResourceOwnerPassword } from 'simple-oauth2';
 
 import { getEnvOrThrow } from '../utils/getEnvOrThrow';
@@ -26,6 +27,6 @@ export async function getToken() {
     return await client.getToken(tokenParams);
   } catch (error) {
     logger.logException('Access Token Error', error);
-    throw new Error('Access Token Error');
+    throw new GraphQLError('Access Token Error');
   }
 }

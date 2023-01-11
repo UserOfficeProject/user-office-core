@@ -1,5 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import BluePromise from 'bluebird';
+import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { injectable } from 'tsyringe';
 
@@ -134,11 +135,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             );
 
             if (!ref) {
-              throw new Error(
+              throw new GraphQLError(
                 `Failed to calculate reference number for proposal with id '${primaryKey}' using format '${call.reference_number_format}'`
               );
             } else if (ref.length > 16) {
-              throw new Error(
+              throw new GraphQLError(
                 `The reference number calculated is too long ('${ref.length} characters)`
               );
             }
@@ -183,7 +184,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     );
 
     if (proposal?.length !== 1) {
-      throw new Error(`Failed to submit proposal with id '${primaryKey}'`);
+      throw new GraphQLError(
+        `Failed to submit proposal with id '${primaryKey}'`
+      );
     }
 
     return createProposalObject(proposal[0]);
@@ -197,7 +200,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .returning('*')
       .then((proposal: ProposalRecord[]) => {
         if (proposal === undefined || proposal.length !== 1) {
-          throw new Error(`Could not delete proposal with id:${id}`);
+          throw new GraphQLError(`Could not delete proposal with id:${id}`);
         }
 
         return createProposalObject(proposal[0]);
@@ -256,7 +259,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where('proposal_pk', proposal.primaryKey)
       .then((records: ProposalRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`Proposal not found ${proposal.primaryKey}`);
+          throw new GraphQLError(`Proposal not found ${proposal.primaryKey}`);
         }
 
         return createProposalObject(records[0]);
@@ -278,7 +281,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where('proposal_pk', proposalPk)
       .then((records: ProposalRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`Proposal not found ${proposalPk}`);
+          throw new GraphQLError(`Proposal not found ${proposalPk}`);
         }
 
         return createProposalObject(records[0]);
@@ -318,7 +321,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     ).filterQuery;
 
     if (!questionFilterQuery) {
-      throw new Error(
+      throw new GraphQLError(
         `Filter query not implemented for ${questionFilter.dataType}`
       );
     }
@@ -394,7 +397,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         if (sortField && sortDirection) {
           if (!fieldMap.hasOwnProperty(sortField)) {
-            throw new Error(`Bad sort field given: ${sortField}`);
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
           query.orderBy(sortField, sortDirection);
@@ -734,7 +737,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         { callId }
       );
 
-      throw new Error('Could not reset proposal events');
+      throw new GraphQLError('Could not reset proposal events');
     }
 
     const proposalEventsToReset: StatusChangingEventRecord[] = (
@@ -774,7 +777,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       if (!updatedProposalEvents) {
         logger.logError('Could not reset proposal events', { dataToUpdate });
 
-        throw new Error('Could not reset proposal events');
+        throw new GraphQLError('Could not reset proposal events');
       }
     }
 
@@ -802,7 +805,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     if (result?.length === 0) {
       logger.logError('Could not change proposals status', { dataToUpdate });
 
-      throw new Error('Could not change proposals status');
+      throw new GraphQLError('Could not change proposals status');
     }
 
     return new ProposalPks(result.map((item) => item.proposal_pk));
@@ -878,7 +881,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .returning(['*']);
 
     if (!addedScheduledEvent) {
-      throw new Error(
+      throw new GraphQLError(
         `Failed to add proposal booking scheduled event '${eventMessage.id}'`
       );
     }
@@ -901,7 +904,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .returning(['*']);
 
     if (!updatedScheduledEvent) {
-      throw new Error(
+      throw new GraphQLError(
         `Failed to update proposal booking scheduled event '${eventToUpdate.id}'`
       );
     }
@@ -922,7 +925,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .returning('*');
 
     if (!removedScheduledEvent) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not delete scheduled events with ids: ${eventMessage
           .map((event) => event.id)
           .join(', ')} `

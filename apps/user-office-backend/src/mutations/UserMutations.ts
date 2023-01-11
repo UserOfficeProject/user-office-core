@@ -70,6 +70,8 @@ export default class UserMutations {
     const user = await this.dataSource.delete(id);
     if (!user) {
       return rejection('Can not delete user because user does not exist', {
+        id,
+        agent,
         code: ApolloServerErrorCodeExtended.NOT_FOUND,
       });
     }
@@ -93,6 +95,8 @@ export default class UserMutations {
 
     if (!agent) {
       return rejection('Agent is not defined', {
+        agent,
+        args,
         code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
       });
     }
@@ -105,7 +109,7 @@ export default class UserMutations {
     } else if (user) {
       return rejection(
         'Can not create account because account already exists',
-        { code: ApolloServerErrorCodeExtended.BAD_REQUEST }
+        { args, code: ApolloServerErrorCodeExtended.BAD_REQUEST }
       );
     }
 
@@ -152,7 +156,9 @@ export default class UserMutations {
     }
 
     if (!userId) {
-      return rejection('Can not create user for this role');
+      return rejection('Can not create user for this role', {
+        args,
+      });
     } else {
       return this.createEmailInviteResponse(userId, agent.id, role);
     }
@@ -166,6 +172,7 @@ export default class UserMutations {
   ): Promise<UserLinkResponse | Rejection> {
     if (process.env.NODE_ENV !== 'development') {
       return rejection('Users can only be created on development env', {
+        args,
         code: ApolloServerErrorCodeExtended.BAD_REQUEST,
       });
     }
@@ -197,16 +204,21 @@ export default class UserMutations {
           placeholder: false,
         })
         .then((user) => user)
-        .catch((exception) => {
-          return rejection('Could not update user', { exception });
+        .catch((err) => {
+          return rejection('Could not update user', { user }, err);
         });
 
       if (isRejection(updatedUser) || !changePassword) {
-        return rejection('Can not create user');
+        return rejection('Can not create user', {
+          updatedUser,
+          changePassword,
+        });
       }
       user = updatedUser;
     } else if (user) {
-      return rejection('Can not create user because account already exists');
+      return rejection('Can not create user because account already exists', {
+        args,
+      });
     } else {
       try {
         user = await this.dataSource.create(
@@ -231,21 +243,22 @@ export default class UserMutations {
           args.telephone,
           args.telephone_alt
         );
-      } catch (exception) {
+      } catch (error) {
         // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
-        const errorCode = (exception as { code: string }).code;
+        const errorCode = (error as { code: string }).code;
 
         if (errorCode === '23503' || errorCode === '23505') {
           return rejection(
             'Can not create user because account already exists',
-            { exception }
+            { args },
+            error
           );
         }
       }
     }
 
     if (!user) {
-      return rejection('Can not create user');
+      return rejection('Can not create user', { args });
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -284,7 +297,11 @@ export default class UserMutations {
     if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
       return rejection(
         'Can not update user because of insufficient permissions',
-        { code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS }
+        {
+          args,
+          agent,
+          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
+        }
       );
     }
 
@@ -292,6 +309,8 @@ export default class UserMutations {
 
     if (!user) {
       return rejection('Can not update user because user does not exist', {
+        args,
+        agent,
         code: ApolloServerErrorCodeExtended.NOT_FOUND,
       });
     }
@@ -315,8 +334,8 @@ export default class UserMutations {
     return this.dataSource
       .update(user)
       .then((user) => user)
-      .catch((exception) => {
-        return rejection('Could not update user', { exception });
+      .catch((err) => {
+        return rejection('Could not update user', { user }, err);
       });
   }
 
@@ -331,6 +350,8 @@ export default class UserMutations {
 
     if (!user) {
       return rejection('Can not update role because user does not exist', {
+        args,
+        agent,
         code: ApolloServerErrorCodeExtended.NOT_FOUND,
       });
     }
@@ -338,10 +359,15 @@ export default class UserMutations {
     return this.dataSource
       .setUserRoles(args.id, args.roles)
       .then(() => user)
-      .catch((exception) => {
-        return rejection('Can not update user because an error occurred', {
-          exception,
-        });
+      .catch((err) => {
+        return rejection(
+          'Can not update user because an error occurred',
+          {
+            args,
+            agent,
+          },
+          err
+        );
       });
   }
 
@@ -359,14 +385,14 @@ export default class UserMutations {
     if (!isImpersonatedUser && !isUserOfficer) {
       return rejection(
         'Can not impersonate user because of insufficient permissions',
-        { code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS }
+        { userId, code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS }
       );
     }
 
     if (isImpersonatedUser && isUserOfficer && shouldImpersonateUser) {
       return rejection(
         'Can not impersonate user with already impersonated user',
-        { code: ApolloServerErrorCodeExtended.BAD_REQUEST }
+        { userId, code: ApolloServerErrorCodeExtended.BAD_REQUEST }
       );
     }
 
@@ -374,7 +400,7 @@ export default class UserMutations {
     if (isImpersonatedUser && shouldImpersonateUser) {
       return rejection(
         'Can not impersonate user because of insufficient permissions',
-        { code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS }
+        { userId, code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS }
       );
     }
 
@@ -383,7 +409,7 @@ export default class UserMutations {
     if (!user) {
       return rejection(
         'Can not get token for user because user does not exist',
-        { code: ApolloServerErrorCodeExtended.NOT_FOUND }
+        { userId, code: ApolloServerErrorCodeExtended.NOT_FOUND }
       );
     }
 
@@ -414,10 +440,14 @@ export default class UserMutations {
 
       return freshToken;
     } catch (error) {
-      return rejection('Bad token', {
-        code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
-        exception: error,
-      });
+      return rejection(
+        'Bad token',
+        {
+          token,
+          code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
+        },
+        error
+      );
     }
   }
 
@@ -433,6 +463,7 @@ export default class UserMutations {
 
       if (!user) {
         return rejection('User not found', {
+          externalToken,
           code: ApolloServerErrorCodeExtended.NOT_FOUND,
         });
       }
@@ -463,9 +494,11 @@ export default class UserMutations {
 
       return uosToken;
     } catch (exception) {
-      return rejection('Error occurred during external authentication', {
-        exception,
-      });
+      return rejection(
+        'Error occurred during external authentication',
+        {},
+        exception
+      );
     }
   }
 
@@ -474,8 +507,14 @@ export default class UserMutations {
       const decodedToken = verifyToken<AuthJwtPayload>(token);
 
       return this.userAuth.logout(decodedToken);
-    } catch (exception) {
-      return rejection('Error occurred during logout', { exception });
+    } catch (error) {
+      return rejection(
+        'Error occurred during logout',
+        {
+          code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
+        },
+        error
+      );
     }
   }
 
@@ -492,6 +531,7 @@ export default class UserMutations {
 
       if (!currentRole) {
         return rejection('User role not found', {
+          selectedRoleId,
           code: ApolloServerErrorCodeExtended.NOT_FOUND,
         });
       }
@@ -507,10 +547,14 @@ export default class UserMutations {
 
       return tokenWithRole;
     } catch (error) {
-      return rejection('Bad token', {
-        code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
-        exception: error,
-      });
+      return rejection(
+        'Bad token',
+        {
+          selectedRoleId,
+          code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
+        },
+        error
+      );
     }
   }
 
@@ -524,6 +568,7 @@ export default class UserMutations {
 
     if (!user) {
       return rejection('Could not find user by email', {
+        args,
         code: ApolloServerErrorCodeExtended.NOT_FOUND,
       });
     }
@@ -556,12 +601,13 @@ export default class UserMutations {
 
         return true;
       } else {
-        return rejection('Can not verify user');
+        return rejection('Can not verify user', { user, decoded });
       }
-    } catch (exception) {
+    } catch (error) {
       return rejection(
         'Can not verify email, please contact user office for help',
-        { exception }
+        {},
+        error
       );
     }
   }
@@ -572,9 +618,9 @@ export default class UserMutations {
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
-      .catch((exception) => {
-        return rejection('Could not add user role', { exception });
-      });
+      .catch((err) =>
+        rejection('Could not add user role', { agent, args }, err)
+      );
   }
 
   @ValidateArgs(updatePasswordValidationSchema)
@@ -587,7 +633,11 @@ export default class UserMutations {
     if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
       return rejection(
         'Can not update password because of insufficient permissions',
-        { code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS }
+        {
+          id,
+          agent,
+          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
+        }
       );
     }
 
@@ -598,11 +648,20 @@ export default class UserMutations {
         return this.dataSource.setUserPassword(user.id, hash);
       } else {
         return rejection('Could not update password. Used does not exist', {
+          agent,
+          id,
           code: ApolloServerErrorCodeExtended.NOT_FOUND,
         });
       }
-    } catch (exception) {
-      return rejection('Could not update password', { exception });
+    } catch (error) {
+      return rejection(
+        'Could not update password',
+        {
+          agent,
+          id,
+        },
+        error
+      );
     }
   }
 
@@ -626,16 +685,16 @@ export default class UserMutations {
         return this.dataSource
           .setUserPassword(user.id, hash)
           .then((user) => user)
-          .catch((exception) => {
-            return rejection('Could not reset password', { exception });
-          });
+          .catch((err) => rejection('Could not reset password', { user }, err));
       }
 
       return rejection('Could not reset password incomplete data', {
+        user,
+        decoded,
         code: ApolloServerErrorCodeExtended.BAD_USER_INPUT,
       });
-    } catch (exception) {
-      return rejection('Could not reset password', { exception });
+    } catch (error) {
+      return rejection('Could not reset password', {}, error);
     }
   }
 

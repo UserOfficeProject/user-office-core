@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
@@ -130,7 +131,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .returning('*')
       .then((rows: TemplateRecord[]) => {
         if (rows.length !== 1) {
-          throw new Error(
+          throw new GraphQLError(
             `createTemplate expected 1 result got ${rows.length}. ${args.name} ${args.description}`
           );
         }
@@ -148,7 +149,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .returning('*')
       .then((resultSet: TemplateRecord[]) => {
         if (!resultSet || resultSet.length == 0) {
-          throw new Error(
+          throw new GraphQLError(
             `DeleteTemplate template does not exist. ID: ${templateId}`
           );
         }
@@ -204,7 +205,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
             | SampleDeclarationConfig;
 
           if (typeof config.templateId !== 'number') {
-            throw new Error(
+            throw new GraphQLError(
               `getTemplateAsJson expected number got ${typeof config.templateId}`
             );
           }
@@ -228,7 +229,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     const subTemplates = await this.getSubtemplatesForQuestions(questions);
 
     if (!template || !templateSteps || !questions || !subTemplates) {
-      throw new Error(`Template does not exist. ID: ${templateId}`);
+      throw new GraphQLError(`Template does not exist. ID: ${templateId}`);
     }
 
     return new TemplateExportData(
@@ -260,27 +261,27 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     const questionComparisons: QuestionComparison[] = [];
 
     if (!data.template) {
-      throw new Error('Template field is missing');
+      throw new GraphQLError('Template field is missing');
     }
 
     if (!data.templateSteps) {
-      throw new Error('TemplateSteps field is missing');
+      throw new GraphQLError('TemplateSteps field is missing');
     }
 
     if (!data.questions) {
-      throw new Error('Questions field is missing');
+      throw new GraphQLError('Questions field is missing');
     }
 
     if (!data.template.name) {
-      throw new Error('Template.name field is missing');
+      throw new GraphQLError('Template.name field is missing');
     }
 
     if (data.template.description == null) {
-      throw new Error('Template.description field is missing');
+      throw new GraphQLError('Template.description field is missing');
     }
 
     if (!data.template.groupId) {
-      throw new Error('Template.group field is missing');
+      throw new GraphQLError('Template.group field is missing');
     }
 
     const questionIds = data.questions.map((question) => question.id);
@@ -355,13 +356,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async validateTemplateExport(templateExport: TemplateExport) {
     const { metadata, data } = templateExport;
     if (isBelowVersion(metadata.version, MIN_SUPPORTED_VERSION)) {
-      throw new Error(
+      throw new GraphQLError(
         `Template version ${metadata.version} is below the minimum supported version ${MIN_SUPPORTED_VERSION}.`
       );
     }
 
     if (isAboveVersion(metadata.version, EXPORT_VERSION)) {
-      throw new Error(
+      throw new GraphQLError(
         `Template version ${metadata.version} is above the current supported version ${EXPORT_VERSION}.`
       );
     }
@@ -499,12 +500,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     if (result?.rows?.length) {
       const returnValue = await this.getTemplate(dataToUpsert[0].template_id);
       if (!returnValue) {
-        throw new Error('Could not get template');
+        throw new GraphQLError('Could not get template');
       }
 
       return returnValue;
     } else {
-      throw new Error('Something went wrong');
+      throw new GraphQLError('Something went wrong');
     }
   }
 
@@ -535,7 +536,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .where({ topic_id: topicId });
 
     if (!resultSet || resultSet.length != 1) {
-      throw new Error('INSERT Topic resultSet must contain exactly 1 row');
+      throw new GraphQLError(
+        'INSERT Topic resultSet must contain exactly 1 row'
+      );
     }
 
     return createTopicObject(resultSet[0]);
@@ -564,7 +567,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
     const question = await this.getQuestion(questionId);
     if (!question) {
-      throw new Error('Could not update field');
+      throw new GraphQLError('Could not update field');
     }
 
     return question;
@@ -605,7 +608,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     }
     const returnValue = await this.getTemplate(templateId);
     if (!returnValue) {
-      throw new Error('Could not get template');
+      throw new GraphQLError('Could not get template');
     }
 
     return returnValue;
@@ -645,12 +648,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     if (result?.rows?.length) {
       const returnValue = await this.getTemplate(dataToUpsert[0].template_id);
       if (!returnValue) {
-        throw new Error('Could not get template');
+        throw new GraphQLError('Could not get template');
       }
 
       return returnValue;
     } else {
-      throw new Error('Something went wrong');
+      throw new GraphQLError('Something went wrong');
     }
   }
 
@@ -689,7 +692,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .from('questions');
 
     if (!resultSet || resultSet.length != 1) {
-      throw new Error('INSERT field resultSet must contain exactly 1 row');
+      throw new GraphQLError(
+        'INSERT field resultSet must contain exactly 1 row'
+      );
     }
 
     return createQuestionObject(resultSet[0]);
@@ -720,7 +725,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .merge();
 
     if (!resultSet || resultSet.length != 1) {
-      throw new Error('Failure to upsert question');
+      throw new GraphQLError('Failure to upsert question');
     }
 
     return createQuestionObject(resultSet[0]);
@@ -855,7 +860,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .del();
     if (!questionRecord) {
       logger.logError('Could not delete question', { fieldId: questionId });
-      throw new Error(`Could not delete question ${questionId}`);
+      throw new GraphQLError(`Could not delete question ${questionId}`);
     }
 
     return createQuestionObject(questionRecord);
@@ -872,13 +877,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .del();
 
     if (rowsAffected !== 1) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not delete questionId ${args.questionId} in templateId:${args.templateId}`
       );
     }
     const returnValue = await this.getTemplate(args.templateId);
     if (!returnValue) {
-      throw new Error('Could not find template');
+      throw new GraphQLError('Could not find template');
     }
 
     return returnValue;
@@ -890,7 +895,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .del(['*']);
 
     if (!topicRecord) {
-      throw new Error(`Could not delete topic ${topicId}`);
+      throw new GraphQLError(`Could not delete topic ${topicId}`);
     }
 
     return createTopicObject(topicRecord);
@@ -912,7 +917,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         { templateId }
       );
 
-      throw new Error('Could not clone template');
+      throw new GraphQLError('Could not clone template');
     }
     const newTemplate = await this.createTemplate({
       groupId: sourceTemplate.groupId,
@@ -1151,9 +1156,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           case ConflictResolutionStrategy.USE_EXISTING:
             break;
           case ConflictResolutionStrategy.UNRESOLVED:
-            throw new Error('No conflict resolution strategy provided');
+            throw new GraphQLError('No conflict resolution strategy provided');
           default:
-            throw new Error('Unknown conflict resolution strategy');
+            throw new GraphQLError('Unknown conflict resolution strategy');
         }
       })
     );

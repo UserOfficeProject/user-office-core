@@ -5,6 +5,7 @@ import {
   ValidTokenSet,
   ValidUserInfo,
 } from '@user-office-software/openid';
+import { GraphQLError } from 'graphql';
 import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';
 
@@ -30,7 +31,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     if (OpenIdClient.hasConfig()) {
       this.initialize();
     } else {
-      throw new Error(
+      throw new GraphQLError(
         'OpenIdClient has no configuration. Please check your environment variables!'
       );
     }
@@ -185,7 +186,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         authorizer: this.constructor.name,
         user,
       });
-      throw new Error('Invalid user');
+      throw new GraphQLError('Invalid user');
     }
 
     return user as ValidUser;
