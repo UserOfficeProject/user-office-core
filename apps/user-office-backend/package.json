@@ -18,7 +18,7 @@
     "tsc": "tsc",
     "build": "rm -rf ./build && tsc",
     "dev": "docker-compose up -d && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
-    "dev:e2e": "docker-compose -f docker-compose.e2e.yml up -d && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
+    "dev:e2e": "docker-compose -f docker-compose.e2e.yml up -d && wait-on postgres://duouser:duopassword@127.0.0.1:5432/duo && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:e2e:stfc": "docker-compose -f docker-compose-stfc.e2e.yml up -d && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:docker": "npm install && ts-node-dev --inspect=0.0.0.0:9229 --respawn -T ./index.ts",
     "prod": "tsc && node ./build/index.js",
