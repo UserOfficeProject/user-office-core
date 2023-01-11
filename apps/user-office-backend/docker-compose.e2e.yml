@@ -9,7 +9,6 @@ services:
 
   db:
     image: postgres:11-alpine
-    build: .
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
