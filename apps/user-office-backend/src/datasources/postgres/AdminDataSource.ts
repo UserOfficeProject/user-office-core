@@ -378,6 +378,18 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
+  async createSetting(setting: Settings): Promise<Settings> {
+    return database
+      .insert({
+        settings_id: setting.id,
+        settings_value: setting.settingsValue,
+        description: setting.description,
+      })
+      .into('settings')
+      .returning('*')
+      .then((settings: SettingsRecord[]) => createSettingsObject(settings[0]));
+  }
+
   async getSettings(): Promise<Settings[]> {
     return database
       .select()
@@ -387,13 +399,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
-  async getSetting(id: SettingsId): Promise<Settings> {
+  async getSetting(id: SettingsId): Promise<Settings | null> {
     return database
       .select()
       .from('settings')
-      .where('setting_id', id)
+      .where('settings_id', id)
       .first()
-      .then((setting: SettingsRecord) => createSettingsObject(setting));
+      .then((setting: SettingsRecord) =>
+        setting ? createSettingsObject(setting) : null
+      );
   }
 
   async getTokenAndPermissionsById(
@@ -493,6 +507,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     updatedSettingsInput: UpdateSettingsInput
   ): Promise<Settings> {
     const { settingsId, description, settingsValue } = updatedSettingsInput;
+
+    const setting = await this.getSetting(settingsId);
+    if (!setting) {
+      await this.createSetting({
+        id: settingsId as SettingsId,
+        settingsValue: '',
+        description: '',
+      });
+    }
 
     return database('settings')
       .update({ settings_value: settingsValue, description: description })
