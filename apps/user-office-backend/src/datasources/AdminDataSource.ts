@@ -34,7 +34,7 @@ export interface AdminDataSource {
   setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
   updateFeatures(updatedFeaturesInput: UpdateFeaturesInput): Promise<Feature[]>;
   getSettings(): Promise<Settings[]>;
-  getSetting(id: SettingsId): Promise<Settings>;
+  getSetting(id: SettingsId): Promise<Settings | null>;
   createApiAccessToken(
     args: CreateApiAccessTokenInput,
     accessTokenId: string,
