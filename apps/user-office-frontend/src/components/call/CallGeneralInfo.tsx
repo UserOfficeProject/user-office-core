@@ -1,4 +1,6 @@
 import HelpIcon from '@mui/icons-material/Help';
+import LaunchIcon from '@mui/icons-material/Launch';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
@@ -7,8 +9,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  FormControl,
   IconButton,
   InputAdornment,
+  Link,
   Paper,
   Table,
   TableBody,
@@ -20,7 +24,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles, makeStyles } from '@mui/styles';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
 import { DateTimePicker } from 'formik-mui-lab';
@@ -39,7 +43,25 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
+type AdornmentIconProps = {
+  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+};
+
+const useStyles = makeStyles((theme) => ({
+  iconVerticalAlign: {
+    verticalAlign: 'middle',
+    marginLeft: theme.spacing(0.5),
+  },
+  textRightAlign: {
+    marginLeft: 'auto',
+    marginRight: 0,
+  },
+}));
 const CallGeneralInfo: React.FC<{
+  reloadTemplates: () => void;
+  reloadEsi: () => void;
+  reloadPdfTemplates: () => void;
+  reloadProposalWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
@@ -53,6 +75,10 @@ const CallGeneralInfo: React.FC<{
   esiTemplates,
   pdfTemplates,
   loadingTemplates,
+  reloadTemplates,
+  reloadEsi,
+  reloadPdfTemplates,
+  reloadProposalWorkflows,
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
@@ -62,6 +88,7 @@ const CallGeneralInfo: React.FC<{
   });
 
   const theme = useTheme();
+  const classes = useStyles();
 
   const templateOptions =
     templates?.map((template) => ({
@@ -99,7 +126,8 @@ const CallGeneralInfo: React.FC<{
   >();
 
   const { values, setValues } = formik;
-  const { startCall, endCall, proposalWorkflowId } = values;
+  const { startCall, endCall, proposalWorkflowId, templateId, esiTemplateId } =
+    values;
 
   useEffect(() => {
     const selectedProposalWorkFlow = proposalWorkflows.find(
@@ -178,6 +206,19 @@ const CallGeneralInfo: React.FC<{
       },
     })
   )(TableRow);
+
+  const AdornmentIcon = (props: AdornmentIconProps) => {
+    return (
+      <IconButton
+        edge="end"
+        title="Refresh"
+        aria-label="Refresh the list"
+        onClick={props.onClick}
+      >
+        <RefreshIcon fontSize="small" />
+      </IconButton>
+    );
+  };
 
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
@@ -321,26 +362,56 @@ const CallGeneralInfo: React.FC<{
           data-cy="reference-number-format"
         />
       </LocalizationProvider>
-
-      <FormikUIAutocomplete
-        name="templateId"
-        label="Call template"
-        loading={loadingTemplates}
-        noOptionsText="No templates"
-        items={templateOptions}
-        InputProps={{ 'data-cy': 'call-template' }}
-        required
-      />
-      {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+      <FormControl fullWidth>
         <FormikUIAutocomplete
-          name="esiTemplateId"
-          label="ESI template"
+          name="templateId"
+          label="Call template"
           loading={loadingTemplates}
           noOptionsText="No templates"
-          items={esiTemplateOptions}
-          InputProps={{ 'data-cy': 'call-esi-template' }}
+          items={templateOptions}
+          InputProps={{ 'data-cy': 'call-template' }}
+          AdornmentIcon={<AdornmentIcon onClick={reloadTemplates} />}
           required
         />
+        <Link
+          href={
+            templateId ? `QuestionaryEditor/${templateId}` : 'ProposalTemplates'
+          }
+          target="_blank"
+          className={classes.textRightAlign}
+        >
+          Edit selected template
+          <LaunchIcon fontSize="small" className={classes.iconVerticalAlign} />
+        </Link>
+      </FormControl>
+      {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+        <FormControl fullWidth>
+          <FormikUIAutocomplete
+            name="esiTemplateId"
+            label="ESI template"
+            loading={loadingTemplates}
+            noOptionsText="No templates"
+            items={esiTemplateOptions}
+            InputProps={{ 'data-cy': 'call-esi-template' }}
+            AdornmentIcon={<AdornmentIcon onClick={reloadEsi} />}
+            required
+          />
+          <Link
+            href={
+              esiTemplateId
+                ? `QuestionaryEditor/${esiTemplateId}`
+                : 'EsiTemplates'
+            }
+            target="_blank"
+            className={classes.textRightAlign}
+          >
+            Edit selected template
+            <LaunchIcon
+              fontSize="small"
+              className={classes.iconVerticalAlign}
+            />
+          </Link>
+        </FormControl>
       )}
       <FormikUIAutocomplete
         name="pdfTemplateId"
@@ -349,6 +420,7 @@ const CallGeneralInfo: React.FC<{
         noOptionsText="No templates"
         items={pdfTemplateOptions}
         InputProps={{ 'data-cy': 'call-pdf-template' }}
+        AdornmentIcon={<AdornmentIcon onClick={reloadPdfTemplates} />}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -359,6 +431,7 @@ const CallGeneralInfo: React.FC<{
         InputProps={{
           'data-cy': 'call-workflow',
         }}
+        AdornmentIcon={<AdornmentIcon onClick={reloadProposalWorkflows} />}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
