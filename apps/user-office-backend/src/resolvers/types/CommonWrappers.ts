@@ -5,10 +5,7 @@ import { Page } from './Admin';
 import { Answer } from './Answer';
 import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
-import { Feedback } from './Feedback';
 import { FeedbackRequest } from './FeedbackRequest';
-import { GenericTemplate } from './GenericTemplate';
-import { Instrument } from './Instrument';
 import { PdfTemplate } from './PdfTemplate';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { PredefinedMessage } from './PredefinedMessage';
@@ -86,13 +83,6 @@ export class SepMeetingDecisionResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SepMeetingDecision, { nullable: true })
   public sepMeetingDecision: SepMeetingDecision;
-}
-
-@ObjectType()
-export class InstrumentResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => Instrument, { nullable: true })
-  public instrument: Instrument;
 }
 
 @ObjectType()
@@ -316,20 +306,6 @@ export class SampleEsiResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SampleExperimentSafetyInput, { nullable: true })
   public esi?: SampleExperimentSafetyInput;
-}
-
-@ObjectType()
-export class GenericTemplateResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => GenericTemplate, { nullable: true })
-  public genericTemplate: GenericTemplate;
-}
-
-@ObjectType()
-export class FeedbackResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => Feedback, { nullable: true })
-  public feedback: Feedback;
 }
 
 @ObjectType()

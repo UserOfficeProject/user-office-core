@@ -971,7 +971,7 @@ context('SEP meeting components tests', () => {
       reviewerId: 0,
     });
     cy.createInstrument(instrument).then((result) => {
-      const createdInstrument = result.createInstrument.instrument;
+      const createdInstrument = result.createInstrument;
       if (createdInstrument) {
         createdInstrumentId = createdInstrument.id;
 
@@ -1064,7 +1064,7 @@ context('SEP meeting components tests', () => {
 
     it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
       cy.createInstrument(instrument).then((result) => {
-        const createdInstrument2Id = result.createInstrument.instrument?.id;
+        const createdInstrument2Id = result.createInstrument.id;
         if (createdInstrument2Id) {
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,

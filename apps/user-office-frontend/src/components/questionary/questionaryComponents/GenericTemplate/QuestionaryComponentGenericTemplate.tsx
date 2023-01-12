@@ -106,8 +106,7 @@ function QuestionaryComponentGenericTemplate(
           api()
             .cloneGenericTemplate({ genericTemplateId: id, title: title })
             .then((response) => {
-              const clonedGenericTemplate =
-                response.cloneGenericTemplate.genericTemplate;
+              const clonedGenericTemplate = response.cloneGenericTemplate;
               if (clonedGenericTemplate) {
                 const newStateItems = [...field.value, clonedGenericTemplate];
 
@@ -118,14 +117,12 @@ function QuestionaryComponentGenericTemplate(
         const deleteGenericTemplate = (id: number) =>
           api()
             .deleteGenericTemplate({ genericTemplateId: id })
-            .then((response) => {
-              if (!response.deleteGenericTemplate.rejection) {
-                const newStateItems = field.value.filter(
-                  (genericTemplate) => genericTemplate.id !== id
-                );
+            .then(() => {
+              const newStateItems = field.value.filter(
+                (genericTemplate) => genericTemplate.id !== id
+              );
 
-                updateFieldValueAndState(newStateItems);
-              }
+              updateFieldValueAndState(newStateItems);
             });
 
         return (

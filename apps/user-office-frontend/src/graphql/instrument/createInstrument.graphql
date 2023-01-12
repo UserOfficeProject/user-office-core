@@ -10,11 +10,6 @@ mutation createInstrument(
     description: $description
     managerUserId: $managerUserId
   ) {
-    instrument {
-      ...instrument
-    }
-    rejection {
-      ...rejection
-    }
+    ...instrument
   }
 }

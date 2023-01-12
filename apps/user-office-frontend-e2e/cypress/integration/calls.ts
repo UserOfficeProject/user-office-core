@@ -700,8 +700,8 @@ context('Calls tests', () => {
         ],
       });
       cy.createInstrument(instrumentAssignedToCall).then((response) => {
-        if (response.createInstrument.instrument) {
-          createdInstrumentId = response.createInstrument.instrument.id;
+        if (response.createInstrument) {
+          createdInstrumentId = response.createInstrument.id;
         }
       });
       cy.visit('/');

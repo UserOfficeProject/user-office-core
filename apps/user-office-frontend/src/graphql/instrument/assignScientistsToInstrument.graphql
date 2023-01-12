@@ -5,10 +5,5 @@ mutation assignScientistsToInstrument(
   assignScientistsToInstrument(
     scientistIds: $scientistIds
     instrumentId: $instrumentId
-  ) {
-    rejection {
-      ...rejection
-    }
-    isSuccess
-  }
+  )
 }

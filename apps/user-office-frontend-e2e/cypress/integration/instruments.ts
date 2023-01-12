@@ -171,8 +171,8 @@ context('Instrument tests', () => {
       });
 
       cy.createInstrument(instrument1).then((result) => {
-        if (result.createInstrument.instrument) {
-          createdInstrumentId = result.createInstrument.instrument.id;
+        if (result.createInstrument) {
+          createdInstrumentId = result.createInstrument.id;
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
@@ -546,8 +546,8 @@ context('Instrument tests', () => {
       });
 
       cy.createInstrument(instrument1).then((result) => {
-        if (result.createInstrument.instrument) {
-          createdInstrumentId = result.createInstrument.instrument.id;
+        if (result.createInstrument) {
+          createdInstrumentId = result.createInstrument.id;
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
@@ -561,8 +561,8 @@ context('Instrument tests', () => {
         }
       });
       cy.createInstrument(instrument2).then((result) => {
-        if (result.createInstrument.instrument) {
-          const createdInstrument2Id = result.createInstrument.instrument.id;
+        if (result.createInstrument) {
+          const createdInstrument2Id = result.createInstrument.id;
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,

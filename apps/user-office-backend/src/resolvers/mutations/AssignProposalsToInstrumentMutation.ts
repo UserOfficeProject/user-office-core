@@ -9,9 +9,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { isRejection } from '../../models/Rejection';
-import { SuccessResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
 import { ProposalPkWithCallId } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
@@ -31,33 +28,27 @@ export class RemoveProposalsFromInstrumentArgs {
 
 @Resolver()
 export class AssignProposalsToInstrumentMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async assignProposalsToInstrument(
     @Args() args: AssignProposalsToInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.instrument.assignProposalsToInstrument(
+    await context.mutations.instrument.assignProposalsToInstrument(
       context.user,
       args
     );
 
-    return wrapResponse(
-      isRejection(res) ? Promise.resolve(res) : Promise.resolve(true),
-      SuccessResponseWrap
-    );
+    return true;
   }
 
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async removeProposalsFromInstrument(
     @Args() args: RemoveProposalsFromInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.instrument.removeProposalsFromInstrument(
-        context.user,
-        args
-      ),
-      SuccessResponseWrap
+    return context.mutations.instrument.removeProposalsFromInstrument(
+      context.user,
+      args
     );
   }
 }

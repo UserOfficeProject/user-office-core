@@ -507,7 +507,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     instrument: InstrumentFragment | null
   ): Promise<void> => {
     if (instrument) {
-      const result = await api({
+      await api({
         toastSuccessMessage:
           'Proposal/s assigned to the selected instrument successfully!',
       }).assignProposalsToInstrument({
@@ -517,14 +517,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })),
         instrumentId: instrument.id,
       });
-      const isError = !!result.assignProposalsToInstrument.rejection;
 
-      if (!isError) {
-        // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
-        setTimeout(fetchProposalsData, 500);
-      }
+      // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
+      setTimeout(fetchProposalsData, 500);
     } else {
-      const result = await api({
+      await api({
         toastSuccessMessage:
           'Proposal/s removed from the instrument successfully!',
       }).removeProposalsFromInstrument({
@@ -533,25 +530,21 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         ),
       });
 
-      const isError = !!result.removeProposalsFromInstrument.rejection;
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => {
+          if (
+            selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === prop.primaryKey
+            )
+          ) {
+            prop.instrumentName = null;
+            prop.instrumentId = null;
+          }
 
-      if (!isError) {
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.instrumentName = null;
-              prop.instrumentId = null;
-            }
-
-            return prop;
-          })
-        );
-      }
+          return prop;
+        })
+      );
     }
   };
 

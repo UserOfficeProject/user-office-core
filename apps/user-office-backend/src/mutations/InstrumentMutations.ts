@@ -210,7 +210,7 @@ export default class InstrumentMutations {
 
   @ValidateArgs(assignScientistsToInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async assignScientsitsToInstrument(
+  async assignScientistsToInstrument(
     agent: UserWithRole | null,
     args: AssignScientistsToInstrumentArgs
   ): Promise<boolean | Rejection> {
