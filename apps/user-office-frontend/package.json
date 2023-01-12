@@ -40,7 +40,7 @@
     "html-react-parser": "^1.4.12",
     "immer": "^9.0.7",
     "jwt-decode": "^3.1.2",
-    "luxon": "^2.3.2",
+    "luxon": "^2.5.2",
     "mime": "^3.0.0",
     "notistack": "^2.0.4",
     "query-string": "^6.14.0",
