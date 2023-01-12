@@ -33,12 +33,10 @@ export class AssignProposalsToInstrumentMutation {
     @Args() args: AssignProposalsToInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    await context.mutations.instrument.assignProposalsToInstrument(
+    return context.mutations.instrument.assignProposalsToInstrument(
       context.user,
       args
     );
-
-    return true;
   }
 
   @Mutation(() => Boolean)

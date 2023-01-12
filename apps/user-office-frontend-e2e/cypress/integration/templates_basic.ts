@@ -1046,7 +1046,7 @@ context('Template tests', () => {
 
     it('User officer can add multiple choice question as a dependency', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1391,7 +1391,7 @@ context('Template tests', () => {
         faker.date.past()
       ).toFormat(initialDBData.getFormats().dateTimeFormat);
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1606,7 +1606,7 @@ context('Template tests', () => {
 
     it('User officer can add multiple dependencies on a question', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1703,7 +1703,7 @@ context('Template tests', () => {
 
     it('User officer can change dependency logic operator', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1800,7 +1800,7 @@ context('Template tests', () => {
     it('User can add captions after uploading image/* file', () => {
       const fileName = 'file_upload_test2.png'; // need to use another file due to bug in cypress, which do not allow the same fixture to be reused
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,

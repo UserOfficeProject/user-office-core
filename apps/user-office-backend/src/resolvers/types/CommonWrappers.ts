@@ -7,9 +7,6 @@ import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { FeedbackRequest } from './FeedbackRequest';
 import { PdfTemplate } from './PdfTemplate';
-import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
-import { PredefinedMessage } from './PredefinedMessage';
-import { Proposal } from './Proposal';
 import { ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
 import { ProposalWorkflowConnection } from './ProposalWorkflowConnection';
@@ -55,13 +52,6 @@ export class UserResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => User, { nullable: true })
   public user: User;
-}
-
-@ObjectType()
-export class PredefinedMessageResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => PredefinedMessage, { nullable: true })
-  public predefinedMessage: PredefinedMessage;
 }
 
 @ObjectType()
@@ -134,13 +124,6 @@ export class QuestionaryStepResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class ProposalResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => Proposal, { nullable: true })
-  public proposal: Proposal;
-}
-
-@ObjectType()
 export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => QuestionTemplateRelation, { nullable: true })
@@ -204,13 +187,6 @@ export class ExternalTokenLoginWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class PrepareDBResponseWrap {
-  @Response()
-  @Field(() => String, { nullable: true })
-  public log: string;
-}
-
-@ObjectType()
 export class AnswerResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Answer, { nullable: true })
@@ -271,20 +247,6 @@ export class SEPProposalResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SEPProposal, { nullable: true })
   public sepProposal: SEPProposal;
-}
-
-@ObjectType()
-export class ApiAccessTokenResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => PermissionsWithAccessToken, { nullable: true })
-  public apiAccessToken: PermissionsWithAccessToken;
-}
-
-@ObjectType()
-export class ProposalsResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => [Proposal], { nullable: true })
-  public proposals: Proposal[];
 }
 
 @ObjectType()

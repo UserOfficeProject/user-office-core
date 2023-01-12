@@ -155,26 +155,26 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             confirm(
               async () => {
                 setIsSubmitting(true);
-                const result = await api({
-                  toastSuccessMessage:
-                    'Your proposal has been submitted successfully. You will receive a confirmation email soon.',
-                }).submitProposal({
-                  proposalPk: state.proposal.primaryKey,
-                });
-                if (!result.submitProposal.proposal) {
-                  setIsSubmitting(false);
+                try {
+                  const { submitProposal } = await api({
+                    toastSuccessMessage:
+                      'Your proposal has been submitted successfully. You will receive a confirmation email soon.',
+                  }).submitProposal({
+                    proposalPk: state.proposal.primaryKey,
+                  });
 
-                  return;
+                  dispatch({
+                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                    itemWithQuestionary: submitProposal,
+                  });
+                  dispatch({
+                    type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                    itemWithQuestionary: submitProposal,
+                  });
+                  setIsSubmitting(false);
+                } catch (error) {
+                  setIsSubmitting(false);
                 }
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: result.submitProposal.proposal,
-                });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: result.submitProposal.proposal,
-                });
-                setIsSubmitting(false);
               },
               {
                 title: 'Please confirm',

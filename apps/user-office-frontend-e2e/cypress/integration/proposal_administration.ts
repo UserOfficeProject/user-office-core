@@ -25,9 +25,9 @@ context('Proposal administration tests', () => {
   describe('Proposal administration advanced search filter tests', () => {
     beforeEach(() => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalName1,
             abstract: proposalName1,
@@ -39,7 +39,7 @@ context('Proposal administration tests', () => {
             isPartialSave: false,
           });
           cy.submitProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
           });
         }
       });
@@ -245,9 +245,9 @@ context('Proposal administration tests', () => {
 
     it('Download proposal is working with dialog window showing up', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalFixedName,
             abstract: proposalName2,
@@ -328,9 +328,9 @@ context('Proposal administration tests', () => {
 
     it('Should be able to save table sort state in url', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalFixedName,
             abstract: proposalName2,
@@ -396,9 +396,9 @@ context('Proposal administration tests', () => {
 
     it('Should preserve the ordering when row is selected', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalFixedName,
             abstract: proposalName2,
             proposerId: existingUserId,

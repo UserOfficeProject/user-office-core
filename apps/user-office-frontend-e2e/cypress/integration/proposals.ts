@@ -107,11 +107,11 @@ context('Proposal tests', () => {
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
 
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: newProposalTitle,
             abstract: newProposalAbstract,
             proposerId: proposer.id,
@@ -268,9 +268,9 @@ context('Proposal tests', () => {
 
       for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
         cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-          if (result.createProposal.proposal) {
+          if (result.createProposal) {
             cy.updateProposal({
-              proposalPk: result.createProposal.proposal.primaryKey,
+              proposalPk: result.createProposal.primaryKey,
               title: newProposalTitle + index,
               abstract: newProposalAbstract + index,
               proposerId: proposer.id,

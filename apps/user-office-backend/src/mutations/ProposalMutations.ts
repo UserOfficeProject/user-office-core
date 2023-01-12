@@ -20,12 +20,12 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, ProposalEndStatus, ProposalPks } from '../models/Proposal';
+import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
-import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
+import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
@@ -437,7 +437,7 @@ export default class ProposalMutations {
   async changeProposalsStatus(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
-  ): Promise<ProposalPks | Rejection> {
+  ): Promise<boolean | Rejection> {
     const { statusId, proposals } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(
@@ -455,9 +455,11 @@ export default class ProposalMutations {
           );
         })
       );
+
+      return true;
     }
 
-    return result || rejection('Can not change proposal status', { result });
+    return rejection('Can not change proposal status', { result });
   }
 
   @Authorized()

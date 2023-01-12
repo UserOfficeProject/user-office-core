@@ -407,14 +407,14 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle[1],
             abstract: faker.lorem.words(3),
           });
           cy.createGenericTemplate({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: genericTemplateTitle,
             templateId: createdGenericTemplateId,
             questionId: createdQuestion1Id,
@@ -536,14 +536,14 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle[1],
             abstract: faker.lorem.words(3),
           });
           cy.createGenericTemplate({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: genericTemplateTitle,
             templateId: createdGenericTemplateId,
             questionId: createdQuestion1Id,

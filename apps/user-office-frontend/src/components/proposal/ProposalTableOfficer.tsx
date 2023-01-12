@@ -413,17 +413,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
   const emailProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
-      const {
-        notifyProposal: { rejection },
-      } = await api({
+      await api({
         toastSuccessMessage: 'Notification sent successfully',
       }).notifyProposal({
         proposalPk: proposal.primaryKey,
       });
-
-      if (rejection) {
-        return;
-      }
 
       setProposalsData((proposalsData) =>
         proposalsData.map((prop) => ({
@@ -436,13 +430,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const deleteProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
-      const {
-        deleteProposal: { rejection },
-      } = await api().deleteProposal({ proposalPk: proposal.primaryKey });
-
-      if (rejection) {
-        return;
-      }
+      await api().deleteProposal({ proposalPk: proposal.primaryKey });
 
       setProposalsData((proposalsData) =>
         proposalsData.filter(
@@ -557,16 +545,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       (selectedProposal) => selectedProposal.primaryKey
     );
 
-    const result = await api({
+    const { cloneProposals } = await api({
       toastSuccessMessage: 'Proposal/s cloned successfully',
     }).cloneProposals({
       callId: call.id,
       proposalsToClonePk,
     });
-    const resultProposals = result.cloneProposals.proposals;
 
-    if (!result.cloneProposals.rejection && proposalsData && resultProposals) {
-      const newClonedProposals = resultProposals.map((resultProposal) =>
+    if (proposalsData && cloneProposals) {
+      const newClonedProposals = cloneProposals.map((resultProposal) =>
         fromProposalToProposalView(resultProposal as Proposal)
       );
 
@@ -579,7 +566,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const changeStatusOnProposals = async (status: ProposalStatus) => {
     if (status?.id && selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
-      const result = await api({
+      await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
       }).changeProposalsStatus({
         proposals: selectedProposals.map((selectedProposal) => ({
@@ -588,33 +575,28 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })),
         statusId: status.id,
       });
+      const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
 
-      const isError = !!result.changeProposalsStatus.rejection;
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => {
+          if (
+            selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === prop.primaryKey
+            )
+          ) {
+            prop.statusId = status.id;
+            prop.statusName = status.name;
+            prop.statusDescription = status.description;
 
-      if (!isError) {
-        const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
-
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.statusId = status.id;
-              prop.statusName = status.name;
-              prop.statusDescription = status.description;
-
-              if (shouldChangeSubmittedValue) {
-                prop.submitted = false;
-              }
+            if (shouldChangeSubmittedValue) {
+              prop.submitted = false;
             }
+          }
 
-            return prop;
-          })
-        );
-      }
+          return prop;
+        })
+      );
     }
   };
 

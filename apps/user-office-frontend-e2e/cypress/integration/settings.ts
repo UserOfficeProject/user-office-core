@@ -308,9 +308,9 @@ context('Settings tests', () => {
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle,
             abstract: proposalTitle,
             proposerId: initialDBData.users.user1.id,
@@ -399,9 +399,9 @@ context('Settings tests', () => {
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle,
             abstract: proposalTitle,
             proposerId: initialDBData.users.user1.id,
@@ -586,7 +586,7 @@ context('Settings tests', () => {
       const publicComment = faker.random.words(2);
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal.proposal;
+        const proposal = result.createProposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
@@ -678,7 +678,7 @@ context('Settings tests', () => {
     it('Proposal status should update immediately after assigning it to a SEP', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal.proposal;
+        const proposal = result.createProposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
@@ -729,7 +729,7 @@ context('Settings tests', () => {
       }
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal.proposal;
+        const proposal = result.createProposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
@@ -829,7 +829,7 @@ context('Settings tests', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal.proposal;
+        const proposal = result.createProposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
@@ -980,7 +980,7 @@ context('Settings tests', () => {
       const publicComment = faker.random.words(2);
       addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal.proposal;
+        const proposal = result.createProposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
@@ -992,7 +992,7 @@ context('Settings tests', () => {
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal.proposal;
+        const proposal = result.createProposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,

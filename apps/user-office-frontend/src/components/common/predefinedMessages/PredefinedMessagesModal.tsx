@@ -86,41 +86,34 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
     title: string;
     message: string;
   }) => {
-    const response = await api({
+    await api({
       toastSuccessMessage: 'Message changes saved successfully',
     }).updatePredefinedMessage({
       input: { ...values, key: messageKey || PredefinedMessageKey.GENERAL },
     });
 
-    if (!response.updatePredefinedMessage.rejection) {
-      const newMessages = predefinedMessages.map((message) => ({
-        ...message,
-        title: message.id === values.id ? values.title : message.title,
-        message: message.id === values.id ? values.message : message.message,
-      }));
+    const newMessages = predefinedMessages.map((message) => ({
+      ...message,
+      title: message.id === values.id ? values.title : message.title,
+      message: message.id === values.id ? values.message : message.message,
+    }));
 
-      setPredefinedMessages(newMessages);
-    }
+    setPredefinedMessages(newMessages);
   };
 
   const createPredefinedMessage = async (values: {
     title: string;
     message: string;
   }) => {
-    const response = await api({
+    const { createPredefinedMessage } = await api({
       toastSuccessMessage: 'Message created successfully',
     }).createPredefinedMessage({
       input: { ...values, key: messageKey || PredefinedMessageKey.GENERAL },
     });
 
-    if (response.createPredefinedMessage.predefinedMessage) {
-      const newMessages = [
-        ...predefinedMessages,
-        response.createPredefinedMessage.predefinedMessage,
-      ];
+    const newMessages = [...predefinedMessages, createPredefinedMessage];
 
-      setPredefinedMessages(newMessages);
-    }
+    setPredefinedMessages(newMessages);
   };
 
   const handlePredefinedMessageSelectionChange = (
@@ -167,24 +160,22 @@ const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
           return;
         }
 
-        const response = await api({
+        await api({
           toastSuccessMessage: 'Message deleted successfully',
         }).deletePredefinedMessage({
           input: { id: initialValues.predefinedMessageId },
         });
 
-        if (response.deletePredefinedMessage.predefinedMessage) {
-          const newPredefinedMessagesArray = predefinedMessages.filter(
-            (predefinedMessage) =>
-              predefinedMessage.id !== initialValues.predefinedMessageId
-          );
-          setPredefinedMessages(newPredefinedMessagesArray);
-          setInitialValues({
-            predefinedMessageId: null,
-            title: '',
-            message: '',
-          });
-        }
+        const newPredefinedMessagesArray = predefinedMessages.filter(
+          (predefinedMessage) =>
+            predefinedMessage.id !== initialValues.predefinedMessageId
+        );
+        setPredefinedMessages(newPredefinedMessagesArray);
+        setInitialValues({
+          predefinedMessageId: null,
+          title: '',
+          message: '',
+        });
       },
       {
         title: 'Please confirm',

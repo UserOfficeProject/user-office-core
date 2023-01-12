@@ -181,8 +181,8 @@ context('Instrument tests', () => {
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
 
           cy.updateProposal({
             proposalPk: createdProposalPk,
@@ -576,9 +576,9 @@ context('Instrument tests', () => {
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
-          createdProposalId = result.createProposal.proposal.proposalId;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId = result.createProposal.proposalId;
 
           cy.updateProposal({
             proposalPk: createdProposalPk,
@@ -663,8 +663,8 @@ context('Instrument tests', () => {
 
     it('Instrument scientists should be able to filter only their own proposals', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
 
           cy.updateProposal({
             proposalPk: createdProposalPk,
@@ -710,8 +710,8 @@ context('Instrument tests', () => {
 
     it('Instrument scientist should be able to download multiple proposals as PDF', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
 
           cy.updateProposal({
             proposalPk: createdProposalPk,
@@ -905,8 +905,8 @@ context('Instrument tests', () => {
 
     it('Technical review assignee should be able to bulk submit technical reviews and see warning if some required info is missing ', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          const createdProposal2Id = result.createProposal.proposal.primaryKey;
+        if (result.createProposal) {
+          const createdProposal2Id = result.createProposal.primaryKey;
 
           cy.updateProposal({
             proposalPk: createdProposal2Id,

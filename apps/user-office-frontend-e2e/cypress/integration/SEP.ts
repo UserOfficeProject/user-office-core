@@ -152,7 +152,7 @@ function initializationBeforeTests() {
     }
   });
   cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-    const createdProposal = result.createProposal.proposal;
+    const createdProposal = result.createProposal;
     if (createdProposal) {
       createdProposalPk = createdProposal.primaryKey;
       createdProposalId = createdProposal.proposalId;
@@ -767,7 +767,7 @@ context('SEP reviews tests', () => {
       });
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           const createdProposal2Pk = createdProposal.primaryKey;
 
@@ -1073,7 +1073,7 @@ context('SEP meeting components tests', () => {
 
           cy.createProposal({ callId: initialDBData.call.id }).then(
             (result) => {
-              const createdProposal = result.createProposal.proposal;
+              const createdProposal = result.createProposal;
               if (createdProposal) {
                 cy.updateProposal({
                   proposalPk: createdProposal.primaryKey,
@@ -1139,7 +1139,7 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to reorder proposal with drag and drop', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1243,7 +1243,7 @@ context('SEP meeting components tests', () => {
 
     it('Proposals in SEP meeting components should be ordered by standard deviation as second order parameter if there is no ranking', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1408,7 +1408,7 @@ context('SEP meeting components tests', () => {
       });
       cy.createProposal({ callId: initialDBData.call.id }).then(
         (proposalResult) => {
-          const createdProposal = proposalResult.createProposal.proposal;
+          const createdProposal = proposalResult.createProposal;
           if (createdProposal) {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
@@ -1762,7 +1762,7 @@ context('SEP meeting components tests', () => {
     it('Officer should be able to bulk download SEP proposals as pdf', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then(
         (proposalResult) => {
-          const createdProposal = proposalResult.createProposal.proposal;
+          const createdProposal = proposalResult.createProposal;
           if (createdProposal) {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,

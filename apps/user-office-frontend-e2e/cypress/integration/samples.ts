@@ -419,9 +419,9 @@ context('Samples tests', () => {
 
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
-          createdProposalId = result.createProposal.proposal.proposalId;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId = result.createProposal.proposalId;
 
           cy.updateProposal({
             proposalPk: createdProposalPk,
