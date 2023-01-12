@@ -166,7 +166,13 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           );
           this.onSessionExpired();
         } else {
-          notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
+          const [graphQLError] = error.response?.errors ?? [];
+
+          notifyAndLog(
+            this.enqueueSnackbar,
+            graphQLError?.message || 'Something went wrong!',
+            error
+          );
         }
 
         throw error;

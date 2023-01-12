@@ -32,8 +32,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .returning('*')
       .then((user: UserRecord[]) => {
-        if (user === undefined || user.length !== 1) {
-          throw new GraphQLError(`Could not delete user with id:${id}`);
+        if (!user?.length) {
+          return null;
         }
 
         return createUserObject(user[0]);
