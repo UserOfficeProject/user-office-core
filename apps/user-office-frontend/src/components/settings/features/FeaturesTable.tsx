@@ -49,21 +49,19 @@ const FeaturesTable: React.FC<{ confirm: WithConfirmType }> = ({ confirm }) => {
       async () => {
         const featureIds = [rowData.id];
 
-        const response = await api({
+        await api({
           toastSuccessMessage: `Feature ${
             shouldEnable ? 'enabled' : 'disabled'
           }`,
         }).updateFeatures({ input: { featureIds, action } });
 
-        if (!response.updateFeatures.rejection) {
-          const newFeatures = features.map((feature) => ({
-            ...feature,
-            isEnabled:
-              feature.id === rowData.id ? shouldEnable : feature.isEnabled,
-          }));
+        const newFeatures = features.map((feature) => ({
+          ...feature,
+          isEnabled:
+            feature.id === rowData.id ? shouldEnable : feature.isEnabled,
+        }));
 
-          setFeatures(newFeatures);
-        }
+        setFeatures(newFeatures);
       },
       {
         title: 'Confirmation',

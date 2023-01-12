@@ -21,7 +21,7 @@ const AppSettingsTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
 
   const handleSettingsUpdate = async (settingsUpdatedData: Settings) => {
-    const response = await api({
+    await api({
       toastSuccessMessage: `Settings updated`,
     }).updateSettings({
       input: {
@@ -31,21 +31,19 @@ const AppSettingsTable: React.FC = () => {
       },
     });
 
-    if (!response.updateSettings.rejection) {
-      const newSettings = settings.map((setting) => ({
-        ...setting,
-        description:
-          settingsUpdatedData.id === setting.id
-            ? settingsUpdatedData.description
-            : setting.description,
-        settingsValue:
-          settingsUpdatedData.id === setting.id
-            ? settingsUpdatedData.settingsValue
-            : setting.settingsValue,
-      }));
+    const newSettings = settings.map((setting) => ({
+      ...setting,
+      description:
+        settingsUpdatedData.id === setting.id
+          ? settingsUpdatedData.description
+          : setting.description,
+      settingsValue:
+        settingsUpdatedData.id === setting.id
+          ? settingsUpdatedData.settingsValue
+          : setting.settingsValue,
+    }));
 
-      setSettings(newSettings);
-    }
+    setSettings(newSettings);
   };
 
   return (

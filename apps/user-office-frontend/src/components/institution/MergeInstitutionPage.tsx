@@ -141,11 +141,8 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
                           newTitle: mergedInstitutionName,
                         })
                         .then((result) => {
-                          const mergedInstitution =
-                            result.mergeInstitutions.institution;
-                          if (!mergedInstitution) {
-                            return;
-                          }
+                          const mergedInstitution = result.mergeInstitutions;
+
                           setInstitutions(
                             institutions
                               .filter(

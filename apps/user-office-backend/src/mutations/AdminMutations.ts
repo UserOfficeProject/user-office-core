@@ -226,7 +226,7 @@ export default class AdminMutations {
   ): Promise<Feature[] | Rejection> {
     const updatedFeatures = await this.dataSource.updateFeatures(args);
 
-    if (!updatedFeatures) {
+    if (!updatedFeatures.length) {
       return rejection('Could not update features', { agent, args });
     }
 

@@ -233,7 +233,7 @@ export class ExternalTokenLoginWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class PrepareDBResponseWrap extends ResponseWrapBase {
+export class PrepareDBResponseWrap {
   @Response()
   @Field(() => String, { nullable: true })
   public log: string;

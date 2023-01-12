@@ -10,14 +10,9 @@ mutation updateApiAccessToken(
       accessPermissions: $accessPermissions
     }
   ) {
-    rejection {
-      ...rejection
-    }
-    apiAccessToken {
-      id
-      name
-      accessToken
-      accessPermissions
-    }
+    id
+    name
+    accessToken
+    accessPermissions
   }
 }

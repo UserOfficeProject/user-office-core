@@ -1,8 +1,7 @@
 import { Arg, Ctx, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SuccessResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+// import { SuccessResponseWrap } from '../types/CommonWrappers';
 
 @InputType()
 export class DeleteApiAccessTokenInput {
@@ -12,18 +11,15 @@ export class DeleteApiAccessTokenInput {
 
 @Resolver()
 export class DeleteApiAccessTokenMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   deleteApiAccessToken(
     @Arg('deleteApiAccessTokenInput')
     deleteApiAccessTokenInput: DeleteApiAccessTokenInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.admin.deleteApiAccessToken(
-        context.user,
-        deleteApiAccessTokenInput
-      ),
-      SuccessResponseWrap
+    return context.mutations.admin.deleteApiAccessToken(
+      context.user,
+      deleteApiAccessTokenInput
     );
   }
 }

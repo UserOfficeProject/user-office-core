@@ -167,36 +167,36 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
         });
 
         if (apiAccessToken) {
-          const data = await api({
-            toastSuccessMessage: 'Api access token updated successfully!',
-          }).updateApiAccessToken({
-            accessTokenId: apiAccessToken.id,
-            name: values.name,
-            accessPermissions: JSON.stringify(accessPermissions),
-          });
-          if (data.updateApiAccessToken.rejection) {
+          try {
+            const { updateApiAccessToken } = await api({
+              toastSuccessMessage: 'Api access token updated successfully!',
+            }).updateApiAccessToken({
+              accessTokenId: apiAccessToken.id,
+              name: values.name,
+              accessPermissions: JSON.stringify(accessPermissions),
+            });
+
+            close(updateApiAccessToken);
+          } catch (error) {
             close(null);
-          } else if (data.updateApiAccessToken.apiAccessToken) {
-            close(data.updateApiAccessToken.apiAccessToken);
           }
         } else {
-          const data = await api({
-            toastSuccessMessage: 'Api access token created successfully!',
-          }).createApiAccessToken({
-            ...values,
-            accessPermissions: JSON.stringify(accessPermissions),
-          });
+          try {
+            const { createApiAccessToken } = await api({
+              toastSuccessMessage: 'Api access token created successfully!',
+            }).createApiAccessToken({
+              ...values,
+              accessPermissions: JSON.stringify(accessPermissions),
+            });
 
-          if (
-            !data.createApiAccessToken.rejection &&
-            data.createApiAccessToken.apiAccessToken
-          ) {
             formikHelpers.setFieldValue(
               'accessToken',
-              `Bearer ${data.createApiAccessToken.apiAccessToken.accessToken}`
+              `Bearer ${createApiAccessToken.accessToken}`
             );
 
-            close(data.createApiAccessToken.apiAccessToken, false);
+            close(createApiAccessToken, false);
+          } catch (error) {
+            close(null);
           }
         }
       }}
