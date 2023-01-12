@@ -634,8 +634,8 @@ context('Proposal tests', () => {
         endCall: tomorrow,
         proposalWorkflowId: createdWorkflowId,
       }).then((response) => {
-        if (response.createCall.call) {
-          createdCallId = response.createCall.call.id;
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
         }
 
         cy.contains('New Proposal').click();
@@ -944,8 +944,8 @@ context('Proposal tests', () => {
         endCallInternal: tomorrow,
         proposalWorkflowId: createdWorkflowId,
       }).then((response) => {
-        if (response.createCall.call) {
-          createdCallId = response.createCall.call.id;
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
         }
 
         cy.contains('New Proposal').click();

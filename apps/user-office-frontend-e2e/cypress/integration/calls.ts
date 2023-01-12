@@ -688,8 +688,8 @@ context('Calls tests', () => {
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
       }).then((response) => {
-        if (response.createCall.call) {
-          createdCallId = response.createCall.call.id;
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
         }
       });
       cy.updateUserRoles({
@@ -902,9 +902,9 @@ context('Calls tests', () => {
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
       }).then((result) => {
-        if (result.createCall.call?.id) {
+        if (result.createCall.id) {
           cy.updateCall({
-            ...result.createCall.call,
+            ...result.createCall,
             isActive: false,
           } as UpdateCallInput);
         }
@@ -952,9 +952,9 @@ context('Calls tests', () => {
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
       }).then((result) => {
-        if (result.createCall.call?.id) {
+        if (result.createCall.id) {
           cy.updateCall({
-            ...result.createCall.call,
+            ...result.createCall,
             isActive: false,
           } as UpdateCallInput);
         }

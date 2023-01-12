@@ -5,13 +5,9 @@ import { Page } from './Admin';
 import { Answer } from './Answer';
 import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
-import { Call } from './Call';
-import { ExperimentSafetyInput } from './ExperimentSafetyInput';
-import { Feature } from './Feature';
 import { Feedback } from './Feedback';
 import { FeedbackRequest } from './FeedbackRequest';
 import { GenericTemplate } from './GenericTemplate';
-import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { PdfTemplate } from './PdfTemplate';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
@@ -32,7 +28,6 @@ import { ScheduledEventCore } from './ScheduledEvent';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
-import { Settings } from './Settings';
 import { Shipment } from './Shipment';
 import { StatusChangingEvent } from './StatusChangingEvent';
 import { TechnicalReview } from './TechnicalReview';
@@ -149,13 +144,6 @@ export class QuestionaryStepResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class CallResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => Call, { nullable: true })
-  public call: Call;
-}
-
-@ObjectType()
 export class ProposalResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Proposal, { nullable: true })
@@ -188,13 +176,6 @@ export class TopicResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
-}
-
-@ObjectType()
-export class InstitutionResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => Institution, { nullable: true })
-  public institution: Institution;
 }
 
 @ObjectType()
@@ -268,20 +249,6 @@ export class ProposalStatusResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class FeaturesResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => [Feature], { nullable: true })
-  public features: Feature[];
-}
-
-@ObjectType()
-export class SettingsResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => Settings, { nullable: true })
-  public settings: Settings;
-}
-
-@ObjectType()
 export class ProposalWorkflowResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ProposalWorkflow, { nullable: true })
@@ -342,13 +309,6 @@ export class VisitRegistrationResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => VisitRegistration, { nullable: true })
   public registration: VisitRegistration;
-}
-
-@ObjectType()
-export class EsiResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => ExperimentSafetyInput, { nullable: true })
-  public esi: ExperimentSafetyInput;
 }
 
 @ObjectType()

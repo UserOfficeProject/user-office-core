@@ -189,8 +189,8 @@ context('visits tests', () => {
   it('Co-proposer should see that risk assessment is completed', () => {
     cy.createEsi({ scheduledEventId: existingScheduledEventId }).then(
       (result) => {
-        if (result.createEsi.esi) {
-          cy.updateEsi({ esiId: result.createEsi.esi.id, isSubmitted: true });
+        if (result.createEsi) {
+          cy.updateEsi({ esiId: result.createEsi.id, isSubmitted: true });
         }
       }
     );

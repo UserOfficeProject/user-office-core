@@ -1,19 +1,18 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { EsiResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { ExperimentSafetyInput } from '../types/ExperimentSafetyInput';
 
 @Resolver()
 export class CreateEsiMutation {
-  @Mutation(() => EsiResponseWrap)
+  @Mutation(() => ExperimentSafetyInput)
   createEsi(
     @Arg('scheduledEventId', () => Int) scheduledEventId: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.proposalEsi.createEsi(context.user, scheduledEventId),
-      EsiResponseWrap
+    return context.mutations.proposalEsi.createEsi(
+      context.user,
+      scheduledEventId
     );
   }
 }
