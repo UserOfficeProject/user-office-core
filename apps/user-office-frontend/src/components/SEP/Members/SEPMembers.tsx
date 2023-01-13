@@ -76,9 +76,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   ): Promise<void> => {
     const [sepChair] = value;
 
-    const {
-      assignChairOrSecretary: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'SEP chair assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
@@ -90,9 +88,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     setOpen(false);
 
-    if (rejection) {
-      return;
-    }
     setSepChairModalOpen(false);
     onSEPUpdate({
       ...sepData,
@@ -109,9 +104,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   ): Promise<void> => {
     const [sepSecretary] = value;
 
-    const {
-      assignChairOrSecretary: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'SEP secretary assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
@@ -122,10 +115,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     });
 
     setOpen(false);
-
-    if (rejection) {
-      return;
-    }
 
     setSepSecretaryModalOpen(false);
     onSEPUpdate({
@@ -139,9 +128,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   };
 
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
-    const {
-      assignReviewersToSEP: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'SEP member assigned successfully!',
     }).assignReviewersToSEP({
       memberIds: users.map((user) => user.id),
@@ -149,10 +136,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     });
 
     setOpen(false);
-
-    if (rejection) {
-      return;
-    }
 
     setSEPReviewersData((sepReviewers) => [
       ...sepReviewers,
@@ -163,19 +146,13 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const removeMember = async (
     user: BasicUserDetailsWithRole
   ): Promise<void> => {
-    const {
-      removeMemberFromSep: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'SEP member removed successfully!',
     }).removeMemberFromSep({
       memberId: user.id,
       sepId: sepData.id,
       roleId: user.roleId,
     });
-
-    if (rejection) {
-      return;
-    }
 
     if (user.roleId === UserRole.SEP_REVIEWER) {
       setSEPReviewersData((sepReviewers) =>

@@ -13,7 +13,7 @@ import {
   TechnicalReview,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
-import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
   ProposalBookingScheduledEventFilterCore,

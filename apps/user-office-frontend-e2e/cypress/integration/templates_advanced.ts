@@ -79,7 +79,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.BOOLEAN,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         boolId = createdQuestion.id;
 
@@ -101,7 +101,7 @@ context('Template tests', () => {
           categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion = questionResult.createQuestion.question;
+          const createdQuestion = questionResult.createQuestion;
           if (createdQuestion) {
             textId = createdQuestion.id;
 
@@ -140,7 +140,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.INTERVAL,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         intervalId = createdQuestion.id;
 
@@ -179,7 +179,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.NUMBER_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         numberId = createdQuestion.id;
 
@@ -219,7 +219,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         multipleChoiceId = createdQuestion.id;
 
@@ -243,7 +243,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         dateId = createdQuestion.id;
 
@@ -267,7 +267,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         timeId = createdQuestion.id;
 
@@ -291,7 +291,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.FILE_UPLOAD,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -313,7 +313,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.RICH_TEXT_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         richTextInputId = createdQuestion.id;
 

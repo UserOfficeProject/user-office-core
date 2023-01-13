@@ -50,25 +50,27 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
         if (proposalStatus) {
-          const data = await api({
-            toastSuccessMessage: 'Proposal status updated successfully',
-          }).updateProposalStatus({
-            id: proposalStatus.id,
-            ...values,
-          });
-          if (data.updateProposalStatus.rejection) {
+          try {
+            const { updateProposalStatus } = await api({
+              toastSuccessMessage: 'Proposal status updated successfully',
+            }).updateProposalStatus({
+              id: proposalStatus.id,
+              ...values,
+            });
+
+            close(updateProposalStatus);
+          } catch (error) {
             close(null);
-          } else if (data.updateProposalStatus.proposalStatus) {
-            close(data.updateProposalStatus.proposalStatus);
           }
         } else {
-          const data = await api({
-            toastSuccessMessage: 'Proposal status created successfully',
-          }).createProposalStatus(values);
-          if (data.createProposalStatus.rejection) {
+          try {
+            const { createProposalStatus } = await api({
+              toastSuccessMessage: 'Proposal status created successfully',
+            }).createProposalStatus(values);
+
+            close(createProposalStatus);
+          } catch (error) {
             close(null);
-          } else if (data.createProposalStatus.proposalStatus) {
-            close(data.createProposalStatus.proposalStatus);
           }
         }
       }}

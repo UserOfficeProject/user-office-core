@@ -1,5 +1,0 @@
-fragment rejection on Rejection {
-  reason
-  context
-  exception
-}

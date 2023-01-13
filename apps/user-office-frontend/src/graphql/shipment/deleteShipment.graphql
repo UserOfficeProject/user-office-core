@@ -1,7 +1,5 @@
 mutation deleteShipment($shipmentId: Int!) {
   deleteShipment(shipmentId: $shipmentId) {
-    rejection {
-      ...rejection
-    }
+    id
   }
 }

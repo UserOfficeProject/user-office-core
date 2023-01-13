@@ -6,7 +6,7 @@ import { VisitRegistration } from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
 import { CreateVisitArgs } from '../../resolvers/mutations/CreateVisitMutation';
 import { UpdateVisitArgs } from '../../resolvers/mutations/UpdateVisitMutation';
-import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistration';
+import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistrationMutation';
 import { VisitDataSource } from '../VisitDataSource';
 import { VisitsFilter } from './../../resolvers/queries/VisitsQuery';
 import database from './database';

@@ -3,10 +3,5 @@ mutation submitTechnicalReviews(
 ) {
   submitTechnicalReviews(
     submitTechnicalReviewsInput: { technicalReviews: $technicalReviews }
-  ) {
-    rejection {
-      ...rejection
-    }
-    isSuccess
-  }
+  )
 }

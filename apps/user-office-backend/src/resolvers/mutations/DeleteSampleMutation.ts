@@ -1,19 +1,15 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SampleResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Sample } from '../types/Sample';
 
 @Resolver()
 export class DeleteSampleMutation {
-  @Mutation(() => SampleResponseWrap)
+  @Mutation(() => Sample)
   deleteSample(
     @Arg('sampleId', () => Int) sampleId: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.sample.deleteSample(context.user, sampleId),
-      SampleResponseWrap
-    );
+    return context.mutations.sample.deleteSample(context.user, sampleId);
   }
 }

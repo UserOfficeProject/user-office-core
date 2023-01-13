@@ -1,8 +1,3 @@
 mutation externalTokenLogin($externalToken: String!, $redirectUri: String!) {
-  externalTokenLogin(externalToken: $externalToken, redirectUri: $redirectUri) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
+  externalTokenLogin(externalToken: $externalToken, redirectUri: $redirectUri)
 }

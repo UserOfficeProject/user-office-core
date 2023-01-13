@@ -24,7 +24,7 @@ import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMut
 import { ProposalPkWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateReviewArgs } from '../resolvers/mutations/UpdateReviewMutation';
-import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 
 @injectable()
 export default class ReviewMutations {

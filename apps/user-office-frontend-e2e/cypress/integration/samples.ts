@@ -35,28 +35,28 @@ context('Samples tests', () => {
       name: sampleTemplateName,
       groupId: TemplateGroupId.SAMPLE,
     }).then((result) => {
-      if (result.createTemplate.template) {
-        createdSampleTemplateId = result.createTemplate.template.templateId;
+      if (result.createTemplate) {
+        createdSampleTemplateId = result.createTemplate.templateId;
         cy.createTopic({
           templateId: createdSampleTemplateId,
           sortOrder: 1,
         }).then((topicResult) => {
-          if (topicResult.createTopic.template) {
+          if (topicResult.createTopic) {
             const topicId =
-              topicResult.createTopic.template.steps[
-                topicResult.createTopic.template.steps.length - 1
+              topicResult.createTopic.steps[
+                topicResult.createTopic.steps.length - 1
               ].topic.id;
             cy.createQuestion({
               dataType: DataType.TEXT_INPUT,
               categoryId: TemplateCategoryId.SAMPLE_DECLARATION,
             }).then((questionResult) => {
-              if (questionResult.createQuestion.question) {
+              if (questionResult.createQuestion) {
                 cy.updateQuestion({
-                  id: questionResult.createQuestion.question.id,
+                  id: questionResult.createQuestion.id,
                   question: sampleQuestion,
                 });
                 cy.createQuestionTemplateRelation({
-                  questionId: questionResult.createQuestion.question.id,
+                  questionId: questionResult.createQuestion.id,
                   sortOrder: 0,
                   templateId: createdSampleTemplateId,
                   topicId: topicId,
@@ -69,24 +69,23 @@ context('Samples tests', () => {
           groupId: TemplateGroupId.PROPOSAL,
           name: proposalTemplateName,
         }).then((result) => {
-          if (result.createTemplate.template) {
-            const templateId = result.createTemplate.template.templateId;
+          if (result.createTemplate) {
+            const templateId = result.createTemplate.templateId;
             cy.createTopic({
               templateId: templateId,
               sortOrder: 1,
             }).then((topicResult) => {
-              if (topicResult.createTopic.template) {
+              if (topicResult.createTopic) {
                 const topicId =
-                  topicResult.createTopic.template.steps[
-                    topicResult.createTopic.template.steps.length - 1
+                  topicResult.createTopic.steps[
+                    topicResult.createTopic.steps.length - 1
                   ].topic.id;
                 cy.createQuestion({
                   dataType: DataType.SAMPLE_DECLARATION,
                   categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 }).then((questionResult) => {
                   if (questionResult.createQuestion.question) {
-                    createdSampleQuestionId =
-                      questionResult.createQuestion.question.id;
+                    createdSampleQuestionId = questionResult.createQuestion.id;
 
                     cy.updateQuestion({
                       id: createdSampleQuestionId,
@@ -107,8 +106,7 @@ context('Samples tests', () => {
                   categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                   dataType: DataType.BOOLEAN,
                 }).then((questionResult) => {
-                  const createdQuestion =
-                    questionResult.createQuestion.question;
+                  const createdQuestion = questionResult.createQuestion;
                   if (createdQuestion) {
                     cy.updateQuestion({
                       id: createdQuestion.id,
@@ -152,8 +150,8 @@ context('Samples tests', () => {
   describe('Samples basic tests', () => {
     beforeEach(() => {
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        if (result.createProposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.id;
         }
       });
     });
@@ -412,8 +410,8 @@ context('Samples tests', () => {
 
     beforeEach(() => {
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        if (result.createProposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.id;
         }
       });
 

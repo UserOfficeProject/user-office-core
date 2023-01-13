@@ -1,16 +1,12 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SEPResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { SEP } from '../types/SEP';
 
 @Resolver()
 export class DeleteSEPMutation {
-  @Mutation(() => SEPResponseWrap)
+  @Mutation(() => SEP)
   deleteSEP(@Arg('id', () => Int) id: number, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.sep.delete(context.user, { sepId: id }),
-      SEPResponseWrap
-    );
+    return context.mutations.sep.delete(context.user, { sepId: id });
   }
 }

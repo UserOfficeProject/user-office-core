@@ -37,18 +37,17 @@ context('GenericTemplates tests', () => {
       name: proposalTemplateName,
       groupId: TemplateGroupId.GENERIC_TEMPLATE,
     }).then((result) => {
-      if (result.createTemplate.template) {
-        createdGenericTemplateId = result.createTemplate.template.templateId;
+      if (result.createTemplate) {
+        createdGenericTemplateId = result.createTemplate.templateId;
 
         const topicId =
-          result.createTemplate.template.steps[
-            result.createTemplate.template.steps.length - 1
-          ].topic.id;
+          result.createTemplate.steps[result.createTemplate.steps.length - 1]
+            .topic.id;
         cy.createQuestion({
           categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion1 = questionResult.createQuestion.question;
+          const createdQuestion1 = questionResult.createQuestion;
           if (createdQuestion1) {
             cy.updateQuestion({
               id: createdQuestion1.id,
@@ -67,7 +66,7 @@ context('GenericTemplates tests', () => {
           categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion2 = questionResult.createQuestion.question;
+          const createdQuestion2 = questionResult.createQuestion;
           if (createdQuestion2) {
             cy.updateQuestion({
               id: createdQuestion2.id,
@@ -87,28 +86,27 @@ context('GenericTemplates tests', () => {
           name: proposalTemplateName,
           groupId: TemplateGroupId.PROPOSAL,
         }).then((result) => {
-          if (result.createTemplate.template) {
-            createdTemplateId = result.createTemplate.template.templateId;
+          if (result.createTemplate) {
+            createdTemplateId = result.createTemplate.templateId;
 
             cy.createTopic({
               templateId: createdTemplateId,
               sortOrder: 1,
             }).then((topicResult) => {
-              if (!topicResult.createTopic.template) {
+              if (!topicResult.createTopic) {
                 throw new Error('Can not create topic');
               }
 
               const topicId =
-                topicResult.createTopic.template.steps[
-                  topicResult.createTopic.template.steps.length - 1
+                topicResult.createTopic.steps[
+                  topicResult.createTopic.steps.length - 1
                 ].topic.id;
               cy.createQuestion({
                 categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 dataType: DataType.GENERIC_TEMPLATE,
               }).then((questionResult) => {
-                if (questionResult.createQuestion.question) {
-                  createdQuestion1Id =
-                    questionResult.createQuestion.question.id;
+                if (questionResult.createQuestion) {
+                  createdQuestion1Id = questionResult.createQuestion.id;
 
                   cy.updateQuestion({
                     id: createdQuestion1Id,
@@ -128,7 +126,7 @@ context('GenericTemplates tests', () => {
                 categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 dataType: DataType.GENERIC_TEMPLATE,
               }).then((questionResult) => {
-                const createdQuestion2 = questionResult.createQuestion.question;
+                const createdQuestion2 = questionResult.createQuestion;
                 if (createdQuestion2) {
                   cy.updateQuestion({
                     id: createdQuestion2.id,
@@ -282,8 +280,8 @@ context('GenericTemplates tests', () => {
       createTemplateAndAllQuestions();
 
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
         } else {
           throw new Error('Workflow creation failed');
         }

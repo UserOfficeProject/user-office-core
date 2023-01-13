@@ -11,7 +11,7 @@ import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegist
 import { ReviewerFilter } from '../../models/Review';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { TechnicalReview } from '../../models/TechnicalReview';
-import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
   ProposalBookingScheduledEventFilterCore,

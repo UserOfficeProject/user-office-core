@@ -4,11 +4,6 @@ mutation saveSepMeetingDecision(
   saveSepMeetingDecision(
     saveSepMeetingDecisionInput: $saveSepMeetingDecisionInput
   ) {
-    rejection {
-      ...rejection
-    }
-    sepMeetingDecision {
-      proposalPk
-    }
+    proposalPk
   }
 }

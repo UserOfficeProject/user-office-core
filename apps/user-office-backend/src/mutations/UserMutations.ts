@@ -89,12 +89,12 @@ export default class UserMutations {
   async createUserByEmailInvite(
     agent: UserWithRole | null,
     args: CreateUserByEmailInviteArgs
-  ): Promise<EmailInviteResponse | Rejection> {
+  ): Promise<EmailInviteResponse> {
     let userId: number | null = null;
     let role: UserRole = args.userRole;
 
     if (!agent) {
-      return rejection('Agent is not defined', {
+      throw rejection('Agent is not defined', {
         agent,
         args,
         code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
@@ -107,10 +107,10 @@ export default class UserMutations {
 
       return this.createEmailInviteResponse(userId, agent.id, role);
     } else if (user) {
-      return rejection(
-        'Can not create account because account already exists',
-        { args, code: ApolloServerErrorCodeExtended.BAD_REQUEST }
-      );
+      throw rejection('Can not create account because account already exists', {
+        args,
+        code: ApolloServerErrorCodeExtended.BAD_REQUEST,
+      });
     }
 
     if (
@@ -156,7 +156,7 @@ export default class UserMutations {
     }
 
     if (!userId) {
-      return rejection('Can not create user for this role', {
+      throw rejection('Can not create user for this role', {
         args,
       });
     } else {
@@ -169,9 +169,9 @@ export default class UserMutations {
   async create(
     agent: UserWithRole | null,
     args: CreateUserArgs
-  ): Promise<UserLinkResponse | Rejection> {
+  ): Promise<UserLinkResponse> {
     if (process.env.NODE_ENV !== 'development') {
-      return rejection('Users can only be created on development env', {
+      throw rejection('Users can only be created on development env', {
         args,
         code: ApolloServerErrorCodeExtended.BAD_REQUEST,
       });
@@ -205,18 +205,18 @@ export default class UserMutations {
         })
         .then((user) => user)
         .catch((err) => {
-          return rejection('Could not update user', { user }, err);
+          throw rejection('Could not update user', { user }, err);
         });
 
       if (isRejection(updatedUser) || !changePassword) {
-        return rejection('Can not create user', {
+        throw rejection('Can not create user', {
           updatedUser,
           changePassword,
         });
       }
       user = updatedUser;
     } else if (user) {
-      return rejection('Can not create user because account already exists', {
+      throw rejection('Can not create user because account already exists', {
         args,
       });
     } else {
@@ -248,7 +248,7 @@ export default class UserMutations {
         const errorCode = (error as { code: string }).code;
 
         if (errorCode === '23503' || errorCode === '23505') {
-          return rejection(
+          throw rejection(
             'Can not create user because account already exists',
             { args },
             error
@@ -258,7 +258,7 @@ export default class UserMutations {
     }
 
     if (!user) {
-      return rejection('Can not create user', { args });
+      throw rejection('Can not create user', { args });
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);

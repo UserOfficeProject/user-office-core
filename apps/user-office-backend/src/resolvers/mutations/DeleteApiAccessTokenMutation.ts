@@ -1,7 +1,6 @@
 import { Arg, Ctx, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-// import { SuccessResponseWrap } from '../types/CommonWrappers';
 
 @InputType()
 export class DeleteApiAccessTokenInput {

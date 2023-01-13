@@ -143,8 +143,7 @@ context('Settings tests', () => {
         sortOrder: 1,
         prevProposalStatusId: prevProposalStatusId,
       }).then((result) => {
-        const connection =
-          result.addProposalWorkflowStatus.proposalWorkflowConnection;
+        const connection = result.addProposalWorkflowStatus;
         if (connection) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: connection.id,
@@ -160,10 +159,9 @@ context('Settings tests', () => {
         prevProposalStatusId:
           initialDBData.proposalStatuses.feasibilityReview.id,
       }).then((result) => {
-        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+        if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId:
-              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: ['PROPOSAL_FEASIBLE'],
           });
         }
@@ -175,10 +173,9 @@ context('Settings tests', () => {
         sortOrder: 3,
         prevProposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
       }).then((result) => {
-        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+        if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId:
-              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: ['PROPOSAL_SEP_SELECTED'],
           });
         }
@@ -190,10 +187,9 @@ context('Settings tests', () => {
         sortOrder: 4,
         prevProposalStatusId: initialDBData.proposalStatuses.sepReview.id,
       }).then((result) => {
-        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+        if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId:
-              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: ['PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED'],
           });
         }
@@ -209,8 +205,7 @@ context('Settings tests', () => {
           sortOrder: 1,
           prevProposalStatusId: prevProposalStatusId,
         }).then((result) => {
-          const connection =
-            result.addProposalWorkflowStatus.proposalWorkflowConnection;
+          const connection = result.addProposalWorkflowStatus;
           if (connection) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: connection.id,
@@ -227,10 +222,9 @@ context('Settings tests', () => {
             initialDBData.proposalStatuses.feasibilityReview.id,
           parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
-          if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId:
-                result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+              proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
               statusChangingEvents: ['PROPOSAL_FEASIBLE'],
             });
           }
@@ -244,10 +238,9 @@ context('Settings tests', () => {
             initialDBData.proposalStatuses.feasibilityReview.id,
           parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
-          if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId:
-                result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+              proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
               statusChangingEvents: ['PROPOSAL_UNFEASIBLE'],
             });
           }
@@ -261,7 +254,7 @@ context('Settings tests', () => {
         name: workflowName,
         description: workflowDescription,
       }).then((result) => {
-        const workflow = result.createProposalWorkflow.proposalWorkflow;
+        const workflow = result.createProposalWorkflow;
         if (workflow) {
           createdWorkflowId = workflow.id;
           prevProposalStatusId =
@@ -273,8 +266,8 @@ context('Settings tests', () => {
             name: 'default esi template',
             groupId: TemplateGroupId.PROPOSAL_ESI,
           }).then((result) => {
-            if (result.createTemplate.template) {
-              createdEsiTemplateId = result.createTemplate.template.templateId;
+            if (result.createTemplate) {
+              createdEsiTemplateId = result.createTemplate.templateId;
 
               cy.updateCall({
                 id: initialDBData.call.id,
@@ -299,10 +292,9 @@ context('Settings tests', () => {
         sortOrder: 1,
         prevProposalStatusId: prevProposalStatusId,
       }).then((result) => {
-        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+        if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId:
-              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: ['PROPOSAL_SUBMITTED'],
           });
         }
@@ -390,10 +382,9 @@ context('Settings tests', () => {
         sortOrder: 1,
         prevProposalStatusId: prevProposalStatusId,
       }).then((result) => {
-        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+        if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId:
-              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: ['PROPOSAL_SUBMITTED'],
           });
         }

@@ -19,7 +19,6 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
@@ -31,11 +30,11 @@ import {
   AssignReviewersToSEPArgs,
   RemoveSepReviewerFromProposalArgs,
   AssignChairOrSecretaryToSEPArgs,
-} from '../resolvers/mutations/AssignMembersToSEP';
+} from '../resolvers/mutations/AssignMembersToSepMutation';
 import {
   AssignProposalsToSepArgs,
   RemoveProposalsFromSepArgs,
-} from '../resolvers/mutations/AssignProposalsToSep';
+} from '../resolvers/mutations/AssignProposalsToSepMutation';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { ReorderSepMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderSepMeetingDecisionProposalsMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
@@ -235,14 +234,17 @@ export default class SEPMutations {
   async assignProposalsToSep(
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
-  ): Promise<ProposalPks | Rejection> {
-    return this.dataSource.assignProposalsToSep(args).catch((err) => {
-      return rejection(
+  ): Promise<boolean> {
+    const result = await this.dataSource.assignProposalsToSep(args);
+
+    if (result.proposalPks.length !== args.proposals.length) {
+      throw rejection(
         'Could not assign proposal to scientific evaluation panel',
-        { agent },
-        err
+        { agent }
       );
-    });
+    }
+
+    return true;
   }
 
   @Authorized([Roles.USER_OFFICER])

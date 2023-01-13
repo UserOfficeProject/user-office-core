@@ -122,7 +122,7 @@ function createWorkflowAndEsiTemplate() {
     name: workflowName,
     description: workflowDescription,
   }).then((result) => {
-    const workflow = result.createProposalWorkflow.proposalWorkflow;
+    const workflow = result.createProposalWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
 
@@ -130,8 +130,8 @@ function createWorkflowAndEsiTemplate() {
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
       }).then((result) => {
-        if (result.createTemplate.template) {
-          createdEsiTemplateId = result.createTemplate.template.templateId;
+        if (result.createTemplate) {
+          createdEsiTemplateId = result.createTemplate.templateId;
         }
       });
     }
@@ -147,8 +147,8 @@ function initializationBeforeTests() {
     numberRatingsRequired: 2,
     active: true,
   }).then((result) => {
-    if (result.createSEP.sep) {
-      createdSepId = result.createSEP.sep.id;
+    if (result.createSEP) {
+      createdSepId = result.createSEP.id;
     }
   });
   cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
@@ -1421,9 +1421,9 @@ context('SEP meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
             }).then((sepResult) => {
-              if (sepResult.createSEP.sep) {
+              if (sepResult.createSEP) {
                 cy.assignProposalsToSep({
-                  sepId: sepResult.createSEP.sep.id,
+                  sepId: sepResult.createSEP.id,
                   proposals: [
                     {
                       callId: initialDBData.call.id,
@@ -1775,9 +1775,9 @@ context('SEP meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
             }).then((sepResult) => {
-              if (sepResult.createSEP.sep) {
+              if (sepResult.createSEP) {
                 cy.assignProposalsToSep({
-                  sepId: sepResult.createSEP.sep.id,
+                  sepId: sepResult.createSEP.id,
                   proposals: [
                     {
                       callId: initialDBData.call.id,

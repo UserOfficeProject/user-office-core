@@ -1,19 +1,15 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { VisitResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Visit } from '../types/Visit';
 
 @Resolver()
 export class DeleteVisit {
-  @Mutation(() => VisitResponseWrap)
+  @Mutation(() => Visit)
   deleteVisit(
     @Arg('visitId', () => Int) visitId: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.visit.deleteVisit(context.user, visitId),
-      VisitResponseWrap
-    );
+    return context.mutations.visit.deleteVisit(context.user, visitId);
   }
 }

@@ -1,9 +1,7 @@
 import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalWorkflow } from '../../../models/ProposalWorkflow';
-import { ProposalWorkflowResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { ProposalWorkflow } from '../../types/ProposalWorkflow';
 
 @InputType()
 export class CreateProposalWorkflowInput implements Partial<ProposalWorkflow> {
@@ -16,18 +14,15 @@ export class CreateProposalWorkflowInput implements Partial<ProposalWorkflow> {
 
 @Resolver()
 export class CreateProposalWorkflowMutation {
-  @Mutation(() => ProposalWorkflowResponseWrap)
+  @Mutation(() => ProposalWorkflow)
   async createProposalWorkflow(
     @Ctx() context: ResolverContext,
     @Arg('newProposalWorkflowInput')
     newProposalWorkflowInput: CreateProposalWorkflowInput
   ) {
-    return wrapResponse(
-      context.mutations.proposalSettings.createProposalWorkflow(
-        context.user,
-        newProposalWorkflowInput
-      ),
-      ProposalWorkflowResponseWrap
+    return context.mutations.proposalSettings.createProposalWorkflow(
+      context.user,
+      newProposalWorkflowInput
     );
   }
 }

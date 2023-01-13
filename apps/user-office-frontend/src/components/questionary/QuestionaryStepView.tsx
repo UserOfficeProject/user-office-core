@@ -167,23 +167,23 @@ export default function QuestionaryStepView(props: {
       return false;
     }
 
-    const answerTopicResult = await api({
-      toastSuccessMessage: 'Saved',
-    }).answerTopic({
-      questionaryId: questionaryId,
-      answers: prepareAnswers(activeFields),
-      topicId: topicId,
-      isPartialSave: isPartialSave,
-    });
+    try {
+      const { answerTopic } = await api({
+        toastSuccessMessage: 'Saved',
+      }).answerTopic({
+        questionaryId: questionaryId,
+        answers: prepareAnswers(activeFields),
+        topicId: topicId,
+        isPartialSave: isPartialSave,
+      });
 
-    if (answerTopicResult.answerTopic.questionaryStep) {
       dispatch({
         type: 'STEP_ANSWERED',
-        step: answerTopicResult.answerTopic.questionaryStep,
+        step: answerTopic,
       });
 
       setLastSavedFormValues(initialValues);
-    } else if (answerTopicResult.answerTopic.rejection) {
+    } catch (error) {
       return false;
     }
 

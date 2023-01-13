@@ -442,7 +442,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
     if (sep) {
-      const response = await api({
+      await api({
         toastSuccessMessage:
           'Proposal/s assigned to the selected SEP successfully!',
       }).assignProposalsToSep({
@@ -453,14 +453,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         sepId: sep.id,
       });
 
-      const isError = !!response.assignProposalsToSep.rejection;
-
-      if (!isError) {
-        // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
-        setTimeout(fetchProposalsData, 500);
-      }
+      // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
+      setTimeout(fetchProposalsData, 500);
     } else {
-      const result = await api({
+      await api({
         toastSuccessMessage: 'Proposal/s removed from the SEP successfully!',
       }).removeProposalsFromSep({
         proposalPks: selectedProposals.map(
@@ -469,25 +465,21 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         sepId: selectedProposals[0].sepId as number,
       });
 
-      const isError = !!result.removeProposalsFromSep.rejection;
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => {
+          if (
+            selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === prop.primaryKey
+            )
+          ) {
+            prop.sepCode = null;
+            prop.sepId = null;
+          }
 
-      if (!isError) {
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.sepCode = null;
-              prop.sepId = null;
-            }
-
-            return prop;
-          })
-        );
-      }
+          return prop;
+        })
+      );
     }
   };
 

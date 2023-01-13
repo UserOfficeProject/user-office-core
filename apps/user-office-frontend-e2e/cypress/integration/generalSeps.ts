@@ -184,8 +184,8 @@ context('General scientific evaluation panel tests', () => {
         numberRatingsRequired: 2,
         active: true,
       }).then((response) => {
-        if (response.createSEP.sep) {
-          createdSepId = response.createSEP.sep.id;
+        if (response.createSEP) {
+          createdSepId = response.createSEP.id;
         }
       });
     });
@@ -435,8 +435,8 @@ context('General scientific evaluation panel tests', () => {
         numberRatingsRequired: 2,
         active: true,
       }).then((response) => {
-        if (response.createSEP.sep) {
-          createdSepId = response.createSEP.sep.id;
+        if (response.createSEP) {
+          createdSepId = response.createSEP.id;
 
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToSEPInput: {
@@ -556,8 +556,8 @@ context('General scientific evaluation panel tests', () => {
         numberRatingsRequired: 2,
         active: true,
       }).then((response) => {
-        if (response.createSEP.sep) {
-          const createdSepId = response.createSEP.sep.id;
+        if (response.createSEP) {
+          const createdSepId = response.createSEP.id;
 
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToSEPInput: {
