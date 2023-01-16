@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../models/Rejection';
 import { ProposalPkWithCallId } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
@@ -33,10 +34,12 @@ export class AssignProposalsToInstrumentMutation {
     @Args() args: AssignProposalsToInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.instrument.assignProposalsToInstrument(
+    const res = await context.mutations.instrument.assignProposalsToInstrument(
       context.user,
       args
     );
+
+    return isRejection(res) ? res : true;
   }
 
   @Mutation(() => Boolean)

@@ -20,7 +20,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, ProposalEndStatus } from '../models/Proposal';
+import { Proposal, ProposalEndStatus, ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
@@ -437,7 +437,7 @@ export default class ProposalMutations {
   async changeProposalsStatus(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
-  ): Promise<boolean | Rejection> {
+  ): Promise<ProposalPks | Rejection> {
     const { statusId, proposals } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(
@@ -455,11 +455,9 @@ export default class ProposalMutations {
           );
         })
       );
-
-      return true;
     }
 
-    return rejection('Can not change proposal status', { result });
+    return result || rejection('Can not change proposal status', { result });
   }
 
   @Authorized()

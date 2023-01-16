@@ -19,6 +19,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
+import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
@@ -234,17 +235,17 @@ export default class SEPMutations {
   async assignProposalsToSep(
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
-  ): Promise<boolean> {
+  ): Promise<ProposalPks | Rejection> {
     const result = await this.dataSource.assignProposalsToSep(args);
 
     if (result.proposalPks.length !== args.proposals.length) {
-      throw rejection(
+      return rejection(
         'Could not assign proposal to scientific evaluation panel',
         { agent }
       );
     }
 
-    return true;
+    return result;
   }
 
   @Authorized([Roles.USER_OFFICER])

@@ -18,6 +18,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Instrument } from '../models/Instrument';
+import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -128,7 +129,7 @@ export default class InstrumentMutations {
   async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
-  ): Promise<boolean | Rejection> {
+  ): Promise<ProposalPks | Rejection> {
     const allProposalsAreOnSameCallAsInstrument =
       await this.checkIfProposalsAreOnSameCallAsInstrument(args);
 
@@ -193,7 +194,7 @@ export default class InstrumentMutations {
       });
     }
 
-    return true;
+    return result;
   }
 
   @Authorized([Roles.USER_OFFICER])

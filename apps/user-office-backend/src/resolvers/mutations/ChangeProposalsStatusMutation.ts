@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../models/Rejection';
 
 @InputType()
 export class ProposalPkWithCallId {
@@ -36,9 +37,11 @@ export class ChangeProposalsStatusMutation {
     changeProposalsStatusInput: ChangeProposalsStatusInput,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.proposal.changeProposalsStatus(
+    const result = await context.mutations.proposal.changeProposalsStatus(
       context.user,
       changeProposalsStatusInput
     );
+
+    return isRejection(result) ? result : true;
   }
 }

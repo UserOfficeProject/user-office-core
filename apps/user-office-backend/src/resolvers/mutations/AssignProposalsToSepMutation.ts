@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../models/Rejection';
 import { SEP } from '../types/SEP';
 import { ProposalPkWithCallId } from './ChangeProposalsStatusMutation';
 
@@ -37,7 +38,12 @@ export class AssignProposalsToSEPMutation {
     @Args() args: AssignProposalsToSepArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.sep.assignProposalsToSep(context.user, args);
+    const res = await context.mutations.sep.assignProposalsToSep(
+      context.user,
+      args
+    );
+
+    return isRejection(res) ? res : true;
   }
 
   @Mutation(() => SEP)

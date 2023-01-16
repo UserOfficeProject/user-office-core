@@ -954,6 +954,7 @@ context('Proposal tests', () => {
         cy.updateCall({
           id: createdCallId,
           ...newCall,
+          endCall: yesterday,
           endCallInternal: yesterday,
           proposalWorkflowId: createdWorkflowId,
         });
