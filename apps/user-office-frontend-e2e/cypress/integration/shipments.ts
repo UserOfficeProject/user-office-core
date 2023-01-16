@@ -35,7 +35,7 @@ context('Shipments tests', () => {
       managementTimeAllocation: 2,
     });
     cy.createVisit({
-      team: [coProposer.id, visitor.id],
+      team: [coProposer.id, visitor.id, PI.id],
       teamLeadUserId: PI.id,
       scheduledEventId: existingScheduledEventId,
     });

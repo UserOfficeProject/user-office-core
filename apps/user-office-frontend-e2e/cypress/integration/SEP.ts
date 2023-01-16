@@ -490,6 +490,15 @@ context('SEP reviews tests', () => {
         memberIds: [sepMembers.reviewer.id],
         proposalPk: createdProposalPk,
       });
+      cy.on('uncaught:exception', (err) => {
+        expect(err.message).to.include(
+          'Failed to delete proposal because, it has dependencies which need to be deleted first'
+        );
+
+        // return false to prevent the error from
+        // failing this test
+        return false;
+      });
       cy.login('officer');
       cy.visit('/ProposalPage');
 
