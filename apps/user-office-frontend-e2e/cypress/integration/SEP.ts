@@ -173,21 +173,6 @@ function initializationBeforeTests() {
       });
     }
   });
-  // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
-  if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-    cy.updateUserRoles({
-      id: sepMembers.chair.id,
-      roles: [initialDBData.roles.sepReviewer],
-    });
-    cy.updateUserRoles({
-      id: sepMembers.secretary.id,
-      roles: [initialDBData.roles.sepReviewer],
-    });
-    cy.updateUserRoles({
-      id: sepMembers.reviewer.id,
-      roles: [initialDBData.roles.sepReviewer],
-    });
-  }
   createWorkflowAndEsiTemplate();
 }
 
@@ -198,6 +183,22 @@ context('SEP reviews tests', () => {
   beforeEach(function () {
     if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
       this.skip();
+    }
+
+    // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      cy.updateUserRoles({
+        id: sepMembers.chair.id,
+        roles: [initialDBData.roles.sepReviewer],
+      });
+      cy.updateUserRoles({
+        id: sepMembers.secretary.id,
+        roles: [initialDBData.roles.sepReviewer],
+      });
+      cy.updateUserRoles({
+        id: sepMembers.reviewer.id,
+        roles: [initialDBData.roles.sepReviewer],
+      });
     }
   });
 
@@ -538,6 +539,13 @@ context('SEP reviews tests', () => {
       cy.updateUserDetails({
         ...loggedInUserParsed,
         organisation: 2,
+        telephone: faker.phone.phoneNumber('+4670#######'),
+        user_title: 'Dr.',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('2000/01/01'),
+        department: 'IT',
+        position: 'Dirrector',
       } as UpdateUserMutationVariables);
 
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
@@ -669,6 +677,12 @@ context('SEP reviews tests', () => {
         organisation: 2,
         telephone: faker.phone.phoneNumber('+4670#######'),
         telephone_alt: faker.phone.phoneNumber('+4670#######'),
+        user_title: 'Dr.',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('2000/01/01'),
+        department: 'IT',
+        position: 'Dirrector',
       } as UpdateUserMutationVariables);
 
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
@@ -786,10 +800,6 @@ context('SEP reviews tests', () => {
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposal2Pk },
             ],
-          });
-          cy.assignReviewersToSep({
-            sepId: createdSepId,
-            memberIds: [sepMembers.reviewer.id],
           });
           cy.assignSepReviewersToProposal({
             sepId: createdSepId,
@@ -1292,18 +1302,10 @@ context('SEP meeting components tests', () => {
             memberIds: [sepMembers.reviewer2.id],
             proposalPk: createdProposalPk,
           });
-          cy.assignReviewersToSep({
-            sepId: createdSepId,
-            memberIds: [sepMembers.reviewer.id],
-          });
           cy.assignSepReviewersToProposal({
             sepId: createdSepId,
             memberIds: [sepMembers.reviewer.id],
             proposalPk: createdProposal.primaryKey,
-          });
-          cy.assignReviewersToSep({
-            sepId: createdSepId,
-            memberIds: [sepMembers.reviewer2.id],
           });
           cy.assignSepReviewersToProposal({
             sepId: createdSepId,
