@@ -25,6 +25,7 @@ const notifyAndLog = async (
   enqueueSnackbar(userMessage, {
     variant: 'error',
     preventDuplicate: true,
+    className: 'snackbar-error',
   });
 
   console.error({ userMessage, error });

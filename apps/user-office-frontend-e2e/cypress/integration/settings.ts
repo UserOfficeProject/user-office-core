@@ -368,12 +368,15 @@ context('Settings tests', () => {
         this.skip();
       }
       const proposalTitle = faker.random.words(3);
+      const endCallDate = faker.date.future();
       const editedProposalTitle = faker.random.words(3);
       cy.updateCall({
         id: initialDBData.call.id,
         ...updatedCall,
         proposalWorkflowId: createdWorkflowId,
-        endCallInternal: faker.date.future(),
+        endCall: endCallDate,
+        // NOTE: Add one day to generated future date because the endCallInternal can not be before endCall.
+        endCallInternal: endCallDate.setDate(endCallDate.getDate() + 1),
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,

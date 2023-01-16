@@ -17,7 +17,7 @@ import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Instrument } from '../models/Instrument';
+import { Instrument, InstrumentHasProposals } from '../models/Instrument';
 import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -274,7 +274,7 @@ export default class InstrumentMutations {
   async submitInstrument(
     agent: UserWithRole | null,
     args: InstrumentSubmitArgs
-  ): Promise<boolean | Rejection> {
+  ): Promise<InstrumentHasProposals | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent, args.sepId))
@@ -332,11 +332,10 @@ export default class InstrumentMutations {
       );
     }
 
-    await this.dataSource.submitInstrument(
-      submittedInstrumentProposalPks,
-      args.instrumentId
-    );
-
-    return true;
+    return this.dataSource
+      .submitInstrument(submittedInstrumentProposalPks, args.instrumentId)
+      .catch((error) => {
+        return rejection('Could not submit instrument', { agent, args }, error);
+      });
   }
 }

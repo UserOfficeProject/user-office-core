@@ -1,7 +1,10 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { dummyInstrument } from '../datasources/mockups/InstrumentDataSource';
+import {
+  dummyInstrument,
+  dummyInstrumentHasProposals,
+} from '../datasources/mockups/InstrumentDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -80,7 +83,7 @@ describe('Test Instrument Mutations', () => {
           instrumentId: 1,
         }
       )
-    ).resolves.toStrictEqual(true);
+    ).resolves.toStrictEqual({ proposalPks: [1, 2] });
   });
 
   test('A logged in user officer can remove assigned proposal from instrument', () => {
@@ -151,6 +154,6 @@ describe('Test Instrument Mutations', () => {
         callId: 1,
         sepId: 1,
       })
-    ).resolves.toBe(true);
+    ).resolves.toBe(dummyInstrumentHasProposals);
   });
 });

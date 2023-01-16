@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../models/Rejection';
 import { Instrument } from '../types/Instrument';
 
 @ArgsType()
@@ -79,8 +80,11 @@ export class UpdateInstrumentMutation {
     @Args() args: InstrumentSubmitArgs,
     @Ctx() context: ResolverContext
   ) {
-    await context.mutations.instrument.submitInstrument(context.user, args);
+    const res = await context.mutations.instrument.submitInstrument(
+      context.user,
+      args
+    );
 
-    return true;
+    return isRejection(res) ? res : true;
   }
 }
