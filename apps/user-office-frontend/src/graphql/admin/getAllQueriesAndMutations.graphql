@@ -1,6 +1,0 @@
-query getAllQueriesAndMutations {
-  queriesAndMutations {
-    queries
-    mutations
-  }
-}

@@ -1,0 +1,7 @@
+query getAllQueriesMutationsAndServices {
+  queriesMutationsAndServices {
+    queries
+    mutations
+    services
+  }
+}
