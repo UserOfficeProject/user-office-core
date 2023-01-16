@@ -692,7 +692,7 @@ context('Calls tests', () => {
         }
       });
       // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
-      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: initialDBData.users.user1.id,
           roles: [

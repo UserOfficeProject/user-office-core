@@ -20,10 +20,13 @@ context('Personal information tests', () => {
   const newTelephone = faker.phone.phoneNumber('0##########');
 
   it('Should be able to see user officer role in use', () => {
-    cy.updateUserRoles({
-      id: initialDBData.users.officer.id,
-      roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
-    });
+    // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      cy.updateUserRoles({
+        id: initialDBData.users.officer.id,
+        roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
+      });
+    }
     cy.login('officer');
     cy.visit('/');
 
@@ -163,10 +166,16 @@ context('Personal information tests', () => {
     });
 
     it('Should be able to change role even in the view where next role is not allowed to be', () => {
-      cy.updateUserRoles({
-        id: initialDBData.users.officer.id,
-        roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
-      });
+      // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: initialDBData.users.officer.id,
+          roles: [
+            initialDBData.roles.userOfficer,
+            initialDBData.roles.sepChair,
+          ],
+        });
+      }
       const workflowName = faker.lorem.words(2);
       const workflowDescription = faker.lorem.words(5);
       cy.login('officer');

@@ -61,10 +61,13 @@ context('Instrument tests', () => {
       cy.login('officer');
       cy.visit('/');
 
-      cy.updateUserRoles({
-        id: scientist1.id,
-        roles: [initialDBData.roles.instrumentScientist],
-      });
+      // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: scientist1.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
+      }
     });
 
     it('User officer should be able to create instrument', function () {
@@ -161,14 +164,17 @@ context('Instrument tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
-      cy.updateUserRoles({
-        id: scientist2.id,
-        roles: [initialDBData.roles.instrumentScientist],
-      });
-      cy.updateUserRoles({
-        id: scientist1.id,
-        roles: [initialDBData.roles.instrumentScientist],
-      });
+      // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        cy.updateUserRoles({
+          id: scientist2.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
+        cy.updateUserRoles({
+          id: scientist1.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
+      }
 
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {
