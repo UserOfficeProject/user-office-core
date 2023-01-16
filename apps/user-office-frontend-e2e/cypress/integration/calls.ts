@@ -691,13 +691,16 @@ context('Calls tests', () => {
           createdCallId = response.createCall.id;
         }
       });
-      cy.updateUserRoles({
-        id: initialDBData.users.user1.id,
-        roles: [
-          initialDBData.roles.user,
-          initialDBData.roles.instrumentScientist,
-        ],
-      });
+      // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        cy.updateUserRoles({
+          id: initialDBData.users.user1.id,
+          roles: [
+            initialDBData.roles.user,
+            initialDBData.roles.instrumentScientist,
+          ],
+        });
+      }
       cy.createInstrument(instrumentAssignedToCall).then((response) => {
         if (response.createInstrument) {
           createdInstrumentId = response.createInstrument.id;
