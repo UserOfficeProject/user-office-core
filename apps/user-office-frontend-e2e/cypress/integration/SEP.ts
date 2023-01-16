@@ -75,6 +75,24 @@ function editFinalRankingForm() {
   });
 }
 
+function updateUsersRoles() {
+  // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
+  if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+    cy.updateUserRoles({
+      id: sepMembers.chair.id,
+      roles: [initialDBData.roles.sepReviewer],
+    });
+    cy.updateUserRoles({
+      id: sepMembers.secretary.id,
+      roles: [initialDBData.roles.sepReviewer],
+    });
+    cy.updateUserRoles({
+      id: sepMembers.reviewer.id,
+      roles: [initialDBData.roles.sepReviewer],
+    });
+  }
+}
+
 const instrumentAvailabilityTime = 20;
 const firstProposalTimeAllocation = 25;
 const secondProposalTimeAllocation = 5;
@@ -184,22 +202,7 @@ context('SEP reviews tests', () => {
     if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
       this.skip();
     }
-
-    // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
-    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-      cy.updateUserRoles({
-        id: sepMembers.chair.id,
-        roles: [initialDBData.roles.sepReviewer],
-      });
-      cy.updateUserRoles({
-        id: sepMembers.secretary.id,
-        roles: [initialDBData.roles.sepReviewer],
-      });
-      cy.updateUserRoles({
-        id: sepMembers.reviewer.id,
-        roles: [initialDBData.roles.sepReviewer],
-      });
-    }
+    updateUsersRoles();
   });
 
   describe('User officer role', () => {
@@ -956,6 +959,7 @@ context('SEP meeting components tests', () => {
     if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
       this.skip();
     }
+    updateUsersRoles();
     createWorkflowAndEsiTemplate();
     cy.assignProposalsToSep({
       sepId: createdSepId,
