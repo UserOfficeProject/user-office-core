@@ -11,7 +11,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { ProposalPks } from '../models/Proposal';
 import { Rejection } from '../models/Rejection';
 import { UserRole } from '../models/User';
 import SEPMutations from './SEPMutations';
@@ -194,17 +193,14 @@ describe('Test SEPMutations', () => {
   });
 
   // TODO: Review this!!!
-  // test('A user can not assign proposal to SEP', async () => {
-  //   const result = await SEPMutationsInstance.assignProposalsToSep(
-  //     dummyUserWithRole,
-  //     {
-  //       proposals: [{ primaryKey: 1, callId: 1 }],
-  //       sepId: 1,
-  //     }
-  //   );
-
-  //   return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
-  // });
+  test('A user can not assign proposal to SEP', async () => {
+    return expect(
+      SEPMutationsInstance.assignProposalsToSep(dummyUserWithRole, {
+        proposals: [{ primaryKey: 1, callId: 1 }],
+        sepId: 1,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
 
   test('A userofficer can assign proposal to SEP', () => {
     return expect(
@@ -212,7 +208,7 @@ describe('Test SEPMutations', () => {
         proposals: [{ primaryKey: 1, callId: 1 }],
         sepId: 1,
       })
-    ).resolves.toStrictEqual(new ProposalPks([1]));
+    ).resolves.toStrictEqual(true);
   });
 
   test('A user can not remove proposal from SEP', async () => {
