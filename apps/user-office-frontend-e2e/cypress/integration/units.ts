@@ -8,8 +8,8 @@ import initialDBData from '../support/initialDBData';
 context('Units tests', () => {
   describe('Template basic unit tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
     });
 
     it('User officer can create unit', () => {
