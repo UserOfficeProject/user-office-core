@@ -2,7 +2,7 @@ import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
 import { EmailAsExternalTokenAuthorization } from '../auth/EmailAsExternalTokenAuthorization';
-import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
+import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
@@ -37,7 +37,7 @@ import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironmen
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
-mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
+mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);
