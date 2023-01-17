@@ -25,10 +25,10 @@ import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import {
   PermissionsWithAccessToken,
-  QueryAndMutationGroup,
-  QueryAndMutationGroups,
+  QueryMutationAndServicesGroup,
+  QueryMutationAndServicesGroups,
 } from 'generated/sdk';
-import { useQueriesAndMutationsData } from 'hooks/admin/useQueriesAndMutationsData';
+import { useQueriesMutationsAndServicesData } from 'hooks/admin/useQueriesMutationsAndServicesData';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -89,8 +89,8 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
 }) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { queriesAndMutations, loadingQueriesAndMutations } =
-    useQueriesAndMutationsData();
+  const { queriesMutationsAndServices, loadingQueriesMutationsAndServices } =
+    useQueriesMutationsAndServicesData();
 
   const normalizeAccessPermissions = (data: string | undefined) => {
     const permissionsArray: string[] = [];
@@ -121,7 +121,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
       };
 
   const allAccessPermissions = (
-    groups: QueryAndMutationGroup[],
+    groups: QueryMutationAndServicesGroup[],
     title: string,
     formValues: FormPermissionsWithAccessToken,
     fieldArrayHelpers: FieldArrayRenderProps
@@ -132,8 +132,8 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
       corePermissionsForSchedulerAPIAccess
     );
 
-    const schedulerAlert = (group: QueryAndMutationGroup) =>
-      group.groupName === QueryAndMutationGroups.SCHEDULER &&
+    const schedulerAlert = (group: QueryMutationAndServicesGroup) =>
+      group.groupName === QueryMutationAndServicesGroups.SCHEDULER &&
       !isCorePermissionEnabled && (
         <Alert severity="warning" data-cy="scheduler-access-alert">
           For Scheduler API access to work you need to have
@@ -286,23 +286,31 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             required
           />
 
-          {loadingQueriesAndMutations ? (
+          {loadingQueriesMutationsAndServices ? (
             <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
           ) : (
             <FieldArray
               name="accessPermissions"
               render={(arrayHelpers) => (
                 <StyledPaper margin={[0]} padding={[0]}>
-                  <SimpleTabs tabNames={['Queries', 'Mutations']}>
+                  <SimpleTabs
+                    tabNames={['Queries', 'Mutations', 'Other Services']}
+                  >
                     {allAccessPermissions(
-                      queriesAndMutations.queries,
+                      queriesMutationsAndServices.queries,
                       'Queries',
                       values,
                       arrayHelpers
                     )}
                     {allAccessPermissions(
-                      queriesAndMutations.mutations,
+                      queriesMutationsAndServices.mutations,
                       'Mutations',
+                      values,
+                      arrayHelpers
+                    )}
+                    {allAccessPermissions(
+                      queriesMutationsAndServices.services,
+                      'Services',
                       values,
                       arrayHelpers
                     )}
@@ -349,7 +357,9 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
               <Button
                 type="submit"
                 disabled={
-                  isSubmitting || loadingQueriesAndMutations || isExecutingCall
+                  isSubmitting ||
+                  loadingQueriesMutationsAndServices ||
+                  isExecutingCall
                 }
                 data-cy="submit"
               >

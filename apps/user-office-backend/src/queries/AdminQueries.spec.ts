@@ -54,14 +54,17 @@ describe('Test Admin Queries', () => {
     ).resolves.toBe(dummyApiAccessToken);
   });
 
-  test('A user can not get all queries and mutations', () => {
+  test('A user can not get all queries mutations and services', () => {
     return expect(
-      adminQueries.getAllQueryAndMutationMethods(dummyUserWithRole, context)
+      adminQueries.getAllQueryMutationAndServicesMethods(
+        dummyUserWithRole,
+        context
+      )
     ).resolves.toEqual(null);
   });
 
-  test('A user-officer can not get all queries and mutations', async () => {
-    const result = await adminQueries.getAllQueryAndMutationMethods(
+  test('A user-officer can get all queries mutations and services', async () => {
+    const result = await adminQueries.getAllQueryMutationAndServicesMethods(
       dummyUserOfficerWithRole,
       context
     );
@@ -72,6 +75,10 @@ describe('Test Admin Queries', () => {
     const coreMutations = result?.mutations.find(
       (mutationGroup) => mutationGroup.groupName === 'core'
     );
+
+    expect(result.queries.length).toBeGreaterThan(0);
+    expect(result.mutations.length).toBeGreaterThan(0);
+    expect(result.services.length).toBeGreaterThan(0);
 
     expect(coreQueries?.items?.length).toBeGreaterThan(0);
     expect(coreMutations?.items?.length).toBeGreaterThan(0);

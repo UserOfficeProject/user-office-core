@@ -26,7 +26,7 @@ import {
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { TrainingStatus } from '../models/VisitRegistration';
-import { QueryAndMutationGroups } from './queries/GetAllQueryAndMutationMethodsQuery';
+import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
   EquipmentAssignmentStatus,
@@ -90,7 +90,7 @@ export const registerEnums = () => {
   registerEnumType(FeatureUpdateAction, {
     name: 'FeatureUpdateAction',
   });
-  registerEnumType(QueryAndMutationGroups, {
-    name: 'QueryAndMutationGroups',
+  registerEnumType(QueryMutationAndServicesGroups, {
+    name: 'QueryMutationAndServicesGroups',
   });
 };

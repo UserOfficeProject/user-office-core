@@ -65,12 +65,13 @@ export default class AdminQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getAllQueryAndMutationMethods(
+  async getAllQueryMutationAndServicesMethods(
     agent: UserWithRole | null,
     context: BasicResolverContext
   ) {
     const allQueryMethods: string[] = [];
     const allMutationMethods: string[] = [];
+    const allServicesMethods: string[] = [];
 
     Object.keys(context.queries).forEach((queryKey) => {
       const element =
@@ -108,6 +109,22 @@ export default class AdminQueries {
       }
     });
 
+    Object.keys(context.services).forEach((servicesKey) => {
+      const element =
+        context.services[servicesKey as keyof BasicResolverContext['services']];
+
+      const proto = Object.getPrototypeOf(element);
+      const names = Object.getOwnPropertyNames(proto).filter(
+        (item) => item !== 'constructor'
+      );
+
+      const classNamesWithMethod = names.map(
+        (item) => `${proto.constructor.name}.${item}`
+      );
+
+      allServicesMethods.push(...classNamesWithMethod);
+    });
+
     // NOTE: If scheduler is disabled we get undefined as scheduler clientF
     const scheduler = await context.clients.scheduler();
 
@@ -136,6 +153,7 @@ export default class AdminQueries {
                     ?.mutations,
               },
             ],
+            services: [{ groupName: 'core', items: allServicesMethods }],
           };
         }
       } catch (error) {
@@ -149,6 +167,7 @@ export default class AdminQueries {
     return {
       queries: [{ groupName: 'core', items: allQueryMethods }],
       mutations: [{ groupName: 'core', items: allMutationMethods }],
+      services: [{ groupName: 'core', items: allServicesMethods }],
     };
   }
 }

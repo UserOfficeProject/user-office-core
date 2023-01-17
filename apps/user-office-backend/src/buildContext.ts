@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 
 import { BasicResolverContext } from './context';
+import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
@@ -101,6 +102,9 @@ const context: BasicResolverContext = {
     scheduler: async () => {
       return undefined;
     },
+  },
+  services: {
+    pdfServices: container.resolve(PDFServices),
   },
 };
 
