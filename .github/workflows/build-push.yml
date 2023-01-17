@@ -83,8 +83,12 @@ jobs:
           gh-trigger-url: ${{ secrets.GITLAB_TRIGGER_URL }}
           gh-token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
 
-      # Trigger Jenkins pipeline
-      - name: Trigger Jenkins
+      - name: Trigger frontend deployment at STFC
         if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
         run: |
           curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalFrontend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
+
+      - name: Trigger backend deployment at STFC
+        if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
+        run: |
+          curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalBackend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
