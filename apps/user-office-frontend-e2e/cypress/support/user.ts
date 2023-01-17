@@ -56,6 +56,8 @@ const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
       JSON.stringify(enabledFeatures)
     );
 
+    console.log('Enabled features (cypress): ', enabledFeatures);
+
     return resp;
   });
 
@@ -142,6 +144,10 @@ const login = (
 
   const extTokenStore = isOauth ? extTokenStoreOAuth : extTokenStoreStfc;
   const externalToken = extTokenStore.get(testUserId)!;
+
+  console.log('isOauth: ', isOauth);
+  console.log('External token store: ', extTokenStore);
+  console.log('Logging in with external token: ', externalToken);
 
   const api = getE2EApi();
   const request = api
