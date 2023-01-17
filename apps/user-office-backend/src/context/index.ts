@@ -1,3 +1,4 @@
+import PDFServices from '../middlewares/factory/factoryServices';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
@@ -95,10 +96,14 @@ interface ResolverContextMutations {
   visit: VisitMutations;
   predefinedMessage: PredefinedMessageMutations;
 }
+interface ResolverContextServices {
+  pdfServices: PDFServices;
+}
 
 export interface BasicResolverContext {
   mutations: ResolverContextMutations;
   queries: ResolverContextQueries;
+  services: ResolverContextServices;
 }
 
 export interface ResolverContext extends BasicResolverContext {
