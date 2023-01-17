@@ -6,12 +6,12 @@ import { DateTime } from 'luxon';
 import initialDBData from '../support/initialDBData';
 
 context('Units tests', () => {
-  describe('Template basic unit tests', () => {
-    beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB();
-    });
+  beforeEach(() => {
+    cy.getAndStoreFeaturesEnabled();
+    cy.resetDB(true);
+  });
 
+  describe('Template basic unit tests', () => {
     it('User officer can create unit', () => {
       cy.login('officer');
       cy.visit('/');
@@ -146,11 +146,6 @@ context('Units tests', () => {
   });
 
   describe('Template advanced unit tests', () => {
-    beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB(true);
-    });
-
     it('Can search answers with units', () => {
       cy.login('officer');
       cy.visit('/');
