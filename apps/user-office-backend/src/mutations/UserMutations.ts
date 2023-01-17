@@ -41,14 +41,12 @@ import {
   UpdateUserRolesArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
-import { AdminDataSource } from './../datasources/AdminDataSource';
 
 @injectable()
 export default class UserMutations {
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
-    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
   ) {}
 
   createHash(password: string): string {
@@ -444,9 +442,6 @@ export default class UserMutations {
         externalToken,
         redirecturi
       );
-
-      const features = await this.adminDataSource.getFeatures();
-      logger.logDebug('Features', { features });
 
       if (!user) {
         return rejection('User not found', { externalToken });
