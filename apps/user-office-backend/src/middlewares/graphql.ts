@@ -150,9 +150,7 @@ const apolloServer = async (app: Express) => {
     formatError: (formattedError, error) => {
       const env = process.env.NODE_ENV;
 
-      // console.log(formattedError, error);
-
-      // NOTE: applyMiddleware must be before addResolversToSchema as a workaround for the issue: https://github.com/maticzav/graphql-middleware/issues/395
+      // NOTE: This is fixed in the next PR for improving the logging and error handling (https://github.com/UserOfficeProject/user-office-core/pull/133)
       // if (env === 'production') {
       //   // prevent exposing too much information when running in production
       //   federatedSchema = applyMiddleware(federatedSchema, rejectionSanitizer);
