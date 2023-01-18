@@ -1295,15 +1295,13 @@ context('Template tests', () => {
       cy.get('[data-cy=import-template-button]').click();
 
       // NOTE: Force is needed because file input is not visible and has display: none
-      cy.get(`[data-cy="${fileQuestion}"]`)
-        .siblings('input[type="file"]')
-        .selectFile(
-          {
-            contents: `cypress/fixtures/${fileName}`,
-            fileName: fileName,
-          },
-          { force: true }
-        );
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName}`,
+          fileName: fileName,
+        },
+        { force: true }
+      );
 
       cy.get("[data-cy='proposal_basis-accordion']")
         .find('[data-cy=conflict-icon]')
