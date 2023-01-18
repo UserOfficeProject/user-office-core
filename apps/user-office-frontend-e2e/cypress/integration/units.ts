@@ -6,12 +6,19 @@ import { DateTime } from 'luxon';
 import initialDBData from '../support/initialDBData';
 
 context('Units tests', () => {
-  describe('Template basic unit tests', () => {
-    beforeEach(() => {
-      cy.resetDB();
-      cy.getAndStoreFeaturesEnabled();
+  beforeEach(() => {
+    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+    // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
     });
 
+    cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
+    
+  });
+
+  describe('Template basic unit tests', () => {
     it('User officer can create unit', () => {
       cy.login('officer');
       cy.visit('/');
@@ -146,11 +153,6 @@ context('Units tests', () => {
   });
 
   describe('Template advanced unit tests', () => {
-    beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB(true);
-    });
-
     it('Can search answers with units', () => {
       cy.login('officer');
       cy.visit('/');
