@@ -424,7 +424,9 @@ export const collectProposalPDFDataTokenAccess = async (
   const principalInvestigator = await userDataSource.getBasicUserInfo(
     proposal.proposerId
   );
-  const coProposers = await userDataSource.getProposalUsers(proposalPk);
+  const coProposers = await userDataSource.getProposalUsers(
+    proposal.primaryKey
+  );
 
   if (!principalInvestigator || !coProposers) {
     throw new Error('Proposal has no PI or co-proposer');
@@ -437,7 +439,7 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   const samples = await sampleDataSource.getSamples({
-    filter: { proposalPk },
+    filter: { proposalPk: proposal.primaryKey },
   });
 
   const samplePDFData = (
@@ -473,7 +475,7 @@ export const collectProposalPDFDataTokenAccess = async (
     );
 
   const genericTemplates = await genericTemplateDataSource.getGenericTemplates({
-    filter: { proposalPk },
+    filter: { proposalPk: proposal.primaryKey },
   });
 
   const genericTemplatePDFData = (
