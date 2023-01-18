@@ -13,8 +13,8 @@ context('Units tests', () => {
       win.location.href = 'about:blank';
     });
 
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Template basic unit tests', () => {
