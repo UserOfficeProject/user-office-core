@@ -13,7 +13,8 @@ export class Rejection extends GraphQLError {
        * NOTE: https://www.apollographql.com/docs/apollo-server/data/errors/#setting-http-status-code-and-headers
        * GraphQL, by design, does not use the same conventions from REST to communicate via HTTP verbs and status codes.
        * Client information should be contained in the schema or as part of the standard response errors field.
-       * To change the HTTP status code and response headers based on an error thrown in either a resolver or context function, throw a rejection with an http extension, like so:
+       * If you still want to change the HTTP status code and response headers based on an error thrown in either a resolver or context function
+       * there is a way to do so by throwing a rejection with an http extension, like so:
        * rejection('error message', {
           code: ApolloServerErrorCodeExtended.NOT_FOUND,
           http: {
