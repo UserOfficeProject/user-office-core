@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -6,6 +7,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { getContextKeys } from '../utils/helperFunctions';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 @injectable()
@@ -68,64 +70,53 @@ export default class AdminQueries {
     agent: UserWithRole | null,
     context: BasicResolverContext
   ) {
-    const allQueryMethods: string[] = [];
-    const allMutationMethods: string[] = [];
-    const allServicesMethods: string[] = [];
+    const allQueryMethods: string[] = getContextKeys(context, 'queries');
+    const allMutationMethods: string[] = getContextKeys(context, 'mutations');
+    const allServicesMethods: string[] = getContextKeys(context, 'services');
 
-    Object.keys(context.queries).forEach((queryKey) => {
-      const element =
-        context.queries[queryKey as keyof BasicResolverContext['queries']];
+    // NOTE: If the scheduler is disabled we get undefined as scheduler client
+    const scheduler = await context.clients.scheduler();
 
-      const proto = Object.getPrototypeOf(element);
-      const names = Object.getOwnPropertyNames(proto).filter((item) =>
-        item.startsWith('get')
-      );
+    if (scheduler) {
+      try {
+        const schedulerQueriesAndMutations =
+          await scheduler.getQueriesAndMutations();
 
-      const classNamesWithMethod = names.map(
-        (item) => `${proto.constructor.name}.${item}`
-      );
-
-      allQueryMethods.push(...classNamesWithMethod);
-    });
-
-    Object.keys(context.mutations).forEach((mutationKey) => {
-      const element =
-        context.mutations[
-          mutationKey as keyof BasicResolverContext['mutations']
-        ];
-
-      const proto = Object.getPrototypeOf(element);
-      const names = Object.getOwnPropertyNames(proto).filter(
-        (item) => item !== 'constructor'
-      );
-
-      const classNamesWithMethod = names.map(
-        (item) => `${proto.constructor.name}.${item}`
-      );
-
-      allMutationMethods.push(...classNamesWithMethod);
-    });
-
-    Object.keys(context.services).forEach((servicesKey) => {
-      const element =
-        context.services[servicesKey as keyof BasicResolverContext['services']];
-
-      const proto = Object.getPrototypeOf(element);
-      const names = Object.getOwnPropertyNames(proto).filter(
-        (item) => item !== 'constructor'
-      );
-
-      const classNamesWithMethod = names.map(
-        (item) => `${proto.constructor.name}.${item}`
-      );
-
-      allServicesMethods.push(...classNamesWithMethod);
-    });
+        if (schedulerQueriesAndMutations) {
+          return {
+            queries: [
+              { groupName: 'core', items: allQueryMethods },
+              {
+                groupName: 'scheduler',
+                items:
+                  schedulerQueriesAndMutations.schedulerQueriesAndMutations
+                    ?.queries,
+              },
+            ],
+            mutations: [
+              { groupName: 'core', items: allMutationMethods },
+              {
+                groupName: 'scheduler',
+                items:
+                  schedulerQueriesAndMutations.schedulerQueriesAndMutations
+                    ?.mutations,
+              },
+            ],
+            services: [{ groupName: 'core', items: allServicesMethods }],
+          };
+        }
+      } catch (error) {
+        logger.logException(
+          'Failed while getting scheduler queries and mutations',
+          error
+        );
+      }
+    }
 
     return {
-      queries: allQueryMethods,
-      mutations: allMutationMethods,
-      services: allServicesMethods,
+      queries: [{ groupName: 'core', items: allQueryMethods }],
+      mutations: [{ groupName: 'core', items: allMutationMethods }],
+      services: [{ groupName: 'core', items: allServicesMethods }],
     };
   }
 }
