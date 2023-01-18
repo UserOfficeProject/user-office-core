@@ -15,7 +15,6 @@ context('Units tests', () => {
 
     cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled();
-    
   });
 
   describe('Template basic unit tests', () => {

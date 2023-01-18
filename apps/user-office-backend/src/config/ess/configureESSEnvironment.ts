@@ -1,4 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { AdminDataSource } from '../../datasources/AdminDataSource';
@@ -85,7 +84,6 @@ async function enableDefaultEssFeatures() {
     ],
     true
   );
-  logger.logInfo('Enabled default ESS features', { label: 'ESS' });
   await db.updateSettings({
     settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
     settingsValue: 'ME',

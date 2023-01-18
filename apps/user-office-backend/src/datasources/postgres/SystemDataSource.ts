@@ -12,12 +12,12 @@ export default class PostgresSystemDataSource implements SystemDataSource {
           return true;
         })
         .catch((error) => {
-          logger.logException('connectivityCheck failed', error);
+          logger.logInfo('Connection not ready yet', { error });
 
           return false;
         });
     } catch (error) {
-      logger.logException('connectivityCheck failed', error);
+      logger.logInfo('Connection not ready yet', { error });
 
       return false;
     }
