@@ -4,7 +4,7 @@ import {
   getAllFields,
   areDependenciesSatisfied,
 } from '../../models/ProposalModelFunctions';
-import { Answer } from '../../models/Questionary';
+import { Answer, Questionary, QuestionaryStep } from '../../models/Questionary';
 import { UserWithRole } from '../../models/User';
 import { getFileAttachments, Attachment } from '../util';
 
@@ -17,13 +17,17 @@ export type GenericTemplatePDFData = {
 export async function collectGenericTemplatePDFData(
   genericTemplateId: number,
   user: UserWithRole,
-  notify?: CallableFunction
+  notify?: CallableFunction,
+  newGenericTemplate?: GenericTemplate,
+  newQuestionary?: Questionary,
+  newQuestionarySteps?: QuestionaryStep[]
 ): Promise<GenericTemplatePDFData> {
   const genericTemplate =
-    await baseContext.queries.genericTemplate.getGenericTemplate(
+    newGenericTemplate ||
+    (await baseContext.queries.genericTemplate.getGenericTemplate(
       user,
       genericTemplateId
-    );
+    ));
   if (!genericTemplate) {
     throw new Error(
       `GenericTemplate with ID '${genericTemplateId}' not found, or the user has insufficient rights`
@@ -32,10 +36,12 @@ export async function collectGenericTemplatePDFData(
 
   notify?.(`genericTemplate_${genericTemplate.id}.pdf`);
 
-  const questionary = await baseContext.queries.questionary.getQuestionary(
-    user,
-    genericTemplate.questionaryId
-  );
+  const questionary =
+    newQuestionary ||
+    (await baseContext.queries.questionary.getQuestionary(
+      user,
+      genericTemplate.questionaryId
+    ));
 
   if (!questionary) {
     throw new Error(
@@ -44,10 +50,11 @@ export async function collectGenericTemplatePDFData(
   }
 
   const questionarySteps =
-    await baseContext.queries.questionary.getQuestionarySteps(
+    newQuestionarySteps ||
+    (await baseContext.queries.questionary.getQuestionarySteps(
       user,
       genericTemplate.questionaryId
-    );
+    ));
 
   if (!questionarySteps) {
     throw new Error(
