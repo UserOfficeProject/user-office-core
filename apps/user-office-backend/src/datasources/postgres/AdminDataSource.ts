@@ -286,7 +286,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         });
     }
 
-    logger.logInfo('Applying patches finished', {});
+    logger.logInfo('Applying patches finished', { timestamp: new Date() });
 
     return log.join('\n');
   }

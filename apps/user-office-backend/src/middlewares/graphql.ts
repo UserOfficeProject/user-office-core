@@ -29,6 +29,7 @@ import { UserWithRole } from '../models/User';
 import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
+import initGraphQLClient from './graphqlClient';
 
 export const context: ContextFunction<
   [ExpressContextFunctionArgument],
@@ -70,7 +71,13 @@ export const context: ContextFunction<
     }
   }
 
-  const context = { ...baseContext, user };
+  const context: ResolverContext = {
+    ...baseContext,
+    user,
+    clients: {
+      scheduler: initGraphQLClient(req.headers.authorization),
+    },
+  };
 
   return context;
 };
