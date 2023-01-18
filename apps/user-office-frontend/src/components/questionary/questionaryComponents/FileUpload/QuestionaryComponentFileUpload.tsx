@@ -49,6 +49,7 @@ export function QuestionaryComponentFileUpload(
       </FormLabel>
       <FileUploadComponent
         id={answer.question.id}
+        question={answer.question.question}
         maxFiles={config.max_files}
         pdfPageLimit={config.pdf_page_limit}
         fileType={config.file_type ? config.file_type.join(',') : ''}

@@ -485,11 +485,16 @@ context('Template tests', () => {
         url: '/files/upload',
       }).as('upload');
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.get(`[data-cy="${fileQuestion}"]`)
+        .siblings('input[type="file"]')
+        .selectFile(
+          {
+            contents: `cypress/fixtures/${fileName}`,
+            fileName: fileName,
+          },
+          { force: true }
+        );
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
@@ -789,11 +794,16 @@ context('Template tests', () => {
         url: '/files/upload',
       }).as('upload');
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.get(`[data-cy="${fileQuestion}"]`)
+        .siblings('input[type="file"]')
+        .selectFile(
+          {
+            contents: `cypress/fixtures/${fileName}`,
+            fileName: fileName,
+          },
+          { force: true }
+        );
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
