@@ -92,6 +92,12 @@ context('Proposal tests', () => {
 
   describe('Proposal basic tests', () => {
     beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
       cy.createTemplate({
@@ -140,6 +146,7 @@ context('Proposal tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
@@ -164,7 +171,16 @@ context('Proposal tests', () => {
       cy.contains('Title is required');
       cy.contains('Abstract is required');
 
+      cy.get('[data-cy=title]').type(' ');
+      cy.get('[data-cy=abstract]').type(' ');
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Title is required');
+      cy.contains('Abstract is required');
+
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
@@ -172,15 +188,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -657,6 +664,12 @@ context('Proposal tests', () => {
 
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB(true);
     });
@@ -689,8 +702,14 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal  basic tests', () => {
+  describe('Proposal internal basic tests', () => {
     beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
       cy.createTemplate({
@@ -716,13 +735,14 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Internal user should be able to create and clone  and delete an internal  proposal', function () {
+    it('Internal user should be able to create and clone and delete an internal proposal', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
@@ -748,6 +768,7 @@ context('Proposal tests', () => {
       cy.contains('Abstract is required');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
@@ -755,15 +776,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -850,6 +862,7 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
@@ -875,6 +888,7 @@ context('Proposal tests', () => {
       cy.contains('Abstract is required');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input')
         .type(newProposalTitle)
@@ -884,15 +898,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 

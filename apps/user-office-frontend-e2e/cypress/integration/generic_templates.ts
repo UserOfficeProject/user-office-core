@@ -301,6 +301,8 @@ context('GenericTemplates tests', () => {
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
       cy.get('[data-cy=title] input').type(faker.lorem.words(1));
 
       cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
@@ -331,6 +333,7 @@ context('GenericTemplates tests', () => {
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(proposalTitle[1]);
 
@@ -473,6 +476,7 @@ context('GenericTemplates tests', () => {
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(proposalTitle[1]);
 

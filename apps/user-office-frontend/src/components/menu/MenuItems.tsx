@@ -167,7 +167,6 @@ const ExperimentSafetyMenuListItem = () => {
 
 const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const proposalDisabled = callsData.length === 0;
-  const multipleCalls = callsData.length > 1;
   const context = useContext(FeatureContext);
 
   const isSchedulerEnabled = context.featuresMap.get(
@@ -199,11 +198,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
       <Tooltip title="New Proposal">
         <ListItem
           component={NavLink}
-          to={
-            multipleCalls
-              ? '/ProposalSelectType'
-              : `/ProposalCreate/${callsData[0]?.id}/${callsData[0]?.templateId}`
-          }
+          to="/ProposalSelectType"
           button
           disabled={proposalDisabled}
         >

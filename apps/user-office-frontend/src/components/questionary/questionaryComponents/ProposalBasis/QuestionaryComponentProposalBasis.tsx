@@ -170,7 +170,7 @@ const proposalBasisPreSubmit =
       }
     } else {
       const createResult = await api.createProposal({
-        callId: call?.id,
+        callId: call!.id,
       });
 
       if (createResult.createProposal.proposal) {

@@ -31,13 +31,28 @@ beforeEach(() => {
 
 test('A user on the proposal can update its title if it is in edit mode', () => {
   const newTitle = 'New Title';
+  const newAbstract = 'New Abstract';
 
   return expect(
     proposalMutations.update(dummyUserWithRole, {
       proposalPk: 1,
       title: newTitle,
+      abstract: newAbstract,
     })
   ).resolves.toHaveProperty('title', newTitle);
+});
+
+test('A user can not create a proposal with blank title and abstract', () => {
+  const newTitle = '';
+  const newAbstract = '';
+
+  return expect(
+    proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: newTitle,
+      abstract: newAbstract,
+    })
+  ).resolves.toBeInstanceOf(Rejection);
 });
 
 test('A user on the proposal can not update its title if it is not in edit mode', async () => {
@@ -51,34 +66,40 @@ test('A user on the proposal can not update its title if it is not in edit mode'
 
 test('A user-officer can update a proposal', async () => {
   const newTitle = 'New Title';
+  const newAbstract = 'New Abstract';
 
   return expect(
     proposalMutations.update(dummyUserOfficerWithRole, {
       proposalPk: 1,
       title: newTitle,
+      abstract: newAbstract,
     })
   ).resolves.toHaveProperty('title', newTitle);
 });
 
 test('A user-officer can update a proposal even if the call is not active', async () => {
   const newTitle = 'New Title';
+  const newAbstract = 'New Abstract';
 
   return expect(
     proposalMutations.update(dummyUserOfficerWithRole, {
       proposalPk: dummyProposalWithNotActiveCall.primaryKey,
       title: newTitle,
+      abstract: newAbstract,
     })
   ).resolves.toHaveProperty('title', newTitle);
 });
 
 test('A user-officer can update submitted proposal', async () => {
   const newTitle = 'New Title';
+  const newAbstract = 'New Abstract';
   await proposalMutations.submit(dummyUserOfficerWithRole, { proposalPk: 1 });
 
   return expect(
     proposalMutations.update(dummyUserOfficerWithRole, {
       proposalPk: 1,
       title: newTitle,
+      abstract: newAbstract,
     })
   ).resolves.toHaveProperty('title', newTitle);
 });
@@ -93,12 +114,16 @@ test('A user-officer can submit proposal even if the call is not active', async 
 
 test('A user-officer can update a proposals score in submit mode', async () => {
   const newProposerId = 99;
+  const newTitle = 'New Title';
+  const newAbstract = 'New Abstract';
   await proposalMutations.submit(dummyUserOfficerWithRole, { proposalPk: 1 });
 
   return expect(
     proposalMutations.update(dummyUserOfficerWithRole, {
       proposalPk: 1,
       proposerId: newProposerId,
+      title: newTitle,
+      abstract: newAbstract,
     })
   ).resolves.toHaveProperty('proposerId', newProposerId);
 });

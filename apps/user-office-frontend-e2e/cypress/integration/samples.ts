@@ -241,6 +241,8 @@ context('Samples tests', () => {
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
       cy.get('[data-cy=title] input').type(proposalTitle);
 
       cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);
@@ -312,6 +314,8 @@ context('Samples tests', () => {
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
       cy.get('[data-cy=title] input').type(proposalTitle);
 
       cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);

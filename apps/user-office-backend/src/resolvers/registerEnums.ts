@@ -26,6 +26,7 @@ import {
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { TrainingStatus } from '../models/VisitRegistration';
+import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { EsdEvaluation } from './../models/EsdEvaluation';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
@@ -92,5 +93,8 @@ export const registerEnums = () => {
   });
   registerEnumType(EsdEvaluation, {
     name: 'EsdEvaluation',
+  });
+  registerEnumType(QueryMutationAndServicesGroups, {
+    name: 'QueryMutationAndServicesGroups',
   });
 };

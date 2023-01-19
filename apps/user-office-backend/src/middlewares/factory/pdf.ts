@@ -1,6 +1,7 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
-import { collectProposalPDFData } from '../../factory/pdf/proposal';
+import { ProposalPDFData } from '../../factory/pdf/proposal';
 import { collectSamplePDFData } from '../../factory/pdf/sample';
 import { collectShipmentPDFData } from '../../factory/pdf/shipmentLabel';
 import callFactoryService, {
@@ -9,6 +10,7 @@ import callFactoryService, {
   PDFType,
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
+import FactoryServices, { PDFServices } from './factoryServices';
 
 const router = express.Router();
 
@@ -17,12 +19,11 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     if (!req.user) {
       throw new Error('Not authorized');
     }
+    const pdfServices = container.resolve<PDFServices>(FactoryServices);
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
-
     const proposalPks: number[] = req.params.proposal_pks
       .split(',')
       .map((n: string) => parseInt(n))
@@ -32,19 +33,18 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       collectionFilename: `proposals_${getCurrentTimestamp()}.pdf`,
       singleFilename: '',
     };
-    const data = await Promise.all(
-      proposalPks.map((proposalPk, indx) =>
-        collectProposalPDFData(
-          proposalPk,
-          userWithRole,
-          indx === 0
-            ? (filename: string) => (meta.singleFilename = filename)
-            : undefined
-        )
-      )
+
+    const data = await pdfServices.getPdfProposals(
+      userWithRole,
+      proposalPks,
+      meta,
+      req.query?.filter?.toString()
     );
 
-    callFactoryService(
+    if (!data) {
+      throw new Error('Could not get proposal details');
+    }
+    callFactoryService<ProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
       { data, meta },
