@@ -486,8 +486,9 @@ context('Template tests', () => {
       }).as('upload');
 
       // NOTE: Force is needed because file input is not visible and has display: none
-      cy.get(`[data-cy="${fileQuestion}"]`)
-        .siblings('input[type="file"]')
+      cy.contains(fileQuestion)
+        .parent()
+        .find('input[type="file"]')
         .selectFile(
           {
             contents: `cypress/fixtures/${fileName}`,
@@ -795,8 +796,9 @@ context('Template tests', () => {
       }).as('upload');
 
       // NOTE: Force is needed because file input is not visible and has display: none
-      cy.get(`[data-cy="${fileQuestion}"]`)
-        .siblings('input[type="file"]')
+      cy.contains(fileQuestion)
+        .parent()
+        .find('input[type="file"]')
         .selectFile(
           {
             contents: `cypress/fixtures/${fileName}`,

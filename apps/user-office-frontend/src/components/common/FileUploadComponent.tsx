@@ -211,7 +211,6 @@ export function FileEntry(props: {
 }
 
 export function NewFileEntry(props: {
-  question?: string;
   filetype: string | undefined;
   onUploadComplete: (data: FileMetaData) => void;
 }) {
@@ -304,24 +303,18 @@ export function NewFileEntry(props: {
       );
     case UPLOAD_STATE.PRISTINE:
       return (
-        <>
-          <label>
-            <input
-              accept={props.filetype}
-              style={{ display: 'none' }}
-              type="file"
-              multiple={false}
-              onChange={onFileSelected}
-            />
-            <Button
-              variant="outlined"
-              component="span"
-              data-cy={props.question}
-            >
-              <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
-            </Button>
-          </label>
-        </>
+        <label>
+          <input
+            accept={props.filetype}
+            style={{ display: 'none' }}
+            type="file"
+            multiple={false}
+            onChange={onFileSelected}
+          />
+          <Button variant="outlined" component="span">
+            <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
+          </Button>
+        </label>
       );
     case UPLOAD_STATE.ABORTED:
       return (
@@ -370,7 +363,6 @@ const useStyles = makeStyles(() => ({
 export function FileUploadComponent(props: {
   maxFiles?: number; // 0 is unlimited
   id?: string;
-  question?: string;
   fileType: string;
   pdfPageLimit: number; // 0 is unlimited
   value: FileIdWithCaptionAndFigure[];
@@ -432,11 +424,7 @@ export function FileUploadComponent(props: {
   let newFileEntry;
   if (files.length < maxFiles || maxFiles === 0) {
     newFileEntry = (
-      <NewFileEntry
-        filetype={fileType}
-        question={props.question}
-        onUploadComplete={onUploadComplete}
-      />
+      <NewFileEntry filetype={fileType} onUploadComplete={onUploadComplete} />
     );
   }
 
