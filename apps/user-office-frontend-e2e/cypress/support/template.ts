@@ -28,7 +28,7 @@ const navigateToTemplatesSubmenu = (submenuName: string) => {
     if ($body.find(`[aria-label='${submenuName}']`).length) {
       cy.get(`[aria-label='${submenuName}']`).children().first().click();
     } else {
-      cy.contains('[aria-label="Templates"]').click();
+      cy.get('[aria-label="Templates"]').click();
       cy.get(`[aria-label='${submenuName}']`).children().first().click();
     }
   });
