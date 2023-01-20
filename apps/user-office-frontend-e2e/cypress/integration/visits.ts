@@ -21,9 +21,6 @@ context('visits tests', () => {
   beforeEach(function () {
     cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
-      this.skip();
-    }
     cy.updateProposal({
       proposalPk: existingProposalId,
       proposerId: PI.id,
@@ -35,6 +32,13 @@ context('visits tests', () => {
       managementTimeAllocation: 5,
       managementDecisionSubmitted: true,
     });
+  });
+
+  beforeEach(function () {
+    // NOTE: We keep this check in separate beforeEach because it is not set right after getAndStoreFeaturesEnabled
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
+      this.skip();
+    }
   });
 
   const startQuestion = 'Visit start';

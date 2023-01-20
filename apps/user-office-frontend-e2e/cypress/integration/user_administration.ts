@@ -22,6 +22,7 @@ context('User administration tests', () => {
   });
 
   beforeEach(function () {
+    // NOTE: We keep this check in separate beforeEach because it is not set right after getAndStoreFeaturesEnabled
     if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
       this.skip();
     }
