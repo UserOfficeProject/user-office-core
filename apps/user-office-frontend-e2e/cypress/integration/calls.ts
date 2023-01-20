@@ -504,7 +504,7 @@ context('Calls tests', () => {
         'have.value',
         initialDBData.template.name
       );
-      cy.get('[data-cy="next-step"]').click();
+      cy.get('.MuiStep-root').contains('Reviews').click();
 
       cy.get('[data-cy="call-seps"]').click();
 

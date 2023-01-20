@@ -25,6 +25,7 @@ context('PageTable component tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
@@ -80,6 +81,7 @@ context('PageTable component tests', () => {
       cy.contains('Dashboard').click();
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
@@ -93,6 +95,7 @@ context('PageTable component tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
@@ -193,6 +196,7 @@ context('PageTable component tests', () => {
 
       cy.finishedLoading();
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
