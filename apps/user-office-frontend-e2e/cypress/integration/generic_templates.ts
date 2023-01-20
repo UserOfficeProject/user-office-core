@@ -158,8 +158,8 @@ context('GenericTemplates tests', () => {
       win.location.href = 'about:blank';
     });
 
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Generic templates basic tests', () => {

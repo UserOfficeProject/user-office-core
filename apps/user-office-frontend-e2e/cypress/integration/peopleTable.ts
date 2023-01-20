@@ -10,16 +10,13 @@ context('PageTable component tests', () => {
   const abstract = faker.random.words(8);
 
   beforeEach(function () {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
-    const isUserManagementEnabled = featureFlags
-      .getEnabledFeatures()
-      .get(FeatureId.USER_MANAGEMENT);
-
-    if (!isUserManagementEnabled) {
-      // false or undefined
-      this.skip();
-    }
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      // NOTE: We can check features after they are stored to the local storage
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
   });
 
   describe('ProposalPeopleTable component Preserve selected users', () => {
@@ -28,6 +25,7 @@ context('PageTable component tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
@@ -83,6 +81,7 @@ context('PageTable component tests', () => {
       cy.contains('Dashboard').click();
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
@@ -96,6 +95,7 @@ context('PageTable component tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
@@ -187,7 +187,7 @@ context('PageTable component tests', () => {
           department: faker.commerce.department(),
           position: faker.name.jobTitle(),
           email: emails[index],
-          telephone: faker.phone.phoneNumber('0##########'),
+          telephone: faker.phone.number('0##########'),
         });
       });
 
@@ -196,6 +196,7 @@ context('PageTable component tests', () => {
 
       cy.finishedLoading();
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
@@ -350,7 +351,7 @@ context('PageTable component tests', () => {
           department: faker.commerce.department(),
           position: faker.name.jobTitle(),
           email: emails[index],
-          telephone: faker.phone.phoneNumber('0##########'),
+          telephone: faker.phone.number('0##########'),
         });
       });
       cy.login('officer');
@@ -420,7 +421,7 @@ context('PageTable component tests', () => {
           department: faker.commerce.department(),
           position: faker.name.jobTitle(),
           email: emails[index],
-          telephone: faker.phone.phoneNumber('0##########'),
+          telephone: faker.phone.number('0##########'),
         });
       });
       let firstTableRowTextBeforeSorting: string;
