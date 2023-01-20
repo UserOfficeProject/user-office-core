@@ -8,10 +8,10 @@ import initialDBData from '../support/initialDBData';
 
 context('App settings tests', () => {
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport(1920, 2000);
     cy.getAndStoreAppSettings();
     cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
   });
 
   describe('Modify app settings', () => {

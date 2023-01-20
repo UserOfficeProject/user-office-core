@@ -336,8 +336,8 @@ context('Template tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
   });
 

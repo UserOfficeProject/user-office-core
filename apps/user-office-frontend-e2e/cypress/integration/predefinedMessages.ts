@@ -4,8 +4,8 @@ import initialDBData from '../support/initialDBData';
 
 context('Predefined messages tests', () => {
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
   });
 
   const messageTitle = faker.random.words();
