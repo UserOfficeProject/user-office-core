@@ -86,11 +86,14 @@ context('Shipments tests', () => {
 
     cy.get('[data-cy=import-template-button]').click();
 
-    cy.get('input[type="file"]').attachFixture({
-      filePath: shipmentsTemplateFile,
-      fileName: shipmentsTemplateFile,
-      mimeType: 'application/json',
-    });
+    // NOTE: Force is needed because file input is not visible and has display: none
+    cy.get('input[type="file"]').selectFile(
+      {
+        contents: `cypress/fixtures/${shipmentsTemplateFile}`,
+        fileName: shipmentsTemplateFile,
+      },
+      { force: true }
+    );
 
     cy.get('[data-cy="import-template-button"]').click();
 
