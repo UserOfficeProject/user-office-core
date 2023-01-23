@@ -11,15 +11,13 @@ context('Scheduler tests', () => {
   const completed = initialDBData.scheduledEvents.completed;
   const scientist = initialDBData.users.user1;
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-  });
-
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-      this.skip();
-    }
+    cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        this.skip();
+      }
+    });
 
     cy.updateUserRoles({
       id: scientist.id,

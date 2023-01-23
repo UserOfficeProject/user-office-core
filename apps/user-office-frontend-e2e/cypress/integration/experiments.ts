@@ -4,16 +4,16 @@ import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Experiments tests', () => {
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-  });
-
   beforeEach(function () {
+    cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      // NOTE: We can check features after they are stored to the local storage
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        this.skip();
+      }
+    });
+
     cy.viewport(1920, 1080);
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-      this.skip();
-    }
     cy.updateProposalManagementDecision({
       proposalPk: initialDBData.proposal.id,
       statusId: 1,
