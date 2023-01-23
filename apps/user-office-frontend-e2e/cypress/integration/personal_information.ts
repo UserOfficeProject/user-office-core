@@ -17,7 +17,7 @@ context('Personal information tests', () => {
   const otherOrg = faker.commerce.department();
   const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.phoneNumber('0##########');
+  const newTelephone = faker.phone.number('0##########');
 
   it('Should be able to see user officer role in use', () => {
     // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.

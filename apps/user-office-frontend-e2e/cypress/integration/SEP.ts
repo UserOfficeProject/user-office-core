@@ -157,6 +157,7 @@ function createWorkflowAndEsiTemplate() {
 }
 
 function initializationBeforeTests() {
+  updateUsersRoles();
   cy.createSep({
     code: sep1.code,
     description: sep1.description,
@@ -199,8 +200,8 @@ context('SEP reviews tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
+      initializationBeforeTests();
     });
-    initializationBeforeTests();
   });
 
   describe('User officer role', () => {
@@ -546,7 +547,7 @@ context('SEP reviews tests', () => {
       cy.updateUserDetails({
         ...loggedInUserParsed,
         organisation: 2,
-        telephone: faker.phone.phoneNumber('+4670#######'),
+        telephone: faker.phone.number('+4670#######'),
         user_title: 'Dr.',
         gender: 'male',
         nationality: 1,
