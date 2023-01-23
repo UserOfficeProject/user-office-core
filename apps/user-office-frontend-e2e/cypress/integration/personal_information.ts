@@ -6,8 +6,8 @@ import initialDBData from '../support/initialDBData';
 
 context('Personal information tests', () => {
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   const newFirstName = faker.name.firstName();
@@ -17,7 +17,7 @@ context('Personal information tests', () => {
   const otherOrg = faker.commerce.department();
   const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.phoneNumber('0##########');
+  const newTelephone = faker.phone.number('0##########');
 
   it('Should be able to see user officer role in use', () => {
     cy.updateUserRoles({

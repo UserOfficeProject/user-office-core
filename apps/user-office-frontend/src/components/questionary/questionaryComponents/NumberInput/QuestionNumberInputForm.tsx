@@ -29,7 +29,8 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(0.5),
   },
   textRightAlign: {
-    textAlign: 'right',
+    marginLeft: 'auto',
+    marginRight: 0,
   },
   closeButton: {
     position: 'absolute',

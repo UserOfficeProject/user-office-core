@@ -98,8 +98,8 @@ context('Proposal tests', () => {
         win.location.href = 'about:blank';
       });
 
-      cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
       cy.createTemplate({
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
