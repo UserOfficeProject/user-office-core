@@ -11,8 +11,8 @@ import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Proposal statuses tests', () => {

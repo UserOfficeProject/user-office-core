@@ -8,8 +8,8 @@ import { TestUserId } from './../support/user';
 
 context('Event log tests', () => {
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Proposal event logs', () => {

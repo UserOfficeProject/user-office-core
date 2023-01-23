@@ -9,8 +9,8 @@ context('PDF template tests', () => {
   let createdTemplateName: string;
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1080);
   });
 

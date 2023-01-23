@@ -42,8 +42,8 @@ context('Instrument tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   // TODO: Maybe this should be moved to permission testing.

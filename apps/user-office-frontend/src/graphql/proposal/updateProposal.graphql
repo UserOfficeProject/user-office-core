@@ -1,7 +1,7 @@
 mutation updateProposal(
   $proposalPk: Int!
-  $title: String
-  $abstract: String
+  $title: String!
+  $abstract: String!
   $users: [Int!]
   $proposerId: Int
 ) {

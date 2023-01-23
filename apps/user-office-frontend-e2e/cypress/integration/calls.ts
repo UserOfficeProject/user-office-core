@@ -80,8 +80,8 @@ context('Calls tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
     cy.createTemplate({
       groupId: TemplateGroupId.PROPOSAL_ESI,
       name: esiTemplateName,
@@ -503,7 +503,7 @@ context('Calls tests', () => {
         'have.value',
         initialDBData.template.name
       );
-      cy.get('[data-cy="next-step"]').click();
+      cy.get('.MuiStep-root').contains('Reviews').click();
 
       cy.get('[data-cy="call-seps"]').click();
 
