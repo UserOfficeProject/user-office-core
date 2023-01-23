@@ -157,7 +157,6 @@ function createWorkflowAndEsiTemplate() {
 }
 
 function initializationBeforeTests() {
-  updateUsersRoles();
   cy.createSep({
     code: sep1.code,
     description: sep1.description,
@@ -200,8 +199,9 @@ context('SEP reviews tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
-      initializationBeforeTests();
+      updateUsersRoles();
     });
+    initializationBeforeTests();
   });
 
   describe('User officer role', () => {
@@ -963,6 +963,7 @@ context('SEP meeting components tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
+      updateUsersRoles();
     });
     initializationBeforeTests();
     cy.assignProposalsToSep({
