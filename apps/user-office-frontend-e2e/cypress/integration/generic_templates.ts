@@ -675,7 +675,7 @@ context('GenericTemplates tests', () => {
     beforeEach(() => {
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
         if (result.createProposalWorkflow.proposalWorkflow) {
-          workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
+          workflowId = result.createProposalWorkflow.proposalWorkflow.id;
           const genericSubTemplates = getGenericSubTemplates(2);
           createGenericTemplateWithSubTemplate(genericSubTemplates);
           cy.createProposal({ callId: initialDBData.call.id }).then(
