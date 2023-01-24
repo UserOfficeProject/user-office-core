@@ -1,0 +1,16 @@
+query getAllQueriesMutationsAndServices {
+  queriesMutationsAndServices {
+    queries {
+      groupName
+      items
+    }
+    mutations {
+      groupName
+      items
+    }
+    services {
+      groupName
+      items
+    }
+  }
+}
