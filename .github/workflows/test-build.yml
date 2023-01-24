@@ -158,6 +158,9 @@ jobs:
         with:
           path: apps/user-office-frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          restore-keys: |
+            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            sdk-frontend-
 
       - run: npm run build
         env:
@@ -257,6 +260,9 @@ jobs:
         with:
           path: apps/user-office-frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          restore-keys: |
+            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            sdk-frontend-
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
@@ -420,6 +426,9 @@ jobs:
         with:
           path: apps/user-office-frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          restore-keys: |
+            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            sdk-frontend-
 
       - name: Build and push frontend
         uses: docker/build-push-action@v3
