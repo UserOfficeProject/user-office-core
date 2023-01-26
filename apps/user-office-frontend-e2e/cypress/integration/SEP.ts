@@ -139,8 +139,6 @@ function createWorkflowAndEsiTemplate() {
 }
 
 function initializationBeforeTests() {
-  cy.getAndStoreFeaturesEnabled();
-  cy.resetDB();
   cy.createSep({
     code: sep1.code,
     description: sep1.description,
@@ -189,22 +187,33 @@ function initializationBeforeTests() {
 }
 
 context('SEP reviews tests', () => {
-  beforeEach(() => {
-    initializationBeforeTests();
-    cy.getAndStoreFeaturesEnabled();
-  });
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
-      this.skip();
-    }
-  });
-
-  describe('User officer role', () => {
-    it('Officer should be able to assign proposal to existing SEP', function () {
-      cy.getAndStoreFeaturesEnabled();
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
+    });
+    initializationBeforeTests();
+  });
+
+  describe('User officer role', () => {
+    it('Copy to clipboard should work for Code in SEPs page', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(createdProposalId).realClick();
+
+      cy.window().then((win) => {
+        win.navigator.clipboard.readText().then((text) => {
+          cy.get('[role="alert"]').should('contain', text);
+        });
+      });
+    });
+
+    it('Officer should be able to assign proposal to existing SEP', function () {
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
@@ -651,8 +660,8 @@ context('SEP reviews tests', () => {
       cy.updateUserDetails({
         ...loggedInUserParsed,
         organisation: 2,
-        telephone: faker.phone.phoneNumber('+4670#######'),
-        telephone_alt: faker.phone.phoneNumber('+4670#######'),
+        telephone: faker.phone.number('+4670#######'),
+        telephone_alt: faker.phone.number('+4670#######'),
       } as UpdateUserMutationVariables);
 
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
@@ -873,7 +882,7 @@ context('SEP reviews tests', () => {
 
       cy.get('[data-cy="SEPs-table"]')
         .contains(sep1.code)
-        .parent()
+        .closest('tr')
         .find('[aria-label="Edit"]')
         .click();
 
@@ -923,13 +932,14 @@ context('SEP reviews tests', () => {
 context('SEP meeting components tests', () => {
   let createdInstrumentId: number;
 
-  beforeEach(() => {
-    initializationBeforeTests();
-  });
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
-      this.skip();
-    }
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
+    });
+    initializationBeforeTests();
     createWorkflowAndEsiTemplate();
     cy.assignProposalsToSep({
       sepId: createdSepId,
@@ -1065,6 +1075,7 @@ context('SEP meeting components tests', () => {
                 cy.updateProposal({
                   proposalPk: createdProposal.primaryKey,
                   title: proposal2.title,
+                  abstract: proposal2.abstract,
                   proposerId: initialDBData.users.user1.id,
                 });
 
@@ -1130,6 +1141,7 @@ context('SEP meeting components tests', () => {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal2.title,
+            abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
 
@@ -1233,6 +1245,7 @@ context('SEP meeting components tests', () => {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal2.title,
+            abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
 
@@ -1397,6 +1410,7 @@ context('SEP meeting components tests', () => {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
               title: proposal2.title,
+              abstract: proposal2.abstract,
             });
             cy.createSep({
               code: sep2.code,
@@ -1750,6 +1764,7 @@ context('SEP meeting components tests', () => {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
               title: proposal2.title,
+              abstract: proposal2.abstract,
             });
             cy.createSep({
               code: sep2.code,

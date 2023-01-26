@@ -13,7 +13,6 @@ import {
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
-  Scalars,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
@@ -33,23 +32,20 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
   const { timezone } = useFormattedDateTime();
 
-  const { templates: proposalTemplates } = useActiveTemplates(
-    TemplateGroupId.PROPOSAL,
-    call?.templateId
-  );
+  const { templates: proposalTemplates, refreshTemplates: reloadProposal } =
+    useActiveTemplates(TemplateGroupId.PROPOSAL, call?.templateId);
 
-  const { templates: proposalEsiTemplates } = useActiveTemplates(
-    TemplateGroupId.PROPOSAL_ESI,
-    call?.esiTemplateId
-  );
+  const { templates: proposalEsiTemplates, refreshTemplates: reloadEsi } =
+    useActiveTemplates(TemplateGroupId.PROPOSAL_ESI, call?.esiTemplateId);
 
-  const { templates: pdfTemplates } = useActiveTemplates(
-    TemplateGroupId.PDF_TEMPLATE,
-    call?.pdfTemplateId
-  );
+  const { templates: pdfTemplates, refreshTemplates: reloadPdfTemplates } =
+    useActiveTemplates(TemplateGroupId.PDF_TEMPLATE, call?.pdfTemplateId);
 
-  const { proposalWorkflows, loadingProposalWorkflows } =
-    useProposalWorkflowsData();
+  const {
+    proposalWorkflows,
+    loadingProposalWorkflows,
+    refreshProposalWorkflows: reloadProposalWorkflows,
+  } = useProposalWorkflowsData();
 
   const currentDayStart = DateTime.now()
     .setZone(timezone || undefined)
@@ -57,18 +53,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const currentDayEnd = DateTime.now()
     .setZone(timezone || undefined)
     .endOf('day');
-
-  const setInternalCallEnd = (
-    callEndDate: Scalars['DateTime'],
-    callEndInternalDate: Scalars['DateTime']
-  ) => {
-    const endCallDate = new Date(callEndDate);
-    const endCallInternalData = new Date(callEndInternalDate);
-
-    return endCallDate > endCallInternalData
-      ? callEndDate
-      : callEndInternalDate;
-  };
 
   const getDateTimeFromISO = (value: string) =>
     DateTime.fromISO(value, {
@@ -143,10 +127,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         initialValues={initialValues}
         onSubmit={async (values) => {
           if (call) {
-            values.endCallInternal = setInternalCallEnd(
-              values.endCall,
-              values.endCallInternal
-            );
             const data = await api({
               toastSuccessMessage: 'Call updated successfully!',
             }).updateCall(values as UpdateCallInput);
@@ -176,6 +156,10 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           }
         >
           <CallGeneralInfo
+            reloadTemplates={reloadProposal}
+            reloadEsi={reloadEsi}
+            reloadPdfTemplates={reloadPdfTemplates}
+            reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
             pdfTemplates={pdfTemplates}

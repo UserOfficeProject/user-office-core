@@ -336,8 +336,8 @@ context('Template tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
   });
 
@@ -468,6 +468,7 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(faker.lorem.words(2));
       cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
@@ -484,11 +485,17 @@ context('Template tests', () => {
         url: '/files/upload',
       }).as('upload');
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.contains(fileQuestion)
+        .parent()
+        .find('input[type="file"]')
+        .selectFile(
+          {
+            contents: `cypress/fixtures/${fileName}`,
+            fileName: fileName,
+          },
+          { force: true }
+        );
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
@@ -788,11 +795,17 @@ context('Template tests', () => {
         url: '/files/upload',
       }).as('upload');
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.contains(fileQuestion)
+        .parent()
+        .find('input[type="file"]')
+        .selectFile(
+          {
+            contents: `cypress/fixtures/${fileName}`,
+            fileName: fileName,
+          },
+          { force: true }
+        );
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });

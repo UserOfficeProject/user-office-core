@@ -1,4 +1,4 @@
-import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { ProposalPks } from '../models/Proposal';
 import { Review, ReviewStatus } from '../models/Review';
 import { Role } from '../models/Role';
 import {
@@ -80,9 +80,7 @@ export interface SEPDataSource {
     args: UpdateMemberSEPArgs,
     isMemberChairOrSecretaryOfSEP: boolean
   ): Promise<SEP>;
-  assignProposalsToSep(
-    args: AssignProposalsToSepArgs
-  ): Promise<ProposalPksWithNextStatus>;
+  assignProposalsToSep(args: AssignProposalsToSepArgs): Promise<ProposalPks>;
   removeMemberFromSepProposal(
     proposalPk: number,
     sepId: number,

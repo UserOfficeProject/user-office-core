@@ -11,8 +11,8 @@ import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Proposal statuses tests', () => {
@@ -1085,8 +1085,6 @@ context('Settings tests', () => {
 
   describe('API access tokens tests', () => {
     const accessTokenName = faker.lorem.words(2);
-    beforeEach(() => {});
-
     let removedAccessToken: string;
 
     it('User Officer should be able to create api access token', () => {
@@ -1144,6 +1142,26 @@ context('Settings tests', () => {
             });
           });
         });
+
+      cy.get('[data-cy="submit"]').contains('Update').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Api access token updated successfully!',
+      });
+
+      cy.get(
+        '[data-cy="api-access-tokens-table"] table tbody [aria-label="Edit"]'
+      ).should('have.length', 1);
+
+      cy.contains(accessTokenName).parent().find('[aria-label="Edit"]').click();
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+
+      cy.get('[data-cy="create-new-entry"]').click();
+      cy.finishedLoading();
+
+      cy.get('#name').invoke('val').should('be.empty');
     });
 
     it('User Officer should be able to update api access token', () => {

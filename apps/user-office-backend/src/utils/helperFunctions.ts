@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto';
 
 import * as Yup from 'yup';
 
+import { BasicResolverContext } from '../context';
 import { Review, ReviewStatus } from '../models/Review';
 
 interface Omit {
@@ -53,6 +54,30 @@ export const checkAllReviewsSubmittedOnProposal = (
   return allOtherReviewsSubmitted;
 };
 
+export const searchObjectByKey = (
+  object: object,
+  originalKey: string
+): object | null => {
+  if (object !== null) {
+    for (const key of Object.keys(object)) {
+      if (key === originalKey) {
+        return object;
+      } else if (typeof object[key as keyof object] === 'object') {
+        const found = searchObjectByKey(
+          object[key as keyof object],
+          originalKey
+        );
+
+        if (found !== null) {
+          return found;
+        }
+      }
+    }
+  }
+
+  return null;
+};
+
 /**
  * @description Makes all fields non-nullable
  */
@@ -83,4 +108,34 @@ export function removeDuplicates<T>(obj: T): T {
   }
 
   return obj;
+}
+
+export function getContextKeys(
+  context: BasicResolverContext,
+  typeOfKey: keyof BasicResolverContext
+) {
+  const arrayOfKeys: string[] = [];
+  Object.keys(context[typeOfKey]).forEach((key) => {
+    const element = (context[typeOfKey] as never)[key];
+
+    const proto = Object.getPrototypeOf(element);
+    // NOTE: For now all admin mutations are excluded for security reasons.
+    if (
+      typeOfKey === 'mutations' &&
+      proto.constructor.name.startsWith('Admin')
+    ) {
+      return;
+    }
+    const names = Object.getOwnPropertyNames(proto).filter((item) =>
+      typeOfKey === 'queries' ? item.startsWith('get') : item !== 'constructor'
+    );
+
+    const classNamesWithMethod = names.map(
+      (item) => `${proto.constructor.name}.${item}`
+    );
+
+    arrayOfKeys.push(...classNamesWithMethod);
+  });
+
+  return arrayOfKeys;
 }

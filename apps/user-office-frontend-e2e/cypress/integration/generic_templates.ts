@@ -151,11 +151,18 @@ context('GenericTemplates tests', () => {
     });
   };
 
-  describe('Generic templates basic tests', () => {
-    beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB();
+  beforeEach(() => {
+    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page before each test.
+    // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
     });
+
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
+  });
+
+  describe('Generic templates basic tests', () => {
     it('Should be able to create proposal template with genericTemplate', () => {
       cy.createTemplate({
         name: proposalTemplateName,
@@ -272,8 +279,6 @@ context('GenericTemplates tests', () => {
 
   describe('Generic templates advanced tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB();
       createTemplateAndAllQuestions();
 
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
@@ -296,6 +301,8 @@ context('GenericTemplates tests', () => {
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
       cy.get('[data-cy=title] input').type(faker.lorem.words(1));
 
       cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
@@ -326,6 +333,7 @@ context('GenericTemplates tests', () => {
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(proposalTitle[1]);
 
@@ -468,6 +476,7 @@ context('GenericTemplates tests', () => {
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(proposalTitle[1]);
 

@@ -87,8 +87,8 @@ const createUsers = async () => {
       faker.commerce.department(),
       faker.name.jobTitle(),
       faker.internet.email(),
-      faker.phone.phoneNumber(),
-      faker.phone.phoneNumber()
+      faker.phone.number(),
+      faker.phone.number()
     );
     userDataSource.addUserRole({ userID: user.id, roleID: UserRole.USER });
     if (Math.random() > 0.8) {

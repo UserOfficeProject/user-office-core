@@ -10,8 +10,8 @@ context('PDF template tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
     cy.getAndStoreFeaturesEnabled();
+    cy.viewport(1920, 1080);
   });
 
   describe('PDF template basic tests', () => {

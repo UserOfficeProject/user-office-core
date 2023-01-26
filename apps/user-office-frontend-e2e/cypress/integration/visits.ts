@@ -18,17 +18,18 @@ context('visits tests', () => {
   const existingProposalId = initialDBData.proposal.id;
   const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-  });
-
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
-      this.skip();
-    }
+    cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      // NOTE: We can check features after they are stored to the local storage
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
+        this.skip();
+      }
+    });
     cy.updateProposal({
       proposalPk: existingProposalId,
+      title: initialDBData.proposal.title,
+      abstract: faker.random.words(3),
       proposerId: PI.id,
       users: [coProposer.id],
     });

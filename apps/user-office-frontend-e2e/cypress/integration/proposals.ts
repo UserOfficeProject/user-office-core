@@ -92,8 +92,14 @@ context('Proposal tests', () => {
 
   describe('Proposal basic tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
       cy.createTemplate({
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
@@ -120,11 +126,27 @@ context('Proposal tests', () => {
       });
     });
 
+    it('Copy to clipboard should work for Proposal ID', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-testid="ContentCopyIcon"]').realClick();
+
+      cy.window().then((win) => {
+        win.navigator.clipboard.readText().then((text) => {
+          cy.get('[role="alert"]').should('contain', text);
+        });
+      });
+    });
+
     it('Should be able create proposal', () => {
       cy.login('user1');
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
@@ -149,7 +171,16 @@ context('Proposal tests', () => {
       cy.contains('Title is required');
       cy.contains('Abstract is required');
 
+      cy.get('[data-cy=title]').type(' ');
+      cy.get('[data-cy=abstract]').type(' ');
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Title is required');
+      cy.contains('Abstract is required');
+
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
@@ -157,15 +188,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -244,6 +266,82 @@ context('Proposal tests', () => {
 
       cy.contains('Call');
       cy.contains('SEP');
+    });
+
+    it('User officer should be able to select all prefetched proposals in the table', function () {
+      const NUMBER_OF_PROPOSALS = 6;
+      const DEFAULT_ROWS_PER_PAGE = 5;
+
+      for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
+        cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+          if (result.createProposal.proposal) {
+            cy.updateProposal({
+              proposalPk: result.createProposal.proposal.primaryKey,
+              title: newProposalTitle + index,
+              abstract: newProposalAbstract + index,
+              proposerId: proposer.id,
+            });
+          }
+        });
+      }
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains('Proposals').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-proposals-table"]').contains(newProposalTitle);
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'not.contain',
+        `${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`
+      );
+      cy.get('[data-cy="officer-proposals-table"] tfoot').contains(
+        `${DEFAULT_ROWS_PER_PAGE} rows`
+      );
+
+      cy.get(
+        '[data-cy="officer-proposals-table"] thead [aria-label="Select All Rows"][type="checkbox"]'
+      ).check();
+
+      cy.get(
+        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"]'
+      ).contains(`${DEFAULT_ROWS_PER_PAGE} row(s) selected`);
+      cy.get(
+        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="select-all-prefetched-proposals"]'
+      ).click();
+
+      cy.get(
+        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
+      ).contains('All proposals are selected');
+
+      cy.get(
+        '[data-cy="officer-proposals-table"] tfoot button[aria-label="Next Page"]'
+      ).click();
+
+      cy.get('[data-cy="officer-proposals-table"]')
+        .contains(`${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`)
+        .parent()
+        .find('input[type="checkbox"]')
+        .should('be.checked');
+
+      cy.get(
+        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="clear-all-selection"]'
+      ).click();
+
+      cy.get(
+        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
+      ).should('not.exist');
+
+      cy.get(
+        '[data-cy="officer-proposals-table"] tfoot button[aria-label="Previous Page"]'
+      ).click();
+
+      cy.get('[data-cy="officer-proposals-table"]')
+        .contains(newProposalTitle)
+        .parent()
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
     });
 
     it('Should be able to see proposal allocation time unit on the proposal', function () {
@@ -566,6 +664,12 @@ context('Proposal tests', () => {
 
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB(true);
     });
@@ -598,8 +702,14 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal  basic tests', () => {
+  describe('Proposal internal basic tests', () => {
     beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
       cy.createTemplate({
@@ -625,13 +735,14 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Internal user should be able to create and clone  and delete an internal  proposal', function () {
+    it('Internal user should be able to create and clone and delete an internal proposal', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
       cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
@@ -657,6 +768,7 @@ context('Proposal tests', () => {
       cy.contains('Abstract is required');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
@@ -664,15 +776,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 
@@ -759,6 +862,7 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
@@ -784,6 +888,7 @@ context('Proposal tests', () => {
       cy.contains('Abstract is required');
 
       cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input')
         .type(newProposalTitle)
@@ -793,15 +898,6 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-      cy.get('[role="presentation"]').as('modal');
-
-      cy.get('@modal')
-        .contains(proposer.firstName)
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
 
       cy.contains('Save and continue').click();
 

@@ -2,8 +2,8 @@ import initialDBData from '../support/initialDBData';
 
 context('Features tests', () => {
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Enable and disable features', () => {
