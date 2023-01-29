@@ -19,14 +19,23 @@ import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
+type Member = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  oidcSub: string | null;
+  oauthIssuer: string | null;
+};
+
 type ProposalMessageData = {
   proposalPk: number;
   shortCode: string;
   title: string;
   abstract: string;
   newStatus?: string;
-  members: { firstName: string; lastName: string; email: string; id: string }[];
-  proposer?: { firstName: string; lastName: string; email: string; id: string };
+  members: Member[];
+  proposer?: Member;
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -91,6 +100,8 @@ const getProposalMessageData = async (proposal: Proposal) => {
       lastName: proposalUser.lastname,
       email: proposalUser.email,
       id: proposalUser.id.toString(),
+      oidcSub: proposalUser.oidcSub,
+      oauthIssuer: proposalUser.oauthIssuer,
     })),
     newStatus: proposalStatus?.shortCode,
   };
@@ -103,6 +114,8 @@ const getProposalMessageData = async (proposal: Proposal) => {
       lastName: proposer.lastname,
       email: proposer.email,
       id: proposer.id.toString(),
+      oidcSub: proposer.oidcSub,
+      oauthIssuer: proposer.oauthIssuer,
     };
   }
 
