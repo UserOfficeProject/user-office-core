@@ -156,8 +156,8 @@ context('GenericTemplates tests', () => {
       }
     });
   };
-  const getGenericSubTemplates = (count: number) => {
-    const subTemaplates: number[] = [];
+  const createGenericTemplates = (count: number) => {
+    const genericTemaplates: number[] = [];
     for (let index = 0; index <= count; index++)
       cy.createTemplate({
         name: faker.lorem.word(5),
@@ -190,13 +190,13 @@ context('GenericTemplates tests', () => {
             }
           });
 
-          subTemaplates.push(genericTemplateID);
+          genericTemaplates.push(genericTemplateID);
         }
       });
 
-    return subTemaplates;
+    return genericTemaplates;
   };
-  const createGenericTemplateWithSubTemplate = (
+  const createProposalTemplateWithSubTemplate = (
     genericSubTemplateIds: number[]
   ) => {
     cy.createTemplate({
@@ -671,13 +671,13 @@ context('GenericTemplates tests', () => {
     });
   });
 
-  describe('Generic sub templates tests', () => {
+  describe('Generic template cloning tests', () => {
     beforeEach(() => {
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
         if (result.createProposalWorkflow.proposalWorkflow) {
           workflowId = result.createProposalWorkflow.proposalWorkflow.id;
-          const genericSubTemplates = getGenericSubTemplates(2);
-          createGenericTemplateWithSubTemplate(genericSubTemplates);
+          const genericTemplates = createGenericTemplates(2);
+          createProposalTemplateWithSubTemplate(genericTemplates);
           cy.createProposal({ callId: initialDBData.call.id }).then(
             (result) => {
               if (result.createProposal.proposal) {
@@ -699,7 +699,7 @@ context('GenericTemplates tests', () => {
                     questionId:
                       result.createProposal.proposal.questionary.steps[index]
                         .fields[0].question.id,
-                    templateId: genericSubTemplates[index - 1],
+                    templateId: genericTemplates[index - 1],
                   }).then((templateResult) => {
                     if (
                       templateResult.createGenericTemplate.genericTemplate
@@ -744,7 +744,7 @@ context('GenericTemplates tests', () => {
         }
       });
     });
-    it('User should be able to modify and submit cloned proposal with generic sub templates', () => {
+    it('User should be able to modify and submit cloned proposal with generic templates', () => {
       cy.login('user1');
       cy.visit('/');
 
@@ -812,7 +812,7 @@ context('GenericTemplates tests', () => {
       cy.contains('OK').click();
 
       cy.contains(genericTemplateTitleAnswers[2]);
-      cy.contains(genericTemplateTitleAnswers[2]);
+      cy.contains(genericTemplateTitleAnswers[3]);
     });
   });
 });
