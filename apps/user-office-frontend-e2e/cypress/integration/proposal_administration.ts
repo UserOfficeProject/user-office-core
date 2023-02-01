@@ -18,8 +18,8 @@ context('Proposal administration tests', () => {
   const existingQuestionaryId = 1;
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Proposal administration advanced search filter tests', () => {

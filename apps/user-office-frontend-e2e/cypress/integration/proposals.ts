@@ -92,8 +92,14 @@ context('Proposal tests', () => {
 
   describe('Proposal basic tests', () => {
     beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
       cy.createTemplate({
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
@@ -658,6 +664,12 @@ context('Proposal tests', () => {
 
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB(true);
     });
@@ -690,8 +702,14 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal  basic tests', () => {
+  describe('Proposal internal basic tests', () => {
     beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
       cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
       cy.createTemplate({

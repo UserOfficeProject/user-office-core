@@ -303,20 +303,18 @@ export function NewFileEntry(props: {
       );
     case UPLOAD_STATE.PRISTINE:
       return (
-        <>
-          <label>
-            <input
-              accept={props.filetype}
-              style={{ display: 'none' }}
-              type="file"
-              multiple={false}
-              onChange={onFileSelected}
-            />
-            <Button variant="outlined" component="span">
-              <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
-            </Button>
-          </label>
-        </>
+        <label>
+          <input
+            accept={props.filetype}
+            style={{ display: 'none' }}
+            type="file"
+            multiple={false}
+            onChange={onFileSelected}
+          />
+          <Button variant="outlined" component="span">
+            <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
+          </Button>
+        </label>
       );
     case UPLOAD_STATE.ABORTED:
       return (

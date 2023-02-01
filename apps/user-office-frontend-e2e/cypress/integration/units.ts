@@ -6,12 +6,18 @@ import { DateTime } from 'luxon';
 import initialDBData from '../support/initialDBData';
 
 context('Units tests', () => {
-  describe('Template basic unit tests', () => {
-    beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB();
+  beforeEach(() => {
+    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+    // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
     });
 
+    cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
+  });
+
+  describe('Template basic unit tests', () => {
     it('User officer can create unit', () => {
       cy.login('officer');
       cy.visit('/');
@@ -85,19 +91,24 @@ context('Units tests', () => {
       cy.get('[data-cy=officer-menu-items]').contains('Units').click();
 
       cy.get('[data-cy="import-units-button"]').click();
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'application/json',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName}`,
+          fileName: fileName,
+        },
+        { force: true }
+      );
 
       cy.get('[data-cy="back-button"]').click();
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'application/json',
-      });
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName}`,
+          fileName: fileName,
+        },
+        { force: true }
+      );
 
       cy.get('[data-cy="import-units-button"]').should('be.disabled');
 
@@ -146,11 +157,6 @@ context('Units tests', () => {
   });
 
   describe('Template advanced unit tests', () => {
-    beforeEach(() => {
-      cy.getAndStoreFeaturesEnabled();
-      cy.resetDB(true);
-    });
-
     it('Can search answers with units', () => {
       cy.login('officer');
       cy.visit('/');
