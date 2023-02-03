@@ -34,7 +34,7 @@ import InviteUserForm from './InviteUserForm';
 
 // This component is for displaying and picking from a users previous collaborators to work on a proposal.
 // The table loads a users most recent and frequent collaborators for the user to choose from.
-// It also allows for a user to add any user to the proposals by there email.
+// It also allows for a user to add any user to the proposals by their email.
 // To add the email form into the material table it uses component overriding to override the material table toolbar
 // with the StylisedToolbar. When find user is click it queries the backend for a user with that email then updates the table.
 
@@ -355,6 +355,15 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
             return;
           }
 
+          for (const selectedParticipant of selectedParticipants) {
+            if (selectedParticipant.id === userDetails.id) {
+              setFieldError('email', 'User is already selected');
+              setLoading(false);
+
+              return;
+            }
+          }
+
           if (!invitedUsers.some((user) => user.id === userDetails.id)) {
             //Add users to the table
             setInvitedUsers([userDetails].concat(invitedUsers));
@@ -464,7 +473,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 toolbar: {
                   searchPlaceholder: 'Filter found users',
                   searchTooltip: 'Filter found users',
-                  nRowsSelected: '{0} Users(s) Selected',
+                  nRowsSelected: '{0} User(s) Selected',
                 },
               }}
               onPageChange={(page) =>
