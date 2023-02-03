@@ -55,7 +55,7 @@ context('PageTable component tests', () => {
         'We cannot find that email'
       );
 
-      cy.get('@modal').contains('1 Users(s) Selected');
+      cy.get('@modal').contains('1 User(s) Selected');
 
       cy.get('[data-cy="assign-selected-users"]').click();
 
