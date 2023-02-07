@@ -9,6 +9,7 @@ import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
 import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
+import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
@@ -92,6 +93,10 @@ export default function QuestionaryStepView(props: {
 
   const { state, dispatch } = useContext(QuestionaryContext);
 
+  const [isProposalSubmitted] = useState(
+    () => (state as ProposalSubmissionState)?.proposal?.submitted ?? false
+  );
+
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -169,7 +174,9 @@ export default function QuestionaryStepView(props: {
 
     try {
       const { answerTopic } = await api({
-        toastSuccessMessage: 'Saved',
+        toastSuccessMessage: isProposalSubmitted
+          ? 'Saved and proposal resubmitted'
+          : 'Saved',
       }).answerTopic({
         questionaryId: questionaryId,
         answers: prepareAnswers(activeFields),

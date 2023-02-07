@@ -55,7 +55,7 @@ context('PageTable component tests', () => {
         'We cannot find that email'
       );
 
-      cy.get('@modal').contains('1 Users(s) Selected');
+      cy.get('@modal').contains('1 User(s) Selected');
 
       cy.get('[data-cy="assign-selected-users"]').click();
 
@@ -483,6 +483,47 @@ context('PageTable component tests', () => {
         .then((element) => {
           expect(firstTableRowTextAfterSorting).not.equal(element.text());
         });
+    });
+  });
+
+  describe('ProposalPeopleTable disallows duplicate co-proposers', () => {
+    it('Should not be able to add duplicate co-proposer', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=add-participant-button]').click();
+
+      cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
+      cy.get('[data-cy=findUser]').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy=assign-selected-users]').click();
+
+      cy.get('[data-cy=title] input').type(title);
+      cy.get('[data-cy=abstract] textarea').first().type(abstract);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Submit').click();
+      cy.get('[data-cy=confirm-ok]').click();
+
+      cy.contains('Dashboard').click();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=add-participant-button]').click();
+
+      cy.get('[aria-label="Select All Rows"]').click();
+      cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
+      cy.get('[data-cy=findUser]').click();
+
+      cy.contains('User is already selected').should('exist');
+      cy.contains('1 user(s) selected').should('exist');
     });
   });
 });
