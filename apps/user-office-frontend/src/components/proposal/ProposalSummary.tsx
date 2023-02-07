@@ -171,8 +171,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                     type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
                     itemWithQuestionary: submitProposal,
                   });
-                  setIsSubmitting(false);
-                } catch (error) {
+                } finally {
                   setIsSubmitting(false);
                 }
               },

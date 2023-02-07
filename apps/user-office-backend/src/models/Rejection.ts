@@ -48,7 +48,7 @@ export class Rejection extends GraphQLError {
 
   get exceptionStr() {
     if (this.context?.exception instanceof Error) {
-      return `${this.context?.exception.name}: ${this.context?.exception.message}`;
+      return `${this.context.exception.name}: ${this.context.exception.message}`;
     }
 
     return JSON.stringify(this.context?.exception);

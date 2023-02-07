@@ -20,7 +20,6 @@ context('Personal information tests', () => {
   const newTelephone = faker.phone.number('0##########');
 
   it('Should be able to see user officer role in use', () => {
-    // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
     if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
       cy.updateUserRoles({
         id: initialDBData.users.officer.id,
@@ -166,7 +165,6 @@ context('Personal information tests', () => {
     });
 
     it('Should be able to change role even in the view where next role is not allowed to be', () => {
-      // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: initialDBData.users.officer.id,

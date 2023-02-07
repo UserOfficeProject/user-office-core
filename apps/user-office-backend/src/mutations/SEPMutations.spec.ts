@@ -193,7 +193,6 @@ describe('Test SEPMutations', () => {
     ).resolves.toStrictEqual(dummySEP);
   });
 
-  // TODO: Review this!!!
   test('A user can not assign proposal to SEP', async () => {
     return expect(
       SEPMutationsInstance.assignProposalsToSep(dummyUserWithRole, {

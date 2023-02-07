@@ -76,7 +76,6 @@ function editFinalRankingForm() {
 }
 
 function updateUsersRoles() {
-  // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
   if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
     cy.updateUserRoles({
       id: sepMembers.chair.id,
@@ -1898,7 +1897,6 @@ context('SEP meeting components tests', () => {
 
   describe('SEP Secretary role', () => {
     beforeEach(() => {
-      // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: sepMembers.secretary.id,
@@ -1980,7 +1978,6 @@ context('SEP meeting components tests', () => {
 
   describe('SEP Reviewer role', () => {
     beforeEach(() => {
-      // TODO: This might need more attention from STFC because updateUserRoles method is not implemented in stfc configuration.
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: sepMembers.reviewer2.id,

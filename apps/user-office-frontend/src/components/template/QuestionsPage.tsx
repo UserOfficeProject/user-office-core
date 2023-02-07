@@ -75,11 +75,15 @@ function QuestionsPage() {
   };
 
   const deleteQuestion = async (questionId: string | number) => {
-    await api({
-      toastSuccessMessage: 'Question deleted',
-    }).deleteQuestion({ questionId: questionId as string });
+    try {
+      await api({
+        toastSuccessMessage: 'Question deleted',
+      }).deleteQuestion({ questionId: questionId as string });
 
-    return true;
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   return (
