@@ -188,9 +188,11 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
             SettingsId.EXTERNAL_AUTH_LOGOUT_URL
           )?.settingsValue;
           clearSession();
-          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
           if (logoutUrl) {
             window.location.assign(logoutUrl);
+          } else {
+            // if there is no logout url, just clear the user context
+            dispatch({ type: ActionType.LOGOFFUSER, payload: null });
           }
         });
     }
