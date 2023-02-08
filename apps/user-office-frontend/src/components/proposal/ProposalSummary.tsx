@@ -78,7 +78,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   // EDITABLE_SUBMITTED is an upcoming status
   useEffect(() => {
     async function initializeSubmissionMessage() {
-      if (!proposal.call || submitDisabled) {
+      if (!proposal.call?.id || submitDisabled) {
         setLoadingSubmitMessage(false);
 
         return;

@@ -25,7 +25,7 @@ export type EsiRowData = NonNullable<GetEsisQuery['esis']>[0];
 function ExperimentSafetyPage() {
   const { api } = useDataApiWithFeedback();
   const { calls, loadingCalls } = useCallsData({ isActive: true });
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+  const [urlQueryParams] = useQueryParams({
     call: NumberParam,
     hasEvaluation: BooleanParam,
   });
