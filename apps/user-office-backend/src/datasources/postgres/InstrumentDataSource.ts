@@ -131,6 +131,7 @@ export default class PostgresInstrumentDataSource
         'description',
         'manager_user_id',
         'chi.availability_time',
+        'chi.submitted',
       ])
       .from('instruments as i')
       .join('call_has_instruments as chi', {

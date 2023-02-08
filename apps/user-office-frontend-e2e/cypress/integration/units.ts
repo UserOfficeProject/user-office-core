@@ -91,19 +91,24 @@ context('Units tests', () => {
       cy.get('[data-cy=officer-menu-items]').contains('Units').click();
 
       cy.get('[data-cy="import-units-button"]').click();
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'application/json',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName}`,
+          fileName: fileName,
+        },
+        { force: true }
+      );
 
       cy.get('[data-cy="back-button"]').click();
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'application/json',
-      });
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName}`,
+          fileName: fileName,
+        },
+        { force: true }
+      );
 
       cy.get('[data-cy="import-units-button"]').should('be.disabled');
 

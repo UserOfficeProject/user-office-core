@@ -145,8 +145,8 @@ context('Samples tests', () => {
       win.location.href = 'about:blank';
     });
 
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Samples basic tests', () => {

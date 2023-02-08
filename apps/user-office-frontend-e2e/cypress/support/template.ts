@@ -24,8 +24,14 @@ import {
 import { getE2EApi } from './utils';
 
 const navigateToTemplatesSubmenu = (submenuName: string) => {
-  cy.contains('Templates').click();
-  cy.get(`[aria-label='${submenuName}']`).children().first().click();
+  cy.get('body').then(($body) => {
+    if ($body.find(`[aria-label='${submenuName}']`).length) {
+      cy.get(`[aria-label='${submenuName}']`).children().first().click();
+    } else {
+      cy.get('[aria-label="Templates"]').click();
+      cy.get(`[aria-label='${submenuName}']`).children().first().click();
+    }
+  });
 };
 
 const createTopic = (

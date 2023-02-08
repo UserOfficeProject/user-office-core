@@ -1,4 +1,3 @@
-import 'cypress-file-upload';
 import 'cypress-real-events';
 
 import { faker } from '@faker-js/faker';
