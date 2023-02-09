@@ -74,14 +74,15 @@ jobs:
           tags: |
             dmsc/duo-frontend:${{ steps.extract_branch.outputs.branch }}
             ghcr.io/userofficeproject/user-office-frontend:${{ steps.extract_branch.outputs.branch }}
-
+          
       - name: Trigger pipeline
-        uses: swapActions/trigger-useroffice-deployment@v1
+        uses: swapActions/trigger-swap-deployment@v1
         with:
-          repository: ${{ github.repository }}
+          repository: ${{ github.event.repository.name }}
           environment: ${{ steps.extract_branch.outputs.branch }}
           gh-trigger-url: ${{ secrets.GITLAB_TRIGGER_URL }}
           gh-token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
+          image-tag: ${{ github.sha }}
 
       - name: Trigger frontend deployment at STFC
         if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch

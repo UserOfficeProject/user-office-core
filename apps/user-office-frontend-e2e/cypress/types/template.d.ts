@@ -9,6 +9,7 @@ import {
   CreateQuestionTemplateRelationMutation,
   CreateQuestionTemplateRelationMutationVariables,
   CreateTopicMutation,
+  UpdateTopicMutation,
   CreateGenericTemplateMutationVariables,
   CreateGenericTemplateMutation,
   AnswerTopicMutationVariables,
@@ -278,6 +279,18 @@ declare global {
       createTopic: (
         createTopicInput: CreateTopicMutationVariables
       ) => Cypress.Chainable<CreateTopicMutation>;
+
+      /**
+       * Updates topic in template
+       *
+       * @returns {typeof updateTopic}
+       * @memberof Chainable
+       * @example
+       *    cy.updateTopic(updateTopicInput: UpdateTopicMutationVariables)
+       */
+      updateTopic: (
+        updateTopicInput: UpdateTopicMutationVariables
+      ) => Cypress.Chainable<UpdateTopicMutation>;
 
       /**
        * Answers topic in proposal template
