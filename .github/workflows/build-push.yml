@@ -6,6 +6,7 @@ on:
     branches:
       - develop
       - staging
+      - fix-pod-recreation
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -22,6 +23,30 @@ jobs:
 
       - id: extract_branch
         uses: swapActions/get-branch-name@v1
+        
+      - name: Create backend image tags
+        id: meta-backend
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            dmsc/duo-backend
+            ghcr.io/userofficeproject/user-office-backend
+          flavor: latest=true # adds :latest tag to outputs.tags
+          tags: |  # adds :<sha> tag to outputs.tags
+            type=sha,format=long,prefix=
+            type=raw,value=${{ steps.extract_branch.outputs.branch }}
+            
+      - name: Create frontend image tags
+        id: meta-frontend
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            dmsc/duo-frontend
+            ghcr.io/userofficeproject/user-office-frontend
+          flavor: latest=true # adds :latest tag to outputs.tags
+          tags: |  # adds :<sha> tag to outputs.tags
+            type=sha,format=long,prefix=
+            type=raw,value=${{ steps.extract_branch.outputs.branch }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -57,11 +82,7 @@ jobs:
           context: ./apps/user-office-backend
           file: ./apps/user-office-backend/Dockerfile
           push: true
-          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
-          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
-          tags: |
-            dmsc/duo-backend:${{ steps.extract_branch.outputs.branch }}
-            ghcr.io/userofficeproject/user-office-backend:${{ steps.extract_branch.outputs.branch }}
+          tags: ${{ steps.meta-backend.outputs.tags }}
 
       - name: Build and push frontend
         uses: docker/build-push-action@v3
@@ -69,11 +90,7 @@ jobs:
           context: ./apps/user-office-frontend
           file: ./apps/user-office-frontend/Dockerfile
           push: true
-          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
-          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
-          tags: |
-            dmsc/duo-frontend:${{ steps.extract_branch.outputs.branch }}
-            ghcr.io/userofficeproject/user-office-frontend:${{ steps.extract_branch.outputs.branch }}
+          tags: ${{ steps.meta-frontend.outputs.tags }}
           
       - name: Trigger pipeline
         uses: swapActions/trigger-swap-deployment@v1
