@@ -14,6 +14,7 @@ import {
 import { QuestionaryStep, SubTemplateConfig } from 'generated/sdk';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
+import { GENERIC_TEMPLATE_EVENT } from 'models/questionary/QuestionarySubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import withPrompt, { WithPromptType } from 'utils/withPrompt';
@@ -92,16 +93,65 @@ function QuestionaryComponentGenericTemplate(
     <Field name={answerId}>
       {({ field, form }: FieldProps<GenericTemplateWithQuestionary[]>) => {
         const updateFieldValueAndState = (
-          updatedItems: GenericTemplateCore[] | null
+          updatedItems: GenericTemplateCore[] | null,
+          dispatchType: GENERIC_TEMPLATE_EVENT
         ) => {
-          form.setFieldValue(answerId, updatedItems);
+          if (
+            dispatchType === GENERIC_TEMPLATE_EVENT.ITEMS_DELETED &&
+            updatedItems
+          )
+            form.setFieldValue(
+              answerId,
+              field.value.filter((genericTemplate) => {
+                return !updatedItems.some((value) => {
+                  return value.id === genericTemplate.id;
+                });
+              })
+            );
+          else {
+            form.setFieldValue(answerId, updatedItems);
+          }
           dispatch({
-            type: 'GENERIC_TEMPLATE_ITEMS_MODIFIED',
+            type: dispatchType,
             id: answerId,
             newItems: updatedItems,
           });
         };
+        const createGenericTemplate = () => {
+          if (!state) {
+            throw new Error(
+              'GenericTemplate Declaration is missing proposal context'
+            );
+          }
 
+          const proposalPk = state.proposal.primaryKey;
+          const questionId = props.answer.question.id;
+          if (proposalPk <= 0 || !questionId) {
+            throw new Error(
+              'GenericTemplate is missing proposal id and/or question id'
+            );
+          }
+          const templateId = config.templateId;
+
+          if (!templateId) {
+            throw new Error('GenericTemplate is missing templateId');
+          }
+
+          api()
+            .getBlankQuestionarySteps({ templateId })
+            .then((result) => {
+              const blankSteps = result.blankQuestionarySteps;
+              if (blankSteps) {
+                const genericTemplateStub = createGenericTemplateStub(
+                  templateId,
+                  blankSteps,
+                  proposalPk,
+                  questionId
+                );
+                setSelectedGenericTemplate(genericTemplateStub);
+              }
+            });
+        };
         const copyGenericTemplate = (id: number, title: string) =>
           api()
             .cloneGenericTemplate({ genericTemplateId: id, title: title })
@@ -111,7 +161,10 @@ function QuestionaryComponentGenericTemplate(
               if (clonedGenericTemplate) {
                 const newStateItems = [...field.value, clonedGenericTemplate];
 
-                updateFieldValueAndState(newStateItems);
+                updateFieldValueAndState(
+                  newStateItems,
+                  GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                );
               }
             });
 
@@ -120,11 +173,14 @@ function QuestionaryComponentGenericTemplate(
             .deleteGenericTemplate({ genericTemplateId: id })
             .then((response) => {
               if (!response.deleteGenericTemplate.rejection) {
-                const newStateItems = field.value.filter(
-                  (genericTemplate) => genericTemplate.id !== id
+                const deletedStateItems = field.value.filter(
+                  (genericTemplate) => genericTemplate.id === id
                 );
 
-                updateFieldValueAndState(newStateItems);
+                updateFieldValueAndState(
+                  deletedStateItems,
+                  GENERIC_TEMPLATE_EVENT.ITEMS_DELETED
+                );
               }
             });
 
@@ -159,42 +215,7 @@ function QuestionaryComponentGenericTemplate(
                   prefilledAnswer: `Copy of ${item.label}`,
                 })();
               }}
-              onAddNewClick={() => {
-                // TODO move this into a function like copyGenericTemplate
-                if (!state) {
-                  throw new Error(
-                    'GenericTemplate Declaration is missing proposal context'
-                  );
-                }
-
-                const proposalPk = state.proposal.primaryKey;
-                const questionId = props.answer.question.id;
-                if (proposalPk <= 0 || !questionId) {
-                  throw new Error(
-                    'GenericTemplate is missing proposal id and/or question id'
-                  );
-                }
-                const templateId = config.templateId;
-
-                if (!templateId) {
-                  throw new Error('GenericTemplate is missing templateId');
-                }
-
-                api()
-                  .getBlankQuestionarySteps({ templateId })
-                  .then((result) => {
-                    const blankSteps = result.blankQuestionarySteps;
-                    if (blankSteps) {
-                      const genericTemplateStub = createGenericTemplateStub(
-                        templateId,
-                        blankSteps,
-                        proposalPk,
-                        questionId
-                      );
-                      setSelectedGenericTemplate(genericTemplateStub);
-                    }
-                  });
-              }}
+              onAddNewClick={() => createGenericTemplate()}
               {...props}
             />
 
@@ -215,12 +236,18 @@ function QuestionaryComponentGenericTemplate(
                         : genericTemplate
                     );
 
-                    updateFieldValueAndState(newStateItems);
+                    updateFieldValueAndState(
+                      newStateItems,
+                      GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                    );
                   }}
                   genericTemplateCreated={(newGenericTemplate) => {
                     const newStateItems = [...field.value, newGenericTemplate];
 
-                    updateFieldValueAndState(newStateItems);
+                    updateFieldValueAndState(
+                      newStateItems,
+                      GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                    );
                   }}
                   genericTemplateEditDone={() => {
                     // refresh all genericTemplates
@@ -232,7 +259,10 @@ function QuestionaryComponentGenericTemplate(
                         },
                       })
                       .then((result) => {
-                        updateFieldValueAndState(result.genericTemplates);
+                        updateFieldValueAndState(
+                          result.genericTemplates,
+                          GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                        );
                       });
 
                     setSelectedGenericTemplate(null);

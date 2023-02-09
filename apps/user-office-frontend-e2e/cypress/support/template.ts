@@ -14,11 +14,13 @@ import {
   CreateTemplateMutation,
   CreateTemplateMutationVariables,
   CreateTopicMutation,
+  UpdateTopicMutation,
   CreateTopicMutationVariables,
   UpdateQuestionMutation,
   UpdateQuestionMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
+  UpdateTopicMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -39,6 +41,15 @@ const createTopic = (
 ): Cypress.Chainable<CreateTopicMutation> => {
   const api = getE2EApi();
   const request = api.createTopic(createTopicInput);
+
+  return cy.wrap(request);
+};
+
+const updateTopic = (
+  updateTopicInput: UpdateTopicMutationVariables
+): Cypress.Chainable<UpdateTopicMutation> => {
+  const api = getE2EApi();
+  const request = api.updateTopic(updateTopicInput);
 
   return cy.wrap(request);
 };
@@ -549,6 +560,7 @@ Cypress.Commands.add('createGenericTemplate', createGenericTemplate);
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 
 Cypress.Commands.add('createTopic', createTopic);
+Cypress.Commands.add('updateTopic', updateTopic);
 Cypress.Commands.add('answerTopic', answerTopic);
 
 Cypress.Commands.add('createQuestion', createQuestion);
