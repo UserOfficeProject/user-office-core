@@ -8,13 +8,8 @@ mutation addStatusChangingEventsToConnection(
       statusChangingEvents: $statusChangingEvents
     }
   ) {
-    statusChangingEvents {
-      statusChangingEventId
-      proposalWorkflowConnectionId
-      statusChangingEvent
-    }
-    rejection {
-      ...rejection
-    }
+    statusChangingEventId
+    proposalWorkflowConnectionId
+    statusChangingEvent
   }
 }

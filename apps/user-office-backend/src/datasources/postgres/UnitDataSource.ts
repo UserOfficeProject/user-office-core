@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Quantity } from '../../models/Quantity';
@@ -43,7 +44,7 @@ export default class PostgresUnitDataSource implements UnitDataSource {
       .returning('*');
 
     if (!unitRecord) {
-      throw new Error('Could not create unit');
+      throw new GraphQLError('Could not create unit');
     }
 
     return createUnitObject(unitRecord);
@@ -132,23 +133,25 @@ export default class PostgresUnitDataSource implements UnitDataSource {
     const questionComparisons: UnitComparison[] = [];
 
     if (isBelowVersion(unitsExport.version, MIN_SUPPORTED_VERSION)) {
-      throw new Error(
+      throw new GraphQLError(
         `Units version ${unitsExport.version} is below the minimum supported version ${MIN_SUPPORTED_VERSION}.`
       );
     }
 
     if (isAboveVersion(unitsExport.version, EXPORT_VERSION)) {
-      throw new Error(
+      throw new GraphQLError(
         `Units version ${unitsExport.version} is above the current supported version ${EXPORT_VERSION}.`
       );
     }
 
     if (!unitsExport.units) {
-      throw new Error('Units field is missing from file you are importing');
+      throw new GraphQLError(
+        'Units field is missing from file you are importing'
+      );
     }
 
     if (!unitsExport.quantities) {
-      throw new Error(
+      throw new GraphQLError(
         'Quantities field is missing from file you are importing'
       );
     }
@@ -239,9 +242,9 @@ export default class PostgresUnitDataSource implements UnitDataSource {
           case ConflictResolutionStrategy.USE_EXISTING:
             break;
           case ConflictResolutionStrategy.UNRESOLVED:
-            throw new Error('No conflict resolution strategy provided');
+            throw new GraphQLError('No conflict resolution strategy provided');
           default:
-            throw new Error('Unknown conflict resolution strategy');
+            throw new GraphQLError('Unknown conflict resolution strategy');
         }
       })
     );

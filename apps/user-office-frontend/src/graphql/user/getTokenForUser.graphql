@@ -1,8 +1,3 @@
 mutation getTokenForUser($userId: Int!) {
-  getTokenForUser(userId: $userId) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
+  getTokenForUser(userId: $userId)
 }

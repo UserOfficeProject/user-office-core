@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { PredefinedMessage } from '../../models/PredefinedMessage';
@@ -36,7 +37,7 @@ export default class PostgresPredefinedMessageDataSource
       .returning('*');
 
     if (!predefinedMessageRecord) {
-      throw new Error('Could not create predefined message');
+      throw new GraphQLError('Could not create predefined message');
     }
 
     return createPredefinedMessageObject(predefinedMessageRecord);
@@ -95,7 +96,7 @@ export default class PostgresPredefinedMessageDataSource
       .returning('*');
 
     if (!predefinedMessageRecord) {
-      throw new Error('Could not update predefined message');
+      throw new GraphQLError('Could not update predefined message');
     }
 
     return createPredefinedMessageObject(predefinedMessageRecord);

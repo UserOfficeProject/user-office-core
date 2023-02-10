@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Sample } from '../../models/Sample';
@@ -17,7 +18,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       .then((records: SampleRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not delete sample', { sampleId });
-          throw new Error('Could not delete sample');
+          throw new GraphQLError('Could not delete sample');
         }
 
         return createSampleObject(records[0]);
@@ -42,7 +43,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       .then((records: SampleRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not update sample', { args });
-          throw new Error('Could not update sample');
+          throw new GraphQLError('Could not update sample');
         }
 
         return createSampleObject(records[0]);
@@ -75,7 +76,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
             proposal_pk,
             questionary_id,
           });
-          throw new Error('Failed to insert sample');
+          throw new GraphQLError('Failed to insert sample');
         }
 
         return createSampleObject(records[0]);

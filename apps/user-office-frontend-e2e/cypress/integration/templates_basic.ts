@@ -81,7 +81,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.BOOLEAN,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         boolId = createdQuestion.id;
 
@@ -103,7 +103,7 @@ context('Template tests', () => {
           categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion = questionResult.createQuestion.question;
+          const createdQuestion = questionResult.createQuestion;
           if (createdQuestion) {
             cy.updateQuestion({
               id: createdQuestion.id,
@@ -140,7 +140,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.INTERVAL,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -177,7 +177,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.NUMBER_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -215,7 +215,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -237,7 +237,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -259,7 +259,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -281,7 +281,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.FILE_UPLOAD,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -303,7 +303,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.RICH_TEXT_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -1001,7 +1001,7 @@ context('Template tests', () => {
 
     it('User officer can add multiple choice question as a dependency', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,

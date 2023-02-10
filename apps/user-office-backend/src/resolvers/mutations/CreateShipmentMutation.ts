@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ShipmentResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Shipment } from '../types/Shipment';
 
 @ArgsType()
 export class CreateShipmentInput {
@@ -26,14 +25,11 @@ export class CreateShipmentInput {
 
 @Resolver()
 export class CreateShipmentMutation {
-  @Mutation(() => ShipmentResponseWrap)
+  @Mutation(() => Shipment)
   createShipment(
     @Args() input: CreateShipmentInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.shipment.createShipment(context.user, input),
-      ShipmentResponseWrap
-    );
+    return context.mutations.shipment.createShipment(context.user, input);
   }
 }

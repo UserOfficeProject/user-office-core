@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SampleEsiResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { SampleExperimentSafetyInput } from '../types/SampleExperimentSafetyInput';
 
 @ArgsType()
 export class UpdateSampleEsiArgs {
@@ -26,14 +25,11 @@ export class UpdateSampleEsiArgs {
 
 @Resolver()
 export class UpdateSampleEsiMutation {
-  @Mutation(() => SampleEsiResponseWrap)
+  @Mutation(() => SampleExperimentSafetyInput)
   updateSampleEsi(
     @Args() args: UpdateSampleEsiArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.sampleEsi.updateSampleEsi(context.user, args),
-      SampleEsiResponseWrap
-    );
+    return context.mutations.sampleEsi.updateSampleEsi(context.user, args);
   }
 }

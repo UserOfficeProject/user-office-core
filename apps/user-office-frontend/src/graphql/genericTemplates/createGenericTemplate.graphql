@@ -10,15 +10,10 @@ mutation createGenericTemplate(
     proposalPk: $proposalPk
     questionId: $questionId
   ) {
-    genericTemplate {
-      ...genericTemplate
-      questionary {
-        isCompleted
-        ...questionary
-      }
-    }
-    rejection {
-      ...rejection
+    ...genericTemplate
+    questionary {
+      isCompleted
+      ...questionary
     }
   }
 }

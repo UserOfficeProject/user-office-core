@@ -58,8 +58,8 @@ context('PDF template tests', () => {
         name: templateName,
         groupId: TemplateGroupId.PDF_TEMPLATE,
       }).then((result) => {
-        if (result.createTemplate.template) {
-          createdTemplateName = result.createTemplate.template.name;
+        if (result.createTemplate) {
+          createdTemplateName = result.createTemplate.name;
         }
       });
     });

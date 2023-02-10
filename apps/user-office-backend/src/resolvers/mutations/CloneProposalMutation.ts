@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalsResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Proposal } from '../types/Proposal';
 
 @InputType()
 export class CloneProposalsInput {
@@ -23,18 +22,15 @@ export class CloneProposalsInput {
 
 @Resolver()
 export class CloneProposalsMutation {
-  @Mutation(() => ProposalsResponseWrap)
+  @Mutation(() => [Proposal])
   async cloneProposals(
     @Arg('cloneProposalsInput')
     cloneProposalsInput: CloneProposalsInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.proposal.cloneProposals(
-        context.user,
-        cloneProposalsInput
-      ),
-      ProposalsResponseWrap
+    return context.mutations.proposal.cloneProposals(
+      context.user,
+      cloneProposalsInput
     );
   }
 }

@@ -1,7 +1,5 @@
 mutation deleteTopic($topicId: Int!) {
   deleteTopic(topicId: $topicId) {
-    rejection {
-      ...rejection
-    }
+    templateId
   }
 }

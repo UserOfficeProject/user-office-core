@@ -10,8 +10,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { QuestionaryStepResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { QuestionaryStep } from '../types/QuestionaryStep';
 
 @InputType()
 export class AnswerInput {
@@ -39,15 +38,12 @@ export class AnswerTopicArgs {
 
 @Resolver()
 export class UpdateQuestionaryMutation {
-  @Mutation(() => QuestionaryStepResponseWrap)
+  @Mutation(() => QuestionaryStep)
   answerTopic(
     @Args()
     args: AnswerTopicArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.questionary.answerTopic(context.user, args),
-      QuestionaryStepResponseWrap
-    );
+    return context.mutations.questionary.answerTopic(context.user, args);
   }
 }

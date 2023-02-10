@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { booleanQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 
 import { BooleanConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -10,7 +11,7 @@ export const booleanDefinition: Question = {
   dataType: DataType.BOOLEAN,
   validate: (field: QuestionTemplateRelation, value: boolean) => {
     if (field.question.dataType !== DataType.BOOLEAN) {
-      throw new Error('DataType should be BOOLEAN');
+      throw new GraphQLError('DataType should be BOOLEAN');
     }
 
     return booleanQuestionValidationSchema(field).isValid(value);
@@ -30,7 +31,7 @@ export const booleanDefinition: Question = {
       case QuestionFilterCompareOperator.EQUALS:
         return queryBuilder.andWhereRaw("answers.answer->>'value'=?", value);
       default:
-        throw new Error(
+        throw new GraphQLError(
           `Unsupported comparator for Boolean ${filter.compareOperator}`
         );
     }

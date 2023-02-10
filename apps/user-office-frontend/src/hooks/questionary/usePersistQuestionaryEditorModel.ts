@@ -3,7 +3,6 @@ import { useState } from 'react';
 import {
   DataType,
   QuestionTemplateRelation,
-  Rejection,
   Template,
   TemplateCategoryId,
 } from 'generated/sdk';
@@ -117,9 +116,7 @@ export function usePersistQuestionaryEditorModel() {
       .then((data) => data.updateTemplate);
   };
 
-  type MonitorableServiceCall = () => Promise<{
-    rejection?: Rejection | null;
-  }>;
+  type MonitorableServiceCall = () => Promise<unknown>;
 
   const persistModel = ({
     getState,
@@ -127,13 +124,7 @@ export function usePersistQuestionaryEditorModel() {
   }: MiddlewareInputParams<Template, Event>) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
-      call().then((result) => {
-        if (result.rejection) {
-          dispatch({
-            type: EventType.SERVICE_ERROR_OCCURRED,
-            payload: result.rejection.reason,
-          });
-        }
+      call().then(() => {
         setIsLoading(false);
       });
     };
@@ -190,10 +181,10 @@ export function usePersistQuestionaryEditorModel() {
               title: stepToUpdate.topic.title,
             });
 
-            if (result.template) {
+            if (result) {
               dispatch({
                 type: EventType.TOPIC_REORDERED,
-                payload: result.template,
+                payload: result,
               });
             }
 
@@ -218,10 +209,10 @@ export function usePersistQuestionaryEditorModel() {
               state.group.categoryId,
               action.payload.dataType
             );
-            if (result.question) {
+            if (result) {
               dispatch({
                 type: EventType.QUESTION_CREATED,
-                payload: result.question,
+                payload: result,
               });
             }
 
@@ -247,10 +238,10 @@ export function usePersistQuestionaryEditorModel() {
 
           executeAndMonitorCall(async () => {
             const result = await createTopic(state.templateId, sortOrder);
-            if (result.template) {
+            if (result) {
               dispatch({
                 type: EventType.TOPIC_CREATED,
-                payload: result.template,
+                payload: result,
               });
             }
 
@@ -267,10 +258,10 @@ export function usePersistQuestionaryEditorModel() {
               name,
               description
             );
-            if (result.template) {
+            if (result) {
               dispatch({
                 type: EventType.TEMPLATE_METADATA_UPDATED,
-                payload: result.template,
+                payload: result,
               });
             }
 
@@ -288,10 +279,10 @@ export function usePersistQuestionaryEditorModel() {
               sortOrder
             );
 
-            if (result.template) {
+            if (result) {
               dispatch({
                 type: EventType.QUESTION_REL_CREATED,
-                payload: result.template,
+                payload: result,
               });
             }
 

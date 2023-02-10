@@ -10,11 +10,6 @@ mutation updateQuestion(
     question: $question
     config: $config
   ) {
-    question {
-      ...question
-    }
-    rejection {
-      ...rejection
-    }
+    ...question
   }
 }

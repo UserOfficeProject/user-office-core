@@ -10,11 +10,6 @@ mutation createProposalStatus(
       description: $description
     }
   ) {
-    proposalStatus {
-      ...proposalStatus
-    }
-    rejection {
-      ...rejection
-    }
+    ...proposalStatus
   }
 }

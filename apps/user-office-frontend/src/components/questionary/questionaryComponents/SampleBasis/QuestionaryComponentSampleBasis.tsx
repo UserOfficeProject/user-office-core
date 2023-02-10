@@ -72,10 +72,10 @@ const sampleBasisPreSubmit =
         title: title,
         sampleId: sample.id,
       });
-      if (result.updateSample.sample) {
+      if (result.updateSample) {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-          itemWithQuestionary: result.updateSample.sample,
+          itemWithQuestionary: result.updateSample,
         });
       }
     } else {
@@ -86,12 +86,12 @@ const sampleBasisPreSubmit =
         questionId: sample.questionId,
       });
 
-      if (result.createSample.sample) {
+      if (result.createSample) {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_CREATED',
-          itemWithQuestionary: result.createSample.sample,
+          itemWithQuestionary: result.createSample,
         });
-        returnValue = result.createSample.sample.questionaryId;
+        returnValue = result.createSample.questionaryId;
       }
     }
 

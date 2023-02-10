@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ReviewResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Review } from '../types/Review';
 
 @ArgsType()
 export class AddUserForReviewArgs {
@@ -26,14 +25,11 @@ export class AddUserForReviewArgs {
 
 @Resolver()
 export class AddUserForReviewMutation {
-  @Mutation(() => ReviewResponseWrap)
+  @Mutation(() => Review)
   addUserForReview(
     @Args() args: AddUserForReviewArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.review.addUserForReview(context.user, args),
-      ReviewResponseWrap
-    );
+    return context.mutations.review.addUserForReview(context.user, args);
   }
 }

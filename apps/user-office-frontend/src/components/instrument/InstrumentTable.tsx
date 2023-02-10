@@ -48,55 +48,49 @@ const InstrumentTable: React.FC = () => {
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
-    return await api({
-      toastSuccessMessage: 'Instrument removed successfully!',
-    })
-      .deleteInstrument({
+    try {
+      await api({
+        toastSuccessMessage: 'Instrument removed successfully!',
+      }).deleteInstrument({
         id: instrumentDeletedId as number,
-      })
-      .then((data) => {
-        if (data.deleteInstrument.rejection) {
-          return false;
-        } else {
-          return true;
-        }
       });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const assignScientistsToInstrument = async (
     scientists: BasicUserDetails[]
   ) => {
-    const assignScientistToInstrumentResult = await api({
+    await api({
       toastSuccessMessage: 'Scientist assigned to instrument successfully!',
     }).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,
       scientistIds: scientists.map((scientist) => scientist.id),
     });
 
-    if (
-      !assignScientistToInstrumentResult.assignScientistsToInstrument.rejection
-    ) {
-      scientists = scientists.map((scientist) => {
-        if (!scientist.organisation) {
-          scientist.organisation = 'Other';
+    scientists = scientists.map((scientist) => {
+      if (!scientist.organisation) {
+        scientist.organisation = 'Other';
+      }
+
+      return scientist;
+    });
+
+    setInstruments((instruments) =>
+      instruments.map((instrumentItem) => {
+        if (instrumentItem.id === assigningInstrumentId) {
+          return {
+            ...instrumentItem,
+            scientists: [...instrumentItem.scientists, ...scientists],
+          };
+        } else {
+          return instrumentItem;
         }
-
-        return scientist;
-      });
-
-      setInstruments((instruments) =>
-        instruments.map((instrumentItem) => {
-          if (instrumentItem.id === assigningInstrumentId) {
-            return {
-              ...instrumentItem,
-              scientists: [...instrumentItem.scientists, ...scientists],
-            };
-          } else {
-            return instrumentItem;
-          }
-        })
-      );
-    }
+      })
+    );
 
     setAssigningInstrumentId(null);
   };

@@ -1,4 +1,5 @@
 import { sampleDeclarationValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 
 import {
   DataType,
@@ -25,7 +26,7 @@ export const sampleDeclarationDefinition: Question = {
   getDefaultAnswer: () => [],
   validate: (field: QuestionTemplateRelation, value: any) => {
     if (field.question.dataType !== DataType.SAMPLE_DECLARATION) {
-      throw new Error('DataType should be SAMPLE_DECLARATION');
+      throw new GraphQLError('DataType should be SAMPLE_DECLARATION');
     }
 
     return sampleDeclarationValidationSchema(field).isValid(value);

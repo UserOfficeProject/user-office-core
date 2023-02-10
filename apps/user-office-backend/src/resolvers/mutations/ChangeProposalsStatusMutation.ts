@@ -10,8 +10,6 @@ import {
 
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
-import { SuccessResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
 
 @InputType()
 export class ProposalPkWithCallId {
@@ -33,20 +31,17 @@ export class ChangeProposalsStatusInput {
 
 @Resolver()
 export class ChangeProposalsStatusMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async changeProposalsStatus(
     @Arg('changeProposalsStatusInput')
     changeProposalsStatusInput: ChangeProposalsStatusInput,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.proposal.changeProposalsStatus(
+    const result = await context.mutations.proposal.changeProposalsStatus(
       context.user,
       changeProposalsStatusInput
     );
 
-    return wrapResponse(
-      isRejection(res) ? Promise.resolve(res) : Promise.resolve(true),
-      SuccessResponseWrap
-    );
+    return isRejection(result) ? result : true;
   }
 }

@@ -1,26 +1,19 @@
 mutation validateUnitsImport($unitsAsJson: String!) {
-  validateUnitsImport(unitsAsJson:$unitsAsJson) {
-    validationResult {
-      json
-      version
-      exportDate
-      isValid
-      errors
-      unitComparisons {
-        existingUnit
-        {
-          ...unit
-        }
-        newUnit
-        {
-          ...unit
-        }
-        status
-        conflictResolutionStrategy
+  validateUnitsImport(unitsAsJson: $unitsAsJson) {
+    json
+    version
+    exportDate
+    isValid
+    errors
+    unitComparisons {
+      existingUnit {
+        ...unit
       }
-    }
-    rejection {
-       ...rejection
+      newUnit {
+        ...unit
+      }
+      status
+      conflictResolutionStrategy
     }
   }
 }

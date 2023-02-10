@@ -1,0 +1,6 @@
+mutation setActiveTemplate(
+  $templateGroupId: TemplateGroupId!
+  $templateId: Int!
+) {
+  setActiveTemplate(templateId: $templateId, templateGroupId: $templateGroupId)
+}
