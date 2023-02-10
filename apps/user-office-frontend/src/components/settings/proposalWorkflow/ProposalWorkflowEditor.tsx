@@ -33,11 +33,6 @@ const ProposalWorkflowEditor: React.FC = () => {
   const reducerMiddleware = () => {
     return (next: FunctionType) => (action: Event) => {
       next(action);
-      switch (action.type) {
-        case EventType.SERVICE_ERROR_OCCURRED:
-          enqueueSnackbar(action.payload, { variant: 'error' });
-          break;
-      }
     };
   };
   const { persistModel, isLoading } = usePersistProposalWorkflowEditorModel();

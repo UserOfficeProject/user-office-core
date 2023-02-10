@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { dateQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 import { DateTime } from 'luxon';
 
 import { DateConfig } from '../../resolvers/types/FieldConfig';
@@ -11,7 +12,7 @@ export const dateDefinition: Question = {
   dataType: DataType.DATE,
   validate: (field: QuestionTemplateRelation, value: Date | null) => {
     if (field.question.dataType !== DataType.DATE) {
-      throw new Error('DataType should be DATE');
+      throw new GraphQLError('DataType should be DATE');
     }
 
     return dateQuestionValidationSchema(field).isValid(value);
@@ -53,7 +54,7 @@ export const dateDefinition: Question = {
           value
         );
       default:
-        throw new Error(
+        throw new GraphQLError(
           `Unsupported comparator for TextInput ${filter.compareOperator}`
         );
     }

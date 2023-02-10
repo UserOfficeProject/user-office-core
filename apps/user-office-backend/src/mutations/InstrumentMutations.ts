@@ -37,6 +37,7 @@ import {
   InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
 import { sortByRankOrAverageScore } from '../utils/mathFunctions';
+import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
 export default class InstrumentMutations {
@@ -181,15 +182,19 @@ export default class InstrumentMutations {
       }
     }
 
-    return this.dataSource
-      .assignProposalsToInstrument(proposalPks, args.instrumentId)
-      .catch((error) => {
-        return rejection(
-          'Could not assign proposal/s to instrument',
-          { agent, args },
-          error
-        );
+    const result = await this.dataSource.assignProposalsToInstrument(
+      proposalPks,
+      args.instrumentId
+    );
+
+    if (result.proposalPks.length !== proposalPks.length) {
+      return rejection('Could not assign proposal/s to instrument', {
+        agent,
+        args,
       });
+    }
+
+    return result;
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -210,7 +215,7 @@ export default class InstrumentMutations {
 
   @ValidateArgs(assignScientistsToInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async assignScientsitsToInstrument(
+  async assignScientistsToInstrument(
     agent: UserWithRole | null,
     args: AssignScientistsToInstrumentArgs
   ): Promise<boolean | Rejection> {
@@ -275,6 +280,7 @@ export default class InstrumentMutations {
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent, args.sepId))
     ) {
       return rejection('Submitting instrument is not permitted', {
+        code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
         args,
       });

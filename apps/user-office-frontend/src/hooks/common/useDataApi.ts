@@ -25,6 +25,7 @@ const notifyAndLog = async (
   enqueueSnackbar(userMessage, {
     variant: 'error',
     preventDuplicate: true,
+    className: 'snackbar-error',
   });
 
   console.error({ userMessage, error });
@@ -109,20 +110,21 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   ): Promise<T> {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
-      const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
-        token: this.token,
-      });
-      if (data.token.rejection) {
+      try {
+        const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
+          token: this.token,
+        });
+
+        const newToken = data.token;
+        this.setHeader('authorization', `Bearer ${newToken}`);
+        this.tokenRenewed && this.tokenRenewed(newToken as string);
+      } catch (error) {
         notifyAndLog(
           this.enqueueSnackbar,
           'Server rejected user credentials',
-          data.token.rejection.reason
+          JSON.stringify(error)
         );
         this.onSessionExpired();
-      } else {
-        const newToken = data.token.token;
-        this.setHeader('authorization', `Bearer ${newToken}`);
-        this.tokenRenewed && this.tokenRenewed(newToken as string);
       }
     }
 
@@ -166,7 +168,13 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           );
           this.onSessionExpired();
         } else {
-          notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
+          const [graphQLError] = error.response?.errors ?? [];
+
+          notifyAndLog(
+            this.enqueueSnackbar,
+            graphQLError?.message || 'Something went wrong!',
+            error
+          );
         }
 
         throw error;

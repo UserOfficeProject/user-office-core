@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { PdfTemplateRecord } from 'knex/types/tables';
 
 import { PdfTemplate } from '../../models/PdfTemplate';
@@ -37,7 +38,7 @@ export default class PostgresPdfTemplateDataSource
         creatorId,
       });
 
-      throw new Error('Failed to insert PDF template');
+      throw new GraphQLError('Failed to insert PDF template');
     }
 
     return createPdfTemplateObject(templates[0]);
@@ -70,7 +71,7 @@ export default class PostgresPdfTemplateDataSource
         pdfTemplateId,
       });
 
-      throw new Error('Could not delete PDF template');
+      throw new GraphQLError('Could not delete PDF template');
     }
 
     return createPdfTemplateObject(templates[0]);
@@ -89,7 +90,7 @@ export default class PostgresPdfTemplateDataSource
     if (templates.length !== 1) {
       logger.logError('Could not update PDF template', { args });
 
-      throw new Error('Could not update PDF template');
+      throw new GraphQLError('Could not update PDF template');
     }
 
     return createPdfTemplateObject(templates[0]);
@@ -112,7 +113,7 @@ export default class PostgresPdfTemplateDataSource
         'Could not clone PDF template because source PDF template does not exist',
         { template_id: sourceTemplateId }
       );
-      throw new Error('Could not clone PDF template');
+      throw new GraphQLError('Could not clone PDF template');
     }
 
     const newTemplate = await this.createPdfTemplate({

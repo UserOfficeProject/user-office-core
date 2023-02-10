@@ -4,7 +4,7 @@ import { Proposal, ProposalPks } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
-import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
   ProposalBookingScheduledEventFilterCore,

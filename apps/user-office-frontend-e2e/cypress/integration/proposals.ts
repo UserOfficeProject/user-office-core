@@ -63,18 +63,18 @@ context('Proposal tests', () => {
       templateId: initialDBData.template.id,
       sortOrder: 1,
     }).then((topicResult) => {
-      if (topicResult.createTopic.template) {
+      if (topicResult.createTopic) {
         const topicId =
-          topicResult.createTopic.template.steps[
-            topicResult.createTopic.template.steps.length - 1
+          topicResult.createTopic.steps[
+            topicResult.createTopic.steps.length - 1
           ].topic.id;
         cy.createQuestion({
           categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
           dataType: DataType.TEXT_INPUT,
         }).then((result) => {
-          if (result.createQuestion.question) {
+          if (result.createQuestion) {
             cy.updateQuestion({
-              id: result.createQuestion.question.id,
+              id: result.createQuestion.id,
               question: textQuestion,
             });
 
@@ -82,7 +82,7 @@ context('Proposal tests', () => {
               templateId: initialDBData.template.id,
               sortOrder: 0,
               topicId: topicId,
-              questionId: result.createQuestion.question.id,
+              questionId: result.createQuestion.id,
             });
           }
         });
@@ -108,16 +108,16 @@ context('Proposal tests', () => {
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
       }).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        if (result.createProposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.id;
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
 
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: newProposalTitle,
             abstract: newProposalAbstract,
             proposerId: proposer.id,
@@ -274,9 +274,9 @@ context('Proposal tests', () => {
 
       for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
         cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-          if (result.createProposal.proposal) {
+          if (result.createProposal) {
             cy.updateProposal({
-              proposalPk: result.createProposal.proposal.primaryKey,
+              proposalPk: result.createProposal.primaryKey,
               title: newProposalTitle + index,
               abstract: newProposalAbstract + index,
               proposerId: proposer.id,
@@ -640,8 +640,8 @@ context('Proposal tests', () => {
         endCall: tomorrow,
         proposalWorkflowId: createdWorkflowId,
       }).then((response) => {
-        if (response.createCall.call) {
-          createdCallId = response.createCall.call.id;
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
         }
 
         cy.contains('New Proposal').click();
@@ -721,15 +721,14 @@ context('Proposal tests', () => {
         name: proposalInternalWorkflow.name,
         description: proposalInternalWorkflow.description,
       }).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        if (result.createProposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.id;
           cy.updateCall({
             id: initialDBData.call.id,
             ...newCall,
             endCall: yesterday,
             endCallInternal: faker.date.future(),
-            proposalWorkflowId:
-              result.createProposalWorkflow.proposalWorkflow.id,
+            proposalWorkflowId: result.createProposalWorkflow.id,
           });
         }
       });
@@ -962,8 +961,8 @@ context('Proposal tests', () => {
         endCallInternal: tomorrow,
         proposalWorkflowId: createdWorkflowId,
       }).then((response) => {
-        if (response.createCall.call) {
-          createdCallId = response.createCall.call.id;
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
         }
 
         cy.contains('New Proposal').click();
@@ -973,6 +972,7 @@ context('Proposal tests', () => {
         cy.updateCall({
           id: createdCallId,
           ...newCall,
+          endCall: yesterday,
           endCallInternal: yesterday,
           proposalWorkflowId: createdWorkflowId,
         });

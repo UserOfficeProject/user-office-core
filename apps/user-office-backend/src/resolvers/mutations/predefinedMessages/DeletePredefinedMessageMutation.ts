@@ -9,13 +9,12 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { PredefinedMessage } from '../../../models/PredefinedMessage';
-import { PredefinedMessageResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { PredefinedMessage as PredefinedMessageModel } from '../../../models/PredefinedMessage';
+import { PredefinedMessage } from '../../types/PredefinedMessage';
 
 @InputType()
 export class DeletePredefinedMessageInput
-  implements Partial<PredefinedMessage>
+  implements Partial<PredefinedMessageModel>
 {
   @Field(() => Int)
   public id: number;
@@ -23,18 +22,15 @@ export class DeletePredefinedMessageInput
 
 @Resolver()
 export class DeletePredefinedMessageMutation {
-  @Mutation(() => PredefinedMessageResponseWrap)
+  @Mutation(() => PredefinedMessage)
   deletePredefinedMessage(
     @Arg('deletePredefinedMessageInput')
     deletePredefinedMessageInput: DeletePredefinedMessageInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.predefinedMessage.delete(
-        context.user,
-        deletePredefinedMessageInput
-      ),
-      PredefinedMessageResponseWrap
+    return context.mutations.predefinedMessage.delete(
+      context.user,
+      deletePredefinedMessageInput
     );
   }
 }

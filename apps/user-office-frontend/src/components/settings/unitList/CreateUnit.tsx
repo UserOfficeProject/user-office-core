@@ -50,11 +50,12 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
     <Formik
       initialValues={initialValues}
       onSubmit={async (newUnit): Promise<void> => {
-        const data = await api({
+        const { createUnit } = await api({
           toastSuccessMessage: 'Unit created successfully',
         }).createUnit(newUnit as Unit);
-        if (data.createUnit.unit) {
-          close(data.createUnit.unit);
+
+        if (createUnit) {
+          close(createUnit);
         }
       }}
       validationSchema={Yup.object().shape({

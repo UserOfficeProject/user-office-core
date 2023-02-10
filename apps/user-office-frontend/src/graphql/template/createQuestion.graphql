@@ -3,11 +3,6 @@ mutation createQuestion(
   $dataType: DataType!
 ) {
   createQuestion(categoryId: $categoryId, dataType: $dataType) {
-    question {
-      ...question
-    }
-    rejection {
-      ...rejection
-    }
+    ...question
   }
 }

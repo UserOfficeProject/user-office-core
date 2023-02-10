@@ -10,11 +10,6 @@ mutation createSEP(
     numberRatingsRequired: $numberRatingsRequired
     active: $active
   ) {
-    sep {
-      ...sep
-    }
-    rejection {
-      ...rejection
-    }
+    ...sep
   }
 }

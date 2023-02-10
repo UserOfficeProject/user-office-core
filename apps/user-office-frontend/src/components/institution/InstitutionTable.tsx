@@ -28,19 +28,17 @@ const InstitutionPage: React.FC = () => {
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const deleteInstitution = async (id: number | string) => {
-    return await api({
-      toastSuccessMessage: 'Institution removed successfully!',
-    })
-      .deleteInstitution({
+    try {
+      await api({
+        toastSuccessMessage: 'Institution removed successfully!',
+      }).deleteInstitution({
         id: id as number,
-      })
-      .then((resp) => {
-        if (resp.deleteInstitution.rejection) {
-          return false;
-        } else {
-          return true;
-        }
       });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const columns = [

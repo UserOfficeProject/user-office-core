@@ -82,14 +82,13 @@ function AssignTechnicalReview({
                       userId: selectedUser,
                       proposalPks: [proposal.primaryKey],
                     })
-                    .then((result) => {
+                    .then(({ updateTechnicalReviewAssignee }) => {
                       onProposalUpdated({
                         ...proposal,
                         technicalReview: proposal.technicalReview
                           ? {
                               ...proposal.technicalReview,
-                              ...result.updateTechnicalReviewAssignee
-                                .technicalReviews?.[0],
+                              ...updateTechnicalReviewAssignee[0],
                             }
                           : null,
                       });

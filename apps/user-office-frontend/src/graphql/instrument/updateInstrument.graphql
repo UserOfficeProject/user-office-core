@@ -12,11 +12,6 @@ mutation updateInstrument(
     description: $description
     managerUserId: $managerUserId
   ) {
-    instrument {
-      ...instrument
-    }
-    rejection {
-      ...rejection
-    }
+    ...instrument
   }
 }

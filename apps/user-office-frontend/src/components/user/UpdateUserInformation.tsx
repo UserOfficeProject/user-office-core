@@ -167,43 +167,35 @@ export default function UpdateUserInformation(
   const isUserOfficer = currentRole === UserRole.USER_OFFICER;
 
   const handleSetUserEmailVerified = async () => {
-    const {
-      setUserEmailVerified: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'Email verified',
     }).setUserEmailVerified({ id: props.id });
 
-    if (!rejection) {
-      setUserData((userData) =>
-        userData
-          ? {
-              ...userData,
-              emailVerified: true,
-            }
-          : null
-      );
-    }
+    setUserData((userData) =>
+      userData
+        ? {
+            ...userData,
+            emailVerified: true,
+          }
+        : null
+    );
   };
 
   const handleSetUserNotPlaceholder = async () => {
-    const {
-      setUserNotPlaceholder: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'User is no longer placeholder',
     }).setUserNotPlaceholder({
       id: props.id,
     });
 
-    if (!rejection) {
-      setUserData((userData) =>
-        userData
-          ? {
-              ...userData,
-              placeholder: false,
-            }
-          : null
-      );
-    }
+    setUserData((userData) =>
+      userData
+        ? {
+            ...userData,
+            placeholder: false,
+          }
+        : null
+    );
   };
 
   return (

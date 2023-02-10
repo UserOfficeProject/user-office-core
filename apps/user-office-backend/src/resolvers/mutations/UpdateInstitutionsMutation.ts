@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { InstitutionResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Institution } from '../types/Institution';
 
 @ArgsType()
 export class UpdateInstitutionsArgs {
@@ -29,14 +28,11 @@ export class UpdateInstitutionsArgs {
 
 @Resolver()
 export class UpdateInstitutionMutation {
-  @Mutation(() => InstitutionResponseWrap)
+  @Mutation(() => Institution)
   updateInstitution(
     @Args() args: UpdateInstitutionsArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.admin.updateInstitutions(context.user, args),
-      InstitutionResponseWrap
-    );
+    return context.mutations.admin.updateInstitutions(context.user, args);
   }
 }

@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { BasicUserDetailsResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { BasicUserDetails } from '../types/BasicUserDetails';
 
 @ArgsType()
 class UpdatePasswordArguments {
@@ -22,14 +21,14 @@ class UpdatePasswordArguments {
 }
 @Resolver()
 export class UpdatePasswordMutations {
-  @Mutation(() => BasicUserDetailsResponseWrap)
+  @Mutation(() => BasicUserDetails)
   updatePassword(
     @Args() { id, password }: UpdatePasswordArguments,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.user.updatePassword(context.user, { id, password }),
-      BasicUserDetailsResponseWrap
-    );
+    return context.mutations.user.updatePassword(context.user, {
+      id,
+      password,
+    });
   }
 }

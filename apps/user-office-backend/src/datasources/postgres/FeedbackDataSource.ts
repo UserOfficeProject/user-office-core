@@ -1,3 +1,5 @@
+import { GraphQLError } from 'graphql';
+
 import { Feedback, FeedbackStatus } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { CreateFeedbackArgs } from '../../resolvers/mutations/CreateFeedbackMutation';
@@ -100,7 +102,7 @@ class PostgresFeedbackDataSource implements FeedbackDataSource {
       .returning('*')
       .then((result) => {
         if (result.length !== 1) {
-          throw new Error('Feedback not found');
+          throw new GraphQLError('Feedback not found');
         }
 
         return createFeedbackObject(result[0]);

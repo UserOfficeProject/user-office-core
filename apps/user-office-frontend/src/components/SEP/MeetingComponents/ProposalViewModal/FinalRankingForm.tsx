@@ -97,20 +97,18 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
       submitted: shouldSubmitMeetingDecision,
     };
 
-    const data = await api({
+    await api({
       toastSuccessMessage: `SEP meeting decision ${
         shouldSubmitMeetingDecision ? 'submitted' : 'saved'
       } successfully!`,
     }).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
-
-    const isError = !!data.saveSepMeetingDecision.rejection;
 
     meetingSubmitted({
       ...(saveSepMeetingDecisionInput as SepMeetingDecision),
       submittedBy: proposalData.sepMeetingDecision?.submittedBy || null,
     });
 
-    if (shouldClose && !isError) {
+    if (shouldClose) {
       closeModal();
     }
   };

@@ -1,18 +1,12 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import { randomBytes } from 'crypto';
 
 import * as Yup from 'yup';
 
 import { BasicResolverContext } from '../context';
 import { Review, ReviewStatus } from '../models/Review';
+import { OmitType } from './utilTypes';
 
-interface Omit {
-  <T extends object, K extends [...(keyof T)[]]>(obj: T, ...keys: K): {
-    [K2 in Exclude<keyof T, K[number]>]: T[K2];
-  };
-}
-
-export const omit: Omit = (obj, ...keys) => {
+export const omit: OmitType = (obj, ...keys) => {
   const ret = {} as {
     [K in keyof typeof obj]: typeof obj[K];
   };
@@ -77,26 +71,6 @@ export const searchObjectByKey = (
 
   return null;
 };
-
-/**
- * @description Makes all fields non-nullable
- */
-export type NonNullableFields<T> = {
-  [P in keyof T]: NonNullable<T[P]>;
-};
-
-/**
- * @description Makes subset fields non-nullable
- */
-
-export type NonNullableField<T, K extends keyof T> = T &
-  NonNullableFields<Pick<T, K>>;
-
-/**
- * @description Makes subset fields required
- */
-export type RequiredField<T, K extends keyof T> = T &
-  NonNullableFields<Required<Pick<T, K>>>;
 
 export function removeDuplicates<T>(obj: T): T {
   if (Array.isArray(obj) && obj.length > 1) {

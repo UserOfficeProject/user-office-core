@@ -86,22 +86,22 @@ context('Calls tests', () => {
       groupId: TemplateGroupId.PROPOSAL_ESI,
       name: esiTemplateName,
     }).then((result) => {
-      if (result.createTemplate.template) {
-        esiTemplateId = result.createTemplate.template?.templateId;
+      if (result.createTemplate) {
+        esiTemplateId = result.createTemplate.templateId;
       } else {
         throw new Error('ESI templete creation failed');
       }
     });
 
     cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow.proposalWorkflow) {
-        workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
+      if (result.createProposalWorkflow) {
+        workflowId = result.createProposalWorkflow.id;
       } else {
         throw new Error('Workflow creation failed');
       }
     });
     cy.createProposalWorkflow(proposalInternalWorkflow).then((result) => {
-      const workflow = result.createProposalWorkflow.proposalWorkflow;
+      const workflow = result.createProposalWorkflow;
       if (workflow) {
         cy.addProposalWorkflowStatus({
           droppableGroupId:
@@ -113,10 +113,9 @@ context('Calls tests', () => {
           prevProposalStatusId:
             workflow.proposalWorkflowConnectionGroups[0].connections[0].id,
         }).then((result) => {
-          if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId:
-                result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+              proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
               statusChangingEvents: ['CALL_ENDED'],
             });
           }
@@ -688,20 +687,22 @@ context('Calls tests', () => {
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
       }).then((response) => {
-        if (response.createCall.call) {
-          createdCallId = response.createCall.call.id;
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
         }
       });
-      cy.updateUserRoles({
-        id: initialDBData.users.user1.id,
-        roles: [
-          initialDBData.roles.user,
-          initialDBData.roles.instrumentScientist,
-        ],
-      });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: initialDBData.users.user1.id,
+          roles: [
+            initialDBData.roles.user,
+            initialDBData.roles.instrumentScientist,
+          ],
+        });
+      }
       cy.createInstrument(instrumentAssignedToCall).then((response) => {
-        if (response.createInstrument.instrument) {
-          createdInstrumentId = response.createInstrument.instrument.id;
+        if (response.createInstrument) {
+          createdInstrumentId = response.createInstrument.id;
         }
       });
       cy.visit('/');
@@ -902,9 +903,9 @@ context('Calls tests', () => {
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
       }).then((result) => {
-        if (result.createCall.call?.id) {
+        if (result.createCall.id) {
           cy.updateCall({
-            ...result.createCall.call,
+            ...result.createCall,
             isActive: false,
           } as UpdateCallInput);
         }
@@ -952,9 +953,9 @@ context('Calls tests', () => {
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
       }).then((result) => {
-        if (result.createCall.call?.id) {
+        if (result.createCall.id) {
           cy.updateCall({
-            ...result.createCall.call,
+            ...result.createCall,
             isActive: false,
           } as UpdateCallInput);
         }

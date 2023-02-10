@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 /* eslint-disable quotes */
 import { numberInputQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 
 import {
   NumberInputConfig,
@@ -25,7 +26,7 @@ export const numberInputDefinition: Question = {
     value: { value: number; unit: string | null }
   ) => {
     if (field.question.dataType !== DataType.NUMBER_INPUT) {
-      throw new Error('DataType should be NUMBER_INPUT');
+      throw new GraphQLError('DataType should be NUMBER_INPUT');
     }
 
     return numberInputQuestionValidationSchema(
@@ -61,7 +62,7 @@ export const numberInputDefinition: Question = {
           value
         );
       default:
-        throw new Error(
+        throw new GraphQLError(
           `Unsupported comparator for NumberInput ${filter.compareOperator}`
         );
     }
@@ -76,7 +77,7 @@ export const numberInputDefinition: Question = {
       const isValid = isSiConversionFormulaValid(unit.siConversionFormula);
       if (isValid === false) {
         logger.logError('Conversion formula is not valid', answer);
-        throw new Error('Error while processing conversion formula');
+        throw new GraphQLError('Error while processing conversion formula');
       }
     }
 

@@ -41,7 +41,7 @@ export default function ImportTemplatePage() {
               api()
                 .validateTemplateImport({ templateAsJson: json })
                 .then(({ validateTemplateImport }) => {
-                  const result = validateTemplateImport.validationResult;
+                  const result = validateTemplateImport;
                   if (result) {
                     setValidationResult(result as TemplateValidation);
                   }

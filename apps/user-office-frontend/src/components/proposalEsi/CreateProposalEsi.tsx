@@ -11,14 +11,14 @@ interface CreateProposalEsiProps {
 }
 function CreateProposalEsi({ scheduledEventId }: CreateProposalEsiProps) {
   const { api } = useDataApiWithFeedback();
-  const [esi, setEsi] = useState<CreateEsiMutation['createEsi']['esi']>(null);
+  const [esi, setEsi] = useState<CreateEsiMutation['createEsi'] | null>(null);
 
   useEffect(() => {
     api()
       .createEsi({ scheduledEventId })
       .then((result) => {
-        if (result.createEsi.esi) {
-          setEsi(result.createEsi.esi);
+        if (result.createEsi) {
+          setEsi(result.createEsi);
         }
       });
   }, [scheduledEventId, api]);

@@ -149,20 +149,16 @@ const ProposalTable = ({
       return;
     }
 
-    const result = await api({
+    const { cloneProposals } = await api({
       toastSuccessMessage: 'Proposal cloned successfully',
     }).cloneProposals({
       callId: call.id,
       proposalsToClonePk: [proposalToClone.primaryKey],
     });
 
-    const [resultProposal] = result.cloneProposals.proposals ?? [];
+    const [resultProposal] = cloneProposals;
 
-    if (
-      !result.cloneProposals.rejection &&
-      partialProposalsData &&
-      resultProposal
-    ) {
+    if (partialProposalsData && resultProposal) {
       const newClonedProposal = {
         primaryKey: resultProposal.primaryKey,
         title: resultProposal.title,
@@ -270,17 +266,15 @@ const ProposalTable = ({
               onClick: (_event, rowData) =>
                 confirm(
                   async () => {
-                    const deletedProposal = (
-                      await api().deleteProposal({
-                        proposalPk: (rowData as PartialProposalsDataType)
-                          .primaryKey,
-                      })
-                    ).deleteProposal.proposal;
-                    if (deletedProposal) {
+                    const { deleteProposal } = await api().deleteProposal({
+                      proposalPk: (rowData as PartialProposalsDataType)
+                        .primaryKey,
+                    });
+                    if (deleteProposal) {
                       setPartialProposalsData(
                         partialProposalsData?.filter(
                           (item) =>
-                            item.primaryKey !== deletedProposal?.primaryKey
+                            item.primaryKey !== deleteProposal?.primaryKey
                         )
                       );
                     }

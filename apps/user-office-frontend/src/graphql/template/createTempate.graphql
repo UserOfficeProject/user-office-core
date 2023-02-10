@@ -4,12 +4,7 @@ mutation createTemplate(
   $description: String
 ) {
   createTemplate(groupId: $groupId, name: $name, description: $description) {
-    template {
-      ...template
-      questionaryCount
-    }
-    rejection {
-      ...rejection
-    }
+    ...template
+    questionaryCount
   }
 }

@@ -4,11 +4,6 @@ mutation reorderSepMeetingDecisionProposals(
   reorderSepMeetingDecisionProposals(
     reorderSepMeetingDecisionProposalsInput: $reorderSepMeetingDecisionProposalsInput
   ) {
-    rejection {
-      ...rejection
-    }
-    sepMeetingDecision {
-      proposalPk
-    }
+    proposalPk
   }
 }

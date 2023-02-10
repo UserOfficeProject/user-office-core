@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Proposal } from '../types/Proposal';
 
 @ArgsType()
 export class NotifyProposalArgs {
@@ -20,17 +19,14 @@ export class NotifyProposalArgs {
 
 @Resolver()
 export class NotifyProposalMutation {
-  @Mutation(() => ProposalResponseWrap)
+  @Mutation(() => Proposal)
   notifyProposal(
     @Args()
     args: NotifyProposalArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.proposal.notify(context.user, {
-        proposalPk: args.proposalPk,
-      }),
-      ProposalResponseWrap
-    );
+    return context.mutations.proposal.notify(context.user, {
+      proposalPk: args.proposalPk,
+    });
   }
 }

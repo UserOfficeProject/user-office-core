@@ -43,18 +43,17 @@ context('GenericTemplates tests', () => {
       name: proposalTemplateName,
       groupId: TemplateGroupId.GENERIC_TEMPLATE,
     }).then((result) => {
-      if (result.createTemplate.template) {
-        createdGenericTemplateId = result.createTemplate.template.templateId;
+      if (result.createTemplate) {
+        createdGenericTemplateId = result.createTemplate.templateId;
 
         const topicId =
-          result.createTemplate.template.steps[
-            result.createTemplate.template.steps.length - 1
-          ].topic.id;
+          result.createTemplate.steps[result.createTemplate.steps.length - 1]
+            .topic.id;
         cy.createQuestion({
           categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion1 = questionResult.createQuestion.question;
+          const createdQuestion1 = questionResult.createQuestion;
           if (createdQuestion1) {
             cy.updateQuestion({
               id: createdQuestion1.id,
@@ -73,7 +72,7 @@ context('GenericTemplates tests', () => {
           categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion2 = questionResult.createQuestion.question;
+          const createdQuestion2 = questionResult.createQuestion;
           if (createdQuestion2) {
             cy.updateQuestion({
               id: createdQuestion2.id,
@@ -93,28 +92,27 @@ context('GenericTemplates tests', () => {
           name: proposalTemplateName,
           groupId: TemplateGroupId.PROPOSAL,
         }).then((result) => {
-          if (result.createTemplate.template) {
-            createdTemplateId = result.createTemplate.template.templateId;
+          if (result.createTemplate) {
+            createdTemplateId = result.createTemplate.templateId;
 
             cy.createTopic({
               templateId: createdTemplateId,
               sortOrder: 1,
             }).then((topicResult) => {
-              if (!topicResult.createTopic.template) {
+              if (!topicResult.createTopic) {
                 throw new Error('Can not create topic');
               }
 
               const topicId =
-                topicResult.createTopic.template.steps[
-                  topicResult.createTopic.template.steps.length - 1
+                topicResult.createTopic.steps[
+                  topicResult.createTopic.steps.length - 1
                 ].topic.id;
               cy.createQuestion({
                 categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 dataType: DataType.GENERIC_TEMPLATE,
               }).then((questionResult) => {
-                if (questionResult.createQuestion.question) {
-                  createdQuestion1Id =
-                    questionResult.createQuestion.question.id;
+                if (questionResult.createQuestion) {
+                  createdQuestion1Id = questionResult.createQuestion.id;
 
                   cy.updateQuestion({
                     id: createdQuestion1Id,
@@ -134,7 +132,7 @@ context('GenericTemplates tests', () => {
                 categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 dataType: DataType.GENERIC_TEMPLATE,
               }).then((questionResult) => {
-                const createdQuestion2 = questionResult.createQuestion.question;
+                const createdQuestion2 = questionResult.createQuestion;
                 if (createdQuestion2) {
                   cy.updateQuestion({
                     id: createdQuestion2.id,
@@ -157,23 +155,22 @@ context('GenericTemplates tests', () => {
     });
   };
   const createGenericTemplates = (count: number) => {
-    const genericTemaplates: number[] = [];
+    const genericTemplates: number[] = [];
     for (let index = 0; index <= count; index++)
       cy.createTemplate({
         name: faker.lorem.word(5),
         groupId: TemplateGroupId.GENERIC_TEMPLATE,
       }).then((result) => {
-        if (result.createTemplate.template) {
-          const genericTemplateID = result.createTemplate.template.templateId;
+        if (result.createTemplate) {
+          const genericTemplateID = result.createTemplate.templateId;
           const topicId =
-            result.createTemplate.template.steps[
-              result.createTemplate.template.steps.length - 1
-            ].topic.id;
+            result.createTemplate.steps[result.createTemplate.steps.length - 1]
+              .topic.id;
           cy.createQuestion({
             categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
             dataType: DataType.TEXT_INPUT,
           }).then((questionResult) => {
-            const createdQuestion = questionResult.createQuestion.question;
+            const createdQuestion = questionResult.createQuestion;
             if (createdQuestion) {
               cy.updateQuestion({
                 id: createdQuestion.id,
@@ -190,11 +187,11 @@ context('GenericTemplates tests', () => {
             }
           });
 
-          genericTemaplates.push(genericTemplateID);
+          genericTemplates.push(genericTemplateID);
         }
       });
 
-    return genericTemaplates;
+    return genericTemplates;
   };
   const createProposalTemplateWithSubTemplate = (
     genericSubTemplateIds: number[]
@@ -203,19 +200,19 @@ context('GenericTemplates tests', () => {
       name: faker.lorem.words(3),
       groupId: TemplateGroupId.PROPOSAL,
     }).then((result) => {
-      if (result.createTemplate.template) {
-        const proposalTemplateId = result.createTemplate.template.templateId;
+      if (result.createTemplate) {
+        const proposalTemplateId = result.createTemplate.templateId;
         for (let index = 0; index < genericSubTemplateIds.length - 1; index++) {
           cy.createTopic({
             templateId: proposalTemplateId,
             sortOrder: index + 1,
           }).then((topicResult) => {
-            if (!topicResult.createTopic.template) {
+            if (!topicResult.createTopic) {
               throw new Error('Can not create topic');
             }
             const topicId =
-              topicResult.createTopic.template.steps[
-                topicResult.createTopic.template.steps.length - 1
+              topicResult.createTopic.steps[
+                topicResult.createTopic.steps.length - 1
               ].topic.id;
             cy.updateTopic({
               title: faker.lorem.words(4),
@@ -227,9 +224,8 @@ context('GenericTemplates tests', () => {
               categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
               dataType: DataType.GENERIC_TEMPLATE,
             }).then((questionResult) => {
-              if (questionResult.createQuestion.question) {
-                const createdQuestion1Id =
-                  questionResult.createQuestion.question.id;
+              if (questionResult.createQuestion) {
+                const createdQuestion1Id = questionResult.createQuestion.id;
 
                 cy.updateQuestion({
                   id: createdQuestion1Id,
@@ -388,8 +384,8 @@ context('GenericTemplates tests', () => {
       createTemplateAndAllQuestions();
 
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
         } else {
           throw new Error('Workflow creation failed');
         }
@@ -513,14 +509,14 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle[1],
             abstract: faker.lorem.words(3),
           });
           cy.createGenericTemplate({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: genericTemplateTitle,
             templateId: createdGenericTemplateId,
             questionId: createdQuestion1Id,
@@ -642,14 +638,14 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle[1],
             abstract: faker.lorem.words(3),
           });
           cy.createGenericTemplate({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: genericTemplateTitle,
             templateId: createdGenericTemplateId,
             questionId: createdQuestion1Id,
@@ -674,19 +670,19 @@ context('GenericTemplates tests', () => {
   describe('Generic template cloning tests', () => {
     beforeEach(() => {
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          workflowId = result.createProposalWorkflow.proposalWorkflow.id;
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
           const genericTemplates = createGenericTemplates(2);
           createProposalTemplateWithSubTemplate(genericTemplates);
           cy.createProposal({ callId: initialDBData.call.id }).then(
             (result) => {
-              if (result.createProposal.proposal) {
-                const proposalPK = result.createProposal.proposal.primaryKey;
+              if (result.createProposal) {
+                const proposalPK = result.createProposal.primaryKey;
                 const questionarySteps =
-                  result.createProposal.proposal.questionary.steps;
-                const proposal = result.createProposal.proposal;
+                  result.createProposal.questionary.steps;
+                const proposal = result.createProposal;
                 cy.updateProposal({
-                  proposalPk: result.createProposal.proposal.primaryKey,
+                  proposalPk: result.createProposal.primaryKey,
                   title: proposalTitle[1],
                   abstract: faker.lorem.words(3),
                   proposerId: initialDBData.users.user1.id,
@@ -694,31 +690,26 @@ context('GenericTemplates tests', () => {
 
                 for (let index = 1; index < questionarySteps.length; index++) {
                   cy.createGenericTemplate({
-                    proposalPk: result.createProposal.proposal.primaryKey,
+                    proposalPk: result.createProposal.primaryKey,
                     title: genericTemplateTitleAnswers[index - 1],
                     questionId:
-                      result.createProposal.proposal.questionary.steps[index]
-                        .fields[0].question.id,
+                      result.createProposal.questionary.steps[index].fields[0]
+                        .question.id,
                     templateId: genericTemplates[index - 1],
                   }).then((templateResult) => {
-                    if (
-                      templateResult.createGenericTemplate.genericTemplate
-                        ?.questionaryId
-                    ) {
+                    if (templateResult.createGenericTemplate?.questionaryId) {
                       cy.answerTopic({
                         isPartialSave: false,
                         questionaryId:
-                          templateResult.createGenericTemplate.genericTemplate
-                            .questionaryId,
+                          templateResult.createGenericTemplate.questionaryId,
                         topicId:
-                          templateResult.createGenericTemplate.genericTemplate
-                            .questionary.steps[0].topic.id,
+                          templateResult.createGenericTemplate.questionary
+                            .steps[0].topic.id,
                         answers: [
                           {
                             questionId:
-                              templateResult.createGenericTemplate
-                                .genericTemplate.questionary.steps[0].fields[1]
-                                .question.id,
+                              templateResult.createGenericTemplate.questionary
+                                .steps[0].fields[1].question.id,
                             value: '{"value":"answer"}',
                           },
                         ],

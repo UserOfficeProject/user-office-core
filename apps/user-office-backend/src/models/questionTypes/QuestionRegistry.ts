@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
@@ -100,7 +101,7 @@ export const getQuestionDefinition = (dataType: DataType) => {
   const definition = componentMap.get(dataType);
   if (!definition) {
     logger.logError('Tried to obtain non-existing definition', { dataType });
-    throw new Error('Tried to obtain non-existing definition');
+    throw new GraphQLError('Tried to obtain non-existing definition');
   }
 
   return definition;

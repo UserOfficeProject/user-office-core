@@ -1,10 +1,5 @@
 mutation deletePredefinedMessage($input: DeletePredefinedMessageInput!) {
   deletePredefinedMessage(deletePredefinedMessageInput: $input) {
-    predefinedMessage {
-      ...predefinedMessage
-    }
-    rejection {
-      ...rejection
-    }
+    ...predefinedMessage
   }
 }
