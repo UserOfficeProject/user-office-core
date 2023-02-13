@@ -39,6 +39,9 @@ export const QuestionDynamicMultipleChoiceForm: FC<QuestionFormProps> = (
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
+          url: Yup.string()
+            .url('Provide a valid URL that includes the HTTP or HTTPS protocol')
+            .required('URL is required'),
         }),
       })}
     >
