@@ -123,12 +123,23 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
     <Grid container style={{ maxWidth: '400px', margin: '0 8px' }}>
       <Grid item xs={12}>
         <Autocomplete
-          id="question-list"
+          id={'question-list'}
+          key={Math.random()}
           options={questions}
           getOptionLabel={(option) => option.question.question}
+          isOptionEqualToValue={(option, value) =>
+            option.question.id === value.question.id
+          }
           renderInput={(params) => (
             <TextField {...params} margin="none" label="Question" />
           )}
+          renderOption={(props, option) => {
+            return (
+              <li {...props} key={option.question.id}>
+                {option.question.question}
+              </li>
+            );
+          }}
           onChange={(_event, newValue) => {
             setSelectedQuestion(newValue);
             setSearchCriteria(null);
