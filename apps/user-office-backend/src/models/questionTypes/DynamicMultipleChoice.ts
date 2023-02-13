@@ -22,12 +22,9 @@ export const dynamicMultipleChoiceDefinition: Question = {
     config.required = false;
     config.small_label = '';
     config.tooltip = '';
-    config.variant = 'input';
+    config.variant = 'dropdown';
     config.url = '';
-    config.min = null;
-    config.max = null;
-    config.multiline = false;
-    config.placeholder = '';
+    config.isMultipleSelect = false;
 
     return config;
   },

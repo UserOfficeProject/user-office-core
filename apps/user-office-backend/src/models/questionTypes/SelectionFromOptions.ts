@@ -20,7 +20,7 @@ export const selectionFromOptionsDefinition: Question = {
     config.small_label = '';
     config.required = false;
     config.tooltip = '';
-    config.variant = 'radio';
+    config.variant = 'dropdown';
     config.options = [];
     config.isMultipleSelect = false;
 

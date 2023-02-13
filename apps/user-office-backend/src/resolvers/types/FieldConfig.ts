@@ -88,23 +88,14 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 
 @ObjectType()
 export class DynamicMultipleChoiceConfig extends ConfigBase {
-  @Field(() => Int, { nullable: true })
-  min: number | null;
-
-  @Field(() => Int, { nullable: true })
-  max: number | null;
-
-  @Field(() => Boolean)
-  multiline: boolean;
-
-  @Field(() => String)
-  placeholder: string;
-
   @Field(() => String)
   variant: string;
 
   @Field(() => String)
   url: string;
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
 }
 
 @ObjectType()
