@@ -124,7 +124,6 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
       <Grid item xs={12}>
         <Autocomplete
           id={'question-list'}
-          key={Math.random()}
           options={questions}
           getOptionLabel={(option) => option.question.question}
           isOptionEqualToValue={(option, value) =>
