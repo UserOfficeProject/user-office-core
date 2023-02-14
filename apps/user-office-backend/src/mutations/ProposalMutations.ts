@@ -226,6 +226,12 @@ export default class ProposalMutations {
         proposalPk,
       });
     }
+    if (proposal.submitted) {
+      return rejection('Can not submit the proposal again', {
+        agent,
+        proposal,
+      });
+    }
 
     return this.submitProposal(agent, proposal);
   }
