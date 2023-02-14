@@ -134,17 +134,18 @@ const CallGeneralInfo: React.FC<{
       (value) => value.id === proposalWorkflowId
     );
     if (selectedProposalWorkFlow) {
-      selectedProposalWorkFlow.proposalWorkflowConnectionGroups.map(
-        (workGroup) => {
-          const result = workGroup.connections.some((connectionStatus) => {
-            return (
-              connectionStatus.proposalStatus.shortCode ===
-              ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
-            );
-          });
-          setInternalCallDate({ showField: result, isValueSet: true });
-        }
-      );
+      const result =
+        selectedProposalWorkFlow.proposalWorkflowConnectionGroups.some(
+          (workGroup) => {
+            return workGroup.connections.some((connectionStatus) => {
+              return (
+                connectionStatus.proposalStatus.shortCode ===
+                ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+              );
+            });
+          }
+        );
+      setInternalCallDate({ showField: result, isValueSet: true });
     }
   }, [proposalWorkflowId, proposalWorkflows]);
 
