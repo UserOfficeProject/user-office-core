@@ -1,4 +1,4 @@
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
+import HttpIcon from '@mui/icons-material/Http';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
@@ -20,7 +20,7 @@ export const dynamicMultipleChoiceDefinition: QuestionaryComponentDefinition = {
     QuestionTemplateRelationDynamicMultipleChoiceForm,
   readonly: false,
   creatable: true,
-  icon: <RadioButtonCheckedIcon />,
+  icon: <HttpIcon />,
   renderers: {
     answerRenderer: DynamicMultipleChoiceAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
