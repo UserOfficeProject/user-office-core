@@ -1,21 +1,23 @@
 /* eslint-disable quotes */
-import { textInputQuestionValidationSchema } from '@user-office-software/duo-validation';
-
 import { DynamicMultipleChoiceConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
-//TODO: include url validation in validate field
-
 export const dynamicMultipleChoiceDefinition: Question = {
   dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
-  validate: (field: QuestionTemplateRelation, value: string[]) => {
+  validate: async (field: QuestionTemplateRelation) => {
     if (field.question.dataType !== DataType.DYNAMIC_MULTIPLE_CHOICE) {
       throw new Error('DataType should be DYNAMIC_MULTIPLE_CHOICE');
     }
+    /*
+    NOTE: Since we are getting options from an api call response,
+    It's hard to make a validation schema to validate whether pre & post values are identical.
+    When we create a question using dynamic multi choice, we copy paste API url in the input field.
+    Where we use the question, however, we use values returned from the API reponse.
+    */
 
-    return textInputQuestionValidationSchema(field).isValid(value);
+    return true;
   },
   createBlankConfig: (): DynamicMultipleChoiceConfig => {
     const config = new DynamicMultipleChoiceConfig();
