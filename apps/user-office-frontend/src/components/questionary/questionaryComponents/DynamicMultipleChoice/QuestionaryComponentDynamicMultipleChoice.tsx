@@ -89,6 +89,7 @@ export function QuestionaryComponentDynamicMultipleChoice(
           <InputLabel id={`questionary-${id}`}>{label}</InputLabel>
           <Select
             id={id}
+            data-cy="dropdown-ul"
             value={
               config.isMultipleSelect
                 ? stateValue
@@ -112,7 +113,11 @@ export function QuestionaryComponentDynamicMultipleChoice(
           >
             {content.map((option) => {
               return (
-                <SelectMenuItem value={option} key={option}>
+                <SelectMenuItem
+                  value={option}
+                  key={option}
+                  data-cy="dropdown-li"
+                >
                   {option}
                 </SelectMenuItem>
               );

@@ -24,7 +24,7 @@ export const dynamicMultipleChoiceDefinition: Question = {
     config.required = false;
     config.small_label = '';
     config.tooltip = '';
-    config.variant = 'dropdown';
+    config.variant = 'radio';
     config.url = '';
     config.isMultipleSelect = false;
 
