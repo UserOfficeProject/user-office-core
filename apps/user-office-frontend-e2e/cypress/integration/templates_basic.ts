@@ -414,6 +414,25 @@ context('Template tests', () => {
         .first()
         .click();
 
+      /* Dynamic multiple choice */
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          isMultipleSelect: true,
+        }
+      );
+
+      cy.contains(dynamicMultipleChoiceQuestion.title)
+        .closest('[data-cy=question-container]')
+        .find("[data-cy='proposal-question-id']")
+        .invoke('html');
+
+      cy.contains(dynamicMultipleChoiceQuestion.title).click();
+      cy.get('[data-cy=natural-key]').click();
+      cy.contains('Save').click();
+      /* --- */
+
       /* Boolean */
 
       cy.createBooleanQuestion(booleanQuestion);
@@ -636,14 +655,12 @@ context('Template tests', () => {
           isMultipleSelect: true,
         }
       );
+
       cy.contains(dynamicMultipleChoiceQuestion.title)
         .closest('[data-cy=question-container]')
-        .find('[data-cy=proposal-question-id]')
-        .invoke('html')
-        .then((fieldId) => {
-          multipleChoiceId = fieldId;
-        });
-      cy.finishedLoading();
+        .find("[data-cy='proposal-question-id']")
+        .invoke('html');
+
       cy.contains(dynamicMultipleChoiceQuestion.title).click();
       cy.get('[data-cy=natural-key]').click();
       cy.contains('Save').click();
