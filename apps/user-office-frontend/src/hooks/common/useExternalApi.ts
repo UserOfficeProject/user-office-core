@@ -5,7 +5,9 @@ export function useExternalApi(url: string) {
 
   useEffect(() => {
     let unmounted = false;
-
+    if (unmounted) {
+      return;
+    }
     fetch(url)
       .then((data) => data.json())
       .then((data) => setContent(data))
