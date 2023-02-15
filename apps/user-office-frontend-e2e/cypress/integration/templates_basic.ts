@@ -57,6 +57,10 @@ context('Template tests', () => {
       faker.lorem.words(3),
     ],
   };
+  const dynamicMultipleChoiceQuestion = {
+    title: faker.lorem.words(2),
+    url: 'https://private-05007-jayquan.apiary-mock.com/values',
+  };
 
   const templateSearch = {
     title: faker.lorem.words(3),
@@ -350,6 +354,41 @@ context('Template tests', () => {
     cy.viewport(1920, 1680);
   });
 
+  describe('Dynamic multiple choice external api call tests', () => {
+    beforeEach(() => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find('[aria-label=Edit]')
+        .first()
+        .click();
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+      cy.login('user1');
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.finishedLoading();
+      cy.get('[data-cy=title] input').type('title');
+      cy.get('[data-cy=abstract] textarea').first().type('abstract');
+      cy.contains(dynamicMultipleChoiceQuestion.title);
+    });
+    it('Should be able to select options returned from external api', () => {
+      cy.contains(dynamicMultipleChoiceQuestion.title).parent().click();
+      cy.get('[data-cy=dropdown-ul]').children().should('have.length.least', 1);
+      cy.get('[data-cy=dropdown-li]').each(($el, index) => {
+        cy.wrap($el).click();
+      });
+    });
+  });
   describe('Proposal templates basic tests', () => {
     it('User officer can delete active template', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
@@ -623,6 +662,27 @@ context('Template tests', () => {
 
       cy.contains('Save').click();
 
+      /* --- */
+
+      /* Dynamic multiple choice */
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          isMultipleSelect: true,
+        }
+      );
+      cy.contains(dynamicMultipleChoiceQuestion.title)
+        .closest('[data-cy=question-container]')
+        .find('[data-cy=proposal-question-id]')
+        .invoke('html')
+        .then((fieldId) => {
+          multipleChoiceId = fieldId;
+        });
+      cy.finishedLoading();
+      cy.contains(dynamicMultipleChoiceQuestion.title).click();
+      cy.get('[data-cy=natural-key]').click();
+      cy.contains('Save').click();
       /* --- */
 
       /* Date */
