@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
+
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
