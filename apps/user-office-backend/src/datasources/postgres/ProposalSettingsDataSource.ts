@@ -1,3 +1,5 @@
+import { GraphQLError } from 'graphql';
+
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
@@ -44,7 +46,7 @@ export default class PostgresProposalSettingsDataSource
       .returning(['*']);
 
     if (!addedProposalStatus) {
-      throw new Error('Could not create proposal status');
+      throw new GraphQLError('Could not create proposal status');
     }
 
     return this.createProposalStatusObject(addedProposalStatus);
@@ -90,7 +92,7 @@ export default class PostgresProposalSettingsDataSource
       .where('proposal_status_id', proposalStatus.id);
 
     if (!updatedProposalStatus) {
-      throw new Error(`ProposalStatus not found ${proposalStatus.id}`);
+      throw new GraphQLError(`ProposalStatus not found ${proposalStatus.id}`);
     }
 
     return this.createProposalStatusObject(updatedProposalStatus);
@@ -108,7 +110,7 @@ export default class PostgresProposalSettingsDataSource
       .returning('*');
 
     if (!removedProposalStatus) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not delete proposalStatus with id: ${proposalStatusId} `
       );
     }
@@ -137,7 +139,7 @@ export default class PostgresProposalSettingsDataSource
       .returning('*');
 
     if (!proposalWorkflowRecord) {
-      throw new Error('Could not create proposal status');
+      throw new GraphQLError('Could not create proposal status');
     }
 
     // NOTE: Add default DRAFT status to proposal workflow when it is created.
@@ -215,7 +217,9 @@ export default class PostgresProposalSettingsDataSource
       .where('proposal_workflow_id', proposalWorkflow.id)
       .then((records: ProposalWorkflowRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`Proposal workflow not found ${proposalWorkflow.id}`);
+          throw new GraphQLError(
+            `Proposal workflow not found ${proposalWorkflow.id}`
+          );
         }
 
         return this.createProposalWorkflowObject(records[0]);
@@ -231,7 +235,7 @@ export default class PostgresProposalSettingsDataSource
       .returning('*')
       .then((proposalWorkflow: ProposalWorkflowRecord[]) => {
         if (proposalWorkflow === undefined || proposalWorkflow.length !== 1) {
-          throw new Error(
+          throw new GraphQLError(
             `Could not delete proposal workflow with id: ${proposalWorkflowId} `
           );
         }
@@ -345,7 +349,7 @@ export default class PostgresProposalSettingsDataSource
       });
 
     if (!proposalWorkflowConnectionRecords) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not find proposal workflow connections with proposalStatusId: ${proposalStatusId}`
       );
     }
@@ -388,7 +392,7 @@ export default class PostgresProposalSettingsDataSource
         });
 
     if (!proposalWorkflowConnectionRecord) {
-      throw new Error('Could not create proposal workflow status');
+      throw new GraphQLError('Could not create proposal workflow status');
     }
 
     return this.createProposalWorkflowConnectionObject(
@@ -470,7 +474,7 @@ export default class PostgresProposalSettingsDataSource
           proposalWorkflowStatus === undefined ||
           proposalWorkflowStatus.length < 1
         ) {
-          throw new Error(
+          throw new GraphQLError(
             `Could not delete proposal workflow status with id: ${proposalWorkflowId} `
           );
         }

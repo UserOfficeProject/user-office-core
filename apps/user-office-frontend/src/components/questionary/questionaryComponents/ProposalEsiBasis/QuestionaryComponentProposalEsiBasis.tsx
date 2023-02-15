@@ -67,15 +67,14 @@ function QuestionaryComponentProposalEsiBasis(
               esiId: state!.esi.id,
               sampleId: sampleId,
             })
-            .then((response) => {
-              const sampleEsi = response.createSampleEsi?.esi;
-              if (sampleEsi) {
+            .then(({ createSampleEsi }) => {
+              if (createSampleEsi) {
                 dispatch({
                   type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED',
-                  sampleEsi: sampleEsi,
+                  sampleEsi: createSampleEsi,
                 });
-                setSelectedSampleEsi(response.createSampleEsi.esi);
-                form.setFieldValue(answerId, [...field.value, sampleEsi]);
+                setSelectedSampleEsi(createSampleEsi);
+                form.setFieldValue(answerId, [...field.value, createSampleEsi]);
               }
             });
         };
@@ -86,12 +85,11 @@ function QuestionaryComponentProposalEsiBasis(
               esiId: state!.esi.id,
               sampleId: sampleId,
             })
-            .then((response) => {
-              const deletedEsi = response.deleteSampleEsi?.esi;
-              if (deletedEsi) {
+            .then(({ deleteSampleEsi }) => {
+              if (deleteSampleEsi) {
                 dispatch({
                   type: 'ESI_SAMPLE_ESI_DELETED',
-                  sampleId: deletedEsi.sampleId,
+                  sampleId: deleteSampleEsi.sampleId,
                 });
 
                 // Refresh ESI list
@@ -121,7 +119,7 @@ function QuestionaryComponentProposalEsiBasis(
             isPostProposalSubmission: true,
           });
 
-          const sample = result.createSample.sample;
+          const sample = result.createSample;
 
           if (sample !== null) {
             dispatch({ type: 'ESI_SAMPLE_CREATED', sample: sample });
@@ -135,7 +133,7 @@ function QuestionaryComponentProposalEsiBasis(
               sampleId: sampleId,
             })
             .then((response) => {
-              const deletedSample = response.deleteSample.sample;
+              const deletedSample = response.deleteSample;
               if (deletedSample) {
                 const newValue = field.value.filter(
                   (esi) => esi.sampleId !== deletedSample.id
@@ -173,16 +171,17 @@ function QuestionaryComponentProposalEsiBasis(
               sampleId: id,
               isSubmitted: false,
             })
-            .then((response) => {
-              const updatedEsi = response.updateSampleEsi.esi;
-              if (updatedEsi) {
-                setSelectedSampleEsi(updatedEsi);
+            .then(({ updateSampleEsi }) => {
+              if (updateSampleEsi) {
+                setSelectedSampleEsi(updateSampleEsi);
                 const newValue = field.value.map((esi) =>
-                  esi.sampleId === updatedEsi.sampleId ? updatedEsi : esi
+                  esi.sampleId === updateSampleEsi.sampleId
+                    ? updateSampleEsi
+                    : esi
                 );
                 dispatch({
                   type: 'ESI_SAMPLE_ESI_UPDATED',
-                  sampleEsi: updatedEsi,
+                  sampleEsi: updateSampleEsi,
                 });
                 form.setFieldValue(answerId, newValue);
               }
@@ -201,7 +200,7 @@ function QuestionaryComponentProposalEsiBasis(
                   isPostProposalSubmission: true,
                 })
                 .then((response) => {
-                  const newSample = response.cloneSample.sample;
+                  const newSample = response.cloneSample;
                   if (newSample !== null) {
                     dispatch({ type: 'ESI_SAMPLE_CREATED', sample: newSample });
                   }
@@ -225,20 +224,19 @@ function QuestionaryComponentProposalEsiBasis(
                   sampleId: sampleToClone.id,
                   newSampleTitle: newTitle,
                 })
-                .then((response) => {
-                  const newSampleEsi = response.cloneSampleEsi.esi;
-                  if (newSampleEsi !== null) {
+                .then(({ cloneSampleEsi }) => {
+                  if (cloneSampleEsi !== null) {
                     dispatch({
                       type: 'ESI_SAMPLE_CREATED',
-                      sample: newSampleEsi.sample,
+                      sample: cloneSampleEsi.sample,
                     });
                     dispatch({
                       type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED',
-                      sampleEsi: newSampleEsi,
+                      sampleEsi: cloneSampleEsi,
                     });
                     form.setFieldValue(answerId, [
                       ...field.value,
-                      newSampleEsi,
+                      cloneSampleEsi,
                     ]);
                   }
                 });

@@ -530,7 +530,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           localization={{
             body: { emptyDataSourceMessage: 'No Users' },
             toolbar: {
-              nRowsSelected: '{0} Users(s) Selected',
+              nRowsSelected: '{0} User(s) Selected',
               searchPlaceholder: 'Filter found users',
               searchTooltip: 'Filter found users',
             },

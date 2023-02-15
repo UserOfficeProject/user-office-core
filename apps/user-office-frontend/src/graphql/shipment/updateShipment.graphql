@@ -10,15 +10,10 @@ mutation updateShipment(
     status: $status
     proposalPk: $proposalPk
   ) {
-    rejection {
-      ...rejection
-    }
-    shipment {
-      ...shipment
-      questionary {
-        ...questionary
-        isCompleted
-      }
+    ...shipment
+    questionary {
+      ...questionary
+      isCompleted
     }
   }
 }

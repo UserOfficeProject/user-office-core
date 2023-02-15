@@ -2,8 +2,7 @@ import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
 import { SettingsId } from '../../../models/Settings';
-import { SettingsResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { Settings } from '../../types/Settings';
 
 @InputType()
 export class UpdateSettingsInput {
@@ -19,18 +18,15 @@ export class UpdateSettingsInput {
 
 @Resolver()
 export class UpdateSettingsMutation {
-  @Mutation(() => SettingsResponseWrap)
+  @Mutation(() => Settings)
   async updateSettings(
     @Ctx() context: ResolverContext,
     @Arg('updatedSettingsInput')
     updatedSettingsInput: UpdateSettingsInput
   ) {
-    return wrapResponse(
-      context.mutations.admin.updateSettings(
-        context.user,
-        updatedSettingsInput
-      ),
-      SettingsResponseWrap
+    return context.mutations.admin.updateSettings(
+      context.user,
+      updatedSettingsInput
     );
   }
 }

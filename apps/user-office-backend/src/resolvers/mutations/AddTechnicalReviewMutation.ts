@@ -10,9 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { TechnicalReviewResponseWrap } from '../types/CommonWrappers';
 import { TechnicalReview } from '../types/TechnicalReview';
-import { wrapResponse } from '../wrapResponse';
 @InputType()
 export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
   @Field(() => Int)
@@ -42,18 +40,15 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
 
 @Resolver()
 export class AddTechnicalReviewMutation {
-  @Mutation(() => TechnicalReviewResponseWrap)
+  @Mutation(() => TechnicalReview)
   addTechnicalReview(
     @Arg('addTechnicalReviewInput')
     addTechnicalReviewInput: AddTechnicalReviewInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.review.setTechnicalReview(
-        context.user,
-        addTechnicalReviewInput
-      ),
-      TechnicalReviewResponseWrap
+    return context.mutations.review.setTechnicalReview(
+      context.user,
+      addTechnicalReviewInput
     );
   }
 }

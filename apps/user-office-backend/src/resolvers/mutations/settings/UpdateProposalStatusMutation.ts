@@ -9,9 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalStatus } from '../../../models/ProposalStatus';
-import { ProposalStatusResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { ProposalStatus } from '../../types/ProposalStatus';
 
 @InputType()
 export class UpdateProposalStatusInput implements ProposalStatus {
@@ -33,18 +31,15 @@ export class UpdateProposalStatusInput implements ProposalStatus {
 
 @Resolver()
 export class UpdateProposalStatusMutation {
-  @Mutation(() => ProposalStatusResponseWrap)
+  @Mutation(() => ProposalStatus)
   async updateProposalStatus(
     @Ctx() context: ResolverContext,
     @Arg('updatedProposalStatusInput')
     updatedProposalStatusInput: UpdateProposalStatusInput
   ) {
-    return wrapResponse(
-      context.mutations.proposalSettings.updateProposalStatus(
-        context.user,
-        updatedProposalStatusInput
-      ),
-      ProposalStatusResponseWrap
+    return context.mutations.proposalSettings.updateProposalStatus(
+      context.user,
+      updatedProposalStatusInput
     );
   }
 }

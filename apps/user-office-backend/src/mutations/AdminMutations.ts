@@ -26,6 +26,7 @@ import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAcces
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 import { generateUniqueId } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
+import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 
 const IS_BACKEND_VALIDATION = true;
 @injectable()
@@ -83,7 +84,10 @@ export default class AdminMutations {
   ) {
     const institution = await this.dataSource.getInstitution(args.id);
     if (!institution) {
-      return rejection('Could not retrieve institutions', { agent });
+      return rejection('Could not retrieve institution', {
+        agent,
+        code: ApolloServerErrorCodeExtended.NOT_FOUND,
+      });
     }
 
     institution.name = args.name ?? institution.name;
@@ -97,15 +101,14 @@ export default class AdminMutations {
   async createInstitutions(
     agent: UserWithRole | null,
     args: CreateInstitutionsArgs
-  ) {
-    const institution = new Institution(
-      0,
-      args.name,
-      args.country,
-      args.verified
-    );
+  ): Promise<Institution | Rejection> {
+    const institution = await this.dataSource.createInstitution(args);
 
-    return await this.dataSource.createInstitution(institution);
+    if (!institution) {
+      return rejection('Could not create institution');
+    }
+
+    return institution;
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -223,7 +226,7 @@ export default class AdminMutations {
   ): Promise<Feature[] | Rejection> {
     const updatedFeatures = await this.dataSource.updateFeatures(args);
 
-    if (!updatedFeatures) {
+    if (!updatedFeatures.length) {
       return rejection('Could not update features', { agent, args });
     }
 

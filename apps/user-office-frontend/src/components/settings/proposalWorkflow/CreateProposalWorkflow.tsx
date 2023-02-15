@@ -37,13 +37,14 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        const data = await api({
-          toastSuccessMessage: 'Proposal workflow created successfully',
-        }).createProposalWorkflow(values);
-        if (data.createProposalWorkflow.rejection) {
+        try {
+          const data = await api({
+            toastSuccessMessage: 'Proposal workflow created successfully',
+          }).createProposalWorkflow(values);
+
+          close(data.createProposalWorkflow);
+        } catch (error) {
           close(null);
-        } else if (data.createProposalWorkflow.proposalWorkflow) {
-          close(data.createProposalWorkflow.proposalWorkflow);
         }
       }}
       validationSchema={createProposalWorkflowValidationSchema}

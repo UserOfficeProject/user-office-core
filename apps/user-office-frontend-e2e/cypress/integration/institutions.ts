@@ -4,14 +4,13 @@ import { FeatureId } from '@user-office-software-libs/shared-types';
 import featureFlags from '../support/featureFlags';
 
 context('Institution tests', () => {
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
-  });
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-      this.skip();
-    }
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
   });
 
   it('User should not be able to see Institutions page', () => {

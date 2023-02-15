@@ -1,6 +1,6 @@
 import { GraphQLScalarType, Kind } from 'graphql';
 
-export type AnswerType = number | string | Date | boolean | number[];
+export type AnswerType = number | string | Date | boolean | number[] | unknown;
 
 const coerce = (value: AnswerType) => {
   if (typeof value === 'number' && Number.isInteger(value)) {

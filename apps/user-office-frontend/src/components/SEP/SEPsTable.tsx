@@ -93,22 +93,18 @@ const SEPsTable: React.FC = () => {
   const EditIcon = (): JSX.Element => <Edit />;
 
   const deleteSEP = async (id: number | string) => {
-    return await api({ toastSuccessMessage: 'SEP deleted successfully' })
-      .deleteSEP({
+    try {
+      await api({ toastSuccessMessage: 'SEP deleted successfully' }).deleteSEP({
         id: id as number,
-      })
-      .then((resp) => {
-        if (!resp.deleteSEP.rejection) {
-          const newObjectsArray = SEPs.filter(
-            (objectItem) => objectItem.id !== id
-          );
-          setSEPs(newObjectsArray);
-
-          return true;
-        } else {
-          return false;
-        }
       });
+
+      const newObjectsArray = SEPs.filter((objectItem) => objectItem.id !== id);
+      setSEPs(newObjectsArray);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const createModal = (

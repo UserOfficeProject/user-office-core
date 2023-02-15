@@ -14,6 +14,7 @@ import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSub
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 import {
   Event,
+  GENERIC_TEMPLATE_EVENT,
   QuestionarySubmissionModel,
 } from 'models/questionary/QuestionarySubmissionState';
 import useEventHandlers from 'models/questionary/useEventHandlers';
@@ -61,8 +62,35 @@ export default function ProposalContainer(props: ProposalContainerProps) {
         draftState.proposal.samples = action.newItems;
         draftState.isDirty = true;
         break;
-      case 'GENERIC_TEMPLATE_ITEMS_MODIFIED':
-        draftState.proposal.genericTemplates = action.newItems;
+      case GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED:
+        if (action.newItems) {
+          if (state.proposal.genericTemplates) {
+            const questionIds = action.newItems.map((value) => value.id);
+            draftState.proposal.genericTemplates = [
+              ...state.proposal.genericTemplates.filter(
+                (value) => !questionIds.some((id) => id === value.id)
+              ),
+              ...action.newItems,
+            ];
+          } else {
+            draftState.proposal.genericTemplates = action.newItems;
+          }
+        }
+        draftState.isDirty = true;
+        break;
+
+      case GENERIC_TEMPLATE_EVENT.ITEMS_DELETED:
+        if (action.newItems) {
+          if (state.proposal.genericTemplates) {
+            const questionIds = action.newItems.map((value) => value.id);
+            draftState.proposal.genericTemplates = [
+              ...state.proposal.genericTemplates.filter(
+                (value) => !questionIds.some((id) => id === value.id)
+              ),
+            ];
+            action.newItems = [];
+          }
+        }
         draftState.isDirty = true;
         break;
     }

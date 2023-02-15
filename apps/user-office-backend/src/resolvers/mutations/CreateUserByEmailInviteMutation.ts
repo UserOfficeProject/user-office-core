@@ -5,16 +5,11 @@ import {
   Field,
   Int,
   Mutation,
-  ObjectType,
   Resolver,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { isRejection } from '../../models/Rejection';
 import { UserRole } from '../../models/User';
-import { Response } from '../Decorators';
-import { ResponseWrapBase } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateUserByEmailInviteArgs {
@@ -31,25 +26,18 @@ export class CreateUserByEmailInviteArgs {
   userRole: UserRole;
 }
 
-@ObjectType()
-class CreateUserByEmailInviteResponseWrap extends ResponseWrapBase {
-  @Response()
-  @Field(() => Int, { nullable: true })
-  public id: number;
-}
-
 @Resolver()
 export class CreateUserByEmailInviteMutation {
-  @Mutation(() => CreateUserByEmailInviteResponseWrap)
-  createUserByEmailInvite(
+  @Mutation(() => Int)
+  async createUserByEmailInvite(
     @Args() args: CreateUserByEmailInviteArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.user
-        .createUserByEmailInvite(context.user, args)
-        .then((res) => (isRejection(res) ? res : res.userId)),
-      CreateUserByEmailInviteResponseWrap
+    const res = await context.mutations.user.createUserByEmailInvite(
+      context.user,
+      args
     );
+
+    return res.userId;
   }
 }

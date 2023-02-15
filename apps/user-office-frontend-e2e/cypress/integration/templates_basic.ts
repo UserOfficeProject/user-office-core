@@ -15,13 +15,6 @@ import initialDBData from '../support/initialDBData';
 
 context('Template tests', () => {
   let boolId: string;
-  let textId: string;
-  let dateId: string;
-  let timeId: string;
-  let multipleChoiceId: string;
-  let intervalId: string;
-  let numberId: string;
-  let richTextInputId: string;
 
   const proposal = {
     title: faker.lorem.words(3),
@@ -92,7 +85,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.BOOLEAN,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         boolId = createdQuestion.id;
 
@@ -114,10 +107,8 @@ context('Template tests', () => {
           categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion = questionResult.createQuestion.question;
+          const createdQuestion = questionResult.createQuestion;
           if (createdQuestion) {
-            textId = createdQuestion.id;
-
             cy.updateQuestion({
               id: createdQuestion.id,
               question: textQuestion.title,
@@ -153,10 +144,8 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.INTERVAL,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
-        intervalId = createdQuestion.id;
-
         cy.updateQuestion({
           id: createdQuestion.id,
           question: intervalQuestion,
@@ -192,10 +181,8 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.NUMBER_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
-        numberId = createdQuestion.id;
-
         cy.updateQuestion({
           id: createdQuestion.id,
           question: numberQuestion,
@@ -232,10 +219,8 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
-        multipleChoiceId = createdQuestion.id;
-
         cy.updateQuestion({
           id: createdQuestion.id,
           question: multipleChoiceQuestion.title,
@@ -256,10 +241,8 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
-        dateId = createdQuestion.id;
-
         cy.updateQuestion({
           id: createdQuestion.id,
           question: dateQuestion.title,
@@ -280,10 +263,8 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
-        timeId = createdQuestion.id;
-
         cy.updateQuestion({
           id: createdQuestion.id,
           question: timeQuestion,
@@ -304,7 +285,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.FILE_UPLOAD,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -326,10 +307,8 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.RICH_TEXT_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
-        richTextInputId = createdQuestion.id;
-
         cy.updateQuestion({
           id: createdQuestion.id,
           question: richTextInputQuestion.title,
@@ -349,8 +328,8 @@ context('Template tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
   });
 
@@ -442,10 +421,7 @@ context('Template tests', () => {
       cy.contains(booleanQuestion)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          boolId = fieldId;
-        });
+        .invoke('html');
 
       /* --- */
 
@@ -457,10 +433,7 @@ context('Template tests', () => {
       cy.contains(intervalQuestion)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          intervalId = fieldId;
-        });
+        .invoke('html');
 
       /* --- */
 
@@ -473,10 +446,7 @@ context('Template tests', () => {
       cy.contains(numberQuestion)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          numberId = fieldId;
-        });
+        .invoke('html');
 
       /* --- */
 
@@ -490,10 +460,7 @@ context('Template tests', () => {
       cy.contains(textQuestion.title)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          textId = fieldId;
-        });
+        .invoke('html');
 
       /* Update question */
 
@@ -580,10 +547,7 @@ context('Template tests', () => {
       cy.contains(multipleChoiceQuestion.title)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          multipleChoiceId = fieldId;
-        });
+        .invoke('html');
 
       cy.finishedLoading();
 
@@ -694,10 +658,7 @@ context('Template tests', () => {
       cy.contains(dateQuestion.title)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          dateId = fieldId;
-        });
+        .invoke('html');
 
       cy.createDateQuestion(timeQuestion, {
         includeTime: true,
@@ -707,10 +668,7 @@ context('Template tests', () => {
       cy.contains(timeQuestion)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          timeId = fieldId;
-        });
+        .invoke('html');
 
       /* --- */
 
@@ -731,10 +689,7 @@ context('Template tests', () => {
       cy.contains(richTextInputQuestion.title)
         .closest('[data-cy=question-container]')
         .find("[data-cy='proposal-question-id']")
-        .invoke('html')
-        .then((fieldId) => {
-          richTextInputId = fieldId;
-        });
+        .invoke('html');
 
       /* --- */
 
@@ -1106,7 +1061,7 @@ context('Template tests', () => {
 
     it('User officer can add multiple choice question as a dependency', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,

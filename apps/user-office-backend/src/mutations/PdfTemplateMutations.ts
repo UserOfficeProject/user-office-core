@@ -8,7 +8,7 @@ import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { CreatePdfTemplateInput } from '../resolvers/mutations/CreatePdfTemplateMutations';
+import { CreatePdfTemplateInput } from '../resolvers/mutations/CreatePdfTemplateMutation';
 import { UpdatePdfTemplateArgs } from '../resolvers/mutations/UpdatePdfTemplateMutation';
 
 @injectable()

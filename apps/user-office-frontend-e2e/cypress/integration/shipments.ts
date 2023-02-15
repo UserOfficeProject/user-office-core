@@ -19,23 +19,20 @@ const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 const shipmentTitle = faker.lorem.words(2);
 
 context('Shipments tests', () => {
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-  });
-
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
-      this.skip();
-    }
-
+    cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
+        this.skip();
+      }
+    });
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
       managementDecisionSubmitted: true,
       managementTimeAllocation: 2,
     });
     cy.createVisit({
-      team: [coProposer.id, visitor.id],
+      team: [coProposer.id, visitor.id, PI.id],
       teamLeadUserId: PI.id,
       scheduledEventId: existingScheduledEventId,
     });
@@ -74,7 +71,7 @@ context('Shipments tests', () => {
     const description = faker.lorem.words(2);
     const name = faker.name.firstName();
     const email = faker.internet.email();
-    const phone = faker.phone.phoneNumber();
+    const phone = faker.phone.number();
     const street = faker.address.streetAddress();
     const zip = faker.address.zipCode();
     const city = faker.address.city();

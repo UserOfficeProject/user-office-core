@@ -28,9 +28,14 @@ const sep2 = {
 };
 
 context('General scientific evaluation panel tests', () => {
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
+  beforeEach(function () {
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      // NOTE: We can check features after they are stored to the local storage
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
+    });
   });
 
   it('User should not be able to see SEPs page', () => {
@@ -46,9 +51,6 @@ context('General scientific evaluation panel tests', () => {
 
   describe('SEP basic tests as user officer role', () => {
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
-        this.skip();
-      }
       cy.login('officer');
       cy.visit('/');
     });
@@ -173,9 +175,6 @@ context('General scientific evaluation panel tests', () => {
     let createdSepId: number;
 
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
-        this.skip();
-      }
       cy.login('officer');
       cy.visit('/');
       cy.createSep({
@@ -184,8 +183,8 @@ context('General scientific evaluation panel tests', () => {
         numberRatingsRequired: 2,
         active: true,
       }).then((response) => {
-        if (response.createSEP.sep) {
-          createdSepId = response.createSEP.sep.id;
+        if (response.createSEP) {
+          createdSepId = response.createSEP.id;
         }
       });
     });
@@ -422,9 +421,6 @@ context('General scientific evaluation panel tests', () => {
     let createdSepId: number;
 
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
-        this.skip();
-      }
       cy.updateUserRoles({
         id: sepMembers.chair.id,
         roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
@@ -435,8 +431,8 @@ context('General scientific evaluation panel tests', () => {
         numberRatingsRequired: 2,
         active: true,
       }).then((response) => {
-        if (response.createSEP.sep) {
-          createdSepId = response.createSEP.sep.id;
+        if (response.createSEP) {
+          createdSepId = response.createSEP.id;
 
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToSEPInput: {
@@ -543,9 +539,6 @@ context('General scientific evaluation panel tests', () => {
 
   describe('SEP tests as SEP Secretary', () => {
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
-        this.skip();
-      }
       cy.updateUserRoles({
         id: sepMembers.secretary.id,
         roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
@@ -556,8 +549,8 @@ context('General scientific evaluation panel tests', () => {
         numberRatingsRequired: 2,
         active: true,
       }).then((response) => {
-        if (response.createSEP.sep) {
-          const createdSepId = response.createSEP.sep.id;
+        if (response.createSEP) {
+          const createdSepId = response.createSEP.id;
 
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToSEPInput: {

@@ -56,11 +56,6 @@ mutation updateCall(
       isActive: $isActive
     }
   ) {
-    rejection {
-      ...rejection
-    }
-    call {
-      ...call
-    }
+    ...call
   }
 }

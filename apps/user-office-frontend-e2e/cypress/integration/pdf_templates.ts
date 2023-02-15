@@ -9,8 +9,8 @@ context('PDF template tests', () => {
   let createdTemplateName: string;
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1080);
   });
 
@@ -58,8 +58,8 @@ context('PDF template tests', () => {
         name: templateName,
         groupId: TemplateGroupId.PDF_TEMPLATE,
       }).then((result) => {
-        if (result.createTemplate.template) {
-          createdTemplateName = result.createTemplate.template.name;
+        if (result.createTemplate) {
+          createdTemplateName = result.createTemplate.name;
         }
       });
     });

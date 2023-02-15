@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLClient } from 'graphql-request';
-import { ClientError, Variables } from 'graphql-request/dist/types';
+import {
+  ClientError,
+  RequestOptions,
+  Variables,
+} from 'graphql-request/dist/types';
 import jwtDecode from 'jwt-decode';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
@@ -8,6 +12,7 @@ import { useCallback, useContext } from 'react';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { getSdk, SettingsId } from 'generated/sdk';
+import { RequestQuery, VariablesAndRequestHeaders } from 'utils/utilTypes';
 
 const endpoint = '/graphql';
 
@@ -20,6 +25,7 @@ const notifyAndLog = async (
   enqueueSnackbar(userMessage, {
     variant: 'error',
     preventDuplicate: true,
+    className: 'snackbar-error',
   });
 
   console.error({ userMessage, error });
@@ -41,35 +47,42 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     super(endpoint);
   }
 
-  async request<T = any, V = Variables>(
-    query: string,
-    variables?: V
+  async request<T = unknown, V extends Variables = Variables>(
+    query: RequestQuery<T, V> | RequestOptions<V, T>,
+    ...variablesAndRequestHeaders: VariablesAndRequestHeaders<V>
   ): Promise<T> {
-    return super.request<T, V>(query, variables).catch((error: ClientError) => {
-      // if the `notificationWithClientLog` fails
-      // and it fails while reporting an error, it can
-      // easily cause an infinite loop
-      if (this.skipErrorReport) {
+    return super
+      .request<T, V>(query as RequestQuery<T, V>, ...variablesAndRequestHeaders)
+      .catch((error: ClientError) => {
+        // if the `notificationWithClientLog` fails
+        // and it fails while reporting an error, it can
+        // easily cause an infinite loop
+        if (this.skipErrorReport) {
+          throw error;
+        }
+
+        if (!error || !error.response) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'No response received from server',
+            error
+          );
+        } else if (
+          error.response.error &&
+          error.response.error.includes('ECONNREFUSED')
+        ) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'Connection problem!',
+            error,
+            false
+          );
+        } else {
+          notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
+        }
+
         throw error;
-      }
-
-      if (!error || !error.response) {
-        notifyAndLog(
-          this.enqueueSnackbar,
-          'No response received from server',
-          error
-        );
-      } else if (
-        error.response.error &&
-        error.response.error.includes('ECONNREFUSED')
-      ) {
-        notifyAndLog(this.enqueueSnackbar, 'Connection problem!', error, false);
-      } else {
-        notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
-      }
-
-      throw error;
-    });
+      });
   }
 }
 
@@ -91,67 +104,81 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     this.externalToken = this.getExternalToken(token);
   }
 
-  async request<T = any, V = Variables>(
-    query: string,
-    variables?: V
+  async request<T = unknown, V extends Variables = Variables>(
+    query: RequestQuery<T, V> | RequestOptions<V, T>,
+    ...variablesAndRequestHeaders: VariablesAndRequestHeaders<V>
   ): Promise<T> {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
-      const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
-        token: this.token,
-      });
-      if (data.token.rejection) {
+      try {
+        const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
+          token: this.token,
+        });
+
+        const newToken = data.token;
+        this.setHeader('authorization', `Bearer ${newToken}`);
+        this.tokenRenewed && this.tokenRenewed(newToken as string);
+      } catch (error) {
         notifyAndLog(
           this.enqueueSnackbar,
           'Server rejected user credentials',
-          data.token.rejection.reason
+          JSON.stringify(error)
         );
         this.onSessionExpired();
-      } else {
-        const newToken = data.token.token;
-        this.setHeader('authorization', `Bearer ${newToken}`);
-        this.tokenRenewed && this.tokenRenewed(newToken as string);
       }
     }
 
-    return super.request<T, V>(query, variables).catch((error: ClientError) => {
-      if (!error || !error.response) {
-        notifyAndLog(
-          this.enqueueSnackbar,
-          'No response received from server',
-          error
-        );
-      } else if (
-        error.response.error &&
-        error.response.error.includes('ECONNREFUSED')
-      ) {
-        notifyAndLog(this.enqueueSnackbar, 'Connection problem!', error, false);
-      } else if (
-        error.response.errors &&
-        error.response.errors[0].message === 'EXTERNAL_TOKEN_INVALID' &&
-        this.externalAuthLoginUrl
-      ) {
-        notifyAndLog(
-          this.enqueueSnackbar,
-          'Your session has expired, you will need to log in again through the external homepage',
-          error,
-          false
-        );
-        this.onSessionExpired();
-      } else if ((jwtDecode(this.token) as any).exp < nowTimestampSeconds) {
-        notifyAndLog(
-          this.enqueueSnackbar,
-          'Your session has expired, you will need to log in again.',
-          error,
-          false
-        );
-        this.onSessionExpired();
-      } else {
-        notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
-      }
+    return super
+      .request<T, V>(query as RequestQuery<T, V>, ...variablesAndRequestHeaders)
+      .catch((error: ClientError) => {
+        if (!error || !error.response) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'No response received from server',
+            error
+          );
+        } else if (
+          error.response.error &&
+          error.response.error.includes('ECONNREFUSED')
+        ) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'Connection problem!',
+            error,
+            false
+          );
+        } else if (
+          error.response.errors &&
+          error.response.errors[0].message === 'EXTERNAL_TOKEN_INVALID' &&
+          this.externalAuthLoginUrl
+        ) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'Your session has expired, you will need to log in again through the external homepage',
+            error,
+            false
+          );
+          this.onSessionExpired();
+        } else if ((jwtDecode(this.token) as any).exp < nowTimestampSeconds) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'Your session has expired, you will need to log in again.',
+            error,
+            false
+          );
+          this.onSessionExpired();
+        } else {
+          const [graphQLError] = error.response?.errors ?? [];
 
-      throw error;
-    });
+          notifyAndLog(
+            this.enqueueSnackbar,
+            graphQLError?.message || 'Something went wrong!',
+            error
+          );
+        }
+
+        throw error;
+      });
   }
 
   private getRenewalDate(token: string): number {

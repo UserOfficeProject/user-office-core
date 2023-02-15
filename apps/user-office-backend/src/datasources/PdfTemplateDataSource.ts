@@ -1,5 +1,5 @@
 import { PdfTemplate } from '../models/PdfTemplate';
-import { CreatePdfTemplateInput } from '../resolvers/mutations/CreatePdfTemplateMutations';
+import { CreatePdfTemplateInput } from '../resolvers/mutations/CreatePdfTemplateMutation';
 import { UpdatePdfTemplateArgs } from '../resolvers/mutations/UpdatePdfTemplateMutation';
 import { PdfTemplatesArgs } from '../resolvers/queries/PdfTemplatesQuery';
 

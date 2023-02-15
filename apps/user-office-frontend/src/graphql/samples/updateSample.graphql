@@ -10,11 +10,6 @@ mutation updateSample(
     safetyComment: $safetyComment
     safetyStatus: $safetyStatus
   ) {
-    sample {
-      ...sample
-    }
-    rejection {
-      ...rejection
-    }
+    ...sample
   }
 }

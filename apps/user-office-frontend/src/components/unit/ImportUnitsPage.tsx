@@ -26,9 +26,8 @@ export default function ImportUnitsPage() {
     api()
       .validateUnitsImport({ unitsAsJson: json })
       .then(({ validateUnitsImport }) => {
-        const result = validateUnitsImport.validationResult;
-        if (result) {
-          setValidationResult(result);
+        if (validateUnitsImport) {
+          setValidationResult(validateUnitsImport);
         }
       });
   };

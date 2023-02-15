@@ -18,6 +18,10 @@ import { getFieldById } from './QuestionaryFunctions';
 import { SampleEsiWithQuestionary } from './sampleEsi/SampleEsiWithQuestionary';
 import { StepType } from './StepType';
 
+export enum GENERIC_TEMPLATE_EVENT {
+  ITEMS_MODIFIED = 'ITEMS_MODIFIED',
+  ITEMS_DELETED = 'ITEMS_DELETED',
+}
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
   | { type: 'BACK_CLICKED' }
@@ -65,7 +69,7 @@ export type Event =
       >;
     }
   | {
-      type: 'GENERIC_TEMPLATE_ITEMS_MODIFIED';
+      type: GENERIC_TEMPLATE_EVENT;
       id: string;
       newItems: Maybe<
         (GenericTemplateFragment & {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GraphQLResolverMap } from 'apollo-graphql';
+import { GraphQLResolverMap } from '@apollo/subgraph/dist/schema-helper';
 
 import { ResolverContext } from '../context';
 import { resolveBasicUserDetailsReference } from './types/BasicUserDetails';

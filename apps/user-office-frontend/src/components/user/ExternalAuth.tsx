@@ -111,14 +111,8 @@ function ExternalAuth() {
           redirectUri: currentUrlWithoutParams,
         })
         .then(({ externalTokenLogin }) => {
-          if (externalTokenLogin.token) {
-            handleLogin(externalTokenLogin.token);
-            window.location.href = '/';
-          } else {
-            setView(
-              <ErrorMessage message={externalTokenLogin.rejection?.reason} />
-            );
-          }
+          handleLogin(externalTokenLogin);
+          window.location.href = '/';
         })
         .catch((error) => {
           setView(<ErrorMessage message={error.message} />);

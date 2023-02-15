@@ -11,20 +11,19 @@ context('User administration tests', () => {
   const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.phoneNumber('0##########');
-  const newTelephoneAlt = faker.phone.phoneNumber('0##########');
-  const newOrganisation = faker.company.companyName();
+  const newTelephone = faker.phone.number('0##########');
+  const newTelephoneAlt = faker.phone.number('0##########');
+  const newOrganisation = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
-  });
-
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-      this.skip();
-    }
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      // NOTE: We can check features after they are stored to the local storage
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
 
     cy.login('officer');
     cy.visit('/');

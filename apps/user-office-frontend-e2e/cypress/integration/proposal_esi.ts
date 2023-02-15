@@ -23,9 +23,14 @@ const proposal = {
 };
 
 context('visits tests', () => {
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
+  beforeEach(function () {
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      // NOTE: We can check features after they are stored to the local storage
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
+        this.skip();
+      }
+    });
     cy.updateProposal({
       proposalPk: existingProposalId,
       title: proposal.title,
@@ -44,12 +49,6 @@ context('visits tests', () => {
       teamLeadUserId: coProposer.id,
       scheduledEventId: existingScheduledEventId,
     });
-  });
-
-  beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
-      this.skip();
-    }
   });
 
   it('PI should see ESI assessment button ', () => {
@@ -189,8 +188,8 @@ context('visits tests', () => {
   it('Co-proposer should see that risk assessment is completed', () => {
     cy.createEsi({ scheduledEventId: existingScheduledEventId }).then(
       (result) => {
-        if (result.createEsi.esi) {
-          cy.updateEsi({ esiId: result.createEsi.esi.id, isSubmitted: true });
+        if (result.createEsi) {
+          cy.updateEsi({ esiId: result.createEsi.id, isSubmitted: true });
         }
       }
     );

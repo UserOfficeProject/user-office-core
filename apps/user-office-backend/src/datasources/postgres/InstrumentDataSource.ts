@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -63,7 +64,7 @@ export default class PostgresInstrumentDataSource
       .returning('*');
 
     if (!instrumentRecord) {
-      throw new Error('Could not create instrument');
+      throw new GraphQLError('Could not create instrument');
     }
 
     return this.createInstrumentObject(instrumentRecord);
@@ -131,6 +132,7 @@ export default class PostgresInstrumentDataSource
         'description',
         'manager_user_id',
         'chi.availability_time',
+        'chi.submitted',
       ])
       .from('instruments as i')
       .join('call_has_instruments as chi', {
@@ -206,7 +208,7 @@ export default class PostgresInstrumentDataSource
       .where('instrument_id', instrument.id);
 
     if (!instrumentRecord) {
-      throw new Error(`Instrument not found ${instrument.id}`);
+      throw new GraphQLError(`Instrument not found ${instrument.id}`);
     }
 
     return this.createInstrumentObject(instrumentRecord);
@@ -219,7 +221,9 @@ export default class PostgresInstrumentDataSource
       .returning('*');
 
     if (!instrumentRecord) {
-      throw new Error(`Could not delete instrument with id: ${instrumentId} `);
+      throw new GraphQLError(
+        `Could not delete instrument with id: ${instrumentId} `
+      );
     }
 
     return this.createInstrumentObject(instrumentRecord);
@@ -257,7 +261,7 @@ export default class PostgresInstrumentDataSource
 
         return await trx.commit(result);
       } catch (error) {
-        throw new Error(
+        throw new GraphQLError(
           `Could not assign proposals ${proposalPks} to instrument with id: ${instrumentId}`
         );
       }
@@ -275,7 +279,7 @@ export default class PostgresInstrumentDataSource
       return new ProposalPks(returnedProposalPks);
     }
 
-    throw new Error(
+    throw new GraphQLError(
       `Could not assign proposals ${proposalPks} to instrument with id: ${instrumentId}`
     );
   }
@@ -526,7 +530,7 @@ export default class PostgresInstrumentDataSource
       .andWhere('instrument_id', instrumentId);
 
     if (!records?.length) {
-      throw new Error(
+      throw new GraphQLError(
         `Some record from instrument_has_proposals not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
       );
     }

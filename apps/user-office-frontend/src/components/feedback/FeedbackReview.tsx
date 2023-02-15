@@ -48,20 +48,17 @@ function FeedbackReview({ confirm }: FeedbackReviewProps) {
           onClick={() =>
             confirm(
               async () => {
-                const result = await api().updateFeedback({
+                const { updateFeedback } = await api().updateFeedback({
                   feedbackId: state.feedback.id,
                   status: FeedbackStatus.SUBMITTED,
                 });
-                if (!result.updateFeedback.feedback) {
-                  return;
-                }
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: result.updateFeedback.feedback,
+                  itemWithQuestionary: updateFeedback,
                 });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: result.updateFeedback.feedback,
+                  itemWithQuestionary: updateFeedback,
                 });
               },
               {

@@ -8,11 +8,6 @@ mutation removeMemberFromSEPProposal(
     sepId: $sepId
     proposalPk: $proposalPk
   ) {
-    rejection {
-      ...rejection
-    }
-    sep {
-      id
-    }
+    id
   }
 }
