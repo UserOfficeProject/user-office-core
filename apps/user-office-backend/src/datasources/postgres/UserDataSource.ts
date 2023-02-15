@@ -711,4 +711,27 @@ export default class PostgresUserDataSource implements UserDataSource {
           new Role(role.role_id, role.short_code, role.title)
       );
   }
+
+  async mergeUsers(userFrom: number, userInto: number): Promise<void> {
+    type Record = { tableName: string; columnName: string };
+
+    const tablesToUpdate: Record[] = [
+      { tableName: 'proposal_user', columnName: 'user_id' },
+      { tableName: 'role_user', columnName: 'user_id' },
+    ];
+
+    tablesToUpdate.forEach(async (row: Record) => {
+      await database(row.tableName)
+        .update({
+          [row.columnName]: userInto,
+        })
+        .where({ [row.columnName]: userFrom })
+        .whereNotExists(function () {
+          // this prevents conflicts
+          this.select('*')
+            .from(row.tableName)
+            .where({ [row.columnName]: userInto });
+        });
+    });
+  }
 }

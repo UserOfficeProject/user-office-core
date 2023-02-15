@@ -1,4 +1,5 @@
 import MaterialTable, { Column } from '@material-table/core';
+import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
 import FileCopy from '@mui/icons-material/FileCopy';
@@ -11,9 +12,11 @@ import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -29,6 +32,7 @@ import {
   PartialProposalsDataType,
   UserProposalDataType,
 } from './ProposalTableUser';
+import RedeemCode from './RedeemCode';
 
 type ProposalTableProps = {
   /** Error flag */
@@ -290,6 +294,24 @@ const ProposalTable = ({
           },
         ]}
       />
+      <ActionButtonContainer>
+        <ButtonWithDialog
+          label="Join proposal"
+          data-cy="join-proposal-btn"
+          startIcon={<AddIcon />}
+        >
+          <RedeemCode
+            title="Join proposal"
+            onRedeemed={() => {
+              searchQuery().then((data) => {
+                if (data) {
+                  setPartialProposalsData(data.data);
+                }
+              });
+            }}
+          />
+        </ButtonWithDialog>
+      </ActionButtonContainer>
       {showReferenceText(data) && (
         <span>
           <br />* Pre-submission reference. Reference will change upon

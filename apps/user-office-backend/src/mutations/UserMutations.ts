@@ -39,14 +39,18 @@ import {
   UpdateUserArgs,
   UpdateUserRolesArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
+import { RedeemCode } from '../resolvers/types/RedeemCode';
 import { signToken, verifyToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
+import { RedeemCodesDataSource } from './../datasources/RedeemCodes';
 
 @injectable()
 export default class UserMutations {
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
+    @inject(Tokens.RedeemCodesDataSource)
+    private redeemCodeDataSource: RedeemCodesDataSource
   ) {}
 
   createHash(password: string): string {
@@ -81,6 +85,10 @@ export default class UserMutations {
 
   createEmailInviteResponse(userId: number, agentId: number, role: UserRole) {
     return new EmailInviteResponse(userId, agentId, role);
+  }
+
+  generateRandomCode() {
+    return Math.random().toString(36).substring(2, 8);
   }
 
   @ValidateArgs(createUserByEmailInviteValidationSchema(UserRole))
@@ -160,6 +168,13 @@ export default class UserMutations {
         args,
       });
     } else {
+      const redeemCode = this.generateRandomCode();
+      await this.redeemCodeDataSource.createRedeemCode(
+        userId,
+        agent.id,
+        redeemCode
+      );
+
       return this.createEmailInviteResponse(userId, agent.id, role);
     }
   }
@@ -712,5 +727,46 @@ export default class UserMutations {
     id: number
   ): Promise<User | null> {
     return this.dataSource.setUserNotPlaceholder(id);
+  }
+
+  @Authorized([Roles.USER])
+  async redeemCode(
+    user: UserWithRole | null,
+    code: string
+  ): Promise<RedeemCode | Rejection> {
+    const redeemCodes = await this.redeemCodeDataSource.getRedeemCodes({
+      code: code.toLowerCase().trim(),
+    });
+    const redeemCode = redeemCodes[0];
+    if (!redeemCode) {
+      return rejection('Could not find redeem code', {
+        code: ApolloServerErrorCodeExtended.NOT_FOUND,
+      });
+    }
+
+    if (redeemCode.claimedBy !== null) {
+      return rejection('The code is already redeemed', {
+        code: ApolloServerErrorCodeExtended.BAD_USER_INPUT,
+      });
+    }
+
+    const redeemerId = user!.id;
+    const placeholderUserId = redeemCode.placeholderUserId;
+
+    const placeholderUser = await this.dataSource.getUser(placeholderUserId);
+    if (!placeholderUser || !placeholderUser.placeholder) {
+      return rejection('Could not find placeholder user', {
+        code: ApolloServerErrorCodeExtended.NOT_FOUND,
+        user: placeholderUser,
+      });
+    }
+
+    await this.dataSource.mergeUsers(placeholderUserId, redeemerId);
+
+    return this.redeemCodeDataSource.updateRedeemCode({
+      code: redeemCode.code,
+      claimedAt: new Date(),
+      claimedBy: redeemerId,
+    });
   }
 }
