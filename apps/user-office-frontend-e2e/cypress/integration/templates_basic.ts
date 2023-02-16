@@ -52,7 +52,13 @@ context('Template tests', () => {
   };
   const dynamicMultipleChoiceQuestion = {
     title: faker.lorem.words(2),
-    url: 'https://private-05007-jayquan.apiary-mock.com/values',
+    url: 'https://extern.url/options',
+    answers: [
+      faker.lorem.words(3),
+      faker.lorem.words(3),
+      faker.lorem.words(3),
+      faker.lorem.words(3),
+    ],
   };
 
   const templateSearch = {
@@ -351,23 +357,37 @@ context('Template tests', () => {
           firstTopic: true,
         }
       );
-      cy.login('user1');
-      cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-      cy.finishedLoading();
-      cy.get('[data-cy=title] input').type('title');
-      cy.get('[data-cy=abstract] textarea').first().type('abstract');
-      cy.contains(dynamicMultipleChoiceQuestion.title);
     });
     it('Should be able to select options returned from external api', () => {
+      cy.intercept(
+        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
+        {
+          statusCode: 201,
+          body: dynamicMultipleChoiceQuestion.answers,
+        }
+      );
+
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title] input').type('title');
+      cy.get('[data-cy=abstract] textarea').first().type('abstract');
+
+      cy.contains(dynamicMultipleChoiceQuestion.title);
       cy.contains(dynamicMultipleChoiceQuestion.title).parent().click();
-      cy.get('[data-cy=dropdown-ul]').children().should('have.length.least', 1);
+
+      cy.get('[data-cy=dropdown-ul]').children().should('have.length', 3);
       cy.get('[data-cy=dropdown-li]').each(($el, index) => {
         cy.wrap($el).click();
       });
     });
   });
+
   describe('Proposal templates basic tests', () => {
     it('User officer can delete active template', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
