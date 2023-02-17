@@ -157,6 +157,7 @@ export default {
     id: 1,
     title: 'Test proposal',
     questionaryId: 1,
+    shortCode: '999999',
   },
   instrument1: {
     id: 1,
@@ -276,6 +277,13 @@ export default {
       id: SettingsId.DATE_TIME_FORMAT,
       description: 'Format used to represent date with time without seconds.',
       settingsValue: 'dd-MM-yyyy HH:mm',
+    },
+  },
+  redeemCodes: {
+    validRedeemCode: {
+      code: '123abc',
+      placeholderUserId: 5,
+      createdBy: 1,
     },
   },
 };

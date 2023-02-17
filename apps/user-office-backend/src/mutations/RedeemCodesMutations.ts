@@ -53,6 +53,12 @@ export default class RedeemCodesMutations {
 
     await this.dataSource.mergeUsers(placeholderUserId, redeemerId);
 
+    const updatedRedeemCode = await this.redeemCodeDataSource.updateRedeemCode({
+      code: redeemCode.code,
+      claimedAt: new Date(),
+      claimedBy: redeemerId,
+    });
+
     try {
       await this.dataSource.delete(placeholderUserId);
     } catch (err) {
@@ -63,10 +69,6 @@ export default class RedeemCodesMutations {
       );
     }
 
-    return this.redeemCodeDataSource.updateRedeemCode({
-      code: redeemCode.code,
-      claimedAt: new Date(),
-      claimedBy: redeemerId,
-    });
+    return updatedRedeemCode;
   }
 }
