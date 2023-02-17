@@ -4,14 +4,13 @@ export interface RedeemCodesDataSource {
   // Create
   createRedeemCode(
     placeholderUserId: number,
-    createdByUserId: number,
-    code: string
+    createdByUserId: number
   ): Promise<RedeemCode>;
 
   // Read
   getRedeemCodes(filter: {
     code?: string;
-    placeholder_user_id?: number;
+    placeholderUserId?: number;
   }): Promise<RedeemCode[]>;
 
   // update

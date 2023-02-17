@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { SEPDataSource } from '../../datasources/SEPDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
@@ -11,7 +12,6 @@ import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-import { RedeemCodesDataSource } from './../../datasources/RedeemCodes';
 
 export async function essEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
@@ -75,7 +75,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       }
 
       const redeemCode = await redeemCodesDataSource.getRedeemCodes({
-        placeholder_user_id: user.id,
+        placeholderUserId: user.id,
       });
 
       if (!redeemCode[0]?.code) {

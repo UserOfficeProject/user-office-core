@@ -717,21 +717,14 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     const tablesToUpdate: Record[] = [
       { tableName: 'proposal_user', columnName: 'user_id' },
-      { tableName: 'role_user', columnName: 'user_id' },
     ];
 
-    tablesToUpdate.forEach(async (row: Record) => {
+    for await (const row of tablesToUpdate) {
       await database(row.tableName)
         .update({
           [row.columnName]: userInto,
         })
-        .where({ [row.columnName]: userFrom })
-        .whereNotExists(function () {
-          // this prevents conflicts
-          this.select('*')
-            .from(row.tableName)
-            .where({ [row.columnName]: userInto });
-        });
-    });
+        .where({ [row.columnName]: userFrom });
+    }
   }
 }

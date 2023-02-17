@@ -14,8 +14,9 @@ import { Redirect } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import CopyToClipboard from 'components/common/CopyToClipboard';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { Call } from 'generated/sdk';
+import { Call, FeatureId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
@@ -79,6 +80,7 @@ const ProposalTable = ({
   confirm,
 }: ProposalTableProps) => {
   const userContext = useContext(UserContext);
+  const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [partialProposalsData, setPartialProposalsData] = useState<
@@ -89,6 +91,10 @@ const ProposalTable = ({
     ProposalData,
     'primaryKey' | 'questionary'
   > | null>(null);
+
+  const isEmailInviteEnabled = featureContext.featuresMap.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
 
   // TODO: This api call here should be replaced with a hook for getting user proposals.
   useEffect(() => {
@@ -294,24 +300,26 @@ const ProposalTable = ({
           },
         ]}
       />
-      <ActionButtonContainer>
-        <ButtonWithDialog
-          label="Join proposal"
-          data-cy="join-proposal-btn"
-          startIcon={<AddIcon />}
-        >
-          <RedeemCode
-            title="Join proposal"
-            onRedeemed={() => {
-              searchQuery().then((data) => {
-                if (data) {
-                  setPartialProposalsData(data.data);
-                }
-              });
-            }}
-          />
-        </ButtonWithDialog>
-      </ActionButtonContainer>
+      {isEmailInviteEnabled && (
+        <ActionButtonContainer>
+          <ButtonWithDialog
+            label="Join proposal"
+            data-cy="join-proposal-btn"
+            startIcon={<AddIcon />}
+          >
+            <RedeemCode
+              title="Join proposal"
+              onRedeemed={() => {
+                searchQuery().then((data) => {
+                  if (data) {
+                    setPartialProposalsData(data.data);
+                  }
+                });
+              }}
+            />
+          </ButtonWithDialog>
+        </ActionButtonContainer>
+      )}
       {showReferenceText(data) && (
         <span>
           <br />* Pre-submission reference. Reference will change upon

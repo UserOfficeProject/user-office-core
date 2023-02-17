@@ -13,6 +13,7 @@ import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalSettingsMutations from '../mutations/ProposalSettingsMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
+import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
@@ -86,6 +87,7 @@ interface ResolverContextMutations {
   proposalEsi: ProposalEsiMutations;
   proposalSettings: ProposalSettingsMutations;
   questionary: QuestionaryMutations;
+  redeemCodes: RedeemCodesMutations;
   review: ReviewMutations;
   sample: SampleMutations;
   sampleEsi: SampleEsiMutations;

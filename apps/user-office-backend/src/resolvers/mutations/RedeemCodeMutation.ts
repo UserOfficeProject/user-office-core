@@ -10,6 +10,6 @@ export class RedeemCodeMutation {
     @Arg('code', () => String) code: string,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.user.redeemCode(context.user, code);
+    return context.mutations.redeemCodes.redeemCode(context.user, code);
   }
 }
