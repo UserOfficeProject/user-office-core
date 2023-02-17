@@ -15,6 +15,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
+import { Instrument } from '../models/Instrument';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
@@ -36,6 +37,7 @@ type ProposalMessageData = {
   newStatus?: string;
   members: Member[];
   proposer?: Member;
+  instrument?: Pick<Instrument, 'id' | 'shortCode'>;
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -82,6 +84,9 @@ const getProposalMessageData = async (proposal: Proposal) => {
     container.resolve<ProposalSettingsDataSource>(
       Tokens.ProposalSettingsDataSource
     );
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
   const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
     proposal.statusId
   );
@@ -90,9 +95,21 @@ const getProposalMessageData = async (proposal: Proposal) => {
     proposal.primaryKey
   );
 
+  const maybeInstrument = await instrumentDataSource.getInstrumentByProposalPk(
+    proposal.primaryKey
+  );
+
+  const instrument = maybeInstrument
+    ? {
+        id: maybeInstrument.id,
+        shortCode: maybeInstrument.shortCode,
+      }
+    : undefined;
+
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
+    instrument: instrument,
     title: proposal.title,
     abstract: proposal.abstract,
     members: proposalUsers.map((proposalUser) => ({
