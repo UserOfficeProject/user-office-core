@@ -138,12 +138,12 @@ jobs:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}
 
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v3
-        with:
-          path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+#       - name: Restore backend node_modules
+#         id: cached-node-modules-backend
+#         uses: actions/cache@v3
+#         with:
+#           path: apps/user-office-backend/node_modules
+#           key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
@@ -181,13 +181,17 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v3
-        with:
-          path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
-
+#       - name: Restore backend node_modules
+#         id: cached-node-modules-backend
+#         uses: actions/cache@v3
+#         with:
+#           path: apps/user-office-backend/node_modules
+#           key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          
+      - name: Install backend dependencies
+        # if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
+        run: npm run install:backend
+        
       - name: Rebuild Muhammara module
         run: npm rebuild muhammara
 
