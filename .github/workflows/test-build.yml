@@ -80,7 +80,7 @@ jobs:
         if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
         # We use --ignore-scripts flag to ignore the postinstall script which is actually installing dependencies in all other apps.
         # Caution! The option --ignore-scripts disables ALL scripts - even from the dependencies. If the dependencies need to run scripts to e.g. install some binaries they may break / be incomplete. For now this works and if we experience some issues we can try to find better solution.
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
