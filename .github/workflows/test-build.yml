@@ -144,7 +144,10 @@ jobs:
 #         with:
 #           path: apps/user-office-backend/node_modules
 #           key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
-
+      - name: Install backend dependencies
+        # if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
+        run: npm run install:backend
+        
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
