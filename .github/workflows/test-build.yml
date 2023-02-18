@@ -90,7 +90,7 @@ jobs:
           key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
       - name: Install backend dependencies
-        if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
+        # if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
         run: npm run install:backend
 
       - name: Cache frontend node_modules
