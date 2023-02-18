@@ -188,6 +188,9 @@ jobs:
           path: apps/user-office-backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
 
+      - name: Rebuild Muhammara module
+        run: npm rebuild muhammara
+
       - name: Run backend unit tests
         env:
           TZ: Europe/Stockholm
