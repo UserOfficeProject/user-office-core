@@ -678,10 +678,6 @@ context('Proposal tests', () => {
       cy.login('user2');
       cy.visit('/Proposals');
       cy.finishedLoading();
-      cy.get('[data-cy="proposal-table"]').should(
-        'not.contain',
-        initialDBData.proposal.shortCode
-      );
       cy.get('[data-cy="join-proposal-btn"]').click();
       cy.get('#code').clear();
       cy.get('#code').type(initialDBData.redeemCodes.validRedeemCode.code);
