@@ -675,7 +675,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able to redeem proposal invite user information', () => {
-      cy.login('user2');
+      cy.login('user3');
       cy.visit('/');
       cy.finishedLoading();
       cy.get('[data-cy="proposal-table"]').should(
