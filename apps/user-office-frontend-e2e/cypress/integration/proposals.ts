@@ -670,13 +670,13 @@ context('Proposal tests', () => {
         win.location.href = 'about:blank';
       });
 
-      cy.getAndStoreFeaturesEnabled();
       cy.resetDB(true);
+      cy.getAndStoreFeaturesEnabled();
     });
 
     it('Should be able to redeem proposal invite user information', () => {
       cy.login('user2');
-      cy.visit('/');
+      cy.visit('/Proposals');
       cy.finishedLoading();
       cy.get('[data-cy="proposal-table"]').should(
         'not.contain',
