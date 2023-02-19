@@ -675,19 +675,18 @@ context('Proposal tests', () => {
     });
 
     it('Should be able to redeem proposal invite user information', () => {
-      cy.login('user3');
+      cy.login('user2');
       cy.visit('/');
       cy.finishedLoading();
       cy.get('[data-cy="proposal-table"]').should(
-        'not.contain.text',
+        'not.contain',
         initialDBData.proposal.shortCode
       );
       cy.get('[data-cy="join-proposal-btn"]').click();
       cy.get('#code').clear();
       cy.get('#code').type(initialDBData.redeemCodes.validRedeemCode.code);
       cy.get('[data-cy="invitation-submit"]').click();
-      cy.get('[data-cy="proposal-table"]').should(
-        'contain.text',
+      cy.get('[data-cy="proposal-table"]').contains(
         initialDBData.proposal.shortCode
       );
     });
