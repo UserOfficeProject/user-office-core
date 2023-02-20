@@ -31,11 +31,11 @@ import {
   AssignReviewersToSEPArgs,
   RemoveSepReviewerFromProposalArgs,
   AssignChairOrSecretaryToSEPArgs,
-} from '../resolvers/mutations/AssignMembersToSEP';
+} from '../resolvers/mutations/AssignMembersToSepMutation';
 import {
   AssignProposalsToSepArgs,
   RemoveProposalsFromSepArgs,
-} from '../resolvers/mutations/AssignProposalsToSep';
+} from '../resolvers/mutations/AssignProposalsToSepMutation';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { ReorderSepMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderSepMeetingDecisionProposalsMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
@@ -236,13 +236,16 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
   ): Promise<ProposalPks | Rejection> {
-    return this.dataSource.assignProposalsToSep(args).catch((err) => {
+    const result = await this.dataSource.assignProposalsToSep(args);
+
+    if (result.proposalPks.length !== args.proposals.length) {
       return rejection(
         'Could not assign proposal to scientific evaluation panel',
-        { agent },
-        err
+        { agent }
       );
-    });
+    }
+
+    return result;
   }
 
   @Authorized([Roles.USER_OFFICER])

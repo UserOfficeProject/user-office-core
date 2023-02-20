@@ -78,9 +78,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
     (review.status === ReviewStatus.SUBMITTED && !hasAccessRights);
 
   const handleSubmit = async (values: GradeFormType) => {
-    const {
-      updateReview: { rejection, review: updatedReview },
-    } = await api({
+    const { updateReview } = await api({
       toastSuccessMessage: shouldSubmit ? 'Submitted' : 'Updated',
     }).updateReview({
       reviewID: review.id,
@@ -93,14 +91,12 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
       sepID: review.sepID,
     });
 
-    if (!rejection && updatedReview) {
-      setReview({
-        ...review,
-        comment: updatedReview.comment,
-        grade: updatedReview.grade,
-        status: updatedReview.status,
-      });
-    }
+    setReview({
+      ...review,
+      comment: updateReview.comment,
+      grade: updateReview.grade,
+      status: updateReview.status,
+    });
     onChange();
     setIsSubmitting(false);
   };

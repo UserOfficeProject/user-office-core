@@ -11,7 +11,7 @@ import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutations';
+import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutation';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
 import { CloneUtils } from '../utils/CloneUtils';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';

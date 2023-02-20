@@ -6,11 +6,6 @@ mutation deleteQuestionTemplateRelation(
     questionId: $questionId
     templateId: $templateId
   ) {
-    template {
-      ...template
-    }
-    rejection {
-      ...rejection
-    }
+    ...template
   }
 }

@@ -112,12 +112,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         seps: [],
       };
 
-  const closeModal = (error: string | null | undefined, callToReturn: Call) => {
-    if (!error) {
-      close(callToReturn);
-    }
-  };
-
   return (
     <>
       <Typography variant="h6" component="h1">
@@ -127,22 +121,16 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         initialValues={initialValues}
         onSubmit={async (values) => {
           if (call) {
-            const data = await api({
+            const { updateCall } = await api({
               toastSuccessMessage: 'Call updated successfully!',
             }).updateCall(values as UpdateCallInput);
-            closeModal(
-              data.updateCall.rejection?.reason,
-              data.updateCall.call as Call
-            );
+            close(updateCall as Call);
           } else {
-            const data = await api({
+            const { createCall } = await api({
               toastSuccessMessage: 'Call created successfully!',
             }).createCall(values as UpdateCallInput);
 
-            closeModal(
-              data.createCall.rejection?.reason,
-              data.createCall.call as Call
-            );
+            close(createCall as Call);
           }
         }}
         shouldCreate={!call}

@@ -15,11 +15,11 @@ import {
   TemplateStep,
   Topic,
 } from '../../models/Template';
-import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
-import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
-import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
+import { CreateTemplateArgs } from '../../resolvers/mutations/template/CreateTemplateMutation';
+import { CreateTopicArgs } from '../../resolvers/mutations/template/CreateTopicMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/template/DeleteQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/template/UpdateQuestionTemplateRelationSettingsMutation';
+import { UpdateTemplateArgs } from '../../resolvers/mutations/template/UpdateTemplateMutation';
 import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { SampleDeclarationConfig } from '../../resolvers/types/FieldConfig';

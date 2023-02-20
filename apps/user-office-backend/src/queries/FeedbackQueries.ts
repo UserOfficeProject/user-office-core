@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { container, inject, injectable } from 'tsyringe';
 
 import { FeedbackAuthorization } from '../auth/FeedbackAuthorization';
@@ -71,7 +72,7 @@ export default class FeedbackQueries {
       questionaryId
     );
     if (!questionary) {
-      throw new Error(
+      throw new GraphQLError(
         'Unexpected error. Feedback must have a questionary, but not found'
       );
     }

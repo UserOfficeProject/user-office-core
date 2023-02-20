@@ -162,42 +162,42 @@ const shipmentBasisPreSubmit =
     let shipmentId = shipment.id;
     let returnValue = state.questionary.questionaryId;
     if (shipmentId > 0) {
-      const result = await api.updateShipment({
+      const { updateShipment } = await api.updateShipment({
         title: title,
         shipmentId: shipment.id,
         proposalPk: shipment.proposalPk,
       });
-      if (result.updateShipment.shipment) {
+      if (updateShipment) {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
           itemWithQuestionary: {
-            ...result.updateShipment.shipment,
+            ...updateShipment,
             questionary: {
-              ...result.updateShipment.shipment.questionary,
+              ...updateShipment.questionary,
               steps: state.questionary.steps,
             },
           },
         });
       }
     } else {
-      const result = await api.createShipment({
+      const { createShipment } = await api.createShipment({
         title: title,
         proposalPk: shipment.proposalPk,
         scheduledEventId: shipment.scheduledEventId,
       });
-      if (result.createShipment.shipment) {
+      if (createShipment) {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_CREATED',
           itemWithQuestionary: {
-            ...result.createShipment.shipment,
+            ...createShipment,
             questionary: {
-              ...result.createShipment.shipment.questionary,
+              ...createShipment.questionary,
               steps: state.questionary.steps,
             },
           },
         });
-        shipmentId = result.createShipment.shipment.id;
-        returnValue = result.createShipment.shipment.questionaryId;
+        shipmentId = createShipment.id;
+        returnValue = createShipment.questionaryId;
       } else {
         return returnValue;
       }

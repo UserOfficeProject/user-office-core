@@ -2,8 +2,7 @@ import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
 import { FeatureId, FeatureUpdateAction } from '../../../models/Feature';
-import { FeaturesResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { Feature } from '../../types/Feature';
 
 @InputType()
 export class UpdateFeaturesInput {
@@ -16,18 +15,15 @@ export class UpdateFeaturesInput {
 
 @Resolver()
 export class UpdateFeaturesMutation {
-  @Mutation(() => FeaturesResponseWrap)
+  @Mutation(() => [Feature])
   async updateFeatures(
     @Ctx() context: ResolverContext,
     @Arg('updatedFeaturesInput')
     updatedFeaturesInput: UpdateFeaturesInput
   ) {
-    return wrapResponse(
-      context.mutations.admin.updateFeatures(
-        context.user,
-        updatedFeaturesInput
-      ),
-      FeaturesResponseWrap
+    return context.mutations.admin.updateFeatures(
+      context.user,
+      updatedFeaturesInput
     );
   }
 }

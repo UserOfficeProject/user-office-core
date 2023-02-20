@@ -92,13 +92,9 @@ const OverwriteTimeAllocationDialog = ({
       <Formik
         initialValues={initialValues}
         onSubmit={async (values) => {
-          const result = await api({
+          await api({
             toastSuccessMessage: 'Updated',
           }).updateSEPTimeAllocation(values);
-
-          if (result.updateSEPTimeAllocation.rejection) {
-            return;
-          }
 
           onClose(values.sepTimeAllocation);
         }}

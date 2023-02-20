@@ -1,37 +1,32 @@
 mutation createProposal($callId: Int!) {
   createProposal(callId: $callId) {
-    proposal {
-      primaryKey
-      status {
-        ...proposalStatus
-      }
-      proposalId
-      questionaryId
+    primaryKey
+    status {
+      ...proposalStatus
+    }
+    proposalId
+    questionaryId
+    questionary {
+      ...questionary
+      isCompleted
+    }
+    proposer {
+      ...basicUserDetails
+    }
+    users {
+      ...basicUserDetails
+    }
+    samples {
+      ...sample
       questionary {
-        ...questionary
         isCompleted
       }
-      proposer {
-        ...basicUserDetails
-      }
-      users {
-        ...basicUserDetails
-      }
-      samples {
-        ...sample
-        questionary {
-          isCompleted
-        }
-      }
-      genericTemplates {
-        ...genericTemplate
-        questionary {
-          isCompleted
-        }
-      }
     }
-    rejection {
-      ...rejection
+    genericTemplates {
+      ...genericTemplate
+      questionary {
+        isCompleted
+      }
     }
   }
 }

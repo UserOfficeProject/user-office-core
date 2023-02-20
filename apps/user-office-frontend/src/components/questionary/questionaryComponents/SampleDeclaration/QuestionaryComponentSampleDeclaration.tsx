@@ -116,7 +116,7 @@ function QuestionaryComponentSampleDeclaration(
           api()
             .cloneSample({ sampleId: id, title: title })
             .then((response) => {
-              const clonedSample = response.cloneSample.sample;
+              const clonedSample = response.cloneSample;
               if (clonedSample) {
                 const newStateItems = [...field.value, clonedSample];
 
@@ -127,14 +127,12 @@ function QuestionaryComponentSampleDeclaration(
         const deleteSample = (id: number) =>
           api()
             .deleteSample({ sampleId: id })
-            .then((response) => {
-              if (!response.deleteSample.rejection) {
-                const newStateItems = field.value.filter(
-                  (sample) => sample.id !== id
-                );
+            .then(() => {
+              const newStateItems = field.value.filter(
+                (sample) => sample.id !== id
+              );
 
-                updateFieldValueAndState(newStateItems);
-              }
+              updateFieldValueAndState(newStateItems);
             });
 
         return (

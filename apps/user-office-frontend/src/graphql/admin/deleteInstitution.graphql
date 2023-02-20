@@ -1,11 +1,6 @@
 mutation deleteInstitution($id: Int!) {
   deleteInstitution(id: $id) {
-    institution {
-      id
-      verified
-    }
-    rejection {
-      ...rejection
-    }
+    id
+    verified
   }
 }

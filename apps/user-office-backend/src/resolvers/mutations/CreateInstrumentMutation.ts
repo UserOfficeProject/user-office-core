@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { InstrumentResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Instrument } from '../types/Instrument';
 
 @ArgsType()
 export class CreateInstrumentArgs {
@@ -29,14 +28,11 @@ export class CreateInstrumentArgs {
 
 @Resolver()
 export class CreateInstrumentMutation {
-  @Mutation(() => InstrumentResponseWrap)
+  @Mutation(() => Instrument)
   async createInstrument(
     @Args() args: CreateInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.instrument.create(context.user, args),
-      InstrumentResponseWrap
-    );
+    return context.mutations.instrument.create(context.user, args);
   }
 }

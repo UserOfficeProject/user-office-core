@@ -148,7 +148,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
     const shouldActivateCall = !call.isActive;
     confirm(
       async () => {
-        const data = await api({
+        await api({
           toastSuccessMessage: `Call ${
             shouldActivateCall ? 'activated' : 'deactivated'
           } successfully`,
@@ -157,12 +157,10 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
           isActive: shouldActivateCall,
         } as UpdateCallInput);
 
-        if (!data.updateCall.rejection) {
-          const newCallsArray = calls.filter(
-            (objectItem) => objectItem.id !== call.id
-          );
-          setCalls(newCallsArray);
-        }
+        const newCallsArray = calls.filter(
+          (objectItem) => objectItem.id !== call.id
+        );
+        setCalls(newCallsArray);
       },
       {
         title: `${shouldActivateCall ? 'Activate' : 'Deactivate'} call`,
@@ -174,22 +172,21 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
   };
 
   const deleteCall = async (id: number | string) => {
-    return await api({ toastSuccessMessage: 'Call deleted successfully' })
-      .deleteCall({
+    try {
+      await api({
+        toastSuccessMessage: 'Call deleted successfully',
+      }).deleteCall({
         id: id as number,
-      })
-      .then((resp) => {
-        if (!resp.deleteCall.rejection) {
-          const newObjectsArray = calls.filter(
-            (objectItem) => objectItem.id !== id
-          );
-          setCalls(newObjectsArray);
-
-          return true;
-        } else {
-          return false;
-        }
       });
+      const newObjectsArray = calls.filter(
+        (objectItem) => objectItem.id !== id
+      );
+      setCalls(newObjectsArray);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const ScienceIconComponent = (): JSX.Element => <ScienceIcon />;

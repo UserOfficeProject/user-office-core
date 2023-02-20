@@ -1,10 +1,5 @@
 mutation submitProposal($proposalPk: Int!) {
   submitProposal(proposalPk: $proposalPk) {
-    proposal {
-      ...proposal
-    }
-    rejection {
-      ...rejection
-    }
+    ...proposal
   }
 }

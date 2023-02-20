@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalWorkflowConnectionResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { ProposalWorkflowConnection } from '../../types/ProposalWorkflowConnection';
 
 @InputType()
 export class IndexWithGroupId {
@@ -35,18 +34,15 @@ export class MoveProposalWorkflowStatusInput {
 
 @Resolver()
 export class MoveProposalWorkflowStatusMutation {
-  @Mutation(() => ProposalWorkflowConnectionResponseWrap)
+  @Mutation(() => ProposalWorkflowConnection)
   async moveProposalWorkflowStatus(
     @Ctx() context: ResolverContext,
     @Arg('moveProposalWorkflowStatusInput')
     moveProposalWorkflowStatusInput: MoveProposalWorkflowStatusInput
   ) {
-    return wrapResponse(
-      context.mutations.proposalSettings.moveProposalWorkflowStatus(
-        context.user,
-        moveProposalWorkflowStatusInput
-      ),
-      ProposalWorkflowConnectionResponseWrap
+    return context.mutations.proposalSettings.moveProposalWorkflowStatus(
+      context.user,
+      moveProposalWorkflowStatusInput
     );
   }
 }

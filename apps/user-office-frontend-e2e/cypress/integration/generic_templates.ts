@@ -22,6 +22,12 @@ context('GenericTemplates tests', () => {
   const addButtonLabel = twoFakes(2);
   const genericTemplateTitle = faker.lorem.words(3);
   const genericTemplateQuestionaryQuestion = twoFakes(3);
+  const genericTemplateTitleAnswers = [
+    faker.lorem.words(3),
+    faker.lorem.words(3),
+    faker.lorem.words(3),
+    faker.lorem.words(3),
+  ];
   const proposalWorkflow = {
     name: faker.random.words(3),
     description: faker.random.words(5),
@@ -37,18 +43,17 @@ context('GenericTemplates tests', () => {
       name: proposalTemplateName,
       groupId: TemplateGroupId.GENERIC_TEMPLATE,
     }).then((result) => {
-      if (result.createTemplate.template) {
-        createdGenericTemplateId = result.createTemplate.template.templateId;
+      if (result.createTemplate) {
+        createdGenericTemplateId = result.createTemplate.templateId;
 
         const topicId =
-          result.createTemplate.template.steps[
-            result.createTemplate.template.steps.length - 1
-          ].topic.id;
+          result.createTemplate.steps[result.createTemplate.steps.length - 1]
+            .topic.id;
         cy.createQuestion({
           categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion1 = questionResult.createQuestion.question;
+          const createdQuestion1 = questionResult.createQuestion;
           if (createdQuestion1) {
             cy.updateQuestion({
               id: createdQuestion1.id,
@@ -67,7 +72,7 @@ context('GenericTemplates tests', () => {
           categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion2 = questionResult.createQuestion.question;
+          const createdQuestion2 = questionResult.createQuestion;
           if (createdQuestion2) {
             cy.updateQuestion({
               id: createdQuestion2.id,
@@ -87,28 +92,27 @@ context('GenericTemplates tests', () => {
           name: proposalTemplateName,
           groupId: TemplateGroupId.PROPOSAL,
         }).then((result) => {
-          if (result.createTemplate.template) {
-            createdTemplateId = result.createTemplate.template.templateId;
+          if (result.createTemplate) {
+            createdTemplateId = result.createTemplate.templateId;
 
             cy.createTopic({
               templateId: createdTemplateId,
               sortOrder: 1,
             }).then((topicResult) => {
-              if (!topicResult.createTopic.template) {
+              if (!topicResult.createTopic) {
                 throw new Error('Can not create topic');
               }
 
               const topicId =
-                topicResult.createTopic.template.steps[
-                  topicResult.createTopic.template.steps.length - 1
+                topicResult.createTopic.steps[
+                  topicResult.createTopic.steps.length - 1
                 ].topic.id;
               cy.createQuestion({
                 categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 dataType: DataType.GENERIC_TEMPLATE,
               }).then((questionResult) => {
-                if (questionResult.createQuestion.question) {
-                  createdQuestion1Id =
-                    questionResult.createQuestion.question.id;
+                if (questionResult.createQuestion) {
+                  createdQuestion1Id = questionResult.createQuestion.id;
 
                   cy.updateQuestion({
                     id: createdQuestion1Id,
@@ -128,7 +132,7 @@ context('GenericTemplates tests', () => {
                 categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 dataType: DataType.GENERIC_TEMPLATE,
               }).then((questionResult) => {
-                const createdQuestion2 = questionResult.createQuestion.question;
+                const createdQuestion2 = questionResult.createQuestion;
                 if (createdQuestion2) {
                   cy.updateQuestion({
                     id: createdQuestion2.id,
@@ -146,6 +150,104 @@ context('GenericTemplates tests', () => {
               });
             });
           }
+        });
+      }
+    });
+  };
+  const createGenericTemplates = (count: number) => {
+    const genericTemplates: number[] = [];
+    for (let index = 0; index <= count; index++)
+      cy.createTemplate({
+        name: faker.lorem.word(5),
+        groupId: TemplateGroupId.GENERIC_TEMPLATE,
+      }).then((result) => {
+        if (result.createTemplate) {
+          const genericTemplateID = result.createTemplate.templateId;
+          const topicId =
+            result.createTemplate.steps[result.createTemplate.steps.length - 1]
+              .topic.id;
+          cy.createQuestion({
+            categoryId: TemplateCategoryId.GENERIC_TEMPLATE,
+            dataType: DataType.TEXT_INPUT,
+          }).then((questionResult) => {
+            const createdQuestion = questionResult.createQuestion;
+            if (createdQuestion) {
+              cy.updateQuestion({
+                id: createdQuestion.id,
+                question: faker.lorem.words(5),
+                naturalKey: faker.lorem.word(5),
+                config: `{"required":true,"multiline":false}`,
+              });
+              cy.createQuestionTemplateRelation({
+                questionId: createdQuestion.id,
+                templateId: genericTemplateID,
+                sortOrder: 1,
+                topicId: topicId,
+              });
+            }
+          });
+
+          genericTemplates.push(genericTemplateID);
+        }
+      });
+
+    return genericTemplates;
+  };
+  const createProposalTemplateWithSubTemplate = (
+    genericSubTemplateIds: number[]
+  ) => {
+    cy.createTemplate({
+      name: faker.lorem.words(3),
+      groupId: TemplateGroupId.PROPOSAL,
+    }).then((result) => {
+      if (result.createTemplate) {
+        const proposalTemplateId = result.createTemplate.templateId;
+        for (let index = 0; index < genericSubTemplateIds.length - 1; index++) {
+          cy.createTopic({
+            templateId: proposalTemplateId,
+            sortOrder: index + 1,
+          }).then((topicResult) => {
+            if (!topicResult.createTopic) {
+              throw new Error('Can not create topic');
+            }
+            const topicId =
+              topicResult.createTopic.steps[
+                topicResult.createTopic.steps.length - 1
+              ].topic.id;
+            cy.updateTopic({
+              title: faker.lorem.words(4),
+              templateId: proposalTemplateId,
+              sortOrder: index + 1,
+              topicId,
+            });
+            cy.createQuestion({
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+              dataType: DataType.GENERIC_TEMPLATE,
+            }).then((questionResult) => {
+              if (questionResult.createQuestion) {
+                const createdQuestion1Id = questionResult.createQuestion.id;
+
+                cy.updateQuestion({
+                  id: createdQuestion1Id,
+                  question: genericTemplateQuestion[index],
+                  config: `{"addEntryButtonLabel":"${addButtonLabel[index]}","minEntries":"1","maxEntries":"2","templateId":${genericSubTemplateIds[index]},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                });
+
+                cy.createQuestionTemplateRelation({
+                  questionId: createdQuestion1Id,
+                  templateId: proposalTemplateId,
+                  sortOrder: index + 1,
+                  topicId: topicId,
+                });
+              }
+            });
+          });
+        }
+        cy.updateCall({
+          id: initialDBData.call.id,
+          ...updatedCall,
+          templateId: proposalTemplateId,
+          proposalWorkflowId: workflowId,
         });
       }
     });
@@ -282,8 +384,8 @@ context('GenericTemplates tests', () => {
       createTemplateAndAllQuestions();
 
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow.proposalWorkflow) {
-          workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
         } else {
           throw new Error('Workflow creation failed');
         }
@@ -407,14 +509,14 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle[1],
             abstract: faker.lorem.words(3),
           });
           cy.createGenericTemplate({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: genericTemplateTitle,
             templateId: createdGenericTemplateId,
             questionId: createdQuestion1Id,
@@ -536,14 +638,14 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalTitle[1],
             abstract: faker.lorem.words(3),
           });
           cy.createGenericTemplate({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: genericTemplateTitle,
             templateId: createdGenericTemplateId,
             questionId: createdQuestion1Id,
@@ -562,6 +664,146 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.contains(proposalTitle[1]).should('not.exist');
+    });
+  });
+
+  describe('Generic template cloning tests', () => {
+    beforeEach(() => {
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
+          const genericTemplates = createGenericTemplates(2);
+          createProposalTemplateWithSubTemplate(genericTemplates);
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            (result) => {
+              if (result.createProposal) {
+                const proposalPK = result.createProposal.primaryKey;
+                const questionarySteps =
+                  result.createProposal.questionary.steps;
+                const proposal = result.createProposal;
+                cy.updateProposal({
+                  proposalPk: result.createProposal.primaryKey,
+                  title: proposalTitle[1],
+                  abstract: faker.lorem.words(3),
+                  proposerId: initialDBData.users.user1.id,
+                });
+
+                for (let index = 1; index < questionarySteps.length; index++) {
+                  cy.createGenericTemplate({
+                    proposalPk: result.createProposal.primaryKey,
+                    title: genericTemplateTitleAnswers[index - 1],
+                    questionId:
+                      result.createProposal.questionary.steps[index].fields[0]
+                        .question.id,
+                    templateId: genericTemplates[index - 1],
+                  }).then((templateResult) => {
+                    if (templateResult.createGenericTemplate?.questionaryId) {
+                      cy.answerTopic({
+                        isPartialSave: false,
+                        questionaryId:
+                          templateResult.createGenericTemplate.questionaryId,
+                        topicId:
+                          templateResult.createGenericTemplate.questionary
+                            .steps[0].topic.id,
+                        answers: [
+                          {
+                            questionId:
+                              templateResult.createGenericTemplate.questionary
+                                .steps[0].fields[1].question.id,
+                            value: '{"value":"answer"}',
+                          },
+                        ],
+                      });
+                    }
+                  });
+                  cy.answerTopic({
+                    questionaryId: proposal.questionaryId,
+                    topicId: questionarySteps[index].topic.id,
+                    isPartialSave: false,
+                    answers: [],
+                  });
+                }
+                cy.cloneProposals({
+                  callId: initialDBData.call.id,
+                  proposalsToClonePk: [proposalPK],
+                });
+              }
+            }
+          );
+        } else {
+          throw new Error('Workflow creation failed');
+        }
+      });
+    });
+    it('User should be able to modify and submit cloned proposal with generic templates', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(`Copy of ${proposalTitle[1]}`)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.contains('New proposal', { matchCase: true }).click();
+
+      cy.get('[data-cy=title] input').clear().type(faker.lorem.word(5));
+
+      cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(genericTemplateTitleAnswers[0]).click();
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(genericTemplateTitleAnswers[2])
+        .should('have.value', genericTemplateTitleAnswers[2])
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.contains(genericTemplateTitleAnswers[2]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(genericTemplateTitleAnswers[1]).click();
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(genericTemplateTitleAnswers[3])
+        .should('have.value', genericTemplateTitleAnswers[3])
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.contains(genericTemplateTitleAnswers[3]);
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains(genericTemplateTitleAnswers[2]);
+      cy.contains(genericTemplateTitleAnswers[3]);
     });
   });
 });

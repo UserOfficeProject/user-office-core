@@ -56,8 +56,8 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               teamLeadUserId: values.teamLeadUserId,
             })
             .then(({ updateVisit }) => {
-              if (updateVisit.visit) {
-                close({ ...event, visit: updateVisit.visit });
+              if (updateVisit) {
+                close({ ...event, visit: updateVisit });
               }
             });
         } else {
@@ -68,8 +68,8 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               teamLeadUserId: values.teamLeadUserId as number,
             })
             .then(({ createVisit }) => {
-              if (createVisit.visit) {
-                close({ ...event, visit: createVisit.visit });
+              if (createVisit) {
+                close({ ...event, visit: createVisit });
               }
             });
         }

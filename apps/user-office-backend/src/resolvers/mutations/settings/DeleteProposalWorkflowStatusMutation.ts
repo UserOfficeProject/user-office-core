@@ -9,8 +9,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { SuccessResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
 
 @InputType()
 export class DeleteProposalWorkflowStatusInput {
@@ -26,18 +24,15 @@ export class DeleteProposalWorkflowStatusInput {
 
 @Resolver()
 export class DeleteProposalWorkflowStatusMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async deleteProposalWorkflowStatus(
     @Ctx() context: ResolverContext,
     @Arg('deleteProposalWorkflowStatusInput')
     deleteProposalWorkflowStatusInput: DeleteProposalWorkflowStatusInput
   ) {
-    return wrapResponse(
-      context.mutations.proposalSettings.deleteProposalWorkflowStatus(
-        context.user,
-        deleteProposalWorkflowStatusInput
-      ),
-      SuccessResponseWrap
+    return context.mutations.proposalSettings.deleteProposalWorkflowStatus(
+      context.user,
+      deleteProposalWorkflowStatusInput
     );
   }
 }

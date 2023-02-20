@@ -54,21 +54,18 @@ function SampleEsiReview() {
         />
         <NavigButton
           onClick={async () => {
-            const result = await api().updateSampleEsi({
+            const { updateSampleEsi } = await api().updateSampleEsi({
               esiId: state.esi.esiId,
               sampleId: state.esi.sample.id,
               isSubmitted: true,
             });
-            if (!result.updateSampleEsi.esi) {
-              return;
-            }
             dispatch({
               type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-              itemWithQuestionary: result.updateSampleEsi.esi,
+              itemWithQuestionary: updateSampleEsi,
             });
             dispatch({
               type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-              itemWithQuestionary: result.updateSampleEsi.esi,
+              itemWithQuestionary: updateSampleEsi,
             });
           }}
           disabled={isSubmitted || !isAffirmChecked}

@@ -19,13 +19,10 @@ const ImpersonateButton: React.FC<ImpersonateButtonProps> = ({
   const history = useHistory();
 
   const handleButtonClick = async () => {
-    const result = await api().getTokenForUser({ userId });
+    const { getTokenForUser } = await api().getTokenForUser({ userId });
 
-    const { token, rejection } = result.getTokenForUser;
-    if (!rejection) {
-      handleLogin(token);
-      history.push('/');
-    }
+    handleLogin(getTokenForUser);
+    history.push('/');
   };
 
   return (

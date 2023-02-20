@@ -12,16 +12,11 @@ mutation updateReview(
     status: $status
     sepID: $sepID
   ) {
-    rejection {
-      ...rejection
-    }
-    review {
-      id
-      userID
-      status
-      comment
-      grade
-      sepID
-    }
+    id
+    userID
+    status
+    comment
+    grade
+    sepID
   }
 }
