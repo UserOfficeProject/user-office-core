@@ -2,7 +2,7 @@ name: Lint
 
 on:
   pull_request:
-    branches: [develop, master, fix-deployment-scripts]
+    branches: [develop, master]
 
 env:
   NODE_VERSION: 16.x

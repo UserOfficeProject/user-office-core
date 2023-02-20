@@ -6,7 +6,6 @@ on:
     branches:
       - develop
       - staging
-      - fix-deployment-scripts
 
 env:
   NODE_VERSION: 16.x
