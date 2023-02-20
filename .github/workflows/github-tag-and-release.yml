@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - fix-deployment-scripts
 
 env:
   NODE_VERSION: 16.x
