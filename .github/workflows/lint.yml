@@ -2,16 +2,15 @@ name: Lint
 
 on:
   pull_request:
-    branches: [develop, master]
+    branches: [develop, master, fix-deployment-scripts]
+
+env:
+  NODE_VERSION: 16.x
 
 jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
 
     steps:
       - name: Check out Git repository
@@ -20,13 +19,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Node.js dependencies
         run: npm ci
-        
+
       - name: Set environment variables
-        run:  cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+        run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
 
       - name: Generate SDK
         run: npm run generate:sdk
