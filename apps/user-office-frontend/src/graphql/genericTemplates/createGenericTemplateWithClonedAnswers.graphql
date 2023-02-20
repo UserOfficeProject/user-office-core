@@ -1,0 +1,21 @@
+mutation createGenericTemplateWithClonedAnswers(
+  $title: String!
+  $templateId: Int!
+  $proposalPk: Int!
+  $questionId: String!
+  $sourceQuestionaryId: Int!
+) {
+  createGenericTemplateWithClonedAnswers(
+    title: $title
+    templateId: $templateId
+    proposalPk: $proposalPk
+    questionId: $questionId
+    sourceQuestionaryId: $sourceQuestionaryId
+  ) {
+    ...genericTemplate
+    questionary {
+      isCompleted
+      ...questionary
+    }
+  }
+}
