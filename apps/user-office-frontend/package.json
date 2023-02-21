@@ -40,6 +40,7 @@
     "graphql-request": "^5.0.0",
     "html-react-parser": "^1.4.12",
     "immer": "^9.0.7",
+    "jsonpath": "^1.1.1",
     "jwt-decode": "^3.1.2",
     "luxon": "^2.3.2",
     "mime": "^3.0.0",
@@ -91,6 +92,7 @@
   },
   "devDependencies": {
     "@types/eslint": "^8.2.1",
+    "@types/jsonpath": "^0.2.0",
     "@types/luxon": "^2.3.0",
     "@types/node": "^16.0.0",
     "@types/react-test-renderer": "^17.0.1",
