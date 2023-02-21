@@ -6,6 +6,7 @@ export type AuthJwtPayload = {
   roles: Role[];
   currentRole: Role;
   externalToken?: string;
+  isInternalUser?: boolean;
   impersonatingUserId?: number;
 };
 
@@ -56,9 +57,10 @@ export class User {
 export interface UserWithRole extends UserJWT {
   currentRole: Role | undefined;
   impersonatingUserId?: number;
-  accessPermissions?: any;
+  accessPermissions?: Record<string, boolean>;
   isApiAccessToken?: boolean;
   externalToken?: string;
+  isInternalUser?: boolean;
   externalTokenValid?: boolean;
 }
 

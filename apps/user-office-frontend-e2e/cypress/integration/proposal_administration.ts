@@ -18,16 +18,16 @@ context('Proposal administration tests', () => {
   const existingQuestionaryId = 1;
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Proposal administration advanced search filter tests', () => {
     beforeEach(() => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalName1,
             abstract: proposalName1,
@@ -39,7 +39,7 @@ context('Proposal administration tests', () => {
             isPartialSave: false,
           });
           cy.submitProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
           });
         }
       });
@@ -245,9 +245,9 @@ context('Proposal administration tests', () => {
 
     it('Download proposal is working with dialog window showing up', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalFixedName,
             abstract: proposalName2,
@@ -286,11 +286,13 @@ context('Proposal administration tests', () => {
       }
       cy.contains('Proposals').click();
 
+      const token = window.localStorage.getItem('token');
+
       cy.request({
         url: '/download/pdf/proposal/1',
         method: 'GET',
         headers: {
-          authorization: `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`,
+          authorization: `Bearer ${token}`,
         },
       }).then((response) => {
         expect(response.headers['content-type']).to.be.equal('application/pdf');
@@ -326,9 +328,9 @@ context('Proposal administration tests', () => {
 
     it('Should be able to save table sort state in url', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalFixedName,
             abstract: proposalName2,
@@ -394,9 +396,9 @@ context('Proposal administration tests', () => {
 
     it('Should preserve the ordering when row is selected', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
+        if (result.createProposal) {
           cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
+            proposalPk: result.createProposal.primaryKey,
             title: proposalFixedName,
             abstract: proposalName2,
             proposerId: existingUserId,
@@ -726,6 +728,144 @@ context('Proposal administration tests', () => {
         .type((answers.proposal.interval.value.min - 1).toString());
       cy.contains('Search').click();
       cy.contains(proposal.title).should('exist');
+    });
+  });
+
+  describe('Proposal administration API token access', () => {
+    let createdProposalPk: number;
+    let createdProposalId: string;
+    beforeEach(() => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId = result.createProposal.proposalId;
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            proposerId: existingUserId,
+            title: proposalName1,
+            abstract: proposalName1,
+          });
+          cy.answerTopic({
+            answers: [],
+            topicId: existingTopicId,
+            questionaryId: existingQuestionaryId,
+            isPartialSave: false,
+          });
+          cy.submitProposal({
+            proposalPk: createdProposalPk,
+          });
+        }
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+    });
+
+    it('Should be able to download proposal pdf with valid API token', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        /*temporarily skipping, until issue is fixed on github stfc actions (no such file or directory, open '/config/logos)
+        This test is passing when you run it in local environment.
+       */
+        this.skip();
+      }
+
+      const accessTokenName = faker.lorem.words(2);
+      cy.createApiAccessToken({
+        name: accessTokenName,
+        accessPermissions: '{"FactoryServices.getPdfProposals":true}',
+      });
+
+      cy.contains('Settings').click();
+      cy.contains('API access tokens').click();
+
+      cy.contains(accessTokenName).parent().find('[aria-label="Edit"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Other Services').click();
+
+      cy.contains('FactoryServices.getPdfProposals');
+      cy.get('#accessToken')
+        .invoke('val')
+        .then((value) => {
+          const accessToken = value as string;
+          cy.request({
+            url: `/download/pdf/proposal/${createdProposalPk}`,
+            method: 'GET',
+            headers: {
+              authorization: accessToken,
+            },
+          }).then((response) => {
+            expect(response.headers['content-type']).to.be.equal(
+              'application/pdf'
+            );
+            expect(response.status).to.be.equal(200);
+          });
+          cy.request({
+            url: `/download/pdf/proposal/${createdProposalId}?filter=id`,
+            method: 'GET',
+            headers: {
+              authorization: accessToken,
+            },
+          }).then((response) => {
+            expect(response.headers['content-type']).to.be.equal(
+              'application/pdf'
+            );
+            expect(response.status).to.be.equal(200);
+          });
+        });
+    });
+
+    it('Should not be able to download proposal pdf with invalid API token', () => {
+      const accessTokenName = faker.lorem.words(2);
+      cy.createApiAccessToken({
+        name: accessTokenName,
+        accessPermissions: '{"ProposalQueries.getAll":true}',
+      });
+
+      cy.contains('Settings').click();
+      cy.contains('API access tokens').click();
+
+      cy.contains(accessTokenName).parent().find('[aria-label="Edit"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Other Services').click();
+
+      cy.contains('FactoryServices.getPdfProposals').should('not.be.checked');
+
+      cy.get('#accessToken')
+        .invoke('val')
+        .then((value) => {
+          const accessToken = value as string;
+          cy.request({
+            url: `/download/pdf/proposal/${createdProposalPk}`,
+            failOnStatusCode: false,
+            method: 'GET',
+            headers: {
+              authorization: accessToken,
+            },
+          }).then((response) => {
+            expect(response.headers['content-type']).not.be.equal(
+              'application/pdf'
+            );
+            expect(response.status).not.equal(200);
+          });
+
+          cy.request({
+            url: `/download/pdf/proposal/${createdProposalId}?filter=id`,
+            failOnStatusCode: false,
+            method: 'GET',
+            headers: {
+              authorization: accessToken,
+            },
+          }).then((response) => {
+            expect(response.headers['content-type']).not.be.equal(
+              'application/pdf'
+            );
+            expect(response.status).not.equal(200);
+          });
+        });
     });
   });
 });

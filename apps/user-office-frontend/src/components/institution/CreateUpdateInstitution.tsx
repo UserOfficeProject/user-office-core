@@ -50,19 +50,17 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
     name: string,
     country: number
   ) => {
-    const response = await api({
-      toastSuccessMessage: 'Institution created successfully!',
-    }).createInstitution({
-      name,
-      country,
-      verified,
-    });
-
-    const { rejection, institution } = response.createInstitution;
-    if (rejection) {
+    try {
+      const { createInstitution } = await api({
+        toastSuccessMessage: 'Institution created successfully!',
+      }).createInstitution({
+        name,
+        country,
+        verified,
+      });
+      close(createInstitution);
+    } catch (error) {
       close(null);
-    } else if (institution) {
-      close(institution);
     }
   };
 
@@ -72,19 +70,19 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
     country: number,
     name: string
   ) => {
-    const response = await api({
-      toastSuccessMessage: 'Institution updated successfully!',
-    }).updateInstitution({
-      id,
-      name,
-      verified,
-      country,
-    });
-    const { rejection: error, institution } = response.updateInstitution;
-    if (error) {
+    try {
+      const { updateInstitution } = await api({
+        toastSuccessMessage: 'Institution updated successfully!',
+      }).updateInstitution({
+        id,
+        name,
+        verified,
+        country,
+      });
+
+      close(updateInstitution);
+    } catch (error) {
       close(null);
-    } else if (institution) {
-      close(institution);
     }
   };
 

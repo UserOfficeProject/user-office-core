@@ -30,13 +30,25 @@ import CallStatusFilter, {
   CallStatusQueryFilter,
   defaultCallStatusQueryFilter,
   CallStatus,
+  CallStatusFilters,
 } from './CallStatusFilter';
 import CreateUpdateCall from './CreateUpdateCall';
 
-const getFilterStatus = (callStatus: string | CallStatus) =>
-  callStatus === CallStatus.ALL
-    ? undefined // if set to ALL we don't filter by status
-    : callStatus === CallStatus.ACTIVE;
+const getFilterStatus = (
+  callStatus: CallStatusFilters
+): Partial<Record<'isActive' | 'isActiveInternal', boolean>> => {
+  if (callStatus === CallStatus.ALL) {
+    return {}; // if set to ALL we don't filter by status
+  }
+
+  if (callStatus === CallStatus.ACTIVE || callStatus === CallStatus.INACTIVE) {
+    return {
+      isActive: callStatus === CallStatus.ACTIVE,
+    };
+  } else {
+    return { isActiveInternal: callStatus === CallStatus.ACTIVEINTERNAL };
+  }
+};
 
 const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
   const { api } = useDataApiWithFeedback();
@@ -60,14 +72,13 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
     setCallsWithLoading: setCalls,
     setCallsFilter,
   } = useCallsData({
-    isActive: getFilterStatus(urlQueryParams.callStatus),
+    ...getFilterStatus(urlQueryParams.callStatus as CallStatusFilters),
   });
 
   const handleStatusFilterChange = (callStatus: CallStatus) => {
     setUrlQueryParams((queries) => ({ ...queries, callStatus }));
-    setCallsFilter((filter) => ({
-      ...filter,
-      isActive: getFilterStatus(callStatus),
+    setCallsFilter(() => ({
+      ...getFilterStatus(callStatus as CallStatusFilters),
     }));
   };
 
@@ -137,7 +148,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
     const shouldActivateCall = !call.isActive;
     confirm(
       async () => {
-        const data = await api({
+        await api({
           toastSuccessMessage: `Call ${
             shouldActivateCall ? 'activated' : 'deactivated'
           } successfully`,
@@ -146,12 +157,10 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
           isActive: shouldActivateCall,
         } as UpdateCallInput);
 
-        if (!data.updateCall.rejection) {
-          const newCallsArray = calls.filter(
-            (objectItem) => objectItem.id !== call.id
-          );
-          setCalls(newCallsArray);
-        }
+        const newCallsArray = calls.filter(
+          (objectItem) => objectItem.id !== call.id
+        );
+        setCalls(newCallsArray);
       },
       {
         title: `${shouldActivateCall ? 'Activate' : 'Deactivate'} call`,
@@ -163,22 +172,21 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
   };
 
   const deleteCall = async (id: number | string) => {
-    return await api({ toastSuccessMessage: 'Call deleted successfully' })
-      .deleteCall({
+    try {
+      await api({
+        toastSuccessMessage: 'Call deleted successfully',
+      }).deleteCall({
         id: id as number,
-      })
-      .then((resp) => {
-        if (!resp.deleteCall.rejection) {
-          const newObjectsArray = calls.filter(
-            (objectItem) => objectItem.id !== id
-          );
-          setCalls(newObjectsArray);
-
-          return true;
-        } else {
-          return false;
-        }
       });
+      const newObjectsArray = calls.filter(
+        (objectItem) => objectItem.id !== id
+      );
+      setCalls(newObjectsArray);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const ScienceIconComponent = (): JSX.Element => <ScienceIcon />;

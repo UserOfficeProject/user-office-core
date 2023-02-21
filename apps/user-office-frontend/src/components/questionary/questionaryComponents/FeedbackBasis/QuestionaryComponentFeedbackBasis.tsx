@@ -32,21 +32,16 @@ const feedbackBasisPreSubmit =
     }
 
     // create new feedback and return new questionary id
-    const result = await api.createFeedback({
+    const { createFeedback } = await api.createFeedback({
       scheduledEventId: feedback.scheduledEventId,
     });
-    const newFeedback = result.createFeedback.feedback;
 
-    if (newFeedback?.questionary) {
-      dispatch({
-        type: 'ITEM_WITH_QUESTIONARY_CREATED',
-        itemWithQuestionary: newFeedback,
-      });
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_CREATED',
+      itemWithQuestionary: createFeedback,
+    });
 
-      return newFeedback.questionary.questionaryId;
-    }
-
-    throw new Error('Failed to create feedback');
+    return createFeedback.questionary.questionaryId;
   };
 
 export { QuestionaryComponentFeedbackBasis, feedbackBasisPreSubmit };

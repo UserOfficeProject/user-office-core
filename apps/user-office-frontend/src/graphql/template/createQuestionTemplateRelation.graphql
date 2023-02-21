@@ -10,11 +10,6 @@ mutation createQuestionTemplateRelation(
     topicId: $topicId
     sortOrder: $sortOrder
   ) {
-    template {
-      ...template
-    }
-    rejection {
-      ...rejection
-    }
+    ...template
   }
 }

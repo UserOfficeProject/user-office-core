@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { PdfTemplateResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { PdfTemplate } from '../types/PdfTemplate';
 
 @ArgsType()
 export class UpdatePdfTemplateArgs {
@@ -23,14 +22,11 @@ export class UpdatePdfTemplateArgs {
 
 @Resolver()
 export class UpdatePdfTemplateMutation {
-  @Mutation(() => PdfTemplateResponseWrap)
+  @Mutation(() => PdfTemplate)
   updatePdfTemplate(
     @Args() args: UpdatePdfTemplateArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.pdfTemplate.updatePdfTemplate(context.user, args),
-      PdfTemplateResponseWrap
-    );
+    return context.mutations.pdfTemplate.updatePdfTemplate(context.user, args);
   }
 }

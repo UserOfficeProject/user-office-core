@@ -10,11 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
-import {
-  InstrumentResponseWrap,
-  SuccessResponseWrap,
-} from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Instrument } from '../types/Instrument';
 
 @ArgsType()
 export class UpdateInstrumentArgs {
@@ -60,32 +56,26 @@ export class InstrumentSubmitArgs {
 
 @Resolver()
 export class UpdateInstrumentMutation {
-  @Mutation(() => InstrumentResponseWrap)
+  @Mutation(() => Instrument)
   async updateInstrument(
     @Args() args: UpdateInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.instrument.update(context.user, args),
-      InstrumentResponseWrap
-    );
+    return context.mutations.instrument.update(context.user, args);
   }
 
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async setInstrumentAvailabilityTime(
     @Args() args: InstrumentAvailabilityTimeArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.instrument.setAvailabilityTimeOnInstrument(
-        context.user,
-        args
-      ),
-      SuccessResponseWrap
+    return context.mutations.instrument.setAvailabilityTimeOnInstrument(
+      context.user,
+      args
     );
   }
 
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async submitInstrument(
     @Args() args: InstrumentSubmitArgs,
     @Ctx() context: ResolverContext
@@ -95,9 +85,6 @@ export class UpdateInstrumentMutation {
       args
     );
 
-    return wrapResponse(
-      isRejection(res) ? Promise.resolve(res) : Promise.resolve(true),
-      SuccessResponseWrap
-    );
+    return isRejection(res) ? res : true;
   }
 }

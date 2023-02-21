@@ -33,6 +33,9 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Date)
   public endCall: Date;
 
+  @Field(() => Date, { nullable: true })
+  public endCallInternal: Date;
+
   @Field(() => Date)
   public startReview: Date;
 
@@ -128,6 +131,15 @@ export class CallInstrumentsResolver {
   @FieldResolver(() => Int)
   async proposalCount(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.proposal.dataSource.getCount(call.id);
+  }
+
+  @FieldResolver(() => Boolean)
+  isActiveInternal(@Root() call: Call): boolean {
+    const now = new Date();
+    const startCall = new Date(call.startCall);
+    const endCallInternal = new Date(call.endCallInternal);
+
+    return startCall <= now && endCallInternal >= now;
   }
 }
 

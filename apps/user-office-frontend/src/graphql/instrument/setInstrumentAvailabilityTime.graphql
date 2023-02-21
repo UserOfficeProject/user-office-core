@@ -7,10 +7,5 @@ mutation setInstrumentAvailabilityTime(
     callId: $callId
     instrumentId: $instrumentId
     availabilityTime: $availabilityTime
-  ) {
-    rejection {
-      ...rejection
-    }
-    isSuccess
-  }
+  )
 }

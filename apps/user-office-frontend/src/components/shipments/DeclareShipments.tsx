@@ -85,11 +85,7 @@ function DeclareShipments({
   const deleteShipment = (shipmentId: number) => {
     api()
       .deleteShipment({ shipmentId })
-      .then((result) => {
-        if (result.deleteShipment.rejection) {
-          // error occurred
-          return;
-        }
+      .then(() => {
         setShipments(shipments.filter((s) => s.id !== shipmentId));
       });
   };

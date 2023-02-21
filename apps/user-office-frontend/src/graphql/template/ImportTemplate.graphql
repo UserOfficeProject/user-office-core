@@ -8,13 +8,6 @@ mutation importTemplate(
     conflictResolutions: $conflictResolutions
     subTemplatesConflictResolutions: $subTemplatesConflictResolutions
   ) {
-    template {
-      ...template
-    }
-    rejection {
-      reason
-      context
-      exception
-    }
+    ...template
   }
 }

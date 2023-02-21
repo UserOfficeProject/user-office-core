@@ -12,15 +12,10 @@ mutation createSample(
     questionId: $questionId
     isPostProposalSubmission: $isPostProposalSubmission
   ) {
-    sample {
-      ...sample
-      questionary {
-        isCompleted
-        ...questionary
-      }
-    }
-    rejection {
-      ...rejection
+    ...sample
+    questionary {
+      isCompleted
+      ...questionary
     }
   }
 }

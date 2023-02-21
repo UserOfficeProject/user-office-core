@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 
 import {
   Answer,
@@ -180,7 +181,7 @@ export default class PostgresQuestionaryDataSource
   ): Promise<string[]> {
     const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not insert files because answer does not exist. AnswerID ${answerId}`
       );
     }
@@ -198,7 +199,7 @@ export default class PostgresQuestionaryDataSource
   ): Promise<string[]> {
     const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not delete files because answer does not exist. AnswerID ${answerId}`
       );
     }
@@ -409,7 +410,7 @@ export default class PostgresQuestionaryDataSource
     const targetTemplateId = targetQuestionary?.templateId;
 
     if (!sourceTemplateId || !targetTemplateId) {
-      throw new Error(
+      throw new GraphQLError(
         'Can not copy questions, because no template for the questionary was found'
       );
     }
@@ -447,7 +448,7 @@ export default class PostgresQuestionaryDataSource
         { questionaryId }
       );
 
-      throw new Error('Could not clone questionary');
+      throw new GraphQLError('Could not clone questionary');
     }
     const clonedQuestionary = await this.create(
       sourceQuestionary.creatorId,

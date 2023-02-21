@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ReviewStatus } from '../../models/Review';
-import { ReviewWithNextStatusResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Review } from '../types/Review';
 
 @ArgsType()
 export class UpdateReviewArgs {
@@ -33,14 +32,11 @@ export class UpdateReviewArgs {
 
 @Resolver()
 export class UpdateReviewMutation {
-  @Mutation(() => ReviewWithNextStatusResponseWrap)
+  @Mutation(() => Review)
   updateReview(
     @Args() args: UpdateReviewArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.review.updateReview(context.user, args),
-      ReviewWithNextStatusResponseWrap
-    );
+    return context.mutations.review.updateReview(context.user, args);
   }
 }

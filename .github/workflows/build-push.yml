@@ -22,6 +22,30 @@ jobs:
 
       - id: extract_branch
         uses: swapActions/get-branch-name@v1
+        
+      - name: Create backend image tags
+        id: meta-backend
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            dmsc/duo-backend
+            ghcr.io/userofficeproject/user-office-backend
+          flavor: latest=true # adds :latest tag to outputs.tags
+          tags: |  # adds :<sha> tag to outputs.tags
+            type=sha,format=long,prefix=
+            type=raw,value=${{ steps.extract_branch.outputs.branch }}
+            
+      - name: Create frontend image tags
+        id: meta-frontend
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            dmsc/duo-frontend
+            ghcr.io/userofficeproject/user-office-frontend
+          flavor: latest=true # adds :latest tag to outputs.tags
+          tags: |  # adds :<sha> tag to outputs.tags
+            type=sha,format=long,prefix=
+            type=raw,value=${{ steps.extract_branch.outputs.branch }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -47,6 +71,9 @@ jobs:
 
       - name: Set environment variables
         run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+        
+      - name: Generate SDK
+        run: npm run generate:sdk
 
       - name: Build and push backend
         uses: docker/build-push-action@v3
@@ -54,11 +81,7 @@ jobs:
           context: ./apps/user-office-backend
           file: ./apps/user-office-backend/Dockerfile
           push: true
-          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
-          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
-          tags: |
-            dmsc/duo-backend:${{ steps.extract_branch.outputs.branch }}
-            ghcr.io/userofficeproject/user-office-backend:${{ steps.extract_branch.outputs.branch }}
+          tags: ${{ steps.meta-backend.outputs.tags }}
 
       - name: Build and push frontend
         uses: docker/build-push-action@v3
@@ -66,22 +89,23 @@ jobs:
           context: ./apps/user-office-frontend
           file: ./apps/user-office-frontend/Dockerfile
           push: true
-          # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
-          # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
-          tags: |
-            dmsc/duo-frontend:${{ steps.extract_branch.outputs.branch }}
-            ghcr.io/userofficeproject/user-office-frontend:${{ steps.extract_branch.outputs.branch }}
-
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          
       - name: Trigger pipeline
-        uses: swapActions/trigger-useroffice-deployment@v1
+        uses: swapActions/trigger-swap-deployment@v1
         with:
-          repository: ${{ github.repository }}
+          repository: ${{ github.event.repository.name }}
           environment: ${{ steps.extract_branch.outputs.branch }}
           gh-trigger-url: ${{ secrets.GITLAB_TRIGGER_URL }}
           gh-token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
+          image-tag: ${{ github.sha }}
 
-      # Trigger Jenkins pipeline
-      - name: Trigger Jenkins
+      - name: Trigger frontend deployment at STFC
         if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
         run: |
           curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalFrontend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
+
+      - name: Trigger backend deployment at STFC
+        if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
+        run: |
+          curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalBackend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"

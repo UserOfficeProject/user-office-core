@@ -74,9 +74,6 @@ export default function TemplateEditor() {
     return (next: FunctionType) => (action: Event) => {
       next(action);
       switch (action.type) {
-        case EventType.SERVICE_ERROR_OCCURRED:
-          break;
-
         case EventType.QUESTION_CREATED:
           setSelectedQuestion(action.payload);
           break;
@@ -192,10 +189,10 @@ export default function TemplateEditor() {
             questionId: question.id,
           })
           .then((data) => {
-            if (data.deleteQuestionTemplateRelation.template) {
+            if (data.deleteQuestionTemplateRelation) {
               dispatch({
                 type: EventType.QUESTION_REL_UPDATED,
-                payload: data.deleteQuestionTemplateRelation.template,
+                payload: data.deleteQuestionTemplateRelation,
               });
             }
           });

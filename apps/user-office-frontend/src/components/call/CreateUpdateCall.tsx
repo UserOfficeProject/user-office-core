@@ -32,23 +32,20 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
   const { timezone } = useFormattedDateTime();
 
-  const { templates: proposalTemplates } = useActiveTemplates(
-    TemplateGroupId.PROPOSAL,
-    call?.templateId
-  );
+  const { templates: proposalTemplates, refreshTemplates: reloadProposal } =
+    useActiveTemplates(TemplateGroupId.PROPOSAL, call?.templateId);
 
-  const { templates: proposalEsiTemplates } = useActiveTemplates(
-    TemplateGroupId.PROPOSAL_ESI,
-    call?.esiTemplateId
-  );
+  const { templates: proposalEsiTemplates, refreshTemplates: reloadEsi } =
+    useActiveTemplates(TemplateGroupId.PROPOSAL_ESI, call?.esiTemplateId);
 
-  const { templates: pdfTemplates } = useActiveTemplates(
-    TemplateGroupId.PDF_TEMPLATE,
-    call?.pdfTemplateId
-  );
+  const { templates: pdfTemplates, refreshTemplates: reloadPdfTemplates } =
+    useActiveTemplates(TemplateGroupId.PDF_TEMPLATE, call?.pdfTemplateId);
 
-  const { proposalWorkflows, loadingProposalWorkflows } =
-    useProposalWorkflowsData();
+  const {
+    proposalWorkflows,
+    loadingProposalWorkflows,
+    refreshProposalWorkflows: reloadProposalWorkflows,
+  } = useProposalWorkflowsData();
 
   const currentDayStart = DateTime.now()
     .setZone(timezone || undefined)
@@ -115,12 +112,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         seps: [],
       };
 
-  const closeModal = (error: string | null | undefined, callToReturn: Call) => {
-    if (!error) {
-      close(callToReturn);
-    }
-  };
-
   return (
     <>
       <Typography variant="h6" component="h1">
@@ -130,22 +121,16 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         initialValues={initialValues}
         onSubmit={async (values) => {
           if (call) {
-            const data = await api({
+            const { updateCall } = await api({
               toastSuccessMessage: 'Call updated successfully!',
             }).updateCall(values as UpdateCallInput);
-            closeModal(
-              data.updateCall.rejection?.reason,
-              data.updateCall.call as Call
-            );
+            close(updateCall as Call);
           } else {
-            const data = await api({
+            const { createCall } = await api({
               toastSuccessMessage: 'Call created successfully!',
             }).createCall(values as UpdateCallInput);
 
-            closeModal(
-              data.createCall.rejection?.reason,
-              data.createCall.call as Call
-            );
+            close(createCall as Call);
           }
         }}
         shouldCreate={!call}
@@ -159,6 +144,10 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           }
         >
           <CallGeneralInfo
+            reloadTemplates={reloadProposal}
+            reloadEsi={reloadEsi}
+            reloadPdfTemplates={reloadPdfTemplates}
+            reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
             pdfTemplates={pdfTemplates}

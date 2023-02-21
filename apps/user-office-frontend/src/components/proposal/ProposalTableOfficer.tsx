@@ -1,20 +1,28 @@
-import MaterialTable, { Column } from '@material-table/core';
+import MaterialTable, {
+  Action,
+  Column,
+  MTableToolbar,
+} from '@material-table/core';
 import Delete from '@mui/icons-material/Delete';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Email from '@mui/icons-material/Email';
 import FileCopy from '@mui/icons-material/FileCopy';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
 import Visibility from '@mui/icons-material/Visibility';
-import { Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
@@ -84,7 +92,19 @@ let columns: Column<ProposalViewData>[] = [
     removable: false,
     field: 'rowActionButtons',
   },
-  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Proposal ID',
+    field: 'proposalId',
+    render: (rawData) => (
+      <CopyToClipboard
+        text={rawData.proposalId}
+        successMessage={`'${rawData.proposalId}' copied to clipboard`}
+        position="right"
+      >
+        {rawData.proposalId || ''}
+      </CopyToClipboard>
+    ),
+  },
   {
     title: 'Title',
     field: 'title',
@@ -138,10 +158,74 @@ const SEPReviewColumns = [
     hidden: true,
   },
   { title: 'Deviation', field: 'reviewDeviation', emptyValue: '-' },
-  { title: 'Average Score', field: 'reviewAverage', emptyValue: '-' },
+  {
+    title: 'Average Score',
+    field: 'reviewAverage',
+    emptyValue: '-',
+    hidden: true,
+  },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
   { title: 'SEP', field: 'sepCode', emptyValue: '-' },
 ];
+
+const PREFETCH_SIZE = 200;
+const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
+/**
+ * NOTE: This toolbar "select all" option works only with all prefetched proposals. Currently that value is set to "PREFETCH_SIZE=200"
+ * For example if we change the PREFETCH_SIZE to 100, that would mean that it can select up to 100 prefetched proposals at once.
+ * For now this works but if we want to support option where we really select all proposals in the database this needs to be refactored a bit.
+ */
+const ToolbarWithSelectAllPrefetched: React.FC<{
+  actions: Action<ProposalViewData>[];
+  selectedRows: ProposalViewData[];
+  data: ProposalViewData[];
+}> = (props) => {
+  const selectAllAction = props.actions.find(
+    (action) => action.hidden && action.tooltip === SELECT_ALL_ACTION_TOOLTIP
+  );
+  const tableHasData = !!props.data.length;
+  const allItemsSelectedOnThePage =
+    props.selectedRows.length === props.data.length;
+
+  return (
+    <div data-cy="select-all-toolbar">
+      <MTableToolbar {...props} />
+      {tableHasData && !!selectAllAction && allItemsSelectedOnThePage && (
+        <Box
+          textAlign="center"
+          padding={1}
+          bgcolor={(theme) => theme.palette.background.default}
+          data-cy="select-all-proposals"
+        >
+          {selectAllAction.iconProps?.hidden ? (
+            <>
+              All proposals are selected.
+              <Button
+                variant="text"
+                onClick={() => selectAllAction.onClick(null, props.data)}
+                data-cy="clear-all-selection"
+              >
+                Clear selection
+              </Button>
+            </>
+          ) : (
+            <>
+              All {props.selectedRows.length} proposals on this page are
+              selected.
+              <Button
+                variant="text"
+                onClick={() => selectAllAction.onClick(null, props.data)}
+                data-cy="select-all-prefetched-proposals"
+              >
+                Select all {selectAllAction.iconProps?.defaultValue} proposals
+              </Button>
+            </>
+          )}
+        </Box>
+      )}
+    </div>
+  );
+};
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
@@ -171,19 +255,23 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   >('proposalColumnsOfficer', null);
   const featureContext = useContext(FeatureContext);
 
-  const prefetchSize = 200;
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [query, setQuery] = useState<QueryParameters>({
-    first: prefetchSize,
+    first: PREFETCH_SIZE,
     offset: 0,
     sortField: urlQueryParams?.sortField,
     sortDirection: urlQueryParams?.sortDirection ?? undefined,
     searchText: urlQueryParams?.search ?? undefined,
   });
-  const { loading, setProposalsData, proposalsData, totalCount } =
-    useProposalsCoreData(proposalFilter, query);
+  const {
+    loading,
+    setProposalsData,
+    proposalsData,
+    totalCount,
+    fetchProposalsData,
+  } = useProposalsCoreData(proposalFilter, query);
 
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);
@@ -192,11 +280,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   useEffect(() => {
     let isMounted = true;
     let endSlice = rowsPerPage * (currentPage + 1);
-    endSlice = endSlice == 0 ? prefetchSize + 1 : endSlice + 1; // Final page of a loaded section would produce the slice (x, 0) without this
+    endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
     if (isMounted) {
       setTableData(
         preselectedProposalsData.slice(
-          (currentPage * rowsPerPage) % prefetchSize,
+          (currentPage * rowsPerPage) % PREFETCH_SIZE,
           endSlice
         )
       );
@@ -325,17 +413,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
   const emailProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
-      const {
-        notifyProposal: { rejection },
-      } = await api({
+      await api({
         toastSuccessMessage: 'Notification sent successfully',
       }).notifyProposal({
         proposalPk: proposal.primaryKey,
       });
-
-      if (rejection) {
-        return;
-      }
 
       setProposalsData((proposalsData) =>
         proposalsData.map((prop) => ({
@@ -348,13 +430,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const deleteProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
-      const {
-        deleteProposal: { rejection },
-      } = await api().deleteProposal({ proposalPk: proposal.primaryKey });
-
-      if (rejection) {
-        return;
-      }
+      await api().deleteProposal({ proposalPk: proposal.primaryKey });
 
       setProposalsData((proposalsData) =>
         proposalsData.filter(
@@ -366,7 +442,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
     if (sep) {
-      const response = await api({
+      await api({
         toastSuccessMessage:
           'Proposal/s assigned to the selected SEP successfully!',
       }).assignProposalsToSep({
@@ -377,32 +453,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         sepId: sep.id,
       });
 
-      const isError = !!response.assignProposalsToSep.rejection;
-
-      if (!isError) {
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.sepCode = sep.code;
-              prop.sepId = sep.id;
-
-              if (response.assignProposalsToSep.nextProposalStatus?.name) {
-                prop.statusName =
-                  response.assignProposalsToSep.nextProposalStatus.name;
-              }
-            }
-
-            return prop;
-          })
-        );
-      }
+      // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
+      setTimeout(fetchProposalsData, 500);
     } else {
-      const result = await api({
+      await api({
         toastSuccessMessage: 'Proposal/s removed from the SEP successfully!',
       }).removeProposalsFromSep({
         proposalPks: selectedProposals.map(
@@ -411,25 +465,21 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         sepId: selectedProposals[0].sepId as number,
       });
 
-      const isError = !!result.removeProposalsFromSep.rejection;
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => {
+          if (
+            selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === prop.primaryKey
+            )
+          ) {
+            prop.sepCode = null;
+            prop.sepId = null;
+          }
 
-      if (!isError) {
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.sepCode = null;
-              prop.sepId = null;
-            }
-
-            return prop;
-          })
-        );
-      }
+          return prop;
+        })
+      );
     }
   };
 
@@ -437,7 +487,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     instrument: InstrumentFragment | null
   ): Promise<void> => {
     if (instrument) {
-      const result = await api({
+      await api({
         toastSuccessMessage:
           'Proposal/s assigned to the selected instrument successfully!',
       }).assignProposalsToInstrument({
@@ -447,27 +497,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })),
         instrumentId: instrument.id,
       });
-      const isError = !!result.assignProposalsToInstrument.rejection;
 
-      if (!isError) {
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.instrumentName = instrument.name;
-              prop.instrumentId = instrument.id;
-            }
-
-            return prop;
-          })
-        );
-      }
+      // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
+      setTimeout(fetchProposalsData, 500);
     } else {
-      const result = await api({
+      await api({
         toastSuccessMessage:
           'Proposal/s removed from the instrument successfully!',
       }).removeProposalsFromInstrument({
@@ -476,25 +510,21 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         ),
       });
 
-      const isError = !!result.removeProposalsFromInstrument.rejection;
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => {
+          if (
+            selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === prop.primaryKey
+            )
+          ) {
+            prop.instrumentName = null;
+            prop.instrumentId = null;
+          }
 
-      if (!isError) {
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.instrumentName = null;
-              prop.instrumentId = null;
-            }
-
-            return prop;
-          })
-        );
-      }
+          return prop;
+        })
+      );
     }
   };
 
@@ -507,16 +537,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       (selectedProposal) => selectedProposal.primaryKey
     );
 
-    const result = await api({
+    const { cloneProposals } = await api({
       toastSuccessMessage: 'Proposal/s cloned successfully',
     }).cloneProposals({
       callId: call.id,
       proposalsToClonePk,
     });
-    const resultProposals = result.cloneProposals.proposals;
 
-    if (!result.cloneProposals.rejection && proposalsData && resultProposals) {
-      const newClonedProposals = resultProposals.map((resultProposal) =>
+    if (proposalsData && cloneProposals) {
+      const newClonedProposals = cloneProposals.map((resultProposal) =>
         fromProposalToProposalView(resultProposal as Proposal)
       );
 
@@ -529,7 +558,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const changeStatusOnProposals = async (status: ProposalStatus) => {
     if (status?.id && selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
-      const result = await api({
+      await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
       }).changeProposalsStatus({
         proposals: selectedProposals.map((selectedProposal) => ({
@@ -538,33 +567,28 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })),
         statusId: status.id,
       });
+      const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
 
-      const isError = !!result.changeProposalsStatus.rejection;
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => {
+          if (
+            selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === prop.primaryKey
+            )
+          ) {
+            prop.statusId = status.id;
+            prop.statusName = status.name;
+            prop.statusDescription = status.description;
 
-      if (!isError) {
-        const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
-
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (
-              selectedProposals.find(
-                (selectedProposal) =>
-                  selectedProposal.primaryKey === prop.primaryKey
-              )
-            ) {
-              prop.statusId = status.id;
-              prop.statusName = status.name;
-              prop.statusDescription = status.description;
-
-              if (shouldChangeSubmittedValue) {
-                prop.submitted = false;
-              }
+            if (shouldChangeSubmittedValue) {
+              prop.submitted = false;
             }
+          }
 
-            return prop;
-          })
-        );
-      }
+          return prop;
+        })
+      );
     }
   };
 
@@ -607,6 +631,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         : '-',
     })
   );
+
+  const shouldShowSelectAllAction =
+    totalCount <= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
+  const allPrefetchedProposalsSelected =
+    preselectedProposalsData.length === urlQueryParams.selection.length;
 
   return (
     <>
@@ -713,9 +742,17 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         data={preselectedProposalDataWithIdAndRowActions}
         totalCount={totalCount}
         page={currentPage}
+        localization={{
+          toolbar: {
+            nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
+          },
+        }}
+        components={{
+          Toolbar: ToolbarWithSelectAllPrefetched,
+        }}
         onPageChange={(page, pageSize) => {
           const newOffset =
-            Math.floor((pageSize * page) / prefetchSize) * prefetchSize;
+            Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
           if (page !== currentPage && newOffset != query.offset) {
             setQuery({ ...query, offset: newOffset });
           }
@@ -842,6 +879,31 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
                     'This action will trigger emails to be sent to principal investigators.',
                 }
               )();
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            tooltip: shouldShowSelectAllAction,
+            icon: DoneAllIcon,
+            hidden: true,
+            iconProps: {
+              hidden: allPrefetchedProposalsSelected,
+              defaultValue: preselectedProposalsData.length,
+            },
+            onClick: () => {
+              if (allPrefetchedProposalsSelected) {
+                setUrlQueryParams((params) => ({
+                  ...params,
+                  selection: undefined,
+                }));
+              } else {
+                setUrlQueryParams((params) => ({
+                  ...params,
+                  selection: preselectedProposalsData.map((proposal) =>
+                    proposal.primaryKey.toString()
+                  ),
+                }));
+              }
             },
             position: 'toolbarOnSelect',
           },

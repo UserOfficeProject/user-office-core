@@ -11,16 +11,11 @@ import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorizati
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection, Rejection } from '../models/Rejection';
-import {
-  Review,
-  ReviewStatus,
-  ReviewWithNextProposalStatus,
-} from '../models/Review';
+import { Review, ReviewStatus } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
@@ -29,8 +24,7 @@ import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMut
 import { ProposalPkWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateReviewArgs } from '../resolvers/mutations/UpdateReviewMutation';
-import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
-import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
+import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 
 @injectable()
 export default class ReviewMutations {
@@ -41,8 +35,6 @@ export default class ReviewMutations {
     @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -52,7 +44,7 @@ export default class ReviewMutations {
   async updateReview(
     agent: UserWithRole | null,
     args: UpdateReviewArgs
-  ): Promise<ReviewWithNextProposalStatus | Rejection> {
+  ): Promise<Review | Rejection> {
     const { reviewID, comment, grade } = args;
     const review = await this.dataSource.getReview(reviewID);
 
@@ -71,54 +63,13 @@ export default class ReviewMutations {
       );
     }
 
-    return this.dataSource
-      .updateReview(args)
-      .then(async (review) => {
-        /**
-         * NOTE: Check if all other Reviews are submitted and set the event that will be fired in the proposal workflow.
-         * Based on that info get the next status that is coming in the workflow and return it for better experience on the frontend.
-         */
-        const allProposalReviews = await this.dataSource.getProposalReviews(
-          review.proposalPk
-        );
-
-        const allOtherReviewsSubmitted = checkAllReviewsSubmittedOnProposal(
-          allProposalReviews,
-          review
-        );
-
-        let event = Event.PROPOSAL_SEP_REVIEW_SUBMITTED;
-        if (allOtherReviewsSubmitted) {
-          event = Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED;
-        }
-
-        let nextProposalStatus = null;
-        if (args.status === ReviewStatus.SUBMITTED) {
-          nextProposalStatus =
-            await this.proposalSettingsDataSource.getProposalNextStatus(
-              review.proposalPk,
-              event
-            );
-        }
-
-        return new ReviewWithNextProposalStatus(
-          review.id,
-          review.proposalPk,
-          review.userID,
-          review.comment,
-          review.grade,
-          review.status,
-          review.sepID,
-          nextProposalStatus
-        );
-      })
-      .catch((err) => {
-        return rejection(
-          'Could not submit review',
-          { agent, reviewID, comment, grade },
-          err
-        );
-      });
+    return this.dataSource.updateReview(args).catch((err) => {
+      return rejection(
+        'Could not submit review',
+        { agent, reviewID, comment, grade },
+        err
+      );
+    });
   }
 
   @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)

@@ -51,10 +51,10 @@ export const QuestionFormShell = withConfirm(
         config: values.config ? JSON.stringify(values.config) : undefined,
       });
 
-      if (updateQuestion.question) {
+      if (updateQuestion) {
         onUpdated?.({
           ...question,
-          ...updateQuestion.question,
+          ...updateQuestion,
         });
         closeMe?.();
       }
@@ -66,8 +66,8 @@ export const QuestionFormShell = withConfirm(
           const { deleteQuestion } = await api().deleteQuestion({
             questionId: question.id,
           });
-          if (deleteQuestion.question) {
-            onDeleted?.(deleteQuestion.question);
+          if (deleteQuestion) {
+            onDeleted?.(deleteQuestion);
             closeMe?.();
           }
         },

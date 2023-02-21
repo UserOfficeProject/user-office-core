@@ -78,28 +78,25 @@ const genericTemplateBasisPreSubmit =
         title: title,
         genericTemplateId: genericTemplate.id,
       });
-      if (result.updateGenericTemplate.genericTemplate) {
+      if (result.updateGenericTemplate) {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-          itemWithQuestionary: result.updateGenericTemplate.genericTemplate,
+          itemWithQuestionary: result.updateGenericTemplate,
         });
       }
     } else {
-      const result = await api.createGenericTemplate({
+      const { createGenericTemplate } = await api.createGenericTemplate({
         title: title,
         templateId: state.questionary.templateId,
         proposalPk: genericTemplate.proposalPk,
         questionId: genericTemplate.questionId,
       });
 
-      if (result.createGenericTemplate.genericTemplate) {
-        dispatch({
-          type: 'ITEM_WITH_QUESTIONARY_CREATED',
-          itemWithQuestionary: result.createGenericTemplate.genericTemplate,
-        });
-        returnValue =
-          result.createGenericTemplate.genericTemplate.questionaryId;
-      }
+      dispatch({
+        type: 'ITEM_WITH_QUESTIONARY_CREATED',
+        itemWithQuestionary: createGenericTemplate,
+      });
+      returnValue = createGenericTemplate.questionaryId;
     }
 
     return returnValue;

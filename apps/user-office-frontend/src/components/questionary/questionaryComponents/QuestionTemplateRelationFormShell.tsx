@@ -72,23 +72,22 @@ export const QuestionTemplateRelationFormShell = (
         dependenciesOperator: values.dependenciesOperator,
       })
       .then((data) => {
-        if (data.updateQuestionTemplateRelationSettings.template) {
-          props.onUpdated?.(
-            data.updateQuestionTemplateRelationSettings.template
-          );
+        if (data.updateQuestionTemplateRelationSettings) {
+          props.onUpdated?.(data.updateQuestionTemplateRelationSettings);
           props.closeMe?.();
         }
       });
   };
 
   const deleteHandler = async () => {
-    const result = await api().deleteQuestionTemplateRelation({
-      templateId: props.template.templateId,
-      questionId: props.questionRel.question.id,
-    });
+    const { deleteQuestionTemplateRelation } =
+      await api().deleteQuestionTemplateRelation({
+        templateId: props.template.templateId,
+        questionId: props.questionRel.question.id,
+      });
 
-    if (result.deleteQuestionTemplateRelation.template) {
-      props.onDeleted?.(result.deleteQuestionTemplateRelation.template);
+    if (deleteQuestionTemplateRelation) {
+      props.onDeleted?.(deleteQuestionTemplateRelation);
       props.closeMe?.();
     }
   };

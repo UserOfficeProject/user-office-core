@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { AllocationTimeUnits } from '../../models/Call';
-import { CallResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Call } from '../types/Call';
 
 @InputType()
 export class CreateCallInput {
@@ -23,6 +22,9 @@ export class CreateCallInput {
 
   @Field()
   public endCall: Date;
+
+  @Field(() => Date, { nullable: true })
+  public endCallInternal?: Date;
 
   @Field()
   public startReview: Date;
@@ -90,15 +92,12 @@ export class CreateCallInput {
 
 @Resolver()
 export class CreateCallMutation {
-  @Mutation(() => CallResponseWrap)
+  @Mutation(() => Call)
   createCall(
     @Arg('createCallInput')
     createCallInput: CreateCallInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.call.create(context.user, createCallInput),
-      CallResponseWrap
-    );
+    return context.mutations.call.create(context.user, createCallInput);
   }
 }

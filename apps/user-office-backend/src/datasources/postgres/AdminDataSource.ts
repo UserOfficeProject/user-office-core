@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Page } from '../../models/Admin';
@@ -11,6 +12,7 @@ import { Permissions } from '../../models/Permissions';
 import { Settings } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
+import { CreateInstitutionsArgs } from '../../resolvers/mutations/CreateInstitutionsMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
@@ -67,19 +69,14 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!institutionRecord) {
-      throw new Error(`Could not update institution with id:${institution.id}`);
+      return null;
     }
 
-    return {
-      id: institutionRecord.institution_id,
-      name: institutionRecord.institution,
-      country: institutionRecord.country_id,
-      verified: institutionRecord.verified,
-    };
+    return createInstitutionObject(institutionRecord);
   }
 
   async createInstitution(
-    institution: Institution
+    institution: CreateInstitutionsArgs
   ): Promise<Institution | null> {
     const [institutionRecord]: InstitutionRecord[] = await database
       .insert({
@@ -91,18 +88,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!institutionRecord) {
-      throw new Error('Could not create call');
+      return null;
     }
 
-    return {
-      id: institutionRecord.institution_id,
-      name: institutionRecord.institution,
-      country: institutionRecord.country_id,
-      verified: institutionRecord.verified,
-    };
+    return createInstitutionObject(institutionRecord);
   }
 
-  async deleteInstitution(id: number): Promise<Institution> {
+  async deleteInstitution(id: number): Promise<Institution | null> {
     const [institutionRecord]: InstitutionRecord[] = await database(
       'institutions'
     )
@@ -112,15 +104,10 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!institutionRecord) {
-      throw new Error(`Could not delete institution with id:${id}`);
+      return null;
     }
 
-    return {
-      id: institutionRecord.institution_id,
-      name: institutionRecord.institution,
-      country: institutionRecord.country_id,
-      verified: institutionRecord.verified,
-    };
+    return createInstitutionObject(institutionRecord);
   }
 
   async get(id: number): Promise<string | null> {
@@ -170,7 +157,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!pagetextRecord) {
-      throw new Error(`Could not update page with id:${id}`);
+      throw new GraphQLError(`Could not update page with id:${id}`);
     }
 
     return createPageObject(pagetextRecord);
@@ -202,14 +189,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         }
       })
       .then((intDB: InstitutionRecord[]) =>
-        intDB.map((int) => {
-          return {
-            id: int.institution_id,
-            name: int.institution,
-            country: int.country_id,
-            verified: int.verified,
-          };
-        })
+        intDB.map((int) => createInstitutionObject(int))
       );
   }
 
@@ -219,15 +199,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('institutions')
       .where('institution_id', id)
       .first()
-      .then(
-        (int: InstitutionRecord) =>
-          new Institution(
-            int.institution_id,
-            int.institution,
-            int.country_id,
-            int.verified
-          )
-      );
+      .then((int?: InstitutionRecord) => {
+        if (!int) {
+          return null;
+        }
+
+        return createInstitutionObject(int);
+      });
   }
 
   async getInstitutionUsers(id: number): Promise<BasicUserDetails[]> {
@@ -308,7 +286,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         });
     }
 
-    logger.logInfo('Applying patches finished', {});
+    logger.logInfo('Applying patches finished', { timestamp: new Date() });
 
     return log.join('\n');
   }
@@ -378,6 +356,18 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
+  async createSetting(setting: Settings): Promise<Settings> {
+    return database
+      .insert({
+        settings_id: setting.id,
+        settings_value: setting.settingsValue,
+        description: setting.description,
+      })
+      .into('settings')
+      .returning('*')
+      .then((settings: SettingsRecord[]) => createSettingsObject(settings[0]));
+  }
+
   async getSettings(): Promise<Settings[]> {
     return database
       .select()
@@ -387,13 +377,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
-  async getSetting(id: SettingsId): Promise<Settings> {
+  async getSetting(id: SettingsId): Promise<Settings | null> {
     return database
       .select()
       .from('settings')
-      .where('setting_id', id)
+      .where('settings_id', id)
       .first()
-      .then((setting: SettingsRecord) => createSettingsObject(setting));
+      .then((setting: SettingsRecord) =>
+        setting ? createSettingsObject(setting) : null
+      );
   }
 
   async getTokenAndPermissionsById(
@@ -405,7 +397,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .where('access_token_id', accessTokenId);
 
     if (!permissionRules) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not find permission rules for access token key: ${accessTokenId}`
       );
     }
@@ -449,7 +441,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!permissionRules) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not insert permission rules with access token key:${accessTokenId}`
       );
     }
@@ -476,7 +468,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!permissionRules) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not update permission rules with access token key: ${args.accessTokenId}`
       );
     }
@@ -494,6 +486,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   ): Promise<Settings> {
     const { settingsId, description, settingsValue } = updatedSettingsInput;
 
+    const setting = await this.getSetting(settingsId);
+    if (!setting) {
+      await this.createSetting({
+        id: settingsId as SettingsId,
+        settingsValue: '',
+        description: '',
+      });
+    }
+
     return database('settings')
       .update({ settings_value: settingsValue, description: description })
       .where('settings_id', settingsId)
@@ -510,7 +511,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!apiAccessTokenRecord) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not delete api access token with id: ${accessTokenId}`
       );
     }
@@ -527,7 +528,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .where('institution_id', args.institutionIdFrom);
 
     if (!institutionFrom) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not find institution to merge with id: ${args.institutionIdFrom}`
       );
     }
@@ -538,7 +539,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .where('institution_id', args.institutionIdInto);
 
     if (!institutionInto) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not find institution with id: ${args.institutionIdInto}`
       );
     }
@@ -557,7 +558,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         return createInstitutionObject(institutionInto);
       })
       .catch((e) => {
-        throw new Error(`Failed to merge institutions: ${e}`);
+        throw new GraphQLError(`Failed to merge institutions: ${e}`);
       });
   }
 }

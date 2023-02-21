@@ -48,7 +48,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   }) as Instrument[];
 
   const onAssignButtonClick = async () => {
-    const assignInstrumentToCallResult = await api({
+    await api({
       toastSuccessMessage: 'Instrument/s assigned successfully!',
     }).assignInstrumentsToCall({
       callId,
@@ -57,9 +57,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
       ),
     });
 
-    if (!assignInstrumentToCallResult.assignInstrumentsToCall.rejection) {
-      assignInstrumentsToCall(selectedInstruments);
-    }
+    assignInstrumentsToCall(selectedInstruments);
   };
 
   return (

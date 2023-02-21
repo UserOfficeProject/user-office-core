@@ -3,7 +3,7 @@ import {
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../models/Instrument';
-import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { ProposalPks } from '../models/Proposal';
 import { BasicUserDetails } from '../models/User';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
@@ -28,7 +28,7 @@ export interface InstrumentDataSource {
   assignProposalsToInstrument(
     proposalPks: number[],
     instrumentId: number
-  ): Promise<ProposalPksWithNextStatus>;
+  ): Promise<ProposalPks>;
   removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean>;
   assignScientistsToInstrument(
     scientistIds: number[],

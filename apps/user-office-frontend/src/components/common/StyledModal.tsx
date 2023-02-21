@@ -13,6 +13,8 @@ const boxStyle = {
   border: 'none',
   boxShadow: '4',
   padding: 3,
+  paddingTop: 4,
+  borderRadius: '5px',
   maxHeight: '100%',
   overflowY: 'auto',
 };

@@ -12,11 +12,6 @@ mutation updateSEP(
     numberRatingsRequired: $numberRatingsRequired
     active: $active
   ) {
-    sep {
-      id
-    }
-    rejection {
-      ...rejection
-    }
+    id
   }
 }

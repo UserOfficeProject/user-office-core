@@ -17,7 +17,7 @@ import { Visit, VisitStatus } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
-import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistration';
+import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistrationMutation';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { UserAuthorization } from './../auth/UserAuthorization';
 

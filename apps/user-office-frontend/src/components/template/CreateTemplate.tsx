@@ -3,7 +3,6 @@ import Typography from '@mui/material/Typography';
 import { createTemplateValidationSchema } from '@user-office-software/duo-validation/lib/Template';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
-import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
@@ -14,7 +13,6 @@ const CreateTemplate = (props: {
   groupId: TemplateGroupId;
 }) => {
   const { onComplete, groupId } = props;
-  const { enqueueSnackbar } = useSnackbar();
   const { api } = useDataApiWithFeedback();
 
   return (
@@ -28,17 +26,11 @@ const CreateTemplate = (props: {
           description: '',
         }}
         onSubmit={async (values): Promise<void> => {
-          const result = await api().createTemplate({ ...values, groupId });
-          const {
-            createTemplate: { template, rejection },
-          } = result;
-          if (!template) {
-            enqueueSnackbar(rejection?.reason ?? 'Unknown error', {
-              variant: 'error',
-            });
-          } else {
-            onComplete(template);
-          }
+          const { createTemplate } = await api().createTemplate({
+            ...values,
+            groupId,
+          });
+          onComplete(createTemplate);
         }}
         validationSchema={createTemplateValidationSchema}
       >

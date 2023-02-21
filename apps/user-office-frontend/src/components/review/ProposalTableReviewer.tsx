@@ -6,17 +6,15 @@ import Visibility from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
-import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ReviewerFilter,
   ReviewStatus,
-  SepAssignment,
   UserWithReviewsQuery,
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -81,7 +79,6 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
   confirm,
 }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
-  const { currentAssignment } = useContext(ReviewAndAssignmentContext);
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { api } = useDataApiWithFeedback();
@@ -213,19 +210,25 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     </>
   );
 
-  const updateView = () => {
-    if (currentAssignment) {
-      const currentReview = (currentAssignment as SepAssignment).review;
+  const updateView = async (reviewId?: number | null) => {
+    if (!reviewId) {
+      return;
+    }
 
+    const { review: freshReview } = await api().getReview({
+      reviewId: reviewId,
+    });
+
+    if (freshReview) {
       const userDataUpdated = {
         ...userData,
         reviews: userData?.reviews.map((review) => {
-          if (review.id === currentReview?.id) {
+          if (review.id === freshReview.id) {
             return {
               ...review,
-              grade: currentReview.grade,
-              status: currentReview.status,
-              comment: currentReview.comment,
+              grade: freshReview.grade,
+              status: freshReview.status,
+              comment: freshReview.comment,
             };
           } else {
             return review;
@@ -290,37 +293,33 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         reviewId: proposal.reviewId,
       }));
 
-      const result = await api({
+      await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} review submitted successfully!`,
       }).submitProposalsReview({ proposals: submitProposalReviewsInput });
 
-      const isError = !!result.submitProposalsReview.rejection;
+      setUserData(
+        (usersData) =>
+          ({
+            ...usersData,
+            reviews: usersData?.reviews.map((review) => {
+              const submittedReview = submitProposalReviewsInput.find(
+                (submittedReviewItem) =>
+                  submittedReviewItem.reviewId === review.id
+              );
 
-      if (!isError) {
-        setUserData(
-          (usersData) =>
-            ({
-              ...usersData,
-              reviews: usersData?.reviews.map((review) => {
-                const submittedReview = submitProposalReviewsInput.find(
-                  (submittedReviewItem) =>
-                    submittedReviewItem.reviewId === review.id
-                );
-
-                if (review.id === submittedReview?.reviewId) {
-                  return {
-                    ...review,
-                    status: ReviewStatus.SUBMITTED,
-                  };
-                } else {
-                  return {
-                    ...review,
-                  };
-                }
-              }),
-            } as UserWithReviewsQuery['me'])
-        );
-      }
+              if (review.id === submittedReview?.reviewId) {
+                return {
+                  ...review,
+                  status: ReviewStatus.SUBMITTED,
+                };
+              } else {
+                return {
+                  ...review,
+                };
+              }
+            }),
+          } as UserWithReviewsQuery['me'])
+      );
     }
   };
 
@@ -402,8 +401,8 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         title={`Proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={() => {
+          updateView(urlQueryParams.reviewModal);
           setUrlQueryParams({ reviewModal: undefined, modalTab: undefined });
-          updateView();
         }}
       >
         <ProposalReviewContent

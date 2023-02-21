@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import { logger } from '@user-office-software/duo-logger';
 import { fileUploadQuestionValidationSchema } from '@user-office-software/duo-validation';
 import NodeClam from 'clamscan';
+import { GraphQLError } from 'graphql';
 import fileTypeInfo from 'magic-bytes.js';
 import { GuessedFile } from 'magic-bytes.js/dist/model/tree';
 import { createReader } from 'muhammara';
@@ -108,7 +109,7 @@ export const fileUploadDefinition: Question = {
         }
 
       default:
-        throw new Error(
+        throw new GraphQLError(
           `Unsupported comparator for Boolean ${filter.compareOperator}`
         );
     }

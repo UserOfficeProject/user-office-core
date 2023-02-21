@@ -18,7 +18,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -37,6 +37,7 @@ import {
   InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
 import { sortByRankOrAverageScore } from '../utils/mathFunctions';
+import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
 export default class InstrumentMutations {
@@ -58,16 +59,13 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: CreateInstrumentArgs
   ): Promise<Instrument | Rejection> {
-    return this.dataSource
-      .create(args)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not create instrument',
-          { agent, shortCode: args.shortCode },
-          error
-        );
-      });
+    return this.dataSource.create(args).catch((error) => {
+      return rejection(
+        'Could not create instrument',
+        { agent, shortCode: args.shortCode },
+        error
+      );
+    });
   }
 
   @ValidateArgs(updateInstrumentValidationSchema)
@@ -76,16 +74,13 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: UpdateInstrumentArgs
   ): Promise<Instrument | Rejection> {
-    return this.dataSource
-      .update(args)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not update instrument',
-          { agent, instrumentId: args.id },
-          error
-        );
-      });
+    return this.dataSource.update(args).catch((error) => {
+      return rejection(
+        'Could not update instrument',
+        { agent, instrumentId: args.id },
+        error
+      );
+    });
   }
 
   @EventBus(Event.INSTRUMENT_DELETED)
@@ -95,16 +90,13 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<Instrument | Rejection> {
-    return this.dataSource
-      .delete(args.id)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not delete instrument',
-          { agent, instrumentId: args.id },
-          error
-        );
-      });
+    return this.dataSource.delete(args.id).catch((error) => {
+      return rejection(
+        'Could not delete instrument',
+        { agent, instrumentId: args.id },
+        error
+      );
+    });
   }
 
   async checkIfProposalsAreOnSameCallAsInstrument(
@@ -137,7 +129,7 @@ export default class InstrumentMutations {
   async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
-  ): Promise<ProposalPksWithNextStatus | Rejection> {
+  ): Promise<ProposalPks | Rejection> {
     const allProposalsAreOnSameCallAsInstrument =
       await this.checkIfProposalsAreOnSameCallAsInstrument(args);
 
@@ -190,16 +182,19 @@ export default class InstrumentMutations {
       }
     }
 
-    return this.dataSource
-      .assignProposalsToInstrument(proposalPks, args.instrumentId)
-      .then((result) => result)
-      .catch((error) => {
-        return rejection(
-          'Could not assign proposal/s to instrument',
-          { agent, args },
-          error
-        );
+    const result = await this.dataSource.assignProposalsToInstrument(
+      proposalPks,
+      args.instrumentId
+    );
+
+    if (result.proposalPks.length !== proposalPks.length) {
+      return rejection('Could not assign proposal/s to instrument', {
+        agent,
+        args,
       });
+    }
+
+    return result;
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -209,7 +204,6 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeProposalsFromInstrument(args.proposalPks)
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not remove assigned proposal/s from instrument',
@@ -221,13 +215,12 @@ export default class InstrumentMutations {
 
   @ValidateArgs(assignScientistsToInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async assignScientsitsToInstrument(
+  async assignScientistsToInstrument(
     agent: UserWithRole | null,
     args: AssignScientistsToInstrumentArgs
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .assignScientistsToInstrument(args.scientistIds, args.instrumentId)
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not assign scientist/s to instrument',
@@ -245,7 +238,6 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeScientistFromInstrument(args.scientistId, args.instrumentId)
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not remove assigned scientist/s from instrument',
@@ -267,7 +259,6 @@ export default class InstrumentMutations {
         args.instrumentId,
         args.availabilityTime
       )
-      .then((result) => result)
       .catch((error) => {
         return rejection(
           'Could not set availability time on instrument',
@@ -289,6 +280,7 @@ export default class InstrumentMutations {
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent, args.sepId))
     ) {
       return rejection('Submitting instrument is not permitted', {
+        code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
         args,
       });
@@ -342,7 +334,6 @@ export default class InstrumentMutations {
 
     return this.dataSource
       .submitInstrument(submittedInstrumentProposalPks, args.instrumentId)
-      .then((result) => result)
       .catch((error) => {
         return rejection('Could not submit instrument', { agent, args }, error);
       });

@@ -35,28 +35,28 @@ context('Samples tests', () => {
       name: sampleTemplateName,
       groupId: TemplateGroupId.SAMPLE,
     }).then((result) => {
-      if (result.createTemplate.template) {
-        createdSampleTemplateId = result.createTemplate.template.templateId;
+      if (result.createTemplate) {
+        createdSampleTemplateId = result.createTemplate.templateId;
         cy.createTopic({
           templateId: createdSampleTemplateId,
           sortOrder: 1,
         }).then((topicResult) => {
-          if (topicResult.createTopic.template) {
+          if (topicResult.createTopic) {
             const topicId =
-              topicResult.createTopic.template.steps[
-                topicResult.createTopic.template.steps.length - 1
+              topicResult.createTopic.steps[
+                topicResult.createTopic.steps.length - 1
               ].topic.id;
             cy.createQuestion({
               dataType: DataType.TEXT_INPUT,
               categoryId: TemplateCategoryId.SAMPLE_DECLARATION,
             }).then((questionResult) => {
-              if (questionResult.createQuestion.question) {
+              if (questionResult.createQuestion) {
                 cy.updateQuestion({
-                  id: questionResult.createQuestion.question.id,
+                  id: questionResult.createQuestion.id,
                   question: sampleQuestion,
                 });
                 cy.createQuestionTemplateRelation({
-                  questionId: questionResult.createQuestion.question.id,
+                  questionId: questionResult.createQuestion.id,
                   sortOrder: 0,
                   templateId: createdSampleTemplateId,
                   topicId: topicId,
@@ -69,24 +69,23 @@ context('Samples tests', () => {
           groupId: TemplateGroupId.PROPOSAL,
           name: proposalTemplateName,
         }).then((result) => {
-          if (result.createTemplate.template) {
-            const templateId = result.createTemplate.template.templateId;
+          if (result.createTemplate) {
+            const templateId = result.createTemplate.templateId;
             cy.createTopic({
               templateId: templateId,
               sortOrder: 1,
             }).then((topicResult) => {
-              if (topicResult.createTopic.template) {
+              if (topicResult.createTopic) {
                 const topicId =
-                  topicResult.createTopic.template.steps[
-                    topicResult.createTopic.template.steps.length - 1
+                  topicResult.createTopic.steps[
+                    topicResult.createTopic.steps.length - 1
                   ].topic.id;
                 cy.createQuestion({
                   dataType: DataType.SAMPLE_DECLARATION,
                   categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                 }).then((questionResult) => {
                   if (questionResult.createQuestion.question) {
-                    createdSampleQuestionId =
-                      questionResult.createQuestion.question.id;
+                    createdSampleQuestionId = questionResult.createQuestion.id;
 
                     cy.updateQuestion({
                       id: createdSampleQuestionId,
@@ -107,8 +106,7 @@ context('Samples tests', () => {
                   categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
                   dataType: DataType.BOOLEAN,
                 }).then((questionResult) => {
-                  const createdQuestion =
-                    questionResult.createQuestion.question;
+                  const createdQuestion = questionResult.createQuestion;
                   if (createdQuestion) {
                     cy.updateQuestion({
                       id: createdQuestion.id,
@@ -139,16 +137,25 @@ context('Samples tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB(true);
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow.proposalWorkflow) {
-        createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
-      }
+    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+    // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
     });
+
+    cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Samples basic tests', () => {
+    beforeEach(() => {
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.id;
+        }
+      });
+    });
+
     it('Should be able to create proposal template with sample', () => {
       cy.login('officer');
       cy.visit('/');
@@ -232,6 +239,8 @@ context('Samples tests', () => {
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
       cy.get('[data-cy=title] input').type(proposalTitle);
 
       cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);
@@ -303,6 +312,8 @@ context('Samples tests', () => {
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
       cy.get('[data-cy=title] input').type(proposalTitle);
 
       cy.get('[data-cy=abstract] textarea').first().type(proposalTitle);
@@ -398,11 +409,17 @@ context('Samples tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.id;
+        }
+      });
+
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          createdProposalPk = result.createProposal.proposal.primaryKey;
-          createdProposalId = result.createProposal.proposal.proposalId;
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId = result.createProposal.proposalId;
 
           cy.updateProposal({
             proposalPk: createdProposalPk,
@@ -412,6 +429,8 @@ context('Samples tests', () => {
           });
         }
       });
+
+      cy.login('officer');
     });
 
     it('Officer should able to delete proposal with sample', () => {
@@ -421,8 +440,6 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Proposals').click();
@@ -446,8 +463,6 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Proposals').click();
@@ -549,10 +564,7 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-
       cy.submitProposal({ proposalPk: createdProposalPk });
-
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Sample safety').click();
@@ -615,7 +627,6 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Sample safety').click();
@@ -643,12 +654,19 @@ context('Samples tests', () => {
         questionId: createdSampleQuestionId,
         title: sampleTitle,
       });
-      cy.login('officer');
       cy.visit('/');
 
       cy.contains('Sample safety').click();
 
-      cy.request('GET', '/download/pdf/sample/1').then((response) => {
+      const token = window.localStorage.getItem('token');
+
+      cy.request({
+        url: '/download/pdf/sample/1',
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }).then((response) => {
         expect(response.headers['content-type']).to.be.equal('application/pdf');
         expect(response.status).to.be.equal(200);
       });

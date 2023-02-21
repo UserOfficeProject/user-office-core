@@ -47,9 +47,15 @@ const UnitTable: React.FC = () => {
   );
 
   const deleteUnit = async (id: string | number) => {
-    return await api({ toastSuccessMessage: 'Unit deleted successfully' })
-      .deleteUnit({ id: id as string })
-      .then((resp) => resp.deleteUnit.rejection === null);
+    try {
+      await api({
+        toastSuccessMessage: 'Unit deleted successfully',
+      }).deleteUnit({ id: id as string });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   return (

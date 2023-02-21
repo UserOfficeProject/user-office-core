@@ -9,10 +9,5 @@ mutation deleteProposalWorkflowStatus(
       proposalWorkflowId: $proposalWorkflowId
       sortOrder: $sortOrder
     }
-  ) {
-    isSuccess
-    rejection {
-      ...rejection
-    }
-  }
+  )
 }
