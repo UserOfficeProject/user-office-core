@@ -89,6 +89,11 @@ export default {
       text: 'Selection from options question from seeds',
       type: DataType.SELECTION_FROM_OPTIONS,
     },
+    dynamicMultipleChoice: {
+      id: 'dynamic_multiple_choice_question',
+      text: 'Dynamic multiple choice question from seeds',
+      type: DataType.DYNAMIC_MULTIPLE_CHOICE,
+    },
     textInput: {
       id: 'text_input_question',
       text: 'Text input question from seeds',
@@ -146,6 +151,9 @@ export default {
         value: {},
       },
       selectionFromOptions: {
+        value: ['One'],
+      },
+      dynamicMultipleChoice: {
         value: ['One'],
       },
       textInput: {
