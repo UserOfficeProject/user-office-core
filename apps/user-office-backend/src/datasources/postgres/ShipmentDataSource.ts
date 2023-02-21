@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 
 import { Shipment } from '../../models/Shipment';
 import { AddSamplesToShipmentArgs } from '../../resolvers/mutations/AddSamplesShipmentMutation';
@@ -30,7 +31,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
             questionary_id,
             scheduled_event_id,
           });
-          throw new Error('Failed to insert shipment');
+          throw new GraphQLError('Failed to insert shipment');
         }
 
         return createShipmentObject(records[0]);
@@ -114,7 +115,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       .then((records: ShipmentRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not update shipment', { args });
-          throw new Error('Could not update shipment');
+          throw new GraphQLError('Could not update shipment');
         }
 
         return createShipmentObject(records[0]);
@@ -128,7 +129,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       .then((records: ShipmentRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not delete shipment', { shipmentId });
-          throw new Error('Could not delete shipment');
+          throw new GraphQLError('Could not delete shipment');
         }
 
         return createShipmentObject(records[0]);
@@ -143,7 +144,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
 
     if (!shipment) {
       logger.logError('Shipment does not exist', { shipmentId, sampleIds });
-      throw new Error('Shipment does not exist');
+      throw new GraphQLError('Shipment does not exist');
     }
 
     await database('shipments_has_samples')

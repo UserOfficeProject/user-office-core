@@ -78,6 +78,10 @@ async function enableDefaultStfcFeatures() {
     settingsValue: process.env.EXTERNAL_AUTH_LOGIN_URL,
   });
   await db.updateSettings({
+    settingsId: SettingsId.EXTERNAL_AUTH_LOGOUT_URL,
+    settingsValue: process.env.EXTERNAL_AUTH_LOGOUT_URL,
+  });
+  await db.updateSettings({
     settingsId: SettingsId.PROFILE_PAGE_LINK,
     settingsValue: process.env.PROFILE_PAGE_LINK,
   });

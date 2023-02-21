@@ -2,6 +2,7 @@ mutation createCall(
   $shortCode: String!
   $startCall: DateTime!
   $endCall: DateTime!
+  $endCallInternal: DateTime
   $startReview: DateTime!
   $endReview: DateTime!
   $startSEPReview: DateTime
@@ -28,6 +29,7 @@ mutation createCall(
       shortCode: $shortCode
       startCall: $startCall
       endCall: $endCall
+      endCallInternal: $endCallInternal
       startReview: $startReview
       endReview: $endReview
       startSEPReview: $startSEPReview
@@ -50,11 +52,6 @@ mutation createCall(
       seps: $seps
     }
   ) {
-    rejection {
-      ...rejection
-    }
-    call {
-      ...call
-    }
+    ...call
   }
 }

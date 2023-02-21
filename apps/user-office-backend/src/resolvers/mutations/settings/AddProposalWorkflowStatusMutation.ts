@@ -9,9 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalWorkflowConnection } from '../../../models/ProposalWorkflowConnections';
-import { ProposalWorkflowConnectionResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { ProposalWorkflowConnection } from '../../types/ProposalWorkflowConnection';
 
 @InputType()
 export class AddProposalWorkflowStatusInput
@@ -41,18 +39,15 @@ export class AddProposalWorkflowStatusInput
 
 @Resolver()
 export class AddProposalWorkflowStatusMutation {
-  @Mutation(() => ProposalWorkflowConnectionResponseWrap)
+  @Mutation(() => ProposalWorkflowConnection)
   async addProposalWorkflowStatus(
     @Ctx() context: ResolverContext,
     @Arg('newProposalWorkflowStatusInput')
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
   ) {
-    return wrapResponse(
-      context.mutations.proposalSettings.addProposalWorkflowStatus(
-        context.user,
-        newProposalWorkflowStatusInput
-      ),
-      ProposalWorkflowConnectionResponseWrap
+    return context.mutations.proposalSettings.addProposalWorkflowStatus(
+      context.user,
+      newProposalWorkflowStatusInput
     );
   }
 }

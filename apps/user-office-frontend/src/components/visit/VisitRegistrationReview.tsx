@@ -60,22 +60,18 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
           onClick={() =>
             confirm(
               async () => {
-                const result = await api().updateVisitRegistration({
-                  visitId: state.registration.visitId,
-                  isRegistrationSubmitted: true,
-                });
-                if (!result.updateVisitRegistration.registration) {
-                  return;
-                }
+                const { updateVisitRegistration } =
+                  await api().updateVisitRegistration({
+                    visitId: state.registration.visitId,
+                    isRegistrationSubmitted: true,
+                  });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary:
-                    result.updateVisitRegistration.registration,
+                  itemWithQuestionary: updateVisitRegistration,
                 });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary:
-                    result.updateVisitRegistration.registration,
+                  itemWithQuestionary: updateVisitRegistration,
                 });
               },
               {

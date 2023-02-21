@@ -99,7 +99,7 @@ describe('Test Instrument Mutations', () => {
 
   test('A logged in user officer can assign scientist/s to instrument', () => {
     return expect(
-      instrumentMutations.assignScientsitsToInstrument(
+      instrumentMutations.assignScientistsToInstrument(
         dummyUserOfficerWithRole,
         {
           scientistIds: [1, 2],

@@ -87,8 +87,8 @@ const createUsers = async () => {
       faker.commerce.department(),
       faker.name.jobTitle(),
       faker.internet.email(),
-      faker.phone.phoneNumber(),
-      faker.phone.phoneNumber()
+      faker.phone.number(),
+      faker.phone.number()
     );
     userDataSource.addUserRole({ userID: user.id, roleID: UserRole.USER });
     if (Math.random() > 0.8) {
@@ -152,6 +152,7 @@ const createCalls = async () => {
       startSEPReview: faker.date.past(1),
       endNotify: faker.date.future(1),
       endCall: faker.date.future(1),
+      endCallInternal: faker.date.future(1),
       endCycle: faker.date.future(1),
       endReview: faker.date.future(1),
       endSEPReview: faker.date.future(1),

@@ -89,6 +89,11 @@ export default {
       text: 'Selection from options question from seeds',
       type: DataType.SELECTION_FROM_OPTIONS,
     },
+    dynamicMultipleChoice: {
+      id: 'dynamic_multiple_choice_question',
+      text: 'Dynamic multiple choice question from seeds',
+      type: DataType.DYNAMIC_MULTIPLE_CHOICE,
+    },
     textInput: {
       id: 'text_input_question',
       text: 'Text input question from seeds',
@@ -146,6 +151,9 @@ export default {
         value: {},
       },
       selectionFromOptions: {
+        value: ['One'],
+      },
+      dynamicMultipleChoice: {
         value: ['One'],
       },
       textInput: {
@@ -241,24 +249,27 @@ export default {
     editableSubmitted: {
       id: 14,
     },
+    editableSubmittedInternal: {
+      id: 15,
+    },
   },
   scheduledEvents: {
     upcoming: {
       id: 996,
-      startsAt: '07-01-2023 10:00',
-      endsAt: '07-01-2023 11:00',
+      startsAt: '07-01-2030 10:00',
+      endsAt: '07-01-2030 11:00',
     },
     upcomingDraft: {
-      startsAt: '07-01-2023 12:00',
-      endsAt: '07-01-2023 13:00',
+      startsAt: '07-01-2030 12:00',
+      endsAt: '07-01-2030 13:00',
     },
     ended: {
       startsAt: '07-01-2020 10:00',
       endsAt: '07-01-2020 11:00',
     },
     completed: {
-      startsAt: '07-02-2023 12:00',
-      endsAt: '07-02-2023 13:00',
+      startsAt: '07-02-2030 12:00',
+      endsAt: '07-02-2030 13:00',
     },
   },
   features: {

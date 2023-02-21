@@ -1,9 +1,7 @@
 import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalStatus } from '../../../models/ProposalStatus';
-import { ProposalStatusResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { ProposalStatus } from '../../types/ProposalStatus';
 
 @InputType()
 export class CreateProposalStatusInput implements Partial<ProposalStatus> {
@@ -19,18 +17,15 @@ export class CreateProposalStatusInput implements Partial<ProposalStatus> {
 
 @Resolver()
 export class CreateProposalStatusMutation {
-  @Mutation(() => ProposalStatusResponseWrap)
+  @Mutation(() => ProposalStatus)
   async createProposalStatus(
     @Ctx() context: ResolverContext,
     @Arg('newProposalStatusInput')
     newProposalStatusInput: CreateProposalStatusInput
   ) {
-    return wrapResponse(
-      context.mutations.proposalSettings.createProposalStatus(
-        context.user,
-        newProposalStatusInput
-      ),
-      ProposalStatusResponseWrap
+    return context.mutations.proposalSettings.createProposalStatus(
+      context.user,
+      newProposalStatusInput
     );
   }
 }

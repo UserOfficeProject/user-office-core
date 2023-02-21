@@ -1,8 +1,7 @@
 import { Arg, Ctx, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ApiAccessTokenResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { PermissionsWithAccessToken } from '../types/PermissionsWithAccessToken';
 
 @InputType()
 export class UpdateApiAccessTokenInput {
@@ -18,18 +17,15 @@ export class UpdateApiAccessTokenInput {
 
 @Resolver()
 export class UpdateApiAccessTokenMutation {
-  @Mutation(() => ApiAccessTokenResponseWrap)
+  @Mutation(() => PermissionsWithAccessToken)
   updateApiAccessToken(
     @Arg('updateApiAccessTokenInput')
     updateApiAccessTokenInput: UpdateApiAccessTokenInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.admin.updateApiAccessToken(
-        context.user,
-        updateApiAccessTokenInput
-      ),
-      ApiAccessTokenResponseWrap
+    return context.mutations.admin.updateApiAccessToken(
+      context.user,
+      updateApiAccessTokenInput
     );
   }
 }

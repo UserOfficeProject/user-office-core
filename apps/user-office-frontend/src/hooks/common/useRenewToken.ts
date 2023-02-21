@@ -14,9 +14,9 @@ export function useRenewToken() {
       const result = await api().getToken({ token });
 
       if (result.token) {
-        setRenewToken(result.token.token);
+        setRenewToken(result.token);
 
-        handleNewToken(result.token.token);
+        handleNewToken(result.token);
       }
     } catch (error) {
       // A more advanced implementation would handle the error case

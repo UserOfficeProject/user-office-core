@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -30,6 +31,11 @@ export default class UserQueries {
   @Authorized([Roles.USER_OFFICER])
   async get(agent: UserWithRole | null, id: number) {
     return this.dataSource.getUser(id);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getByOidcSub(agent: UserWithRole | null, oidcSub: string) {
+    return this.dataSource.getByOIDCSub(oidcSub);
   }
 
   @Authorized()
@@ -157,7 +163,7 @@ export default class UserQueries {
       );
 
       if (!('user' in payload) && !('accessTokenId' in payload)) {
-        throw new Error('Unknown or malformed token');
+        throw new GraphQLError('Unknown or malformed token');
       }
 
       return {

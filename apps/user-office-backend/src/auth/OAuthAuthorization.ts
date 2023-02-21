@@ -5,6 +5,7 @@ import {
   ValidTokenSet,
   ValidUserInfo,
 } from '@user-office-software/openid';
+import { GraphQLError } from 'graphql';
 import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';
 
@@ -13,7 +14,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { rejection, Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { NonNullableField } from '../utils/helperFunctions';
+import { NonNullableField } from '../utils/utilTypes';
 import { UserAuthorization } from './UserAuthorization';
 
 type ValidUser = NonNullableField<
@@ -30,7 +31,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     if (OpenIdClient.hasConfig()) {
       this.initialize();
     } else {
-      throw new Error(
+      throw new GraphQLError(
         'OpenIdClient has no configuration. Please check your environment variables!'
       );
     }
@@ -185,7 +186,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         authorizer: this.constructor.name,
         user,
       });
-      throw new Error('Invalid user');
+      throw new GraphQLError('Invalid user');
     }
 
     return user as ValidUser;

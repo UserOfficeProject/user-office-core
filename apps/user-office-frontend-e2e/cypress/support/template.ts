@@ -14,18 +14,26 @@ import {
   CreateTemplateMutation,
   CreateTemplateMutationVariables,
   CreateTopicMutation,
+  UpdateTopicMutation,
   CreateTopicMutationVariables,
   UpdateQuestionMutation,
   UpdateQuestionMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
+  UpdateTopicMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
 
 const navigateToTemplatesSubmenu = (submenuName: string) => {
-  cy.contains('Templates').click();
-  cy.get(`[aria-label='${submenuName}']`).children().first().click();
+  cy.get('body').then(($body) => {
+    if ($body.find(`[aria-label='${submenuName}']`).length) {
+      cy.get(`[aria-label='${submenuName}']`).children().first().click();
+    } else {
+      cy.get('[aria-label="Templates"]').click();
+      cy.get(`[aria-label='${submenuName}']`).children().first().click();
+    }
+  });
 };
 
 const createTopic = (
@@ -33,6 +41,15 @@ const createTopic = (
 ): Cypress.Chainable<CreateTopicMutation> => {
   const api = getE2EApi();
   const request = api.createTopic(createTopicInput);
+
+  return cy.wrap(request);
+};
+
+const updateTopic = (
+  updateTopicInput: UpdateTopicMutationVariables
+): Cypress.Chainable<UpdateTopicMutation> => {
+  const api = getE2EApi();
+  const request = api.updateTopic(updateTopicInput);
 
   return cy.wrap(request);
 };
@@ -315,6 +332,53 @@ function createMultipleChoiceQuestion(
   closeQuestionsMenu();
 }
 
+function createDynamicMultipleChoiceQuestion(
+  question: string,
+  options?: {
+    key?: string;
+    url?: string;
+    firstTopic?: boolean;
+    isMultipleSelect?: boolean;
+    type?: 'radio' | 'dropdown';
+  }
+) {
+  openQuestionsMenu({
+    firstTopic: options?.firstTopic,
+  });
+
+  cy.contains('Add Dynamic Multiple choice').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
+
+  cy.get('[data-cy=question]').clear().type(question);
+
+  if (options?.type === undefined || options.type === 'dropdown') {
+    cy.contains('Radio').click();
+
+    cy.contains('Dropdown').click();
+  }
+
+  if (options?.isMultipleSelect === true) {
+    cy.contains('Is multiple select').click();
+  }
+
+  if (options?.url) {
+    cy.get('[data-cy=dynamic-url]').type(options?.url);
+  }
+
+  cy.contains('Save').click({ force: true });
+
+  cy.contains(question)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+  cy.finishedLoading();
+
+  closeQuestionsMenu();
+}
+
 function createFileUploadQuestion(question: string, fileTypes: string[]) {
   openQuestionsMenu();
 
@@ -543,6 +607,7 @@ Cypress.Commands.add('createGenericTemplate', createGenericTemplate);
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 
 Cypress.Commands.add('createTopic', createTopic);
+Cypress.Commands.add('updateTopic', updateTopic);
 Cypress.Commands.add('answerTopic', answerTopic);
 
 Cypress.Commands.add('createQuestion', createQuestion);
@@ -566,6 +631,11 @@ Cypress.Commands.add('createDateQuestion', createDateQuestion);
 Cypress.Commands.add(
   'createMultipleChoiceQuestion',
   createMultipleChoiceQuestion
+);
+
+Cypress.Commands.add(
+  'createDynamicMultipleChoiceQuestion',
+  createDynamicMultipleChoiceQuestion
 );
 
 Cypress.Commands.add('createFileUploadQuestion', createFileUploadQuestion);

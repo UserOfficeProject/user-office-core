@@ -1,19 +1,18 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { VisitRegistrationResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { VisitRegistration } from '../types/VisitRegistration';
 
 @Resolver()
 export class CreateVisitRegistrationMutation {
-  @Mutation(() => VisitRegistrationResponseWrap)
+  @Mutation(() => VisitRegistration)
   createVisitRegistration(
     @Arg('visitId', () => Int) visitId: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.visit.createVisitRegistration(context.user, visitId),
-      VisitRegistrationResponseWrap
+    return context.mutations.visit.createVisitRegistration(
+      context.user,
+      visitId
     );
   }
 }

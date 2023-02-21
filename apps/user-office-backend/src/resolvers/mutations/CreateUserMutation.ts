@@ -9,9 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { isRejection } from '../../models/Rejection';
-import { UserResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { User } from '../types/User';
 
 @ArgsType()
 export class CreateUserArgs {
@@ -69,16 +67,13 @@ export class CreateUserArgs {
 
 @Resolver()
 export class CreateUserMutation {
-  @Mutation(() => UserResponseWrap)
+  @Mutation(() => User)
   async createUser(
     @Args() args: CreateUserArgs,
     @Ctx() context: ResolverContext
   ) {
     const res = await context.mutations.user.create(context.user, args);
 
-    return wrapResponse(
-      isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user),
-      UserResponseWrap
-    );
+    return res.user;
   }
 }

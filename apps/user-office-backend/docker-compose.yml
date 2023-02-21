@@ -1,18 +1,6 @@
 version: "3.1"
 
 services:
-  # used to proxy the scheduler UI FE and BE requests to the right container
-  # Scheduler FE is accessible on localhost:33000/
-  # API gateway is accessible on localhost:33000/gateway
-  scheduler-proxy:
-    image: traefik:1.7 # The official Traefik docker image
-    command: --api --docker # Enables the web UI and tells Traefik to listen to docker
-    ports:
-      - "33000:80" # The HTTP port
-      - "8080:8080" # The Web UI (enabled by --api)
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
   duo-cron-job:
     image: dmsc/duo-cron-job:develop
     environment:

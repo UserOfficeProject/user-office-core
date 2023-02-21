@@ -3,6 +3,7 @@ fragment call on Call {
   shortCode
   startCall
   endCall
+  endCallInternal
   startReview
   endReview
   startSEPReview
@@ -49,4 +50,5 @@ fragment call on Call {
   description
   submissionMessage
   isActive
+  isActiveInternal
 }

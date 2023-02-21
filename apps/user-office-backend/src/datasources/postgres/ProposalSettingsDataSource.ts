@@ -1,4 +1,5 @@
-import { Event } from '../../events/event.enum';
+import { GraphQLError } from 'graphql';
+
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
@@ -45,7 +46,7 @@ export default class PostgresProposalSettingsDataSource
       .returning(['*']);
 
     if (!addedProposalStatus) {
-      throw new Error('Could not create proposal status');
+      throw new GraphQLError('Could not create proposal status');
     }
 
     return this.createProposalStatusObject(addedProposalStatus);
@@ -91,7 +92,7 @@ export default class PostgresProposalSettingsDataSource
       .where('proposal_status_id', proposalStatus.id);
 
     if (!updatedProposalStatus) {
-      throw new Error(`ProposalStatus not found ${proposalStatus.id}`);
+      throw new GraphQLError(`ProposalStatus not found ${proposalStatus.id}`);
     }
 
     return this.createProposalStatusObject(updatedProposalStatus);
@@ -109,7 +110,7 @@ export default class PostgresProposalSettingsDataSource
       .returning('*');
 
     if (!removedProposalStatus) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not delete proposalStatus with id: ${proposalStatusId} `
       );
     }
@@ -138,7 +139,7 @@ export default class PostgresProposalSettingsDataSource
       .returning('*');
 
     if (!proposalWorkflowRecord) {
-      throw new Error('Could not create proposal status');
+      throw new GraphQLError('Could not create proposal status');
     }
 
     // NOTE: Add default DRAFT status to proposal workflow when it is created.
@@ -216,7 +217,9 @@ export default class PostgresProposalSettingsDataSource
       .where('proposal_workflow_id', proposalWorkflow.id)
       .then((records: ProposalWorkflowRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`Proposal workflow not found ${proposalWorkflow.id}`);
+          throw new GraphQLError(
+            `Proposal workflow not found ${proposalWorkflow.id}`
+          );
         }
 
         return this.createProposalWorkflowObject(records[0]);
@@ -232,7 +235,7 @@ export default class PostgresProposalSettingsDataSource
       .returning('*')
       .then((proposalWorkflow: ProposalWorkflowRecord[]) => {
         if (proposalWorkflow === undefined || proposalWorkflow.length !== 1) {
-          throw new Error(
+          throw new GraphQLError(
             `Could not delete proposal workflow with id: ${proposalWorkflowId} `
           );
         }
@@ -346,7 +349,7 @@ export default class PostgresProposalSettingsDataSource
       });
 
     if (!proposalWorkflowConnectionRecords) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not find proposal workflow connections with proposalStatusId: ${proposalStatusId}`
       );
     }
@@ -389,7 +392,7 @@ export default class PostgresProposalSettingsDataSource
         });
 
     if (!proposalWorkflowConnectionRecord) {
-      throw new Error('Could not create proposal workflow status');
+      throw new GraphQLError('Could not create proposal workflow status');
     }
 
     return this.createProposalWorkflowConnectionObject(
@@ -471,7 +474,7 @@ export default class PostgresProposalSettingsDataSource
           proposalWorkflowStatus === undefined ||
           proposalWorkflowStatus.length < 1
         ) {
-          throw new Error(
+          throw new GraphQLError(
             `Could not delete proposal workflow status with id: ${proposalWorkflowId} `
           );
         }
@@ -536,58 +539,5 @@ export default class PostgresProposalSettingsDataSource
           this.createStatusChangingEventObject(statusChangingEvent)
         );
       });
-  }
-
-  async getProposalNextStatus(proposalPk: number, event: Event) {
-    const currentProposalWorkflowConnection: ProposalWorkflowConnectionRecord =
-      await database('proposals')
-        .select(['pwc.*'])
-        .join('call', {
-          'call.call_id': 'proposals.call_id',
-        })
-        .join('proposal_workflow_connections as pwc', {
-          'pwc.proposal_workflow_id': 'call.proposal_workflow_id',
-          'pwc.proposal_status_id': 'proposals.status_id',
-        })
-        .where('proposal_pk', proposalPk)
-        .first();
-
-    if (!currentProposalWorkflowConnection) {
-      return null;
-    }
-
-    const nextProposalStatus: ProposalStatusRecord = await database(
-      'proposal_workflow_connections as pwc'
-    )
-      .select(['ps.*'])
-      .join('proposal_statuses as ps', {
-        'ps.proposal_status_id': 'pwc.proposal_status_id',
-      })
-      .join('status_changing_events as sce', {
-        'sce.proposal_workflow_connection_id':
-          'pwc.proposal_workflow_connection_id',
-      })
-      .where(
-        'pwc.proposal_status_id',
-        currentProposalWorkflowConnection.next_proposal_status_id
-      )
-      .andWhere(
-        'pwc.proposal_workflow_id',
-        currentProposalWorkflowConnection.proposal_workflow_id
-      )
-      .andWhere('sce.status_changing_event', event)
-      .first();
-
-    if (!nextProposalStatus) {
-      return null;
-    }
-
-    return new ProposalStatus(
-      nextProposalStatus.proposal_status_id,
-      nextProposalStatus.short_code,
-      nextProposalStatus.name,
-      nextProposalStatus.description,
-      nextProposalStatus.is_default
-    );
   }
 }

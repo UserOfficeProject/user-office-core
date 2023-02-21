@@ -9,8 +9,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SuccessResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class AssignScientistsToInstrumentArgs {
@@ -32,31 +30,25 @@ export class RemoveScientistFromInstrumentArgs {
 
 @Resolver()
 export class AssignScientsitsToInstrumentMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async assignScientistsToInstrument(
     @Args() args: AssignScientistsToInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.instrument.assignScientsitsToInstrument(
-        context.user,
-        args
-      ),
-      SuccessResponseWrap
+    return context.mutations.instrument.assignScientistsToInstrument(
+      context.user,
+      args
     );
   }
 
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async removeScientistFromInstrument(
     @Args() args: RemoveScientistFromInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.instrument.removeScientistFromInstrument(
-        context.user,
-        args
-      ),
-      SuccessResponseWrap
+    return context.mutations.instrument.removeScientistFromInstrument(
+      context.user,
+      args
     );
   }
 }

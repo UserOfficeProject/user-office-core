@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -30,7 +31,7 @@ export default class PostgresGenericTemplateDataSource
         'Could not clone genericTemplate because source genericTemplate does not exist',
         { genericTemplateId }
       );
-      throw new Error('Could not clone genericTemplate');
+      throw new GraphQLError('Could not clone genericTemplate');
     }
 
     const newQuestionary = await this.questionaryDataSource.clone(
@@ -57,7 +58,7 @@ export default class PostgresGenericTemplateDataSource
           logger.logError('Could not delete genericTemplate', {
             genericTemplateId,
           });
-          throw new Error('Could not delete genericTemplate');
+          throw new GraphQLError('Could not delete genericTemplate');
         }
 
         return createGenericTemplateObject(records[0]);
@@ -80,7 +81,7 @@ export default class PostgresGenericTemplateDataSource
       .then((records: GenericTemplateRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not update genericTemplate', { args });
-          throw new Error('Could not update genericTemplate');
+          throw new GraphQLError('Could not update genericTemplate');
         }
 
         return createGenericTemplateObject(records[0]);
@@ -108,7 +109,7 @@ export default class PostgresGenericTemplateDataSource
             questionary_id,
             question_id,
           });
-          throw new Error('Failed to insert genericTemplate');
+          throw new GraphQLError('Failed to insert genericTemplate');
         }
 
         return createGenericTemplateObject(records[0]);

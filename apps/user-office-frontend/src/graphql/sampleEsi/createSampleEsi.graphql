@@ -1,17 +1,12 @@
 mutation createSampleEsi($sampleId: Int!, $esiId: Int!) {
   createSampleEsi(sampleId: $sampleId, esiId: $esiId) {
-    esi {
-      ...sampleEsi
-      questionary {
-        isCompleted
-        ...questionary
-      }
-      sample {
-        ...sample
-      }
+    ...sampleEsi
+    questionary {
+      isCompleted
+      ...questionary
     }
-    rejection {
-      ...rejection
+    sample {
+      ...sample
     }
   }
 }

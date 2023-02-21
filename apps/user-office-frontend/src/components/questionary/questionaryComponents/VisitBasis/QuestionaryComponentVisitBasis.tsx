@@ -100,11 +100,8 @@ const createVisitRegistration = async (api: Sdk, visitId: number) => {
   const { createVisitRegistration } = await api.createVisitRegistration({
     visitId,
   });
-  if (createVisitRegistration.registration === null) {
-    throw new Error("Couldn't create visit registration");
-  }
 
-  return createVisitRegistration.registration;
+  return createVisitRegistration;
 };
 
 const updateVisitRegistration = async (
@@ -112,11 +109,8 @@ const updateVisitRegistration = async (
   update: UpdateVisitRegistrationMutationVariables
 ) => {
   const { updateVisitRegistration } = await api.updateVisitRegistration(update);
-  if (updateVisitRegistration.registration === null) {
-    throw new Error("Couldn't update visit registration");
-  }
 
-  return updateVisitRegistration.registration;
+  return updateVisitRegistration;
 };
 
 const visitBasisPreSubmit =

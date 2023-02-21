@@ -7,6 +7,7 @@ const clearSession = () => {
   localStorage.removeItem('user');
   localStorage.removeItem('expToken');
   localStorage.removeItem('impersonatingUserId');
+  localStorage.removeItem('isInternalUser');
 };
 
 export default clearSession;

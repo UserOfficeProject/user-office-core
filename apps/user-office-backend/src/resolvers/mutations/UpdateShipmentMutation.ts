@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ShipmentStatus } from '../../models/Shipment';
-import { ShipmentResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Shipment } from '../types/Shipment';
 
 @ArgsType()
 export class UpdateShipmentArgs {
@@ -33,14 +32,11 @@ export class UpdateShipmentArgs {
 
 @Resolver()
 export class UpdateShipmentMutation {
-  @Mutation(() => ShipmentResponseWrap)
+  @Mutation(() => Shipment)
   updateShipment(
     @Args() args: UpdateShipmentArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.shipment.updateShipment(context.user, args),
-      ShipmentResponseWrap
-    );
+    return context.mutations.shipment.updateShipment(context.user, args);
   }
 }

@@ -3,6 +3,7 @@ mutation updateCall(
   $shortCode: String!
   $startCall: DateTime!
   $endCall: DateTime!
+  $endCallInternal: DateTime
   $startReview: DateTime!
   $endReview: DateTime!
   $startSEPReview: DateTime
@@ -31,6 +32,7 @@ mutation updateCall(
       shortCode: $shortCode
       startCall: $startCall
       endCall: $endCall
+      endCallInternal: $endCallInternal
       startReview: $startReview
       endReview: $endReview
       startSEPReview: $startSEPReview
@@ -54,11 +56,6 @@ mutation updateCall(
       isActive: $isActive
     }
   ) {
-    rejection {
-      ...rejection
-    }
-    call {
-      ...call
-    }
+    ...call
   }
 }

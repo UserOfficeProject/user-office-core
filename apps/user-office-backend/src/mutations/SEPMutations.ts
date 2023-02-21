@@ -15,12 +15,11 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
@@ -32,11 +31,11 @@ import {
   AssignReviewersToSEPArgs,
   RemoveSepReviewerFromProposalArgs,
   AssignChairOrSecretaryToSEPArgs,
-} from '../resolvers/mutations/AssignMembersToSEP';
+} from '../resolvers/mutations/AssignMembersToSepMutation';
 import {
   AssignProposalsToSepArgs,
   RemoveProposalsFromSepArgs,
-} from '../resolvers/mutations/AssignProposalsToSep';
+} from '../resolvers/mutations/AssignProposalsToSepMutation';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { ReorderSepMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderSepMeetingDecisionProposalsMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
@@ -52,8 +51,6 @@ export default class SEPMutations {
     private instrumentDataSource: InstrumentDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
@@ -238,30 +235,17 @@ export default class SEPMutations {
   async assignProposalsToSep(
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
-  ): Promise<ProposalPksWithNextStatus | Rejection> {
-    return this.dataSource
-      .assignProposalsToSep(args)
-      .then(async (result) => {
-        const nextProposalStatus =
-          await this.proposalSettingsDataSource.getProposalNextStatus(
-            args.proposals[0].primaryKey,
-            Event.PROPOSAL_SEP_SELECTED
-          );
+  ): Promise<ProposalPks | Rejection> {
+    const result = await this.dataSource.assignProposalsToSep(args);
 
-        return new ProposalPksWithNextStatus(
-          result.proposalPks,
-          nextProposalStatus?.id,
-          nextProposalStatus?.shortCode,
-          nextProposalStatus?.name
-        );
-      })
-      .catch((err) => {
-        return rejection(
-          'Could not assign proposal to scientific evaluation panel',
-          { agent },
-          err
-        );
-      });
+    if (result.proposalPks.length !== args.proposals.length) {
+      return rejection(
+        'Could not assign proposal to scientific evaluation panel',
+        { agent }
+      );
+    }
+
+    return result;
   }
 
   @Authorized([Roles.USER_OFFICER])

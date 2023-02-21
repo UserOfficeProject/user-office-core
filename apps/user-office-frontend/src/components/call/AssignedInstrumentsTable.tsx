@@ -1,13 +1,17 @@
-import MaterialTable, { Column } from '@material-table/core';
+import MaterialTable, {
+  Column,
+  EditComponentProps,
+} from '@material-table/core';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { ChangeEvent } from 'react';
 
 import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+const MAX_32_BIT_INTEGER = Math.pow(2, 31);
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -42,23 +46,25 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
 }) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
-  const { enqueueSnackbar } = useSnackbar();
 
-  const availabilityTimeInput = ({
-    onChange,
-    value,
-  }: {
-    onChange: (e: string) => void;
-    value: string;
-  }) => (
+  const availabilityTimeInput = (
+    props: EditComponentProps<InstrumentWithAvailabilityTime> & {
+      helperText?: string;
+    }
+  ) => (
     <TextField
       type="number"
       data-cy="availability-time"
       placeholder={`Availability time (${call.allocationTimeUnit}s)`}
-      value={value || ''}
-      onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+      value={props.value || ''}
+      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+        props.onChange(e.target.value)
+      }
+      InputProps={{ inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } }}
       required
       fullWidth
+      error={props.error}
+      helperText={props.helperText}
     />
   );
 
@@ -85,30 +91,58 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       type: 'numeric',
       emptyValue: '-',
       editComponent: availabilityTimeInput,
+      align: 'left',
+      validate: (
+        rowData: InstrumentWithAvailabilityTime & {
+          tableData?: { editing: string };
+        }
+      ) => {
+        // NOTE: Return valid state if the action is delete and not update
+        if (rowData.tableData?.editing !== 'update') {
+          return { isValid: true };
+        }
+
+        if (rowData.availabilityTime && +rowData.availabilityTime > 0) {
+          // NOTE: Preventing inputs grater than 32-bit integer.
+          if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {
+            return {
+              isValid: false,
+              helperText: `Availability time can not be grater than ${
+                MAX_32_BIT_INTEGER - 1
+              }`,
+            };
+          }
+
+          return { isValid: true };
+        } else {
+          return {
+            isValid: false,
+            helperText: 'Availability time must be a positive number',
+          };
+        }
+      },
     },
   ];
 
   const removeAssignedInstrument = async (instrumentId: number) => {
-    const result = await api({
+    await api({
       toastSuccessMessage: 'Assigned instrument removed successfully!',
     }).removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,
     });
 
-    if (!result.removeAssignedInstrumentFromCall.rejection) {
-      const dataUpdate = call.instruments.filter(
-        (instrumentItem) => instrumentItem.id !== instrumentId
-      );
-      removeAssignedInstrumentFromCall(dataUpdate, call.id);
-    }
+    const dataUpdate = call.instruments.filter(
+      (instrumentItem) => instrumentItem.id !== instrumentId
+    );
+    removeAssignedInstrumentFromCall(dataUpdate, call.id);
   };
 
   const updateInstrument = async (instrumentUpdatedData: {
     id: number;
     availabilityTime: number | string;
   }) => {
-    const result = await api({
+    await api({
       toastSuccessMessage: 'Availability time set successfully!',
     }).setInstrumentAvailabilityTime({
       callId: call.id,
@@ -116,17 +150,15 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       availabilityTime: +instrumentUpdatedData.availabilityTime,
     });
 
-    if (!result.setInstrumentAvailabilityTime.rejection) {
-      const newUpdatedData = call.instruments.map((instrument) => ({
-        ...instrument,
-        availabilityTime:
-          instrument.id === instrumentUpdatedData.id
-            ? +instrumentUpdatedData.availabilityTime
-            : instrument.availabilityTime,
-      }));
+    const newUpdatedData = call.instruments.map((instrument) => ({
+      ...instrument,
+      availabilityTime:
+        instrument.id === instrumentUpdatedData.id
+          ? +instrumentUpdatedData.availabilityTime
+          : instrument.availabilityTime,
+    }));
 
-      setInstrumentAvailabilityTime(newUpdatedData, call.id);
-    }
+    setInstrumentAvailabilityTime(newUpdatedData, call.id);
   };
 
   return (
@@ -144,8 +176,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
             new Promise<void>(async (resolve, reject) => {
               if (
                 instrumentUpdatedData &&
-                instrumentUpdatedData.availabilityTime &&
-                +instrumentUpdatedData.availabilityTime > 0
+                instrumentUpdatedData.availabilityTime
               ) {
                 await updateInstrument({
                   id: instrumentUpdatedData.id,
@@ -153,10 +184,6 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
                 });
                 resolve();
               } else {
-                enqueueSnackbar('Availability time must be positive number', {
-                  variant: 'error',
-                  className: 'snackbar-error',
-                });
                 reject();
               }
             }),

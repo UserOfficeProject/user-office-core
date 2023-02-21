@@ -8,8 +8,6 @@ mutation updateSEPTimeAllocation(
     proposalPk: $proposalPk
     sepTimeAllocation: $sepTimeAllocation
   ) {
-    rejection {
-      ...rejection
-    }
+    sepId
   }
 }

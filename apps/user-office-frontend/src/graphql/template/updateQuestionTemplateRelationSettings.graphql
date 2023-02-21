@@ -12,11 +12,6 @@ mutation updateQuestionTemplateRelationSettings(
     dependencies: $dependencies
     dependenciesOperator: $dependenciesOperator
   ) {
-    template {
-      ...template
-    }
-    rejection {
-      ...rejection
-    }
+    ...template
   }
 }

@@ -285,26 +285,22 @@ const ProposalTableInstrumentScientist: React.FC<{
           submitted: true,
         }));
 
-      const result = await api({
+      await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} technical review submitted successfully!`,
       }).submitTechnicalReviews({
         technicalReviews: submittedTechnicalReviewsInput,
       });
 
-      const isError = !!result.submitTechnicalReviews.rejection;
-
-      if (!isError) {
-        const newProposalsData = proposalsData.map((proposalData) => ({
-          ...proposalData,
-          technicalReviewSubmitted: selectedProposals.find(
-            (selectedProposal) =>
-              selectedProposal.primaryKey === proposalData.primaryKey
-          )
-            ? 1
-            : proposalData.technicalReviewSubmitted,
-        }));
-        setProposalsData(newProposalsData);
-      }
+      const newProposalsData = proposalsData.map((proposalData) => ({
+        ...proposalData,
+        technicalReviewSubmitted: selectedProposals.find(
+          (selectedProposal) =>
+            selectedProposal.primaryKey === proposalData.primaryKey
+        )
+          ? 1
+          : proposalData.technicalReviewSubmitted,
+      }));
+      setProposalsData(newProposalsData);
     }
   };
 

@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { SampleStatus } from '../../models/Sample';
-import { SampleResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Sample } from '../types/Sample';
 
 @ArgsType()
 export class UpdateSampleArgs {
@@ -36,14 +35,11 @@ export class UpdateSampleArgs {
 
 @Resolver()
 export class UpdateSampleMutation {
-  @Mutation(() => SampleResponseWrap)
+  @Mutation(() => Sample)
   updateSample(
     @Args() args: UpdateSampleArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.sample.updateSample(context.user, args),
-      SampleResponseWrap
-    );
+    return context.mutations.sample.updateSample(context.user, args);
   }
 }

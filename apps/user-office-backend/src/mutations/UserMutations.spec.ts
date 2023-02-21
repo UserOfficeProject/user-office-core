@@ -77,10 +77,7 @@ test('A user cannot invite another user by email if the user already has an acco
       email: dummyUser.email,
       userRole: UserRole.USER,
     })
-  ).resolves.toHaveProperty(
-    'reason',
-    'Can not create account because account already exists'
-  );
+  ).rejects.toThrow('Can not create account because account already exists');
 });
 
 test('A user can reinvite another user by email if the user has not created an account', () => {
@@ -125,7 +122,7 @@ test('A user cannot invite a reviewer by email', () => {
       email: 'email@google.com',
       userRole: UserRole.SEP_REVIEWER,
     })
-  ).resolves.toHaveProperty('reason', 'Can not create user for this role');
+  ).rejects.toThrow('Can not create user for this role');
 });
 
 test('A user can update its own name', () => {

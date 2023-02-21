@@ -71,13 +71,11 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
   const handleProposalAdministration = async (
     administrationValues: AdministrationFormData
   ) => {
-    const result = await api({
+    await api({
       toastSuccessMessage: 'Saved!',
     }).administrationProposal(administrationValues);
 
-    if (!result.administrationProposal.rejection) {
-      setAdministration(administrationValues);
-    }
+    setAdministration(administrationValues);
   };
 
   return (

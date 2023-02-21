@@ -16,12 +16,14 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
 
     const schema = Yup.object().shape({
       title: Yup.string()
+        .trim()
         .max(
           MAX_TITLE_LEN,
           `Please make abstract at most ${MAX_TITLE_LEN} characters long`
         )
         .required('Title is required'),
       abstract: Yup.string()
+        .trim()
         .max(
           MAX_ABSTRACT_LEN,
           `Please make abstract at most ${MAX_ABSTRACT_LEN} characters long`

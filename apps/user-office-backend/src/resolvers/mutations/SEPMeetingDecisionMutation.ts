@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
-import { SepMeetingDecisionResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { SepMeetingDecision } from '../types/SepMeetingDecision';
 
 @InputType()
 export class SaveSEPMeetingDecisionInput {
@@ -36,18 +35,15 @@ export class SaveSEPMeetingDecisionInput {
 
 @Resolver()
 export class SEPMeetingDecisionMutation {
-  @Mutation(() => SepMeetingDecisionResponseWrap)
+  @Mutation(() => SepMeetingDecision)
   saveSepMeetingDecision(
     @Arg('saveSepMeetingDecisionInput')
     saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.sep.saveSepMeetingDecision(
-        context.user,
-        saveSepMeetingDecisionInput
-      ),
-      SepMeetingDecisionResponseWrap
+    return context.mutations.sep.saveSepMeetingDecision(
+      context.user,
+      saveSepMeetingDecisionInput
     );
   }
 }

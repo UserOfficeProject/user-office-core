@@ -4,6 +4,7 @@ import { Tokens } from '../config/Tokens';
 import { PredefinedMessageDataSource } from '../datasources/PredefinedMessageDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
+import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreatePredefinedMessageInput } from '../resolvers/mutations/predefinedMessages/CreatePredefinedMessageMutation';
@@ -41,6 +42,12 @@ export default class PredefinedMessageMutations {
     agent: UserWithRole | null,
     input: DeletePredefinedMessageInput
   ) {
-    return await this.predefinedMessageDataSource.delete(input);
+    const deletedMessage = await this.predefinedMessageDataSource.delete(input);
+
+    if (!deletedMessage) {
+      throw rejection('Could not delete predefined message');
+    }
+
+    return deletedMessage;
   }
 }

@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { AllocationTimeUnits } from '../../models/Call';
-import { CallResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Call } from '../types/Call';
 
 @InputType()
 export class UpdateCallInput {
@@ -26,6 +25,9 @@ export class UpdateCallInput {
 
   @Field()
   public endCall: Date;
+
+  @Field(() => Date, { nullable: true })
+  public endCallInternal?: Date;
 
   @Field()
   public startReview: Date;
@@ -75,6 +77,9 @@ export class UpdateCallInput {
   @Field(() => Int, { nullable: true })
   public callEnded?: boolean;
 
+  @Field({ nullable: true })
+  public callEndedInternal?: boolean;
+
   @Field(() => Int, { nullable: true })
   public callReviewEnded?: boolean;
 
@@ -123,45 +128,36 @@ export class RemoveAssignedInstrumentFromCallInput {
 
 @Resolver()
 export class UpdateCallMutation {
-  @Mutation(() => CallResponseWrap)
+  @Mutation(() => Call)
   updateCall(
     @Arg('updateCallInput')
     updateCallInput: UpdateCallInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.call.update(context.user, updateCallInput),
-      CallResponseWrap
-    );
+    return context.mutations.call.update(context.user, updateCallInput);
   }
 
-  @Mutation(() => CallResponseWrap)
+  @Mutation(() => Call)
   assignInstrumentsToCall(
     @Arg('assignInstrumentsToCallInput')
     assignInstrumentsToCallInput: AssignInstrumentsToCallInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.call.assignInstrumentsToCall(
-        context.user,
-        assignInstrumentsToCallInput
-      ),
-      CallResponseWrap
+    return context.mutations.call.assignInstrumentsToCall(
+      context.user,
+      assignInstrumentsToCallInput
     );
   }
 
-  @Mutation(() => CallResponseWrap)
+  @Mutation(() => Call)
   removeAssignedInstrumentFromCall(
     @Arg('removeAssignedInstrumentFromCallInput')
     removeAssignedInstrumentFromCallInput: RemoveAssignedInstrumentFromCallInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.call.removeAssignedInstrumentFromCall(
-        context.user,
-        removeAssignedInstrumentFromCallInput
-      ),
-      CallResponseWrap
+    return context.mutations.call.removeAssignedInstrumentFromCall(
+      context.user,
+      removeAssignedInstrumentFromCallInput
     );
   }
 }

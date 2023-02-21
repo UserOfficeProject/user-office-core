@@ -1,4 +1,4 @@
-import MaterialTable, { Action, Options } from '@material-table/core';
+import MaterialTable, { Action, Column, Options } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -12,18 +12,12 @@ import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import {
-  UserRole,
-  ReviewWithNextProposalStatus,
-  ProposalStatus,
-  Review,
-  SettingsId,
-  Sep,
-} from 'generated/sdk';
+import { UserRole, Review, SettingsId, Sep } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
@@ -64,7 +58,7 @@ const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
     .map((assignment) => assignment.review)
     .filter((review): review is Review => !!review);
 
-const SEPProposalColumns = [
+const SEPProposalColumns: Column<SEPProposalType>[] = [
   {
     title: 'Actions',
     cellStyle: { padding: 0, minWidth: 80 },
@@ -72,7 +66,19 @@ const SEPProposalColumns = [
     removable: false,
     field: 'rowActionButtons',
   },
-  { title: 'ID', field: 'proposal.proposalId' },
+  {
+    title: 'ID',
+    field: 'proposal.proposalId',
+    render: (rawData) => (
+      <CopyToClipboard
+        text={rawData.proposal.proposalId}
+        successMessage={`'${rawData.proposal.proposalId}' copied to clipboard`}
+        position="right"
+      >
+        {rawData.proposal.proposalId || ''}
+      </CopyToClipboard>
+    ),
+  },
   {
     title: 'Title',
     field: 'proposal.title',
@@ -92,7 +98,7 @@ const SEPProposalColumns = [
   },
   {
     title: 'Average grade',
-    render: (rowData: SEPProposalType): string => {
+    render: (rowData) => {
       const avgGrade = average(
         getGradesFromReviews(
           getReviewsFromAssignments(rowData.assignments ?? [])
@@ -101,7 +107,7 @@ const SEPProposalColumns = [
 
       return avgGrade === 0 ? '-' : `${avgGrade}`;
     },
-    customSort: (a: SEPProposalType, b: SEPProposalType) =>
+    customSort: (a, b) =>
       average(
         getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
       ) -
@@ -112,7 +118,7 @@ const SEPProposalColumns = [
   {
     title: 'Deviation',
     field: 'deviation',
-    render: (rowData: SEPProposalType): string => {
+    render: (rowData) => {
       const stdDeviation = standardDeviation(
         getGradesFromReviews(
           getReviewsFromAssignments(rowData.assignments ?? [])
@@ -121,7 +127,7 @@ const SEPProposalColumns = [
 
       return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
     },
-    customSort: (a: SEPProposalType, b: SEPProposalType) =>
+    customSort: (a, b) =>
       standardDeviation(
         getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
       ) -
@@ -238,9 +244,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       return;
     }
 
-    const {
-      assignSepReviewersToProposal: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'Members assigned',
     }).assignSepReviewersToProposal({
       memberIds: assignedMembers.map(({ id }) => id),
@@ -249,10 +253,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<
     });
 
     setProposalPk(null);
-
-    if (rejection) {
-      return;
-    }
 
     const { proposalReviews } = await api().getProposalReviews({
       proposalPk,
@@ -414,49 +414,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<
 
   const ReviewersTable = React.useCallback(
     ({ rowData }: Record<'rowData', SEPProposalType>) => {
-      const updateReviewStatusAndGrade = (
-        sepProposalData: SEPProposalType[],
-        editingProposalData: SEPProposalType,
-        currentAssignment: SEPProposalAssignmentType
-      ) => {
-        const newProposalsData =
-          sepProposalData?.map((sepProposalsData) => {
-            if (
-              sepProposalsData.proposalPk === editingProposalData.proposalPk
-            ) {
-              const editingProposalStatus = (
-                currentAssignment.review as ReviewWithNextProposalStatus
-              ).nextProposalStatus
-                ? ((currentAssignment.review as ReviewWithNextProposalStatus)
-                    .nextProposalStatus as ProposalStatus)
-                : editingProposalData.proposal.status;
-
-              return {
-                ...editingProposalData,
-                proposal: {
-                  ...editingProposalData.proposal,
-                  status: editingProposalStatus,
-                },
-                assignments:
-                  editingProposalData.assignments?.map((proposalAssignment) => {
-                    if (
-                      proposalAssignment?.review?.id ===
-                      currentAssignment?.review?.id
-                    ) {
-                      return currentAssignment;
-                    } else {
-                      return proposalAssignment;
-                    }
-                  }) ?? [],
-              };
-            } else {
-              return sepProposalsData;
-            }
-          }) || [];
-
-        return newProposalsData;
-      };
-
       const removeAssignedReviewer = async (
         assignedReviewer: SEPProposalAssignmentType,
         proposalPk: number
@@ -520,31 +477,26 @@ const SEPProposalsAndAssignmentsTable: React.FC<
           });
       };
 
-      const updateSEPProposalAssignmentsView = async (
-        currentAssignment: SEPProposalAssignmentType,
-        shouldRefreshProposalAssignments?: boolean
-      ) => {
-        if (shouldRefreshProposalAssignments) {
-          const refreshedSepProposal = await loadSEPProposal(
-            currentAssignment.proposalPk
-          );
+      const updateSEPProposalAssignmentsView = async (proposalPk: number) => {
+        const refreshedSepProposal = await loadSEPProposal(proposalPk);
+
+        if (refreshedSepProposal) {
           setSEPProposalsData((sepProposalsData) => {
             return sepProposalsData.map((sepProposal) => ({
               ...sepProposal,
+              proposal: {
+                ...sepProposal.proposal,
+                status:
+                  refreshedSepProposal.proposalPk === sepProposal.proposalPk
+                    ? refreshedSepProposal.proposal.status
+                    : sepProposal.proposal.status,
+              },
               assignments:
-                refreshedSepProposal?.proposalPk === sepProposal.proposalPk
-                  ? refreshedSepProposal?.assignments
+                refreshedSepProposal.proposalPk === sepProposal.proposalPk
+                  ? refreshedSepProposal.assignments
                   : sepProposal.assignments,
             }));
           });
-        } else {
-          setSEPProposalsData((sepProposalData) =>
-            updateReviewStatusAndGrade(
-              sepProposalData,
-              rowData,
-              currentAssignment
-            )
-          );
         }
       };
 

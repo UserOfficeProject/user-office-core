@@ -9,9 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalWorkflow } from '../../../models/ProposalWorkflow';
-import { ProposalWorkflowResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { ProposalWorkflow } from '../../types/ProposalWorkflow';
 
 @InputType()
 export class UpdateProposalWorkflowInput implements ProposalWorkflow {
@@ -27,18 +25,15 @@ export class UpdateProposalWorkflowInput implements ProposalWorkflow {
 
 @Resolver()
 export class UpdateProposalWorkflowMutation {
-  @Mutation(() => ProposalWorkflowResponseWrap)
+  @Mutation(() => ProposalWorkflow)
   async updateProposalWorkflow(
     @Ctx() context: ResolverContext,
     @Arg('updatedProposalWorkflowInput')
     updatedProposalWorkflowInput: UpdateProposalWorkflowInput
   ) {
-    return wrapResponse(
-      context.mutations.proposalSettings.updateProposalWorkflow(
-        context.user,
-        updatedProposalWorkflowInput
-      ),
-      ProposalWorkflowResponseWrap
+    return context.mutations.proposalSettings.updateProposalWorkflow(
+      context.user,
+      updatedProposalWorkflowInput
     );
   }
 }

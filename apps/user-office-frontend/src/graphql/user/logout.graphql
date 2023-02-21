@@ -1,8 +1,3 @@
 mutation logout($token: String!) {
-  logout(token: $token) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
+  logout(token: $token)
 }

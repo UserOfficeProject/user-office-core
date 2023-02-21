@@ -2,6 +2,7 @@
 
 import { logger } from '@user-office-software/duo-logger';
 import { intervalQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 
 import { IntervalConfig } from '../../resolvers/types/FieldConfig';
 import { isSiConversionFormulaValid } from '../../utils/isSiConversionFormulaValid';
@@ -24,7 +25,7 @@ export const intervalDefinition: Question = {
     value: { min: number; max: number; unit: string | null }
   ) => {
     if (field.question.dataType !== DataType.INTERVAL) {
-      throw new Error('DataType should be INTERVAL');
+      throw new GraphQLError('DataType should be INTERVAL');
     }
 
     return intervalQuestionValidationSchema(field).isValid(value);
@@ -52,7 +53,7 @@ export const intervalDefinition: Question = {
           value
         );
       default:
-        throw new Error(
+        throw new GraphQLError(
           `Unsupported comparator for Interval ${filter.compareOperator}`
         );
     }
@@ -67,7 +68,7 @@ export const intervalDefinition: Question = {
       const isValid = isSiConversionFormulaValid(unit.siConversionFormula);
       if (isValid === false) {
         logger.logError('Conversion formula is not valid', answer);
-        throw new Error('Error while processing conversion formula');
+        throw new GraphQLError('Error while processing conversion formula');
       }
     }
 
