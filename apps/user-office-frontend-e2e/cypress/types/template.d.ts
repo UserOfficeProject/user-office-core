@@ -138,6 +138,25 @@ declare global {
       ) => void;
 
       /**
+       * Creates dynamic multiple choice question. You have to be in edit template view to call this method
+       *
+       * @returns {typeof createDynamicMultipleChoiceQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createDynamicMultipleChoiceQuestion('Is dangerous')
+       */
+      createDynamicMultipleChoiceQuestion: (
+        title: string,
+        options?: {
+          url?: string;
+          isMultipleSelect?: boolean;
+          type?: 'radio' | 'dropdown';
+          firstTopic?: boolean;
+          key?: string;
+        }
+      ) => void;
+
+      /**
        * Creates FileUpload question.
        * You have to be in edit template view to call this method
        *

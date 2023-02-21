@@ -332,6 +332,53 @@ function createMultipleChoiceQuestion(
   closeQuestionsMenu();
 }
 
+function createDynamicMultipleChoiceQuestion(
+  question: string,
+  options?: {
+    key?: string;
+    url?: string;
+    firstTopic?: boolean;
+    isMultipleSelect?: boolean;
+    type?: 'radio' | 'dropdown';
+  }
+) {
+  openQuestionsMenu({
+    firstTopic: options?.firstTopic,
+  });
+
+  cy.contains('Add Dynamic Multiple choice').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
+
+  cy.get('[data-cy=question]').clear().type(question);
+
+  if (options?.type === undefined || options.type === 'dropdown') {
+    cy.contains('Radio').click();
+
+    cy.contains('Dropdown').click();
+  }
+
+  if (options?.isMultipleSelect === true) {
+    cy.contains('Is multiple select').click();
+  }
+
+  if (options?.url) {
+    cy.get('[data-cy=dynamic-url]').type(options?.url);
+  }
+
+  cy.contains('Save').click({ force: true });
+
+  cy.contains(question)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+  cy.finishedLoading();
+
+  closeQuestionsMenu();
+}
+
 function createFileUploadQuestion(question: string, fileTypes: string[]) {
   openQuestionsMenu();
 
@@ -584,6 +631,11 @@ Cypress.Commands.add('createDateQuestion', createDateQuestion);
 Cypress.Commands.add(
   'createMultipleChoiceQuestion',
   createMultipleChoiceQuestion
+);
+
+Cypress.Commands.add(
+  'createDynamicMultipleChoiceQuestion',
+  createDynamicMultipleChoiceQuestion
 );
 
 Cypress.Commands.add('createFileUploadQuestion', createFileUploadQuestion);
