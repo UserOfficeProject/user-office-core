@@ -52,7 +52,7 @@ context('Template tests', () => {
   };
   const dynamicMultipleChoiceQuestion = {
     title: faker.lorem.words(2),
-    url: 'https://extern.url/options',
+    url: faker.internet.url(),
     answers: [
       faker.lorem.words(3),
       faker.lorem.words(3),
