@@ -82,14 +82,14 @@ const GenericTemplateFromPreviousTemplateSelectModalOnAdd: React.FC<
 
   useEffect(() => {
     let unmounted = false;
-    if (unmounted) {
-      return;
-    }
     api()
       .getGenericTemplatesWithProposalData({
         filter,
       })
       .then((result) => {
+        if (unmounted) {
+          return;
+        }
         if (result.genericTemplates) {
           setGenericTemplates(
             result.genericTemplates.filter(
