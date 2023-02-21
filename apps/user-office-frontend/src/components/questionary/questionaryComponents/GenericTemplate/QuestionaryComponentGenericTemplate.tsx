@@ -24,6 +24,7 @@ import {
   QuestionnairesListRow,
 } from '../QuestionnairesList';
 import { GenericTemplateContainer } from './GenericTemplateContainer';
+import GenericTemplateFromPreviousTemplateSelectModalOnAdd from './GenericTemplateFromPreviousTemplateSelectModalOnAdd';
 
 const useStyles = makeStyles(() => ({
   questionLabel: {
@@ -84,7 +85,10 @@ function QuestionaryComponentGenericTemplate(
 
   const [selectedGenericTemplate, setSelectedGenericTemplate] =
     useState<GenericTemplateWithQuestionary | null>(null);
-
+  const [
+    openPreviousGenericTemplateSelectionModal,
+    setOpenPreviousGenericTemplateSelectionModal,
+  ] = useState(false);
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -181,6 +185,50 @@ function QuestionaryComponentGenericTemplate(
               );
             });
 
+        const createGenericTemplateWithClonedAnswers = (
+          newTitle: string,
+          newSourceQuestionaryId: number
+        ) => {
+          if (!state) {
+            throw new Error(
+              'GenericTemplate Declaration is missing proposal context'
+            );
+          }
+
+          const proposalPk = state.proposal.primaryKey;
+          const questionId = props.answer.question.id;
+          if (proposalPk <= 0 || !questionId) {
+            throw new Error(
+              'GenericTemplate is missing proposal id and/or question id'
+            );
+          }
+          const templateId = config.templateId;
+
+          if (!templateId) {
+            throw new Error('GenericTemplate is missing templateId');
+          }
+          api()
+            .createGenericTemplateWithClonedAnswers({
+              title: newTitle,
+              templateId: templateId,
+              proposalPk: proposalPk,
+              sourceQuestionaryId: newSourceQuestionaryId,
+              questionId: questionId,
+            })
+            .then((response) => {
+              const clonedGenericTemplate =
+                response.createGenericTemplateWithClonedAnswers;
+              if (clonedGenericTemplate) {
+                const newStateItems = [...field.value, clonedGenericTemplate];
+
+                updateFieldValueAndState(
+                  newStateItems,
+                  GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                );
+              }
+            });
+        };
+
         return (
           <div>
             <label className={classes.questionLabel}>
@@ -213,6 +261,9 @@ function QuestionaryComponentGenericTemplate(
                 })();
               }}
               onAddNewClick={() => createGenericTemplate()}
+              onAddFromPreviousGenericTemplateClick={() =>
+                setOpenPreviousGenericTemplateSelectionModal(true)
+              }
               {...props}
             />
 
@@ -270,6 +321,36 @@ function QuestionaryComponentGenericTemplate(
                 <UOLoader />
               )}
             </StyledModal>
+            {openPreviousGenericTemplateSelectionModal && (
+              <StyledModal
+                aria-labelledby="previous-generic-template-selection-modal"
+                aria-describedby="previous-generic-template-selection-on-add-modal"
+                open={openPreviousGenericTemplateSelectionModal}
+                onClose={(): void =>
+                  setOpenPreviousGenericTemplateSelectionModal(false)
+                }
+              >
+                <GenericTemplateFromPreviousTemplateSelectModalOnAdd
+                  close={(): void =>
+                    setOpenPreviousGenericTemplateSelectionModal(false)
+                  }
+                  filter={{
+                    questionId: answerId,
+                  }}
+                  currentProposalPk={state.proposal.primaryKey}
+                  addButtonLabel={config.addEntryButtonLabel}
+                  handleCreateGenericTemplateWithClonedAnswers={(
+                    title: string,
+                    sourceQuestionaryId: number
+                  ) =>
+                    createGenericTemplateWithClonedAnswers(
+                      title,
+                      sourceQuestionaryId
+                    )
+                  }
+                />
+              </StyledModal>
+            )}
           </div>
         );
       }}

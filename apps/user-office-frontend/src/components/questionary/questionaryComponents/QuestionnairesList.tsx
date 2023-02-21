@@ -19,6 +19,7 @@ export interface QuestionnairesListProps {
   onDeleteClick?: (record: QuestionnairesListRow) => void;
   onEditClick?: (record: QuestionnairesListRow) => void;
   onCloneClick?: (record: QuestionnairesListRow) => void;
+  onAddFromPreviousGenericTemplateClick?: () => void;
   data: Array<QuestionnairesListRow>;
   addButtonLabel?: string;
   maxEntries?: number;
@@ -43,6 +44,9 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonContainer: {
     flex: '1 1 0px',
+    '& button': {
+      marginLeft: 6,
+    },
   },
 }));
 
@@ -51,6 +55,7 @@ export function QuestionnairesList({
   onDeleteClick,
   onEditClick,
   onCloneClick,
+  onAddFromPreviousGenericTemplateClick,
   style,
   data,
   maxEntries,
@@ -97,6 +102,21 @@ export function QuestionnairesList({
             }
           >
             {addButtonLabel || 'Add'}
+          </Button>
+          <Button
+            onClick={onAddFromPreviousGenericTemplateClick}
+            variant="outlined"
+            data-cy="and-from-previous-generic-template-button"
+            color="primary"
+            startIcon={<AddCircleOutlineIcon />}
+            disabled={
+              (!!maxEntries && data.length >= maxEntries) ||
+              onAddFromPreviousGenericTemplateClick === undefined
+            }
+          >
+            {addButtonLabel
+              ? `${addButtonLabel} From Previous`
+              : 'Add From Previous'}
           </Button>
         </StyledButtonContainer>
       </Box>
