@@ -12,7 +12,6 @@ import React from 'react';
 
 type IdleTimeoutPromptProps = {
   isIdle: boolean;
-  buttonMessage: string;
   onConfirm: () => void;
 };
 

@@ -84,7 +84,6 @@ export const IdleContextProvider: React.FC = (props) => {
   }
 
   function userActiveButton() {
-    console.log((jwtDecode(token) as any).externalToken);
     unauthorizedApi()
       .checkExternalToken({ token: (jwtDecode(token) as any).externalToken })
       .then((res) => {
