@@ -7,6 +7,9 @@ on:
       - develop
       - staging
 
+env:
+  NODE_VERSION: 16.x
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # List of jobs
@@ -22,7 +25,7 @@ jobs:
 
       - id: extract_branch
         uses: swapActions/get-branch-name@v1
-        
+
       - name: Create backend image tags
         id: meta-backend
         uses: docker/metadata-action@v4
@@ -31,10 +34,10 @@ jobs:
             dmsc/duo-backend
             ghcr.io/userofficeproject/user-office-backend
           flavor: latest=true # adds :latest tag to outputs.tags
-          tags: |  # adds :<sha> tag to outputs.tags
+          tags: | # adds :<sha> tag to outputs.tags
             type=sha,format=long,prefix=
             type=raw,value=${{ steps.extract_branch.outputs.branch }}
-            
+
       - name: Create frontend image tags
         id: meta-frontend
         uses: docker/metadata-action@v4
@@ -43,7 +46,7 @@ jobs:
             dmsc/duo-frontend
             ghcr.io/userofficeproject/user-office-frontend
           flavor: latest=true # adds :latest tag to outputs.tags
-          tags: |  # adds :<sha> tag to outputs.tags
+          tags: | # adds :<sha> tag to outputs.tags
             type=sha,format=long,prefix=
             type=raw,value=${{ steps.extract_branch.outputs.branch }}
 
@@ -66,12 +69,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Install Node.js dependencies
         run: npm ci
 
       - name: Set environment variables
         run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
-        
+
       - name: Generate SDK
         run: npm run generate:sdk
 
@@ -90,7 +98,7 @@ jobs:
           file: ./apps/user-office-frontend/Dockerfile
           push: true
           tags: ${{ steps.meta-frontend.outputs.tags }}
-          
+
       - name: Trigger pipeline
         uses: swapActions/trigger-swap-deployment@v1
         with:
