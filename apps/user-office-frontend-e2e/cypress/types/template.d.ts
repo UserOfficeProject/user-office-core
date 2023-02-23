@@ -149,6 +149,7 @@ declare global {
         title: string,
         options?: {
           url?: string;
+          jsonPath?: string;
           isMultipleSelect?: boolean;
           type?: 'radio' | 'dropdown';
           firstTopic?: boolean;
