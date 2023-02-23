@@ -53,6 +53,7 @@ export default class InstrumentMutations {
     private reviewDataSource: ReviewDataSource
   ) {}
 
+  @EventBus(Event.INSTRUMENT_CREATED)
   @ValidateArgs(createInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async create(
@@ -68,6 +69,7 @@ export default class InstrumentMutations {
     });
   }
 
+  @EventBus(Event.INSTRUMENT_UPDATED)
   @ValidateArgs(updateInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async update(
