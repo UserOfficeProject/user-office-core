@@ -127,6 +127,7 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     url
+    jsonPath
     isMultipleSelect
     variant
   }

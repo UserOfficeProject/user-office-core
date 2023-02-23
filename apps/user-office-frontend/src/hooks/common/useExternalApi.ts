@@ -1,6 +1,7 @@
+import jp from 'jsonpath';
 import { useState, useEffect } from 'react';
 
-export function useExternalApi(url: string) {
+export function useExternalApi(url: string, path = '') {
   const [content, setContent] = useState<string[]>([]);
 
   useEffect(() => {
@@ -9,14 +10,31 @@ export function useExternalApi(url: string) {
       return;
     }
     fetch(url)
-      .then((data) => data.json())
-      .then((data) => setContent(data))
-      .catch((err) => console.error(err));
+      .then((resp) => resp.json())
+      .then((data) => {
+        const isArrayOfStrings =
+          Array.isArray(data) && data.every((el) => typeof el === 'string');
+        if (isArrayOfStrings) {
+          setContent(data);
+        } else {
+          try {
+            const jsonPathFilteredData = jp.query(data, path);
+            setContent(jsonPathFilteredData);
+          } catch (err) {
+            setContent([]);
+            throw err;
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        setContent([]);
+      });
 
     return () => {
       unmounted = true;
     };
-  }, [url]);
+  }, [url, path]);
 
   return { content, setContent };
 }

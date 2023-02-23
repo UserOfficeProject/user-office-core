@@ -26,6 +26,7 @@ export const dynamicMultipleChoiceDefinition: Question = {
     config.tooltip = '';
     config.variant = 'radio';
     config.url = '';
+    config.jsonPath = '';
     config.isMultipleSelect = false;
 
     return config;

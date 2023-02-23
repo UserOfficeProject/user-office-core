@@ -136,6 +136,20 @@ export const QuestionDynamicMultipleChoiceForm: FC<QuestionFormProps> = (
                 inputProps={{ 'data-cy': 'dynamic-url' }}
               />
             </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel htmlFor="config.jsonPath" shrink>
+                JsonPath
+              </InputLabel>
+              <Field
+                name="config.jsonPath"
+                id="config.jsonPath"
+                type="text"
+                component={TextField}
+                fullWidth
+                inputProps={{ 'data-cy': 'dynamic-url-jsonPath' }}
+              />
+            </FormControl>
           </TitledContainer>
         </>
       )}

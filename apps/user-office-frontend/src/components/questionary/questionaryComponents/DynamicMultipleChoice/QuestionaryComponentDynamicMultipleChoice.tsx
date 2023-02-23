@@ -50,7 +50,7 @@ export function QuestionaryComponentDynamicMultipleChoice(
   const config = answer.config as DynamicMultipleChoiceConfig;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
-  const { content } = useExternalApi(config.url);
+  const { content } = useExternalApi(config.url, config.jsonPath);
   const [stateValue, setStateValue] = useState<Array<string>>(content);
 
   useEffect(() => {

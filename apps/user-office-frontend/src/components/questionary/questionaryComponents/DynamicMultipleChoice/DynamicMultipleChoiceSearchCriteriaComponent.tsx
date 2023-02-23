@@ -16,7 +16,8 @@ function DynamicMultipleChoiceSearchCriteriaComponent({
 }: SearchCriteriaInputProps) {
   const [value, setValue] = useState(searchCriteria?.value ?? '');
   const { content } = useExternalApi(
-    (questionTemplateRelation.config as DynamicMultipleChoiceConfig).url
+    (questionTemplateRelation.config as DynamicMultipleChoiceConfig).url,
+    (questionTemplateRelation.config as DynamicMultipleChoiceConfig).jsonPath
   );
 
   return (
