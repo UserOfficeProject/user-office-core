@@ -224,7 +224,11 @@ export function createPostToRabbitMQHandler() {
           case ProposalEndStatus.ACCEPTED:
             const json = await getProposalMessageData(event.proposal);
 
-            await rabbitMQ.sendBroadcast(Event.PROPOSAL_ACCEPTED, json);
+            await rabbitMQ.sendMessageToExchange(
+              EXCHANGE_NAME,
+              Event.PROPOSAL_ACCEPTED,
+              json
+            );
             break;
           default:
             break;
@@ -235,31 +239,33 @@ export function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_UPDATED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendBroadcast(Event.PROPOSAL_UPDATED, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.PROPOSAL_DELETED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.PROPOSAL_CREATED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendBroadcast(Event.PROPOSAL_CREATED, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
+      case Event.INSTRUMENT_CREATED:
+      case Event.INSTRUMENT_UPDATED:
       case Event.INSTRUMENT_DELETED: {
         const json = JSON.stringify(event.instrument);
 
-        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.PROPOSAL_SUBMITTED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendBroadcast(Event.PROPOSAL_SUBMITTED, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.TOPIC_ANSWERED: {
@@ -282,13 +288,14 @@ export function createPostToRabbitMQHandler() {
         });
 
         const json = JSON.stringify(answers);
-        await rabbitMQ.sendBroadcast(Event.TOPIC_ANSWERED, json);
+
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.CALL_CREATED: {
-        const callJson = JSON.stringify(event.call);
+        const json = JSON.stringify(event.call);
 
-        await rabbitMQ.sendBroadcast(Event.CALL_CREATED, callJson);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
     }
