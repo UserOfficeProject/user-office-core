@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import jwtDecode from 'jwt-decode';
 import PropTypes from 'prop-types';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 
 import IdleTimeoutPrompt from 'components/timeout/TimeOutPrompt';
 import { FeatureId, SettingsId } from 'generated/sdk';
@@ -96,14 +97,6 @@ export const IdleContextProvider: React.FC = (props) => {
 
     userActive();
   }
-
-  useEffect(() => {
-    idleTimeout.current = userIdleTimer();
-
-    return () => {
-      if (idleTimeout.current) clearTimeout(idleTimeout.current);
-    };
-  }, []);
 
   return (
     <IdleContext.Provider
