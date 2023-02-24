@@ -70,6 +70,7 @@ export const IdleContextProvider: React.FC = (props) => {
           isIdle: true,
         });
       },
+      // Timeout in milliseconds
       idleTimeoutLength ? parseInt(idleTimeoutLength) : 3600000
     );
   };
