@@ -379,7 +379,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     # Don't push the built image if dependabot is creating the PR
-    if: github.actor != 'dependabot[bot]'
+    if: ${{ github.actor == 'dependabot[bot]' }}
     needs: [install-and-cache, e2e]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
