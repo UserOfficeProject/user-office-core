@@ -10,11 +10,6 @@ mutation updateTemplate(
     description: $description
     isArchived: $isArchived
   ) {
-    template {
-      ...templateMetadata
-    }
-    rejection {
-      ...rejection
-    }
+    ...templateMetadata
   }
 }

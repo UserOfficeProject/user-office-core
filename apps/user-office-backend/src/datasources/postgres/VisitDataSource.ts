@@ -1,10 +1,12 @@
+import { GraphQLError } from 'graphql';
+
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
 import { CreateVisitArgs } from '../../resolvers/mutations/CreateVisitMutation';
 import { UpdateVisitArgs } from '../../resolvers/mutations/UpdateVisitMutation';
-import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistration';
+import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistrationMutation';
 import { VisitDataSource } from '../VisitDataSource';
 import { VisitsFilter } from './../../resolvers/queries/VisitsQuery';
 import database from './database';
@@ -136,7 +138,7 @@ class PostgresVisitDataSource implements VisitDataSource {
       .then(async () => {
         const updatedVisit = await this.getVisit(args.visitId);
         if (!updatedVisit) {
-          throw new Error('Updated visit not found');
+          throw new GraphQLError('Updated visit not found');
         }
 
         return updatedVisit;
@@ -175,7 +177,7 @@ class PostgresVisitDataSource implements VisitDataSource {
       .returning('*')
       .then((result) => {
         if (result.length !== 1) {
-          throw new Error('Visit not found');
+          throw new GraphQLError('Visit not found');
         }
 
         return createVisitObject(result[0]);

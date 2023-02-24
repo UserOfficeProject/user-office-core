@@ -1,19 +1,15 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { FeedbackResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Feedback } from '../types/Feedback';
 
 @Resolver()
 export class DeleteFeedback {
-  @Mutation(() => FeedbackResponseWrap)
+  @Mutation(() => Feedback)
   deleteFeedback(
     @Arg('feedbackId', () => Int) feedbackId: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.feedback.deleteFeedback(context.user, feedbackId),
-      FeedbackResponseWrap
-    );
+    return context.mutations.feedback.deleteFeedback(context.user, feedbackId);
   }
 }

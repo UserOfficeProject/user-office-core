@@ -9,13 +9,12 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { PredefinedMessage } from '../../../models/PredefinedMessage';
-import { PredefinedMessageResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { PredefinedMessage as PredefinedMessageModel } from '../../../models/PredefinedMessage';
+import { PredefinedMessage } from '../../types/PredefinedMessage';
 
 @InputType()
 export class UpdatePredefinedMessageInput
-  implements Partial<PredefinedMessage>
+  implements Partial<PredefinedMessageModel>
 {
   @Field(() => Int)
   public id: number;
@@ -32,18 +31,15 @@ export class UpdatePredefinedMessageInput
 
 @Resolver()
 export class UpdatePredefinedMessageMutation {
-  @Mutation(() => PredefinedMessageResponseWrap)
+  @Mutation(() => PredefinedMessage)
   updatePredefinedMessage(
     @Arg('updatePredefinedMessageInput')
     updatePredefinedMessageInput: UpdatePredefinedMessageInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.predefinedMessage.update(
-        context.user,
-        updatePredefinedMessageInput
-      ),
-      PredefinedMessageResponseWrap
+    return context.mutations.predefinedMessage.update(
+      context.user,
+      updatePredefinedMessageInput
     );
   }
 }

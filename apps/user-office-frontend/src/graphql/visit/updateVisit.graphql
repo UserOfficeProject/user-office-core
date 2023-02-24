@@ -10,30 +10,24 @@ mutation updateVisit(
     status: $status
     teamLeadUserId: $teamLeadUserId
   ) {
-    visit {
-      ...visit
+    ...visit
 
-      teamLead {
+    teamLead {
+      ...basicUserDetails
+    }
+
+    registrations {
+      ...visitRegistration
+      user {
         ...basicUserDetails
-      }
-
-      registrations {
-        ...visitRegistration
-        user {
-          ...basicUserDetails
-        }
-      }
-
-      proposal {
-        ...proposal
-        instrument {
-          name
-        }
       }
     }
 
-    rejection {
-      ...rejection
+    proposal {
+      ...proposal
+      instrument {
+        name
+      }
     }
   }
 }

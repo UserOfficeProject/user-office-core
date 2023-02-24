@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { injectable, container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -167,7 +168,7 @@ export class StfcUserAuthorization extends UserAuthorization {
           token: token,
         });
 
-        throw new Error(rethrowMessage);
+        throw new GraphQLError(rethrowMessage);
       });
 
     if (!stfcUser) {

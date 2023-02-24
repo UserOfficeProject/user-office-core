@@ -293,37 +293,33 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         reviewId: proposal.reviewId,
       }));
 
-      const result = await api({
+      await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} review submitted successfully!`,
       }).submitProposalsReview({ proposals: submitProposalReviewsInput });
 
-      const isError = !!result.submitProposalsReview.rejection;
+      setUserData(
+        (usersData) =>
+          ({
+            ...usersData,
+            reviews: usersData?.reviews.map((review) => {
+              const submittedReview = submitProposalReviewsInput.find(
+                (submittedReviewItem) =>
+                  submittedReviewItem.reviewId === review.id
+              );
 
-      if (!isError) {
-        setUserData(
-          (usersData) =>
-            ({
-              ...usersData,
-              reviews: usersData?.reviews.map((review) => {
-                const submittedReview = submitProposalReviewsInput.find(
-                  (submittedReviewItem) =>
-                    submittedReviewItem.reviewId === review.id
-                );
-
-                if (review.id === submittedReview?.reviewId) {
-                  return {
-                    ...review,
-                    status: ReviewStatus.SUBMITTED,
-                  };
-                } else {
-                  return {
-                    ...review,
-                  };
-                }
-              }),
-            } as UserWithReviewsQuery['me'])
-        );
-      }
+              if (review.id === submittedReview?.reviewId) {
+                return {
+                  ...review,
+                  status: ReviewStatus.SUBMITTED,
+                };
+              } else {
+                return {
+                  ...review,
+                };
+              }
+            }),
+          } as UserWithReviewsQuery['me'])
+      );
     }
   };
 

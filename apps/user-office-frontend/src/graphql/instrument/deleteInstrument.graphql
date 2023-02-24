@@ -1,7 +1,5 @@
 mutation deleteInstrument($id: Int!) {
   deleteInstrument(id: $id) {
-    rejection {
-      ...rejection
-    }
+    id
   }
 }

@@ -71,15 +71,15 @@ function changeActiveRole(selectedRoleId: number) {
 
   const api = getE2EApi();
   const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
-    if (!resp.selectRole.token) {
+    if (!resp.selectRole) {
       return;
     }
 
     const { currentRole, user, exp, isInternalUser } = jwtDecode(
-      resp.selectRole.token
+      resp.selectRole
     ) as DecodedTokenData;
 
-    window.localStorage.setItem('token', resp.selectRole.token);
+    window.localStorage.setItem('token', resp.selectRole);
     window.localStorage.setItem(
       'currentRole',
       currentRole.shortCode.toUpperCase()
@@ -123,13 +123,8 @@ const selectRole = async (token: string, selectedRoleId: number) => {
     token,
     selectedRoleId,
   });
-  if (!response.selectRole.token) {
-    throw new Error(
-      `Error while selecting role, ${response.selectRole.rejection?.reason}`
-    );
-  }
 
-  return response.selectRole.token;
+  return response.selectRole;
 };
 
 const login = (
@@ -150,7 +145,7 @@ const login = (
       redirectUri: '',
     })
     .then(async (resp) => {
-      let token = resp.externalTokenLogin.token;
+      let token = resp.externalTokenLogin;
 
       if (!token) {
         return resp;

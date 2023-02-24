@@ -159,38 +159,33 @@ const proposalBasisPreSubmit =
         proposerId: proposer?.id,
       });
 
-      if (result.updateProposal.proposal) {
-        dispatch({
-          type: 'ITEM_WITH_QUESTIONARY_LOADED',
-          itemWithQuestionary: {
-            ...proposal,
-            ...result.updateProposal.proposal,
-          },
-        });
-      }
-    } else {
-      const createResult = await api.createProposal({
-        callId: call!.id,
+      dispatch({
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: {
+          ...proposal,
+          ...result.updateProposal,
+        },
       });
-
-      if (createResult.createProposal.proposal) {
-        const updateResult = await api.updateProposal({
-          proposalPk: createResult.createProposal.proposal.primaryKey,
-          title: title,
-          abstract: abstract,
-          users: users.map((user) => user.id),
-          proposerId: proposer?.id,
-        });
-        dispatch({
-          type: 'ITEM_WITH_QUESTIONARY_CREATED',
-          itemWithQuestionary: {
-            ...proposal,
-            ...createResult.createProposal.proposal,
-            ...updateResult.updateProposal.proposal,
-          },
-        });
-        returnValue = createResult.createProposal.proposal.questionaryId;
-      }
+    } else {
+      const { createProposal } = await api.createProposal({
+        callId: callId,
+      });
+      const { updateProposal } = await api.updateProposal({
+        proposalPk: createProposal.primaryKey,
+        title: title,
+        abstract: abstract,
+        users: users.map((user) => user.id),
+        proposerId: proposer?.id,
+      });
+      dispatch({
+        type: 'ITEM_WITH_QUESTIONARY_CREATED',
+        itemWithQuestionary: {
+          ...proposal,
+          ...createProposal,
+          ...updateProposal,
+        },
+      });
+      returnValue = createProposal.questionaryId;
     }
 
     return returnValue;

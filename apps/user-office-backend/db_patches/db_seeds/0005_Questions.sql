@@ -346,6 +346,41 @@ VALUES
     1, 'selection_from_options_question', 
     '{"value": ["One"] }'
   );
+
+-- Dynamic multiple choice
+INSERT INTO questions(
+  question_id, data_type, question, 
+  default_config, created_at, updated_at, 
+  natural_key, category_id
+) 
+VALUES 
+  (
+    'dynamic_multiple_choice_question', 
+    'DYNAMIC_MULTIPLE_CHOICE', 'Dynamic multiple choice question from seeds', 
+    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}', 
+    '2023-02-08 10:23:10.285415+00', 
+    '2023-02-08 10:23:10.285415+00', 
+    'dynamic_multiple_choice_question', 
+    1
+  );
+INSERT INTO templates_has_questions(
+  question_id, template_id, topic_id, 
+  sort_order, config
+) 
+VALUES 
+  (
+    'dynamic_multiple_choice_question', 
+    1, 5, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+  );
+INSERT INTO answers(
+  questionary_id, question_id, answer
+) 
+VALUES 
+  (
+    1, 'dynamic_multiple_choice_question', 
+    '{"value": ["One"] }'
+  );
+
 -- Text input
 INSERT INTO questions(
   question_id, data_type, question, 

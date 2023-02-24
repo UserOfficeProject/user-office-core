@@ -75,6 +75,23 @@ function editFinalRankingForm() {
   });
 }
 
+function updateUsersRoles() {
+  if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+    cy.updateUserRoles({
+      id: sepMembers.chair.id,
+      roles: [initialDBData.roles.sepReviewer],
+    });
+    cy.updateUserRoles({
+      id: sepMembers.secretary.id,
+      roles: [initialDBData.roles.sepReviewer],
+    });
+    cy.updateUserRoles({
+      id: sepMembers.reviewer.id,
+      roles: [initialDBData.roles.sepReviewer],
+    });
+  }
+}
+
 const instrumentAvailabilityTime = 20;
 const firstProposalTimeAllocation = 25;
 const secondProposalTimeAllocation = 5;
@@ -122,7 +139,7 @@ function createWorkflowAndEsiTemplate() {
     name: workflowName,
     description: workflowDescription,
   }).then((result) => {
-    const workflow = result.createProposalWorkflow.proposalWorkflow;
+    const workflow = result.createProposalWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
 
@@ -130,8 +147,8 @@ function createWorkflowAndEsiTemplate() {
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
       }).then((result) => {
-        if (result.createTemplate.template) {
-          createdEsiTemplateId = result.createTemplate.template.templateId;
+        if (result.createTemplate) {
+          createdEsiTemplateId = result.createTemplate.templateId;
         }
       });
     }
@@ -145,12 +162,12 @@ function initializationBeforeTests() {
     numberRatingsRequired: 2,
     active: true,
   }).then((result) => {
-    if (result.createSEP.sep) {
-      createdSepId = result.createSEP.sep.id;
+    if (result.createSEP) {
+      createdSepId = result.createSEP.id;
     }
   });
   cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-    const createdProposal = result.createProposal.proposal;
+    const createdProposal = result.createProposal;
     if (createdProposal) {
       createdProposalPk = createdProposal.primaryKey;
       createdProposalId = createdProposal.proposalId;
@@ -171,18 +188,6 @@ function initializationBeforeTests() {
       });
     }
   });
-  cy.updateUserRoles({
-    id: sepMembers.chair.id,
-    roles: [initialDBData.roles.sepReviewer],
-  });
-  cy.updateUserRoles({
-    id: sepMembers.secretary.id,
-    roles: [initialDBData.roles.sepReviewer],
-  });
-  cy.updateUserRoles({
-    id: sepMembers.reviewer.id,
-    roles: [initialDBData.roles.sepReviewer],
-  });
   createWorkflowAndEsiTemplate();
 }
 
@@ -193,6 +198,7 @@ context('SEP reviews tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
+      updateUsersRoles();
     });
     initializationBeforeTests();
   });
@@ -479,6 +485,15 @@ context('SEP reviews tests', () => {
         memberIds: [sepMembers.reviewer.id],
         proposalPk: createdProposalPk,
       });
+      cy.on('uncaught:exception', (err) => {
+        expect(err.message).to.include(
+          'Failed to delete proposal because, it has dependencies which need to be deleted first'
+        );
+
+        // return false to prevent the error from
+        // failing this test
+        return false;
+      });
       cy.login('officer');
       cy.visit('/ProposalPage');
 
@@ -531,6 +546,13 @@ context('SEP reviews tests', () => {
       cy.updateUserDetails({
         ...loggedInUserParsed,
         organisation: 2,
+        telephone: faker.phone.number('+4670#######'),
+        user_title: 'Dr.',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('2000/01/01'),
+        department: 'IT',
+        position: 'Dirrector',
       } as UpdateUserMutationVariables);
 
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
@@ -662,6 +684,12 @@ context('SEP reviews tests', () => {
         organisation: 2,
         telephone: faker.phone.number('+4670#######'),
         telephone_alt: faker.phone.number('+4670#######'),
+        user_title: 'Dr.',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('2000/01/01'),
+        department: 'IT',
+        position: 'Dirrector',
       } as UpdateUserMutationVariables);
 
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
@@ -763,7 +791,7 @@ context('SEP reviews tests', () => {
       });
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           const createdProposal2Pk = createdProposal.primaryKey;
 
@@ -779,10 +807,6 @@ context('SEP reviews tests', () => {
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposal2Pk },
             ],
-          });
-          cy.assignReviewersToSep({
-            sepId: createdSepId,
-            memberIds: [sepMembers.reviewer.id],
           });
           cy.assignSepReviewersToProposal({
             sepId: createdSepId,
@@ -938,9 +962,9 @@ context('SEP meeting components tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
       }
+      updateUsersRoles();
     });
     initializationBeforeTests();
-    createWorkflowAndEsiTemplate();
     cy.assignProposalsToSep({
       sepId: createdSepId,
       proposals: [
@@ -968,7 +992,7 @@ context('SEP meeting components tests', () => {
       reviewerId: 0,
     });
     cy.createInstrument(instrument).then((result) => {
-      const createdInstrument = result.createInstrument.instrument;
+      const createdInstrument = result.createInstrument;
       if (createdInstrument) {
         createdInstrumentId = createdInstrument.id;
 
@@ -1061,7 +1085,7 @@ context('SEP meeting components tests', () => {
 
     it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
       cy.createInstrument(instrument).then((result) => {
-        const createdInstrument2Id = result.createInstrument.instrument?.id;
+        const createdInstrument2Id = result.createInstrument.id;
         if (createdInstrument2Id) {
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
@@ -1070,7 +1094,7 @@ context('SEP meeting components tests', () => {
 
           cy.createProposal({ callId: initialDBData.call.id }).then(
             (result) => {
-              const createdProposal = result.createProposal.proposal;
+              const createdProposal = result.createProposal;
               if (createdProposal) {
                 cy.updateProposal({
                   proposalPk: createdProposal.primaryKey,
@@ -1136,7 +1160,7 @@ context('SEP meeting components tests', () => {
 
     it('Officer should be able to reorder proposal with drag and drop', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1240,7 +1264,7 @@ context('SEP meeting components tests', () => {
 
     it('Proposals in SEP meeting components should be ordered by standard deviation as second order parameter if there is no ranking', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -1286,18 +1310,10 @@ context('SEP meeting components tests', () => {
             memberIds: [sepMembers.reviewer2.id],
             proposalPk: createdProposalPk,
           });
-          cy.assignReviewersToSep({
-            sepId: createdSepId,
-            memberIds: [sepMembers.reviewer.id],
-          });
           cy.assignSepReviewersToProposal({
             sepId: createdSepId,
             memberIds: [sepMembers.reviewer.id],
             proposalPk: createdProposal.primaryKey,
-          });
-          cy.assignReviewersToSep({
-            sepId: createdSepId,
-            memberIds: [sepMembers.reviewer2.id],
           });
           cy.assignSepReviewersToProposal({
             sepId: createdSepId,
@@ -1405,7 +1421,7 @@ context('SEP meeting components tests', () => {
       });
       cy.createProposal({ callId: initialDBData.call.id }).then(
         (proposalResult) => {
-          const createdProposal = proposalResult.createProposal.proposal;
+          const createdProposal = proposalResult.createProposal;
           if (createdProposal) {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
@@ -1418,9 +1434,9 @@ context('SEP meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
             }).then((sepResult) => {
-              if (sepResult.createSEP.sep) {
+              if (sepResult.createSEP) {
                 cy.assignProposalsToSep({
-                  sepId: sepResult.createSEP.sep.id,
+                  sepId: sepResult.createSEP.id,
                   proposals: [
                     {
                       callId: initialDBData.call.id,
@@ -1759,7 +1775,7 @@ context('SEP meeting components tests', () => {
     it('Officer should be able to bulk download SEP proposals as pdf', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then(
         (proposalResult) => {
-          const createdProposal = proposalResult.createProposal.proposal;
+          const createdProposal = proposalResult.createProposal;
           if (createdProposal) {
             cy.updateProposal({
               proposalPk: createdProposal.primaryKey,
@@ -1772,9 +1788,9 @@ context('SEP meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
             }).then((sepResult) => {
-              if (sepResult.createSEP.sep) {
+              if (sepResult.createSEP) {
                 cy.assignProposalsToSep({
-                  sepId: sepResult.createSEP.sep.id,
+                  sepId: sepResult.createSEP.id,
                   proposals: [
                     {
                       callId: initialDBData.call.id,
@@ -1881,10 +1897,12 @@ context('SEP meeting components tests', () => {
 
   describe('SEP Secretary role', () => {
     beforeEach(() => {
-      cy.updateUserRoles({
-        id: sepMembers.secretary.id,
-        roles: [initialDBData.roles.sepReviewer],
-      });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: sepMembers.secretary.id,
+          roles: [initialDBData.roles.sepReviewer],
+        });
+      }
       cy.assignChairOrSecretary({
         assignChairOrSecretaryToSEPInput: {
           sepId: createdSepId,
@@ -1960,10 +1978,12 @@ context('SEP meeting components tests', () => {
 
   describe('SEP Reviewer role', () => {
     beforeEach(() => {
-      cy.updateUserRoles({
-        id: sepMembers.reviewer2.id,
-        roles: [initialDBData.roles.sepReviewer],
-      });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: sepMembers.reviewer2.id,
+          roles: [initialDBData.roles.sepReviewer],
+        });
+      }
       cy.assignReviewersToSep({
         sepId: createdSepId,
         memberIds: [sepMembers.reviewer2.id],

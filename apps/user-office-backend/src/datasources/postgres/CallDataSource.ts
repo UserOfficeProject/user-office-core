@@ -1,5 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import BluePromise from 'bluebird';
+import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
@@ -169,7 +170,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         );
         trx.rollback();
 
-        throw new Error('Could not create call');
+        throw new GraphQLError('Could not create call');
       }
     });
 
@@ -297,7 +298,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         );
         trx.rollback();
 
-        throw new Error('Could not update call');
+        throw new GraphQLError('Could not update call');
       }
     });
 
@@ -320,7 +321,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       return callUpdated;
     }
 
-    throw new Error(`Call not found ${args.callId}`);
+    throw new GraphQLError(`Call not found ${args.callId}`);
   }
 
   async removeAssignedInstrumentFromCall(
@@ -337,7 +338,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       return callUpdated;
     }
 
-    throw new Error(`Call not found ${args.callId}`);
+    throw new GraphQLError(`Call not found ${args.callId}`);
   }
 
   async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {

@@ -38,20 +38,17 @@ function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
           onClick={() =>
             confirm(
               async () => {
-                const result = await api().updateEsi({
+                const { updateEsi } = await api().updateEsi({
                   esiId: state.esi.id,
                   isSubmitted: true,
                 });
-                if (!result.updateEsi.esi) {
-                  return;
-                }
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: result.updateEsi.esi,
+                  itemWithQuestionary: updateEsi,
                 });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: result.updateEsi.esi,
+                  itemWithQuestionary: updateEsi,
                 });
               },
               {

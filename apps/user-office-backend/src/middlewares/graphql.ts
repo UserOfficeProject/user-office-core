@@ -1,6 +1,5 @@
 import {
   ApolloServerPlugin,
-  BaseContext,
   ApolloServer,
   ContextFunction,
 } from '@apollo/server';
@@ -34,7 +33,7 @@ import initGraphQLClient from './graphqlClient';
 
 export const context: ContextFunction<
   [ExpressContextFunctionArgument],
-  BaseContext
+  ResolverContext
 > = async ({ req }) => {
   let user = null;
   const userId = req.user?.user?.id as number;
@@ -109,12 +108,18 @@ const apolloServer = async (app: Express) => {
     }
   );
 
-  const errorLoggingPlugin: ApolloServerPlugin<BaseContext> = {
+  const errorLoggingPlugin: ApolloServerPlugin<ResolverContext> = {
     async requestDidStart() {
       return {
-        async didEncounterErrors({ errors }) {
-          logger.logInfo('GraphQL response contained error(s)', {
+        async didEncounterErrors({ errors, contextValue: { user }, request }) {
+          const context = {
+            requestUserId: user?.id,
+            request,
+          };
+
+          logger.logError('GraphQL response contained error(s)', {
             errors,
+            context,
           });
         },
       };
@@ -154,8 +159,15 @@ const apolloServer = async (app: Express) => {
   const server = new ApolloServer({
     schema: schema,
     plugins: plugins,
-    formatError: (formattedError) => {
-      // NOTE: This is improved in the next PR for logging and error handling (https://github.com/UserOfficeProject/user-office-core/pull/133)
+    formatError(formattedError) {
+      const isProd = process.env.NODE_ENV === 'production';
+
+      // NOTE: Prevent exposing some sensitive data to the client in production.
+      if (isProd) {
+        delete formattedError.extensions?.context;
+        delete formattedError.extensions?.exception;
+      }
+
       return formattedError;
     },
   });

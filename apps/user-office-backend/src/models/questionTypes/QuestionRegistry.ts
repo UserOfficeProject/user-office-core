@@ -1,10 +1,12 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
+import { dynamicMultipleChoiceDefinition } from './DynamicMultipleChoice';
 import { embellishmentDefinition } from './Embellishment';
 import { feedbackBasisDefinition } from './FeedbackBasis';
 import { fileUploadDefinition } from './FileUpload';
@@ -86,6 +88,7 @@ const registry = [
   selectionFromOptionsDefinition,
   shipmentBasis,
   textInputDefinition,
+  dynamicMultipleChoiceDefinition,
   visitBasisDefinition,
 ];
 
@@ -100,7 +103,7 @@ export const getQuestionDefinition = (dataType: DataType) => {
   const definition = componentMap.get(dataType);
   if (!definition) {
     logger.logError('Tried to obtain non-existing definition', { dataType });
-    throw new Error('Tried to obtain non-existing definition');
+    throw new GraphQLError('Tried to obtain non-existing definition');
   }
 
   return definition;

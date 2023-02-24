@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { textInputQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 
 import { ConfigBase, TextInputConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -10,7 +11,7 @@ export const textInputDefinition: Question = {
   dataType: DataType.TEXT_INPUT,
   validate: (field: QuestionTemplateRelation, value: any) => {
     if (field.question.dataType !== DataType.TEXT_INPUT) {
-      throw new Error('DataType should be TEXT_INPUT');
+      throw new GraphQLError('DataType should be TEXT_INPUT');
     }
 
     return textInputQuestionValidationSchema(field).isValid(value);
@@ -41,7 +42,7 @@ export const textInputDefinition: Question = {
           `%${value}%`,
         ]);
       default:
-        throw new Error(
+        throw new GraphQLError(
           `Unsupported comparator for TextInput ${filter.compareOperator}`
         );
     }

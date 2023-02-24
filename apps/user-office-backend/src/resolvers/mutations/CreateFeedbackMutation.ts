@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { FeedbackResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Feedback } from '../types/Feedback';
 
 @ArgsType()
 export class CreateFeedbackArgs {
@@ -23,14 +22,11 @@ export class CreateFeedbackArgs {
 
 @Resolver()
 export class CreateFeedbackMutation {
-  @Mutation(() => FeedbackResponseWrap)
+  @Mutation(() => Feedback)
   createFeedback(
     @Args() args: CreateFeedbackArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.feedback.createFeedback(context.user, args),
-      FeedbackResponseWrap
-    );
+    return context.mutations.feedback.createFeedback(context.user, args);
   }
 }

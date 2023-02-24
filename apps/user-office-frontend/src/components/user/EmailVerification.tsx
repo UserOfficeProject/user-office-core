@@ -46,11 +46,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({ match }) => {
   if (!emailVerified) {
     api()
       .verifyEmail({ token: match.params.token })
-      .then((data) =>
-        data.emailVerification.success
-          ? setEmailVerified(true)
-          : setErrorMessage(true)
-      );
+      .then(() => setEmailVerified(true))
+      .catch(() => setErrorMessage(true));
   }
 
   return (

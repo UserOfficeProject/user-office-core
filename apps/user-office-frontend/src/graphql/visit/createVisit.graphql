@@ -8,29 +8,23 @@ mutation createVisit(
     team: $team
     teamLeadUserId: $teamLeadUserId
   ) {
-    visit {
-      ...visit
+    ...visit
 
-      teamLead {
-        ...basicUserDetails
-      }
-
-      registrations {
-        ...visitRegistration
-        user {
-          ...basicUserDetails
-        }
-      }
-      proposal {
-        ...proposal
-        instrument {
-          name
-        }
-      }
+    teamLead {
+      ...basicUserDetails
     }
 
-    rejection {
-      ...rejection
+    registrations {
+      ...visitRegistration
+      user {
+        ...basicUserDetails
+      }
+    }
+    proposal {
+      ...proposal
+      instrument {
+        name
+      }
     }
   }
 }

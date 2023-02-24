@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SepMeetingDecisionResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { SepMeetingDecision } from '../types/SepMeetingDecision';
 
 @InputType()
 export class ProposalPkWithRankOrder {
@@ -29,18 +28,15 @@ export class ReorderSepMeetingDecisionProposalsInput {
 
 @Resolver()
 export class ReorderSepMeetingDecisionProposalsMutation {
-  @Mutation(() => SepMeetingDecisionResponseWrap)
+  @Mutation(() => SepMeetingDecision)
   reorderSepMeetingDecisionProposals(
     @Arg('reorderSepMeetingDecisionProposalsInput')
     reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.sep.reorderSepMeetingDecisionProposals(
-        context.user,
-        reorderSepMeetingDecisionProposalsInput
-      ),
-      SepMeetingDecisionResponseWrap
+    return context.mutations.sep.reorderSepMeetingDecisionProposals(
+      context.user,
+      reorderSepMeetingDecisionProposalsInput
     );
   }
 }

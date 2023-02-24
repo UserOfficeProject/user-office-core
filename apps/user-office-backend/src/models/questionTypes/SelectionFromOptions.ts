@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { multipleChoiceValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 
 import { SelectionFromOptionsConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -10,7 +11,7 @@ export const selectionFromOptionsDefinition: Question = {
   dataType: DataType.SELECTION_FROM_OPTIONS,
   validate: (field: QuestionTemplateRelation, value: string[]) => {
     if (field.question.dataType !== DataType.SELECTION_FROM_OPTIONS) {
-      throw new Error('DataType should be SELECTION_FROM_OPTIONS');
+      throw new GraphQLError('DataType should be SELECTION_FROM_OPTIONS');
     }
 
     return multipleChoiceValidationSchema(field).isValid(value);
@@ -41,7 +42,7 @@ export const selectionFromOptionsDefinition: Question = {
           value
         );
       default:
-        throw new Error(
+        throw new GraphQLError(
           `Unsupported comparator for SelectionFromOptions ${filter.compareOperator}`
         );
     }

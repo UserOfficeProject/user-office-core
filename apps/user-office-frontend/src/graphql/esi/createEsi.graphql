@@ -1,19 +1,25 @@
 mutation createEsi($scheduledEventId: Int!) {
   createEsi(scheduledEventId: $scheduledEventId) {
-    esi {
-      ...esi
+    ...esi
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sampleEsis {
+      sample {
+        ...sample
+      }
+      ...sampleEsi
       questionary {
         isCompleted
-        ...questionary
       }
-      sampleEsis {
-        sample {
-          ...sample
-        }
-        ...sampleEsi
-        questionary {
-          isCompleted
-        }
+    }
+    proposal {
+      primaryKey
+      proposalId
+      title
+      samples {
+        ...sample
       }
       proposal {
         ...proposal
@@ -28,10 +34,6 @@ mutation createEsi($scheduledEventId: Int!) {
       scheduledEvent {
         ...scheduledEventCore
       }
-    }
-
-    rejection {
-      ...rejection
     }
   }
 }

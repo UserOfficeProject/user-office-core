@@ -3,7 +3,7 @@ import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../queries/VisitQueries';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
-import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistration';
+import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistrationMutation';
 import { CreateVisitArgs } from './../resolvers/mutations/CreateVisitMutation';
 import { VisitsFilter } from './../resolvers/queries/VisitsQuery';
 

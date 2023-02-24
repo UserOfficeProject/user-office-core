@@ -52,11 +52,6 @@ mutation createCall(
       seps: $seps
     }
   ) {
-    rejection {
-      ...rejection
-    }
-    call {
-      ...call
-    }
+    ...call
   }
 }

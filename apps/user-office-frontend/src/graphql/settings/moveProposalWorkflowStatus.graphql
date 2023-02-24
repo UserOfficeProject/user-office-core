@@ -10,8 +10,6 @@ mutation moveProposalWorkflowStatus(
       proposalWorkflowId: $proposalWorkflowId
     }
   ) {
-    rejection {
-      ...rejection
-    }
+    id
   }
 }

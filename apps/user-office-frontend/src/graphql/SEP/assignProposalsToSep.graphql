@@ -2,10 +2,5 @@ mutation assignProposalsToSep(
   $proposals: [ProposalPkWithCallId!]!
   $sepId: Int!
 ) {
-  assignProposalsToSep(proposals: $proposals, sepId: $sepId) {
-    rejection {
-      ...rejection
-    }
-    isSuccess
-  }
+  assignProposalsToSep(proposals: $proposals, sepId: $sepId)
 }

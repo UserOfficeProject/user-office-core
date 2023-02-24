@@ -1,11 +1,6 @@
 mutation setPageContent($id: PageName!, $text: String!) {
   setPageContent(id: $id, text: $text) {
-    page {
-      id
-      content
-    }
-    rejection {
-      ...rejection
-    }
+    id
+    content
   }
 }

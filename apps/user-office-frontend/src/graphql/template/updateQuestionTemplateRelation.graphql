@@ -12,11 +12,6 @@ mutation updateQuestionTemplateRelation(
     sortOrder: $sortOrder
     config: $config
   ) {
-    template {
-      ...template
-    }
-    rejection {
-      ...rejection
-    }
+    ...template
   }
 }
