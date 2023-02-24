@@ -63,6 +63,8 @@ export function QuestionaryComponentDynamicMultipleChoice(
     onComplete(newValue);
   };
 
+  const hasNoContent = 'No available answer found';
+
   const label = (
     <>
       {question}
@@ -123,6 +125,9 @@ export function QuestionaryComponentDynamicMultipleChoice(
               );
             })}
           </Select>
+          {content.length < 1 && (
+            <FormHelperText>{hasNoContent}</FormHelperText>
+          )}
           {isError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );
@@ -153,6 +158,9 @@ export function QuestionaryComponentDynamicMultipleChoice(
               );
             })}
           </RadioGroup>
+          {content.length < 1 && (
+            <FormHelperText>{hasNoContent}</FormHelperText>
+          )}
           {isError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );

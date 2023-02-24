@@ -9,9 +9,12 @@ export function useExternalApi(url: string, path = '') {
     if (unmounted) {
       return;
     }
-    fetch(url)
-      .then((resp) => resp.json())
-      .then((data) => {
+
+    const fetchData = async (url: string) => {
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
         const isArrayOfStrings =
           Array.isArray(data) && data.every((el) => typeof el === 'string');
         if (isArrayOfStrings) {
@@ -20,16 +23,18 @@ export function useExternalApi(url: string, path = '') {
           try {
             const jsonPathFilteredData = jp.query(data, path);
             setContent(jsonPathFilteredData);
-          } catch (err) {
+          } catch (jsonPathError) {
             setContent([]);
-            throw err;
+            throw jsonPathError;
           }
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error(error);
         setContent([]);
-      });
+      }
+    };
+
+    fetchData(url);
 
     return () => {
       unmounted = true;
