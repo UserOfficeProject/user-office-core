@@ -358,129 +358,6 @@ context('Template tests', () => {
     cy.viewport(1920, 1680);
   });
 
-  describe('Dynamic multiple choice external api call tests', () => {
-    const createProposalAndClickDropdownBehavior = () => {
-      cy.login('user1');
-      cy.visit('/');
-
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy=title] input').type('title');
-      cy.get('[data-cy=abstract] textarea').first().type('abstract');
-
-      cy.contains(dynamicMultipleChoiceQuestion.title);
-      cy.contains(dynamicMultipleChoiceQuestion.title).parent().click();
-    };
-
-    beforeEach(() => {
-      cy.login('officer');
-      cy.visit('/');
-      cy.navigateToTemplatesSubmenu('Proposal');
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find('[aria-label=Edit]')
-        .first()
-        .click();
-    });
-
-    it('Should render empty list if JSONPATH syntax is invalid', () => {
-      cy.intercept(
-        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
-        {
-          statusCode: 201,
-          body: dynamicMultipleChoiceQuestion.answers.arrayObject,
-        }
-      );
-      cy.createDynamicMultipleChoiceQuestion(
-        dynamicMultipleChoiceQuestion.title,
-        {
-          url: dynamicMultipleChoiceQuestion.url,
-          jsonPath: '$.[*].item',
-          isMultipleSelect: true,
-          firstTopic: true,
-        }
-      );
-
-      createProposalAndClickDropdownBehavior();
-
-      cy.get('[data-cy=dropdown-ul]').children().should('not.contain.value');
-    });
-
-    it('Should render empty list if external API is down', () => {
-      cy.intercept(
-        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
-        {
-          statusCode: 404,
-          body: 'Not Found',
-        }
-      );
-      cy.createDynamicMultipleChoiceQuestion(
-        dynamicMultipleChoiceQuestion.title,
-        {
-          url: dynamicMultipleChoiceQuestion.url,
-          jsonPath: dynamicMultipleChoiceQuestion.jsonPath,
-          isMultipleSelect: true,
-          firstTopic: true,
-        }
-      );
-      createProposalAndClickDropdownBehavior();
-
-      cy.get('[data-cy=dropdown-ul]').children().should('not.contain.value');
-    });
-
-    it('Should be able to use JSONPATH library to extract specific data from API response', () => {
-      cy.intercept(
-        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
-        {
-          statusCode: 201,
-          body: dynamicMultipleChoiceQuestion.answers.arrayObject,
-        }
-      );
-      cy.createDynamicMultipleChoiceQuestion(
-        dynamicMultipleChoiceQuestion.title,
-        {
-          url: dynamicMultipleChoiceQuestion.url,
-          jsonPath: dynamicMultipleChoiceQuestion.jsonPath,
-          isMultipleSelect: true,
-          firstTopic: true,
-        }
-      );
-      createProposalAndClickDropdownBehavior();
-
-      cy.get('[data-cy=dropdown-ul]').children().should('have.length', 3);
-      cy.get('[data-cy=dropdown-li]').each(($el) => {
-        cy.wrap($el).click();
-      });
-    });
-
-    it('Should render selectable options from an API response', () => {
-      cy.intercept(
-        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
-        {
-          statusCode: 201,
-          body: dynamicMultipleChoiceQuestion.answers.arrayString,
-        }
-      );
-      cy.createDynamicMultipleChoiceQuestion(
-        dynamicMultipleChoiceQuestion.title,
-        {
-          url: dynamicMultipleChoiceQuestion.url,
-          isMultipleSelect: true,
-          firstTopic: true,
-        }
-      );
-      createProposalAndClickDropdownBehavior();
-
-      cy.get('[data-cy=dropdown-ul]').children().should('have.length', 3);
-      cy.get('[data-cy=dropdown-li]').each(($el) => {
-        cy.wrap($el).click();
-      });
-    });
-  });
-
   describe('Proposal templates basic tests', () => {
     it('User officer can delete active template', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
@@ -1507,6 +1384,129 @@ context('Template tests', () => {
 
       cy.get('[data-cy=max_files] input').clear().type('-1');
       cy.get('[data-cy=submit]').should('be.disabled');
+    });
+  });
+
+  describe('Dynamic multiple choice external api call tests', () => {
+    const createProposalAndClickDropdownBehavior = () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title] input').type('title');
+      cy.get('[data-cy=abstract] textarea').first().type('abstract');
+
+      cy.contains(dynamicMultipleChoiceQuestion.title);
+      cy.contains(dynamicMultipleChoiceQuestion.title).parent().click();
+    };
+
+    beforeEach(() => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find('[aria-label=Edit]')
+        .first()
+        .click();
+    });
+
+    it('Should render empty list if JSONPATH syntax is invalid', () => {
+      cy.intercept(
+        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
+        {
+          statusCode: 201,
+          body: dynamicMultipleChoiceQuestion.answers.arrayObject,
+        }
+      );
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          jsonPath: '$.[*].item',
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+
+      createProposalAndClickDropdownBehavior();
+
+      cy.get('[data-cy=dropdown-ul]').children().should('not.contain.value');
+    });
+
+    it('Should render empty list if external API is down', () => {
+      cy.intercept(
+        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
+        {
+          statusCode: 404,
+          body: 'Not Found',
+        }
+      );
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          jsonPath: dynamicMultipleChoiceQuestion.jsonPath,
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+      createProposalAndClickDropdownBehavior();
+
+      cy.get('[data-cy=dropdown-ul]').children().should('not.contain.value');
+    });
+
+    it('Should be able to use JSONPATH library to extract specific data from API response', () => {
+      cy.intercept(
+        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
+        {
+          statusCode: 201,
+          body: dynamicMultipleChoiceQuestion.answers.arrayObject,
+        }
+      );
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          jsonPath: dynamicMultipleChoiceQuestion.jsonPath,
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+      createProposalAndClickDropdownBehavior();
+
+      cy.get('[data-cy=dropdown-ul]').children().should('have.length', 3);
+      cy.get('[data-cy=dropdown-li]').each(($el) => {
+        cy.wrap($el).click();
+      });
+    });
+
+    it('Should render selectable options from an API response', () => {
+      cy.intercept(
+        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
+        {
+          statusCode: 201,
+          body: dynamicMultipleChoiceQuestion.answers.arrayString,
+        }
+      );
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+      createProposalAndClickDropdownBehavior();
+
+      cy.get('[data-cy=dropdown-ul]').children().should('have.length', 3);
+      cy.get('[data-cy=dropdown-li]').each(($el) => {
+        cy.wrap($el).click();
+      });
     });
   });
 
