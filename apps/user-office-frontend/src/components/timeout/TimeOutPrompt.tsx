@@ -29,27 +29,21 @@ function IdleTimeoutPrompt(props: IdleTimeoutPromptProps): JSX.Element {
   const classes = useStyles();
 
   return (
-    <>
-      <Dialog fullWidth data-cy="timeout-dialog" open={props.isIdle}>
-        <DialogTitle className={classes.title}>{'Warning'}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {
-              'You are at risk of being logged out and losing any unsaved data due to inactivity. Please confirm you are still using the system'
-            }
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={props.onConfirm}
-            data-cy="confirm-idle"
-            variant="text"
-          >
-            {'Close'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Dialog fullWidth data-cy="timeout-dialog" open={props.isIdle}>
+      <DialogTitle className={classes.title}>{'Warning'}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          {
+            'You are at risk of being logged out and losing any unsaved data due to inactivity. Please confirm you are still using the system'
+          }
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={props.onConfirm} data-cy="confirm-idle" variant="text">
+          {'Close'}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 
