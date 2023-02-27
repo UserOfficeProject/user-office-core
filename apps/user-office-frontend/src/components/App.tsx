@@ -14,6 +14,7 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
+import { IdleContextPicker } from 'context/IdleContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
@@ -122,11 +123,13 @@ class App extends React.Component {
               <FeatureContextProvider>
                 <UserContextProvider>
                   <DownloadContextProvider>
-                    <Router>
-                      <QueryParamProvider ReactRouterRoute={Route}>
-                        <Routes />
-                      </QueryParamProvider>
-                    </Router>
+                    <IdleContextPicker>
+                      <Router>
+                        <QueryParamProvider ReactRouterRoute={Route}>
+                          <Routes />
+                        </QueryParamProvider>
+                      </Router>
+                    </IdleContextPicker>
                   </DownloadContextProvider>
                 </UserContextProvider>
               </FeatureContextProvider>

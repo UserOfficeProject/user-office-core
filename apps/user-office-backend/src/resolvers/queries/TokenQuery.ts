@@ -58,3 +58,20 @@ export class TokenQuery {
     return result;
   }
 }
+
+@ObjectType()
+class ExternalTokenResult {
+  @Field(() => Boolean)
+  isValid: boolean;
+}
+
+@Resolver()
+export class CheckExternalTokenQuery {
+  @Query(() => ExternalTokenResult)
+  async checkExternalToken(
+    @Ctx() context: ResolverContext,
+    @Arg('token') token: string
+  ) {
+    return { isValid: context.queries.user.checkExternalToken(token) };
+  }
+}
