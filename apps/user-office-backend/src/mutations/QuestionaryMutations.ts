@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { container, inject, injectable } from 'tsyringe';
 
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
@@ -45,7 +46,7 @@ export default class QuestionaryMutations {
         questionaryId,
         topicId,
       });
-      throw new Error('Expected to find step, but was not found');
+      throw new GraphQLError('Expected to find step, but was not found');
     }
 
     const questionIds: string[] = stepQuestions.map(

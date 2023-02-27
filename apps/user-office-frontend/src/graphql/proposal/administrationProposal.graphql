@@ -16,11 +16,6 @@ mutation administrationProposal(
     managementTimeAllocation: $managementTimeAllocation
     managementDecisionSubmitted: $managementDecisionSubmitted
   ) {
-    proposal {
-      primaryKey
-    }
-    rejection {
-      ...rejection
-    }
+    primaryKey
   }
 }

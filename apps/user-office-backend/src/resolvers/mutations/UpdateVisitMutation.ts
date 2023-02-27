@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { VisitStatus } from '../../models/Visit';
-import { VisitResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Visit } from '../types/Visit';
 
 @ArgsType()
 export class UpdateVisitArgs {
@@ -21,7 +20,7 @@ export class UpdateVisitArgs {
   @Field(() => VisitStatus, { nullable: true })
   status?: VisitStatus;
 
-  @Field(() => [Int!], { nullable: true })
+  @Field(() => [Int], { nullable: true })
   team?: number[];
 
   @Field(() => Int, { nullable: true })
@@ -30,11 +29,8 @@ export class UpdateVisitArgs {
 
 @Resolver()
 export class UpdateVisitMutation {
-  @Mutation(() => VisitResponseWrap)
+  @Mutation(() => Visit)
   updateVisit(@Args() args: UpdateVisitArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.visit.updateVisit(context.user, args),
-      VisitResponseWrap
-    );
+    return context.mutations.visit.updateVisit(context.user, args);
   }
 }

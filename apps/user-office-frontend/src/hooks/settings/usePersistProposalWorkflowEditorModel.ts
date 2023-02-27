@@ -4,7 +4,7 @@ import {
   Event,
   EventType,
 } from 'components/settings/proposalWorkflow/ProposalWorkflowEditorModel';
-import { IndexWithGroupId, ProposalWorkflow, Rejection } from 'generated/sdk';
+import { IndexWithGroupId, ProposalWorkflow } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -30,9 +30,7 @@ export function usePersistProposalWorkflowEditorModel() {
       .then((data) => data.updateProposalWorkflow);
   };
 
-  type MonitorableServiceCall = () => Promise<{
-    rejection?: Rejection | null;
-  }>;
+  type MonitorableServiceCall = () => Promise<unknown>;
 
   const persistModel = ({
     getState,
@@ -128,7 +126,7 @@ export function usePersistProposalWorkflowEditorModel() {
               description
             );
 
-            if (result.proposalWorkflow) {
+            if (result) {
               dispatch({
                 type: EventType.WORKFLOW_METADATA_UPDATED,
                 payload: action.payload,
@@ -142,13 +140,15 @@ export function usePersistProposalWorkflowEditorModel() {
           const { source, destination } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await reorderStatusesInProposalWorkflow(
-              source,
-              destination,
-              state.id
-            );
+            try {
+              const result = await reorderStatusesInProposalWorkflow(
+                source,
+                destination,
+                state.id
+              );
 
-            if (result.rejection) {
+              return result;
+            } catch (error) {
               dispatch({
                 type: EventType.REORDER_WORKFLOW_STATUS_FAILED,
                 payload: {
@@ -157,8 +157,6 @@ export function usePersistProposalWorkflowEditorModel() {
                 },
               });
             }
-
-            return result;
           });
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
           dispatch({
@@ -176,13 +174,15 @@ export function usePersistProposalWorkflowEditorModel() {
 
           if (proposalWorkflowConnectionToRemove) {
             return executeAndMonitorCall(async () => {
-              const result = await deleteProposalWorkflowStatus(
-                proposalWorkflowConnectionToRemove.proposalStatusId,
-                proposalWorkflowConnectionToRemove.proposalWorkflowId,
-                proposalWorkflowConnectionToRemove.sortOrder
-              );
+              try {
+                const result = await deleteProposalWorkflowStatus(
+                  proposalWorkflowConnectionToRemove.proposalStatusId,
+                  proposalWorkflowConnectionToRemove.proposalWorkflowId,
+                  proposalWorkflowConnectionToRemove.sortOrder
+                );
 
-              if (result.rejection) {
+                return result;
+              } catch (error) {
                 dispatch({
                   type: EventType.WORKFLOW_STATUS_ADDED,
                   payload: {
@@ -191,8 +191,6 @@ export function usePersistProposalWorkflowEditorModel() {
                   },
                 });
               }
-
-              return result;
             });
           }
 
@@ -216,25 +214,27 @@ export function usePersistProposalWorkflowEditorModel() {
           });
 
           return executeAndMonitorCall(async () => {
-            const result = await insertNewStatusInProposalWorkflow(
-              proposalWorkflowId,
-              sortOrder,
-              droppableGroupId,
-              parentDroppableGroupId,
-              proposalStatusId,
-              nextProposalStatusId,
-              prevProposalStatusId
-            );
+            try {
+              const result = await insertNewStatusInProposalWorkflow(
+                proposalWorkflowId,
+                sortOrder,
+                droppableGroupId,
+                parentDroppableGroupId,
+                proposalStatusId,
+                nextProposalStatusId,
+                prevProposalStatusId
+              );
 
-            dispatch({
-              type: EventType.WORKFLOW_STATUS_UPDATED,
-              payload: {
-                ...action.payload,
-                id: result.proposalWorkflowConnection?.id,
-              },
-            });
+              dispatch({
+                type: EventType.WORKFLOW_STATUS_UPDATED,
+                payload: {
+                  ...action.payload,
+                  id: result.id,
+                },
+              });
 
-            if (result.rejection) {
+              return result;
+            } catch (error) {
               dispatch({
                 type: EventType.WORKFLOW_STATUS_DELETED,
                 payload: {
@@ -242,8 +242,6 @@ export function usePersistProposalWorkflowEditorModel() {
                 },
               });
             }
-
-            return result;
           });
         }
 
@@ -256,15 +254,13 @@ export function usePersistProposalWorkflowEditorModel() {
               statusChangingEvents
             );
 
-            if (!result.rejection) {
-              dispatch({
-                type: EventType.NEXT_STATUS_EVENTS_ADDED,
-                payload: {
-                  workflowConnection,
-                  statusChangingEvents: result.statusChangingEvents,
-                },
-              });
-            }
+            dispatch({
+              type: EventType.NEXT_STATUS_EVENTS_ADDED,
+              payload: {
+                workflowConnection,
+                statusChangingEvents: result,
+              },
+            });
 
             return result;
           });

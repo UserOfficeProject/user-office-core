@@ -12,11 +12,6 @@ mutation updateTopic(
     sortOrder: $sortOrder
     isEnabled: $isEnabled
   ) {
-    template {
-      ...template
-    }
-    rejection {
-      ...rejection
-    }
+    ...template
   }
 }

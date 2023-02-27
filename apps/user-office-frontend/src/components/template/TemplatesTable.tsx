@@ -81,8 +81,7 @@ const TemplatesTable = ({
                 data.splice(
                   templates.findIndex(
                     (elem) =>
-                      elem.templateId ===
-                      response.updateTemplate.template?.templateId
+                      elem.templateId === response.updateTemplate.templateId
                   ),
                   1
                 );
@@ -123,8 +122,7 @@ const TemplatesTable = ({
                 data.splice(
                   templates.findIndex(
                     (elem) =>
-                      elem.templateId ===
-                      response.updateTemplate.template?.templateId
+                      elem.templateId === response.updateTemplate.templateId
                   ),
                   1
                 );
@@ -164,8 +162,7 @@ const TemplatesTable = ({
                 data.splice(
                   templates.findIndex(
                     (elem) =>
-                      elem.templateId ===
-                      response.deleteTemplate.template?.templateId
+                      elem.templateId === response.deleteTemplate.templateId
                   ),
                   1
                 );
@@ -262,7 +259,7 @@ const TemplatesTable = ({
                       templateId: (data as TemplateRowDataType).templateId,
                     })
                     .then((result) => {
-                      const clonedTemplate = result.cloneTemplate.template;
+                      const clonedTemplate = result.cloneTemplate;
                       if (clonedTemplate) {
                         const newTemplates = [...templates];
                         newTemplates.push({ ...clonedTemplate, callCount: 0 });

@@ -4,18 +4,13 @@ mutation updateSampleEsi($esiId: Int!, $sampleId: Int!, $isSubmitted: Boolean) {
     esiId: $esiId
     isSubmitted: $isSubmitted
   ) {
-    esi {
-      ...sampleEsi
-      questionary {
-        isCompleted
-        ...questionary
-      }
-      sample {
-        ...sample
-      }
+    ...sampleEsi
+    questionary {
+      isCompleted
+      ...questionary
     }
-    rejection {
-      ...rejection
+    sample {
+      ...sample
     }
   }
 }

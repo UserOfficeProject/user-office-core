@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SEPResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { SEP } from '../types/SEP';
 
 @ArgsType()
 export class UpdateSEPArgs {
@@ -32,14 +31,11 @@ export class UpdateSEPArgs {
 
 @Resolver()
 export class UpdateSEPMutation {
-  @Mutation(() => SEPResponseWrap)
+  @Mutation(() => SEP)
   async updateSEP(
     @Args() args: UpdateSEPArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.sep.update(context.user, args),
-      SEPResponseWrap
-    );
+    return context.mutations.sep.update(context.user, args);
   }
 }

@@ -10,36 +10,31 @@ mutation updateProposalWorkflow(
       description: $description
     }
   ) {
-    proposalWorkflow {
-      id
-      name
-      description
-      proposalWorkflowConnectionGroups {
-        groupId
-        parentGroupId
-        connections {
+    id
+    name
+    description
+    proposalWorkflowConnectionGroups {
+      groupId
+      parentGroupId
+      connections {
+        id
+        sortOrder
+        proposalWorkflowId
+        proposalStatusId
+        proposalStatus {
           id
-          sortOrder
-          proposalWorkflowId
-          proposalStatusId
-          proposalStatus {
-            id
-            name
-            description
-          }
-          nextProposalStatusId
-          prevProposalStatusId
-          droppableGroupId
-          statusChangingEvents {
-            statusChangingEventId
-            proposalWorkflowConnectionId
-            statusChangingEvent
-          }
+          name
+          description
+        }
+        nextProposalStatusId
+        prevProposalStatusId
+        droppableGroupId
+        statusChangingEvents {
+          statusChangingEventId
+          proposalWorkflowConnectionId
+          statusChangingEvent
         }
       }
-    }
-    rejection {
-      ...rejection
     }
   }
 }

@@ -59,9 +59,7 @@ export default function PdfTemplateEditor() {
                   pdfTemplateId: pdfTemplate?.pdfTemplateId,
                 })
                 .then((template) => {
-                  setPdfTemplate(
-                    template.updatePdfTemplate.pdfTemplate as PdfTemplate
-                  );
+                  setPdfTemplate(template.updatePdfTemplate as PdfTemplate);
                 });
             }
           }}

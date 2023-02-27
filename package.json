@@ -26,7 +26,7 @@
     "install:libs:shared-types": "cd libs/shared-types && npm install",
     "install:libs:validation": "cd libs/validation && npm install",
     "postinstall": "concurrently \"npm run install:backend\" \"npm run install:frontend\" \"npm run install:e2e\"",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"wait-on --interval 1000 http://localhost:4000/readiness && npm run dev:frontend\"",
     "dev:e2e": "concurrently \"npm run dev:backend:e2e\" \"npm run dev:frontend\"",
     "dev:e2e:stfc": "concurrently \"npm run dev:backend:e2e:stfc\" \"npm run dev:frontend\"",
     "dev:backend": "cd apps/user-office-backend && node ../../copyIfNotExist.js example.development.env .env && npm run dev",
@@ -61,6 +61,6 @@
   },
   "devDependencies": {
     "husky": "^4.3.8",
-    "lint-staged": "^13.1.0"
+    "lint-staged": "^13.1.1"
   }
 }

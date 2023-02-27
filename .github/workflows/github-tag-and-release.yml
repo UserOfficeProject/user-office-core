@@ -3,13 +3,14 @@ on:
   push:
     branches:
       - master
+
+env:
+  NODE_VERSION: 16.x
+
 jobs:
   build:
-    runs-on: ubuntu-latest  
-    strategy:
-      matrix:
-        node-version: [16.x]
-        
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -59,12 +60,17 @@ jobs:
             dmsc/duo-backend:${{ steps.tag_version.outputs.new_tag }}
             ghcr.io/userofficeproject/user-office-backend:${{ steps.tag_version.outputs.new_tag }}
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Install Node.js dependencies
         run: npm ci
-        
+
       - name: Set environment variables
-        run:  cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
-        
+        run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+
       - name: Generate SDK
         run: npm run generate:sdk
 

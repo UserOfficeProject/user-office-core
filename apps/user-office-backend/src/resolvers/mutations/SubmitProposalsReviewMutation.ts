@@ -10,8 +10,6 @@ import {
 
 import { ResolverContext } from '../../context';
 import { isRejection, rejection } from '../../models/Rejection';
-import { SuccessResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
 
 @InputType()
 export class ProposalPkWithReviewId {
@@ -30,7 +28,7 @@ export class SubmitProposalsReviewInput {
 
 @Resolver()
 export class SubmitProposalsReviewMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async submitProposalsReview(
     @Arg('submitProposalsReviewInput')
     submitProposalsReviewInput: SubmitProposalsReviewInput,
@@ -47,13 +45,10 @@ export class SubmitProposalsReviewMutation {
       }
     }
 
-    return wrapResponse(
-      failedProposals.length > 0
-        ? Promise.resolve(
-            rejection('Failed to submit one more proposal reviews')
-          )
-        : Promise.resolve(true),
-      SuccessResponseWrap
-    );
+    if (failedProposals.length > 0) {
+      throw rejection('Failed to submit one more proposal reviews');
+    } else {
+      return true;
+    }
   }
 }

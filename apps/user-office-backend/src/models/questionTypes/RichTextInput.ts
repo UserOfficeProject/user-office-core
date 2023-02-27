@@ -1,4 +1,5 @@
 import { richTextInputQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 import sanitizeHtml, { IOptions } from 'sanitize-html';
 
 import {
@@ -48,7 +49,7 @@ export const richTextInputDefinition: Question = {
   dataType: DataType.RICH_TEXT_INPUT,
   validate: (field: QuestionTemplateRelation, value: any) => {
     if (field.question.dataType !== DataType.RICH_TEXT_INPUT) {
-      throw new Error('DataType should be RICH_TEXT_INPUT');
+      throw new GraphQLError('DataType should be RICH_TEXT_INPUT');
     }
 
     return richTextInputQuestionValidationSchema(field).isValid(value);

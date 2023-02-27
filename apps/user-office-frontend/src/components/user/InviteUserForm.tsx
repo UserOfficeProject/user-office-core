@@ -46,7 +46,7 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
         userRole: userRole,
       }}
       onSubmit={async (values): Promise<void> => {
-        const createResult = await api({
+        const { createUserByEmailInvite: createdUserId } = await api({
           toastSuccessMessage: 'Invitation sent successfully!',
         }).createUserByEmailInvite({
           firstname: values.firstname,
@@ -54,9 +54,9 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
           email: values.email,
           userRole: userRole,
         });
-        if (createResult?.createUserByEmailInvite.id) {
+        if (createdUserId) {
           action({
-            id: createResult.createUserByEmailInvite.id,
+            id: createdUserId,
             firstname: values.firstname,
             lastname: values.lastname,
             organisation: '',

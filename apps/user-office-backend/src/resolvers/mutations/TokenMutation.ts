@@ -10,8 +10,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TokenResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class SelectRoleArgs {
@@ -23,16 +21,13 @@ export class SelectRoleArgs {
 }
 @Resolver()
 export class TokenMutation {
-  @Mutation(() => TokenResponseWrap)
+  @Mutation(() => String)
   token(@Arg('token') token: string, @Ctx() context: ResolverContext) {
-    return wrapResponse(context.mutations.user.token(token), TokenResponseWrap);
+    return context.mutations.user.token(token);
   }
 
-  @Mutation(() => TokenResponseWrap)
+  @Mutation(() => String)
   selectRole(@Args() args: SelectRoleArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.user.selectRole(args.token, args.selectedRoleId),
-      TokenResponseWrap
-    );
+    return context.mutations.user.selectRole(args.token, args.selectedRoleId);
   }
 }

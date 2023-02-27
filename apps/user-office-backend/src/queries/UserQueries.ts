@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -162,7 +163,7 @@ export default class UserQueries {
       );
 
       if (!('user' in payload) && !('accessTokenId' in payload)) {
-        throw new Error('Unknown or malformed token');
+        throw new GraphQLError('Unknown or malformed token');
       }
 
       return {
@@ -176,6 +177,20 @@ export default class UserQueries {
         isValid: false,
         payload: null,
       };
+    }
+  }
+
+  async checkExternalToken(externalToken: string): Promise<boolean> {
+    try {
+      const valid = await this.userAuth.isExternalTokenValid(externalToken);
+
+      return valid;
+    } catch (error) {
+      logger.logException('Error checking external token', error, {
+        externalToken,
+      });
+
+      return false;
     }
   }
 }

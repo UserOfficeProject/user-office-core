@@ -36,11 +36,6 @@ mutation createUser(
     otherOrganisation: $otherOrganisation
     organizationCountry: $organizationCountry
   ) {
-    user {
-      id
-    }
-    rejection {
-      ...rejection
-    }
+    id
   }
 }

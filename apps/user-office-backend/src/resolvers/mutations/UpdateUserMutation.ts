@@ -10,8 +10,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { UserResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { User } from '../types/User';
 
 @ArgsType()
 export class UpdateUserArgs {
@@ -87,44 +86,32 @@ export class UpdateUserRolesArgs {
 
 @Resolver()
 export class UpdateUserMutation {
-  @Mutation(() => UserResponseWrap)
+  @Mutation(() => User)
   updateUser(@Args() args: UpdateUserArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.user.update(context.user, args),
-      UserResponseWrap
-    );
+    return context.mutations.user.update(context.user, args);
   }
 
-  @Mutation(() => UserResponseWrap)
+  @Mutation(() => User)
   updateUserRoles(
     @Args() args: UpdateUserRolesArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.user.updateRoles(context.user, args),
-      UserResponseWrap
-    );
+    return context.mutations.user.updateRoles(context.user, args);
   }
 
-  @Mutation(() => UserResponseWrap)
+  @Mutation(() => User)
   setUserEmailVerified(
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.user.setUserEmailVerified(context.user, id),
-      UserResponseWrap
-    );
+    return context.mutations.user.setUserEmailVerified(context.user, id);
   }
 
-  @Mutation(() => UserResponseWrap)
+  @Mutation(() => User)
   setUserNotPlaceholder(
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.user.setUserNotPlaceholder(context.user, id),
-      UserResponseWrap
-    );
+    return context.mutations.user.setUserNotPlaceholder(context.user, id);
   }
 }

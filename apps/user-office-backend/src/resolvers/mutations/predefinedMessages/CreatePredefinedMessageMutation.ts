@@ -1,13 +1,12 @@
 import { Arg, Ctx, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { PredefinedMessage } from '../../../models/PredefinedMessage';
-import { PredefinedMessageResponseWrap } from '../../types/CommonWrappers';
-import { wrapResponse } from '../../wrapResponse';
+import { PredefinedMessage as PredefinedMessageModel } from '../../../models/PredefinedMessage';
+import { PredefinedMessage } from '../../types/PredefinedMessage';
 
 @InputType()
 export class CreatePredefinedMessageInput
-  implements Partial<PredefinedMessage>
+  implements Partial<PredefinedMessageModel>
 {
   @Field(() => String)
   public title: string;
@@ -21,18 +20,15 @@ export class CreatePredefinedMessageInput
 
 @Resolver()
 export class CreatePredefinedMessageMutation {
-  @Mutation(() => PredefinedMessageResponseWrap)
+  @Mutation(() => PredefinedMessage)
   createPredefinedMessage(
     @Arg('createPredefinedMessageInput')
     createPredefinedMessageInput: CreatePredefinedMessageInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.predefinedMessage.create(
-        context.user,
-        createPredefinedMessageInput
-      ),
-      PredefinedMessageResponseWrap
+    return context.mutations.predefinedMessage.create(
+      context.user,
+      createPredefinedMessageInput
     );
   }
 }

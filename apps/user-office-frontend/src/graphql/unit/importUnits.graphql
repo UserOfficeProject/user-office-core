@@ -1,10 +1,8 @@
-mutation importUnits($json: String!, $conflictResolutions: [ConflictResolution!]!) {
-  importUnits(json:$json, conflictResolutions: $conflictResolutions) {
-    units {
-      ...unit
-    }
-    rejection {
-       ...rejection
-    }
+mutation importUnits(
+  $json: String!
+  $conflictResolutions: [ConflictResolution!]!
+) {
+  importUnits(json: $json, conflictResolutions: $conflictResolutions) {
+    ...unit
   }
 }

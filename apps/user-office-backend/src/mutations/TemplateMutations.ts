@@ -31,17 +31,17 @@ import {
   TemplateGroupId,
 } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
-import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
-import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
-import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
-import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
-import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
-import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
-import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
-import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
+import { CreateQuestionArgs } from '../resolvers/mutations/template/CreateQuestionMutation';
+import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/template/CreateQuestionTemplateRelationMutation';
+import { CreateTemplateArgs } from '../resolvers/mutations/template/CreateTemplateMutation';
+import { CreateTopicArgs } from '../resolvers/mutations/template/CreateTopicMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/template/DeleteQuestionTemplateRelationMutation';
+import { SetActiveTemplateArgs } from '../resolvers/mutations/template/SetActiveTemplateMutation';
+import { UpdateQuestionArgs } from '../resolvers/mutations/template/UpdateQuestionMutation';
+import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/template/UpdateQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/template/UpdateQuestionTemplateRelationSettingsMutation';
+import { UpdateTemplateArgs } from '../resolvers/mutations/template/UpdateTemplateMutation';
+import { UpdateTopicArgs } from '../resolvers/mutations/template/UpdateTopicMutation';
 import { ConflictResolution } from '../resolvers/types/ConflictResolution';
 import { TemplateExport } from './../models/Template';
 @injectable()

@@ -1,19 +1,15 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { InstrumentResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Instrument } from '../types/Instrument';
 
 @Resolver()
 export class DeleteInstrumentMutation {
-  @Mutation(() => InstrumentResponseWrap)
+  @Mutation(() => Instrument)
   async deleteInstrument(
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.instrument.delete(context.user, { id }),
-      InstrumentResponseWrap
-    );
+    return context.mutations.instrument.delete(context.user, { id });
   }
 }

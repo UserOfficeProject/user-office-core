@@ -114,9 +114,9 @@ export function MergeReview(props: MergeReviewProps) {
           }),
       })
       .then((result) => {
-        if (result.importTemplate.template) {
+        if (result.importTemplate) {
           history.push(
-            `/QuestionaryEditor/${result.importTemplate.template.templateId}`
+            `/QuestionaryEditor/${result.importTemplate.templateId}`
           );
         }
       });

@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import 'reflect-metadata';
 import { injectable } from 'tsyringe';
 
@@ -8,7 +9,7 @@ import { UserAuthorization } from './UserAuthorization';
 export class EmailAsExternalTokenAuthorization extends UserAuthorization {
   constructor() {
     if (!process.env.EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION) {
-      throw new Error(
+      throw new GraphQLError(
         'Please explicitly enable this authorizer by setting environmental variable EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION to true'
       );
     }

@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -82,7 +83,7 @@ export class CloneUtils {
       sourceSampleEsi.sampleId
     );
     if (!sourceSample) {
-      throw new Error('Sample could not be found');
+      throw new GraphQLError('Sample could not be found');
     }
 
     const newSample = await this.cloneSample(sourceSample, overrides?.sample);

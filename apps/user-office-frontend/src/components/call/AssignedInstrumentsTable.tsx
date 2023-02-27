@@ -125,26 +125,24 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   ];
 
   const removeAssignedInstrument = async (instrumentId: number) => {
-    const result = await api({
+    await api({
       toastSuccessMessage: 'Assigned instrument removed successfully!',
     }).removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,
     });
 
-    if (!result.removeAssignedInstrumentFromCall.rejection) {
-      const dataUpdate = call.instruments.filter(
-        (instrumentItem) => instrumentItem.id !== instrumentId
-      );
-      removeAssignedInstrumentFromCall(dataUpdate, call.id);
-    }
+    const dataUpdate = call.instruments.filter(
+      (instrumentItem) => instrumentItem.id !== instrumentId
+    );
+    removeAssignedInstrumentFromCall(dataUpdate, call.id);
   };
 
   const updateInstrument = async (instrumentUpdatedData: {
     id: number;
     availabilityTime: number | string;
   }) => {
-    const result = await api({
+    await api({
       toastSuccessMessage: 'Availability time set successfully!',
     }).setInstrumentAvailabilityTime({
       callId: call.id,
@@ -152,17 +150,15 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       availabilityTime: +instrumentUpdatedData.availabilityTime,
     });
 
-    if (!result.setInstrumentAvailabilityTime.rejection) {
-      const newUpdatedData = call.instruments.map((instrument) => ({
-        ...instrument,
-        availabilityTime:
-          instrument.id === instrumentUpdatedData.id
-            ? +instrumentUpdatedData.availabilityTime
-            : instrument.availabilityTime,
-      }));
+    const newUpdatedData = call.instruments.map((instrument) => ({
+      ...instrument,
+      availabilityTime:
+        instrument.id === instrumentUpdatedData.id
+          ? +instrumentUpdatedData.availabilityTime
+          : instrument.availabilityTime,
+    }));
 
-      setInstrumentAvailabilityTime(newUpdatedData, call.id);
-    }
+    setInstrumentAvailabilityTime(newUpdatedData, call.id);
   };
 
   return (

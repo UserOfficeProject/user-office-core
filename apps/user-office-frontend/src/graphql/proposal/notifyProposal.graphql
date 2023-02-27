@@ -1,10 +1,5 @@
 mutation notifyProposal($proposalPk: Int!) {
   notifyProposal(proposalPk: $proposalPk) {
-    proposal {
-      primaryKey
-    }
-    rejection {
-      ...rejection
-    }
+    primaryKey
   }
 }

@@ -36,11 +36,6 @@ mutation updateUser(
     otherOrganisation: $otherOrganisation
     organizationCountry: $organizationCountry
   ) {
-    user {
-      id
-    }
-    rejection {
-      ...rejection
-    }
+    id
   }
 }
