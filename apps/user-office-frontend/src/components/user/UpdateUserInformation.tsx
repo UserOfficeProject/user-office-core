@@ -69,8 +69,8 @@ export default function UpdateUserInformation(
   props: UpdateUserInformationProps
 ) {
   const theme = useTheme();
-  const { currentRole, user } = useContext(UserContext);
-  const { userData, setUserData } = useUserData({ userId: props.id });
+  const { user } = useContext(UserContext);
+  const { userData } = useUserData({ userId: props.id });
   const { format, mask } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
