@@ -283,6 +283,15 @@ interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
   scheduledEvents: ScheduledEventCore[];
 }
 
+interface InstrumentCreatedEvent extends GeneralEvent {
+  type: Event.INSTRUMENT_CREATED;
+  instrument: Instrument;
+}
+interface InstrumentUpdatedEvent extends GeneralEvent {
+  type: Event.INSTRUMENT_UPDATED;
+  instrument: Instrument;
+}
+
 interface InstrumentDeletedEvent extends GeneralEvent {
   type: Event.INSTRUMENT_DELETED;
   instrument: Instrument;
@@ -345,5 +354,7 @@ export type ApplicationEvent =
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
   | ProposalBookingTimeSlotsRemovedEvent
+  | InstrumentCreatedEvent
+  | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
   | SEPReviewerNotified;

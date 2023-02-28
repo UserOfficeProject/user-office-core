@@ -15,6 +15,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
+import { Instrument } from '../models/Instrument';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
@@ -29,13 +30,17 @@ type Member = {
 };
 
 type ProposalMessageData = {
+  abstract: string;
+  allocatedTime: number;
+  callId: number;
+  instrument?: Pick<Instrument, 'id' | 'shortCode'>;
+  members: Member[];
+  newStatus?: string;
   proposalPk: number;
+  proposer?: Member;
   shortCode: string;
   title: string;
-  abstract: string;
-  newStatus?: string;
-  members: Member[];
-  proposer?: Member;
+  instrumentId?: number; // instrumentId is here for backwards compatibility.
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -82,6 +87,14 @@ const getProposalMessageData = async (proposal: Proposal) => {
     container.resolve<ProposalSettingsDataSource>(
       Tokens.ProposalSettingsDataSource
     );
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
+
   const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
     proposal.statusId
   );
@@ -90,11 +103,36 @@ const getProposalMessageData = async (proposal: Proposal) => {
     proposal.primaryKey
   );
 
+  const maybeInstrument = await instrumentDataSource.getInstrumentByProposalPk(
+    proposal.primaryKey
+  );
+
+  const call = await callDataSource.getCall(proposal.callId);
+  if (!call) {
+    throw new Error('Call not found');
+  }
+
+  const proposalAllocatedTime = getSecondsPerAllocationTimeUnit(
+    proposal.managementTimeAllocation,
+    call.allocationTimeUnit
+  );
+
+  const instrument = maybeInstrument
+    ? {
+        id: maybeInstrument.id,
+        shortCode: maybeInstrument.shortCode,
+      }
+    : undefined;
+
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
+    instrument: instrument,
     title: proposal.title,
     abstract: proposal.abstract,
+    callId: call.id,
+    allocatedTime: proposalAllocatedTime,
+    instrumentId: instrument?.id,
     members: proposalUsers.map((proposalUser) => ({
       firstName: proposalUser.firstname,
       lastName: proposalUser.lastname,
@@ -136,6 +174,7 @@ const getSecondsPerAllocationTimeUnit = (
 };
 
 export function createPostToRabbitMQHandler() {
+  const EXCHANGE_NAME = 'user_office_backend.fanout';
   const rabbitMQ = getRabbitMQMessageBroker();
 
   const proposalSettingsDataSource =
@@ -145,12 +184,6 @@ export function createPostToRabbitMQHandler() {
 
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
-  );
-  const instrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
   );
 
   return async (event: ApplicationEvent) => {
@@ -167,10 +200,6 @@ export function createPostToRabbitMQHandler() {
         const proposalStatus =
           await proposalSettingsDataSource.getProposalStatus(proposal.statusId);
 
-        const instrument = await instrumentDataSource.getInstrumentByProposalPk(
-          proposal.primaryKey
-        );
-
         if (!proposalStatus) {
           logger.logError(`Unknown proposalStatus '${proposal.statusId}'`, {
             proposal,
@@ -179,59 +208,13 @@ export function createPostToRabbitMQHandler() {
           return;
         }
 
-        const call = await callDataSource.getCall(proposal.callId);
+        const message = await getProposalMessageData(event.proposal);
 
-        if (!call) {
-          logger.logError(`Proposal '${proposal.primaryKey}' has no call`, {
-            proposal,
-          });
-
-          return;
-        }
-
-        const proposalAllocatedTime = getSecondsPerAllocationTimeUnit(
-          proposal.managementTimeAllocation,
-          call.allocationTimeUnit
-        );
-
-        // NOTE: maybe use shared types?
-        const message = {
-          proposalPk: proposal.primaryKey,
-          proposalId: proposal.proposalId,
-          callId: proposal.callId,
-          allocatedTime: proposalAllocatedTime,
-          instrumentId: instrument?.id,
-          newStatus: proposalStatus.shortCode,
-        };
-
-        const schedulerMessage = JSON.stringify(message);
-
-        const fullProposalMessage = await getProposalMessageData(
-          event.proposal
-        );
-
-        // NOTE: This message is consumed by scichat
-        await rabbitMQ.sendMessage(
-          Queue.SCICHAT_PROPOSAL,
-          event.type,
-          fullProposalMessage
-        );
-        // NOTE: This message is consumed by scicat
-        await rabbitMQ.sendMessage(
-          Queue.SCICAT_PROPOSAL,
-          event.type,
-          fullProposalMessage
-        );
-        // NOTE: Send message for scheduler in a separate queue
-        await rabbitMQ.sendMessage(
-          Queue.SCHEDULING_PROPOSAL,
-          event.type,
-          schedulerMessage
-        );
+        rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, message);
 
         logger.logDebug(
           'Proposal event successfully sent to the message broker',
-          { eventType: event.type, fullProposalMessage }
+          { eventType: event.type, fullProposalMessage: message }
         );
 
         break;
@@ -241,7 +224,11 @@ export function createPostToRabbitMQHandler() {
           case ProposalEndStatus.ACCEPTED:
             const json = await getProposalMessageData(event.proposal);
 
-            await rabbitMQ.sendBroadcast(Event.PROPOSAL_ACCEPTED, json);
+            await rabbitMQ.sendMessageToExchange(
+              EXCHANGE_NAME,
+              Event.PROPOSAL_ACCEPTED,
+              json
+            );
             break;
           default:
             break;
@@ -252,31 +239,33 @@ export function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_UPDATED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendBroadcast(Event.PROPOSAL_UPDATED, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.PROPOSAL_DELETED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.PROPOSAL_CREATED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendBroadcast(Event.PROPOSAL_CREATED, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
+      case Event.INSTRUMENT_CREATED:
+      case Event.INSTRUMENT_UPDATED:
       case Event.INSTRUMENT_DELETED: {
         const json = JSON.stringify(event.instrument);
 
-        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.PROPOSAL_SUBMITTED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendBroadcast(Event.PROPOSAL_SUBMITTED, json);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.TOPIC_ANSWERED: {
@@ -299,13 +288,14 @@ export function createPostToRabbitMQHandler() {
         });
 
         const json = JSON.stringify(answers);
-        await rabbitMQ.sendBroadcast(Event.TOPIC_ANSWERED, json);
+
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
       case Event.CALL_CREATED: {
-        const callJson = JSON.stringify(event.call);
+        const json = JSON.stringify(event.call);
 
-        await rabbitMQ.sendBroadcast(Event.CALL_CREATED, callJson);
+        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
         break;
       }
     }
@@ -348,20 +338,10 @@ export function createListenToRabbitMQHandler() {
         );
 
         /**
-         * NOTE: After running the workflow engine send back messages to all the queues with updated data.
+         * NOTE: After running the workflow engine, we send the message to the exchange
          */
-        rabbitMQ.sendMessage(
-          Queue.SCICHAT_PROPOSAL,
-          Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-          fullProposalMessage
-        );
-        rabbitMQ.sendMessage(
-          Queue.SCICAT_PROPOSAL,
-          Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-          fullProposalMessage
-        );
-        rabbitMQ.sendMessage(
-          Queue.SCHEDULING_PROPOSAL,
+        rabbitMQ.sendMessageToExchange(
+          'user_office_backend.fanout',
           Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
           fullProposalMessage
         );
