@@ -44,7 +44,7 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
-  protected autoUpgradedDBReady = true;
+  protected autoUpgradedDBReady = false;
 
   async getCountry(id: number): Promise<Entry | null> {
     return database
