@@ -580,7 +580,6 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 export class PostgresAdminDataSourceWithAutoUpgrade extends PostgresAdminDataSource {
   constructor() {
     super();
-    this.autoUpgradedDBReady = false;
     this.upgrade();
   }
 }
