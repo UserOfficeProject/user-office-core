@@ -50,7 +50,6 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const proposal = state.proposal;
 
-  // Declare state of submission. This is first submission. (3-Feb-23)
   const [firstSubmit, setFirstSubmit] = React.useState(true);
 
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -175,7 +174,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                     itemWithQuestionary: submitProposal,
                   });
                 } finally {
-                  setFirstSubmit(false); //Set state after first submission. (3-Feb-23)
+                  setFirstSubmit(false); 
                   setIsSubmitting(false);
                 }
               },
@@ -185,7 +184,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               }
             )();
           }}
-          disabled={submitDisabled || !firstSubmit} //Disable button after first submission. (3-Feb-23)
+          disabled={submitDisabled || !firstSubmit}
           isBusy={isSubmitting}
           data-cy="button-submit-proposal"
         >

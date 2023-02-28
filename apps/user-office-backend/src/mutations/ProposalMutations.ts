@@ -227,7 +227,7 @@ export default class ProposalMutations {
       });
     }
     if (proposal.submitted) {
-      return rejection('Can not submit the proposal again', {
+      return rejection('Proposal has been submitted already', {
         agent,
         proposal,
       });
