@@ -174,7 +174,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                     itemWithQuestionary: submitProposal,
                   });
                 } finally {
-                  setFirstSubmit(false); 
+                  setFirstSubmit(false);
                   setIsSubmitting(false);
                 }
               },
