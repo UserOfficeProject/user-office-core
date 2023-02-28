@@ -44,6 +44,8 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
+  protected autoUpgradedDBReady = true;
+
   async getCountry(id: number): Promise<Entry | null> {
     return database
       .select('*')
@@ -341,7 +343,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           }
 
           setTimeout(initDb, 1000);
-        });
+        })
+        .finally(() => (this.autoUpgradedDBReady = true));
     };
 
     setTimeout(initDb, 500);
@@ -561,11 +564,23 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         throw new GraphQLError(`Failed to merge institutions: ${e}`);
       });
   }
+
+  waitForDBUpgrade(): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      const checkUpdate = () => {
+        if (this.autoUpgradedDBReady) res();
+        setTimeout(checkUpdate, 30);
+      };
+
+      checkUpdate();
+    });
+  }
 }
 
 export class PostgresAdminDataSourceWithAutoUpgrade extends PostgresAdminDataSource {
   constructor() {
     super();
+    this.autoUpgradedDBReady = false;
     this.upgrade();
   }
 }
