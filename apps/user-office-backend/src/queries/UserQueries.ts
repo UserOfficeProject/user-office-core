@@ -179,4 +179,18 @@ export default class UserQueries {
       };
     }
   }
+
+  async checkExternalToken(externalToken: string): Promise<boolean> {
+    try {
+      const valid = await this.userAuth.isExternalTokenValid(externalToken);
+
+      return valid;
+    } catch (error) {
+      logger.logException('Error checking external token', error, {
+        externalToken,
+      });
+
+      return false;
+    }
+  }
 }
