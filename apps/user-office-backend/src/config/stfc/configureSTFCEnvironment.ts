@@ -9,6 +9,9 @@ import { Tokens } from '../Tokens';
 
 async function setStfcColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  await db.waitForDBUpgrade();
+
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_DARK,
     settingsValue: '#2e2d62',
@@ -69,6 +72,9 @@ async function setStfcColourTheme() {
 
 async function enableDefaultStfcFeatures() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  await db.waitForDBUpgrade();
+
   await db.setFeatures(
     [
       FeatureId.EMAIL_SEARCH,
