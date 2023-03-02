@@ -45,6 +45,7 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
       referenceNumberFormat
       startCall
       endCall
+      endCallInternal
     }
   }
 }
