@@ -87,6 +87,18 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class DynamicMultipleChoiceConfig extends ConfigBase {
+  @Field(() => String)
+  variant: string;
+
+  @Field(() => String)
+  url: string;
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
+}
+
+@ObjectType()
 export class TextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   min: number | null;
@@ -200,6 +212,7 @@ export const FieldConfigType = createUnionType({
     EmbellishmentConfig,
     FileUploadConfig,
     SelectionFromOptionsConfig,
+    DynamicMultipleChoiceConfig,
     TextInputConfig,
     SampleBasisConfig,
     SampleDeclarationConfig,

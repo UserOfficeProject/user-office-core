@@ -6,6 +6,7 @@ import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
+import { dynamicMultipleChoiceDefinition } from './DynamicMultipleChoice';
 import { embellishmentDefinition } from './Embellishment';
 import { feedbackBasisDefinition } from './FeedbackBasis';
 import { fileUploadDefinition } from './FileUpload';
@@ -87,6 +88,7 @@ const registry = [
   selectionFromOptionsDefinition,
   shipmentBasis,
   textInputDefinition,
+  dynamicMultipleChoiceDefinition,
   visitBasisDefinition,
 ];
 
