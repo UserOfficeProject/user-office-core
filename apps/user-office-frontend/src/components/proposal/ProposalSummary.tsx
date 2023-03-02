@@ -50,15 +50,13 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const proposal = state.proposal;
 
-  const [firstSubmit, setFirstSubmit] = React.useState(true);
-
   const downloadPDFProposal = useDownloadPDFProposal();
 
   const allStepsComplete =
     proposal.questionary &&
     proposal.questionary.steps.every((step) => step.isCompleted);
 
-  const [submitDisabled] = useState(() => {
+  const [submitDisabled, setSubmitDisabled] = useState(() => {
     const submitionDisabled =
       (!isUserOfficer && callHasEnded) || // disallow submit for non user officers if the call ended
       !allStepsComplete ||
@@ -174,7 +172,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                     itemWithQuestionary: submitProposal,
                   });
                 } finally {
-                  setFirstSubmit(false);
+                  setSubmitDisabled(true);
                   setIsSubmitting(false);
                 }
               },
@@ -184,7 +182,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               }
             )();
           }}
-          disabled={submitDisabled || !firstSubmit}
+          disabled={submitDisabled}
           isBusy={isSubmitting}
           data-cy="button-submit-proposal"
         >
