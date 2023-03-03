@@ -50,6 +50,8 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const proposal = state.proposal;
 
+  const [firstSubmit, setFirstSubmit] = React.useState(true);
+
   const downloadPDFProposal = useDownloadPDFProposal();
 
   const allStepsComplete =
@@ -182,7 +184,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               }
             )();
           }}
-          disabled={submitDisabled}
+          disabled={submitDisabled || !firstSubmit}
           isBusy={isSubmitting}
           data-cy="button-submit-proposal"
         >
