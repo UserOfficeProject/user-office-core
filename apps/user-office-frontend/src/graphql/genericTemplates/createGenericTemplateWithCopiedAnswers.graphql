@@ -1,16 +1,14 @@
-mutation createGenericTemplateWithClonedAnswers(
-  $title: String!
+mutation createGenericTemplateWithCopiedAnswers(
   $templateId: Int!
   $proposalPk: Int!
   $questionId: String!
-  $sourceQuestionaryId: Int!
+  $copyAnswersInput: [CopyAnswerInput!]!
 ) {
-  createGenericTemplateWithClonedAnswers(
-    title: $title
+  createGenericTemplateWithCopiedAnswers(
     templateId: $templateId
     proposalPk: $proposalPk
     questionId: $questionId
-    sourceQuestionaryId: $sourceQuestionaryId
+    copyAnswersInput: $copyAnswersInput
   ) {
     ...genericTemplate
     questionary {
