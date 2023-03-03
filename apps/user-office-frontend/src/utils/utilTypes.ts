@@ -50,11 +50,3 @@ export type VariablesAndRequestHeaders<V> = V extends Record<string, never>
   : keyof RemoveIndex<V> extends never
   ? [variables?: V, requestHeaders?: Dom.RequestInit['headers']]
   : [variables: V, requestHeaders?: Dom.RequestInit['headers']];
-
-/**
- * This extract type from array type
- */
-
-export type FlattenArrayType<Type> = Type extends Array<infer Item>
-  ? Item
-  : Type;
