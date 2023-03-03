@@ -153,7 +153,7 @@ const GenericTemplateSelectModalOnCopy: React.FC<
           {genericTemplates && (
             <div className={classes.selectorContainer}>
               <Autocomplete
-                id="selectedProposalId"
+                id="generic-template-proposal-select"
                 aria-labelledby="generic-template-proposal-select-label"
                 fullWidth={true}
                 noOptionsText={capitalize(
@@ -174,11 +174,11 @@ const GenericTemplateSelectModalOnCopy: React.FC<
                       (value) => value.proposalPk == template.proposalPk
                     ) === index
                 )}
-                data-cy="generic-template-proposal-select"
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     key={params.id}
+                    data-cy="genericTemplateProposalTitle"
                     label="Proposal title"
                     placeholder="Select proposal title"
                   />
@@ -202,8 +202,8 @@ const GenericTemplateSelectModalOnCopy: React.FC<
                 </InputLabel>
                 <Select
                   labelId="generic-template-answer-select-label"
-                  id="genericTemplateAnswerIds"
-                  data-cy="generic-template-answer-select"
+                  id="generic-template-answer-select"
+                  data-cy="genericTemplateAnswers"
                   multiple={isMultipleCopySelect}
                   value={
                     isMultipleCopySelect
@@ -251,7 +251,7 @@ const GenericTemplateSelectModalOnCopy: React.FC<
       <div className={classes.buttonContainer}>
         <Button
           disabled={genericTemplateAnswer ? false : true}
-          data-cy="generic-template-answer-save-button"
+          data-cy="genericTemplateAnswerSaveButton"
           onClick={() => {
             close();
             const copyAnswersInput = getGenericTemplateAnswers();

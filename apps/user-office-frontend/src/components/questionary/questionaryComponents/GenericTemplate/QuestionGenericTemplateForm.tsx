@@ -103,6 +103,7 @@ export const QuestionGenericTemplateForm: FC<QuestionFormProps> = (props) => {
               component={CheckboxWithLabel}
               type="checkbox"
               id="can-copy-checkbox-input"
+              data-cy="cancopy"
               Label={{
                 label: 'Can copy',
               }}
@@ -130,6 +131,7 @@ export const QuestionGenericTemplateForm: FC<QuestionFormProps> = (props) => {
                   label: 'Multiple copy selection',
                 }}
                 name="config.isMultipleCopySelect"
+                data-cy="isMultipleCopySelect"
               />
               <Field
                 component={CheckboxWithLabel}
@@ -139,6 +141,7 @@ export const QuestionGenericTemplateForm: FC<QuestionFormProps> = (props) => {
                   label: 'Copy is complete',
                 }}
                 name="config.isCompleteOnCopy"
+                data-cy="isCompleteOnCopy"
               />
             </Collapse>
           </TitledContainer>
