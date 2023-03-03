@@ -25,6 +25,7 @@ import {
   GetGenericTemplatesWithProposalDataQuery,
   Maybe,
 } from 'generated/sdk';
+import { capitalize } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type GenericTemplateSelectModalOnCopyProps = {
@@ -155,7 +156,9 @@ const GenericTemplateSelectModalOnCopy: React.FC<
                 id="selectedProposalId"
                 aria-labelledby="generic-template-proposal-select-label"
                 fullWidth={true}
-                noOptionsText="No proposal(s) with matching template"
+                noOptionsText={capitalize(
+                  `No proposal(s) with matching ${question || 'answers(s)'}`
+                )}
                 disableClearable
                 onChange={(_event, selectedValue) => {
                   setGenericTemplateAnswer([]);
@@ -256,9 +259,12 @@ const GenericTemplateSelectModalOnCopy: React.FC<
             if (copyAnswersInput) {
               handleGenericTemplateOnCopy(copyAnswersInput);
             } else {
-              enqueueSnackbar(`${question || 'Title(s)'} selected`, {
-                variant: 'warning',
-              });
+              enqueueSnackbar(
+                capitalize(`${question || 'Title(s)'} selected`),
+                {
+                  variant: 'warning',
+                }
+              );
             }
           }}
         >
