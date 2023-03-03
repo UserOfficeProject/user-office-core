@@ -11,7 +11,11 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { QuestionaryStep, SubTemplateConfig } from 'generated/sdk';
+import {
+  CopyAnswerInput,
+  QuestionaryStep,
+  SubTemplateConfig,
+} from 'generated/sdk';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
 import { GENERIC_TEMPLATE_EVENT } from 'models/questionary/QuestionarySubmissionState';
@@ -24,7 +28,7 @@ import {
   QuestionnairesListRow,
 } from '../QuestionnairesList';
 import { GenericTemplateContainer } from './GenericTemplateContainer';
-import GenericTemplateFromPreviousTemplateSelectModalOnAdd from './GenericTemplateFromPreviousTemplateSelectModalOnAdd';
+import GenericTemplateSelectModalOnCopy from './GenericTemplateSelectModalOnCopy';
 
 const useStyles = makeStyles(() => ({
   questionLabel: {
@@ -185,44 +189,44 @@ function QuestionaryComponentGenericTemplate(
               );
             });
 
-        const createGenericTemplateWithClonedAnswers = (
-          newTitle: string,
-          newSourceQuestionaryId: number
+        const createGenericTemplateWithCopiedAnswers = (
+          copyAnswersInput: CopyAnswerInput[]
         ) => {
           if (!state) {
             throw new Error(
-              'GenericTemplate Declaration is missing proposal context'
+              'GenericTemplate declaration is missing proposal context'
             );
           }
 
           const proposalPk = state.proposal.primaryKey;
-          const questionId = props.answer.question.id;
+          const questionId = answer.question.id;
           if (proposalPk <= 0 || !questionId) {
             throw new Error(
               'GenericTemplate is missing proposal id and/or question id'
             );
           }
           const templateId = config.templateId;
-
           if (!templateId) {
             throw new Error('GenericTemplate is missing templateId');
           }
+
+          if (!copyAnswersInput) {
+            throw new Error(
+              'GenericTemplate is missing source questionary information'
+            );
+          }
           api()
-            .createGenericTemplateWithClonedAnswers({
-              title: newTitle,
-              templateId: templateId,
-              proposalPk: proposalPk,
-              sourceQuestionaryId: newSourceQuestionaryId,
-              questionId: questionId,
+            .createGenericTemplateWithCopiedAnswers({
+              templateId,
+              proposalPk,
+              questionId,
+              copyAnswersInput,
             })
             .then((response) => {
-              const clonedGenericTemplate =
-                response.createGenericTemplateWithClonedAnswers;
-              if (clonedGenericTemplate) {
-                const newStateItems = [...field.value, clonedGenericTemplate];
-
+              const { createGenericTemplateWithCopiedAnswers } = response;
+              if (createGenericTemplateWithCopiedAnswers) {
                 updateFieldValueAndState(
-                  newStateItems,
+                  [...createGenericTemplateWithCopiedAnswers],
                   GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
                 );
               }
@@ -236,6 +240,8 @@ function QuestionaryComponentGenericTemplate(
             </label>
             <QuestionnairesList
               addButtonLabel={config.addEntryButtonLabel}
+              copyButtonLabel={config.copyButtonLabel || undefined}
+              canCopy={config.canCopy}
               data={field.value?.map(genericTemplateToListRow) ?? []}
               maxEntries={config.maxEntries || undefined}
               onEditClick={(item) =>
@@ -261,7 +267,7 @@ function QuestionaryComponentGenericTemplate(
                 })();
               }}
               onAddNewClick={() => createGenericTemplate()}
-              onAddFromPreviousGenericTemplateClick={() =>
+              onCopyClick={() =>
                 setOpenPreviousGenericTemplateSelectionModal(true)
               }
               {...props}
@@ -330,7 +336,7 @@ function QuestionaryComponentGenericTemplate(
                   setOpenPreviousGenericTemplateSelectionModal(false)
                 }
               >
-                <GenericTemplateFromPreviousTemplateSelectModalOnAdd
+                <GenericTemplateSelectModalOnCopy
                   close={(): void =>
                     setOpenPreviousGenericTemplateSelectionModal(false)
                   }
@@ -338,16 +344,12 @@ function QuestionaryComponentGenericTemplate(
                     questionId: answerId,
                   }}
                   currentProposalPk={state.proposal.primaryKey}
-                  addButtonLabel={config.addEntryButtonLabel}
-                  handleCreateGenericTemplateWithClonedAnswers={(
-                    title: string,
-                    sourceQuestionaryId: number
-                  ) =>
-                    createGenericTemplateWithClonedAnswers(
-                      title,
-                      sourceQuestionaryId
-                    )
-                  }
+                  copyButtonLabel={config.copyButtonLabel}
+                  isMultipleCopySelect={config.isMultipleCopySelect || false}
+                  question={answer.question.question}
+                  handleGenericTemplateOnCopy={(
+                    copyAnswersInput: CopyAnswerInput[]
+                  ) => createGenericTemplateWithCopiedAnswers(copyAnswersInput)}
                 />
               </StyledModal>
             )}

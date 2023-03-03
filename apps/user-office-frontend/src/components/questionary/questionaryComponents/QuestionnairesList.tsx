@@ -19,9 +19,11 @@ export interface QuestionnairesListProps {
   onDeleteClick?: (record: QuestionnairesListRow) => void;
   onEditClick?: (record: QuestionnairesListRow) => void;
   onCloneClick?: (record: QuestionnairesListRow) => void;
-  onAddFromPreviousGenericTemplateClick?: () => void;
+  onCopyClick?: () => void;
   data: Array<QuestionnairesListRow>;
   addButtonLabel?: string;
+  canCopy?: boolean;
+  copyButtonLabel?: string;
   maxEntries?: number;
   style?: React.CSSProperties;
 }
@@ -55,11 +57,13 @@ export function QuestionnairesList({
   onDeleteClick,
   onEditClick,
   onCloneClick,
-  onAddFromPreviousGenericTemplateClick,
+  onCopyClick,
   style,
   data,
   maxEntries,
   addButtonLabel,
+  canCopy,
+  copyButtonLabel,
 }: QuestionnairesListProps) {
   const classes = useStyles();
   const isListEmpty = data.length === 0;
@@ -90,6 +94,21 @@ export function QuestionnairesList({
       <Box display="flex" alignItems="center">
         {`${data.length} item(s)`}
         <StyledButtonContainer className={classes.buttonContainer}>
+          {canCopy && (
+            <Button
+              onClick={onCopyClick}
+              variant="outlined"
+              data-cy="copy-button"
+              color="primary"
+              startIcon={<AddCircleOutlineIcon />}
+              disabled={
+                (!!maxEntries && data.length >= maxEntries) ||
+                onCopyClick === undefined
+              }
+            >
+              {copyButtonLabel || 'Copy'}
+            </Button>
+          )}
           <Button
             onClick={onAddNewClick}
             variant="outlined"
@@ -102,21 +121,6 @@ export function QuestionnairesList({
             }
           >
             {addButtonLabel || 'Add'}
-          </Button>
-          <Button
-            onClick={onAddFromPreviousGenericTemplateClick}
-            variant="outlined"
-            data-cy="and-from-previous-generic-template-button"
-            color="primary"
-            startIcon={<AddCircleOutlineIcon />}
-            disabled={
-              (!!maxEntries && data.length >= maxEntries) ||
-              onAddFromPreviousGenericTemplateClick === undefined
-            }
-          >
-            {addButtonLabel
-              ? `${addButtonLabel} From Previous`
-              : 'Add From Previous'}
           </Button>
         </StyledButtonContainer>
       </Box>
