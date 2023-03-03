@@ -13,7 +13,7 @@ import { rejection } from '../models/Rejection';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateGenericTemplateInput } from '../resolvers/mutations/CreateGenericTemplateMutation';
-import { CreateGenericTemplateWithClonedAnswersInput } from '../resolvers/mutations/CreateGenericTemplateWithClonedAnswersMutation';
+import { CreateGenericTemplateWithCopiedAnswersInput } from '../resolvers/mutations/CreateGenericTemplateWithCopiedAnswersMutation';
 import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
 
 @injectable()
@@ -99,9 +99,9 @@ export default class GenericTemplateMutations {
   }
 
   @Authorized()
-  async createGenericTemplateWithClonedAnswers(
+  async createGenericTemplateWithCopiedAnswers(
     agent: UserWithRole | null,
-    args: CreateGenericTemplateWithClonedAnswersInput
+    args: CreateGenericTemplateWithCopiedAnswersInput
   ) {
     if (!agent) {
       return rejection(
@@ -112,29 +112,9 @@ export default class GenericTemplateMutations {
         }
       );
     }
-
-    const cloneQuestionary = await this.questionaryDataSource.getQuestionary(
-      args.sourceQuestionaryId
-    );
-    if (!cloneQuestionary) {
-      return rejection('Can not clone questionary because it does not exist', {
-        agent,
-        args,
-      });
-    }
-    const canCloneQuestionary = await this.questionaryAuth.hasReadRights(
-      agent,
-      args.sourceQuestionaryId
-    );
-    if (!canCloneQuestionary) {
-      return rejection(
-        'Can not clone questionary answers because of insufficient permissions',
-        { agent, args }
-      );
-    }
     const template = await this.templateDataSource.getTemplate(args.templateId);
     if (template?.groupId !== TemplateGroupId.GENERIC_TEMPLATE) {
-      return rejection('Can not create genericTemplate with this template', {
+      return rejection('Can not create generic template with this template', {
         agent,
         args,
       });
@@ -142,7 +122,7 @@ export default class GenericTemplateMutations {
     const proposal = await this.proposalDataSource.get(args.proposalPk);
     if (!proposal) {
       return rejection(
-        'Can not create genericTemplate because proposal was not found',
+        'Can not create generic template because proposal was not found',
         {
           agent,
           args,
@@ -155,35 +135,61 @@ export default class GenericTemplateMutations {
     );
     if (canReadProposal === false) {
       return rejection(
-        'Can not create genericTemplate because of insufficient permissions',
+        'Can not create generic template because of insufficient permissions',
         { agent, args }
       );
     }
 
-    return await this.questionaryDataSource
-      .create(agent.id, args.templateId)
-      .then((questionary) => {
-        return this.genericTemplateDataSource
-          .create(
-            args.title,
-            agent.id,
-            args.proposalPk,
-            questionary.questionaryId,
-            args.questionId
-          )
-          .then((template) =>
-            this.questionaryDataSource
-              .copyAnswers(args.sourceQuestionaryId, template.questionaryId)
-              .then(() => template)
+    return args.copyAnswersInput.map(async (answerInput) => {
+      await this.questionaryDataSource
+        .getQuestionary(answerInput.sourceQuestionaryId)
+        .then((questionary) => {
+          if (!questionary)
+            return rejection(
+              'Can not copy questionary because it does not exist',
+              {
+                agent,
+                args,
+              }
+            );
+        });
+      await this.questionaryAuth
+        .hasReadRights(agent, answerInput.sourceQuestionaryId)
+        .then((questionary) => {
+          if (!questionary)
+            return rejection(
+              'Can not copy questionary answers because of insufficient permissions',
+              {
+                agent,
+                args,
+              }
+            );
+        });
+
+      return await this.questionaryDataSource
+        .create(agent.id, args.templateId)
+        .then(async (questionary) => {
+          const template =
+            await this.genericTemplateDataSource.createGenericTemplateWithCopiedAnswers(
+              answerInput.title,
+              agent.id,
+              args.proposalPk,
+              questionary.questionaryId,
+              questionary.templateId,
+              args.questionId,
+              answerInput.sourceQuestionaryId
+            );
+
+          return template;
+        })
+        .catch((error) => {
+          rejection(
+            'Could not create generic template with copied answers because an error occurred',
+            { agent, args },
+            error
           );
-      })
-      .catch((error) =>
-        rejection(
-          'Could not create genericTemplate with cloned answers because an error occurred',
-          { agent, args },
-          error
-        )
-      );
+        });
+    });
   }
 
   @Authorized()
