@@ -1,14 +1,14 @@
-import FormControl from '@mui/material/FormControl';
+import { Collapse, FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { TemplateGroupId } from 'generated/sdk';
+import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -39,10 +39,15 @@ export const QuestionGenericTemplateForm: FC<QuestionFormProps> = (props) => {
           templateId: Yup.number().required('Template is required'),
           addEntryButtonLabel: Yup.string(),
           maxEntries: Yup.number().nullable(),
+          canCopy: Yup.bool().required(),
+          copyButtonLabel: Yup.string().when('canCopy', {
+            is: (canCopy: boolean) => canCopy,
+            then: Yup.string().required('Copy button label is required'),
+          }),
         }),
       })}
     >
-      {() => (
+      {(formikProps) => (
         <>
           <Field
             name="naturalKey"
@@ -94,6 +99,50 @@ export const QuestionGenericTemplateForm: FC<QuestionFormProps> = (props) => {
               fullWidth
               data-cy="addEntryButtonLabel"
             />
+            <Field
+              component={CheckboxWithLabel}
+              type="checkbox"
+              id="can-copy-checkbox-input"
+              Label={{
+                label: 'Can copy',
+              }}
+              name="config.canCopy"
+              checked={(formikProps.values.config as SubTemplateConfig).canCopy}
+            />
+            <Collapse
+              in={(formikProps.values.config as SubTemplateConfig).canCopy}
+            >
+              <Field
+                name="config.copyButtonLabel"
+                id="copy-button-label-input"
+                label="Copy button label"
+                placeholder='(e.g. "copy previous")'
+                type="text"
+                component={TextField}
+                fullWidth
+                data-cy="copyButtonLabel"
+              />
+              <Field
+                component={CheckboxWithLabel}
+                type="checkbox"
+                id="is-multiple-copy-select-checkbox-input"
+                Label={{
+                  label: 'Multiple copy selection',
+                }}
+                name="config.isMultipleCopySelect"
+              />
+              <Field
+                component={CheckboxWithLabel}
+                type="checkbox"
+                id="is-complete-on-copy-checkbox-input"
+                Label={{
+                  label: 'Copy is complete',
+                }}
+                name="config.isCompleteOnCopy"
+              />
+            </Collapse>
+          </TitledContainer>
+          <TitledContainer label="Constraints">
             <Field
               name="config.minEntries"
               id="Min-Input"

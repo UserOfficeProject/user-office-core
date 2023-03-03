@@ -1,7 +1,7 @@
-import FormControl from '@mui/material/FormControl';
+import { Collapse, FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { default as React, FC } from 'react';
 import * as Yup from 'yup';
 
@@ -43,6 +43,11 @@ export const QuestionTemplateRelationGenericTemplateForm: FC<
           addEntryButtonLabel: Yup.string(),
           maxEntries: Yup.number().nullable(),
           templateId: Yup.number().required('Template is required'),
+          canCopy: Yup.bool().required(),
+          copyButtonLabel: Yup.string().when('canCopy', {
+            is: (canCopy: boolean) => canCopy,
+            then: Yup.string().required('Copy button label is required'),
+          }),
         }),
       })}
     >
@@ -60,6 +65,45 @@ export const QuestionTemplateRelationGenericTemplateForm: FC<
               fullWidth
               data-cy="addEntryButtonLabel"
             />
+            <Field
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Can copy',
+              }}
+              name="config.canCopy"
+              checked={(formikProps.values.config as SubTemplateConfig).canCopy}
+            />
+            <Collapse
+              in={(formikProps.values.config as SubTemplateConfig).canCopy}
+            >
+              <Field
+                name="config.copyButtonLabel"
+                id="copy-button-label-Input"
+                label="Copy button label"
+                placeholder='(e.g. "copy previous")'
+                type="text"
+                component={TextField}
+                fullWidth
+                data-cy="copyButtonLabel"
+              />
+              <Field
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Multiple copy selection',
+                }}
+                name="config.isMultipleCopySelect"
+              />
+              <Field
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Copy is complete',
+                }}
+                name="config.isCompleteOnCopy"
+              />
+            </Collapse>
           </TitledContainer>
 
           <TitledContainer label="Constraints">
