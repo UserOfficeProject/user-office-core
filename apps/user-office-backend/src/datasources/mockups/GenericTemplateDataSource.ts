@@ -82,7 +82,8 @@ export class GenericTemplateDataSourceMock
   }
 
   async cloneGenericTemplate(
-    genericTemplateId: number
+    genericTemplateId: number,
+    reviewBeforeSubmit?: boolean
   ): Promise<GenericTemplate> {
     const genericTemplate = await this.getGenericTemplate(genericTemplateId);
     if (!genericTemplate) {

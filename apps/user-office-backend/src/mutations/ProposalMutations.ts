@@ -540,7 +540,8 @@ export default class ProposalMutations {
       );
 
       const clonedQuestionary = await this.questionaryDataSource.clone(
-        sourceProposal.questionaryId
+        sourceProposal.questionaryId,
+        true
       );
 
       // if user clones the proposal then it is his/her,
@@ -600,7 +601,8 @@ export default class ProposalMutations {
       for await (const genericTemplate of proposalGenericTemplates) {
         const clonedGenericTemplate =
           await this.genericTemplateDataSource.cloneGenericTemplate(
-            genericTemplate.id
+            genericTemplate.id,
+            true
           );
         await this.genericTemplateDataSource.updateGenericTemplate({
           genericTemplateId: clonedGenericTemplate.id,
