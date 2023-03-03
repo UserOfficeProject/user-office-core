@@ -90,8 +90,8 @@ function QuestionaryComponentGenericTemplate(
   const [selectedGenericTemplate, setSelectedGenericTemplate] =
     useState<GenericTemplateWithQuestionary | null>(null);
   const [
-    openPreviousGenericTemplateSelectionModal,
-    setOpenPreviousGenericTemplateSelectionModal,
+    openGenericTemplateSelectionOnCopyModal,
+    setOpenGenericTemplateSelectionOnCopyModal,
   ] = useState(false);
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
@@ -268,7 +268,7 @@ function QuestionaryComponentGenericTemplate(
               }}
               onAddNewClick={() => createGenericTemplate()}
               onCopyClick={() =>
-                setOpenPreviousGenericTemplateSelectionModal(true)
+                setOpenGenericTemplateSelectionOnCopyModal(true)
               }
               {...props}
             />
@@ -327,18 +327,18 @@ function QuestionaryComponentGenericTemplate(
                 <UOLoader />
               )}
             </StyledModal>
-            {openPreviousGenericTemplateSelectionModal && (
+            {openGenericTemplateSelectionOnCopyModal && (
               <StyledModal
-                aria-labelledby="previous-generic-template-selection-modal"
-                aria-describedby="previous-generic-template-selection-on-add-modal"
-                open={openPreviousGenericTemplateSelectionModal}
+                aria-labelledby="generic-template-selection-on-copy-modal-label"
+                aria-describedby="generic-template-selection-on-copy-modal"
+                open={openGenericTemplateSelectionOnCopyModal}
                 onClose={(): void =>
-                  setOpenPreviousGenericTemplateSelectionModal(false)
+                  setOpenGenericTemplateSelectionOnCopyModal(false)
                 }
               >
                 <GenericTemplateSelectModalOnCopy
                   close={(): void =>
-                    setOpenPreviousGenericTemplateSelectionModal(false)
+                    setOpenGenericTemplateSelectionOnCopyModal(false)
                   }
                   filter={{
                     questionId: answerId,

@@ -81,7 +81,7 @@ export const QuestionTemplateRelationGenericTemplateForm: FC<
                 name="config.copyButtonLabel"
                 id="copy-button-label-Input"
                 label="Copy button label"
-                placeholder='(e.g. "copy previous")'
+                placeholder='(e.g. "copy")'
                 type="text"
                 component={TextField}
                 fullWidth

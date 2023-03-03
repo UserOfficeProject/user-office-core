@@ -116,7 +116,7 @@ export const QuestionGenericTemplateForm: FC<QuestionFormProps> = (props) => {
                 name="config.copyButtonLabel"
                 id="copy-button-label-input"
                 label="Copy button label"
-                placeholder='(e.g. "copy previous")'
+                placeholder='(e.g. "copy")'
                 type="text"
                 component={TextField}
                 fullWidth
