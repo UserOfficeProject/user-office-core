@@ -182,7 +182,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               }
             )();
           }}
-          disabled={submitDisabled || !firstSubmit}
+          disabled={submitDisabled}
           isBusy={isSubmitting}
           data-cy="button-submit-proposal"
         >
