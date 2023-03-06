@@ -19,6 +19,7 @@ export enum FeatureId {
   VISIT_MANAGEMENT = 'VISIT_MANAGEMENT',
   SAFETY = 'SAFETY',
   OAUTH = 'OAUTH',
+  STFC_IDLE_TIMER = 'STFC_IDLE_TIMER',
 }
 
 export enum FeatureUpdateAction {
