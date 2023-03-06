@@ -50,8 +50,6 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const proposal = state.proposal;
 
-  const [firstSubmit, setFirstSubmit] = React.useState(true);
-
   const downloadPDFProposal = useDownloadPDFProposal();
 
   const allStepsComplete =
