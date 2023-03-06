@@ -40,8 +40,8 @@ context('App settings tests', () => {
       cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();
 
       cy.get('[data-cy="settings-table"]')
-        .find('button[aria-label="Next Page"]')
-        .click();
+        .get('input[aria-label="Search"]')
+        .type(initialDBData.settings.dateTimeFormat.id);
 
       cy.get('[data-cy="settings-table"]')
         .contains(initialDBData.settings.dateTimeFormat.id)
