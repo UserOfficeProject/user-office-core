@@ -198,7 +198,7 @@ const GenericTemplateSelectModalOnCopy: React.FC<
                 disabled={selectedProposalPk ? false : true}
               >
                 <InputLabel id="generic-template-answer-label">
-                  {question || 'Title(s)'}
+                  {question || 'Answer(s)'}
                 </InputLabel>
                 <Select
                   labelId="generic-template-answer-select-label"
@@ -260,7 +260,7 @@ const GenericTemplateSelectModalOnCopy: React.FC<
               handleGenericTemplateOnCopy(copyAnswersInput);
             } else {
               enqueueSnackbar(
-                capitalize(`${question || 'Title(s)'} selected`),
+                capitalize(`No ${question || 'answer(s)'} selected`),
                 {
                   variant: 'warning',
                 }
