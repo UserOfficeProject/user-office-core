@@ -56,7 +56,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     proposal.questionary &&
     proposal.questionary.steps.every((step) => step.isCompleted);
 
-  const [submitDisabled] = useState(() => {
+  const [submitDisabled, setSubmitDisabled] = useState(() => {
     const submissionDisabled =
       (!isUserOfficer && callHasEnded) || // disallow submit for non user officers if the call ended
       !allStepsComplete ||
@@ -173,6 +173,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                     itemWithQuestionary: submitProposal,
                   });
                 } finally {
+                  setSubmitDisabled(true);
                   setIsSubmitting(false);
                 }
               },
