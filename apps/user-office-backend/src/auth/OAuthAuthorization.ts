@@ -131,7 +131,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     const user = userWithOAuthSubMatch ?? userWithEmailMatch;
 
     if (user) {
-      await this.userDataSource.update({
+      const updatedUser = await this.userDataSource.update({
         ...user,
         firstname: userInfo.given_name,
         lastname: userInfo.family_name,
@@ -146,7 +146,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         organisation: institutionId ?? user.organisation,
       });
 
-      return user;
+      return updatedUser;
     } else {
       const newUser = await this.userDataSource.create(
         'unspecified',
