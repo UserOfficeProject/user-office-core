@@ -126,7 +126,7 @@ const selectRole = async (token: string, selectedRoleId: number) => {
 };
 
 const getOauthExternalToken = async (testUserId: TestUserId) => {
-  const DEV_AUTH_SERVER_URL = 'http://localhost:5000';
+  const DEV_AUTH_SERVER_URL = Cypress.env('DEV_AUTH_SERVER_URL');
   const { email, password } = getCredentialsFromUserId(testUserId);
   const params = {
     login: email,
