@@ -4,6 +4,7 @@ query getGenericTemplatesWithProposalData($filter: GenericTemplatesFilter) {
     proposal {
       primaryKey
       proposalId
+      title
     }
   }
 }
