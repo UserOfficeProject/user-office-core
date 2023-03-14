@@ -20,6 +20,9 @@ import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
+const EXCHANGE_NAME =
+  process.env.CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
+
 type Member = {
   id: string;
   firstName: string;
@@ -45,17 +48,17 @@ type ProposalMessageData = {
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
 
-const getRabbitMQMessageBroker = () => {
+const getRabbitMQMessageBroker = async () => {
   if (rabbitMQCachedBroker === null) {
-    rabbitMQCachedBroker = createRabbitMQMessageBroker();
+    rabbitMQCachedBroker = await createRabbitMQMessageBroker();
   }
 
   return rabbitMQCachedBroker;
 };
 
-const createRabbitMQMessageBroker = () => {
+const createRabbitMQMessageBroker = async () => {
   const messageBroker = new RabbitMQMessageBroker();
-  messageBroker.setup({
+  await messageBroker.setup({
     hostname: process.env.RABBITMQ_HOSTNAME,
     username: process.env.RABBITMQ_USERNAME,
     password: process.env.RABBITMQ_PASSWORD,
@@ -173,9 +176,8 @@ const getSecondsPerAllocationTimeUnit = (
   }
 };
 
-export function createPostToRabbitMQHandler() {
-  const EXCHANGE_NAME = 'user_office_backend.fanout';
-  const rabbitMQ = getRabbitMQMessageBroker();
+export async function createPostToRabbitMQHandler() {
+  const rabbitMQ = await getRabbitMQMessageBroker();
 
   const proposalSettingsDataSource =
     container.resolve<ProposalSettingsDataSource>(
@@ -208,13 +210,13 @@ export function createPostToRabbitMQHandler() {
           return;
         }
 
-        const message = await getProposalMessageData(event.proposal);
+        const jsonMessage = await getProposalMessageData(event.proposal);
 
-        rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, message);
+        rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, jsonMessage);
 
         logger.logDebug(
           'Proposal event successfully sent to the message broker',
-          { eventType: event.type, fullProposalMessage: message }
+          { eventType: event.type, fullProposalMessage: jsonMessage }
         );
 
         break;
@@ -222,12 +224,12 @@ export function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED: {
         switch (event.proposal.finalStatus) {
           case ProposalEndStatus.ACCEPTED:
-            const json = await getProposalMessageData(event.proposal);
+            const jsonMessage = await getProposalMessageData(event.proposal);
 
             await rabbitMQ.sendMessageToExchange(
               EXCHANGE_NAME,
               Event.PROPOSAL_ACCEPTED,
-              json
+              jsonMessage
             );
             break;
           default:
@@ -236,36 +238,29 @@ export function createPostToRabbitMQHandler() {
         break;
       }
 
-      case Event.PROPOSAL_UPDATED: {
-        const json = await getProposalMessageData(event.proposal);
+      case Event.PROPOSAL_UPDATED:
+      case Event.PROPOSAL_DELETED:
+      case Event.PROPOSAL_CREATED:
+      case Event.PROPOSAL_SUBMITTED: {
+        const jsonMessage = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
-        break;
-      }
-      case Event.PROPOSAL_DELETED: {
-        const json = await getProposalMessageData(event.proposal);
-
-        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
-        break;
-      }
-      case Event.PROPOSAL_CREATED: {
-        const json = await getProposalMessageData(event.proposal);
-
-        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
       case Event.INSTRUMENT_CREATED:
       case Event.INSTRUMENT_UPDATED:
       case Event.INSTRUMENT_DELETED: {
-        const json = JSON.stringify(event.instrument);
+        const jsonMessage = JSON.stringify(event.instrument);
 
-        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
-        break;
-      }
-      case Event.PROPOSAL_SUBMITTED: {
-        const json = await getProposalMessageData(event.proposal);
-
-        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
       case Event.TOPIC_ANSWERED: {
@@ -287,23 +282,49 @@ export function createPostToRabbitMQHandler() {
           };
         });
 
-        const json = JSON.stringify(answers);
+        const jsonMessage = JSON.stringify(answers);
 
-        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
       case Event.CALL_CREATED: {
-        const json = JSON.stringify(event.call);
+        const jsonMessage = JSON.stringify(event.call);
 
-        await rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, json);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
     }
   };
 }
 
-export function createListenToRabbitMQHandler() {
-  const rabbitMQ = getRabbitMQMessageBroker();
+export async function createListenToRabbitMQHandler() {
+  const EVENT_SCHEDULING_QUEUE_NAME = process.env
+    .EVENT_SCHEDULING_QUEUE_NAME as Queue;
+  const SCHEDULER_EXCHANGE_NAME = process.env.SCHEDULER_EXCHANGE_NAME;
+
+  // TODO: Maybe we need to check if scheduler is enabled then throw these errors. Check this with STFC.
+  if (!SCHEDULER_EXCHANGE_NAME) {
+    throw new Error('SCHEDULER_EXCHANGE_NAME environment variable not set');
+  }
+
+  if (!EVENT_SCHEDULING_QUEUE_NAME) {
+    throw new Error('EVENT_SCHEDULING_QUEUE_NAME env variable not set');
+  }
+
+  const rabbitMQ = await getRabbitMQMessageBroker();
+
+  await rabbitMQ.bindQueueToExchange(
+    EVENT_SCHEDULING_QUEUE_NAME,
+    SCHEDULER_EXCHANGE_NAME
+  );
 
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
@@ -341,7 +362,7 @@ export function createListenToRabbitMQHandler() {
          * NOTE: After running the workflow engine, we send the message to the exchange
          */
         rabbitMQ.sendMessageToExchange(
-          'user_office_backend.fanout',
+          EXCHANGE_NAME,
           Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
           fullProposalMessage
         );
@@ -349,12 +370,12 @@ export function createListenToRabbitMQHandler() {
     }
   };
 
-  rabbitMQ.listenOn(Queue.SCHEDULED_EVENTS, async (type, message) => {
+  rabbitMQ.listenOn(EVENT_SCHEDULING_QUEUE_NAME, async (type, message) => {
     switch (type) {
       case Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED:
         try {
           logger.logDebug(
-            `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
             {
               type,
               message,
@@ -388,7 +409,7 @@ export function createListenToRabbitMQHandler() {
       case Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED:
         try {
           logger.logDebug(
-            `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
             {
               type,
               message,
@@ -427,7 +448,7 @@ export function createListenToRabbitMQHandler() {
       case Event.PROPOSAL_BOOKING_TIME_REOPENED:
         try {
           logger.logDebug(
-            `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
             {
               type,
               message,
@@ -458,7 +479,7 @@ export function createListenToRabbitMQHandler() {
         return;
       default:
         // captured and logged by duo-message-broker
-        // message forwarded to dead-letter queue (DL__SCHEDULED_EVENTS)
+        // message forwarded to dead-letter queue (DL__${EVENT_SCHEDULING_QUEUE_NAME})
         throw 'Received unknown event';
     }
   });
