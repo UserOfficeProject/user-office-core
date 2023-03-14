@@ -11,7 +11,11 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { QuestionaryStep, SubTemplateConfig } from 'generated/sdk';
+import {
+  CopyAnswerInput,
+  QuestionaryStep,
+  SubTemplateConfig,
+} from 'generated/sdk';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
 import { GENERIC_TEMPLATE_EVENT } from 'models/questionary/QuestionarySubmissionState';
@@ -24,6 +28,7 @@ import {
   QuestionnairesListRow,
 } from '../QuestionnairesList';
 import { GenericTemplateContainer } from './GenericTemplateContainer';
+import GenericTemplateSelectModalOnCopy from './GenericTemplateSelectModalOnCopy';
 
 const useStyles = makeStyles(() => ({
   questionLabel: {
@@ -84,7 +89,10 @@ function QuestionaryComponentGenericTemplate(
 
   const [selectedGenericTemplate, setSelectedGenericTemplate] =
     useState<GenericTemplateWithQuestionary | null>(null);
-
+  const [
+    openGenericTemplateSelectionOnCopyModal,
+    setOpenGenericTemplateSelectionOnCopyModal,
+  ] = useState(false);
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -181,6 +189,50 @@ function QuestionaryComponentGenericTemplate(
               );
             });
 
+        const createGenericTemplateWithCopiedAnswers = (
+          copyAnswersInput: CopyAnswerInput[]
+        ) => {
+          if (!state) {
+            throw new Error(
+              'GenericTemplate declaration is missing proposal context'
+            );
+          }
+
+          const proposalPk = state.proposal.primaryKey;
+          const questionId = answer.question.id;
+          if (proposalPk <= 0 || !questionId) {
+            throw new Error(
+              'GenericTemplate is missing proposal id and/or question id'
+            );
+          }
+          const templateId = config.templateId;
+          if (!templateId) {
+            throw new Error('GenericTemplate is missing templateId');
+          }
+
+          if (!copyAnswersInput) {
+            throw new Error(
+              'GenericTemplate is missing source questionary information'
+            );
+          }
+          api()
+            .createGenericTemplateWithCopiedAnswers({
+              templateId,
+              proposalPk,
+              questionId,
+              copyAnswersInput,
+            })
+            .then((response) => {
+              const { createGenericTemplateWithCopiedAnswers } = response;
+              if (createGenericTemplateWithCopiedAnswers) {
+                updateFieldValueAndState(
+                  [...createGenericTemplateWithCopiedAnswers],
+                  GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                );
+              }
+            });
+        };
+
         return (
           <div>
             <label className={classes.questionLabel}>
@@ -188,6 +240,8 @@ function QuestionaryComponentGenericTemplate(
             </label>
             <QuestionnairesList
               addButtonLabel={config.addEntryButtonLabel}
+              copyButtonLabel={config.copyButtonLabel || undefined}
+              canCopy={config.canCopy}
               data={field.value?.map(genericTemplateToListRow) ?? []}
               maxEntries={config.maxEntries || undefined}
               onEditClick={(item) =>
@@ -213,6 +267,9 @@ function QuestionaryComponentGenericTemplate(
                 })();
               }}
               onAddNewClick={() => createGenericTemplate()}
+              onCopyClick={() =>
+                setOpenGenericTemplateSelectionOnCopyModal(true)
+              }
               {...props}
             />
 
@@ -270,6 +327,32 @@ function QuestionaryComponentGenericTemplate(
                 <UOLoader />
               )}
             </StyledModal>
+            {openGenericTemplateSelectionOnCopyModal && (
+              <StyledModal
+                aria-labelledby="generic-template-selection-on-copy-modal-label"
+                aria-describedby="generic-template-selection-on-copy-modal"
+                open={openGenericTemplateSelectionOnCopyModal}
+                onClose={(): void =>
+                  setOpenGenericTemplateSelectionOnCopyModal(false)
+                }
+              >
+                <GenericTemplateSelectModalOnCopy
+                  close={(): void =>
+                    setOpenGenericTemplateSelectionOnCopyModal(false)
+                  }
+                  filter={{
+                    questionId: answerId,
+                  }}
+                  currentProposalPk={state.proposal.primaryKey}
+                  copyButtonLabel={config.copyButtonLabel}
+                  isMultipleCopySelect={config.isMultipleCopySelect || false}
+                  question={answer.question.question}
+                  handleGenericTemplateOnCopy={(
+                    copyAnswersInput: CopyAnswerInput[]
+                  ) => createGenericTemplateWithCopiedAnswers(copyAnswersInput)}
+                />
+              </StyledModal>
+            )}
           </div>
         );
       }}

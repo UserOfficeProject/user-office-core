@@ -19,4 +19,13 @@ export interface GenericTemplateDataSource {
     genericTemplateId: number
   ): Promise<GenericTemplate | null>;
   getGenericTemplates(args: GenericTemplatesArgs): Promise<GenericTemplate[]>;
+  createGenericTemplateWithCopiedAnswers(
+    title: string,
+    creatorId: number,
+    proposalPk: number,
+    questionaryId: number,
+    templateId: number,
+    questionId: string,
+    sourceQuestionaryId: number
+  ): Promise<GenericTemplate>;
 }
