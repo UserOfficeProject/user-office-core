@@ -1,7 +1,7 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
-import { EmailAsExternalTokenAuthorization } from '../auth/EmailAsExternalTokenAuthorization';
+import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -65,7 +65,7 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 
-mapClass(Tokens.UserAuthorization, EmailAsExternalTokenAuthorization);
+mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

@@ -27,6 +27,16 @@ services:
     volumes:
       - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
 
+  dev-auth-server:
+    image: "ghcr.io/userofficeproject/user-office-development-authorization-server:develop"
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - "db"
+
   factory:
     image: dmsc/duo-factory:${USER_OFFICE_FACTORY_TAG}
     init: true
