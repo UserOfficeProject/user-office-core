@@ -22,7 +22,8 @@ export default class PostgresGenericTemplateDataSource
   ) {}
 
   async cloneGenericTemplate(
-    genericTemplateId: number
+    genericTemplateId: number,
+    reviewBeforeSubmit?: boolean
   ): Promise<GenericTemplate> {
     const sourceGenericTemplate = await this.getGenericTemplate(
       genericTemplateId
@@ -36,7 +37,8 @@ export default class PostgresGenericTemplateDataSource
     }
 
     const newQuestionary = await this.questionaryDataSource.clone(
-      sourceGenericTemplate.questionaryId
+      sourceGenericTemplate.questionaryId,
+      reviewBeforeSubmit
     );
 
     const newGenericTemplate = await this.create(

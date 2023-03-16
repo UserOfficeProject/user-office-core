@@ -31,7 +31,10 @@ export interface QuestionaryDataSource {
     isComplete: boolean
   ): Promise<void>;
   create(creator_id: number, template_id: number): Promise<Questionary>;
-  clone(questionaryId: number): Promise<Questionary>;
+  clone(
+    questionaryId: number,
+    reviewBeforeSubmit?: boolean
+  ): Promise<Questionary>;
   copyAnswers(
     sourceQuestionaryId: number,
     targetQuestionaryId: number
