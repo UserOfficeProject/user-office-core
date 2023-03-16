@@ -19,6 +19,7 @@ export const Tokens = {
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),
   ProposalSettingsDataSource: Symbol('ProposalSettingsDataSource'),
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
+  RedeemCodesDataSource: Symbol('RedeemCodesDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),
   SEPDataSource: Symbol('SEPDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),

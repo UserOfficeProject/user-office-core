@@ -2,6 +2,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { GenericTemplateAuthorization } from '../auth/GenericTemplateAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -12,12 +13,14 @@ import { rejection } from '../models/Rejection';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateGenericTemplateInput } from '../resolvers/mutations/CreateGenericTemplateMutation';
+import { CreateGenericTemplateWithCopiedAnswersInput } from '../resolvers/mutations/CreateGenericTemplateWithCopiedAnswersMutation';
 import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
 
 @injectable()
 export default class GenericTemplateMutations {
   private genericTemplateAuth = container.resolve(GenericTemplateAuthorization);
   private proposalAuth = container.resolve(ProposalAuthorization);
+  private questionaryAuth = container.resolve(QuestionaryAuthorization);
 
   constructor(
     @inject(Tokens.GenericTemplateDataSource)
@@ -93,6 +96,100 @@ export default class GenericTemplateMutations {
           error
         );
       });
+  }
+
+  @Authorized()
+  async createGenericTemplateWithCopiedAnswers(
+    agent: UserWithRole | null,
+    args: CreateGenericTemplateWithCopiedAnswersInput
+  ) {
+    if (!agent) {
+      return rejection(
+        'Can not create genericTemplate because user is not authorized',
+        {
+          agent,
+          args,
+        }
+      );
+    }
+    const template = await this.templateDataSource.getTemplate(args.templateId);
+    if (template?.groupId !== TemplateGroupId.GENERIC_TEMPLATE) {
+      return rejection('Can not create generic template with this template', {
+        agent,
+        args,
+      });
+    }
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
+    if (!proposal) {
+      return rejection(
+        'Can not create generic template because proposal was not found',
+        {
+          agent,
+          args,
+        }
+      );
+    }
+    const canReadProposal = await this.proposalAuth.hasReadRights(
+      agent,
+      proposal
+    );
+    if (canReadProposal === false) {
+      return rejection(
+        'Can not create generic template because of insufficient permissions',
+        { agent, args }
+      );
+    }
+
+    return args.copyAnswersInput.map(async (answerInput) => {
+      await this.questionaryDataSource
+        .getQuestionary(answerInput.sourceQuestionaryId)
+        .then((questionary) => {
+          if (!questionary)
+            return rejection(
+              'Can not copy questionary because it does not exist',
+              {
+                agent,
+                args,
+              }
+            );
+        });
+      await this.questionaryAuth
+        .hasReadRights(agent, answerInput.sourceQuestionaryId)
+        .then((questionary) => {
+          if (!questionary)
+            return rejection(
+              'Can not copy questionary answers because of insufficient permissions',
+              {
+                agent,
+                args,
+              }
+            );
+        });
+
+      return await this.questionaryDataSource
+        .create(agent.id, args.templateId)
+        .then(async (questionary) => {
+          const template =
+            await this.genericTemplateDataSource.createGenericTemplateWithCopiedAnswers(
+              answerInput.title,
+              agent.id,
+              args.proposalPk,
+              questionary.questionaryId,
+              questionary.templateId,
+              args.questionId,
+              answerInput.sourceQuestionaryId
+            );
+
+          return template;
+        })
+        .catch((error) => {
+          rejection(
+            'Could not create generic template with copied answers because an error occurred',
+            { agent, args },
+            error
+          );
+        });
+    });
   }
 
   @Authorized()

@@ -58,6 +58,31 @@ export class GenericTemplateDataSourceMock
     );
   }
 
+  async createGenericTemplateWithCopiedAnswers(
+    title: string,
+    creatorId: number,
+    proposalPk: number,
+    questionaryId: number,
+    templateId: number,
+    questionId: string,
+    sourceQuestionaryId: number
+  ): Promise<GenericTemplate> {
+    if (!templateId || !sourceQuestionaryId) {
+      throw new Error(
+        'GenericTemplate not be created missing coping information'
+      );
+    }
+
+    return new GenericTemplate(
+      1,
+      title,
+      creatorId,
+      proposalPk,
+      questionaryId,
+      questionId,
+      new Date()
+    );
+  }
   async delete(genericTemplateId: number): Promise<GenericTemplate> {
     return this.genericTemplates.splice(
       this.genericTemplates.findIndex(

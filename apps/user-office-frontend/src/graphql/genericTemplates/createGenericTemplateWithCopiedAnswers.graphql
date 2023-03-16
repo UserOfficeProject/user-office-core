@@ -1,0 +1,19 @@
+mutation createGenericTemplateWithCopiedAnswers(
+  $templateId: Int!
+  $proposalPk: Int!
+  $questionId: String!
+  $copyAnswersInput: [CopyAnswerInput!]!
+) {
+  createGenericTemplateWithCopiedAnswers(
+    templateId: $templateId
+    proposalPk: $proposalPk
+    questionId: $questionId
+    copyAnswersInput: $copyAnswersInput
+  ) {
+    ...genericTemplate
+    questionary {
+      isCompleted
+      ...questionary
+    }
+  }
+}
