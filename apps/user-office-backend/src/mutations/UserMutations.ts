@@ -507,7 +507,7 @@ export default class UserMutations {
     }
   }
 
-  async logout(token: string): Promise<void | Rejection> {
+  async logout(token: string): Promise<string | Rejection> {
     try {
       const decodedToken = verifyToken<AuthJwtPayload>(token);
 

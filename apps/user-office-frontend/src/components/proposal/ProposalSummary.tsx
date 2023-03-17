@@ -57,21 +57,22 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     proposal.questionary.steps.every((step) => step.isCompleted);
 
   const [submitDisabled, setSubmitDisabled] = useState(() => {
-    const submitionDisabled =
+    const submissionDisabled =
       (!isUserOfficer && callHasEnded) || // disallow submit for non user officers if the call ended
       !allStepsComplete ||
       proposal.submitted;
 
     if (
       !proposal.submitted &&
-      submitionDisabled &&
+      submissionDisabled &&
       isInternalUser &&
-      isCallActiveInternal
+      isCallActiveInternal &&
+      allStepsComplete
     ) {
       return false; // allow submit for intenal users if the call ended
     }
 
-    return submitionDisabled;
+    return submissionDisabled;
   });
 
   // Show a different submit confirmation if

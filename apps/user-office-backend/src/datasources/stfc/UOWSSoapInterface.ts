@@ -1072,7 +1072,7 @@
                   }
 
                   const refinedResult = this.client['logoutAsync'](argsObj).then((result: any) => {
-                      return result[0];
+                      return "successfully logged out";
                   }).catch((result: any) => {
                       const response = result?.response;
                       const exceptionMessage = response?.data?.match("<faultstring>(.*)</faultstring>")[1];
