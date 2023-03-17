@@ -70,7 +70,8 @@ const CallSelectModalOnProposalsClone: React.FC<
               component="h1"
               className={classes.cardHeader}
             >
-              Clone proposal/s to call
+              Clone proposal/s to call. You will need to review the proposal
+              before it is submitted.
             </Typography>
 
             <Grid container spacing={3}>
