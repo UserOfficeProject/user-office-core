@@ -440,7 +440,10 @@ export default class PostgresQuestionaryDataSource
     );
   }
 
-  async clone(questionaryId: number): Promise<Questionary> {
+  async clone(
+    questionaryId: number,
+    reviewBeforeSubmit?: boolean
+  ): Promise<Questionary> {
     const sourceQuestionary = await this.getQuestionary(questionaryId);
     if (!sourceQuestionary) {
       logger.logError(
@@ -467,11 +470,11 @@ export default class PostgresQuestionaryDataSource
           :clonedQuestionaryId
         , question_id
         , answer
-      FROM 
+      FROM
         answers
       WHERE
         questionary_id = :sourceQuestionaryId
-    `,
+      `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
@@ -488,14 +491,15 @@ export default class PostgresQuestionaryDataSource
       SELECT 
           :clonedQuestionaryId
         , topic_id
-        , is_complete
+        , :reviewBeforeSubmit
       FROM
         topic_completenesses
       WHERE
         questionary_id = :sourceQuestionaryId
-    `,
+      `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
+        reviewBeforeSubmit: !reviewBeforeSubmit,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
       }
     );

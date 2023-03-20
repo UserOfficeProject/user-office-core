@@ -1,0 +1,5 @@
+query checkExternalToken($token: String!) {
+  checkExternalToken(token: $token) {
+    isValid
+  }
+}

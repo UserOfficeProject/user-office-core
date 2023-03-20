@@ -535,7 +535,11 @@ const createGenericTemplateQuestion = (
   question: string,
   templateName: string,
   addButtonLabel: string,
-  options?: { minEntries?: number; maxEntries?: number }
+  canCopy: boolean,
+  options?: { minEntries?: number; maxEntries?: number },
+  copyButtonLabel?: string,
+  isCompleteOnCopy?: boolean,
+  isMultipleCopySelect?: boolean
 ) => {
   openQuestionsMenu();
 
@@ -552,6 +556,24 @@ const createGenericTemplateQuestion = (
 
   if (addButtonLabel) {
     cy.get('[data-cy="addEntryButtonLabel"]').type(addButtonLabel);
+  }
+
+  if (canCopy) {
+    cy.contains('Can copy')
+      .click()
+      .then(() => {
+        cy.get('[data-cy="addEntryButtonLabel"]').type(addButtonLabel);
+
+        if (copyButtonLabel) {
+          cy.get('[data-cy="copyButtonLabel"]').type(copyButtonLabel);
+        }
+        if (isMultipleCopySelect) {
+          cy.get('[data-cy="isMultipleCopySelect"]').click();
+        }
+        if (isCompleteOnCopy) {
+          cy.get('[data-cy="isCompleteOnCopy"]').click();
+        }
+      });
   }
 
   if (options?.minEntries) {

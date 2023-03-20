@@ -132,7 +132,7 @@ export class ShipmentBasisConfig extends ConfigBase {}
 export class FeedbackBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class SubTemplateConfig {
+export class SubTemplateBaseConfig {
   @Field(() => Int, { nullable: true })
   minEntries: number | null;
 
@@ -156,7 +156,22 @@ export class SubTemplateConfig {
 }
 
 @ObjectType()
-export class SampleDeclarationConfig extends SubTemplateConfig {
+export class SubTemplateConfig extends SubTemplateBaseConfig {
+  @Field(() => Boolean)
+  canCopy: boolean;
+
+  @Field(() => String, { nullable: true })
+  copyButtonLabel: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isMultipleCopySelect: boolean | null;
+
+  @Field(() => Boolean, { nullable: true })
+  isCompleteOnCopy: boolean | null;
+}
+
+@ObjectType()
+export class SampleDeclarationConfig extends SubTemplateBaseConfig {
   @Field(() => Int, { nullable: true })
   esiTemplateId: number | null;
 }

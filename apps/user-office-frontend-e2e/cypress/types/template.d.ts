@@ -228,7 +228,11 @@ declare global {
         question: string,
         template: string,
         addButtonLabel: string,
-        options?: { minEntries?: number; maxEntries?: number }
+        canCopy: boolean,
+        options?: { minEntries?: number; maxEntries?: number },
+        copyButtonLabel?: string,
+        isCompleteOnCopy?: boolean,
+        isMultipleCopySelect?: boolean
       ) => void;
 
       /**

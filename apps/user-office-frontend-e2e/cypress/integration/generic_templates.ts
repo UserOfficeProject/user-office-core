@@ -20,6 +20,7 @@ context('GenericTemplates tests', () => {
   const genericTemplateQuestion = twoFakes(4);
   const proposalTitle = twoFakes(3);
   const addButtonLabel = twoFakes(2);
+  const copyButtonLabel = faker.lorem.words(3);
   const genericTemplateTitle = faker.lorem.words(3);
   const genericTemplateQuestionaryQuestion = twoFakes(3);
   const genericTemplateTitleAnswers = [
@@ -117,7 +118,7 @@ context('GenericTemplates tests', () => {
                   cy.updateQuestion({
                     id: createdQuestion1Id,
                     question: genericTemplateQuestion[0],
-                    config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                    config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":true,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
                   });
 
                   cy.createQuestionTemplateRelation({
@@ -358,16 +359,21 @@ context('GenericTemplates tests', () => {
         genericTemplateQuestion[0],
         genericTemplateName[0],
         addButtonLabel[0],
+        true,
         {
           minEntries: 1,
           maxEntries: 2,
-        }
+        },
+        copyButtonLabel,
+        true,
+        true
       );
 
       cy.createGenericTemplateQuestion(
         genericTemplateQuestion[1],
         genericTemplateName[1],
         addButtonLabel[1],
+        false,
         {
           minEntries: 0,
           maxEntries: 2,
@@ -392,7 +398,7 @@ context('GenericTemplates tests', () => {
       });
     });
 
-    it('Should have different Question lables for different tables', () => {
+    it('Should have different Question labels for different tables', () => {
       cy.updateCall({
         id: initialDBData.call.id,
         ...updatedCall,
@@ -664,6 +670,61 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.contains(proposalTitle[1]).should('not.exist');
+    });
+
+    it('User should be able to copy previous genericTemplate', () => {
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...updatedCall,
+        templateId: createdTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: proposalTitle[0],
+            abstract: faker.lorem.words(3),
+            proposerId: initialDBData.users.user1.id,
+          });
+          cy.createGenericTemplate({
+            proposalPk: result.createProposal.primaryKey,
+            title: genericTemplateTitle,
+            templateId: createdGenericTemplateId,
+            questionId: createdQuestion1Id,
+          });
+        }
+      });
+
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(copyButtonLabel).click();
+
+      cy.contains(copyButtonLabel);
+
+      cy.get('[data-cy="genericTemplateProposalTitle"]').click();
+      cy.get('[role=presentation]').contains(proposalTitle[0]).click();
+
+      cy.get('[data-cy="genericTemplateAnswers"]').click();
+      cy.get('[role=presentation]').contains(genericTemplateTitle).click();
+
+      cy.get('[data-cy="genericTemplateAnswerSaveButton"]').click({
+        force: true,
+      });
+
+      cy.contains(genericTemplateTitle);
     });
   });
 
