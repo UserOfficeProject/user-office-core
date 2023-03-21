@@ -57,15 +57,21 @@ const getRabbitMQMessageBroker = async () => {
 };
 
 const createRabbitMQMessageBroker = async () => {
-  const messageBroker = new RabbitMQMessageBroker();
-  await messageBroker.setup({
-    hostname: process.env.RABBITMQ_HOSTNAME,
-    username: process.env.RABBITMQ_USERNAME,
-    password: process.env.RABBITMQ_PASSWORD,
-    vhost: process.env.RABBITMQ_VIRTUAL_HOST ?? '/',
-  });
+  try {
+    const messageBroker = new RabbitMQMessageBroker();
+    await messageBroker.setup({
+      hostname: process.env.RABBITMQ_HOSTNAME,
+      username: process.env.RABBITMQ_USERNAME,
+      password: process.env.RABBITMQ_PASSWORD,
+      vhost: process.env.RABBITMQ_VIRTUAL_HOST ?? '/',
+    });
 
-  return messageBroker;
+    return messageBroker;
+  } catch (error) {
+    throw new Error(
+      `Something went wrong while setting up the message broker: ${error}`
+    );
+  }
 };
 
 export function createPostToQueueHandler() {
