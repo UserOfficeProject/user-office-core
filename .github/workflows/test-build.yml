@@ -39,7 +39,6 @@ jobs:
           }
 
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v2/repositories/dmsc/duo-factory/tags \
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
@@ -425,9 +424,7 @@ jobs:
           push: true
           # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
           # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
-          tags: |
-            dmsc/duo-backend:${{ github.head_ref }}
-            ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
+          tags: ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
 
       - name: Restore frontend SDK
         # Don't login if dependabot is creating the PR
@@ -451,6 +448,4 @@ jobs:
           push: true
           # NOTE: We use two different tags to be able to push the images to both: Github registry and DockerHub
           # If you want to get rid of pushing to DockerHub later just remove the first line in tags.
-          tags: |
-            dmsc/duo-frontend:${{ github.head_ref }}
-            ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}
+          tags: ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}
