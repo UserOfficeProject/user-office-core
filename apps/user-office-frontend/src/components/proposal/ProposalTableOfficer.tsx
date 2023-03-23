@@ -370,9 +370,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     FeatureId.SEP_REVIEW
   )?.isEnabled;
 
-  const isPrincipalInvestigatorManagementEnabled =
-    featureContext.featuresMap.get(FeatureId.INSTRUMENT_MANAGEMENT)?.isEnabled;
-
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.

@@ -6,8 +6,8 @@ import {
   Ctx,
   FieldResolver,
   Resolver,
-  Root
- } from 'type-graphql';
+  Root,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { AllocationTimeUnits } from '../../models/Call';
