@@ -111,6 +111,17 @@ let columns: Column<ProposalViewData>[] = [
     ...{ width: 'auto' },
   },
   {
+    render: (principalInvestigator) => {
+      return `${principalInvestigator.principalInvestigator?.firstname} ${principalInvestigator.principalInvestigator?.lastname}`;
+    },
+    title: 'Principal Investigator',
+  },
+  {
+    title: 'Email',
+    field: 'principalInvestigator.email',
+    emptyValue: '-',
+  },
+  {
     title: 'Submitted',
     field: 'submitted',
     lookup: { true: 'Yes', false: 'No' },
@@ -358,6 +369,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const isSEPEnabled = featureContext.featuresMap.get(
     FeatureId.SEP_REVIEW
   )?.isEnabled;
+
+  const isPrincipalInvestigatorManagementEnabled =
+    featureContext.featuresMap.get(FeatureId.INSTRUMENT_MANAGEMENT)?.isEnabled;
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table

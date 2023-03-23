@@ -97,7 +97,7 @@ export interface ProposalRecord {
   readonly proposal_pk: number;
   readonly title: string;
   readonly abstract: string;
-  readonly proposer_id: number;
+  readonly principal_investigator_id: number;
   readonly status_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
@@ -118,6 +118,7 @@ export interface ProposalRecord {
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
   readonly title: string;
+  readonly principal_investigator: number;
   readonly proposal_status_id: number;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
@@ -686,7 +687,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.proposal_pk,
     proposal.title || '',
     proposal.abstract || '',
-    proposal.proposer_id,
+    proposal.principal_investigator_id,
     proposal.status_id,
     proposal.created_at,
     proposal.updated_at,
@@ -737,6 +738,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
   return new ProposalView(
     proposal.proposal_pk,
     proposal.title || '',
+    proposal.principal_investigator,
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,
@@ -760,7 +762,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.submitted
+    proposal.submitted,
   );
 };
 

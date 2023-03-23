@@ -66,11 +66,25 @@ let columns: Column<ProposalViewData>[] = [
     removable: false,
     field: 'rowActionButtons',
   },
-  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Proposal ID',
+    field: 'proposalId',
+  },
   {
     title: 'Title',
     field: 'title',
     ...{ width: 'auto' },
+  },
+  {
+    render: (principalInvestigator) => {
+      return `${principalInvestigator.principalInvestigator?.firstname} ${principalInvestigator.principalInvestigator?.lastname}`;
+    },
+    title: 'Principal Investigator',
+  },
+  {
+    title: 'PI Email',
+    field: 'principalInvestigator.email',
+    emptyValue: '-',
   },
   {
     title: 'Submitted',
