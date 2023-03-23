@@ -6,7 +6,8 @@ import {
   Ctx,
   FieldResolver,
   Resolver,
-  Root, } from 'type-graphql';
+  Root
+ } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { AllocationTimeUnits } from '../../models/Call';
@@ -15,7 +16,6 @@ import {
   ProposalEndStatus,
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { BasicUserDetails } from './BasicUserDetails';
 import { User } from './User';
 
 @ObjectType()
@@ -27,7 +27,7 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public title: string;
 
   @Field(() => Int)
-  public principalInvestigatorId: number; //Add id
+  public principalInvestigatorId: number;
 
   @Field(() => Int)
   public statusId: number;
@@ -100,13 +100,11 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
-
 }
 
 @Resolver(() => ProposalView)
 export class ProposalResolver {
   @FieldResolver(() => User, { nullable: true })
-  //change to principalInvestigator
   async principalInvestigator(
     @Root() proposal: ProposalView,
     @Ctx() context: ResolverContext

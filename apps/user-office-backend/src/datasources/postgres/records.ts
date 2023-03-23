@@ -762,7 +762,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.submitted,
+    proposal.submitted
   );
 };
 
