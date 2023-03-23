@@ -99,6 +99,12 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 
   @Field(() => Boolean)
   isMultipleSelect: boolean;
+
+  @Field(() => [String])
+  options: string[];
+
+  @Field(() => String)
+  token?: string;
 }
 
 @ObjectType()

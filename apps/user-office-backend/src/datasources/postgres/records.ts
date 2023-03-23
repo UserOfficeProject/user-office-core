@@ -18,7 +18,11 @@ import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
-import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import { DynamicRecord } from '../../models/questionTypes/DynamicMultipleChoice';
+import {
+  createConfig,
+  getExternalApiCallData,
+} from '../../models/questionTypes/QuestionRegistry';
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
@@ -791,11 +795,16 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionTemplateRelationObject = (
+export const createQuestionTemplateRelationObject = async (
   record: QuestionRecord &
     QuestionTemplateRelRecord & { dependency_natural_key: string },
   dependencies: FieldDependency[]
 ) => {
+  let recordWithApiCall;
+  if (record.config.hasOwnProperty('url')) {
+    recordWithApiCall = await getExternalApiCallData(record as DynamicRecord);
+  }
+
   return new QuestionTemplateRelation(
     new Question(
       record.category_id,
@@ -807,7 +816,10 @@ export const createQuestionTemplateRelationObject = (
     ),
     record.topic_id,
     record.sort_order,
-    createConfig<any>(record.data_type as DataType, record.config),
+    createConfig<any>(
+      record.data_type as DataType,
+      recordWithApiCall ? recordWithApiCall.config : record.config
+    ),
     dependencies,
     record.dependencies_operator
   );

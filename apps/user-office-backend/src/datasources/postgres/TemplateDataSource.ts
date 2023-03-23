@@ -440,13 +440,18 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       templateId
     );
 
-    const fields = questionRecords.map((record) => {
-      const questionDependencies = dependencies.filter(
-        (dependency) => dependency.questionId === record.question_id
-      );
+    const fields = await Promise.all(
+      questionRecords.map((record) => {
+        const questionDependencies = dependencies.filter(
+          (dependency) => dependency.questionId === record.question_id
+        );
 
-      return createQuestionTemplateRelationObject(record, questionDependencies);
-    });
+        return createQuestionTemplateRelationObject(
+          record,
+          questionDependencies
+        );
+      })
+    );
 
     const steps = Array<TemplateStep>();
     topicRecords.forEach((topic) => {

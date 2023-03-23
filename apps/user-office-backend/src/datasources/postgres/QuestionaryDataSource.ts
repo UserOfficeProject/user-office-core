@@ -365,24 +365,27 @@ export default class PostgresQuestionaryDataSource
       templateId
     );
 
-    const fields = answerRecords.map((record) => {
-      const questionDependencies = dependencies.filter(
-        (dependency) => dependency.questionId === record.question_id
-      );
+    const fields = await Promise.all(
+      answerRecords.map(async (record) => {
+        const questionDependencies = dependencies.filter(
+          (dependency) => dependency.questionId === record.question_id
+        );
 
-      const questionTemplateRelation = createQuestionTemplateRelationObject(
-        record,
-        questionDependencies
-      );
+        const questionTemplateRelation =
+          await createQuestionTemplateRelationObject(
+            record,
+            questionDependencies
+          );
 
-      // if no answer has been saved, return the default answer value
-      const value =
-        record.value === null
-          ? getDefaultAnswerValue(questionTemplateRelation)
-          : record.value.value;
+        // if no answer has been saved, return the default answer value
+        const value =
+          record.value === null
+            ? getDefaultAnswerValue(questionTemplateRelation)
+            : record.value.value;
 
-      return new Answer(record.answer_id, questionTemplateRelation, value);
-    });
+        return new Answer(record.answer_id, questionTemplateRelation, value);
+      })
+    );
 
     const steps = Array<QuestionaryStep>();
     topicRecords.forEach((topic) => {

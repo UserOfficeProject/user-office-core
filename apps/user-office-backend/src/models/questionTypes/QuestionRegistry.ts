@@ -6,7 +6,10 @@ import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
-import { dynamicMultipleChoiceDefinition } from './DynamicMultipleChoice';
+import {
+  dynamicMultipleChoiceDefinition,
+  DynamicRecord,
+} from './DynamicMultipleChoice';
 import { embellishmentDefinition } from './Embellishment';
 import { feedbackBasisDefinition } from './FeedbackBasis';
 import { fileUploadDefinition } from './FileUpload';
@@ -66,6 +69,8 @@ export interface Question {
     query: Knex.QueryBuilder<any, any>,
     filter: QuestionFilterInput
   ) => any;
+
+  readonly externalApiCall?: (data: DynamicRecord) => Promise<DynamicRecord>;
 }
 
 // Add new component definitions here
@@ -120,9 +125,10 @@ export function createConfig<T extends object>(
   const config: T = definition.createBlankConfig();
   const initValues: Partial<T> =
     typeof init === 'string' ? JSON.parse(init) : init;
-  Object.assign(config, { ...initValues });
 
-  return config;
+  const configData = Object.assign(config, { ...initValues });
+
+  return configData;
 }
 
 /**
@@ -137,3 +143,20 @@ export function getDefaultAnswerValue(
 
   return definition.getDefaultAnswer(questionTemplateRelation);
 }
+
+export function getExternalApiCallData(record: DynamicRecord) {
+  const definition = getQuestionDefinition(record.data_type as DataType);
+
+  if (!definition.externalApiCall) {
+    logger.logError('Tried to make non-existing definition callback', {
+      dataType: record.data_type as DataType,
+    });
+    throw new GraphQLError('Tried to execute non-existing definition callback');
+  }
+
+  const options = definition.externalApiCall(record as DynamicRecord);
+
+  return options;
+}
+
+// export function
