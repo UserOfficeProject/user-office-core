@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { DynamicMultipleChoiceConfig } from 'generated/sdk';
+import { urlValidationSchema } from 'utils/helperFunctions';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
@@ -22,6 +23,7 @@ export const QuestionDynamicMultipleChoiceForm: FC<QuestionFormProps> = (
   const config = field.config as DynamicMultipleChoiceConfig;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
+  const urlValidation = urlValidationSchema();
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
 
@@ -39,9 +41,7 @@ export const QuestionDynamicMultipleChoiceForm: FC<QuestionFormProps> = (
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: Yup.string()
-            .url('Provide a valid URL that includes the HTTP or HTTPS protocol')
-            .required('URL is required'),
+          url: urlValidation,
         }),
       })}
     >

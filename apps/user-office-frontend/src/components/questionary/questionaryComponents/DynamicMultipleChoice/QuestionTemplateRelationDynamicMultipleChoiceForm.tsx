@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
+import { urlValidationSchema } from 'utils/helperFunctions';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -29,6 +30,8 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm: FC<
     { label: 'Dropdown', value: 'dropdown' },
   ];
 
+  const urlValidation = urlValidationSchema();
+
   return (
     <QuestionTemplateRelationFormShell
       {...props}
@@ -36,9 +39,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm: FC<
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: Yup.string()
-            .url('Provide a valid URL that includes the HTTP or HTTPS protocol')
-            .required('URL is required'),
+          url: urlValidation,
         }),
       })}
     >
