@@ -154,7 +154,5 @@ export async function getExternalApiCallData(record: DynamicRecord) {
     throw new GraphQLError('Tried to execute non-existing definition callback');
   }
 
-  const options = await definition.externalApiCall(record as DynamicRecord);
-
-  return options;
+  return await definition.externalApiCall(record as DynamicRecord);
 }
