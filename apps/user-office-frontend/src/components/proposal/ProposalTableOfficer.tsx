@@ -117,7 +117,7 @@ let columns: Column<ProposalViewData>[] = [
     title: 'Principal Investigator',
   },
   {
-    title: 'Email',
+    title: 'PI Email',
     field: 'principalInvestigator.email',
     emptyValue: '-',
   },
