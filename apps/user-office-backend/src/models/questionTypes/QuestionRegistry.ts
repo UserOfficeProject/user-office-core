@@ -144,7 +144,7 @@ export function getDefaultAnswerValue(
   return definition.getDefaultAnswer(questionTemplateRelation);
 }
 
-export function getExternalApiCallData(record: DynamicRecord) {
+export async function getExternalApiCallData(record: DynamicRecord) {
   const definition = getQuestionDefinition(record.data_type as DataType);
 
   if (!definition.externalApiCall) {
@@ -154,9 +154,7 @@ export function getExternalApiCallData(record: DynamicRecord) {
     throw new GraphQLError('Tried to execute non-existing definition callback');
   }
 
-  const options = definition.externalApiCall(record as DynamicRecord);
+  const options = await definition.externalApiCall(record as DynamicRecord);
 
   return options;
 }
-
-// export function

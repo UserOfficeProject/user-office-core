@@ -89,8 +89,6 @@ export const dynamicMultipleChoiceDefinition: Question = {
         };
       } else {
         try {
-          //TODO: if jsonPathFilteredData is empty, then we know
-          // either jsonpath syntax is wrong or api returns no value with success http status
           const jsonPathFilteredData = jp.query(
             resp.data,
             record.config.jsonPath
