@@ -42,6 +42,14 @@ jobs:
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
+          CHECK_IF_IMAGE_EXISTS=$(docker manifest inspect ghcr.io/userofficeproject/user-office-factory:${{ github.head_ref }})
+
+          echo $CHECK_IF_IMAGE_EXISTS
+
+          if [[ $CHECK_IF_IMAGE_EXISTS != ""  ]]; then 
+              FACTORY_TAGS=$((FACTORY_TAGS+1))
+          fi
+
           FACTORY_TAG=develop
           if [[ $FACTORY_TAGS == "2" ]]; then
             FACTORY_TAG="${{ github.head_ref }}"
