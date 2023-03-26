@@ -126,9 +126,9 @@ export function createConfig<T extends object>(
   const initValues: Partial<T> =
     typeof init === 'string' ? JSON.parse(init) : init;
 
-  const configData = Object.assign(config, { ...initValues });
+  Object.assign(config, { ...initValues });
 
-  return configData;
+  return config;
 }
 
 /**

@@ -61,7 +61,8 @@ module.exports = (on: Cypress.PluginEvents) => {
 
   on('task', {
     mockServer({ interceptUrl, fixture }) {
-      if (server) server.close(); // close any previous instance
+      // close any previous instance
+      if (server) server.close();
 
       const url = new URL(interceptUrl);
       const data = JSON.stringify(fixture);
@@ -74,7 +75,6 @@ module.exports = (on: Cypress.PluginEvents) => {
       });
 
       server.listen(url.port);
-      console.log(`listening at port ${url.port}`);
 
       return null;
     },
