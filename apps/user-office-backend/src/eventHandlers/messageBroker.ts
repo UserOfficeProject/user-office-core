@@ -316,7 +316,6 @@ export async function createListenToRabbitMQHandler() {
     .EVENT_SCHEDULING_QUEUE_NAME as Queue;
   const SCHEDULER_EXCHANGE_NAME = process.env.SCHEDULER_EXCHANGE_NAME;
 
-  // TODO: Maybe we need to check if scheduler is enabled then throw these errors. Check this with STFC.
   if (!SCHEDULER_EXCHANGE_NAME) {
     throw new Error('SCHEDULER_EXCHANGE_NAME environment variable not set');
   }
