@@ -144,7 +144,7 @@ export const isCallEnded = (
 export const urlValidationSchema = () => {
   return Yup.string()
     .matches(
-      /https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,63})|(localhost))\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i,
+      /https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,63})|(localhost))\b([-a-zA-Z0-9@:%_\+.~#?&/=]*)/i,
       'Provide a valid URL that includes the HTTP or HTTPS protocol'
     )
     .required('URL is required');

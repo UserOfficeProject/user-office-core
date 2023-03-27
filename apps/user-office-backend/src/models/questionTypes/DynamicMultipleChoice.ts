@@ -73,7 +73,7 @@ export const dynamicMultipleChoiceDefinition: Question = {
     try {
       const resp = await axios.get(record.config.url, {
         headers: {
-          Authorization: `Bearer ${record.config?.token}`,
+          Authorization: `Bearer ${record.config.token}`,
         },
       });
       const arrayData =
