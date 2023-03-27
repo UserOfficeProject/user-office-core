@@ -1,10 +1,12 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { UpdateGenericTemplateArgs } from '../../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplatesArgs } from '../../resolvers/queries/GenericTemplatesQuery';
+import { SubTemplateConfig } from '../../resolvers/types/FieldConfig';
 import { GenericTemplateDataSource } from '../GenericTemplateDataSource';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
@@ -20,7 +22,8 @@ export default class PostgresGenericTemplateDataSource
   ) {}
 
   async cloneGenericTemplate(
-    genericTemplateId: number
+    genericTemplateId: number,
+    reviewBeforeSubmit?: boolean
   ): Promise<GenericTemplate> {
     const sourceGenericTemplate = await this.getGenericTemplate(
       genericTemplateId
@@ -30,11 +33,12 @@ export default class PostgresGenericTemplateDataSource
         'Could not clone genericTemplate because source genericTemplate does not exist',
         { genericTemplateId }
       );
-      throw new Error('Could not clone genericTemplate');
+      throw new GraphQLError('Could not clone genericTemplate');
     }
 
     const newQuestionary = await this.questionaryDataSource.clone(
-      sourceGenericTemplate.questionaryId
+      sourceGenericTemplate.questionaryId,
+      reviewBeforeSubmit
     );
 
     const newGenericTemplate = await this.create(
@@ -57,7 +61,7 @@ export default class PostgresGenericTemplateDataSource
           logger.logError('Could not delete genericTemplate', {
             genericTemplateId,
           });
-          throw new Error('Could not delete genericTemplate');
+          throw new GraphQLError('Could not delete genericTemplate');
         }
 
         return createGenericTemplateObject(records[0]);
@@ -80,7 +84,7 @@ export default class PostgresGenericTemplateDataSource
       .then((records: GenericTemplateRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not update genericTemplate', { args });
-          throw new Error('Could not update genericTemplate');
+          throw new GraphQLError('Could not update genericTemplate');
         }
 
         return createGenericTemplateObject(records[0]);
@@ -108,7 +112,7 @@ export default class PostgresGenericTemplateDataSource
             questionary_id,
             question_id,
           });
-          throw new Error('Failed to insert genericTemplate');
+          throw new GraphQLError('Failed to insert genericTemplate');
         }
 
         return createGenericTemplateObject(records[0]);
@@ -116,6 +120,86 @@ export default class PostgresGenericTemplateDataSource
       .catch((err) => {
         return err;
       });
+  }
+
+  async createGenericTemplateWithCopiedAnswers(
+    title: string,
+    creatorId: number,
+    proposalPk: number,
+    questionaryId: number,
+    templateId: number,
+    questionId: string,
+    sourceQuestionaryId: number
+  ): Promise<GenericTemplate> {
+    const newGenericTemplate = await this.create(
+      title,
+      creatorId,
+      proposalPk,
+      questionaryId,
+      questionId
+    );
+    const subTemplate = await database('templates_has_questions')
+      .select('*')
+      .first()
+      .where({ question_id: newGenericTemplate.questionId })
+      .then((result) => {
+        if (!result) {
+          throw new GraphQLError(
+            `Generic template value does not exist ID: ${templateId}`
+          );
+        }
+
+        return {
+          config: result.config as SubTemplateConfig,
+          topicId: result.topic_id,
+        };
+      });
+
+    if (subTemplate.config.canCopy === false) {
+      throw new GraphQLError(
+        `Coping generic template questionary is not allowed ID: ${questionaryId}`
+      );
+    }
+
+    if (!subTemplate.topicId) {
+      throw new GraphQLError(
+        `Can not create generic template because topic does not exist ID: ${templateId}`
+      );
+    }
+    await this.questionaryDataSource
+      .copyAnswers(sourceQuestionaryId, newGenericTemplate.questionaryId)
+      .then(async () => {
+        if (
+          subTemplate.config.isCompleteOnCopy &&
+          subTemplate.config.isCompleteOnCopy === true
+        ) {
+          await database(
+            database.raw('?? (??, ??, ??)', [
+              'topic_completenesses',
+              'questionary_id',
+              'topic_id',
+              'is_complete',
+            ])
+          )
+            .insert(
+              database('topics')
+                .select(
+                  database.raw(`${questionaryId}, ??, ${true}`, ['topic_id'])
+                )
+                .where('template_id', templateId),
+              ['questionary_id', 'topic_id', 'is_complete']
+            )
+            .then((result) => {
+              if (!result) {
+                throw new GraphQLError(
+                  `Could not set generic template topic(s) as complete ID: ${templateId}`
+                );
+              }
+            });
+        }
+      });
+
+    return newGenericTemplate;
   }
 
   getGenericTemplate(

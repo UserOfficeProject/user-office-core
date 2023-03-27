@@ -1,3 +1,5 @@
+import PDFServices from '../middlewares/factory/factoryServices';
+import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
@@ -11,6 +13,7 @@ import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalSettingsMutations from '../mutations/ProposalSettingsMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
+import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
@@ -84,6 +87,7 @@ interface ResolverContextMutations {
   proposalEsi: ProposalEsiMutations;
   proposalSettings: ProposalSettingsMutations;
   questionary: QuestionaryMutations;
+  redeemCodes: RedeemCodesMutations;
   review: ReviewMutations;
   sample: SampleMutations;
   sampleEsi: SampleEsiMutations;
@@ -95,10 +99,17 @@ interface ResolverContextMutations {
   visit: VisitMutations;
   predefinedMessage: PredefinedMessageMutations;
 }
+interface ResolverContextServices {
+  pdfServices: PDFServices;
+}
 
 export interface BasicResolverContext {
   mutations: ResolverContextMutations;
   queries: ResolverContextQueries;
+  clients: {
+    scheduler: () => Promise<Sdk | undefined>;
+  };
+  services: ResolverContextServices;
 }
 
 export interface ResolverContext extends BasicResolverContext {

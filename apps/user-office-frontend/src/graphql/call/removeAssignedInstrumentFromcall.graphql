@@ -5,11 +5,6 @@ mutation removeAssignedInstrumentFromCall($instrumentId: Int!, $callId: Int!) {
       callId: $callId
     }
   ) {
-    rejection {
-      ...rejection
-    }
-    call {
-      id
-    }
+    id
   }
 }

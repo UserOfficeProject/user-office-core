@@ -87,19 +87,16 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
           onClick={() =>
             confirm(
               async () => {
-                const result = await api().submitShipment({
+                const { submitShipment } = await api().submitShipment({
                   shipmentId: state.shipment.id,
                 });
-                if (!result.submitShipment.shipment) {
-                  return;
-                }
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: result.submitShipment.shipment,
+                  itemWithQuestionary: submitShipment,
                 });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: result.submitShipment.shipment,
+                  itemWithQuestionary: submitShipment,
                 });
               },
               {

@@ -47,19 +47,17 @@ const ApiAccessTokensTable: React.FC = () => {
   );
 
   const deleteApiAccessToken = async (id: string | number) => {
-    return await api({
-      toastSuccessMessage: 'Api access token deleted successfully',
-    })
-      .deleteApiAccessToken({
+    try {
+      await api({
+        toastSuccessMessage: 'Api access token deleted successfully',
+      }).deleteApiAccessToken({
         accessTokenId: id as string,
-      })
-      .then((resp) => {
-        if (resp.deleteApiAccessToken.rejection) {
-          return false;
-        } else {
-          return true;
-        }
       });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   return (

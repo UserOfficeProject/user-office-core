@@ -6,6 +6,7 @@ import { Permissions } from '../models/Permissions';
 import { Settings, SettingsId } from '../models/Settings';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
+import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
@@ -15,9 +16,11 @@ import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 export interface AdminDataSource {
   getCountry(id: number): Promise<Entry | null>;
   getInstitution(id: number): Promise<Institution | null>;
-  createInstitution(institution: Institution): Promise<Institution | null>;
+  createInstitution(
+    institutionInput: CreateInstitutionsArgs
+  ): Promise<Institution | null>;
   updateInstitution(institution: Institution): Promise<Institution | null>;
-  deleteInstitution(id: number): Promise<Institution>;
+  deleteInstitution(id: number): Promise<Institution | null>;
   mergeInstitutions(args: MergeInstitutionsInput): Promise<Institution | null>;
   getInstitutions(filter?: InstitutionsFilter): Promise<Institution[]>;
   getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;
@@ -42,4 +45,5 @@ export interface AdminDataSource {
   getTokenAndPermissionsById(accessTokenId: string): Promise<Permissions>;
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;
+  waitForDBUpgrade(): Promise<void>;
 }

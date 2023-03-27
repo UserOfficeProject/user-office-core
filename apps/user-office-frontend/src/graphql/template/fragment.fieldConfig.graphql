@@ -78,6 +78,10 @@ fragment fieldConfig on FieldConfig {
 
   ... on SubTemplateConfig {
     addEntryButtonLabel
+    copyButtonLabel
+    canCopy
+    isMultipleCopySelect
+    isCompleteOnCopy
     minEntries
     maxEntries
     templateId
@@ -122,6 +126,15 @@ fragment fieldConfig on FieldConfig {
     max
   }
 
+  ... on DynamicMultipleChoiceConfig {
+    small_label
+    required
+    tooltip
+    url
+    isMultipleSelect
+    variant
+  }
+
   ... on VisitBasisConfig {
     small_label
     required
@@ -133,7 +146,7 @@ fragment fieldConfig on FieldConfig {
     questionLabel
   }
 
-    ... on FeedbackBasisConfig {
+  ... on FeedbackBasisConfig {
     small_label
     required
     tooltip

@@ -87,6 +87,18 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class DynamicMultipleChoiceConfig extends ConfigBase {
+  @Field(() => String)
+  variant: string;
+
+  @Field(() => String)
+  url: string;
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
+}
+
+@ObjectType()
 export class TextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   min: number | null;
@@ -117,7 +129,7 @@ export class ShipmentBasisConfig extends ConfigBase {}
 export class FeedbackBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class SubTemplateConfig {
+export class SubTemplateBaseConfig {
   @Field(() => Int, { nullable: true })
   minEntries: number | null;
 
@@ -141,7 +153,22 @@ export class SubTemplateConfig {
 }
 
 @ObjectType()
-export class SampleDeclarationConfig extends SubTemplateConfig {
+export class SubTemplateConfig extends SubTemplateBaseConfig {
+  @Field(() => Boolean)
+  canCopy: boolean;
+
+  @Field(() => String, { nullable: true })
+  copyButtonLabel: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isMultipleCopySelect: boolean | null;
+
+  @Field(() => Boolean, { nullable: true })
+  isCompleteOnCopy: boolean | null;
+}
+
+@ObjectType()
+export class SampleDeclarationConfig extends SubTemplateBaseConfig {
   @Field(() => Int, { nullable: true })
   esiTemplateId: number | null;
 }
@@ -200,6 +227,7 @@ export const FieldConfigType = createUnionType({
     EmbellishmentConfig,
     FileUploadConfig,
     SelectionFromOptionsConfig,
+    DynamicMultipleChoiceConfig,
     TextInputConfig,
     SampleBasisConfig,
     SampleDeclarationConfig,

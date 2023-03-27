@@ -5,6 +5,7 @@ import {
   ValidTokenSet,
   ValidUserInfo,
 } from '@user-office-software/openid';
+import { GraphQLError } from 'graphql';
 import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';
 
@@ -13,7 +14,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { rejection, Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { NonNullableField } from '../utils/helperFunctions';
+import { NonNullableField } from '../utils/utilTypes';
 import { UserAuthorization } from './UserAuthorization';
 
 type ValidUser = NonNullableField<
@@ -30,7 +31,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     if (OpenIdClient.hasConfig()) {
       this.initialize();
     } else {
-      throw new Error(
+      throw new GraphQLError(
         'OpenIdClient has no configuration. Please check your environment variables!'
       );
     }
@@ -57,7 +58,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     }
   }
 
-  async logout(uosToken: AuthJwtPayload): Promise<void | Rejection> {
+  async logout(uosToken: AuthJwtPayload): Promise<string | Rejection> {
     const oidcSub = uosToken.user.oidcSub;
 
     if (!oidcSub) {
@@ -72,7 +73,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
 
       await OpenIdClient.logout(user.oauthAccessToken);
 
-      return;
+      return 'logged out';
     } catch (error) {
       return rejection('Error ocurred while logging out', {
         error: (error as Error)?.message,
@@ -130,7 +131,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     const user = userWithOAuthSubMatch ?? userWithEmailMatch;
 
     if (user) {
-      await this.userDataSource.update({
+      const updatedUser = await this.userDataSource.update({
         ...user,
         firstname: userInfo.given_name,
         lastname: userInfo.family_name,
@@ -145,7 +146,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         organisation: institutionId ?? user.organisation,
       });
 
-      return user;
+      return updatedUser;
     } else {
       const newUser = await this.userDataSource.create(
         'unspecified',
@@ -185,7 +186,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         authorizer: this.constructor.name,
         user,
       });
-      throw new Error('Invalid user');
+      throw new GraphQLError('Invalid user');
     }
 
     return user as ValidUser;

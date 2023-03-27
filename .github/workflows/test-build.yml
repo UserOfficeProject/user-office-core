@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [develop]
 
+env:
+  NODE_VERSION: 16.x
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   resolve_dep:
@@ -56,10 +59,6 @@ jobs:
     needs: resolve_dep
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
@@ -67,7 +66,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node_modules
         id: cached-node-modules-root
@@ -80,7 +79,7 @@ jobs:
         if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
         # We use --ignore-scripts flag to ignore the postinstall script which is actually installing dependencies in all other apps.
         # Caution! The option --ignore-scripts disables ALL scripts - even from the dependencies. If the dependencies need to run scripts to e.g. install some binaries they may break / be incomplete. For now this works and if we experience some issues we can try to find better solution.
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
@@ -103,7 +102,7 @@ jobs:
       - name: Install frontend dependencies
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
         run: npm run install:frontend
-        
+
       - name: Cache frontend SDK
         id: cached-sdk-frontend
         uses: actions/cache@v3
@@ -129,7 +128,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore node_modules
         id: cached-node-modules-root
@@ -151,14 +150,16 @@ jobs:
         with:
           path: apps/user-office-frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
-          
+
       - name: Restore frontend SDK
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-
+          restore-keys: |
+            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            sdk-frontend-
 
       - run: npm run build
         env:
@@ -177,7 +178,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
@@ -229,7 +230,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore node_modules
         id: cached-node-modules-root
@@ -251,14 +252,16 @@ jobs:
         with:
           path: apps/user-office-frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
-          
+
       - name: Restore frontend SDK
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-
+          restore-keys: |
+            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            sdk-frontend-
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
@@ -359,7 +362,9 @@ jobs:
           EAM_AUTH_PASS: dummyAuthPass
           EAM_API_URL: https://ios.esss.lu.se:7443
           EAM_PART_CODE: 12413
-          EMAIL_AS_EXTERNAL_TOKEN_AUTHORIZATION: "true"
+          AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
+          AUTH_CLIENT_ID: useroffice
+          AUTH_CLIENT_SECRET: useroffice
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
@@ -375,7 +380,9 @@ jobs:
   push:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    needs: e2e
+    # Don't build and push image if dependabot is creating the PR
+    if: github.actor != 'dependabot[bot]'
+    needs: [install-and-cache, e2e]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # TODO: Maybe it is a good idea to use some caching mechanism here for building docker images.
@@ -392,12 +399,16 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Login to DockerHub
+        # Don't login if dependabot is creating the PR
+        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GitHub Container Registry
+        # Don't login if dependabot is creating the PR
+        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -405,6 +416,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
+        # Don't login if dependabot is creating the PR
+        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
         uses: docker/build-push-action@v3
         with:
           context: ./apps/user-office-backend
@@ -415,15 +428,22 @@ jobs:
           tags: |
             dmsc/duo-backend:${{ github.head_ref }}
             ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
-            
+
       - name: Restore frontend SDK
+        # Don't login if dependabot is creating the PR
+        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-          
+          restore-keys: |
+            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            sdk-frontend-
+
       - name: Build and push frontend
+        # Don't login if dependabot is creating the PR
+        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
         uses: docker/build-push-action@v3
         with:
           context: ./apps/user-office-frontend

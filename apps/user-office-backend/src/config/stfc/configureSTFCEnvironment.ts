@@ -9,6 +9,9 @@ import { Tokens } from '../Tokens';
 
 async function setStfcColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  await db.waitForDBUpgrade();
+
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_DARK,
     settingsValue: '#2e2d62',
@@ -69,8 +72,15 @@ async function setStfcColourTheme() {
 
 async function enableDefaultStfcFeatures() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  await db.waitForDBUpgrade();
+
   await db.setFeatures(
-    [FeatureId.EMAIL_SEARCH, FeatureId.INSTRUMENT_MANAGEMENT],
+    [
+      FeatureId.EMAIL_SEARCH,
+      FeatureId.INSTRUMENT_MANAGEMENT,
+      FeatureId.STFC_IDLE_TIMER,
+    ],
     true
   );
   await db.updateSettings({
@@ -92,6 +102,10 @@ async function enableDefaultStfcFeatures() {
   await db.updateSettings({
     settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
     settingsValue: 'ALL',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.IDLE_TIMEOUT,
+    settingsValue: '1200000',
   });
 }
 

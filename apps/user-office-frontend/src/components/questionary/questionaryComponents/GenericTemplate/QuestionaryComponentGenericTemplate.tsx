@@ -11,9 +11,14 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { QuestionaryStep, SubTemplateConfig } from 'generated/sdk';
+import {
+  CopyAnswerInput,
+  QuestionaryStep,
+  SubTemplateConfig,
+} from 'generated/sdk';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
+import { GENERIC_TEMPLATE_EVENT } from 'models/questionary/QuestionarySubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import withPrompt, { WithPromptType } from 'utils/withPrompt';
@@ -23,6 +28,7 @@ import {
   QuestionnairesListRow,
 } from '../QuestionnairesList';
 import { GenericTemplateContainer } from './GenericTemplateContainer';
+import GenericTemplateSelectModalOnCopy from './GenericTemplateSelectModalOnCopy';
 
 const useStyles = makeStyles(() => ({
   questionLabel: {
@@ -83,7 +89,10 @@ function QuestionaryComponentGenericTemplate(
 
   const [selectedGenericTemplate, setSelectedGenericTemplate] =
     useState<GenericTemplateWithQuestionary | null>(null);
-
+  const [
+    openGenericTemplateSelectionOnCopyModal,
+    setOpenGenericTemplateSelectionOnCopyModal,
+  ] = useState(false);
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -92,41 +101,137 @@ function QuestionaryComponentGenericTemplate(
     <Field name={answerId}>
       {({ field, form }: FieldProps<GenericTemplateWithQuestionary[]>) => {
         const updateFieldValueAndState = (
-          updatedItems: GenericTemplateCore[] | null
+          updatedItems: GenericTemplateCore[] | null,
+          dispatchType: GENERIC_TEMPLATE_EVENT
         ) => {
-          form.setFieldValue(answerId, updatedItems);
+          if (
+            dispatchType === GENERIC_TEMPLATE_EVENT.ITEMS_DELETED &&
+            updatedItems
+          )
+            form.setFieldValue(
+              answerId,
+              field.value.filter((genericTemplate) => {
+                return !updatedItems.some((value) => {
+                  return value.id === genericTemplate.id;
+                });
+              })
+            );
+          else {
+            form.setFieldValue(answerId, updatedItems);
+          }
           dispatch({
-            type: 'GENERIC_TEMPLATE_ITEMS_MODIFIED',
+            type: dispatchType,
             id: answerId,
             newItems: updatedItems,
           });
         };
+        const createGenericTemplate = () => {
+          if (!state) {
+            throw new Error(
+              'GenericTemplate Declaration is missing proposal context'
+            );
+          }
 
+          const proposalPk = state.proposal.primaryKey;
+          const questionId = props.answer.question.id;
+          if (proposalPk <= 0 || !questionId) {
+            throw new Error(
+              'GenericTemplate is missing proposal id and/or question id'
+            );
+          }
+          const templateId = config.templateId;
+
+          if (!templateId) {
+            throw new Error('GenericTemplate is missing templateId');
+          }
+
+          api()
+            .getBlankQuestionarySteps({ templateId })
+            .then((result) => {
+              const blankSteps = result.blankQuestionarySteps;
+              if (blankSteps) {
+                const genericTemplateStub = createGenericTemplateStub(
+                  templateId,
+                  blankSteps,
+                  proposalPk,
+                  questionId
+                );
+                setSelectedGenericTemplate(genericTemplateStub);
+              }
+            });
+        };
         const copyGenericTemplate = (id: number, title: string) =>
           api()
             .cloneGenericTemplate({ genericTemplateId: id, title: title })
             .then((response) => {
-              const clonedGenericTemplate =
-                response.cloneGenericTemplate.genericTemplate;
+              const clonedGenericTemplate = response.cloneGenericTemplate;
               if (clonedGenericTemplate) {
                 const newStateItems = [...field.value, clonedGenericTemplate];
 
-                updateFieldValueAndState(newStateItems);
+                updateFieldValueAndState(
+                  newStateItems,
+                  GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                );
               }
             });
 
         const deleteGenericTemplate = (id: number) =>
           api()
             .deleteGenericTemplate({ genericTemplateId: id })
-            .then((response) => {
-              if (!response.deleteGenericTemplate.rejection) {
-                const newStateItems = field.value.filter(
-                  (genericTemplate) => genericTemplate.id !== id
-                );
+            .then(() => {
+              const deletedStateItems = field.value.filter(
+                (genericTemplate) => genericTemplate.id === id
+              );
 
-                updateFieldValueAndState(newStateItems);
+              updateFieldValueAndState(
+                deletedStateItems,
+                GENERIC_TEMPLATE_EVENT.ITEMS_DELETED
+              );
+            });
+
+        const createGenericTemplateWithCopiedAnswers = (
+          copyAnswersInput: CopyAnswerInput[]
+        ) => {
+          if (!state) {
+            throw new Error(
+              'GenericTemplate declaration is missing proposal context'
+            );
+          }
+
+          const proposalPk = state.proposal.primaryKey;
+          const questionId = answer.question.id;
+          if (proposalPk <= 0 || !questionId) {
+            throw new Error(
+              'GenericTemplate is missing proposal id and/or question id'
+            );
+          }
+          const templateId = config.templateId;
+          if (!templateId) {
+            throw new Error('GenericTemplate is missing templateId');
+          }
+
+          if (!copyAnswersInput) {
+            throw new Error(
+              'GenericTemplate is missing source questionary information'
+            );
+          }
+          api()
+            .createGenericTemplateWithCopiedAnswers({
+              templateId,
+              proposalPk,
+              questionId,
+              copyAnswersInput,
+            })
+            .then((response) => {
+              const { createGenericTemplateWithCopiedAnswers } = response;
+              if (createGenericTemplateWithCopiedAnswers) {
+                updateFieldValueAndState(
+                  [...createGenericTemplateWithCopiedAnswers],
+                  GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                );
               }
             });
+        };
 
         return (
           <div>
@@ -135,6 +240,8 @@ function QuestionaryComponentGenericTemplate(
             </label>
             <QuestionnairesList
               addButtonLabel={config.addEntryButtonLabel}
+              copyButtonLabel={config.copyButtonLabel || undefined}
+              canCopy={config.canCopy}
               data={field.value?.map(genericTemplateToListRow) ?? []}
               maxEntries={config.maxEntries || undefined}
               onEditClick={(item) =>
@@ -159,42 +266,10 @@ function QuestionaryComponentGenericTemplate(
                   prefilledAnswer: `Copy of ${item.label}`,
                 })();
               }}
-              onAddNewClick={() => {
-                // TODO move this into a function like copyGenericTemplate
-                if (!state) {
-                  throw new Error(
-                    'GenericTemplate Declaration is missing proposal context'
-                  );
-                }
-
-                const proposalPk = state.proposal.primaryKey;
-                const questionId = props.answer.question.id;
-                if (proposalPk <= 0 || !questionId) {
-                  throw new Error(
-                    'GenericTemplate is missing proposal id and/or question id'
-                  );
-                }
-                const templateId = config.templateId;
-
-                if (!templateId) {
-                  throw new Error('GenericTemplate is missing templateId');
-                }
-
-                api()
-                  .getBlankQuestionarySteps({ templateId })
-                  .then((result) => {
-                    const blankSteps = result.blankQuestionarySteps;
-                    if (blankSteps) {
-                      const genericTemplateStub = createGenericTemplateStub(
-                        templateId,
-                        blankSteps,
-                        proposalPk,
-                        questionId
-                      );
-                      setSelectedGenericTemplate(genericTemplateStub);
-                    }
-                  });
-              }}
+              onAddNewClick={() => createGenericTemplate()}
+              onCopyClick={() =>
+                setOpenGenericTemplateSelectionOnCopyModal(true)
+              }
               {...props}
             />
 
@@ -215,12 +290,18 @@ function QuestionaryComponentGenericTemplate(
                         : genericTemplate
                     );
 
-                    updateFieldValueAndState(newStateItems);
+                    updateFieldValueAndState(
+                      newStateItems,
+                      GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                    );
                   }}
                   genericTemplateCreated={(newGenericTemplate) => {
                     const newStateItems = [...field.value, newGenericTemplate];
 
-                    updateFieldValueAndState(newStateItems);
+                    updateFieldValueAndState(
+                      newStateItems,
+                      GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                    );
                   }}
                   genericTemplateEditDone={() => {
                     // refresh all genericTemplates
@@ -232,7 +313,10 @@ function QuestionaryComponentGenericTemplate(
                         },
                       })
                       .then((result) => {
-                        updateFieldValueAndState(result.genericTemplates);
+                        updateFieldValueAndState(
+                          result.genericTemplates,
+                          GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                        );
                       });
 
                     setSelectedGenericTemplate(null);
@@ -243,6 +327,32 @@ function QuestionaryComponentGenericTemplate(
                 <UOLoader />
               )}
             </StyledModal>
+            {openGenericTemplateSelectionOnCopyModal && (
+              <StyledModal
+                aria-labelledby="generic-template-selection-on-copy-modal-label"
+                aria-describedby="generic-template-selection-on-copy-modal"
+                open={openGenericTemplateSelectionOnCopyModal}
+                onClose={(): void =>
+                  setOpenGenericTemplateSelectionOnCopyModal(false)
+                }
+              >
+                <GenericTemplateSelectModalOnCopy
+                  close={(): void =>
+                    setOpenGenericTemplateSelectionOnCopyModal(false)
+                  }
+                  filter={{
+                    questionId: answerId,
+                  }}
+                  currentProposalPk={state.proposal.primaryKey}
+                  copyButtonLabel={config.copyButtonLabel}
+                  isMultipleCopySelect={config.isMultipleCopySelect || false}
+                  question={answer.question.question}
+                  handleGenericTemplateOnCopy={(
+                    copyAnswersInput: CopyAnswerInput[]
+                  ) => createGenericTemplateWithCopiedAnswers(copyAnswersInput)}
+                />
+              </StyledModal>
+            )}
           </div>
         );
       }}

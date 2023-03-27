@@ -2,8 +2,7 @@ import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { ConflictResolution } from '../types/ConflictResolution';
-import { wrapResponse } from '../wrapResponse';
-import { UnitsResponseWrap } from './../types/CommonWrappers';
+import { Unit } from '../types/Unit';
 
 @ArgsType()
 export class ImportUnitsArgs {
@@ -16,11 +15,8 @@ export class ImportUnitsArgs {
 
 @Resolver()
 export class ImportUnitsMutation {
-  @Mutation(() => UnitsResponseWrap)
+  @Mutation(() => [Unit])
   importUnits(@Args() args: ImportUnitsArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.unit.importUnits(context.user, args),
-      UnitsResponseWrap
-    );
+    return context.mutations.unit.importUnits(context.user, args);
   }
 }

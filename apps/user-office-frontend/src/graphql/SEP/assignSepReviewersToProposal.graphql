@@ -8,11 +8,6 @@ mutation assignSepReviewersToProposal(
     sepId: $sepId
     proposalPk: $proposalPk
   ) {
-    rejection {
-      ...rejection
-    }
-    sep {
-      id
-    }
+    id
   }
 }

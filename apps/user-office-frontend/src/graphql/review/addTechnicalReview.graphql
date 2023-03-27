@@ -20,11 +20,6 @@ mutation addTechnicalReview(
       files: $files
     }
   ) {
-    rejection {
-      ...rejection
-    }
-    technicalReview {
-      id
-    }
+    id
   }
 }

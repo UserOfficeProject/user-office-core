@@ -11,21 +11,14 @@ mutation updateVisitRegistration(
     isRegistrationSubmitted: $isRegistrationSubmitted
     startsAt: $startsAt
     endsAt: $endsAt
-
   ) {
-    registration {
-      ...visitRegistration
-      user {
-        ...basicUserDetails
-      }
-      questionary {
-        ...questionary
-        isCompleted
-      }
+    ...visitRegistration
+    user {
+      ...basicUserDetails
     }
-
-    rejection {
-      ...rejection
+    questionary {
+      ...questionary
+      isCompleted
     }
   }
 }

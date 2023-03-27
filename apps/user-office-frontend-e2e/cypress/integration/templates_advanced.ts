@@ -79,7 +79,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.BOOLEAN,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         boolId = createdQuestion.id;
 
@@ -101,7 +101,7 @@ context('Template tests', () => {
           categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
           dataType: DataType.TEXT_INPUT,
         }).then((questionResult) => {
-          const createdQuestion = questionResult.createQuestion.question;
+          const createdQuestion = questionResult.createQuestion;
           if (createdQuestion) {
             textId = createdQuestion.id;
 
@@ -140,7 +140,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.INTERVAL,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         intervalId = createdQuestion.id;
 
@@ -179,7 +179,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.NUMBER_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         numberId = createdQuestion.id;
 
@@ -219,7 +219,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         multipleChoiceId = createdQuestion.id;
 
@@ -243,7 +243,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         dateId = createdQuestion.id;
 
@@ -267,7 +267,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.DATE,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         timeId = createdQuestion.id;
 
@@ -291,7 +291,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.FILE_UPLOAD,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         cy.updateQuestion({
           id: createdQuestion.id,
@@ -313,7 +313,7 @@ context('Template tests', () => {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.RICH_TEXT_INPUT,
     }).then((questionResult) => {
-      const createdQuestion = questionResult.createQuestion.question;
+      const createdQuestion = questionResult.createQuestion;
       if (createdQuestion) {
         richTextInputId = createdQuestion.id;
 
@@ -336,8 +336,8 @@ context('Template tests', () => {
   };
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
   });
 
@@ -351,7 +351,7 @@ context('Template tests', () => {
         faker.date.past()
       ).toFormat(initialDBData.getFormats().dateTimeFormat);
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -485,11 +485,17 @@ context('Template tests', () => {
         url: '/files/upload',
       }).as('upload');
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.contains(fileQuestion)
+        .parent()
+        .find('input[type="file"]')
+        .selectFile(
+          {
+            contents: `cypress/fixtures/${fileName}`,
+            fileName: fileName,
+          },
+          { force: true }
+        );
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
@@ -566,7 +572,7 @@ context('Template tests', () => {
 
     it('User officer can add multiple dependencies on a question', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -663,7 +669,7 @@ context('Template tests', () => {
 
     it('User officer can change dependency logic operator', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -760,7 +766,7 @@ context('Template tests', () => {
     it('User can add captions after uploading image/* file', () => {
       const fileName = 'file_upload_test2.png'; // need to use another file due to bug in cypress, which do not allow the same fixture to be reused
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const createdProposal = result.createProposal.proposal;
+        const createdProposal = result.createProposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
@@ -789,11 +795,17 @@ context('Template tests', () => {
         url: '/files/upload',
       }).as('upload');
 
-      cy.get('input[type="file"]').attachFixture({
-        filePath: fileName,
-        fileName: fileName,
-        mimeType: 'image/png',
-      });
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.contains(fileQuestion)
+        .parent()
+        .find('input[type="file"]')
+        .selectFile(
+          {
+            contents: `cypress/fixtures/${fileName}`,
+            fileName: fileName,
+          },
+          { force: true }
+        );
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });

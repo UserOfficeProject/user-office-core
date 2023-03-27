@@ -1,8 +1,3 @@
 mutation getToken($token: String!) {
-  token(token: $token) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
+  token(token: $token)
 }

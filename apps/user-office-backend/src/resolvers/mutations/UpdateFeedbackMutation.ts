@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { FeedbackStatus } from '../../models/Feedback';
-import { FeedbackResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Feedback } from '../types/Feedback';
 
 @ArgsType()
 export class UpdateFeedbackArgs {
@@ -26,14 +25,11 @@ export class UpdateFeedbackArgs {
 
 @Resolver()
 export class UpdateFeedbackMutation {
-  @Mutation(() => FeedbackResponseWrap)
+  @Mutation(() => Feedback)
   updateFeedback(
     @Args() args: UpdateFeedbackArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.feedback.updateFeedback(context.user, args),
-      FeedbackResponseWrap
-    );
+    return context.mutations.feedback.updateFeedback(context.user, args);
   }
 }

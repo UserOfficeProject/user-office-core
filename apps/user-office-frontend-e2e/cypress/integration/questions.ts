@@ -11,16 +11,16 @@ context('Questions tests', () => {
   const samplesQuestion = initialDBData.questions.addSamples.text;
 
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB(true);
+    cy.getAndStoreFeaturesEnabled();
 
     cy.createQuestion({
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       dataType: DataType.TEXT_INPUT,
     }).then((questionResult) => {
-      if (questionResult.createQuestion.question) {
+      if (questionResult.createQuestion) {
         cy.updateQuestion({
-          id: questionResult.createQuestion.question.id,
+          id: questionResult.createQuestion.id,
           question: textQuestion,
         });
       }

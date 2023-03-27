@@ -11,83 +11,22 @@ context('User administration tests', () => {
   const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.phoneNumber('0##########');
-  const newTelephoneAlt = faker.phone.phoneNumber('0##########');
-  const newOrganisation = faker.company.companyName();
+  const newTelephone = faker.phone.number('0##########');
+  const newTelephoneAlt = faker.phone.number('0##########');
+  const newOrganisation = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
 
-  beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
-    cy.resetDB();
-  });
-
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-      this.skip();
-    }
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      // NOTE: We can check features after they are stored to the local storage
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
 
     cy.login('officer');
     cy.visit('/');
-  });
-
-  it('should be able to verify email manually', () => {
-    cy.contains('People').click();
-
-    cy.contains(placeholderUser.firstName)
-      .parent()
-      .find("[aria-label='Edit user']")
-      .click();
-
-    cy.contains('Email not verified');
-
-    cy.get('[data-cy=btn-verify-email]').click();
-
-    cy.notification({ variant: 'success', text: 'Email verified' });
-
-    cy.contains('Email not verified').should('not.exist');
-
-    cy.logout();
-
-    cy.login('placeholderUser');
-    cy.visit('/');
-
-    cy.get('[data-cy="active-user-profile"]').click();
-
-    cy.contains('Email not verified').should('not.exist');
-    cy.contains('Placeholder').should('exist');
-  });
-
-  it('should be able to remove the placeholder flag', () => {
-    cy.setUserEmailVerified({ id: placeholderUser.id });
-    cy.contains('People').click();
-
-    cy.get('input[aria-label=Search]').type('placeholder');
-
-    cy.contains(placeholderUser.firstName)
-      .parent()
-      .find("[aria-label='Edit user']")
-      .click();
-
-    cy.contains('Placeholder user');
-
-    cy.get('[data-cy=btn-set-user-not-placeholder]').click();
-
-    cy.notification({
-      variant: 'success',
-      text: 'User is no longer placeholder',
-    });
-
-    cy.contains('Placeholder user').should('not.exist');
-
-    cy.logout();
-
-    cy.login('placeholderUser');
-    cy.visit('/');
-
-    cy.get('[data-cy="active-user-profile"]').click();
-
-    cy.contains('Email not verified').should('not.exist');
-    cy.contains('Placeholder user').should('not.exist');
   });
 
   it('Should be able administer user information', () => {

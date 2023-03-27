@@ -5,51 +5,47 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
       callId: $callId
     }
   ) {
-    proposals {
-      ...proposal
-      proposer {
-        ...basicUserDetails
-      }
-      users {
-        ...basicUserDetails
-      }
-      questionary {
-        ...questionary
-        isCompleted
-      }
-      technicalReview {
-        ...coreTechnicalReview
-      }
-      reviews {
+    ...proposal
+    proposer {
+      ...basicUserDetails
+    }
+    users {
+      ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+      isCompleted
+    }
+    technicalReview {
+      ...coreTechnicalReview
+    }
+    reviews {
+      id
+      grade
+      comment
+      status
+      userID
+      sepID
+      reviewer {
+        firstname
+        lastname
         id
-        grade
-        comment
-        status
-        userID
-        sepID
-        reviewer {
-          firstname
-          lastname
-          id
-        }
-      }
-      instrument {
-        id
-        name
-        shortCode
-      }
-      call {
-        id
-        shortCode
-        isActive
-        isActiveInternal
-        referenceNumberFormat
-        startCall
-        endCall
       }
     }
-    rejection {
-      ...rejection
+    instrument {
+      id
+      name
+      shortCode
+    }
+    call {
+      id
+      shortCode
+      isActive
+      isActiveInternal
+      referenceNumberFormat
+      startCall
+      endCall
+      endCallInternal
     }
   }
 }

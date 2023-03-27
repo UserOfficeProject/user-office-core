@@ -11,9 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { isRejection, rejection } from '../../models/Rejection';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { TechnicalReview } from '../types/TechnicalReview';
-import { wrapResponse } from '../wrapResponse';
 
 @InputType()
 export class SubmitTechnicalReviewInput implements Partial<TechnicalReview> {
@@ -50,7 +48,7 @@ export class SubmitTechnicalReviewsInput {
 
 @Resolver()
 export class SubmitTechnicalReviewMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => Boolean)
   async submitTechnicalReviews(
     @Arg('submitTechnicalReviewsInput')
     submitTechnicalReviewsInput: SubmitTechnicalReviewsInput,
@@ -67,13 +65,10 @@ export class SubmitTechnicalReviewMutation {
       }
     }
 
-    return wrapResponse(
-      failedReviews.length > 0
-        ? Promise.resolve(
-            rejection('Failed to submit one or more technical reviews')
-          )
-        : Promise.resolve(true),
-      SuccessResponseWrap
-    );
+    if (failedReviews.length > 0) {
+      throw rejection('Failed to submit one or more technical reviews');
+    } else {
+      return true;
+    }
   }
 }

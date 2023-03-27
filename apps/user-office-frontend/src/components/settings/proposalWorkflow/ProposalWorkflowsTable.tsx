@@ -50,19 +50,17 @@ const ProposalWorkflowsTable: React.FC = () => {
   );
 
   const deleteProposalWorkflow = async (id: number | string) => {
-    return await api({
-      toastSuccessMessage: 'Proposal workflow deleted successfully',
-    })
-      .deleteProposalWorkflow({
+    try {
+      await api({
+        toastSuccessMessage: 'Proposal workflow deleted successfully',
+      }).deleteProposalWorkflow({
         id: id as number,
-      })
-      .then((resp) => {
-        if (resp.deleteProposalWorkflow.rejection) {
-          return false;
-        } else {
-          return true;
-        }
       });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const EditIcon = (): JSX.Element => <Edit />;

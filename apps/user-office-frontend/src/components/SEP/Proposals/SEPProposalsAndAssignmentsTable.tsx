@@ -244,9 +244,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       return;
     }
 
-    const {
-      assignSepReviewersToProposal: { rejection },
-    } = await api({
+    await api({
       toastSuccessMessage: 'Members assigned',
     }).assignSepReviewersToProposal({
       memberIds: assignedMembers.map(({ id }) => id),
@@ -255,10 +253,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<
     });
 
     setProposalPk(null);
-
-    if (rejection) {
-      return;
-    }
 
     const { proposalReviews } = await api().getProposalReviews({
       proposalPk,

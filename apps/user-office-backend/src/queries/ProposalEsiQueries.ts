@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -56,7 +57,7 @@ export default class ProposalEsiQueries {
       questionaryId
     );
     if (!questionary) {
-      throw new Error(
+      throw new GraphQLError(
         'Unexpected error. ESI must have a questionary, but not found'
       );
     }

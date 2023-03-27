@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql';
 
 import {
   Answer,
@@ -180,7 +181,7 @@ export default class PostgresQuestionaryDataSource
   ): Promise<string[]> {
     const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not insert files because answer does not exist. AnswerID ${answerId}`
       );
     }
@@ -198,7 +199,7 @@ export default class PostgresQuestionaryDataSource
   ): Promise<string[]> {
     const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
-      throw new Error(
+      throw new GraphQLError(
         `Could not delete files because answer does not exist. AnswerID ${answerId}`
       );
     }
@@ -409,7 +410,7 @@ export default class PostgresQuestionaryDataSource
     const targetTemplateId = targetQuestionary?.templateId;
 
     if (!sourceTemplateId || !targetTemplateId) {
-      throw new Error(
+      throw new GraphQLError(
         'Can not copy questions, because no template for the questionary was found'
       );
     }
@@ -439,7 +440,10 @@ export default class PostgresQuestionaryDataSource
     );
   }
 
-  async clone(questionaryId: number): Promise<Questionary> {
+  async clone(
+    questionaryId: number,
+    reviewBeforeSubmit?: boolean
+  ): Promise<Questionary> {
     const sourceQuestionary = await this.getQuestionary(questionaryId);
     if (!sourceQuestionary) {
       logger.logError(
@@ -447,7 +451,7 @@ export default class PostgresQuestionaryDataSource
         { questionaryId }
       );
 
-      throw new Error('Could not clone questionary');
+      throw new GraphQLError('Could not clone questionary');
     }
     const clonedQuestionary = await this.create(
       sourceQuestionary.creatorId,
@@ -466,11 +470,11 @@ export default class PostgresQuestionaryDataSource
           :clonedQuestionaryId
         , question_id
         , answer
-      FROM 
+      FROM
         answers
       WHERE
         questionary_id = :sourceQuestionaryId
-    `,
+      `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
@@ -487,14 +491,15 @@ export default class PostgresQuestionaryDataSource
       SELECT 
           :clonedQuestionaryId
         , topic_id
-        , is_complete
+        , :reviewBeforeSubmit
       FROM
         topic_completenesses
       WHERE
         questionary_id = :sourceQuestionaryId
-    `,
+      `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
+        reviewBeforeSubmit: !reviewBeforeSubmit,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
       }
     );

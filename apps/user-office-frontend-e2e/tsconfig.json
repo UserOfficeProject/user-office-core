@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "lib": ["ES6", "dom"],
-    "types": ["node", "cypress", "cypress-file-upload", "./cypress/types"],
+    "types": ["node", "cypress", "./cypress/types"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

@@ -9,6 +9,7 @@ import {
   CreateQuestionTemplateRelationMutation,
   CreateQuestionTemplateRelationMutationVariables,
   CreateTopicMutation,
+  UpdateTopicMutation,
   CreateGenericTemplateMutationVariables,
   CreateGenericTemplateMutation,
   AnswerTopicMutationVariables,
@@ -137,6 +138,25 @@ declare global {
       ) => void;
 
       /**
+       * Creates dynamic multiple choice question. You have to be in edit template view to call this method
+       *
+       * @returns {typeof createDynamicMultipleChoiceQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createDynamicMultipleChoiceQuestion('Is dangerous')
+       */
+      createDynamicMultipleChoiceQuestion: (
+        title: string,
+        options?: {
+          url?: string;
+          isMultipleSelect?: boolean;
+          type?: 'radio' | 'dropdown';
+          firstTopic?: boolean;
+          key?: string;
+        }
+      ) => void;
+
+      /**
        * Creates FileUpload question.
        * You have to be in edit template view to call this method
        *
@@ -207,7 +227,11 @@ declare global {
         question: string,
         template: string,
         addButtonLabel: string,
-        options?: { minEntries?: number; maxEntries?: number }
+        canCopy: boolean,
+        options?: { minEntries?: number; maxEntries?: number },
+        copyButtonLabel?: string,
+        isCompleteOnCopy?: boolean,
+        isMultipleCopySelect?: boolean
       ) => void;
 
       /**
@@ -278,6 +302,18 @@ declare global {
       createTopic: (
         createTopicInput: CreateTopicMutationVariables
       ) => Cypress.Chainable<CreateTopicMutation>;
+
+      /**
+       * Updates topic in template
+       *
+       * @returns {typeof updateTopic}
+       * @memberof Chainable
+       * @example
+       *    cy.updateTopic(updateTopicInput: UpdateTopicMutationVariables)
+       */
+      updateTopic: (
+        updateTopicInput: UpdateTopicMutationVariables
+      ) => Cypress.Chainable<UpdateTopicMutation>;
 
       /**
        * Answers topic in proposal template

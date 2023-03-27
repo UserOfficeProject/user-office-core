@@ -9,15 +9,14 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { VisitResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { Visit } from '../types/Visit';
 
 @ArgsType()
 export class CreateVisitArgs {
   @Field(() => Int)
   scheduledEventId: number;
 
-  @Field(() => [Int!])
+  @Field(() => [Int])
   team: number[];
 
   @Field(() => Int)
@@ -26,11 +25,8 @@ export class CreateVisitArgs {
 
 @Resolver()
 export class CreateVisitMutation {
-  @Mutation(() => VisitResponseWrap)
+  @Mutation(() => Visit)
   createVisit(@Args() args: CreateVisitArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.visit.createVisit(context.user, args),
-      VisitResponseWrap
-    );
+    return context.mutations.visit.createVisit(context.user, args);
   }
 }

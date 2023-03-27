@@ -8,8 +8,8 @@ import { TestUserId } from './../support/user';
 
 context('Event log tests', () => {
   beforeEach(() => {
-    cy.getAndStoreFeaturesEnabled();
     cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
   });
 
   describe('Proposal event logs', () => {
@@ -18,8 +18,8 @@ context('Event log tests', () => {
     beforeEach(() => {
       cy.login('user1');
       cy.createProposal({ callId: initialDBData.call.id }).then((response) => {
-        if (response.createProposal.proposal) {
-          createdProposalPk = response.createProposal.proposal.primaryKey;
+        if (response.createProposal) {
+          createdProposalPk = response.createProposal.primaryKey;
         }
       });
     });

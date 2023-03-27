@@ -1,12 +1,7 @@
 mutation updateSettings($input: UpdateSettingsInput!) {
   updateSettings(updatedSettingsInput: $input) {
-    settings {
-      id
-      settingsValue
-      description
-    }
-    rejection {
-      ...rejection
-    }
+    id
+    settingsValue
+    description
   }
 }

@@ -89,6 +89,11 @@ export default {
       text: 'Selection from options question from seeds',
       type: DataType.SELECTION_FROM_OPTIONS,
     },
+    dynamicMultipleChoice: {
+      id: 'dynamic_multiple_choice_question',
+      text: 'Dynamic multiple choice question from seeds',
+      type: DataType.DYNAMIC_MULTIPLE_CHOICE,
+    },
     textInput: {
       id: 'text_input_question',
       text: 'Text input question from seeds',
@@ -148,6 +153,9 @@ export default {
       selectionFromOptions: {
         value: ['One'],
       },
+      dynamicMultipleChoice: {
+        value: ['One'],
+      },
       textInput: {
         value: 'Text input answer from seeds',
       },
@@ -157,6 +165,7 @@ export default {
     id: 1,
     title: 'Test proposal',
     questionaryId: 1,
+    shortCode: '999999',
   },
   instrument1: {
     id: 1,
@@ -276,6 +285,13 @@ export default {
       id: SettingsId.DATE_TIME_FORMAT,
       description: 'Format used to represent date with time without seconds.',
       settingsValue: 'dd-MM-yyyy HH:mm',
+    },
+  },
+  redeemCodes: {
+    validRedeemCode: {
+      code: '123abc',
+      placeholderUserId: 5,
+      createdBy: 1,
     },
   },
 };
