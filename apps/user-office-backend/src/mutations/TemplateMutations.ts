@@ -444,7 +444,7 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource.updateTemplate(args).catch((err) => {
-      return rejection('Could not update topic order', { user }, err);
+      return rejection('Could not update template topic order', { user }, err);
     });
   }
 

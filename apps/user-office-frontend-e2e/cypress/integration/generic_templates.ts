@@ -216,7 +216,7 @@ context('GenericTemplates tests', () => {
                 topicResult.createTopic.steps.length - 1
               ].topic.id;
             cy.updateTopic({
-              title: faker.lorem.words(4),
+              title: faker.lorem.words(2),
               templateId: proposalTemplateId,
               sortOrder: index + 1,
               topicId,
