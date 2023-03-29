@@ -19,14 +19,6 @@ services:
     volumes:
       - ./db_patches/:/docker-entrypoint-initdb.d/
 
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    volumes:
-      - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
-
   dev-auth-server:
     image: "ghcr.io/userofficeproject/user-office-development-authorization-server:develop"
     environment:
