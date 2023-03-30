@@ -1,0 +1,10 @@
+{
+  "instrument": {
+    "single": "Instrument",
+    "plural": "Instruments"
+  },
+  "instrumentSci": {
+    "single": "Instrument Scientist",
+    "plural": "Instrument Scientists"
+  }
+}
