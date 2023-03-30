@@ -255,7 +255,7 @@ export function NewFileEntry(props: {
   };
 
   const hasExtension = (file: File) => {
-    return file.name.split('.').length - 1 == 1;
+    return file.name.split('.').length - 1 >= 1;
   };
 
   const onFileSelected = (e: ChangeEvent<HTMLInputElement>) => {

@@ -1,0 +1,7 @@
+fragment redeemCode on RedeemCode {
+  code
+  placeholderUserId
+  createdBy
+  createdAt
+  claimedAt
+}
