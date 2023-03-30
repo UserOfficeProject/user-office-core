@@ -1,6 +1,7 @@
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -40,6 +41,7 @@ const InstrumentTable: React.FC = () => {
   } = useInstrumentsData();
 
   const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
   >(null);
@@ -161,7 +163,7 @@ const InstrumentTable: React.FC = () => {
         )}
         selection={true}
         userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={'Instrument scientist'}
+        title={t('instrumentSci.single')}
         invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
       />
       <div data-cy="instruments-table">
@@ -175,7 +177,7 @@ const InstrumentTable: React.FC = () => {
           }}
           title={
             <Typography variant="h6" component="h2">
-              Instruments
+              {t('instrument.plural')}
             </Typography>
           }
           columns={columns}

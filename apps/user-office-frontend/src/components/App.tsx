@@ -2,7 +2,7 @@ import Close from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
-import React, { ErrorInfo } from 'react';
+import React, { ErrorInfo, Suspense } from 'react';
 import {
   BrowserRouter as Router,
   Redirect,
@@ -107,36 +107,38 @@ class App extends React.Component {
 
   render(): JSX.Element {
     return (
-      <StyledEngineProvider injectFirst>
-        <SnackbarProvider
-          ref={this.notistackRef}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          maxSnack={1}
-          action={(key) => (
-            <IconButton onClick={this.onClickDismiss(key)}>
-              <Close htmlColor="white" />
-            </IconButton>
-          )}
-        >
-          <SettingsContextProvider>
-            <Theme>
-              <FeatureContextProvider>
-                <UserContextProvider>
-                  <DownloadContextProvider>
-                    <IdleContextPicker>
-                      <Router>
-                        <QueryParamProvider ReactRouterRoute={Route}>
-                          <Routes />
-                        </QueryParamProvider>
-                      </Router>
-                    </IdleContextPicker>
-                  </DownloadContextProvider>
-                </UserContextProvider>
-              </FeatureContextProvider>
-            </Theme>
-          </SettingsContextProvider>
-        </SnackbarProvider>
-      </StyledEngineProvider>
+      <Suspense fallback="">
+        <StyledEngineProvider injectFirst>
+          <SnackbarProvider
+            ref={this.notistackRef}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            maxSnack={1}
+            action={(key) => (
+              <IconButton onClick={this.onClickDismiss(key)}>
+                <Close htmlColor="white" />
+              </IconButton>
+            )}
+          >
+            <SettingsContextProvider>
+              <Theme>
+                <FeatureContextProvider>
+                  <UserContextProvider>
+                    <DownloadContextProvider>
+                      <IdleContextPicker>
+                        <Router>
+                          <QueryParamProvider ReactRouterRoute={Route}>
+                            <Routes />
+                          </QueryParamProvider>
+                        </Router>
+                      </IdleContextPicker>
+                    </DownloadContextProvider>
+                  </UserContextProvider>
+                </FeatureContextProvider>
+              </Theme>
+            </SettingsContextProvider>
+          </SnackbarProvider>
+        </StyledEngineProvider>
+      </Suspense>
     );
   }
 }

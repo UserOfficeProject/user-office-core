@@ -18,8 +18,10 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
+import { useTranslation } from 'react-i18next';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -145,8 +147,10 @@ const technicalReviewColumns = [
   },
 ];
 
-const instrumentManagementColumns = [
-  { title: 'Instrument', field: 'instrumentName', emptyValue: '-' },
+const instrumentManagementColumns = (
+  t: TFunction<'translation', undefined, 'translation'>
+) => [
+  { title: t('instrument.single'), field: 'instrumentName', emptyValue: '-' },
 ];
 
 const SEPReviewColumns = [
@@ -250,6 +254,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
@@ -383,9 +388,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   }
 
   if (isInstrumentManagementEnabled) {
-    addColumns(columns, instrumentManagementColumns);
+    addColumns(columns, instrumentManagementColumns(t));
   } else {
-    removeColumns(columns, instrumentManagementColumns);
+    removeColumns(columns, instrumentManagementColumns(t));
   }
 
   if (isSEPEnabled) {
