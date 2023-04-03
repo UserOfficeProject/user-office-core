@@ -30,8 +30,8 @@ import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
-  createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
+  createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
@@ -76,7 +76,7 @@ mapClass(Tokens.MailService, SMTPMailService);
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
-mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
+mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));

@@ -5,11 +5,13 @@ import { isRejection, Rejection } from '../models/Rejection';
 export type EventHandler<T> = (event: T) => Promise<void>;
 
 export class EventBus<T extends { type: string }> {
-  constructor(private handlers: EventHandler<T>[] = []) {}
+  constructor(
+    private handlers: Promise<EventHandler<T>>[] | EventHandler<T>[] = []
+  ) {}
 
   public async publish(event: T) {
     for (let i = 0; i < this.handlers.length; i++) {
-      const handler = this.handlers[i];
+      const handler = await this.handlers[i];
       try {
         await handler(event);
       } catch (err) {
