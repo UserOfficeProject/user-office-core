@@ -77,7 +77,7 @@ let columns: Column<ProposalViewData>[] = [
   },
   {
     render: (principalInvestigator) => {
-      return `${principalInvestigator.principalInvestigator?.firstname} ${principalInvestigator.principalInvestigator?.lastname}`;
+      return `${principalInvestigator.principalInvestigator?.lastname}, ${principalInvestigator.principalInvestigator?.firstname}`;
     },
     title: 'Principal Investigator',
   },
