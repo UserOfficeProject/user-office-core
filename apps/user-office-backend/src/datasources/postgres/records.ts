@@ -97,7 +97,8 @@ export interface ProposalRecord {
   readonly proposal_pk: number;
   readonly title: string;
   readonly abstract: string;
-  readonly principal_investigator_id: number;
+  readonly proposer_id: number;
+  //readonly principal_investigator_id: number;
   readonly status_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
@@ -687,7 +688,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.proposal_pk,
     proposal.title || '',
     proposal.abstract || '',
-    proposal.principal_investigator_id,
+    proposal.proposer_id,
     proposal.status_id,
     proposal.created_at,
     proposal.updated_at,
