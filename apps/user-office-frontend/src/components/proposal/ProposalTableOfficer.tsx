@@ -115,6 +115,7 @@ let columns: Column<ProposalViewData>[] = [
       return `${principalInvestigator.principalInvestigator?.lastname}, ${principalInvestigator.principalInvestigator?.firstname}`;
     },
     title: 'Principal Investigator',
+    emptyValue: '-',
   },
   {
     title: 'PI Email',

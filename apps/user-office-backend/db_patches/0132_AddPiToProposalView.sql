@@ -1,12 +1,9 @@
 DO
 $$
 BEGIN
-  IF register_patch('AddPiToProposalView.sql', 'Edward Haynes', 'Adding the PI ID to the proposal_table_view', '2023-03-20') THEN
-    -- drop view to allow recreating it
-    DROP VIEW proposal_table_view;
-
+  IF register_patch('AddPiToProposalView.sql', 'Edward Haynes', 'Adding the PI ID to the proposal_table_view', '2023-04-05') THEN
     -- re-create view with PI ID
-    CREATE VIEW proposal_table_view
+    CREATE OR REPLACE VIEW proposal_table_view
     AS
     SELECT  p.proposal_pk AS proposal_pk,
             p.title,
