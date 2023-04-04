@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
   formControlGroup: {
     border: `1px solid ${theme.palette.grey[200]}`,
     padding: theme.spacing(0, 1),
+    width: '100%',
 
     '& legend': {
       textTransform: 'capitalize',
