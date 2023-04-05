@@ -10,7 +10,7 @@ i18n
     lng: 'override',
     fallbackLng: 'override',
     backend: {
-      loadPath: './locales/{{lng}}/translation.json',
+      loadPath: '/locales/{{lng}}/translation.json',
     },
   });
 
