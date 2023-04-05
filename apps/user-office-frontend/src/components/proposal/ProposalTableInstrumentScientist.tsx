@@ -78,11 +78,12 @@ let columns: Column<ProposalViewData>[] = [
   {
     render: (principalInvestigator) => {
       if (
-        principalInvestigator.principalInvestigator?.lastname && 
-        principalInvestigator.principalInvestigator?.firstname)
-        {
-        return `${principalInvestigator.principalInvestigator?.lastname}, ${principalInvestigator.principalInvestigator?.firstname}`;
+        principalInvestigator.principalInvestigator?.lastname &&
+        principalInvestigator.principalInvestigator?.firstname
+      ) {
+        return `${principalInvestigator.principalInvestigator.lastname}, ${principalInvestigator.principalInvestigator.firstname}`;
       }
+
       return '';
     },
     title: 'Principal Investigator',
