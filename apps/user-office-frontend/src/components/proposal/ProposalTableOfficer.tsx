@@ -122,6 +122,7 @@ let columns: Column<ProposalViewData>[] = [
       return '';
     },
     title: 'Principal Investigator',
+    emptyValue: '-',
   },
   {
     title: 'PI Email',
