@@ -112,10 +112,15 @@ let columns: Column<ProposalViewData>[] = [
   },
   {
     render: (principalInvestigator) => {
-      return `${principalInvestigator.principalInvestigator?.lastname}, ${principalInvestigator.principalInvestigator?.firstname}`;
+      if (
+        principalInvestigator.principalInvestigator?.lastname && 
+        principalInvestigator.principalInvestigator?.firstname)
+        {
+        return `${principalInvestigator.principalInvestigator?.lastname}, ${principalInvestigator.principalInvestigator?.firstname}`;
+      }
+      return '';
     },
     title: 'Principal Investigator',
-    emptyValue: '-',
   },
   {
     title: 'PI Email',
