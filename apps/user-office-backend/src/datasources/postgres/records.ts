@@ -98,7 +98,6 @@ export interface ProposalRecord {
   readonly title: string;
   readonly abstract: string;
   readonly proposer_id: number;
-  //readonly principal_investigator_id: number;
   readonly status_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
