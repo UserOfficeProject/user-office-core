@@ -1,7 +1,6 @@
 import Close from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import { SnackbarProvider } from 'notistack';
 import React, { ErrorInfo, Suspense } from 'react';
 import {
@@ -25,16 +24,6 @@ import DashBoard from './DashBoard';
 import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
 import ExternalAuth from './user/ExternalAuth';
-
-const useStyles = makeStyles({
-  loader: {
-    display: 'flex',
-    width: '100vw',
-    height: '100vh',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   if (!component) {
@@ -118,7 +107,22 @@ class App extends React.Component {
 
   render(): JSX.Element {
     return (
-      <Suspense fallback={<div data-cy="loading">Loading...</div>}>
+      <Suspense
+        fallback={
+          <div
+            data-cy="loading"
+            style={{
+              display: 'flex',
+              width: '100vw',
+              height: '100vh',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            Loading...
+          </div>
+        }
+      >
         <StyledEngineProvider injectFirst>
           <SnackbarProvider
             ref={this.notistackRef}
