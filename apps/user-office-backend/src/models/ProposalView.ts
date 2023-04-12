@@ -4,6 +4,7 @@ export class ProposalView {
   constructor(
     public primaryKey: number,
     public title: string,
+    public principalInvestigatorId: number,
     public statusId: number,
     public statusName: string,
     public statusDescription: string,
