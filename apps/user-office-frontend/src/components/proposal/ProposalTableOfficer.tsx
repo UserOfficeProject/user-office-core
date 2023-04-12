@@ -493,8 +493,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   ): Promise<void> => {
     if (instrument) {
       await api({
-        toastSuccessMessage:
-          'Proposal/s assigned to the selected instrument successfully!',
+        toastSuccessMessage: `Proposal/s assigned to the selected ${t(
+          'instrument.single'
+        )} successfully!`,
       }).assignProposalsToInstrument({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
@@ -507,8 +508,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setTimeout(fetchProposalsData, 500);
     } else {
       await api({
-        toastSuccessMessage:
-          'Proposal/s removed from the instrument successfully!',
+        toastSuccessMessage: `Proposal/s removed from the ${t(
+          'instrument.single'
+        )} successfully!`,
       }).removeProposalsFromInstrument({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
@@ -856,7 +858,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           },
           {
             icon: ScienceIconComponent,
-            tooltip: 'Assign/Remove instrument',
+            tooltip: `Assign/Remove ${t('instrument.single')}`,
             onClick: () => {
               setOpenInstrumentAssignment(true);
             },

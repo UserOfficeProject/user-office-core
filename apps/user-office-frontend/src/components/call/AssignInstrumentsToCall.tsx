@@ -3,6 +3,7 @@ import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { Instrument, InstrumentWithAvailabilityTime } from 'generated/sdk';
@@ -28,6 +29,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     InstrumentWithAvailabilityTime[]
   >([]);
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { t } = useTranslation();
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -66,7 +68,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h1">
-            Instruments
+            {t('instrument.plural')}
           </Typography>
         }
         columns={columns}

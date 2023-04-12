@@ -52,7 +52,7 @@ const InstrumentTable: React.FC = () => {
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Instrument removed successfully!',
+        toastSuccessMessage: t('instrument.single') + ' removed successfully!',
       }).deleteInstrument({
         id: instrumentDeletedId as number,
       });
@@ -67,7 +67,9 @@ const InstrumentTable: React.FC = () => {
     scientists: BasicUserDetails[]
   ) => {
     await api({
-      toastSuccessMessage: 'Scientist assigned to instrument successfully!',
+      toastSuccessMessage: `Scientist assigned to ${t(
+        'instrument.single'
+      )} successfully!`,
     }).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,
       scientistIds: scientists.map((scientist) => scientist.id),

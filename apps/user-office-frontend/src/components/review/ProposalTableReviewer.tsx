@@ -6,7 +6,9 @@ import Visibility from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
+import { TFunction } from 'i18next';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
@@ -56,7 +58,9 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
     ? ReviewStatus.DRAFT
     : undefined; // if the selected status is not a valid status assume we want to see everything
 
-let columns: Column<UserWithReview>[] = [
+const columns: (
+  t: TFunction<'translation', undefined, 'translation'>
+) => Column<UserWithReview>[] = (t) => [
   {
     title: 'Actions',
     cellStyle: { padding: 0, minWidth: 120 },
@@ -72,7 +76,7 @@ let columns: Column<UserWithReview>[] = [
     customSort: (a, b) => a.status.localeCompare(b.status),
   },
   { title: 'Call', field: 'callShortCode' },
-  { title: 'Instrument', field: 'instrumentShortCode' },
+  { title: t('instrument.single') as string, field: 'instrumentShortCode' },
 ];
 
 const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
@@ -82,6 +86,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
@@ -155,8 +160,8 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     }
   ): JSX.Element => <DoneAll {...props} />;
 
-  columns = setSortDirectionOnSortColumn(
-    columns,
+  const sortedColumns = setSortDirectionOnSortColumn(
+    columns(t),
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
@@ -413,7 +418,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
       <MaterialTable
         icons={tableIcons}
         title={'Proposals to grade'}
-        columns={columns}
+        columns={sortedColumns}
         data={preselectedProposalsDataWithIdAndRowActions}
         isLoading={loading}
         options={{

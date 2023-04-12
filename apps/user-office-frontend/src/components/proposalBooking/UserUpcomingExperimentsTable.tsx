@@ -1,8 +1,10 @@
 import MaterialTable, { Column } from '@material-table/core';
 import { Dialog, DialogContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { TFunction } from 'i18next';
 import React, { useState } from 'react';
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
@@ -14,10 +16,12 @@ import { StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
-const columns: Column<ProposalScheduledEvent>[] = [
+const columns: (
+  t: TFunction<'translation', undefined, 'translation'>
+) => Column<ProposalScheduledEvent>[] = (t) => [
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
-  { title: 'Instrument', field: 'instrument.name' },
+  { title: t('instrument.single') as string, field: 'instrument.name' },
   {
     title: 'Local contact',
     render: (rowData) => getFullUserName(rowData.localContact),
@@ -41,6 +45,7 @@ export default function UserUpcomingExperimentsTable() {
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
+  const { t } = useTranslation();
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 
@@ -93,7 +98,7 @@ export default function UserUpcomingExperimentsTable() {
           icons={tableIcons}
           title="Upcoming experiments"
           isLoading={loading}
-          columns={columns}
+          columns={columns(t)}
           data={proposalScheduledEventsWithFormattedDates}
           options={{
             search: false,

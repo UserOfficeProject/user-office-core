@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
@@ -37,6 +38,8 @@ const AssignProposalsToInstrument: React.FC<
   AssignProposalsToInstrumentProps
 > = ({ close, assignProposalsToInstrument, callIds, instrumentIds }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const { instruments, loadingInstruments } = useInstrumentsData(callIds);
 
   const allSelectedProposalsHaveSameInstrument = instrumentIds.every(
@@ -74,7 +77,7 @@ const AssignProposalsToInstrument: React.FC<
               variant="h6"
               component="h1"
             >
-              Assign proposal/s to instrument
+              {`Assign proposal/s to ${t('instrument.single')}`}
             </Typography>
 
             <Grid container spacing={3}>
@@ -88,15 +91,17 @@ const AssignProposalsToInstrument: React.FC<
                     text: instrument.name,
                   }))}
                   disabled={isSubmitting}
-                  noOptionsText="No instruments"
+                  noOptionsText={'No ' + t('instrument.plural')}
                   data-cy="instrument-selection"
                 />
               </Grid>
             </Grid>
             {!values.selectedInstrumentId && (
               <Alert severity="warning" data-cy="remove-instrument-alert">
-                Be aware that leaving instrument selection empty will remove
-                assigned instrument from proposal/s.
+                {`Be aware that leaving ${t(
+                  'instrument.single'
+                )} selection empty will remove
+                assigned instrument from proposal/s.`}
               </Alert>
             )}
             <Button

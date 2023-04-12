@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -40,6 +41,7 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
   selectedProposalStatuses,
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
 
@@ -108,9 +110,11 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
             {values.selectedStatusId === 8 &&
               !allSelectedProposalsHaveInstrument && (
                 <Alert severity="warning">
-                  Be aware that proposal/s not assigned to an instrument will
+                  {`Be aware that proposal/s not assigned to an ${t(
+                    'instrument.single'
+                  )} will
                   not be shown in the scheduler after changing status to
-                  &quot;SCHEDULING&quot;.
+                  &quot;SCHEDULING&quot;.`}
                 </Alert>
               )}
             {!values.selectedStatusId && (

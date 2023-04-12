@@ -9,6 +9,7 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
@@ -33,6 +34,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
   instrument,
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { usersData } = useUsersData({
     userRole: UserRole.INSTRUMENT_SCIENTIST,
@@ -61,7 +63,8 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         if (instrument) {
           try {
             const { updateInstrument } = await api({
-              toastSuccessMessage: 'Instrument updated successfully!',
+              toastSuccessMessage:
+                t('instrument.single') + ' updated successfully!',
             }).updateInstrument({
               ...values,
               id: instrument.id,
@@ -74,7 +77,8 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         } else {
           try {
             const { createInstrument } = await api({
-              toastSuccessMessage: 'Instrument created successfully!',
+              toastSuccessMessage:
+                t('instrument.single') + 'created successfully!',
             }).createInstrument(values);
 
             close(createInstrument);
@@ -92,7 +96,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
       {() => (
         <Form>
           <Typography variant="h6" component="h1">
-            {instrument ? 'Update' : 'Create new'} instrument
+            {(instrument ? 'Update ' : 'Create new ') + t('instrument.single')}
           </Typography>
           <Field
             name="name"

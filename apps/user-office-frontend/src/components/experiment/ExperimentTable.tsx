@@ -1,5 +1,7 @@
 import { Typography } from '@mui/material';
+import { TFunction } from 'i18next';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryParams, NumberParam, DateParam } from 'use-query-params';
 
 import SuperMaterialTable, {
@@ -17,7 +19,7 @@ import ExperimentVisitsTable from './ExperimentVisitsTable';
 
 type RowType = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
 
-const columns = [
+const columns = (t: TFunction<'translation', undefined, 'translation'>) => [
   {
     title: 'Proposal ID',
     field: 'proposal.proposalId',
@@ -43,7 +45,7 @@ const columns = [
     field: 'esiFormatted',
   },
   {
-    title: 'Instrument',
+    title: t('instrument.single'),
     field: 'proposal.instrument.name',
   },
 ];
@@ -64,6 +66,8 @@ function ExperimentTable() {
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     setArgs({
@@ -112,7 +116,7 @@ function ExperimentTable() {
           Experiments
         </Typography>
       }
-      columns={columns}
+      columns={columns(t)}
       isLoading={loadingEvents}
       options={{
         search: false,
