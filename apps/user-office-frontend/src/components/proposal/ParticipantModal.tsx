@@ -1,10 +1,13 @@
 import AddBox from '@mui/icons-material/AddBox';
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton } from '@mui/material';
+import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
 import makeStyles from '@mui/styles/makeStyles';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import PeopleTable from 'components/user/PeopleTable';
@@ -12,15 +15,16 @@ import ProposalPeopleTable from 'components/user/ProposalsPeopleTable';
 import { UserRole, BasicUserDetails } from 'generated/sdk';
 
 const useStyles = makeStyles((theme) => ({
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    zIndex: '1',
+  dialogTitle: {
+    padding: theme.spacing(0.5),
+    textAlign: 'right',
+  },
+  selectedUsersText: {
+    paddingRight: theme.spacing(1),
   },
 }));
 
-function ParticipantModal(props: {
+type ParticipantModalProps = {
   title: string;
   addParticipants: (data: BasicUserDetails[]) => void;
   show: boolean;
@@ -30,61 +34,93 @@ function ParticipantModal(props: {
   userRole?: UserRole;
   invitationUserRole?: UserRole;
   participant?: boolean;
-}) {
+};
+
+const ParticipantModal: React.FC<ParticipantModalProps> = ({
+  addParticipants,
+  close,
+  show,
+  title,
+  invitationUserRole,
+  participant,
+  selectedUsers,
+  selection,
+  userRole,
+}) => {
+  const classes = useStyles();
+  const [selectedParticipants, setSelectedParticipants] = useState<
+    BasicUserDetails[]
+  >([]);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
   const addUser = (rowData: BasicUserDetails | BasicUserDetails[]) => {
     const addedUserDetails = rowData as BasicUserDetails;
 
-    props.addParticipants([addedUserDetails]);
+    addParticipants([addedUserDetails]);
   };
-  const classes = useStyles();
+
+  const onClickHandlerUpdateBtn = () => {
+    addParticipants(selectedParticipants);
+    setSelectedParticipants([]);
+  };
 
   const userTableProps = {
-    title: props.title,
+    title: title,
     action: {
       fn: addUser,
       actionText: 'Select user',
       actionIcon: <AddBox data-cy="select-user" />,
     },
-    selectedUsers: props.selectedUsers,
-    userRole: props.userRole || ('' as UserRole),
+    selectedUsers: selectedUsers,
+    userRole: userRole || ('' as UserRole),
     emailInvite: true,
-    selection: !!props.selection,
-    onUpdate: (data: BasicUserDetails[]) => props.addParticipants(data),
-    invitationUserRole: props.invitationUserRole || props.userRole,
+    selection: !!selection,
+    onUpdate: (data: BasicUserDetails[]) => addParticipants(data),
+    invitationUserRole: invitationUserRole || userRole,
+    selectedParticipants,
+    setSelectedParticipants,
   };
-
-  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-
   const peopleTable = <PeopleTable {...userTableProps} />;
-
   const proposalPeopleTable = <ProposalPeopleTable {...userTableProps} />;
 
   return (
     <Dialog
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"
-      open={props.show}
+      open={show}
       onClose={(_, reason) => {
         if (reason && reason == 'backdropClick') return;
-        props.close();
+        close();
       }}
       maxWidth="sm"
+      scroll="paper"
       fullWidth
     >
-      <DialogContent>
-        <IconButton
-          data-cy="close-modal-btn"
-          className={classes.closeButton}
-          onClick={() => props.close()}
-        >
+      <DialogTitle className={classes.dialogTitle}>
+        <IconButton data-cy="close-modal-btn" onClick={close}>
           <CloseIcon />
         </IconButton>
-        {props.participant && !isUserOfficer
-          ? proposalPeopleTable
-          : peopleTable}
+      </DialogTitle>
+      <DialogContent>
+        {participant && !isUserOfficer ? proposalPeopleTable : peopleTable}
       </DialogContent>
+      {selection && (
+        <DialogActions>
+          <div className={classes.selectedUsersText}>
+            {selectedParticipants.length} user(s) selected
+          </div>
+          <Button
+            type="button"
+            onClick={onClickHandlerUpdateBtn}
+            disabled={selectedParticipants.length === 0}
+            data-cy="assign-selected-users"
+          >
+            Update
+          </Button>
+        </DialogActions>
+      )}
     </Dialog>
   );
-}
+};
 
 export default ParticipantModal;
