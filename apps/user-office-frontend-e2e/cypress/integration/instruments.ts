@@ -132,7 +132,7 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name).parent().find('[type="checkbox"]').check();
 
-      cy.contains('Assign instrument').click();
+      cy.get('[data-cy="assign-instrument-to-call"').click();
 
       cy.notification({
         variant: 'success',
@@ -230,7 +230,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s assigned to the selected instrument successfully!',
+        text: 'Proposal/s assigned to the selected Instrument successfully!',
       });
 
       cy.get('@checkbox').uncheck();
@@ -258,7 +258,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s removed from the instrument successfully!',
+        text: 'Proposal/s removed from the Instrument successfully!',
       });
 
       cy.contains(proposal1.title)
@@ -284,7 +284,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Scientist assigned to instrument',
+        text: 'Scientist assigned to Instrument',
       });
     });
 

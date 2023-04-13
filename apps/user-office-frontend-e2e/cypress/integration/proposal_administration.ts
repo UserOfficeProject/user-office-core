@@ -164,7 +164,7 @@ context('Proposal administration tests', () => {
         .should('exist')
         .and(
           'contain.text',
-          'Be aware that proposal/s not assigned to an instrument will not be shown in the scheduler after changing status to "SCHEDULING"'
+          'Be aware that proposal/s not assigned to an Instrument will not be shown in the scheduler after changing status to "SCHEDULING"'
         );
     });
 

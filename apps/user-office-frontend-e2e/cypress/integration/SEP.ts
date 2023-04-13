@@ -1036,7 +1036,7 @@ context('SEP meeting components tests', () => {
 
       cy.contains(instrument.name);
 
-      cy.get("[aria-label='Submit instrument']").should('exist');
+      cy.get("[aria-label='Submit Instrument']").should('exist');
 
       cy.get("[aria-label='Detail panel visibility toggle']").first().click();
 
@@ -1063,7 +1063,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Submit instrument']").first().click();
+      cy.get("[aria-label='Submit Instrument']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -1080,7 +1080,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"]').should('not.be.disabled');
+      cy.get('[aria-label="Submit Instrument"]').should('not.be.disabled');
     });
 
     it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
@@ -1601,7 +1601,7 @@ context('SEP meeting components tests', () => {
         text: 'SEP meeting decision submitted successfully',
       });
 
-      cy.get("[aria-label='Submit instrument']").first().click();
+      cy.get("[aria-label='Submit Instrument']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -1625,7 +1625,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit Instrument"] button').should('be.disabled');
     });
 
     it('Officer should be able to edit SEP Meeting form after instrument is submitted', () => {
@@ -1646,7 +1646,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit Instrument"] button').should('be.disabled');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -1864,7 +1864,7 @@ context('SEP meeting components tests', () => {
       cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit Instrument"] button').should('be.disabled');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -1945,7 +1945,7 @@ context('SEP meeting components tests', () => {
       cy.visit(`/SEPPage/${createdSepId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit Instrument"] button').should('be.disabled');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
