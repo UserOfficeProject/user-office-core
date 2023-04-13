@@ -325,7 +325,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
         actions={[
           {
             icon: ScienceIconComponent,
-            tooltip: 'Assign' + t('instrument.single'),
+            tooltip: 'Assign ' + t('instrument.single'),
             onClick: (event, rowData): void =>
               setAssigningInstrumentsCallId((rowData as Call).id),
             position: 'row',

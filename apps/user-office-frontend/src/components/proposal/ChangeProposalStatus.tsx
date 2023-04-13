@@ -112,9 +112,7 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
                 <Alert severity="warning">
                   {`Be aware that proposal/s not assigned to an ${t(
                     'instrument.single'
-                  )} will
-                  not be shown in the scheduler after changing status to
-                  &quot;SCHEDULING&quot;.`}
+                  )} will not be shown in the scheduler after changing status to "SCHEDULING"`}
                 </Alert>
               )}
             {!values.selectedStatusId && (

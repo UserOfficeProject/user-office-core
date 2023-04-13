@@ -51,7 +51,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
 
   const onAssignButtonClick = async () => {
     await api({
-      toastSuccessMessage: 'Instrument/s assigned successfully!',
+      toastSuccessMessage: t('instrument.single') + '/s assigned successfully!',
     }).assignInstrumentsToCall({
       callId,
       instrumentIds: selectedInstruments.map(
@@ -98,7 +98,10 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           disabled={selectedInstruments.length === 0 || isExecutingCall}
           data-cy="assign-instrument-to-call"
         >
-          Assign instrument{selectedInstruments.length > 1 && 's'}
+          {'Assign ' +
+            (selectedInstruments.length > 1
+              ? t('instrument.plural')
+              : t('instrument.single'))}
         </Button>
       </ActionButtonContainer>
     </>
