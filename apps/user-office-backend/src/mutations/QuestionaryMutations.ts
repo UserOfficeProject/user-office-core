@@ -112,9 +112,8 @@ export default class QuestionaryMutations {
           !(await isMatchingConstraints(questionTemplateRelation, value))
         ) {
           return rejection(
-            'Please enter a valid input for "' +
-              questionTemplateRelation.question.question +
-              '"',
+            'Please enter a valid input for ' +
+              questionTemplateRelation.question.question,
             { answer, questionTemplateRelation }
           );
         }
