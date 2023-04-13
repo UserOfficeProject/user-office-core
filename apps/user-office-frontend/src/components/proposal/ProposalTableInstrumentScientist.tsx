@@ -66,11 +66,33 @@ let columns: Column<ProposalViewData>[] = [
     removable: false,
     field: 'rowActionButtons',
   },
-  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Proposal ID',
+    field: 'proposalId',
+  },
   {
     title: 'Title',
     field: 'title',
     ...{ width: 'auto' },
+  },
+  {
+    render: (proposalView) => {
+      if (
+        proposalView.principalInvestigator?.lastname &&
+        proposalView.principalInvestigator?.firstname
+      ) {
+        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
+      }
+
+      return '';
+    },
+    title: 'Principal Investigator',
+    emptyValue: '-',
+  },
+  {
+    title: 'PI Email',
+    field: 'principalInvestigator.email',
+    emptyValue: '-',
   },
   {
     title: 'Submitted',
