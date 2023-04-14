@@ -402,7 +402,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
                   {title}
                 </Typography>
               }
-              // style={{ position: 'static' }}
+              style={{ position: 'static' }}
               page={currentPage}
               columns={columns}
               onSelectionChange={(selectedItems, selectedItem) =>
