@@ -93,7 +93,6 @@ const ParticipantModal: React.FC<ParticipantModalProps> = ({
         close();
       }}
       maxWidth="sm"
-      scroll="paper"
       fullWidth
     >
       <DialogTitle className={classes.dialogTitle}>

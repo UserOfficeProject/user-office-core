@@ -260,6 +260,7 @@ const Dashboard: React.FC = () => {
             aria-label="Close drawer"
             onClick={handleDrawerClose}
             className="closeDrawer"
+            data-cy="close-drawer"
           >
             <ChevronLeftIcon />
           </IconButton>

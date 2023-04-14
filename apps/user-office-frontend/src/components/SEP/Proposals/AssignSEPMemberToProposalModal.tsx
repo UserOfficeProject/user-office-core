@@ -78,7 +78,6 @@ const AssignSEPMemberToProposalModal: React.FC<
       aria-describedby="simple-modal-description"
       open={!!proposalPk}
       onClose={(): void => setProposalPk(null)}
-      scroll="paper"
     >
       <DialogContent>
         <PeopleTable
