@@ -14,11 +14,11 @@ i18n
     },
   });
 
-i18n.services.formatter?.add('lowercase', (value, lng, options) => {
+i18n.services.formatter?.add('lowercase', (value) => {
   return value.toLowerCase();
 });
 
-i18n.services.formatter?.add('plural', (value, lng, options) => {
+i18n.services.formatter?.add('plural', (value) => {
   return value + 's';
 });
 
