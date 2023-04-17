@@ -1,6 +1,7 @@
 import MaterialTable, { Options } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import { Typography } from '@mui/material';
+import i18n from 'i18n';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -144,13 +145,14 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
               submitInstrument(rowData as InstrumentWithAvailabilityTime);
             },
             {
-              title: 'Submit ' + t('instrument.single'),
+              title:
+                'Submit ' + i18n.format(t('instrument.single'), 'lowercase'),
               description: `No further changes to sep meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
                 'instrument.single'
               )}?`,
             }
           )(),
-        tooltip: 'Submit ' + t('instrument.single'),
+        tooltip: 'Submit ' + i18n.format(t('instrument.single'), 'lowercase'),
       })
     );
   }

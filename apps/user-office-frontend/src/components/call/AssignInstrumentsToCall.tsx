@@ -1,6 +1,7 @@
 import MaterialTable from '@material-table/core';
 import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -99,9 +100,11 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           data-cy="assign-instrument-to-call"
         >
           {'Assign ' +
-            (selectedInstruments.length > 1
-              ? t('instrument.plural')
-              : t('instrument.single'))}
+            i18n.format(
+              selectedInstruments.length > 1
+                ? t('instrument.plural')
+                : t('instrument.single')
+            )}
         </Button>
       </ActionButtonContainer>
     </>

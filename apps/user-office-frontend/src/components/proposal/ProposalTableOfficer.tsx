@@ -18,6 +18,7 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import i18n from 'i18n';
 import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
@@ -512,8 +513,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   ): Promise<void> => {
     if (instrument) {
       await api({
-        toastSuccessMessage: `Proposal/s assigned to the selected ${t(
-          'instrument.single'
+        toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
+          t('instrument.single'),
+          'lowercase'
         )} successfully!`,
       }).assignProposalsToInstrument({
         proposals: selectedProposals.map((selectedProposal) => ({
@@ -527,8 +529,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setTimeout(fetchProposalsData, 500);
     } else {
       await api({
-        toastSuccessMessage: `Proposal/s removed from the ${t(
-          'instrument.single'
+        toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
+          t('instrument.single'),
+          'lowercase'
         )} successfully!`,
       }).removeProposalsFromInstrument({
         proposalPks: selectedProposals.map(

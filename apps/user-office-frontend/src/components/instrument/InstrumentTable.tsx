@@ -1,5 +1,6 @@
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
+import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
@@ -52,7 +53,9 @@ const InstrumentTable: React.FC = () => {
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     try {
       await api({
-        toastSuccessMessage: t('instrument.single') + ' removed successfully!',
+        toastSuccessMessage:
+          i18n.format(t('instrument.single'), 'lowercase') +
+          ' removed successfully!',
       }).deleteInstrument({
         id: instrumentDeletedId as number,
       });
@@ -67,8 +70,9 @@ const InstrumentTable: React.FC = () => {
     scientists: BasicUserDetails[]
   ) => {
     await api({
-      toastSuccessMessage: `Scientist assigned to ${t(
-        'instrument.single'
+      toastSuccessMessage: `Scientist assigned to ${i18n.format(
+        t('instrument.single'),
+        'lowercase'
       )} successfully!`,
     }).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,

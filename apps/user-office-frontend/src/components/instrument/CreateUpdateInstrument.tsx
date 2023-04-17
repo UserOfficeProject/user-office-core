@@ -7,6 +7,7 @@ import {
 } from '@user-office-software/duo-validation/lib/Instrument';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
+import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -96,7 +97,8 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
       {() => (
         <Form>
           <Typography variant="h6" component="h1">
-            {(instrument ? 'Update ' : 'Create new ') + t('instrument.single')}
+            {(instrument ? 'Update ' : 'Create new ') +
+              i18n.format(t('instrument.single'), 'lowercase')}
           </Typography>
           <Field
             name="name"

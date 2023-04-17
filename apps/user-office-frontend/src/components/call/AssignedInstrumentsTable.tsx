@@ -4,6 +4,7 @@ import MaterialTable, {
 } from '@material-table/core';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
+import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -129,7 +130,9 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   const removeAssignedInstrument = async (instrumentId: number) => {
     await api({
       toastSuccessMessage:
-        'Assigned ' + t('instrument.single') + ' removed successfully!',
+        'Assigned ' +
+        i18n.format(t('instrument.single'), 'lowercase') +
+        ' removed successfully!',
     }).removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,
@@ -169,7 +172,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={'Assigned instruments'}
+        title={'Assigned ' + i18n.format(t('instrument.plural'), 'lowercase')}
         data={call.instruments}
         editable={{
           onRowDelete: (

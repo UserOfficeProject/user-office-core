@@ -14,6 +14,10 @@ i18n
     },
   });
 
+i18n.services.formatter?.add('lowercase', (value, lng, options) => {
+  return value.toLowerCase();
+});
+
 i18n.languages = ['override'];
 
 export default i18n;

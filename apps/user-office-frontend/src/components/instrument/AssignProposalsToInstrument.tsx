@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
+import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -77,7 +78,10 @@ const AssignProposalsToInstrument: React.FC<
               variant="h6"
               component="h1"
             >
-              {`Assign proposal/s to ${t('instrument.single')}`}
+              {`Assign proposal/s to ${i18n.format(
+                t('instrument.single'),
+                'lowercase'
+              )}`}
             </Typography>
 
             <Grid container spacing={3}>
@@ -91,15 +95,18 @@ const AssignProposalsToInstrument: React.FC<
                     text: instrument.name,
                   }))}
                   disabled={isSubmitting}
-                  noOptionsText={'No ' + t('instrument.plural')}
+                  noOptionsText={
+                    'No ' + i18n.format(t('instrument.plural'), 'lowercase')
+                  }
                   data-cy="instrument-selection"
                 />
               </Grid>
             </Grid>
             {!values.selectedInstrumentId && (
               <Alert severity="warning" data-cy="remove-instrument-alert">
-                {`Be aware that leaving ${t(
-                  'instrument.single'
+                {`Be aware that leaving ${i18n.format(
+                  t('instrument.single'),
+                  'lowercase'
                 )} selection empty will remove
                 assigned instrument from proposal/s.`}
               </Alert>

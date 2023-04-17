@@ -74,7 +74,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={`Assigned ${t('instrument.single')}`}
+        title={`Assigned ${t('instrument.plural')}`}
         data={instrument.scientists}
         editable={
           isUserOfficer

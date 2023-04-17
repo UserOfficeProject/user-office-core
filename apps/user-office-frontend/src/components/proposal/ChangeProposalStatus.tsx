@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
+import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
@@ -110,8 +111,9 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
             {values.selectedStatusId === 8 &&
               !allSelectedProposalsHaveInstrument && (
                 <Alert severity="warning">
-                  {`Be aware that proposal/s not assigned to an ${t(
-                    'instrument.single'
+                  {`Be aware that proposal/s not assigned to an ${i18n.format(
+                    t('instrument.single'),
+                    'lowercase'
                   )} will not be shown in the scheduler after changing status to "SCHEDULING"`}
                 </Alert>
               )}
