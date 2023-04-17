@@ -145,14 +145,13 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
               submitInstrument(rowData as InstrumentWithAvailabilityTime);
             },
             {
-              title:
-                'Submit ' + i18n.format(t('instrument.single'), 'lowercase'),
+              title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
               description: `No further changes to sep meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
-                'instrument.single'
+                'instrument'
               )}?`,
             }
           )(),
-        tooltip: 'Submit ' + i18n.format(t('instrument.single'), 'lowercase'),
+        tooltip: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
       })
     );
   }
@@ -163,7 +162,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {`${t('instrument.plural')} with proposals`}
+            {`${i18n.format(t('instrument'), 'plural')} with proposals`}
           </Typography>
         }
         columns={columns}

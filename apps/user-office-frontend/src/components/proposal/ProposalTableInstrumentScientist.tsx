@@ -130,9 +130,7 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
 
 const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
-) => [
-  { title: t('instrument.single'), field: 'instrumentName', emptyValue: '-' },
-];
+) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
 const SEPReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },

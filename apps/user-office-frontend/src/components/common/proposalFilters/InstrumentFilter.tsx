@@ -57,7 +57,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
     <>
       <FormControl className={classes.formControl}>
         <InputLabel id="instrument-select-label" shrink>
-          {t('instrument.single')}
+          {t('instrument')}
         </InputLabel>
         {isLoading ? (
           <div className={classes.loadingText}>Loading...</div>

@@ -131,7 +131,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     await api({
       toastSuccessMessage:
         'Assigned ' +
-        i18n.format(t('instrument.single'), 'lowercase') +
+        i18n.format(t('instrument'), 'lowercase') +
         ' removed successfully!',
     }).removeAssignedInstrumentFromCall({
       callId: call.id,
@@ -172,7 +172,10 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={'Assigned ' + i18n.format(t('instrument.plural'), 'lowercase')}
+        title={
+          'Assigned ' +
+          i18n.format(i18n.format(t('instrument'), 'plural'), 'lowercase')
+        }
         data={call.instruments}
         editable={{
           onRowDelete: (

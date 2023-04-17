@@ -1,5 +1,6 @@
 import MaterialTable from '@material-table/core';
 import makeStyles from '@mui/styles/makeStyles';
+import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +75,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={`Assigned ${t('instrument.plural')}`}
+        title={`Assigned ${i18n.format(t('instrument'), 'plural')}`}
         data={instrument.scientists}
         editable={
           isUserOfficer

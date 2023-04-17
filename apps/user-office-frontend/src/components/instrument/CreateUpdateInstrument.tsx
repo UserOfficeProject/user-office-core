@@ -64,8 +64,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         if (instrument) {
           try {
             const { updateInstrument } = await api({
-              toastSuccessMessage:
-                t('instrument.single') + ' updated successfully!',
+              toastSuccessMessage: t('instrument') + ' updated successfully!',
             }).updateInstrument({
               ...values,
               id: instrument.id,
@@ -78,8 +77,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         } else {
           try {
             const { createInstrument } = await api({
-              toastSuccessMessage:
-                t('instrument.single') + ' created successfully!',
+              toastSuccessMessage: t('instrument') + ' created successfully!',
             }).createInstrument(values);
 
             close(createInstrument);
@@ -98,7 +96,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
         <Form>
           <Typography variant="h6" component="h1">
             {(instrument ? 'Update ' : 'Create new ') +
-              i18n.format(t('instrument.single'), 'lowercase')}
+              i18n.format(t('instrument'), 'lowercase')}
           </Typography>
           <Field
             name="name"

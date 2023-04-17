@@ -54,8 +54,7 @@ const InstrumentTable: React.FC = () => {
     try {
       await api({
         toastSuccessMessage:
-          i18n.format(t('instrument.single'), 'lowercase') +
-          ' removed successfully!',
+          i18n.format(t('instrument'), 'lowercase') + ' removed successfully!',
       }).deleteInstrument({
         id: instrumentDeletedId as number,
       });
@@ -71,7 +70,7 @@ const InstrumentTable: React.FC = () => {
   ) => {
     await api({
       toastSuccessMessage: `Scientist assigned to ${i18n.format(
-        t('instrument.single'),
+        t('instrument'),
         'lowercase'
       )} successfully!`,
     }).assignScientistsToInstrument({
@@ -169,7 +168,7 @@ const InstrumentTable: React.FC = () => {
         )}
         selection={true}
         userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={t('instrumentSci.single')}
+        title={t('instrumentSci')}
         invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
       />
       <div data-cy="instruments-table">
@@ -183,7 +182,7 @@ const InstrumentTable: React.FC = () => {
           }}
           title={
             <Typography variant="h6" component="h2">
-              {t('instrument.plural')}
+              {i18n.format(t('instrument'), 'plural')}
             </Typography>
           }
           columns={columns}

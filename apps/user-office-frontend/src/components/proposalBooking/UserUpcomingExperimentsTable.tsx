@@ -21,7 +21,7 @@ const columns: (
 ) => Column<ProposalScheduledEvent>[] = (t) => [
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
-  { title: t('instrument.single') as string, field: 'instrument.name' },
+  { title: t('instrument') as string, field: 'instrument.name' },
   {
     title: 'Local contact',
     render: (rowData) => getFullUserName(rowData.localContact),

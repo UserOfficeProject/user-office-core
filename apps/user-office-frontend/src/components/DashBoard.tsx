@@ -10,6 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import parse from 'html-react-parser';
+import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -363,7 +364,7 @@ const Dashboard: React.FC = () => {
           {isInstrumentManagementEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title={t('instrument.plural')}
+              title={i18n.format(t('instrument'), 'plural')}
               path="/Instruments"
               component={InstrumentsPage}
             />

@@ -1,6 +1,7 @@
 import Archive from '@mui/icons-material/Archive';
 import Unarchive from '@mui/icons-material/Unarchive';
 import { Typography } from '@mui/material';
+import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
@@ -111,7 +112,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
       emptyValue: '-',
     },
     {
-      title: '#' + t('instrument.plural'),
+      title: '#' + i18n.format(t('instrument'), 'plural'),
       field: 'instruments.length',
       emptyValue: '-',
     },
@@ -315,7 +316,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
         isLoading={loadingCalls}
         detailPanel={[
           {
-            tooltip: 'Show ' + t('instrument.plural'),
+            tooltip: 'Show ' + i18n.format(t('instrument'), 'plural'),
             render: AssignedInstruments,
           },
         ]}
@@ -325,7 +326,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
         actions={[
           {
             icon: ScienceIconComponent,
-            tooltip: 'Assign ' + t('instrument.single'),
+            tooltip: 'Assign ' + t('instrument'),
             onClick: (event, rowData): void =>
               setAssigningInstrumentsCallId((rowData as Call).id),
             position: 'row',

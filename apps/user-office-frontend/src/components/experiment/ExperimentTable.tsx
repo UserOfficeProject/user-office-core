@@ -45,7 +45,7 @@ const columns = (t: TFunction<'translation', undefined, 'translation'>) => [
     field: 'esiFormatted',
   },
   {
-    title: t('instrument.single'),
+    title: t('instrument'),
     field: 'proposal.instrument.name',
   },
 ];

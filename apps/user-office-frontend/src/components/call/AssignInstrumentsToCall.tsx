@@ -52,7 +52,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
 
   const onAssignButtonClick = async () => {
     await api({
-      toastSuccessMessage: t('instrument.single') + '/s assigned successfully!',
+      toastSuccessMessage: t('instrument') + '/s assigned successfully!',
     }).assignInstrumentsToCall({
       callId,
       instrumentIds: selectedInstruments.map(
@@ -69,7 +69,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h1">
-            {t('instrument.plural')}
+            {i18n.format(t('instrument'), 'plural')}
           </Typography>
         }
         columns={columns}
@@ -102,8 +102,8 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           {'Assign ' +
             i18n.format(
               selectedInstruments.length > 1
-                ? t('instrument.plural')
-                : t('instrument.single')
+                ? i18n.format(t('instrument'), 'plural')
+                : t('instrument')
             )}
         </Button>
       </ActionButtonContainer>

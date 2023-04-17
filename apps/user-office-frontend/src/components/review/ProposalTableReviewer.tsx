@@ -76,7 +76,7 @@ const columns: (
     customSort: (a, b) => a.status.localeCompare(b.status),
   },
   { title: 'Call', field: 'callShortCode' },
-  { title: t('instrument.single') as string, field: 'instrumentShortCode' },
+  { title: t('instrument') as string, field: 'instrumentShortCode' },
 ];
 
 const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({

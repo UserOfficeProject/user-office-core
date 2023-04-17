@@ -79,7 +79,7 @@ const AssignProposalsToInstrument: React.FC<
               component="h1"
             >
               {`Assign proposal/s to ${i18n.format(
-                t('instrument.single'),
+                t('instrument'),
                 'lowercase'
               )}`}
             </Typography>
@@ -96,7 +96,11 @@ const AssignProposalsToInstrument: React.FC<
                   }))}
                   disabled={isSubmitting}
                   noOptionsText={
-                    'No ' + i18n.format(t('instrument.plural'), 'lowercase')
+                    'No ' +
+                    i18n.format(
+                      i18n.format(t('instrument'), 'plural'),
+                      'lowercase'
+                    )
                   }
                   data-cy="instrument-selection"
                 />
@@ -105,7 +109,7 @@ const AssignProposalsToInstrument: React.FC<
             {!values.selectedInstrumentId && (
               <Alert severity="warning" data-cy="remove-instrument-alert">
                 {`Be aware that leaving ${i18n.format(
-                  t('instrument.single'),
+                  t('instrument'),
                   'lowercase'
                 )} selection empty will remove
                 assigned instrument from proposal/s.`}

@@ -169,9 +169,7 @@ const technicalReviewColumns = [
 
 const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
-) => [
-  { title: t('instrument.single'), field: 'instrumentName', emptyValue: '-' },
-];
+) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
 const SEPReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
@@ -514,7 +512,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     if (instrument) {
       await api({
         toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
-          t('instrument.single'),
+          t('instrument'),
           'lowercase'
         )} successfully!`,
       }).assignProposalsToInstrument({
@@ -530,7 +528,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     } else {
       await api({
         toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
-          t('instrument.single'),
+          t('instrument'),
           'lowercase'
         )} successfully!`,
       }).removeProposalsFromInstrument({
@@ -880,7 +878,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           },
           {
             icon: ScienceIconComponent,
-            tooltip: `Assign/Remove ${t('instrument.single')}`,
+            tooltip: `Assign/Remove ${t('instrument')}`,
             onClick: () => {
               setOpenInstrumentAssignment(true);
             },
