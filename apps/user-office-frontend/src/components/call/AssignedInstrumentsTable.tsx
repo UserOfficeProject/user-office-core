@@ -129,7 +129,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   const removeAssignedInstrument = async (instrumentId: number) => {
     await api({
       toastSuccessMessage:
-        'Assigned ' + t('instrument.single') + '  removed successfully!',
+        'Assigned ' + t('instrument.single') + ' removed successfully!',
     }).removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,

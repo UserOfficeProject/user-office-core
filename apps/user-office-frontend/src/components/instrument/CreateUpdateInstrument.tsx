@@ -78,7 +78,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
           try {
             const { createInstrument } = await api({
               toastSuccessMessage:
-                t('instrument.single') + 'created successfully!',
+                t('instrument.single') + ' created successfully!',
             }).createInstrument(values);
 
             close(createInstrument);
