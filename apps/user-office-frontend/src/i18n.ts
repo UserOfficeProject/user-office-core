@@ -6,7 +6,6 @@ i18n
   .use(Backend)
   .use(initReactI18next)
   .init({
-    debug: true,
     lng: 'override',
     fallbackLng: 'override',
     backend: {

@@ -53,8 +53,7 @@ const InstrumentTable: React.FC = () => {
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     try {
       await api({
-        toastSuccessMessage:
-          i18n.format(t('instrument'), 'lowercase') + ' removed successfully!',
+        toastSuccessMessage: t('instrument') + ' removed successfully!',
       }).deleteInstrument({
         id: instrumentDeletedId as number,
       });

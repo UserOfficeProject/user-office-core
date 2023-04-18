@@ -100,11 +100,9 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           data-cy="assign-instrument-to-call"
         >
           {'Assign ' +
-            i18n.format(
-              selectedInstruments.length > 1
-                ? i18n.format(t('instrument'), 'plural')
-                : t('instrument')
-            )}
+            (selectedInstruments.length > 1
+              ? i18n.format(t('instrument'), 'plural')
+              : t('instrument'))}
         </Button>
       </ActionButtonContainer>
     </>

@@ -230,7 +230,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s assigned to the selected Instrument successfully!',
+        text: 'Proposal/s assigned to the selected instrument successfully!',
       });
 
       cy.get('@checkbox').uncheck();
@@ -258,7 +258,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s removed from the Instrument successfully!',
+        text: 'Proposal/s removed from the instrument successfully!',
       });
 
       cy.contains(proposal1.title)
@@ -284,7 +284,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Scientist assigned to Instrument',
+        text: 'Scientist assigned to instrument',
       });
     });
 
