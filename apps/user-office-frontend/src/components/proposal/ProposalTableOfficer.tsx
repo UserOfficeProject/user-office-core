@@ -111,6 +111,25 @@ let columns: Column<ProposalViewData>[] = [
     ...{ width: 'auto' },
   },
   {
+    render: (proposalView) => {
+      if (
+        proposalView.principalInvestigator?.lastname &&
+        proposalView.principalInvestigator?.firstname
+      ) {
+        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
+      }
+
+      return '';
+    },
+    title: 'Principal Investigator',
+    emptyValue: '-',
+  },
+  {
+    title: 'PI Email',
+    field: 'principalInvestigator.email',
+    emptyValue: '-',
+  },
+  {
     title: 'Submitted',
     field: 'submitted',
     lookup: { true: 'Yes', false: 'No' },
