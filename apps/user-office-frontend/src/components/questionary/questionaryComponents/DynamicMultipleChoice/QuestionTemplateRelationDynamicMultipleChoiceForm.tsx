@@ -10,7 +10,7 @@ import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { SelectionFromOptionsConfig } from 'generated/sdk';
+import { DynamicMultipleChoiceConfig } from 'generated/sdk';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
@@ -21,7 +21,7 @@ const columns = [{ title: 'Answer', field: 'answer' }];
 export const QuestionTemplateRelationDynamicMultipleChoiceForm: FC<
   QuestionTemplateRelationFormProps
 > = (props) => {
-  const config = props.questionRel.config as SelectionFromOptionsConfig;
+  const config = props.questionRel.config as DynamicMultipleChoiceConfig;
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
 

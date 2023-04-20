@@ -18,7 +18,6 @@ import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
-import { DynamicRecord } from '../../models/questionTypes/DynamicMultipleChoice';
 import {
   createConfig,
   getExternalApiCallData,
@@ -802,9 +801,12 @@ export const createQuestionTemplateRelationObject = async (
     QuestionTemplateRelRecord & { dependency_natural_key: string },
   dependencies: FieldDependency[]
 ) => {
-  let recordWithApiCall;
-  if (record.config.hasOwnProperty('url')) {
-    recordWithApiCall = await getExternalApiCallData(record as DynamicRecord);
+  const parsedRecord = JSON.parse(JSON.stringify(record));
+  if (parsedRecord.config.externalApiCall) {
+    parsedRecord.config = await getExternalApiCallData(
+      parsedRecord.data_type,
+      parsedRecord.config
+    );
   }
 
   return new QuestionTemplateRelation(
@@ -818,10 +820,7 @@ export const createQuestionTemplateRelationObject = async (
     ),
     record.topic_id,
     record.sort_order,
-    createConfig<any>(
-      record.data_type as DataType,
-      recordWithApiCall ? recordWithApiCall.config : record.config
-    ),
+    createConfig<any>(record.data_type as DataType, parsedRecord.config),
     dependencies,
     record.dependencies_operator
   );
