@@ -135,7 +135,6 @@ fragment fieldConfig on FieldConfig {
     token
     jsonPath
     isMultipleSelect
-    externalApiCall
     variant
   }
 
