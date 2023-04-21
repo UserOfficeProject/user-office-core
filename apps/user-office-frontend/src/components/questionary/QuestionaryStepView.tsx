@@ -158,7 +158,21 @@ export default function QuestionaryStepView(props: {
     };
   }, [initialValues, lastSavedFormValues, state.isDirty, dispatch]);
 
+  const actionsTemplateChanges = () => {
+    const promises = [];
+
+    for (let i = 0; i < state.deleteList.length; i++) {
+      promises.push(
+        api().deleteGenericTemplate({ genericTemplateId: state.deleteList[i] })
+      );
+    }
+
+    Promise.all(promises).then(() => dispatch({ type: 'CLEAR_DELETE_LIST' }));
+  };
+
   const performSave = async (isPartialSave: boolean): Promise<boolean> => {
+    actionsTemplateChanges();
+
     const questionaryId =
       (
         await Promise.all(
@@ -199,7 +213,10 @@ export default function QuestionaryStepView(props: {
 
   const backHandler = () => dispatch({ type: 'BACK_CLICKED' });
 
-  const resetHandler = () => dispatch({ type: 'RESET_CLICKED' });
+  const resetHandler = () => {
+    dispatch({ type: 'CLEAR_DELETE_LIST' });
+    dispatch({ type: 'RESET_CLICKED' });
+  };
 
   const saveHandler = () => performSave(true);
 
@@ -260,10 +277,7 @@ export default function QuestionaryStepView(props: {
               >
                 Back
               </NavigButton>
-              <NavigButton
-                onClick={resetHandler}
-                disabled={state.isDirty === false}
-              >
+              <NavigButton onClick={resetHandler} disabled={!state.isDirty}>
                 Reset
               </NavigButton>
               {!questionaryStep.isCompleted && (

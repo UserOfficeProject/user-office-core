@@ -30,6 +30,7 @@ export type Event =
   | { type: 'GO_STEP_BACK' }
   | { type: 'GO_STEP_FORWARD' }
   | { type: 'CLEAN_DIRTY_STATE' }
+  | { type: 'CLEAR_DELETE_LIST' }
   | { type: 'GO_TO_STEP'; stepIndex: number }
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
   | { type: 'STEP_ANSWERED'; step: QuestionaryStep }
@@ -116,7 +117,8 @@ export abstract class QuestionarySubmissionState {
           templateGroupId
         ).wizardStepFactory.getWizardSteps(initItem.questionary.steps),
     public stepIndex: number = 0,
-    public isDirty: boolean = false
+    public isDirty: boolean = false,
+    public deleteList: number[] = []
   ) {
     this.initItem = deepClone(initItem); // save initial data to restore it if reset is clicked
   }
@@ -193,6 +195,9 @@ export function QuestionarySubmissionModel<
           break;
         case 'CLEAN_DIRTY_STATE':
           draftState.isDirty = false;
+          break;
+        case 'CLEAR_DELETE_LIST':
+          draftState.deleteList = [];
           break;
 
         case 'GO_STEP_BACK':

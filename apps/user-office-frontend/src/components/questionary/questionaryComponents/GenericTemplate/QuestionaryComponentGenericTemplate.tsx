@@ -175,19 +175,16 @@ function QuestionaryComponentGenericTemplate(
               }
             });
 
-        const deleteGenericTemplate = (id: number) =>
-          api()
-            .deleteGenericTemplate({ genericTemplateId: id })
-            .then(() => {
-              const deletedStateItems = field.value.filter(
-                (genericTemplate) => genericTemplate.id === id
-              );
+        const deleteGenericTemplate = (id: number) => {
+          const deletedStateItems = field.value.filter(
+            (genericTemplate) => genericTemplate.id === id
+          );
 
-              updateFieldValueAndState(
-                deletedStateItems,
-                GENERIC_TEMPLATE_EVENT.ITEMS_DELETED
-              );
-            });
+          updateFieldValueAndState(
+            deletedStateItems,
+            GENERIC_TEMPLATE_EVENT.ITEMS_DELETED
+          );
+        };
 
         const createGenericTemplateWithCopiedAnswers = (
           copyAnswersInput: CopyAnswerInput[]

@@ -88,6 +88,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
                 (value) => !questionIds.some((id) => id === value.id)
               ),
             ];
+            draftState.deleteList = [...state.deleteList, ...questionIds];
             action.newItems = [];
           }
         }
