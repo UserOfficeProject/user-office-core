@@ -878,7 +878,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           },
           {
             icon: ScienceIconComponent,
-            tooltip: `Assign/Remove ${t('instrument')}`,
+            tooltip: `Assign/Remove ${i18n.format(
+              t('instrument'),
+              'lowercase'
+            )}`,
             onClick: () => {
               setOpenInstrumentAssignment(true);
             },
