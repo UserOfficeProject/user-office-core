@@ -73,9 +73,8 @@ export default function useEventHandlers(templateGroupId: TemplateGroupId) {
           break;
 
         case 'RESET_CLICKED':
-          if (confirmNavigation()) {
-            await handleReset();
-          }
+          await handleReset();
+
           break;
 
         case 'GO_TO_STEP_CLICKED':

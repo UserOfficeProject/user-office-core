@@ -72,6 +72,15 @@ export default function ProposalContainer(props: ProposalContainerProps) {
               ),
               ...action.newItems,
             ];
+            //if a new template has been created add it to the list of created templates
+            if (
+              action.newItems.length > state.proposal.genericTemplates.length
+            ) {
+              draftState.createdTemplates = [
+                ...state.createdTemplates,
+                questionIds[questionIds.length - 1],
+              ];
+            }
           } else {
             draftState.proposal.genericTemplates = action.newItems;
           }
@@ -88,7 +97,10 @@ export default function ProposalContainer(props: ProposalContainerProps) {
                 (value) => !questionIds.some((id) => id === value.id)
               ),
             ];
-            draftState.deleteList = [...state.deleteList, ...questionIds];
+            draftState.deletedTemplates = [
+              ...state.deletedTemplates,
+              ...questionIds,
+            ];
             action.newItems = [];
           }
         }
