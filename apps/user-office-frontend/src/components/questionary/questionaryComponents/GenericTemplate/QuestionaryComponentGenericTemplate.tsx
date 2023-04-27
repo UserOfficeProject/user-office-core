@@ -100,9 +100,6 @@ function QuestionaryComponentGenericTemplate(
   return (
     <Field name={answerId}>
       {({ field, form }: FieldProps<GenericTemplateWithQuestionary[]>) => {
-        field.value = field.value.filter(
-          (value) => !state.hiddenTemplates.includes(value.id)
-        );
         const updateFieldValueAndState = (
           updatedItems: GenericTemplateCore[] | null,
           dispatchType: GENERIC_TEMPLATE_EVENT
@@ -289,6 +286,7 @@ function QuestionaryComponentGenericTemplate(
                     GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
                   );
                 }
+                dispatch({ type: 'CLEAN_DIRTY_STATE' });
                 setSelectedGenericTemplate(null);
               }}
               open={selectedGenericTemplate !== null}

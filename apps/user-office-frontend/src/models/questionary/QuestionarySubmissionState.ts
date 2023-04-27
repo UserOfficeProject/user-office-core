@@ -21,7 +21,6 @@ import { StepType } from './StepType';
 export enum GENERIC_TEMPLATE_EVENT {
   ITEMS_MODIFIED = 'ITEMS_MODIFIED',
   ITEMS_DELETED = 'ITEMS_DELETED',
-  CREATED_ITEMS_DELETED = 'CREATED_ITEMS_DELETED',
 }
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
@@ -33,8 +32,6 @@ export type Event =
   | { type: 'CLEAN_DIRTY_STATE' }
   | { type: 'CLEAR_DELETE_LIST' }
   | { type: 'CLEAR_CREATED_LIST' }
-  | { type: 'ADD_HIDDEN_TEMPLATES'; hiddenTemplates: number[] }
-  | { type: 'SET_CREATED_LIST'; createdList: number[] }
   | { type: 'GO_TO_STEP'; stepIndex: number }
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
   | { type: 'STEP_ANSWERED'; step: QuestionaryStep }
@@ -80,7 +77,7 @@ export type Event =
         (GenericTemplateFragment & {
           questionary: Pick<Questionary, 'isCompleted'>;
         })[]
-      > | null;
+      >;
     };
 
 export interface WizardStepMetadata {
@@ -123,8 +120,7 @@ export abstract class QuestionarySubmissionState {
     public stepIndex: number = 0,
     public isDirty: boolean = false,
     public deletedTemplates: number[] = [],
-    public createdTemplates: number[] = [],
-    public hiddenTemplates: number[] = []
+    public createdTemplates: number[] = []
   ) {
     this.initItem = deepClone(initItem); // save initial data to restore it if reset is clicked
   }
@@ -208,16 +204,6 @@ export function QuestionarySubmissionModel<
         case 'CLEAR_CREATED_LIST':
           draftState.createdTemplates = [];
           break;
-        case 'SET_CREATED_LIST':
-          draftState.createdTemplates = action.createdList;
-          break;
-        case 'ADD_HIDDEN_TEMPLATES':
-          draftState.hiddenTemplates = [
-            ...draftState.hiddenTemplates,
-            ...action.hiddenTemplates,
-          ];
-          break;
-
         case 'GO_STEP_BACK':
           draftState.stepIndex = clamStepIndex(
             draftState.stepIndex - 1,

@@ -227,13 +227,7 @@ export default function QuestionaryStepView(props: {
       );
     }
     Promise.all(promises).then(() => {
-      dispatch({
-        type: 'ADD_HIDDEN_TEMPLATES',
-        hiddenTemplates: state.createdTemplates,
-      });
-      dispatch({
-        type: 'CLEAR_CREATED_LIST',
-      });
+      dispatch({ type: 'CLEAR_CREATED_LIST' });
       dispatch({ type: 'CLEAR_DELETE_LIST' });
       dispatch({ type: 'RESET_CLICKED' });
     });
