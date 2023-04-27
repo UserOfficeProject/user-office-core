@@ -175,22 +175,6 @@ export default function QuestionaryStepView(props: {
     });
   };
 
-  const revertTemplateChanges = async () => {
-    const promises = [];
-
-    for (let i = 0; i < state.createdTemplates.length; i++) {
-      promises.push(
-        api().deleteGenericTemplate({
-          genericTemplateId: state.createdTemplates[i],
-        })
-      );
-    }
-
-    Promise.all(promises).then(() => {
-      dispatch({ type: 'CLEAR_CREATED_LIST' });
-    });
-  };
-
   const performSave = async (isPartialSave: boolean): Promise<boolean> => {
     actionsTemplateChanges();
 
@@ -232,6 +216,29 @@ export default function QuestionaryStepView(props: {
     return true;
   };
 
+  const revertTemplateChanges = () => {
+    const promises = [];
+
+    for (let i = 0; i < state.createdTemplates.length; i++) {
+      promises.push(
+        api().deleteGenericTemplate({
+          genericTemplateId: state.createdTemplates[i],
+        })
+      );
+    }
+    Promise.all(promises).then(() => {
+      dispatch({
+        type: 'ADD_HIDDEN_TEMPLATES',
+        hiddenTemplates: state.createdTemplates,
+      });
+      dispatch({
+        type: 'CLEAR_CREATED_LIST',
+      });
+      dispatch({ type: 'CLEAR_DELETE_LIST' });
+      dispatch({ type: 'RESET_CLICKED' });
+    });
+  };
+
   const backHandler = () => dispatch({ type: 'BACK_CLICKED' });
 
   const confirmNavigation = () =>
@@ -242,8 +249,6 @@ export default function QuestionaryStepView(props: {
   const resetHandler = () => {
     if (confirmNavigation()) {
       revertTemplateChanges();
-      dispatch({ type: 'CLEAR_DELETE_LIST' });
-      dispatch({ type: 'RESET_CLICKED' });
     }
   };
 

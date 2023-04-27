@@ -72,13 +72,18 @@ export default function ProposalContainer(props: ProposalContainerProps) {
               ),
               ...action.newItems,
             ];
-            //if a new template has been created add it to the list of created templates
+            //if new templates have been created add them to the list of created templates
             if (
               action.newItems.length > state.proposal.genericTemplates.length
             ) {
               draftState.createdTemplates = [
                 ...state.createdTemplates,
-                questionIds[questionIds.length - 1],
+                ...questionIds.slice(
+                  -(
+                    action.newItems.length -
+                    state.proposal.genericTemplates.length
+                  )
+                ),
               ];
             }
           } else {
@@ -105,6 +110,18 @@ export default function ProposalContainer(props: ProposalContainerProps) {
           }
         }
         draftState.isDirty = true;
+        break;
+
+      case GENERIC_TEMPLATE_EVENT.CREATED_ITEMS_DELETED:
+        if (state.proposal.genericTemplates) {
+          draftState.proposal.genericTemplates = [
+            ...state.proposal.genericTemplates.filter(
+              (value) => !state.createdTemplates.includes(value.id)
+            ),
+          ];
+          draftState.proposal.genericTemplates = [];
+          draftState.createdTemplates = [];
+        }
         break;
     }
 

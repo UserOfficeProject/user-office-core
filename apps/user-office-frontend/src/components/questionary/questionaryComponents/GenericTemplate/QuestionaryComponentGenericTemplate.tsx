@@ -100,6 +100,9 @@ function QuestionaryComponentGenericTemplate(
   return (
     <Field name={answerId}>
       {({ field, form }: FieldProps<GenericTemplateWithQuestionary[]>) => {
+        field.value = field.value.filter(
+          (value) => !state.hiddenTemplates.includes(value.id)
+        );
         const updateFieldValueAndState = (
           updatedItems: GenericTemplateCore[] | null,
           dispatchType: GENERIC_TEMPLATE_EVENT
@@ -273,7 +276,21 @@ function QuestionaryComponentGenericTemplate(
             <ErrorMessage name={answerId} />
 
             <StyledModal
-              onClose={() => setSelectedGenericTemplate(null)}
+              onClose={() => {
+                if (state.isDirty) {
+                  const newStateItems = field.value.map((genericTemplate) =>
+                    genericTemplate.id === selectedGenericTemplate?.id
+                      ? selectedGenericTemplate
+                      : genericTemplate
+                  );
+
+                  updateFieldValueAndState(
+                    newStateItems,
+                    GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                  );
+                }
+                setSelectedGenericTemplate(null);
+              }}
               open={selectedGenericTemplate !== null}
               data-cy="genericTemplate-declaration-modal"
             >
