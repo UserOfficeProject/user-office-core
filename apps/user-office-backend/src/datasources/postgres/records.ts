@@ -210,7 +210,7 @@ export interface QuestionTemplateRelRecord {
   readonly template_id: number;
   readonly topic_id: number;
   readonly sort_order: number;
-  readonly config: ConfigBase;
+  readonly config: string;
   readonly dependencies_operator?: DependenciesLogicOperator;
 }
 
@@ -803,6 +803,7 @@ export const createFileMetadata = (record: FileRecord) => {
 export const createQuestionTemplateRelationObject = async (
   record: QuestionRecord &
     QuestionTemplateRelRecord & {
+      config: ConfigBase | DynamicMultipleChoiceConfig;
       dependency_natural_key: string;
     },
   dependencies: FieldDependency[]

@@ -33,6 +33,7 @@ import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { ConflictResolution } from '../../resolvers/types/ConflictResolution';
 import {
+  ConfigBase,
   SampleDeclarationConfig,
   SubTemplateConfig,
 } from '../../resolvers/types/FieldConfig';
@@ -417,7 +418,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
     const questionRecords: Array<
       QuestionRecord &
-        QuestionTemplateRelRecord & { dependency_natural_key: string }
+        QuestionTemplateRelRecord & {
+          config: ConfigBase;
+          dependency_natural_key: string;
+        }
     > = (
       await database.raw(`
         SELECT 
@@ -770,7 +774,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   ): Promise<QuestionTemplateRelation | null> {
     const [questionRecord]: Array<
       QuestionTemplateRelRecord &
-        QuestionRecord & { dependency_natural_key: string }
+        QuestionRecord & { config: ConfigBase; dependency_natural_key: string }
     > = await database({
       templates_has_questions: 'templates_has_questions',
     })
