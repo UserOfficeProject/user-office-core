@@ -723,7 +723,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal basic tests', () => {
+  describe('Proposal internal and external basic tests', () => {
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -879,8 +879,6 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
       createTopicAndQuestionToExistingTemplate();
-      cy.login('user1');
-      cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
