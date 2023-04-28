@@ -1003,5 +1003,89 @@ context('Proposal tests', () => {
         cy.contains(createdCallTitle).should('not.exist');
       });
     });
+
+    it('External user should not be able to select an active internal call for a new proposal', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: createdWorkflowId,
+      });
+      const createdCallTitle = 'Created call';
+      cy.createCall({
+        ...newCall,
+        title: createdCallTitle,
+        endCall: yesterday,
+        endCallInternal: tomorrow,
+        proposalWorkflowId: createdWorkflowId,
+      });
+
+      cy.login('user2');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+
+      cy.reload();
+
+      cy.contains(createdCallTitle).should('not.exist');
+    });
+
+    it('External user should not be able to submit proposal with active internal call', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newCall,
+        proposalWorkflowId: createdWorkflowId,
+      });
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: newProposalTitle,
+            abstract: newProposalAbstract,
+            proposerId: initialDBData.users.user2.id,
+          });
+        }
+      });
+
+      cy.login('user2');
+      cy.visit('/');
+
+      cy.contains('Dashboard').click();
+
+      cy.finishedLoading();
+
+      cy.contains(newProposalTitle).parent().contains('draft');
+
+      cy.contains(newProposalTitle)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .click();
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newCall,
+        startCall: twoDaysAgo,
+        endCall: yesterday,
+        endCallInternal: tomorrow,
+        proposalWorkflowId: createdWorkflowId,
+      });
+
+      cy.visit('/');
+
+      cy.contains(newProposalTitle)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
+
+      cy.contains('Review').click();
+
+      cy.contains('Submit').should('be.disabled');
+    });
   });
 });
