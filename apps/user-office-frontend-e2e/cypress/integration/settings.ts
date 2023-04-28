@@ -4,6 +4,7 @@ import {
   TechnicalReviewStatus,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -368,22 +369,12 @@ context('Settings tests', () => {
         this.skip();
       }
       const proposalTitle = faker.random.words(3);
-      const endCallDate = faker.date.future();
-      // NOTE: Add one day to generated future date because the endCallInternal can not be before endCall.
-      const endCallInternalDate = new Date(
-        endCallDate.setDate(endCallDate.getDate() + 1)
-      ).toISOString();
+      const currentDayStart = DateTime.now().startOf('day');
       const editedProposalTitle = faker.random.words(3);
-      cy.updateCall({
-        id: initialDBData.call.id,
-        ...updatedCall,
-        proposalWorkflowId: createdWorkflowId,
-        endCall: endCallDate,
-        endCallInternal: endCallInternalDate,
-      });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
+        proposalStatusId:
+          initialDBData.proposalStatuses.editableSubmittedInternal.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
         prevProposalStatusId: prevProposalStatusId,
@@ -408,7 +399,6 @@ context('Settings tests', () => {
 
       cy.login('user1');
       cy.visit('/');
-      window.localStorage.isInternalUser = true;
 
       cy.contains(proposalTitle)
         .parent()
@@ -430,6 +420,15 @@ context('Settings tests', () => {
       cy.contains('OK').click();
 
       cy.contains('Submitted');
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...updatedCall,
+        startCall: currentDayStart.plus({ days: -10 }),
+        endCall: currentDayStart.plus({ days: -3 }),
+        endCallInternal: currentDayStart.plus({ days: 365 }),
+        proposalWorkflowId: createdWorkflowId,
+      });
 
       cy.contains('Dashboard').click();
 
