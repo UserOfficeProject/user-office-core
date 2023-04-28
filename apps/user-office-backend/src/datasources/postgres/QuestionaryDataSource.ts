@@ -9,6 +9,7 @@ import {
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
 import { FieldDependency, Template, Topic } from '../../models/Template';
+import { ConfigBase } from '../../resolvers/types/FieldConfig';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
@@ -336,6 +337,7 @@ export default class PostgresQuestionaryDataSource
     const answerRecords: Array<
       QuestionRecord &
         QuestionTemplateRelRecord & { value: any; answer_id: number } & {
+          config: ConfigBase;
           dependency_natural_key: string;
         }
     > = (

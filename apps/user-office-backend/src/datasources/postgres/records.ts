@@ -803,7 +803,7 @@ export const createFileMetadata = (record: FileRecord) => {
 export const createQuestionTemplateRelationObject = async (
   record: QuestionRecord &
     QuestionTemplateRelRecord & {
-      config: ConfigBase | DynamicMultipleChoiceConfig;
+      config: string | ConfigBase | DynamicMultipleChoiceConfig;
       dependency_natural_key: string;
     },
   dependencies: FieldDependency[]
