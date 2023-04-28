@@ -209,7 +209,6 @@ export function QuestionarySubmissionModel<
             draftState.stepIndex - 1,
             draftState.wizardSteps.length
           );
-
           break;
 
         case 'GO_STEP_FORWARD':

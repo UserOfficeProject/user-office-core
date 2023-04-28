@@ -21,6 +21,7 @@ context('GenericTemplates tests', () => {
   const proposalTitle = twoFakes(3);
   const addButtonLabel = twoFakes(2);
   const copyButtonLabel = faker.lorem.words(3);
+  const deleteButtonLabel = faker.lorem.words(3);
   const genericTemplateTitle = faker.lorem.words(3);
   const genericTemplateQuestionaryQuestion = twoFakes(3);
   const genericTemplateTitleAnswers = [
@@ -118,7 +119,7 @@ context('GenericTemplates tests', () => {
                   cy.updateQuestion({
                     id: createdQuestion1Id,
                     question: genericTemplateQuestion[0],
-                    config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":true,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                    config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","deleteButtonLabel":"${deleteButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":true,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
                   });
 
                   cy.createQuestionTemplateRelation({
@@ -866,5 +867,129 @@ context('GenericTemplates tests', () => {
       cy.contains(genericTemplateTitleAnswers[2]);
       cy.contains(genericTemplateTitleAnswers[3]);
     });
+  });
+
+  describe('Generic template cloning tests', () => {
+    beforeEach(() => {
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
+          const genericTemplates = createGenericTemplates(2);
+          createProposalTemplateWithSubTemplate(genericTemplates);
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            (result) => {
+              if (result.createProposal) {
+                const proposalPK = result.createProposal.primaryKey;
+                const questionarySteps =
+                  result.createProposal.questionary.steps;
+                const proposal = result.createProposal;
+                cy.updateProposal({
+                  proposalPk: result.createProposal.primaryKey,
+                  title: proposalTitle[1],
+                  abstract: faker.lorem.words(3),
+                  proposerId: initialDBData.users.user1.id,
+                });
+
+                for (let index = 1; index < questionarySteps.length; index++) {
+                  cy.createGenericTemplate({
+                    proposalPk: result.createProposal.primaryKey,
+                    title: genericTemplateTitleAnswers[index - 1],
+                    questionId:
+                      result.createProposal.questionary.steps[index].fields[0]
+                        .question.id,
+                    templateId: genericTemplates[index - 1],
+                  }).then((templateResult) => {
+                    if (templateResult.createGenericTemplate?.questionaryId) {
+                      cy.answerTopic({
+                        isPartialSave: false,
+                        questionaryId:
+                          templateResult.createGenericTemplate.questionaryId,
+                        topicId:
+                          templateResult.createGenericTemplate.questionary
+                            .steps[0].topic.id,
+                        answers: [
+                          {
+                            questionId:
+                              templateResult.createGenericTemplate.questionary
+                                .steps[0].fields[1].question.id,
+                            value: '{"value":"answer"}',
+                          },
+                        ],
+                      });
+                    }
+                  });
+                  cy.answerTopic({
+                    questionaryId: proposal.questionaryId,
+                    topicId: questionarySteps[index].topic.id,
+                    isPartialSave: false,
+                    answers: [],
+                  });
+                }
+              }
+            }
+          );
+        } else {
+          throw new Error('Workflow creation failed');
+        }
+      });
+    });
+
+    it('User should be able to revert deleting a template', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(`${proposalTitle[1]}`)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .click();
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=delete]').its('length').should('eq', 1);
+
+      cy.get('[data-cy=delete]').first().click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=confirm-ok]').first().click();
+
+      cy.get('[data-cy=delete]').its('length').should('eq', 0);
+
+      cy.finishedLoading();
+
+      cy.contains('Reset').click();
+
+      cy.on('window:confirm', (text) => {
+        expect(text).to.contains(
+          'You have made changes in this step, which will be discarded. Are you sure?'
+        );
+      });
+
+      cy.get('[data-cy=delete]').its('length').should('eq', 1);
+    });
+
+    it('User should be able to revert deleting multiple templates', () => {});
+
+    it('User should be able to revert deleting a template, then another one', () => {});
+
+    it('User should be able to revert cloning a template', () => {});
+
+    it('User should be able to revert cloning multiple templates', () => {});
+
+    it('User should be able to revert cloning a template, then another one', () => {});
+
+    it('User should be able to revert deleting and cloning templates', () => {});
+
+    it('User should be able to revert cloning a proposal then revert deleting a proposal', () => {});
+
+    it('User should be able to revert deleting a proposal then revert cloning a proposal', () => {});
+
+    it('State is correct after user edits a template', () => {});
+
+    it('State is correct after user closes edit template prompt', () => {});
   });
 });

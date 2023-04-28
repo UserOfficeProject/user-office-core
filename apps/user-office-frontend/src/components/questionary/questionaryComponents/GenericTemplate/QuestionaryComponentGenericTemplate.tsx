@@ -286,7 +286,12 @@ function QuestionaryComponentGenericTemplate(
                     GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
                   );
                 }
-                dispatch({ type: 'CLEAN_DIRTY_STATE' });
+                if (
+                  state.deletedTemplates.length === 0 &&
+                  state.createdTemplates.length === 0
+                ) {
+                  dispatch({ type: 'CLEAN_DIRTY_STATE' });
+                }
                 setSelectedGenericTemplate(null);
               }}
               open={selectedGenericTemplate !== null}

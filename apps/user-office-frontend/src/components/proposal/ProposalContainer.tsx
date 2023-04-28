@@ -68,7 +68,11 @@ export default function ProposalContainer(props: ProposalContainerProps) {
             const questionIds = action.newItems.map((value) => value.id);
             draftState.proposal.genericTemplates = [
               ...state.proposal.genericTemplates.filter(
-                (value) => !questionIds.some((id) => id === value.id)
+                (value) =>
+                  !questionIds.some(
+                    (id) =>
+                      id === value.id || state.deletedTemplates.includes(id)
+                  )
               ),
               ...action.newItems,
             ];
@@ -90,7 +94,11 @@ export default function ProposalContainer(props: ProposalContainerProps) {
             draftState.proposal.genericTemplates = action.newItems;
           }
         }
-        draftState.isDirty = true;
+        if (
+          action.newItems?.length !== state.proposal.genericTemplates?.length
+        ) {
+          draftState.isDirty = true;
+        }
         break;
 
       case GENERIC_TEMPLATE_EVENT.ITEMS_DELETED:
