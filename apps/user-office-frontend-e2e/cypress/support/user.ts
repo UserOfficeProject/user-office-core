@@ -29,7 +29,7 @@ type DecodedTokenData = {
 
 const extTokenStoreStfc = new Map<TestUserId, string>([
   ['user1', 'user'],
-  ['user2', 'user'],
+  ['user2', 'externalUser'],
   ['user3', 'user'],
   ['officer', 'officer'],
   ['placeholderUser', 'user'],
