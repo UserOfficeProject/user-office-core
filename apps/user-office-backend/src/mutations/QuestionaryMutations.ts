@@ -114,7 +114,7 @@ export default class QuestionaryMutations {
           return rejection(
             'The input to "' +
               questionTemplateRelation.question.question +
-              '" is not satisfying constraint. Please enter valid input.',
+              '" is not satisfying a constraint. Please enter a valid input.',
             { answer, questionTemplateRelation }
           );
         }
