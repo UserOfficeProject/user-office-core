@@ -132,7 +132,6 @@ fragment fieldConfig on FieldConfig {
     tooltip
     url
     options
-    token
     jsonPath
     isMultipleSelect
     variant

@@ -50,6 +50,10 @@ import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import {
+  ConfigBase,
+  DynamicMultipleChoiceConfig,
+} from '../../resolvers/types/FieldConfig';
+import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
@@ -206,7 +210,7 @@ export interface QuestionTemplateRelRecord {
   readonly template_id: number;
   readonly topic_id: number;
   readonly sort_order: number;
-  readonly config: string;
+  readonly config: ConfigBase;
   readonly dependencies_operator?: DependenciesLogicOperator;
 }
 
@@ -798,16 +802,21 @@ export const createFileMetadata = (record: FileRecord) => {
 
 export const createQuestionTemplateRelationObject = async (
   record: QuestionRecord &
-    QuestionTemplateRelRecord & { dependency_natural_key: string },
+    QuestionTemplateRelRecord & {
+      dependency_natural_key: string;
+    },
   dependencies: FieldDependency[]
 ) => {
-  const parsedRecord = JSON.parse(JSON.stringify(record));
-  if (parsedRecord.config.externalApiCall) {
-    parsedRecord.config = await getExternalApiCallData(
-      parsedRecord.data_type,
-      parsedRecord.config
+  let dynamicMultipleChoiceConfig;
+
+  if ((record.config as DynamicMultipleChoiceConfig).externalApiCall) {
+    dynamicMultipleChoiceConfig = await getExternalApiCallData(
+      record.data_type as DataType,
+      record.config as DynamicMultipleChoiceConfig
     );
   }
+
+  const mutatedConfig = dynamicMultipleChoiceConfig ?? record.config;
 
   return new QuestionTemplateRelation(
     new Question(
@@ -820,7 +829,7 @@ export const createQuestionTemplateRelationObject = async (
     ),
     record.topic_id,
     record.sort_order,
-    createConfig<any>(record.data_type as DataType, parsedRecord.config),
+    createConfig<any>(record.data_type as DataType, mutatedConfig),
     dependencies,
     record.dependencies_operator
   );

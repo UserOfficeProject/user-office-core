@@ -34,7 +34,6 @@ export const dynamicMultipleChoiceDefinition: Question = {
     config.options = [];
     config.jsonPath = '';
     config.isMultipleSelect = false;
-    config.token = '';
     config.externalApiCall = true;
 
     return config;
@@ -59,15 +58,11 @@ export const dynamicMultipleChoiceDefinition: Question = {
         );
     }
   },
-  externalApiCall: async (config: DynamicMultipleChoiceConfig) => {
+  externalApiCall: async (config) => {
     const fallBackConfig = { ...config, options: [] };
 
     try {
-      const resp = await axios.get(config.url, {
-        headers: {
-          Authorization: `Bearer ${config.token}`,
-        },
-      });
+      const resp = await axios.get(config.url);
 
       if (
         Array.isArray(resp.data) &&
