@@ -12,6 +12,7 @@
 // the project's config changing)
 
 import fs from 'fs';
+import { createServer, Server } from 'http';
 
 function replaceLastOccurrenceInString(
   string: string,
@@ -34,6 +35,8 @@ function replaceInvalidFileNameCharacters(filename: string) {
   return filename.replace(/:/g, '.');
 }
 
+let server: Server;
+
 module.exports = (on: Cypress.PluginEvents) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
@@ -54,5 +57,26 @@ module.exports = (on: Cypress.PluginEvents) => {
         resolve({ path: newPath });
       });
     });
+  });
+
+  on('task', {
+    mockServer({ interceptUrl, fixture }) {
+      // close any previous instance
+      if (server) server.close();
+
+      const url = new URL(interceptUrl);
+      const data = JSON.stringify(fixture);
+      server = createServer((req, res) => {
+        if (req.url === url.pathname) {
+          res.end(data);
+        } else {
+          res.end();
+        }
+      });
+
+      server.listen(url.port);
+
+      return null;
+    },
   });
 };
