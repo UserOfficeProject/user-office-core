@@ -971,11 +971,11 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
       let createdCallId: number;
-      const createdCallTitle = 'Created call';
+      const createdCallTitle = faker.random.alphaNumeric(15);
 
       cy.createCall({
         ...newCall,
-        title: createdCallTitle,
+        shortCode: createdCallTitle,
         endCall: yesterday,
         endCallInternal: tomorrow,
         proposalWorkflowId: createdWorkflowId,
@@ -986,7 +986,7 @@ context('Proposal tests', () => {
 
         cy.contains('New Proposal').click();
 
-        cy.contains(createdCallTitle);
+        cy.get('[data-cy=call-list]').should('contain', createdCallTitle);
 
         cy.updateCall({
           id: createdCallId,
@@ -998,7 +998,7 @@ context('Proposal tests', () => {
 
         cy.reload();
 
-        cy.contains(createdCallTitle).should('not.exist');
+        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
       });
     });
 
@@ -1010,10 +1010,10 @@ context('Proposal tests', () => {
         ...newCall,
         proposalWorkflowId: createdWorkflowId,
       });
-      const createdCallTitle = 'Created call';
+      const createdCallTitle = faker.random.alphaNumeric(15);
       cy.createCall({
         ...newCall,
-        title: createdCallTitle,
+        shortCode: createdCallTitle,
         endCall: yesterday,
         endCallInternal: tomorrow,
         proposalWorkflowId: createdWorkflowId,
@@ -1026,7 +1026,7 @@ context('Proposal tests', () => {
 
       cy.reload();
 
-      cy.contains(createdCallTitle).should('not.exist');
+      cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
     });
 
     it('External user should not be able to submit proposal with active internal call', function () {
