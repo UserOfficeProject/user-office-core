@@ -998,6 +998,8 @@ context('Proposal tests', () => {
 
         cy.reload();
 
+        cy.finishedLoading();
+
         cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
       });
     });
@@ -1024,7 +1026,7 @@ context('Proposal tests', () => {
 
       cy.contains('New Proposal').click();
 
-      cy.reload();
+      cy.finishedLoading();
 
       cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
     });
