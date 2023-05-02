@@ -52,13 +52,32 @@ context('Template tests', () => {
   };
   const dynamicMultipleChoiceQuestion = {
     title: faker.lorem.words(2),
-    url: faker.internet.url(),
-    answers: [
-      faker.lorem.words(3),
-      faker.lorem.words(3),
-      faker.lorem.words(3),
-      faker.lorem.words(3),
-    ],
+    url: 'http://localhost:9000',
+    jsonPath: '$.*.item',
+    answers: {
+      arrayString: [
+        faker.lorem.words(3),
+        faker.lorem.words(3),
+        faker.lorem.words(3),
+        faker.lorem.words(3),
+      ],
+      arrayObject: [
+        {
+          item: faker.lorem.words(3),
+        },
+        {
+          item: faker.lorem.words(3),
+        },
+        {
+          item: faker.lorem.words(3),
+        },
+      ],
+      errorData: {
+        item: faker.lorem.words(3),
+        item1: faker.lorem.words(3),
+        item2: faker.lorem.words(3),
+      },
+    },
   };
 
   const templateSearch = {
@@ -1369,33 +1388,7 @@ context('Template tests', () => {
   });
 
   describe('Dynamic multiple choice external api call tests', () => {
-    beforeEach(() => {
-      cy.login('officer');
-      cy.visit('/');
-      cy.navigateToTemplatesSubmenu('Proposal');
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find('[aria-label=Edit]')
-        .first()
-        .click();
-      cy.createDynamicMultipleChoiceQuestion(
-        dynamicMultipleChoiceQuestion.title,
-        {
-          url: dynamicMultipleChoiceQuestion.url,
-          isMultipleSelect: true,
-          firstTopic: true,
-        }
-      );
-    });
-    it('Should be able to select options returned from external api', () => {
-      cy.intercept(
-        { method: 'GET', url: dynamicMultipleChoiceQuestion.url },
-        {
-          statusCode: 201,
-          body: dynamicMultipleChoiceQuestion.answers,
-        }
-      );
-
+    const createProposalAndClickDropdownBehavior = () => {
       cy.login('user1');
       cy.visit('/');
 
@@ -1409,9 +1402,79 @@ context('Template tests', () => {
 
       cy.contains(dynamicMultipleChoiceQuestion.title);
       cy.contains(dynamicMultipleChoiceQuestion.title).parent().click();
+    };
+
+    beforeEach(() => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find('[aria-label=Edit]')
+        .first()
+        .click();
+    });
+
+    it('Should render empty list if JSONPATH syntax is invalid', () => {
+      cy.task('mockServer', {
+        interceptUrl: dynamicMultipleChoiceQuestion.url,
+        fixture: dynamicMultipleChoiceQuestion.answers.arrayObject,
+      });
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          jsonPath: '$.[*].item',
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+
+      createProposalAndClickDropdownBehavior();
+
+      cy.get('[data-cy=dropdown-ul]').children().should('not.contain.value');
+    });
+
+    it('Should be able to use JSONPATH library to extract specific data from API response', () => {
+      cy.task('mockServer', {
+        interceptUrl: dynamicMultipleChoiceQuestion.url,
+        fixture: dynamicMultipleChoiceQuestion.answers.arrayObject,
+      });
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          jsonPath: dynamicMultipleChoiceQuestion.jsonPath,
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+      createProposalAndClickDropdownBehavior();
 
       cy.get('[data-cy=dropdown-ul]').children().should('have.length', 3);
-      cy.get('[data-cy=dropdown-li]').each(($el, index) => {
+      cy.get('[data-cy=dropdown-li]').each(($el) => {
+        cy.wrap($el).click();
+      });
+    });
+
+    it('Should render selectable options from an API response', () => {
+      cy.task('mockServer', {
+        interceptUrl: dynamicMultipleChoiceQuestion.url,
+        fixture: dynamicMultipleChoiceQuestion.answers.arrayString,
+      });
+
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          isMultipleSelect: true,
+          firstTopic: true,
+        }
+      );
+      createProposalAndClickDropdownBehavior();
+
+      cy.get('[data-cy=dropdown-ul]').children().should('have.length', 3);
+      cy.get('[data-cy=dropdown-li]').each(($el) => {
         cy.wrap($el).click();
       });
     });
