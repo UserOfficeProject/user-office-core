@@ -94,8 +94,16 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
   @Field(() => String)
   url: string;
 
+  @Field(() => String)
+  jsonPath: string;
+
   @Field(() => Boolean)
   isMultipleSelect: boolean;
+
+  @Field(() => [String])
+  options: string[];
+
+  externalApiCall: boolean;
 }
 
 @ObjectType()

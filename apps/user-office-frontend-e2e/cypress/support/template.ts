@@ -337,6 +337,7 @@ function createDynamicMultipleChoiceQuestion(
   options?: {
     key?: string;
     url?: string;
+    jsonPath?: string;
     firstTopic?: boolean;
     isMultipleSelect?: boolean;
     type?: 'radio' | 'dropdown';
@@ -366,6 +367,10 @@ function createDynamicMultipleChoiceQuestion(
 
   if (options?.url) {
     cy.get('[data-cy=dynamic-url]').type(options?.url);
+  }
+
+  if (options?.jsonPath) {
+    cy.get('[data-cy=dynamic-url-jsonPath]').type(options?.jsonPath);
   }
 
   cy.contains('Save').click({ force: true });
