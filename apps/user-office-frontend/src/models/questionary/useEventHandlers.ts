@@ -74,7 +74,6 @@ export default function useEventHandlers(templateGroupId: TemplateGroupId) {
 
         case 'RESET_CLICKED':
           await handleReset();
-
           break;
 
         case 'GO_TO_STEP_CLICKED':
