@@ -274,18 +274,17 @@ function QuestionaryComponentGenericTemplate(
 
             <StyledModal
               onClose={() => {
-                if (state.isDirty) {
-                  const newStateItems = field.value.map((genericTemplate) =>
-                    genericTemplate.id === selectedGenericTemplate?.id
-                      ? selectedGenericTemplate
-                      : genericTemplate
-                  );
+                const newStateItems = field.value.map((genericTemplate) =>
+                  genericTemplate.id === selectedGenericTemplate?.id
+                    ? selectedGenericTemplate
+                    : genericTemplate
+                );
 
-                  updateFieldValueAndState(
-                    newStateItems,
-                    GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
-                  );
-                }
+                updateFieldValueAndState(
+                  newStateItems,
+                  GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                );
+
                 if (
                   state.deletedTemplates.length === 0 &&
                   state.createdTemplates.length === 0
