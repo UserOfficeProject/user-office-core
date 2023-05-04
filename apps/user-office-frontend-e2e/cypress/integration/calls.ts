@@ -721,7 +721,7 @@ context('Calls tests', () => {
         .find('[type="checkbox"]')
         .check();
 
-      cy.contains('Assign instrument').click();
+      cy.contains('Assign Instrument').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
