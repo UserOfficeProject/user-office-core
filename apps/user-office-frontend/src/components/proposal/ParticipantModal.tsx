@@ -30,6 +30,7 @@ function ParticipantModal(props: {
   userRole?: UserRole;
   invitationUserRole?: UserRole;
   participant?: boolean;
+  setPi?: (user: BasicUserDetails) => void;
 }) {
   const addUser = (rowData: BasicUserDetails | BasicUserDetails[]) => {
     const addedUserDetails = rowData as BasicUserDetails;
@@ -51,6 +52,7 @@ function ParticipantModal(props: {
     selection: !!props.selection,
     onUpdate: (data: BasicUserDetails[]) => props.addParticipants(data),
     invitationUserRole: props.invitationUserRole || props.userRole,
+    setPi: props.setPi,
   };
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);

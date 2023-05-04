@@ -15,6 +15,7 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
+import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
@@ -50,6 +51,39 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   }
 
   const { proposer, users } = state.proposal;
+
+  const [piUserId, setPiUserId] = useState<number | undefined>(
+    state?.proposal.proposer?.id //user that is logged in
+  );
+  const { userData } = useBasicUserData(piUserId);
+
+  const coIChanged = (users: BasicUserDetails[]) => {
+    formikProps.setFieldValue(
+      `${id}.users`,
+      users.map((user) => user.id)
+    );
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: { users: users },
+    });
+  };
+
+  const piChanged = (user: BasicUserDetails) => {
+    formikProps.setFieldValue(`${id}.proposer`, user.id);
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: {
+        proposer: user,
+      },
+    });
+
+    setPiUserId(user.id);
+    coIChanged(
+      users
+        .filter((coI) => coI.id !== user.id)
+        .concat(proposer as BasicUserDetails)
+    );
+  };
 
   return (
     <div>
@@ -105,37 +139,21 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
       </div>
       <ProposalParticipant
-        userChanged={(user: BasicUserDetails) => {
-          formikProps.setFieldValue(`${id}.proposer`, user.id);
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: {
-              proposer: user,
-              users: users.concat(proposer as BasicUserDetails),
-            },
-          });
-        }}
+        pi={userData}
+        setPi={piChanged}
         className={classes.container}
-        userId={proposer?.id}
       />
       <Participants
         title="Co-Proposers"
         className={classes.container}
-        setUsers={(users: BasicUserDetails[]) => {
-          formikProps.setFieldValue(
-            `${id}.users`,
-            users.map((user) => user.id)
-          );
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: { users: users },
-          });
-        }}
+        pi={userData}
+        setPi={piChanged}
+        setUsers={coIChanged}
         preserveSelf={true}
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
-        principalInvestigator={proposer?.id}
+        // principalInvestigator={proposer?.id}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>

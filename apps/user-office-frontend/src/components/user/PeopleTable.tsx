@@ -4,7 +4,7 @@ import MaterialTable, {
   MTableToolbar,
 } from '@material-table/core';
 import Email from '@mui/icons-material/Email';
-import { Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -69,6 +69,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   mtOptions?: Options<T>;
   columns?: Column<T>[];
   preserveSelf?: boolean;
+  setPi?: (user: BasicUserDetails) => void;
 };
 
 const useStyles = makeStyles({
@@ -234,6 +235,13 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   }
   const EmailIcon = (): JSX.Element => <Email />;
 
+  const handleChangeCoIToPi = (user: BasicUserDetails) => {
+    try {
+      props.onRemove?.(user);
+      props.setPi?.(user);
+    } catch (error) {}
+  };
+
   const actionArray = [];
   action &&
     !props.selection &&
@@ -253,6 +261,26 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       isFreeAction: true,
       tooltip: 'Add by email',
       onClick: () => setSendUserEmail(true),
+    });
+
+  props.setPi &&
+    props.onRemove &&
+    actionArray.push({
+      icon: () => (
+        <Link href="#" underline="hover" variant="subtitle2" component="button">
+          Assign <br /> as PI
+        </Link>
+      ),
+      tooltip: 'Set Principal Investigator',
+      onClick: (
+        event: React.MouseEvent<JSX.Element>,
+        rowData: BasicUserDetails | BasicUserDetails[]
+      ) =>
+        new Promise<void>(() => {
+          const user = Array.isArray(rowData) ? rowData[0] : rowData;
+          handleChangeCoIToPi(user);
+          setQuery({ ...query, refreshData: !query.refreshData });
+        }),
     });
 
   const invitationButtons: InvitationButtonProps[] = [];

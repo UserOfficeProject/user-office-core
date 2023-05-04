@@ -4,11 +4,12 @@ import FormControl from '@mui/material/FormControl';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, UserRole } from 'generated/sdk';
+import { BasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -26,18 +27,22 @@ type ParticipantsProps = {
   users: BasicUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
+  pi: BasicUserData | null | undefined;
+  setPi: (user: BasicUserDetails) => void;
   className?: string;
   title: string;
-  principalInvestigator?: number;
+  // principalInvestigator?: number;
   preserveSelf?: boolean;
 };
 
 const Participants: React.FC<ParticipantsProps> = ({
   users,
   setUsers,
+  pi,
+  setPi,
   className,
   title,
-  principalInvestigator,
+  // principalInvestigator,
   preserveSelf,
 }) => {
   const [modalOpen, setOpen] = useState(false);
@@ -58,16 +63,6 @@ const Participants: React.FC<ParticipantsProps> = ({
     setOpen(true);
   };
 
-  useEffect(() => {
-    if (
-      !!principalInvestigator &&
-      users.map((user) => user.id).includes(principalInvestigator)
-    ) {
-      const user = users.find((u) => u.id === principalInvestigator);
-      removeUser(user as BasicUserDetails);
-    }
-  });
-
   return (
     <div className={className}>
       <ParticipantModal
@@ -75,14 +70,15 @@ const Participants: React.FC<ParticipantsProps> = ({
         close={() => setOpen(false)}
         addParticipants={addUsers}
         selectedUsers={
-          !!principalInvestigator // add principal investigator if one exists
-            ? users.map((user) => user.id).concat([principalInvestigator])
+          !!pi // add principal investigator if one exists
+            ? users.map((user) => user.id).concat([pi.id])
             : users.map((user) => user.id)
         }
         title={title}
         selection={true}
         userRole={UserRole.USER}
         participant={true}
+        setPi={setPi}
       />
 
       <FormControl margin="dense" fullWidth>
@@ -104,6 +100,7 @@ const Participants: React.FC<ParticipantsProps> = ({
           invitationUserRole={UserRole.USER}
           onRemove={removeUser}
           preserveSelf={preserveSelf}
+          setPi={setPi}
         />
         <ActionButtonContainer className={classes.StyledButtonContainer}>
           <Button

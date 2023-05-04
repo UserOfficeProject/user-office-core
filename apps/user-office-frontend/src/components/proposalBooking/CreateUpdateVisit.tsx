@@ -86,6 +86,10 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               setFieldValue('team', team);
             }}
             users={values.team || []}
+            pi={undefined}
+            setPi={function (): void {
+              throw new Error('Function not implemented.');
+            }}
           />
           <ErrorMessage name="team" />
 
