@@ -18,8 +18,11 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import i18n from 'i18n';
+import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
+import { useTranslation } from 'react-i18next';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -164,9 +167,9 @@ const technicalReviewColumns = [
   },
 ];
 
-const instrumentManagementColumns = [
-  { title: 'Instrument', field: 'instrumentName', emptyValue: '-' },
-];
+const instrumentManagementColumns = (
+  t: TFunction<'translation', undefined, 'translation'>
+) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
 const SEPReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
@@ -269,6 +272,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
@@ -402,9 +406,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   }
 
   if (isInstrumentManagementEnabled) {
-    addColumns(columns, instrumentManagementColumns);
+    addColumns(columns, instrumentManagementColumns(t));
   } else {
-    removeColumns(columns, instrumentManagementColumns);
+    removeColumns(columns, instrumentManagementColumns(t));
   }
 
   if (isSEPEnabled) {
@@ -507,8 +511,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   ): Promise<void> => {
     if (instrument) {
       await api({
-        toastSuccessMessage:
-          'Proposal/s assigned to the selected instrument successfully!',
+        toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
       }).assignProposalsToInstrument({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
@@ -521,8 +527,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setTimeout(fetchProposalsData, 500);
     } else {
       await api({
-        toastSuccessMessage:
-          'Proposal/s removed from the instrument successfully!',
+        toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
       }).removeProposalsFromInstrument({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
@@ -870,7 +878,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           },
           {
             icon: ScienceIconComponent,
-            tooltip: 'Assign/Remove instrument',
+            tooltip: `Assign/Remove ${i18n.format(
+              t('instrument'),
+              'lowercase'
+            )}`,
             onClick: () => {
               setOpenInstrumentAssignment(true);
             },

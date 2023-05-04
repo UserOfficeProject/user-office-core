@@ -10,7 +10,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import makeStyles from '@mui/styles/makeStyles';
 import { Formik } from 'formik';
+import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import EmailSearchBar from 'components/common/EmailSearchBar';
@@ -95,7 +97,13 @@ const localColumns = [
   { title: 'Organisation', field: 'organisation' },
 ];
 
-const getTitle = (invitationUserRole?: UserRole): string => {
+const getTitle = ({
+  t,
+  invitationUserRole,
+}: {
+  t: TFunction<'translation', undefined, 'translation'>;
+  invitationUserRole?: UserRole;
+}): string => {
   switch (invitationUserRole) {
     case UserRole.USER_OFFICER:
       return 'Invite User';
@@ -104,7 +112,7 @@ const getTitle = (invitationUserRole?: UserRole): string => {
     case UserRole.SEP_SECRETARY:
       return 'Invite SEP Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
-      return 'Invite Instrument Scientist';
+      return 'Invite ' + t('instrumentSci');
     default:
       return 'Invite User';
   }
@@ -212,6 +220,7 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
   const [tableEmails, setTableEmails] = useState<string[]>([]);
 
   const classes = useStyles();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isLoading !== undefined) {
@@ -238,7 +247,7 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
   if (sendUserEmail && invitationUserRole && action) {
     return (
       <InviteUserForm
-        title={getTitle(invitationUserRole)}
+        title={getTitle({ t, invitationUserRole })}
         action={action.fn}
         close={() => setSendUserEmail(false)}
         userRole={invitationUserRole}
