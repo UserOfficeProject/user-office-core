@@ -1373,13 +1373,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains('Reset').click();
 
-      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
-        'have.length',
-        0
-      );
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
     });
-
-    it('User should be able to revert adding a proposal then revert cloning a proposal, then revert deleting a proposal', () => {});
 
     it('Reverted changes should not be restored after saving', () => {
       cy.login('user1');
