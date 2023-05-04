@@ -12,7 +12,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import { Formik } from 'formik';
+import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import EmailSearchBar from 'components/common/EmailSearchBar';
@@ -94,7 +96,13 @@ const columns = [
   { title: 'Organisation', field: 'organisation' },
 ];
 
-const getTitle = (invitationUserRole?: UserRole): string => {
+const getTitle = ({
+  t,
+  invitationUserRole,
+}: {
+  t: TFunction<'translation', undefined, 'translation'>;
+  invitationUserRole?: UserRole;
+}): string => {
   switch (invitationUserRole) {
     case UserRole.USER_OFFICER:
       return 'Invite User';
@@ -103,7 +111,7 @@ const getTitle = (invitationUserRole?: UserRole): string => {
     case UserRole.SEP_SECRETARY:
       return 'Invite SEP Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
-      return 'Invite Instrument Scientist';
+      return 'Invite ' + t('instrumentSci');
     default:
       return 'Invite User';
   }
@@ -198,6 +206,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   const [tableEmails, setTableEmails] = useState<string[]>([]);
 
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const { data, action } = props;
 
@@ -226,7 +235,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   if (sendUserEmail && props.invitationUserRole && action) {
     return (
       <InviteUserForm
-        title={getTitle(props.invitationUserRole)}
+        title={getTitle({ t, invitationUserRole: props.invitationUserRole })}
         action={action.fn}
         close={() => setSendUserEmail(false)}
         userRole={props.invitationUserRole}

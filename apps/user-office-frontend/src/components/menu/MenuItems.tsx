@@ -19,7 +19,9 @@ import Collapse from '@mui/material/Collapse';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import i18n from 'i18n';
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { encodeDate } from 'use-query-params';
@@ -155,6 +157,7 @@ const SamplesMenuListItem = () => {
 const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const proposalDisabled = callsData.length === 0;
   const context = useContext(FeatureContext);
+  const { t } = useTranslation();
 
   const isSchedulerEnabled = context.featuresMap.get(
     FeatureId.SCHEDULER
@@ -265,7 +268,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
             <ListItemIcon>
               <ScienceIcon />
             </ListItemIcon>
-            <ListItemText primary="Instruments" />
+            <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
           </ListItem>
         </Tooltip>
       )}
@@ -343,7 +346,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemIcon>
             <GroupWorkIcon />
           </ListItemIcon>
-          <ListItemText primary="Instruments" />
+          <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItem>
       )}
       {isSchedulerEnabled && (

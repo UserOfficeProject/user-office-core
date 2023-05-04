@@ -18,7 +18,10 @@ import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
-import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import {
+  createConfig,
+  getExternalApiCallData,
+} from '../../models/questionTypes/QuestionRegistry';
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
@@ -46,6 +49,10 @@ import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
+import {
+  ConfigBase,
+  DynamicMultipleChoiceConfig,
+} from '../../resolvers/types/FieldConfig';
 import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
@@ -118,6 +125,7 @@ export interface ProposalRecord {
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
   readonly title: string;
+  readonly principal_investigator: number;
   readonly proposal_status_id: number;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
@@ -737,6 +745,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
   return new ProposalView(
     proposal.proposal_pk,
     proposal.title || '',
+    proposal.principal_investigator,
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,
@@ -791,11 +800,25 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionTemplateRelationObject = (
+export const createQuestionTemplateRelationObject = async (
   record: QuestionRecord &
-    QuestionTemplateRelRecord & { dependency_natural_key: string },
+    QuestionTemplateRelRecord & {
+      config: string | ConfigBase | DynamicMultipleChoiceConfig;
+      dependency_natural_key: string;
+    },
   dependencies: FieldDependency[]
 ) => {
+  let dynamicMultipleChoiceConfig;
+
+  if ((record.config as DynamicMultipleChoiceConfig).externalApiCall) {
+    dynamicMultipleChoiceConfig = await getExternalApiCallData(
+      record.data_type as DataType,
+      record.config as DynamicMultipleChoiceConfig
+    );
+  }
+
+  const mutatedConfig = dynamicMultipleChoiceConfig ?? record.config;
+
   return new QuestionTemplateRelation(
     new Question(
       record.category_id,
@@ -807,7 +830,7 @@ export const createQuestionTemplateRelationObject = (
     ),
     record.topic_id,
     record.sort_order,
-    createConfig<any>(record.data_type as DataType, record.config),
+    createConfig<any>(record.data_type as DataType, mutatedConfig),
     dependencies,
     record.dependencies_operator
   );
