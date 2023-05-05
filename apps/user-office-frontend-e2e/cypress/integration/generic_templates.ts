@@ -1432,6 +1432,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains('Reset').click();
 
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
       cy.contains('Save and continue').click();
 
       cy.finishedLoading();
