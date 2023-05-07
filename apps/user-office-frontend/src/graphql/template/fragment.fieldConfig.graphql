@@ -133,6 +133,7 @@ fragment fieldConfig on FieldConfig {
     url
     options
     jsonPath
+    externalApiCall
     isMultipleSelect
     variant
   }
