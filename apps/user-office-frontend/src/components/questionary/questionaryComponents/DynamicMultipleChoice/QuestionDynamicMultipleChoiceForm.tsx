@@ -233,12 +233,7 @@ export const QuestionDynamicMultipleChoiceForm: FC<QuestionFormProps> = (
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        onClick={() =>
-                          setIsJsonPathFieldDocPopupOpen(
-                            (isJsonPathFieldDocPopupOpen) =>
-                              !isJsonPathFieldDocPopupOpen
-                          )
-                        }
+                        onClick={() => setIsJsonPathFieldDocPopupOpen(true)}
                       >
                         <Help />
                       </IconButton>
