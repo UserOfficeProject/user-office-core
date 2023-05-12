@@ -2,11 +2,20 @@
 import MaterialTable, { Action } from '@material-table/core';
 import CloseIcon from '@mui/icons-material/Close';
 import Email from '@mui/icons-material/Email';
-import { Alert, AlertTitle, IconButton, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  IconButton,
+  Typography,
+} from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
+import useTheme from '@mui/styles/useTheme';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import EmailSearchBar from 'components/common/EmailSearchBar';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
@@ -100,10 +109,6 @@ type PeopleTableProps = {
   onUpdate?: FunctionType<void, [any[]]>;
   emailInvite?: boolean;
   selectedUsers?: number[];
-  selectedParticipants: BasicUserDetails[];
-  setSelectedParticipants: React.Dispatch<
-    React.SetStateAction<BasicUserDetails[]>
-  >;
 };
 
 const useStyles = makeStyles({
@@ -113,6 +118,20 @@ const useStyles = makeStyles({
       paddingRight: '0',
       marginRight: '24px',
     },
+  },
+  verticalCentered: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  mobileUpdateButton: {
+    paddingBottom: '10px',
+  },
+  titleStyle: {
+    display: 'inline',
+  },
+  inviteButton: {
+    marginLeft: '10px',
+    whiteSpace: 'nowrap',
   },
   email: {
     display: 'flex',
@@ -131,17 +150,7 @@ const columns = [
   { title: 'Organisation', field: 'organisation' },
 ];
 
-const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
-  selectedParticipants,
-  selection,
-  setSelectedParticipants,
-  action,
-  emailInvite,
-  invitationUserRole,
-  selectedUsers,
-  title,
-  userRole,
-}) => {
+const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   const tableRef = React.useRef();
   const [query, setQuery] = useState<
     GetUsersQueryVariables & { refreshData: boolean }
@@ -149,11 +158,13 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
     offset: 0,
     first: 5,
     filter: '',
-    subtractUsers: selectedUsers ? selectedUsers : [],
-    userRole: userRole ? userRole : null,
+    subtractUsers: props.selectedUsers ? props.selectedUsers : [],
+    userRole: props.userRole ? props.userRole : null,
     refreshData: false,
   });
 
+  const theme = useTheme();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
   const featureContext = useContext(FeatureContext);
   const isEmailInviteEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
@@ -164,12 +175,17 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
   const [loading, setLoading] = useState(false);
   const [pageSize] = useState(10);
   const [sendUserEmail, setSendUserEmail] = useState(false);
+  const [selectedParticipants, setSelectedParticipants] = useState<
+    BasicUserDetails[]
+  >([]);
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
 
   const classes = useStyles();
+
+  const { action } = props;
 
   useEffect(() => {
     if (!prevColabUsers.users) {
@@ -187,13 +203,13 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
     setCurrentPageIds(currentPage.map(({ id }) => id));
   }, [invitedUsers, prevColabUsers, query.first, query.offset]);
 
-  if (sendUserEmail && invitationUserRole && action) {
+  if (sendUserEmail && props.invitationUserRole && action) {
     return (
       <InviteUserForm
         title={'Invite User'}
         action={action.fn}
         close={() => setSendUserEmail(false)}
-        userRole={invitationUserRole}
+        userRole={props.invitationUserRole}
       />
     );
   }
@@ -221,7 +237,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
     | undefined = [];
 
   action &&
-    !selection &&
+    !props.selection &&
     actionArray.push({
       icon: () => action.actionIcon,
       tooltip: action.actionText,
@@ -231,7 +247,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
       ) => action.fn(rowData),
     });
 
-  emailInvite &&
+  props.emailInvite &&
     isEmailInviteEnabled &&
     actionArray.push({
       icon: EmailIcon,
@@ -306,6 +322,13 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
     ? 'Please check the spelling and if the user has registered with us. If not found, the user can be added through email invite.'
     : 'Please check the spelling and if the user has registered with us or has the correct privacy settings to be found by this search.';
 
+  const onClickHandlerUpdateBtn = () => {
+    if (props.onUpdate) {
+      props.onUpdate(selectedParticipants);
+      setSelectedParticipants([]);
+    }
+  };
+
   return (
     <Formik
       initialValues={{
@@ -325,7 +348,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
             return;
           }
 
-          if (selectedUsers?.includes(userDetails.id)) {
+          if (props.selectedUsers?.includes(userDetails.id)) {
             setFieldError('email', 'User is already on the proposal');
             setLoading(false);
 
@@ -348,7 +371,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
             setFieldValue('email', '');
 
             //If we are selecting multiple users add the user as pre selected.
-            if (selection)
+            if (props.selection)
               setSelectedParticipants(
                 selectedParticipants.concat([userDetails])
               );
@@ -393,13 +416,33 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
             )}
           </div>
 
+          {!isLargeScreen && (
+            <div className={classes.mobileUpdateButton}>
+              {props.selection && (
+                <ActionButtonContainer>
+                  <div className={classes.verticalCentered}>
+                    {selectedParticipants.length} user(s) selected
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={onClickHandlerUpdateBtn}
+                    disabled={selectedParticipants.length === 0}
+                    data-cy="assign-selected-users"
+                  >
+                    Update
+                  </Button>
+                </ActionButtonContainer>
+              )}
+            </div>
+          )}
+
           <div data-cy="co-proposers" className={classes.tableWrapper}>
             <MaterialTable
               tableRef={tableRef}
               icons={tableIcons}
               title={
                 <Typography variant="h6" component="h1">
-                  {title}
+                  {props.title}
                 </Typography>
               }
               style={{ position: 'static' }}
@@ -414,7 +457,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
               options={{
                 debounceInterval: 400,
                 pageSize,
-                selection,
+                selection: props.selection,
                 selectionProps: (rowdata: any) => ({
                   inputProps: {
                     'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
@@ -446,6 +489,21 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
                 Toolbar: EmailSearchBar,
               }}
             />
+            {isLargeScreen && props.selection && (
+              <ActionButtonContainer>
+                <div className={classes.verticalCentered}>
+                  {selectedParticipants.length} user(s) selected
+                </div>
+                <Button
+                  type="button"
+                  onClick={onClickHandlerUpdateBtn}
+                  disabled={selectedParticipants.length === 0}
+                  data-cy="assign-selected-users"
+                >
+                  Update
+                </Button>
+              </ActionButtonContainer>
+            )}
           </div>
         </>
       )}

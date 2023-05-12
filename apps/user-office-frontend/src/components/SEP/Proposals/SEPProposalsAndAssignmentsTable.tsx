@@ -4,6 +4,8 @@ import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
@@ -33,9 +35,9 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import AssignSEPMemberToProposalModal, {
+import AssignSEPMemberToProposal, {
   SepAssignedMember,
-} from './AssignSEPMemberToProposalModal';
+} from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 
 type SEPProposalsAndAssignmentsTableProps = {
@@ -534,15 +536,24 @@ const SEPProposalsAndAssignmentsTable: React.FC<
           ]}
         />
       </ProposalReviewModal>
-      <AssignSEPMemberToProposalModal
-        proposalPk={proposalPk}
-        setProposalPk={setProposalPk}
-        sepId={data.id}
-        assignedMembers={
-          proposalAssignments?.map((assignment) => assignment.user) ?? []
-        }
-        assignMemberToSEPProposal={handleMemberAssignmentToSEPProposal}
-      />
+      <Dialog
+        maxWidth="sm"
+        fullWidth
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={!!proposalPk}
+        onClose={(): void => setProposalPk(null)}
+      >
+        <DialogContent>
+          <AssignSEPMemberToProposal
+            sepId={data.id}
+            assignedMembers={
+              proposalAssignments?.map((assignment) => assignment.user) ?? []
+            }
+            assignMemberToSEPProposal={handleMemberAssignmentToSEPProposal}
+          />
+        </DialogContent>
+      </Dialog>
       <Grid container spacing={3}>
         <Grid data-cy="sep-assignments-table" item xs={12}>
           <MaterialTable

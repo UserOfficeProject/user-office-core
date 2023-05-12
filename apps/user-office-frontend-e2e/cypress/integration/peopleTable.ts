@@ -29,7 +29,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[role="presentation"] [data-cy="co-proposers"]').as('modal');
 
       cy.get('@modal').contains('No Previous Collaborators');
 
@@ -99,7 +99,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[role="presentation"] [data-cy="co-proposers"]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
 
@@ -200,7 +200,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[role="presentation"]').as('modal');
 
       cy.finishedLoading();
 
@@ -272,7 +272,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[role="presentation"]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
 
@@ -365,7 +365,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[role="presentation"]').as('modal');
 
       cy.contains('10 rows').click();
       cy.get('[data-value=5]').click();
