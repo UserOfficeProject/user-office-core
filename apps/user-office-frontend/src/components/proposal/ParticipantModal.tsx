@@ -79,9 +79,16 @@ const ParticipantModal: React.FC<ParticipantModalProps> = ({
     selection: !!selection,
     onUpdate: (data: BasicUserDetails[]) => addParticipants(data),
     invitationUserRole: invitationUserRole || userRole,
+    setPi: setPi,
   };
   const peopleTable = <PeopleTable {...userTableProps} />;
-  const proposalPeopleTable = <ProposalPeopleTable {...userTableProps} />;
+  const proposalPeopleTable = (
+    <ProposalPeopleTable
+      selectedParticipants={selectedParticipants}
+      setSelectedParticipants={setSelectedParticipants}
+      {...userTableProps}
+    />
+  );
 
   return (
     <Dialog
