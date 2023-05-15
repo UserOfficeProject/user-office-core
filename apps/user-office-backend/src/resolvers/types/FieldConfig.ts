@@ -103,6 +103,7 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
   @Field(() => [String])
   options: string[];
 
+  @Field(() => Boolean)
   externalApiCall: boolean;
 }
 
