@@ -426,18 +426,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
-        # Don't login if dependabot is creating the PR
-        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./apps/user-office-backend
           file: ./apps/user-office-backend/Dockerfile
-          push: true
+          # Build but don't push if dependabot is creating the PR
+          push: ${{ !startsWith(github.head_ref, 'dependabot') }}
           tags: ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
 
       - name: Restore frontend SDK
-        # Don't login if dependabot is creating the PR
-        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
@@ -448,11 +445,10 @@ jobs:
             sdk-frontend-
 
       - name: Build and push frontend
-        # Don't login if dependabot is creating the PR
-        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./apps/user-office-frontend
           file: ./apps/user-office-frontend/Dockerfile
-          push: true
+          # Build but don't push if dependabot is creating the PR
+          push: ${{ !startsWith(github.head_ref, 'dependabot') }}
           tags: ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}

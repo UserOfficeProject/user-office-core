@@ -1,5 +1,7 @@
 import MaterialTable, { Column, Options } from '@material-table/core';
+import { TFunction } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { ProposalScheduledEvent } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
@@ -13,10 +15,12 @@ type ExperimentTimesTableProps = {
   options?: Partial<Options<ProposalScheduledEvent>>;
 };
 
-const columns: Column<ProposalScheduledEvent>[] = [
+const columns: (
+  t: TFunction<'translation', undefined, 'translation'>
+) => Column<ProposalScheduledEvent>[] = (t) => [
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
-  { title: 'Instrument', field: 'instrument.name' },
+  { title: t('instrument') as string, field: 'instrument.name' },
   {
     title: 'Local contact',
     render: (rowData) => getFullUserName(rowData.localContact),
@@ -37,6 +41,7 @@ export default function ExperimentsTable({
   proposalScheduledEvents,
   options,
 }: ExperimentTimesTableProps) {
+  const { t } = useTranslation();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -54,7 +59,7 @@ export default function ExperimentsTable({
       icons={tableIcons}
       title={title}
       isLoading={isLoading}
-      columns={columns}
+      columns={columns(t)}
       data={proposalScheduledEventsWithFormattedDates}
       options={{
         search: false,

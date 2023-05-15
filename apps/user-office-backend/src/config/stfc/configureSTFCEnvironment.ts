@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
+import { Roles } from '../../models/Role';
 import { SettingsId } from '../../models/Settings';
 import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
@@ -109,9 +110,21 @@ async function enableDefaultStfcFeatures() {
   });
 }
 
+async function setSTFCRoleNames() {
+  const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  await db.waitForDBUpgrade();
+
+  await db.updateRoleTitle({
+    shortCode: Roles.INSTRUMENT_SCIENTIST,
+    title: 'Experiment Scientist',
+  });
+}
+
 export async function configureSTFCEnvironment() {
   await setStfcColourTheme();
   await enableDefaultStfcFeatures();
+  await setSTFCRoleNames();
   await setTimezone();
   await setDateTimeFormats();
 }

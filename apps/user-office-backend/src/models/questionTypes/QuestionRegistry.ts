@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
+import { DynamicMultipleChoiceConfig } from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
@@ -66,6 +67,10 @@ export interface Question {
     query: Knex.QueryBuilder<any, any>,
     filter: QuestionFilterInput
   ) => any;
+
+  readonly externalApiCall?: (
+    config: DynamicMultipleChoiceConfig
+  ) => Promise<DynamicMultipleChoiceConfig>;
 }
 
 // Add new component definitions here
@@ -120,6 +125,7 @@ export function createConfig<T extends object>(
   const config: T = definition.createBlankConfig();
   const initValues: Partial<T> =
     typeof init === 'string' ? JSON.parse(init) : init;
+
   Object.assign(config, { ...initValues });
 
   return config;
@@ -136,4 +142,20 @@ export function getDefaultAnswerValue(
   );
 
   return definition.getDefaultAnswer(questionTemplateRelation);
+}
+
+export async function getExternalApiCallData(
+  dataType: DataType,
+  config: DynamicMultipleChoiceConfig
+) {
+  const definition = getQuestionDefinition(dataType);
+
+  if (!definition.externalApiCall) {
+    logger.logError('Tried to make non-existing definition callback', {
+      dataType: dataType,
+    });
+    throw new GraphQLError('Tried to execute non-existing definition callback');
+  }
+
+  return await definition.externalApiCall(config);
 }

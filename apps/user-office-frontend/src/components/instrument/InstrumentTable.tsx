@@ -1,6 +1,8 @@
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
+import i18n from 'i18n';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -40,6 +42,7 @@ const InstrumentTable: React.FC = () => {
   } = useInstrumentsData();
 
   const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
   >(null);
@@ -50,7 +53,7 @@ const InstrumentTable: React.FC = () => {
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Instrument removed successfully!',
+        toastSuccessMessage: t('instrument') + ' removed successfully!',
       }).deleteInstrument({
         id: instrumentDeletedId as number,
       });
@@ -65,7 +68,10 @@ const InstrumentTable: React.FC = () => {
     scientists: BasicUserDetails[]
   ) => {
     await api({
-      toastSuccessMessage: 'Scientist assigned to instrument successfully!',
+      toastSuccessMessage: `Scientist assigned to ${i18n.format(
+        t('instrument'),
+        'lowercase'
+      )} successfully!`,
     }).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,
       scientistIds: scientists.map((scientist) => scientist.id),
@@ -161,7 +167,7 @@ const InstrumentTable: React.FC = () => {
         )}
         selection={true}
         userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={'Instrument scientist'}
+        title={t('instrumentSci')}
         invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
       />
       <div data-cy="instruments-table">
@@ -175,7 +181,7 @@ const InstrumentTable: React.FC = () => {
           }}
           title={
             <Typography variant="h6" component="h2">
-              Instruments
+              {i18n.format(t('instrument'), 'plural')}
             </Typography>
           }
           columns={columns}

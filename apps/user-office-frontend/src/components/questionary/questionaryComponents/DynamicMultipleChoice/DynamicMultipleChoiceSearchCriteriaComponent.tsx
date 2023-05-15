@@ -5,7 +5,6 @@ import {
   QuestionFilterCompareOperator,
   DynamicMultipleChoiceConfig,
 } from 'generated/sdk';
-import { useExternalApi } from 'hooks/common/useExternalApi';
 
 import { SearchCriteriaInputProps } from '../../../proposal/SearchCriteriaInputProps';
 
@@ -15,9 +14,9 @@ function DynamicMultipleChoiceSearchCriteriaComponent({
   searchCriteria,
 }: SearchCriteriaInputProps) {
   const [value, setValue] = useState(searchCriteria?.value ?? '');
-  const { content } = useExternalApi(
-    (questionTemplateRelation.config as DynamicMultipleChoiceConfig).url
-  );
+  const content = (
+    questionTemplateRelation.config as DynamicMultipleChoiceConfig
+  ).options;
 
   return (
     <Grid container spacing={2}>

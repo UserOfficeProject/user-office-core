@@ -5,6 +5,7 @@ import Select from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { InstrumentFragment } from 'generated/sdk';
@@ -42,6 +43,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
   const [, setQuery] = useQueryParams({
     instrument: NumberParam,
   });
+  const { t } = useTranslation();
 
   if (instruments === undefined) {
     return null;
@@ -55,7 +57,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
     <>
       <FormControl className={classes.formControl}>
         <InputLabel id="instrument-select-label" shrink>
-          Instrument
+          {t('instrument')}
         </InputLabel>
         {isLoading ? (
           <div className={classes.loadingText}>Loading...</div>
