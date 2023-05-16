@@ -69,7 +69,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   mtOptions?: Options<T>;
   columns?: Column<T>[];
   preserveSelf?: boolean;
-  setPi?: (user: BasicUserDetails) => void;
+  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   selectedParticipants?: BasicUserDetails[];
   setSelectedParticipants?: React.Dispatch<
     React.SetStateAction<BasicUserDetails[]>
@@ -186,7 +186,7 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
   preserveSelf,
   search,
   title,
-  setPi,
+  setPrincipalInvestigator,
 }) => {
   const [query, setQuery] = useState<
     GetUsersQueryVariables & { refreshData: boolean }
@@ -259,10 +259,8 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
   const EmailIcon = (): JSX.Element => <Email />;
 
   const handleChangeCoIToPi = (user: BasicUserDetails) => {
-    try {
-      onRemove?.(user);
-      setPi?.(user);
-    } catch (error) {}
+    onRemove?.(user);
+    setPrincipalInvestigator?.(user);
   };
 
   const actionArray = [];
@@ -286,7 +284,7 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
       onClick: () => setSendUserEmail(true),
     });
 
-  setPi &&
+  setPrincipalInvestigator &&
     onRemove &&
     actionArray.push({
       icon: () => (

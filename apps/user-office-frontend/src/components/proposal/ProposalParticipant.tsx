@@ -23,8 +23,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ProposalParticipant(props: {
-  pi: BasicUserData | null | undefined;
-  setPi: (user: BasicUserDetails) => void;
+  principalInvestigator: BasicUserData | null | undefined;
+  setPrincipalInvestigator: (user: BasicUserDetails) => void;
   className?: string;
 }) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -40,9 +40,11 @@ export default function ProposalParticipant(props: {
         close={() => {
           setIsPickerOpen(false);
         }}
-        selectedUsers={!!props.pi ? [props.pi?.id] : []}
+        selectedUsers={
+          !!props.principalInvestigator ? [props.principalInvestigator?.id] : []
+        }
         addParticipants={(users: BasicUserDetails[]) => {
-          props.setPi(users[0]);
+          props.setPrincipalInvestigator(users[0]);
           setIsPickerOpen(false);
         }}
         participant={true}
@@ -51,8 +53,8 @@ export default function ProposalParticipant(props: {
         <TextField
           label="Principal Investigator"
           value={
-            props.pi
-              ? `${props.pi.firstname} ${props.pi.lastname}; ${props.pi.organisation}`
+            props.principalInvestigator
+              ? `${props.principalInvestigator.firstname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
               : ''
           }
           InputLabelProps={{ shrink: true }}

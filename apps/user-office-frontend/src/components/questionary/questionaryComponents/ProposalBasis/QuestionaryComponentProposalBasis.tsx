@@ -52,12 +52,13 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 
   const { proposer, users } = state.proposal;
 
-  const [piUserId, setPiUserId] = useState<number | undefined>(
-    state?.proposal.proposer?.id //user that is logged in
-  );
-  const { userData } = useBasicUserData(piUserId);
+  const [principalInvestigatorUserId, setPrincipalInvestigatorUserId] =
+    useState<number | undefined>(
+      state?.proposal.proposer?.id //user that is logged in
+    );
+  const { userData } = useBasicUserData(principalInvestigatorUserId);
 
-  const coIChanged = (users: BasicUserDetails[]) => {
+  const coInvestigatorChanged = (users: BasicUserDetails[]) => {
     formikProps.setFieldValue(
       `${id}.users`,
       users.map((user) => user.id)
@@ -68,7 +69,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     });
   };
 
-  const piChanged = (user: BasicUserDetails) => {
+  const principalInvestigatorChanged = (user: BasicUserDetails) => {
     formikProps.setFieldValue(`${id}.proposer`, user.id);
     dispatch({
       type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
@@ -77,10 +78,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       },
     });
 
-    setPiUserId(user.id);
-    coIChanged(
+    setPrincipalInvestigatorUserId(user.id);
+    coInvestigatorChanged(
       users
-        .filter((coI) => coI.id !== user.id)
+        .filter((coInvestigator) => coInvestigator.id !== user.id)
         .concat(proposer as BasicUserDetails)
     );
   };
@@ -139,21 +140,20 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
       </div>
       <ProposalParticipant
-        pi={userData}
-        setPi={piChanged}
+        principalInvestigator={userData}
+        setPrincipalInvestigator={principalInvestigatorChanged}
         className={classes.container}
       />
       <Participants
         title="Co-Proposers"
         className={classes.container}
-        pi={userData}
-        setPi={piChanged}
-        setUsers={coIChanged}
+        principalInvestigator={userData}
+        setPrincipalInvestigator={principalInvestigatorChanged}
+        setUsers={coInvestigatorChanged}
         preserveSelf={true}
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
-        // principalInvestigator={proposer?.id}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>

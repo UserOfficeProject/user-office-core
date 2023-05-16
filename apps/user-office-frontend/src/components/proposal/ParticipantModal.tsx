@@ -34,7 +34,7 @@ type ParticipantModalProps = {
   userRole?: UserRole;
   invitationUserRole?: UserRole;
   participant?: boolean;
-  setPi?: (user: BasicUserDetails) => void;
+  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
 };
 
 const ParticipantModal: React.FC<ParticipantModalProps> = ({
@@ -47,7 +47,7 @@ const ParticipantModal: React.FC<ParticipantModalProps> = ({
   selectedUsers,
   selection,
   userRole,
-  setPi,
+  setPrincipalInvestigator,
 }) => {
   const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
@@ -79,7 +79,7 @@ const ParticipantModal: React.FC<ParticipantModalProps> = ({
     selection: !!selection,
     onUpdate: (data: BasicUserDetails[]) => addParticipants(data),
     invitationUserRole: invitationUserRole || userRole,
-    setPi: setPi,
+    setPrincipalInvestigator: setPrincipalInvestigator,
   };
   const peopleTable = <PeopleTable {...userTableProps} />;
   const proposalPeopleTable = (

@@ -27,22 +27,20 @@ type ParticipantsProps = {
   users: BasicUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
-  pi: BasicUserData | null | undefined;
-  setPi: (user: BasicUserDetails) => void;
+  principalInvestigator?: BasicUserData | null;
+  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   className?: string;
   title: string;
-  // principalInvestigator?: number;
   preserveSelf?: boolean;
 };
 
 const Participants: React.FC<ParticipantsProps> = ({
   users,
   setUsers,
-  pi,
-  setPi,
+  principalInvestigator,
+  setPrincipalInvestigator,
   className,
   title,
-  // principalInvestigator,
   preserveSelf,
 }) => {
   const [modalOpen, setOpen] = useState(false);
@@ -70,15 +68,15 @@ const Participants: React.FC<ParticipantsProps> = ({
         close={() => setOpen(false)}
         addParticipants={addUsers}
         selectedUsers={
-          !!pi // add principal investigator if one exists
-            ? users.map((user) => user.id).concat([pi.id])
+          !!principalInvestigator // add principal investigator if one exists
+            ? users.map((user) => user.id).concat([principalInvestigator.id])
             : users.map((user) => user.id)
         }
         title={title}
         selection={true}
         userRole={UserRole.USER}
         participant={true}
-        setPi={setPi}
+        setPrincipalInvestigator={setPrincipalInvestigator}
       />
 
       <FormControl margin="dense" fullWidth>
@@ -100,7 +98,7 @@ const Participants: React.FC<ParticipantsProps> = ({
           invitationUserRole={UserRole.USER}
           onRemove={removeUser}
           preserveSelf={preserveSelf}
-          setPi={setPi}
+          setPrincipalInvestigator={setPrincipalInvestigator}
         />
         <ActionButtonContainer className={classes.StyledButtonContainer}>
           <Button
