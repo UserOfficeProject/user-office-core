@@ -575,6 +575,17 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       checkUpdate();
     });
   }
+
+  async updateRoleTitle(rolesToUpdate: {
+    shortCode: string;
+    title: string;
+  }): Promise<void> {
+    const { shortCode, title } = rolesToUpdate;
+
+    await database('roles')
+      .update({ title: title })
+      .where('short_code', shortCode);
+  }
 }
 
 export class PostgresAdminDataSourceWithAutoUpgrade extends PostgresAdminDataSource {

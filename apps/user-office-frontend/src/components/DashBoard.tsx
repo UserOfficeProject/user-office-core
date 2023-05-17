@@ -10,8 +10,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import parse from 'html-react-parser';
+import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Route, Switch } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -166,6 +168,8 @@ const Dashboard: React.FC = () => {
       ? localStorage.drawerOpen === '1'
       : !isTabletOrMobile
   );
+  const { t } = useTranslation();
+
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isSampleSafetyReviewer = useCheckAccess([
     UserRole.SAMPLE_SAFETY_REVIEWER,
@@ -260,6 +264,7 @@ const Dashboard: React.FC = () => {
             aria-label="Close drawer"
             onClick={handleDrawerClose}
             className="closeDrawer"
+            data-cy="close-drawer"
           >
             <ChevronLeftIcon />
           </IconButton>
@@ -360,7 +365,7 @@ const Dashboard: React.FC = () => {
           {isInstrumentManagementEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title="Instruments"
+              title={i18n.format(t('instrument'), 'plural')}
               path="/Instruments"
               component={InstrumentsPage}
             />

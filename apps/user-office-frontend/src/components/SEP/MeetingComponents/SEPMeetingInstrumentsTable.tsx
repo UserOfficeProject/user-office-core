@@ -1,8 +1,10 @@
 import MaterialTable, { Options } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import { Typography } from '@mui/material';
+import i18n from 'i18n';
 import { useSnackbar } from 'notistack';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
@@ -51,6 +53,8 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     UserRole.SEP_SECRETARY,
   ]);
   const { enqueueSnackbar } = useSnackbar();
+  const { t } = useTranslation();
+
   const columns = instrumentTableColumns.map((column) => ({
     ...column,
     title:
@@ -141,12 +145,13 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
               submitInstrument(rowData as InstrumentWithAvailabilityTime);
             },
             {
-              title: 'Submit instrument',
-              description:
-                'No further changes to sep meeting decisions and rankings are possible after submission. Are you sure you want to submit the instrument?',
+              title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
+              description: `No further changes to sep meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
+                'instrument'
+              )}?`,
             }
           )(),
-        tooltip: 'Submit instrument',
+        tooltip: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
       })
     );
   }
@@ -157,7 +162,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            Instruments with proposals
+            {`${i18n.format(t('instrument'), 'plural')} with proposals`}
           </Typography>
         }
         columns={columns}
