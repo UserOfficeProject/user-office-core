@@ -950,98 +950,48 @@ context('Proposal tests', () => {
       cy.contains(title).should('not.exist');
     });
 
-    it('User should not be able to create and submit proposal with inactive internal call', function () {
+    it('User should not be able to edit proposal with inactive internal call', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
+      cy.createProposal({ callId: initialDBData.call.id })
+        .then((result) => {
+          const createdProposal = result.createProposal;
+          if (createdProposal) {
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: title,
+              abstract: abstract,
+              proposerId: initialDBData.users.user1.id,
+            });
+          }
+        })
+        .then(() => {
+          cy.updateCall({
+            id: initialDBData.call.id,
+            ...newCall,
+            startCall: twoDaysAgo,
+            endCall: yesterday,
+            endCallInternal: yesterday,
+            proposalWorkflowId: createdWorkflowId,
+          });
+        });
+
       cy.login('user1');
-      cy.visit('/');
-      createTopicAndQuestionToExistingTemplate();
-      cy.login('user1');
-      cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl'
-      );
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
-
-      cy.contains('Save and continue').click();
-
-      cy.contains('Title is required');
-      cy.contains('Abstract is required');
-
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=title] input')
-        .type(newProposalTitle)
-        .should('have.value', newProposalTitle);
-
-      cy.get('[data-cy=abstract] textarea')
-        .first()
-        .type(abstract)
-        .should('have.value', abstract);
-
-      cy.contains('Save and continue').click();
-
-      cy.finishedLoading();
-
-      cy.notification({ variant: 'success', text: 'Saved' });
-
       cy.visit('/');
       cy.contains('Dashboard').click();
 
-      cy.finishedLoading();
+      cy.contains(title).parent().contains('draft');
 
-      cy.contains(newProposalTitle).parent().contains('draft');
-
-      cy.contains(newProposalTitle)
+      cy.contains(title)
         .parent()
         .find('[aria-label="Edit proposal"]')
-        .click();
+        .should('not.exist');
 
-      cy.contains('label', textQuestion).then(($elem) => {
-        cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
-      });
-      cy.contains('Save and continue').click();
-      cy.notification({ text: 'Saved', variant: 'success' });
-
-      cy.updateCall({
-        id: initialDBData.call.id,
-        ...newCall,
-        startCall: twoDaysAgo,
-        endCall: yesterday,
-        endCallInternal: yesterday,
-        proposalWorkflowId: createdWorkflowId,
-      });
-
-      cy.visit('/');
-
-      cy.contains(newProposalTitle)
+      cy.contains(title)
         .parent()
         .find('[aria-label="View proposal"]')
-        .click();
-
-      cy.contains('Submit').should('be.disabled');
-
-      cy.get('[data-cy="user-menu-items"]')
-        .find('[aria-label="New Proposal"]')
-        .should('have.css', 'pointer-events', 'none');
+        .should('exist');
     });
 
     it('User cannot select inactive internal call for new proposal', function () {
