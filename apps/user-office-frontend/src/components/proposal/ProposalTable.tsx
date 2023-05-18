@@ -141,13 +141,10 @@ const ProposalTable = ({
       proposalData.status?.shortCode !==
         ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED;
     if (readonly && isInternalUser) {
-      if (
-        proposalData.submitted &&
+      return (
         proposalData.status?.shortCode !==
-          ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
-      ) {
-        return true;
-      }
+        ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+      );
     }
 
     return readonly;
