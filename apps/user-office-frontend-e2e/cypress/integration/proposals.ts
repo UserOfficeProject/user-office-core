@@ -1038,84 +1038,85 @@ context('Proposal tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.createCall({
-        ...newCall,
-        proposalWorkflowId: createdWorkflowId,
-      });
+      let createdCallId: number;
       const createdCallTitle = faker.random.alphaNumeric(15);
       cy.createCall({
         ...newCall,
         shortCode: createdCallTitle,
-        endCall: yesterday,
-        endCallInternal: tomorrow,
         proposalWorkflowId: createdWorkflowId,
+      }).then((response) => {
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
+        }
+        cy.login('user2');
+        cy.visit('/');
+
+        cy.contains('New Proposal').click();
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('contain', createdCallTitle);
+
+        cy.updateCall({
+          id: createdCallId,
+          ...updatedCall,
+          endCall: yesterday,
+          endCallInternal: tomorrow,
+          proposalWorkflowId: createdWorkflowId,
+        });
+
+        cy.reload();
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
       });
-
-      cy.login('user2');
-      cy.visit('/');
-
-      cy.contains('New Proposal').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
     });
 
-    it('External user should not be able to submit proposal with active internal call', function () {
+    it('External user should not be able to submit draft proposal with active internal call', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.updateCall({
-        id: initialDBData.call.id,
-        ...newCall,
-        proposalWorkflowId: createdWorkflowId,
-      });
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal) {
-          createdProposalPk = result.createProposal.primaryKey;
+      cy.createProposal({ callId: initialDBData.call.id })
+        .then((result) => {
+          if (result.createProposal) {
+            createdProposalPk = result.createProposal.primaryKey;
 
-          cy.updateProposal({
-            proposalPk: result.createProposal.primaryKey,
-            title: newProposalTitle,
-            abstract: newProposalAbstract,
-            proposerId: initialDBData.users.user2.id,
+            cy.updateProposal({
+              proposalPk: result.createProposal.primaryKey,
+              title: title,
+              abstract: abstract,
+              proposerId: initialDBData.users.user2.id,
+            });
+          }
+        })
+        .then(() => {
+          cy.updateCall({
+            id: initialDBData.call.id,
+            ...newCall,
+            startCall: twoDaysAgo,
+            endCall: yesterday,
+            endCallInternal: tomorrow,
+            proposalWorkflowId: createdWorkflowId,
           });
-        }
-      });
+        });
 
       cy.login('user2');
       cy.visit('/');
 
       cy.contains('Dashboard').click();
 
-      cy.finishedLoading();
+      cy.contains(title).parent().contains('draft');
 
-      cy.contains(newProposalTitle).parent().contains('draft');
-
-      cy.contains(newProposalTitle)
+      cy.contains(title)
         .parent()
         .find('[aria-label="Edit proposal"]')
-        .click();
+        .should('not.exist');
 
-      cy.updateCall({
-        id: initialDBData.call.id,
-        ...newCall,
-        startCall: twoDaysAgo,
-        endCall: yesterday,
-        endCallInternal: tomorrow,
-        proposalWorkflowId: createdWorkflowId,
-      });
-
-      cy.visit('/');
-
-      cy.contains(newProposalTitle)
+      cy.contains(title)
         .parent()
         .find('[aria-label="View proposal"]')
-        .click();
-
-      cy.contains('Review').click();
-
-      cy.contains('Submit').should('be.disabled');
+        .should('exist');
     });
   });
 });
