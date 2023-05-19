@@ -26,6 +26,7 @@ export default function ProposalParticipant(props: {
   principalInvestigator: BasicUserData | null | undefined;
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
   className?: string;
+  loadingPrincipalInvestigator?: boolean;
 }) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
@@ -70,6 +71,7 @@ export default function ProposalParticipant(props: {
           <IconButton
             onClick={() => setIsPickerOpen(true)}
             className={classes.addButton}
+            disabled={props.loadingPrincipalInvestigator}
           >
             <EditIcon data-cy="edit-proposer-button" fontSize="small" />
           </IconButton>

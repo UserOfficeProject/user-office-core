@@ -32,6 +32,7 @@ type ParticipantsProps = {
   className?: string;
   title: string;
   preserveSelf?: boolean;
+  loadingPrincipalInvestigator?: boolean;
 };
 
 const Participants: React.FC<ParticipantsProps> = ({
@@ -42,6 +43,7 @@ const Participants: React.FC<ParticipantsProps> = ({
   className,
   title,
   preserveSelf,
+  loadingPrincipalInvestigator,
 }) => {
   const [modalOpen, setOpen] = useState(false);
 
@@ -107,6 +109,7 @@ const Participants: React.FC<ParticipantsProps> = ({
             data-cy="add-participant-button"
             size="small"
             startIcon={<PersonAddIcon />}
+            disabled={loadingPrincipalInvestigator}
           >
             Add
           </Button>

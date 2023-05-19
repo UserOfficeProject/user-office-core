@@ -81,14 +81,15 @@ const ParticipantModal: React.FC<ParticipantModalProps> = ({
     invitationUserRole: invitationUserRole || userRole,
     setPrincipalInvestigator: setPrincipalInvestigator,
   };
-  const peopleTable = <PeopleTable {...userTableProps} />;
-  const proposalPeopleTable = (
-    <ProposalPeopleTable
-      selectedParticipants={selectedParticipants}
-      setSelectedParticipants={setSelectedParticipants}
-      {...userTableProps}
-    />
-  );
+
+  const peopleTablesProps = {
+    selectedParticipants,
+    setSelectedParticipants,
+    ...userTableProps,
+  };
+
+  const peopleTable = <PeopleTable {...peopleTablesProps} />;
+  const proposalPeopleTable = <ProposalPeopleTable {...peopleTablesProps} />;
 
   return (
     <Dialog

@@ -288,7 +288,13 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
     onRemove &&
     actionArray.push({
       icon: () => (
-        <Link href="#" underline="hover" variant="subtitle2" component="button">
+        <Link
+          href="#"
+          data-cy="assign-as-pi"
+          underline="hover"
+          variant="subtitle2"
+          component="button"
+        >
           Assign <br /> as PI
         </Link>
       ),

@@ -56,7 +56,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     useState<number | undefined>(
       state?.proposal.proposer?.id //user that is logged in
     );
-  const { userData } = useBasicUserData(principalInvestigatorUserId);
+  const { loading, userData } = useBasicUserData(principalInvestigatorUserId);
 
   const coInvestigatorChanged = (users: BasicUserDetails[]) => {
     formikProps.setFieldValue(
@@ -143,6 +143,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         principalInvestigator={userData}
         setPrincipalInvestigator={principalInvestigatorChanged}
         className={classes.container}
+        loadingPrincipalInvestigator={loading}
       />
       <Participants
         title="Co-Proposers"
@@ -154,6 +155,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
+        loadingPrincipalInvestigator={loading}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>
