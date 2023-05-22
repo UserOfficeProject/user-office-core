@@ -108,6 +108,12 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class InstrumentPickerConfig extends ConfigBase {
+  @Field(() => String)
+  variant: string;
+}
+
+@ObjectType()
 export class TextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   min: number | null;
@@ -251,5 +257,6 @@ export const FieldConfigType = createUnionType({
     VisitBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
+    InstrumentPickerConfig,
   ], // function that returns array of object types classes
 });
