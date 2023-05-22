@@ -13,6 +13,7 @@ import { feedbackBasisDefinition } from './FeedbackBasis';
 import { fileUploadDefinition } from './FileUpload';
 import { genericTemplateDefinition } from './GenericTemplate';
 import { genericTemplateBasisDefinition } from './GenericTemplateBasis';
+import { instrumentPickerDefinition } from './InstrumentPicker';
 import { intervalDefinition } from './Interval';
 import { numberInputDefinition } from './NumberInput';
 import { proposalBasisDefinition } from './ProposalBasis';
@@ -95,6 +96,7 @@ const registry = [
   textInputDefinition,
   dynamicMultipleChoiceDefinition,
   visitBasisDefinition,
+  instrumentPickerDefinition,
 ];
 
 Object.freeze(registry);
