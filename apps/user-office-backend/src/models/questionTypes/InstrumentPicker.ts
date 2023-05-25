@@ -1,6 +1,8 @@
+/* eslint-disable quotes */
 import { GraphQLError } from 'graphql';
 
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
+import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -23,4 +25,15 @@ export const instrumentPickerDefinition: Question = {
     return config;
   },
   getDefaultAnswer: () => null,
+  filterQuery: (queryBuilder, filter) => {
+    const value = JSON.parse(filter.value).value;
+    switch (filter.compareOperator) {
+      case QuestionFilterCompareOperator.EQUALS:
+        return queryBuilder.andWhereRaw("answers.answer->>'value'=?", value);
+      default:
+        throw new GraphQLError(
+          `Unsupported comparator for SelectionFromOptions ${filter.compareOperator}`
+        );
+    }
+  },
 };
