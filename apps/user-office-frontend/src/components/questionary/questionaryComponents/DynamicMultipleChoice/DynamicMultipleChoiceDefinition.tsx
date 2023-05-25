@@ -1,4 +1,5 @@
 import HttpIcon from '@mui/icons-material/Http';
+import { dynamicMultipleChoiceValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
@@ -25,7 +26,7 @@ export const dynamicMultipleChoiceDefinition: QuestionaryComponentDefinition = {
     answerRenderer: DynamicMultipleChoiceAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: null, //TODO: Create dynamicMultipleChoiceValidationSchema on @user-office-software/duo-validation and put here.
+  createYupValidationSchema: dynamicMultipleChoiceValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || [],
   searchCriteriaComponent: DynamicMultipleChoiceSearchCriteriaComponent,
 };

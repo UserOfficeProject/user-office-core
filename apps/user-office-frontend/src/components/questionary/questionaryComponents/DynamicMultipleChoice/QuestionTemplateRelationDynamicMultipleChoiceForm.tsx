@@ -10,7 +10,8 @@ import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { SelectionFromOptionsConfig } from 'generated/sdk';
+import { DynamicMultipleChoiceConfig } from 'generated/sdk';
+import { urlValidationSchema } from 'utils/helperFunctions';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -20,7 +21,7 @@ const columns = [{ title: 'Answer', field: 'answer' }];
 export const QuestionTemplateRelationDynamicMultipleChoiceForm: FC<
   QuestionTemplateRelationFormProps
 > = (props) => {
-  const config = props.questionRel.config as SelectionFromOptionsConfig;
+  const config = props.questionRel.config as DynamicMultipleChoiceConfig;
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
 
@@ -29,6 +30,8 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm: FC<
     { label: 'Dropdown', value: 'dropdown' },
   ];
 
+  const urlValidation = urlValidationSchema();
+
   return (
     <QuestionTemplateRelationFormShell
       {...props}
@@ -36,9 +39,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm: FC<
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: Yup.string()
-            .url('Provide a valid URL that includes the HTTP or HTTPS protocol')
-            .required('URL is required'),
+          url: urlValidation,
         }),
       })}
     >
@@ -113,6 +114,20 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm: FC<
                 columns={columns}
                 fullWidth
                 inputProps={{ 'data-cy': 'dynamic-url' }}
+              />
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="config.jsonPath" shrink>
+                JsonPath
+              </InputLabel>
+              <Field
+                name="config.jsonPath"
+                id="config.jsonPath"
+                type="text"
+                component={TextField}
+                columns={columns}
+                fullWidth
+                inputProps={{ 'data-cy': 'dynamic-url-jsonPath' }}
               />
             </FormControl>
           </TitledContainer>
