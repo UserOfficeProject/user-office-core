@@ -148,6 +148,20 @@ test('A user not on a proposal can not update it', () => {
   ).resolves.toBeInstanceOf(Rejection);
 });
 
+test('A user can not add duplicate co-proposers', async () => {
+  return expect(
+    proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: 'newTitle',
+      abstract: 'newAbstract',
+      users: [dummyUserWithRole.id],
+    })
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not associate duplicate co-proposers with proposal'
+  );
+});
+
 //Submit
 
 test('A user officer can not reject a proposal that does not exist', () => {
