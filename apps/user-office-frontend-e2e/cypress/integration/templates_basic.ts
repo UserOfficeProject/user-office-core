@@ -1610,7 +1610,10 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
     });
 
     it('Question is not accepted when one of many files is invalid', () => {
