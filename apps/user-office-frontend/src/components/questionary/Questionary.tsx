@@ -59,7 +59,7 @@ function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
   }
 
   const getStepperNavig = () => {
-    // if there are less than 2 steps then there is no need to show the wizard navigation
+    // if there are fewer than 2 steps then there is no need to show the wizard navigation
     if (state.wizardSteps.length < 2) {
       return null;
     }

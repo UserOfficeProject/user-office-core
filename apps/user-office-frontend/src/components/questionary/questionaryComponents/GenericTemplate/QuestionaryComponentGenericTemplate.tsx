@@ -175,19 +175,16 @@ function QuestionaryComponentGenericTemplate(
               }
             });
 
-        const deleteGenericTemplate = (id: number) =>
-          api()
-            .deleteGenericTemplate({ genericTemplateId: id })
-            .then(() => {
-              const deletedStateItems = field.value.filter(
-                (genericTemplate) => genericTemplate.id === id
-              );
+        const deleteGenericTemplate = (id: number) => {
+          const deletedStateItems = field.value.filter(
+            (genericTemplate) => genericTemplate.id === id
+          );
 
-              updateFieldValueAndState(
-                deletedStateItems,
-                GENERIC_TEMPLATE_EVENT.ITEMS_DELETED
-              );
-            });
+          updateFieldValueAndState(
+            deletedStateItems,
+            GENERIC_TEMPLATE_EVENT.ITEMS_DELETED
+          );
+        };
 
         const createGenericTemplateWithCopiedAnswers = (
           copyAnswersInput: CopyAnswerInput[]
@@ -276,7 +273,26 @@ function QuestionaryComponentGenericTemplate(
             <ErrorMessage name={answerId} />
 
             <StyledModal
-              onClose={() => setSelectedGenericTemplate(null)}
+              onClose={() => {
+                const newStateItems = field.value.map((genericTemplate) =>
+                  genericTemplate.id === selectedGenericTemplate?.id
+                    ? selectedGenericTemplate
+                    : genericTemplate
+                );
+
+                updateFieldValueAndState(
+                  newStateItems,
+                  GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                );
+
+                if (
+                  state.deletedTemplates.length === 0 &&
+                  state.createdTemplates.length === 0
+                ) {
+                  dispatch({ type: 'CLEAN_DIRTY_STATE' });
+                }
+                setSelectedGenericTemplate(null);
+              }}
               open={selectedGenericTemplate !== null}
               data-cy="genericTemplate-declaration-modal"
             >
