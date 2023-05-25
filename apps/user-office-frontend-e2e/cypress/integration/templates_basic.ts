@@ -1579,7 +1579,7 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({ variant: 'error', text: 'not satisfying a constraint' });
     });
 
     it('Identifiable disguised file is uploaded but not accepted', () => {
