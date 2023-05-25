@@ -7,7 +7,7 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import MultipleChoiceSearchCriteriaComponent from '../MultipleChoice/MultipleChoiceSearchCriteriaComponent';
-import { InstrumentPickerAnswerRenderer } from './InstrumentPickerAnswerRenderer';
+import InstrumentPickerAnswerRenderer from './InstrumentPickerAnswerRenderer';
 import { QuestionaryComponentInstrumentPicker } from './QuestionaryComponentInstrumentPicker';
 import { QuestionInstrumentPickerForm } from './QuestionInstrumentPickerForm';
 import { QuestionTemplateRelationInstrumentPickerForm } from './QuestionTemplateRelationInstrumentPickerForm';
@@ -23,7 +23,7 @@ export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <PrecisionManufacturingIcon />,
   renderers: {
-    answerRenderer: InstrumentPickerAnswerRenderer,
+    answerRenderer: (answer) => <InstrumentPickerAnswerRenderer {...answer} />,
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: instrumentPickerValidationSchema,
