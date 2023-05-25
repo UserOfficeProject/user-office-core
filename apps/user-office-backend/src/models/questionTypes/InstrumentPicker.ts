@@ -7,7 +7,7 @@ import { Question } from './QuestionRegistry';
 export const instrumentPickerDefinition: Question = {
   dataType: DataType.INSTRUMENT_PICKER,
   validate: (field: QuestionTemplateRelation, value: string[]) => {
-    if (field.question.dataType !== DataType.SELECTION_FROM_OPTIONS) {
+    if (field.question.dataType !== DataType.INSTRUMENT_PICKER) {
       throw new GraphQLError('DataType should be INSTRUMENT_PICKER');
     }
 

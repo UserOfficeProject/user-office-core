@@ -5,6 +5,7 @@ import React, { FC } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Answer, DataType } from 'generated/sdk';
+import { useInstrumentData } from 'hooks/instrument/useInstrumentData';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { areDependenciesSatisfied } from 'models/questionary/QuestionaryFunctions';
 
@@ -22,6 +23,13 @@ export interface QuestionaryDetailsProps extends TableProps<FC<unknown>> {
   title?: string;
   answerRenderer?: (answer: Answer) => JSX.Element | null;
 }
+
+const Test = () => {
+  const instrumentData = useInstrumentData(1);
+  console.log({ instrumentData });
+
+  return <>test</>;
+};
 
 function QuestionaryDetails(props: QuestionaryDetailsProps) {
   const { answerRenderer, questionaryId, additionalDetails, title } = props;
