@@ -149,6 +149,21 @@ export default class ProposalMutations {
     }
 
     if (users !== undefined) {
+      if (
+        await this.userDataSource
+          .getProposalUsers(proposal.primaryKey)
+          .then((currentUsers) => {
+            return currentUsers.some((currentUser) =>
+              users.includes(currentUser.id)
+            );
+          })
+      ) {
+        return rejection(
+          'Can not associate duplicate co-proposers with proposal',
+          { primaryKey: proposalPk, agent }
+        );
+      }
+
       await this.proposalDataSource
         .setProposalUsers(proposalPk, users)
         .catch((error) => {
