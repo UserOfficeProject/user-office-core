@@ -724,7 +724,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal basic tests', () => {
+  describe('Proposal internal and external basic tests', () => {
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -1001,11 +1001,11 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
       let createdCallId: number;
-      const createdCallTitle = 'Created call';
+      const createdCallTitle = faker.random.alphaNumeric(15);
 
       cy.createCall({
         ...newCall,
-        title: createdCallTitle,
+        shortCode: createdCallTitle,
         endCall: yesterday,
         endCallInternal: tomorrow,
         proposalWorkflowId: createdWorkflowId,
@@ -1016,7 +1016,7 @@ context('Proposal tests', () => {
 
         cy.contains('New Proposal').click();
 
-        cy.contains(createdCallTitle);
+        cy.get('[data-cy=call-list]').should('contain', createdCallTitle);
 
         cy.updateCall({
           id: createdCallId,
@@ -1028,8 +1028,95 @@ context('Proposal tests', () => {
 
         cy.reload();
 
-        cy.contains(createdCallTitle).should('not.exist');
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
       });
+    });
+
+    it('External user should not be able to select an active internal call for a new proposal', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      let createdCallId: number;
+      const createdCallTitle = faker.random.alphaNumeric(15);
+      cy.createCall({
+        ...newCall,
+        shortCode: createdCallTitle,
+        proposalWorkflowId: createdWorkflowId,
+      }).then((response) => {
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
+        }
+        cy.login('user2');
+        cy.visit('/');
+
+        cy.contains('New Proposal').click();
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('contain', createdCallTitle);
+
+        cy.updateCall({
+          id: createdCallId,
+          ...updatedCall,
+          endCall: yesterday,
+          endCallInternal: tomorrow,
+          proposalWorkflowId: createdWorkflowId,
+        });
+
+        cy.reload();
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
+      });
+    });
+
+    it('External user should not be able to submit draft proposal with active internal call', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      cy.createProposal({ callId: initialDBData.call.id })
+        .then((result) => {
+          if (result.createProposal) {
+            createdProposalPk = result.createProposal.primaryKey;
+
+            cy.updateProposal({
+              proposalPk: result.createProposal.primaryKey,
+              title: title,
+              abstract: abstract,
+              proposerId: initialDBData.users.user2.id,
+            });
+          }
+        })
+        .then(() => {
+          cy.updateCall({
+            id: initialDBData.call.id,
+            ...newCall,
+            startCall: twoDaysAgo,
+            endCall: yesterday,
+            endCallInternal: tomorrow,
+            proposalWorkflowId: createdWorkflowId,
+          });
+        });
+
+      cy.login('user2');
+      cy.visit('/');
+
+      cy.contains('Dashboard').click();
+
+      cy.contains(title).parent().contains('draft');
+
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('not.exist');
+
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .should('exist');
     });
   });
 });
