@@ -138,6 +138,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
       {selectedCallTemplateId && (
         <Collapse in={showQuestionFilter}>
           <QuestionaryFilter
+            callId={filter.callId}
             templateId={selectedCallTemplateId}
             onSubmit={(questionFilter) => {
               setProposalFilter({

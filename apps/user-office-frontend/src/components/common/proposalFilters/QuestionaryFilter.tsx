@@ -5,7 +5,9 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
+  Call,
   GetTemplateQuery,
+  InputMaybe,
   QuestionFilterCompareOperator,
   QuestionFilterInput,
   QuestionTemplateRelation,
@@ -25,6 +27,7 @@ export interface SearchCriteria {
 
 interface QuestionaryFilterProps {
   templateId: number;
+  callId?: InputMaybe<Call['id']>;
   onSubmit?: (questionFilter?: QuestionFilterInput) => void;
 }
 
@@ -68,7 +71,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
+function QuestionaryFilter({
+  templateId,
+  onSubmit,
+  callId,
+}: QuestionaryFilterProps) {
   const { template, isLoadingTemplate } = useTemplate(templateId);
   const classes = useStyles();
 
@@ -163,6 +170,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
                 });
               }}
               questionTemplateRelation={selectedQuestion}
+              callId={callId}
             />
           )}
         </Collapse>
