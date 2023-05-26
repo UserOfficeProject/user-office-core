@@ -1679,7 +1679,10 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
     });
 
     it('Question is not accepted when PDF file page count is outside limit', () => {
@@ -1710,7 +1713,10 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
     });
 
     it('Question accepted when PDF file page count is within limit', () => {
