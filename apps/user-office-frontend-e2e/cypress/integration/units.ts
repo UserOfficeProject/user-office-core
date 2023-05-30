@@ -141,7 +141,7 @@ context('Units tests', () => {
       cy.fixture(fileName).then((expectedExport) => {
         const downloadsFolder = Cypress.config('downloadsFolder');
 
-        cy.readFile(`${downloadsFolder}\\${downloadFileName}`).then(
+        cy.readFile(`${downloadsFolder}/${downloadFileName}`).then(
           (actualExport) => {
             // remove date from the export, because it is not deterministic
             delete expectedExport.exportDate;
