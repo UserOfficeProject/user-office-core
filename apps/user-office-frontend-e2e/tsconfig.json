@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["ES6", "dom"],
+    "target": "ES2022",
+    "lib": ["ES2022", "dom"],
     "types": ["node", "cypress", "./cypress/types"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -13,7 +13,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": false,
-    "noEmit": true,
     "jsx": "preserve",
     "baseUrl": ".",
     "noFallthroughCasesInSwitch": true,
