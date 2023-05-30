@@ -47,7 +47,7 @@ module.exports = (on: Cypress.PluginEvents) => {
     watchOptions: {},
   };
 
-  // NOTE: This is needed for newest version of graphql-request to work in the e2e tests.
+  // NOTE: This is needed for newest version of graphql-request to work in the e2e tests because it is commonjs module from version 5.2.0.
   on('file:preprocessor', webpackPreprocessor(options));
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config

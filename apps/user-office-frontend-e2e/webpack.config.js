@@ -1,3 +1,4 @@
+// NOTE: This file is needed for newest version of graphql-request to work in the e2e tests because it is commonjs module from version 5.2.0.
 import { resolve as _resolve } from 'path';
 
 module.exports = {
@@ -17,24 +18,6 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
-      {
-        test: /\.(?:js|mjs|cjs)$/,
-        // exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [['@babel/preset-env', { targets: 'defaults' }]],
-            plugins: [
-              '@babel/plugin-transform-logical-assignment-operators',
-              '@babel/plugin-transform-nullish-coalescing-operator',
-            ],
-          },
-        },
-      },
     ],
-  },
-  output: {
-    filename: 'bundle.js',
-    path: _resolve(__dirname, 'dist'),
   },
 };

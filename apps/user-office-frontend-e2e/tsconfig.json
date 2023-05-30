@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "dom"],
+    "target": "es6",
+    "lib": ["ES6", "dom"],
     "types": ["node", "cypress", "./cypress/types"],
     "allowJs": true,
     "skipLibCheck": true,
