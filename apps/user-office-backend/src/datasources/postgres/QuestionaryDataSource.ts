@@ -13,7 +13,9 @@ import { ConfigBase } from '../../resolvers/types/FieldConfig';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
+  CallRecord,
   createAnswerBasic,
+  createCallObject,
   createProposalTemplateObject,
   createQuestionaryObject,
   createQuestionTemplateRelationObject,
@@ -260,6 +262,22 @@ export default class PostgresQuestionaryDataSource
     templateId: number
   ): Promise<QuestionaryStep[]> {
     return this.getQuestionaryStepsWithTemplateId(0, templateId);
+  }
+
+  async getBlankQuestionaryStepsByCallId(
+    callId: number
+  ): Promise<QuestionaryStep[]> {
+    const call = await database
+      .select()
+      .from('call')
+      .where('call_id', callId)
+      .first()
+      .then((call: CallRecord | null) =>
+        call ? createCallObject(call) : null
+      );
+    if (!call) return [];
+
+    return this.getQuestionaryStepsWithTemplateId(0, call.templateId);
   }
 
   async updateTopicCompleteness(
