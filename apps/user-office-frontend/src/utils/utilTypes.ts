@@ -1,5 +1,5 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { RequestDocument, Variables } from 'graphql-request/build/cjs/types';
+import { RequestDocument, Variables } from 'graphql-request';
 /**
  * This unpacks an array let you infer the type of a single elem
  *
