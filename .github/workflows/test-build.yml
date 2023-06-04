@@ -179,7 +179,7 @@ jobs:
             sdk-frontend-${{ hashFiles('**/**.graphql') }}
             sdk-frontend-
 
-      - run: npm run ci
+      - run: npm ci
 
       - run: npm run build
         env:
