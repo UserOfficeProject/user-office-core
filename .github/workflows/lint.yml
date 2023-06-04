@@ -5,7 +5,7 @@ on:
     branches: [develop, master]
 
 env:
-  NODE_VERSION: 16.x
+  NODE_VERSION: 18.x
 
 jobs:
   run-linters:
