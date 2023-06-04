@@ -153,21 +153,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
@@ -203,7 +203,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Run backend unit tests
         env:
@@ -255,21 +255,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
           path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}
+          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
           path: apps/user-office-frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}
+          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
