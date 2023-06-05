@@ -56,7 +56,7 @@
     }
   },
   "dependencies": {
-    "concurrently": "^8.0.1",
+    "concurrently": "^8.1.0",
     "wait-on": "^6.0.1"
   },
   "devDependencies": {
