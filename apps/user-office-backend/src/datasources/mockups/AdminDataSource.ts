@@ -191,4 +191,15 @@ export class AdminDataSourceMock implements AdminDataSource {
   ): Promise<Institution | null> {
     return dummyInstitution;
   }
+
+  waitForDBUpgrade(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  updateRoleTitle(rolesToUpdate: {
+    shortCode: string;
+    title: string;
+  }): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
 }

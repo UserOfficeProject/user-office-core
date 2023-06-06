@@ -58,7 +58,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     }
   }
 
-  async logout(uosToken: AuthJwtPayload): Promise<void | Rejection> {
+  async logout(uosToken: AuthJwtPayload): Promise<string | Rejection> {
     const oidcSub = uosToken.user.oidcSub;
 
     if (!oidcSub) {
@@ -73,7 +73,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
 
       await OpenIdClient.logout(user.oauthAccessToken);
 
-      return;
+      return 'logged out';
     } catch (error) {
       return rejection('Error ocurred while logging out', {
         error: (error as Error)?.message,
@@ -131,7 +131,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     const user = userWithOAuthSubMatch ?? userWithEmailMatch;
 
     if (user) {
-      await this.userDataSource.update({
+      const updatedUser = await this.userDataSource.update({
         ...user,
         firstname: userInfo.given_name,
         lastname: userInfo.family_name,
@@ -146,7 +146,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         organisation: institutionId ?? user.organisation,
       });
 
-      return user;
+      return updatedUser;
     } else {
       const newUser = await this.userDataSource.create(
         'unspecified',

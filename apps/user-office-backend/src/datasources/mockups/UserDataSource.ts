@@ -136,7 +136,7 @@ export const dummyInstrumentScientist: UserWithRole = {
 };
 
 export const dummyPlaceHolderUser = new User(
-  2,
+  5,
   'Dr.',
   'Jane',
   '',
@@ -332,6 +332,10 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async getUser(id: number) {
+    if (id === dummyPlaceHolderUser.id) {
+      return dummyPlaceHolderUser;
+    }
+
     return dummyUser;
   }
 
@@ -414,5 +418,9 @@ export class UserDataSourceMock implements UserDataSource {
     currentRole: Role | null
   ): Promise<boolean> {
     return true;
+  }
+
+  async mergeUsers(fromUserId: number, intoUserId: number): Promise<void> {
+    return;
   }
 }

@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { SEPDataSource } from '../../datasources/SEPDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
@@ -19,6 +20,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
   );
   const sepDataSource = container.resolve<SEPDataSource>(Tokens.SEPDataSource);
   const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+  const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
     Tokens.UserDataSource
   );
 
@@ -70,6 +74,20 @@ export async function essEmailHandler(event: ApplicationEvent) {
         return;
       }
 
+      const redeemCode = await redeemCodesDataSource.getRedeemCodes({
+        placeholderUserId: user.id,
+      });
+
+      if (!redeemCode[0]?.code) {
+        logger.logError('Failed email invite. No redeem code found', {
+          user,
+          inviter,
+          event,
+        });
+
+        return;
+      }
+
       mailService
         .sendMail({
           content: {
@@ -85,6 +103,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             inviterName: inviter.firstname,
             inviterLastname: inviter.lastname,
             inviterOrg: inviter.organisation,
+            redeemCode: redeemCode[0].code,
           },
           recipients: [{ address: user.email }],
         })

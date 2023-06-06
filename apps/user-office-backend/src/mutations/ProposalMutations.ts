@@ -149,6 +149,21 @@ export default class ProposalMutations {
     }
 
     if (users !== undefined) {
+      if (
+        await this.userDataSource
+          .getProposalUsers(proposal.primaryKey)
+          .then((currentUsers) => {
+            return currentUsers.some((currentUser) =>
+              users.includes(currentUser.id)
+            );
+          })
+      ) {
+        return rejection(
+          'Can not associate duplicate co-proposers with proposal',
+          { primaryKey: proposalPk, agent }
+        );
+      }
+
       await this.proposalDataSource
         .setProposalUsers(proposalPk, users)
         .catch((error) => {
@@ -224,6 +239,12 @@ export default class ProposalMutations {
       return rejection('Can not submit proposal because call is not active', {
         agent,
         proposalPk,
+      });
+    }
+    if (proposal.submitted) {
+      return rejection('Proposal has been submitted already', {
+        agent,
+        proposal,
       });
     }
 
@@ -540,21 +561,16 @@ export default class ProposalMutations {
       );
 
       const clonedQuestionary = await this.questionaryDataSource.clone(
-        sourceProposal.questionaryId
+        sourceProposal.questionaryId,
+        true
       );
-
-      // if user clones the proposal then it is his/her,
-      // but if userofficer, then it will belong to original proposer
-      const proposerId = this.userAuth.isUserOfficer(agent)
-        ? sourceProposal.proposerId
-        : agent!.id;
 
       // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
         title: `Copy of ${clonedProposal.title}`,
         abstract: clonedProposal.abstract,
-        proposerId: proposerId,
+        proposerId: sourceProposal.proposerId,
         statusId: 1,
         created: new Date(),
         updated: new Date(),
@@ -600,7 +616,8 @@ export default class ProposalMutations {
       for await (const genericTemplate of proposalGenericTemplates) {
         const clonedGenericTemplate =
           await this.genericTemplateDataSource.cloneGenericTemplate(
-            genericTemplate.id
+            genericTemplate.id,
+            true
           );
         await this.genericTemplateDataSource.updateGenericTemplate({
           genericTemplateId: clonedGenericTemplate.id,

@@ -1,6 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
-import DoneIcon from '@mui/icons-material/Done';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -27,11 +26,7 @@ import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import ImpersonateButton from 'components/common/ImpersonateButton';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import {
-  SettingsId,
-  UpdateUserMutationVariables,
-  UserRole,
-} from 'generated/sdk';
+import { SettingsId, UpdateUserMutationVariables } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useCountries } from 'hooks/user/useCountries';
@@ -74,8 +69,8 @@ export default function UpdateUserInformation(
   props: UpdateUserInformationProps
 ) {
   const theme = useTheme();
-  const { currentRole, user } = useContext(UserContext);
-  const { userData, setUserData } = useUserData({ userId: props.id });
+  const { user } = useContext(UserContext);
+  const { userData } = useUserData({ userId: props.id });
   const { format, mask } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -164,40 +159,6 @@ export default function UpdateUserInformation(
     );
   };
 
-  const isUserOfficer = currentRole === UserRole.USER_OFFICER;
-
-  const handleSetUserEmailVerified = async () => {
-    await api({
-      toastSuccessMessage: 'Email verified',
-    }).setUserEmailVerified({ id: props.id });
-
-    setUserData((userData) =>
-      userData
-        ? {
-            ...userData,
-            emailVerified: true,
-          }
-        : null
-    );
-  };
-
-  const handleSetUserNotPlaceholder = async () => {
-    await api({
-      toastSuccessMessage: 'User is no longer placeholder',
-    }).setUserNotPlaceholder({
-      id: props.id,
-    });
-
-    setUserData((userData) =>
-      userData
-        ? {
-            ...userData,
-            placeholder: false,
-          }
-        : null
-    );
-  };
-
   return (
     <Formik
       validateOnChange={false}
@@ -229,10 +190,6 @@ export default function UpdateUserInformation(
               {!userData.emailVerified && (
                 <Chip
                   color="primary"
-                  deleteIcon={<DoneIcon data-cy="btn-verify-email" />}
-                  onDelete={
-                    isUserOfficer ? handleSetUserEmailVerified : undefined
-                  }
                   icon={<AlternateEmailIcon />}
                   size="small"
                   label="Email not verified"
@@ -241,12 +198,6 @@ export default function UpdateUserInformation(
               {userData.placeholder && (
                 <Chip
                   color="primary"
-                  deleteIcon={
-                    <DoneIcon data-cy="btn-set-user-not-placeholder" />
-                  }
-                  onDelete={
-                    isUserOfficer ? handleSetUserNotPlaceholder : undefined
-                  }
                   icon={<AccountCircleIcon />}
                   size="small"
                   label="Placeholder user"

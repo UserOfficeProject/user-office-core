@@ -21,8 +21,8 @@ export class UserAuthorizationMock extends UserAuthorization {
   async isInternalUser(userId: number, currentRole: Role): Promise<boolean> {
     return true;
   }
-  async logout(token: AuthJwtPayload): Promise<void> {
-    return;
+  async logout(token: AuthJwtPayload): Promise<string> {
+    return 'logged out';
   }
   async isExternalTokenValid(externalToken: string): Promise<boolean> {
     return true;

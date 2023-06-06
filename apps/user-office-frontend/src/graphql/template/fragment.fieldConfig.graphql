@@ -78,6 +78,10 @@ fragment fieldConfig on FieldConfig {
 
   ... on SubTemplateConfig {
     addEntryButtonLabel
+    copyButtonLabel
+    canCopy
+    isMultipleCopySelect
+    isCompleteOnCopy
     minEntries
     maxEntries
     templateId
@@ -127,6 +131,9 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     url
+    options
+    jsonPath
+    externalApiCall
     isMultipleSelect
     variant
   }

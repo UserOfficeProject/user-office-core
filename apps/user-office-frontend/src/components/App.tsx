@@ -2,7 +2,7 @@ import Close from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
-import React, { ErrorInfo } from 'react';
+import React, { ErrorInfo, Suspense } from 'react';
 import {
   BrowserRouter as Router,
   Redirect,
@@ -14,6 +14,7 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
+import { IdleContextPicker } from 'context/IdleContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
@@ -106,34 +107,53 @@ class App extends React.Component {
 
   render(): JSX.Element {
     return (
-      <StyledEngineProvider injectFirst>
-        <SnackbarProvider
-          ref={this.notistackRef}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          maxSnack={1}
-          action={(key) => (
-            <IconButton onClick={this.onClickDismiss(key)}>
-              <Close htmlColor="white" />
-            </IconButton>
-          )}
-        >
-          <SettingsContextProvider>
-            <Theme>
-              <FeatureContextProvider>
-                <UserContextProvider>
-                  <DownloadContextProvider>
-                    <Router>
-                      <QueryParamProvider ReactRouterRoute={Route}>
-                        <Routes />
-                      </QueryParamProvider>
-                    </Router>
-                  </DownloadContextProvider>
-                </UserContextProvider>
-              </FeatureContextProvider>
-            </Theme>
-          </SettingsContextProvider>
-        </SnackbarProvider>
-      </StyledEngineProvider>
+      <Suspense
+        fallback={
+          <div
+            data-cy="loading"
+            style={{
+              display: 'flex',
+              width: '100vw',
+              height: '100vh',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            Loading...
+          </div>
+        }
+      >
+        <StyledEngineProvider injectFirst>
+          <SnackbarProvider
+            ref={this.notistackRef}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            maxSnack={1}
+            action={(key) => (
+              <IconButton onClick={this.onClickDismiss(key)}>
+                <Close htmlColor="white" />
+              </IconButton>
+            )}
+          >
+            <SettingsContextProvider>
+              <Theme>
+                <FeatureContextProvider>
+                  <UserContextProvider>
+                    <DownloadContextProvider>
+                      <IdleContextPicker>
+                        <Router>
+                          <QueryParamProvider ReactRouterRoute={Route}>
+                            <Routes />
+                          </QueryParamProvider>
+                        </Router>
+                      </IdleContextPicker>
+                    </DownloadContextProvider>
+                  </UserContextProvider>
+                </FeatureContextProvider>
+              </Theme>
+            </SettingsContextProvider>
+          </SnackbarProvider>
+        </StyledEngineProvider>
+      </Suspense>
     );
   }
 }
