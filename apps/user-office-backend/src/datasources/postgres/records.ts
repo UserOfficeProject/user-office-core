@@ -806,15 +806,13 @@ export const createQuestionTemplateRelationObject = async <T extends Datatype>(
   dependencies: FieldDependency[],
   callId?: number
 ) => {
-  let transformedConfigData;
-  if ('transformConfig' in record.config) {
-    transformedConfigData = await getTransformedConfigData(
-      record.data_type,
-      record.config,
-      callId
-    );
-  }
-  const mutatedConfig = transformedConfigData ?? record.config;
+  // The default config data doesn't contain all the data for all the Components. For Components like InstrumentPicker and DynamicMultipleChoice, the config data is being overwritten in the run time.
+  // Technically, any Questionary Component with a function transformConfig must be doing the config changes.
+  const mutatedConfig = await getTransformedConfigData(
+    record.data_type,
+    record.config,
+    callId
+  );
 
   return new QuestionTemplateRelation(
     new Question(

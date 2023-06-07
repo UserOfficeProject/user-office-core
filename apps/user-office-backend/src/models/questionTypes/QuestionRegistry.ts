@@ -133,10 +133,10 @@ export interface Question<T extends DataType> {
     filter: QuestionFilterInput
   ) => any;
 
-  readonly externalApiCall?: (
-    config: DynamicMultipleChoiceConfig
-  ) => Promise<DynamicMultipleChoiceConfig>;
-
+  /**
+   * Function to transform the config value before sending back to the front end.
+   * Ideal for changes in config at run time.
+   */
   readonly transformConfig?: (
     config: QuestionDataTypeConfigMapping<T>,
     callI?: number
@@ -215,22 +215,6 @@ export function getDefaultAnswerValue(
   return definition.getDefaultAnswer(questionTemplateRelation);
 }
 
-export async function getExternalApiCallData(
-  dataType: DataType,
-  config: DynamicMultipleChoiceConfig
-) {
-  const definition = getQuestionDefinition(dataType);
-
-  if (!definition.externalApiCall) {
-    logger.logError('Tried to make non-existing definition callback', {
-      dataType: dataType,
-    });
-    throw new GraphQLError('Tried to execute non-existing definition callback');
-  }
-
-  return await definition.externalApiCall(config);
-}
-
 export async function getTransformedConfigData<T extends DataType>(
   dataType: T,
   config: QuestionDataTypeConfigMapping<T>,
@@ -239,10 +223,7 @@ export async function getTransformedConfigData<T extends DataType>(
   const definition = getQuestionDefinition(dataType);
 
   if (!definition.transformConfig) {
-    logger.logError('Tried to make non-existing definition callback', {
-      dataType: dataType,
-    });
-    throw new GraphQLError('Tried to execute non-existing definition callback');
+    return config;
   }
 
   return await definition.transformConfig(config, callId);

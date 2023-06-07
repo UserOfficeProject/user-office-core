@@ -30,7 +30,6 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       config.tooltip = '';
       config.variant = 'dropdown';
       config.instruments = [];
-      config.transformConfig = true;
 
       return config;
     },

@@ -106,9 +106,6 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 
   @Field(() => Boolean)
   externalApiCall: boolean;
-
-  @Field(() => Boolean)
-  transformConfig: boolean;
 }
 
 @ObjectType()
@@ -127,9 +124,6 @@ export class InstrumentPickerConfig extends ConfigBase {
 
   @Field(() => [InstrumentOption])
   instruments: InstrumentOption[];
-
-  @Field(() => Boolean)
-  transformConfig: boolean;
 }
 
 @ObjectType()
