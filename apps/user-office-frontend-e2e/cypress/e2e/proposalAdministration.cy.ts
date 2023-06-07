@@ -246,6 +246,10 @@ context('Proposal administration tests', () => {
     });
 
     it('Download proposal is working with dialog window showing up', () => {
+      cy.intercept({
+        method: 'GET',
+        url: '/download/pdf/proposal/**',
+      }).as('downloadFile');
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           const createdProposalId = result.createProposal.proposalId;
@@ -267,6 +271,8 @@ context('Proposal administration tests', () => {
           cy.get('[data-cy="preparing-download-dialog-item"]').contains(
             proposalFixedName
           );
+
+          cy.wait('@downloadFile');
 
           const currentYear = new Date().getFullYear();
           const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
