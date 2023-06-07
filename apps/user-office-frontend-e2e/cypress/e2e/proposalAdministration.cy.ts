@@ -281,7 +281,7 @@ context('Proposal administration tests', () => {
             const fixtureFileContentStringLength =
               fileContent.toString().length;
             const downloadsFolder = Cypress.config('downloadsFolder');
-            const downloadPath = `${downloadsFolder}\\${downloadedFileName}`;
+            const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
             cy.readFile(downloadPath).then((downloadedFileContent) => {
               const downloadedFileContentByteLength = Buffer.byteLength(
                 downloadedFileContent
