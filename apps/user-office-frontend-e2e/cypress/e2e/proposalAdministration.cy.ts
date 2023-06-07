@@ -9,11 +9,13 @@ context('Proposal administration tests', () => {
   const proposalName1 = faker.lorem.words(3);
   const proposalName2 = faker.lorem.words(3);
   const proposalFixedName = '0000. Alphabetically first title';
+  const proposalFixedAbstract =
+    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 
   const textUser = faker.lorem.words(5);
   const textManager = faker.lorem.words(5);
 
-  const existingUserId = 1;
+  const existingUserId = initialDBData.users.user1.id;
   const existingTopicId = 1;
   const existingQuestionaryId = 1;
 
@@ -246,37 +248,103 @@ context('Proposal administration tests', () => {
     it('Download proposal is working with dialog window showing up', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
+          const createdProposalId = result.createProposal.proposalId;
           cy.updateProposal({
             proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalFixedName,
-            abstract: proposalName2,
+            abstract: proposalFixedAbstract,
           });
+
+          cy.contains(proposalFixedName)
+            .parent()
+            .find('input[type="checkbox"]')
+            .check();
+
+          cy.get('[data-cy="download-proposals"]').click();
+
+          cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+          cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+            proposalFixedName
+          );
+
+          const currentYear = new Date().getFullYear();
+          const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
+          const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${createdProposalId}.pdf`;
+
+          /** NOTE: This is pdf content comparisson to some extent.
+           * If real pdf comparisson is needed then we might need to consider using some external package:
+           * https://filiphric.com/testing-pdf-file-with-cypress or https://glebbahmutov.com/blog/cypress-pdf/
+           */
+          cy.fixture(FIXTURE_FILE_PATH).then((fileContent) => {
+            const fixtureFileContentByteLength = Buffer.byteLength(fileContent);
+            const fixtureFileContentStringLength =
+              fileContent.toString().length;
+            const downloadsFolder = Cypress.config('downloadsFolder');
+            const downloadPath = `${downloadsFolder}\\${downloadedFileName}`;
+            cy.readFile(downloadPath).then((downloadedFileContent) => {
+              const downloadedFileContentByteLength = Buffer.byteLength(
+                downloadedFileContent
+              );
+              const downloadedFileContentStringLength =
+                fileContent.toString().length;
+
+              expect(downloadedFileContentByteLength).equals(
+                fixtureFileContentByteLength
+              );
+              expect(downloadedFileContentStringLength).equals(
+                fixtureFileContentStringLength
+              );
+            });
+          });
+
+          cy.contains(proposalName1)
+            .parent()
+            .find('input[type="checkbox"]')
+            .check();
+
+          cy.get('[data-cy="download-proposals"]').click();
+
+          cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+          cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+            '2 selected items'
+          );
+
+          /** TODO: This can be fixed in the near future and I want to keep the working example here.
+           * If we want to test the multi proposal download properly we need to get the random file name somehow from downloads folder.
+           * Maybe something like this which is more advanced and will need creating a cypress task:
+           * fs.readdirSync('C:/tmp/').filter((allFilesPaths:string) =>
+           * allFilesPaths.match(/\.csv$/) !== null)
+           */
+          // const MULTI_PROPOSAL_FIXTURE_FILE_PATH =
+          //   '2023_multi_proposal_fixture.pdf';
+          // const downloadedMultiProposalFileName =
+          //   'proposals_2023-06-07_101558.pdf';
+
+          // cy.fixture(MULTI_PROPOSAL_FIXTURE_FILE_PATH).then((fileContent) => {
+          //   const fixtureFileContentByteLength = Buffer.byteLength(fileContent);
+          //   const fixtureFileContentStringLength =
+          //     fileContent.toString().length;
+          //   const downloadsFolder = Cypress.config('downloadsFolder');
+
+          //   const downloadPath = `${downloadsFolder}\\${downloadedFileName}`;
+          //   cy.readFile(downloadPath).then((downloadedFileContent) => {
+          //     const downloadedFileContentByteLength = Buffer.byteLength(
+          //       downloadedFileContent
+          //     );
+          //     const downloadedFileContentStringLength =
+          //       fileContent.toString().length;
+
+          //     expect(downloadedFileContentByteLength).equals(
+          //       fixtureFileContentByteLength
+          //     );
+          //     expect(downloadedFileContentStringLength).equals(
+          //       fixtureFileContentStringLength
+          //     );
+          //   });
+          // });
         }
       });
-      cy.contains(proposalName1)
-        .parent()
-        .find('input[type="checkbox"]')
-        .check();
-
-      cy.get('[data-cy="download-proposals"]').click();
-
-      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        proposalName1
-      );
-
-      cy.contains(proposalFixedName)
-        .parent()
-        .find('input[type="checkbox"]')
-        .check();
-
-      cy.get('[data-cy="download-proposals"]').click();
-
-      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        '2 selected items'
-      );
     });
 
     it('Should be able to download proposal pdf', function () {
