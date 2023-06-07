@@ -1,15 +1,23 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
+import { Proposal } from '../../models/Proposal';
 import {
   Answer,
   AnswerBasic,
   Questionary,
   QuestionaryStep,
 } from '../../models/Questionary';
-import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
-import { FieldDependency, Template, Topic } from '../../models/Template';
-import { ConfigBase } from '../../resolvers/types/FieldConfig';
+import {
+  getDefaultAnswerValue,
+  QuestionDataTypeConfigMapping,
+} from '../../models/questionTypes/QuestionRegistry';
+import {
+  DataType,
+  FieldDependency,
+  Template,
+  Topic,
+} from '../../models/Template';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
@@ -25,7 +33,15 @@ import {
   QuestionRecord,
   QuestionTemplateRelRecord,
   TopicRecord,
+  ProposalRecord,
+  createProposalObject,
 } from './records';
+
+type AnswerRecord<T extends DataType> = QuestionRecord &
+  QuestionTemplateRelRecord & { value: any; answer_id: number } & {
+    config: QuestionDataTypeConfigMapping<T>;
+    dependency_natural_key: string;
+  };
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource
@@ -277,7 +293,7 @@ export default class PostgresQuestionaryDataSource
       );
     if (!call) return [];
 
-    return this.getQuestionaryStepsWithTemplateId(0, call.templateId);
+    return this.getQuestionaryStepsWithTemplateId(0, call.templateId, callId);
   }
 
   async updateTopicCompleteness(
@@ -297,10 +313,7 @@ export default class PostgresQuestionaryDataSource
 
   // TODO: This is repeated in template datasource. Find a way to reuse it.
   async getQuestionsDependencies(
-    questionRecords: Array<
-      QuestionRecord &
-        QuestionTemplateRelRecord & { dependency_natural_key: string }
-    >,
+    questionRecords: AnswerRecord<DataType>[],
     templateId: number
   ): Promise<FieldDependency[]> {
     const questionDependencies: QuestionDependencyRecord[] = await database
@@ -329,8 +342,14 @@ export default class PostgresQuestionaryDataSource
 
   private async getQuestionaryStepsWithTemplateId(
     questionaryId: number,
-    templateId: number
+    templateId: number,
+    callId?: number
   ): Promise<QuestionaryStep[]> {
+    if (!callId && questionaryId > 0) {
+      const proposal = await this.getProposalByQuestionaryId(questionaryId);
+      callId = proposal.callId;
+    }
+
     const topicRecords: (TopicRecord & {
       is_complete: boolean;
     })[] = (
@@ -352,13 +371,7 @@ export default class PostgresQuestionaryDataSource
 
     // this contains all questions for template, with left joined answers
     // meaning that if there is no answer, it will still be on the list but `null`
-    const answerRecords: Array<
-      QuestionRecord &
-        QuestionTemplateRelRecord & { value: any; answer_id: number } & {
-          config: ConfigBase;
-          dependency_natural_key: string;
-        }
-    > = (
+    const answerRecords: AnswerRecord<DataType>[] = (
       await database.raw(`
         SELECT 
           templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, questions.natural_key as dependency_natural_key
@@ -390,11 +403,11 @@ export default class PostgresQuestionaryDataSource
         const questionDependencies = dependencies.filter(
           (dependency) => dependency.questionId === record.question_id
         );
-
         const questionTemplateRelation =
           await createQuestionTemplateRelationObject(
             record,
-            questionDependencies
+            questionDependencies,
+            callId
           );
 
         // if no answer has been saved, return the default answer value
@@ -528,5 +541,17 @@ export default class PostgresQuestionaryDataSource
     );
 
     return clonedQuestionary;
+  }
+
+  private async getProposalByQuestionaryId(
+    questionaryId: number
+  ): Promise<Proposal> {
+    return database('proposals')
+      .select('*')
+      .where({ questionary_id: questionaryId })
+      .first()
+      .then((proposal: ProposalRecord) => {
+        return createProposalObject(proposal);
+      });
   }
 }

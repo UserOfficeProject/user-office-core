@@ -3,7 +3,27 @@ import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
-import { DynamicMultipleChoiceConfig } from '../../resolvers/types/FieldConfig';
+import {
+  DateConfig,
+  DynamicMultipleChoiceConfig,
+  EmbellishmentConfig,
+  FeedbackBasisConfig,
+  FileUploadConfig,
+  GenericTemplateBasisConfig,
+  InstrumentPickerConfig,
+  IntervalConfig,
+  NumberInputConfig,
+  ProposalBasisConfig,
+  ProposalEsiBasisConfig,
+  RichTextInputConfig,
+  SampleBasisConfig,
+  SampleDeclarationConfig,
+  SampleEsiBasisConfig,
+  SelectionFromOptionsConfig,
+  ShipmentBasisConfig,
+  TextInputConfig,
+  VisitBasisConfig,
+} from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
@@ -27,11 +47,55 @@ import { shipmentBasis } from './ShipmentBasis';
 import { textInputDefinition } from './TextInput';
 import { visitBasisDefinition } from './VisitBasis';
 
-export interface Question {
+export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
+  ? DynamicMultipleChoiceConfig
+  : T extends DataType.DATE
+  ? DateConfig
+  : T extends DataType.EMBELLISHMENT
+  ? EmbellishmentConfig
+  : T extends DataType.FILE_UPLOAD
+  ? FileUploadConfig
+  : T extends DataType.GENERIC_TEMPLATE
+  ? GenericTemplateBasisConfig
+  : T extends DataType.SELECTION_FROM_OPTIONS
+  ? SelectionFromOptionsConfig
+  : T extends DataType.TEXT_INPUT
+  ? TextInputConfig
+  : T extends DataType.SAMPLE_DECLARATION
+  ? SampleDeclarationConfig
+  : T extends DataType.SAMPLE_BASIS
+  ? SampleBasisConfig
+  : T extends DataType.PROPOSAL_BASIS
+  ? ProposalBasisConfig
+  : T extends DataType.INTERVAL
+  ? IntervalConfig
+  : T extends DataType.NUMBER_INPUT
+  ? NumberInputConfig
+  : T extends DataType.SHIPMENT_BASIS
+  ? ShipmentBasisConfig
+  : T extends DataType.RICH_TEXT_INPUT
+  ? RichTextInputConfig
+  : T extends DataType.VISIT_BASIS
+  ? VisitBasisConfig
+  : T extends DataType.GENERIC_TEMPLATE_BASIS
+  ? GenericTemplateBasisConfig
+  : T extends DataType.PROPOSAL_ESI_BASIS
+  ? ProposalEsiBasisConfig
+  : T extends DataType.SAMPLE_ESI_BASIS
+  ? SampleEsiBasisConfig
+  : T extends DataType.FEEDBACK_BASIS
+  ? FeedbackBasisConfig
+  : T extends DataType.DYNAMIC_MULTIPLE_CHOICE
+  ? DynamicMultipleChoiceConfig
+  : T extends DataType.INSTRUMENT_PICKER
+  ? InstrumentPickerConfig
+  : never;
+
+export interface Question<T extends DataType> {
   /**
    * The enum value from DataType
    */
-  readonly dataType: DataType;
+  readonly dataType: T;
 
   /**
    * Perform validation rules before persisting data into the database
@@ -72,6 +136,11 @@ export interface Question {
   readonly externalApiCall?: (
     config: DynamicMultipleChoiceConfig
   ) => Promise<DynamicMultipleChoiceConfig>;
+
+  readonly transformConfig?: (
+    config: QuestionDataTypeConfigMapping<T>,
+    callI?: number
+  ) => Promise<QuestionDataTypeConfigMapping<T>>;
 }
 
 // Add new component definitions here
@@ -101,7 +170,7 @@ const registry = [
 
 Object.freeze(registry);
 
-const componentMap = new Map<DataType, Question>();
+const componentMap = new Map<DataType, Question<DataType>>();
 registry.forEach((definition) =>
   componentMap.set(definition.dataType, definition)
 );
@@ -160,4 +229,21 @@ export async function getExternalApiCallData(
   }
 
   return await definition.externalApiCall(config);
+}
+
+export async function getTransformedConfigData<T extends DataType>(
+  dataType: T,
+  config: QuestionDataTypeConfigMapping<T>,
+  callId?: number
+) {
+  const definition = getQuestionDefinition(dataType);
+
+  if (!definition.transformConfig) {
+    logger.logError('Tried to make non-existing definition callback', {
+      dataType: dataType,
+    });
+    throw new GraphQLError('Tried to execute non-existing definition callback');
+  }
+
+  return await definition.transformConfig(config, callId);
 }

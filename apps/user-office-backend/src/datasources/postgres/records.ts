@@ -1,3 +1,4 @@
+import { Datatype } from '@faker-js/faker/modules/datatype';
 import { PdfTemplateRecord } from 'knex/types/tables';
 
 import { Page } from '../../models/Admin';
@@ -20,7 +21,8 @@ import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import {
   createConfig,
-  getExternalApiCallData,
+  getTransformedConfigData,
+  QuestionDataTypeConfigMapping,
 } from '../../models/questionTypes/QuestionRegistry';
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
@@ -49,10 +51,6 @@ import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
-import {
-  ConfigBase,
-  DynamicMultipleChoiceConfig,
-} from '../../resolvers/types/FieldConfig';
 import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
@@ -170,7 +168,7 @@ export interface FieldDependencyRecord {
 export interface QuestionRecord {
   readonly category_id: number;
   readonly question_id: string;
-  readonly data_type: string;
+  readonly data_type: DataType;
   readonly question: string;
   readonly default_config: string;
   readonly sort_order: number;
@@ -210,7 +208,6 @@ export interface QuestionTemplateRelRecord {
   readonly template_id: number;
   readonly topic_id: number;
   readonly sort_order: number;
-  readonly config: string;
   readonly dependencies_operator?: DependenciesLogicOperator;
 }
 
@@ -800,24 +797,24 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionTemplateRelationObject = async (
+export const createQuestionTemplateRelationObject = async <T extends Datatype>(
   record: QuestionRecord &
     QuestionTemplateRelRecord & {
-      config: string | ConfigBase | DynamicMultipleChoiceConfig;
+      config: QuestionDataTypeConfigMapping<T>;
       dependency_natural_key: string;
     },
-  dependencies: FieldDependency[]
+  dependencies: FieldDependency[],
+  callId?: number
 ) => {
-  let dynamicMultipleChoiceConfig;
-
-  if ((record.config as DynamicMultipleChoiceConfig).externalApiCall) {
-    dynamicMultipleChoiceConfig = await getExternalApiCallData(
-      record.data_type as DataType,
-      record.config as DynamicMultipleChoiceConfig
+  let transformedConfigData;
+  if ('transformConfig' in record.config) {
+    transformedConfigData = await getTransformedConfigData(
+      record.data_type,
+      record.config,
+      callId
     );
   }
-
-  const mutatedConfig = dynamicMultipleChoiceConfig ?? record.config;
+  const mutatedConfig = transformedConfigData ?? record.config;
 
   return new QuestionTemplateRelation(
     new Question(

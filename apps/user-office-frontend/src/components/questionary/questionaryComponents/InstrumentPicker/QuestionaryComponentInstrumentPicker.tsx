@@ -11,12 +11,10 @@ import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { ProposalContextType } from 'components/proposal/ProposalContainer';
-import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
-import { Call, SelectionFromOptionsConfig } from 'generated/sdk';
+import { InstrumentPickerConfig } from 'generated/sdk';
 
 const useStyles = makeStyles(() => ({
   horizontalLayout: {
@@ -30,8 +28,6 @@ const useStyles = makeStyles(() => ({
 export function QuestionaryComponentInstrumentPicker(
   props: BasicComponentProps
 ) {
-  const { state } = useContext(QuestionaryContext) as ProposalContextType;
-  const call = state?.proposal?.call as Call;
   const classes = useStyles();
   const {
     answer,
@@ -41,7 +37,7 @@ export function QuestionaryComponentInstrumentPicker(
   const {
     question: { id, question, naturalKey },
   } = answer;
-  const config = answer.config as SelectionFromOptionsConfig;
+  const config = answer.config as InstrumentPickerConfig;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
 
@@ -58,9 +54,8 @@ export function QuestionaryComponentInstrumentPicker(
   );
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
-    onComplete(event.target.value);
+    onComplete(+event.target.value);
   };
-
   switch (config.variant) {
     case 'dropdown':
       return (
@@ -75,7 +70,6 @@ export function QuestionaryComponentInstrumentPicker(
             id={id}
             value={answer.value ?? null}
             onChange={handleOnChange}
-            multiple={config.isMultipleSelect}
             labelId={`questionary-${id}`}
             required={config.required}
             MenuProps={{
@@ -84,7 +78,7 @@ export function QuestionaryComponentInstrumentPicker(
             data-natural-key={naturalKey}
           >
             <MenuItem value={''}>None</MenuItem>
-            {call.instruments.map((instrument) => {
+            {config.instruments.map((instrument) => {
               return (
                 <MenuItem value={instrument.id} key={instrument.id}>
                   {instrument.name}
@@ -102,15 +96,15 @@ export function QuestionaryComponentInstrumentPicker(
           <RadioGroup
             id={id}
             name={id}
-            value={answer.value ?? ''}
+            value={answer.value ?? null}
             onChange={handleOnChange}
             className={
-              call.instruments.length < 3
+              config.instruments.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
             }
           >
-            {call.instruments.map((instrument) => {
+            {config.instruments.map((instrument) => {
               return (
                 <FormControlLabel
                   value={instrument.id}

@@ -6,14 +6,14 @@ import React, { FC, useEffect, useState } from 'react';
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   Call,
-  GetTemplateQuery,
+  GetBlankQuestionaryStepsByCallIdQuery,
   InputMaybe,
   QuestionFilterCompareOperator,
   QuestionFilterInput,
   QuestionTemplateRelation,
   QuestionTemplateRelationFragment,
 } from 'generated/sdk';
-import { useTemplate } from 'hooks/template/useTemplate';
+import { useBlankQuestionaryStepsDataByCallId } from 'hooks/questionary/useBlankQuestionaryStepsDataByCallId';
 
 import { useQuestionFilterQueryParams } from '../../../hooks/proposal/useQuestionFilterQueryParams';
 import { SearchCriteriaInputProps } from '../../proposal/SearchCriteriaInputProps';
@@ -45,14 +45,14 @@ const getSearchCriteriaComponent = (
   );
 };
 
-const extractSearchableQuestionsFromTemplate = (
-  template: GetTemplateQuery['template']
+const extractSearchableQuestions = (
+  questionarySteps: GetBlankQuestionaryStepsByCallIdQuery['blankQuestionaryStepsByCallId']
 ) => {
-  if (!template) {
+  if (!questionarySteps) {
     return [];
   }
 
-  return template.steps
+  return questionarySteps
     .reduce(
       (questions, step) => questions.concat(step.fields),
       new Array<QuestionTemplateRelation>()
@@ -76,7 +76,8 @@ function QuestionaryFilter({
   onSubmit,
   callId,
 }: QuestionaryFilterProps) {
-  const { template, isLoadingTemplate } = useTemplate(templateId);
+  const { loading: isLoadingQuestionarySteps, questionarySteps } =
+    useBlankQuestionaryStepsDataByCallId(callId);
   const classes = useStyles();
 
   const { questionFilterQuery, setQuestionFilterQuery } =
@@ -100,29 +101,29 @@ function QuestionaryFilter({
 
   useEffect(() => {
     if (questionFilterQuery.questionId) {
-      const selectedQuestion = extractSearchableQuestionsFromTemplate(
-        template
+      const selectedQuestion = extractSearchableQuestions(
+        questionarySteps
       ).find(
         (question) => question.question.id === questionFilterQuery.questionId
       );
       setSelectedQuestion(selectedQuestion ?? null);
     }
-  }, [template, setSelectedQuestion, questionFilterQuery.questionId]);
+  }, [questionarySteps, setSelectedQuestion, questionFilterQuery.questionId]);
 
   const handleSubmit = (filter?: QuestionFilterInput) => {
     setQuestionFilterQuery(filter);
     onSubmit?.(filter);
   };
 
-  if (isLoadingTemplate) {
+  if (isLoadingQuestionarySteps) {
     return <UOLoader />;
   }
 
-  if (template === null) {
+  if (questionarySteps === null) {
     return <span>Failed to load template</span>;
   }
 
-  const questions = extractSearchableQuestionsFromTemplate(template);
+  const questions = extractSearchableQuestions(questionarySteps);
 
   const SearchCriteriaComponent = getSearchCriteriaComponent(selectedQuestion);
 

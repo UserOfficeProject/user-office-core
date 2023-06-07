@@ -134,6 +134,7 @@ fragment fieldConfig on FieldConfig {
     options
     jsonPath
     externalApiCall
+    transformConfig
     isMultipleSelect
     variant
   }
@@ -161,5 +162,10 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    instruments {
+      id
+      name
+    }
+    transformConfig
   }
 }
