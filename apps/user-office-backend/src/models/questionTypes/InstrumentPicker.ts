@@ -47,8 +47,6 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       }
     },
     transformConfig: async (config, callId) => {
-      console.log('-------callId--------');
-      console.log({ callId });
       const fallBackConfig = { ...config, instruments: [] };
 
       try {
