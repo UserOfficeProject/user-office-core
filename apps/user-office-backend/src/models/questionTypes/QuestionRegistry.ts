@@ -141,6 +141,11 @@ export interface Question<T extends DataType> {
     config: QuestionDataTypeConfigMapping<T>,
     callI?: number
   ) => Promise<QuestionDataTypeConfigMapping<T>>;
+
+  /**
+   * Function to execute after the Question has been answered. Ex., Attach an instrument to a proposal, when the Instrument Proposal Question has been answered.
+   */
+  readonly afterSave?: (questionaryId: number, value: any) => any;
 }
 
 // Add new component definitions here

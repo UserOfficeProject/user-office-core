@@ -1,4 +1,3 @@
-import { Datatype } from '@faker-js/faker/modules/datatype';
 import { PdfTemplateRecord } from 'knex/types/tables';
 
 import { Page } from '../../models/Admin';
@@ -13,6 +12,7 @@ import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
+import { Instrument } from '../../models/Instrument';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
@@ -25,7 +25,6 @@ import {
   QuestionDataTypeConfigMapping,
 } from '../../models/questionTypes/QuestionRegistry';
 import { RedeemCode } from '../../models/RedeemCode';
-import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
@@ -709,15 +708,13 @@ export const createProposalObject = (proposal: ProposalRecord) => {
   );
 };
 
-export const createReviewObject = (review: ReviewRecord) => {
-  return new Review(
-    review.review_id,
-    review.proposal_pk,
-    review.user_id,
-    review.comment,
-    review.grade,
-    review.status,
-    review.sep_id
+export const createInstrumentObject = (instrument: InstrumentRecord) => {
+  return new Instrument(
+    instrument.instrument_id,
+    instrument.name,
+    instrument.short_code,
+    instrument.description,
+    instrument.manager_user_id
   );
 };
 
@@ -797,7 +794,7 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionTemplateRelationObject = async <T extends Datatype>(
+export const createQuestionTemplateRelationObject = async <T extends DataType>(
   record: QuestionRecord &
     QuestionTemplateRelRecord & {
       config: QuestionDataTypeConfigMapping<T>;

@@ -3,7 +3,13 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
 import database from '../../datasources/postgres/database';
-import { InstrumentWithAvailabilityTimeRecord } from '../../datasources/postgres/records';
+import {
+  InstrumentRecord,
+  InstrumentWithAvailabilityTimeRecord,
+  ProposalRecord,
+  createInstrumentObject,
+  createProposalObject,
+} from '../../datasources/postgres/records';
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -86,5 +92,52 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       }
 
       return fallBackConfig;
+    },
+    afterSave: async (questionaryId, value) => {
+      // Get Proposal
+      const proposal = await database
+        .select()
+        .from('proposals')
+        .where('questionary_id', questionaryId)
+        .first()
+        .then((proposal: ProposalRecord | null) =>
+          proposal ? createProposalObject(proposal) : null
+        );
+      // Get Instrument
+      const instrument = await database
+        .select()
+        .from('instruments')
+        .where('instrument_id', value)
+        .first()
+        .then((instrument: InstrumentRecord | null) =>
+          instrument ? createInstrumentObject(instrument) : null
+        );
+      if (!instrument || !proposal) return;
+      await database.transaction(async (trx) => {
+        try {
+          /**
+           * NOTE: First delete all connections that should be changed,
+           * because currently we only support one proposal to be assigned on one instrument.
+           * So we don't end up in a situation that one proposal is assigned to multiple instruments
+           * which is not supported scenario by the frontend because it only shows one instrument per proposal.
+           */
+          await database('instrument_has_proposals')
+            .del()
+            .where('proposal_pk', proposal.primaryKey)
+            .transacting(trx);
+
+          const result = await database('instrument_has_proposals')
+            .insert({
+              instrument_id: value,
+              proposal_pk: proposal.primaryKey,
+            })
+            .returning(['*'])
+            .transacting(trx);
+
+          await trx.commit(result);
+        } catch (error) {
+          logger.logException('Could not assign Instrument to Proposal', error);
+        }
+      });
     },
   };
