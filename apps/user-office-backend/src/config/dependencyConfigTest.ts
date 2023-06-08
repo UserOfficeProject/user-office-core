@@ -16,6 +16,7 @@ import { ProposalEsdDataSourceMock } from '../datasources/mockups/ProposalEsdDat
 import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
+import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventDataSource';
@@ -51,6 +52,7 @@ mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);
 mapClass(Tokens.ProposalEsdDataSource, ProposalEsdDataSourceMock);
 mapClass(Tokens.ProposalSettingsDataSource, ProposalSettingsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
+mapClass(Tokens.RedeemCodesDataSource, RedeemDataSourceMock);
 mapClass(Tokens.ReviewDataSource, ReviewDataSourceMock);
 mapClass(Tokens.SEPDataSource, SEPDataSourceMock);
 mapClass(Tokens.SampleDataSource, SampleDataSourceMock);

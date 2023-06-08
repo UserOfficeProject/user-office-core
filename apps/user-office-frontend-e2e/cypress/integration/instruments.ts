@@ -132,7 +132,7 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name).parent().find('[type="checkbox"]').check();
 
-      cy.contains('Assign instrument').click();
+      cy.get('[data-cy="assign-instrument-to-call"').click();
 
       cy.notification({
         variant: 'success',

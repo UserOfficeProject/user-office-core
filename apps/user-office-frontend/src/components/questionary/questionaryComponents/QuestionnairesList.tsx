@@ -19,8 +19,11 @@ export interface QuestionnairesListProps {
   onDeleteClick?: (record: QuestionnairesListRow) => void;
   onEditClick?: (record: QuestionnairesListRow) => void;
   onCloneClick?: (record: QuestionnairesListRow) => void;
+  onCopyClick?: () => void;
   data: Array<QuestionnairesListRow>;
   addButtonLabel?: string;
+  canCopy?: boolean;
+  copyButtonLabel?: string;
   maxEntries?: number;
   style?: React.CSSProperties;
 }
@@ -43,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonContainer: {
     flex: '1 1 0px',
+    '& button': {
+      marginLeft: 6,
+    },
   },
 }));
 
@@ -51,10 +57,13 @@ export function QuestionnairesList({
   onDeleteClick,
   onEditClick,
   onCloneClick,
+  onCopyClick,
   style,
   data,
   maxEntries,
   addButtonLabel,
+  canCopy,
+  copyButtonLabel,
 }: QuestionnairesListProps) {
   const classes = useStyles();
   const isListEmpty = data.length === 0;
@@ -85,6 +94,21 @@ export function QuestionnairesList({
       <Box display="flex" alignItems="center">
         {`${data.length} item(s)`}
         <StyledButtonContainer className={classes.buttonContainer}>
+          {canCopy && (
+            <Button
+              onClick={onCopyClick}
+              variant="outlined"
+              data-cy="copy-button"
+              color="primary"
+              startIcon={<AddCircleOutlineIcon />}
+              disabled={
+                (!!maxEntries && data.length >= maxEntries) ||
+                onCopyClick === undefined
+              }
+            >
+              {copyButtonLabel || 'Copy'}
+            </Button>
+          )}
           <Button
             onClick={onAddNewClick}
             variant="outlined"

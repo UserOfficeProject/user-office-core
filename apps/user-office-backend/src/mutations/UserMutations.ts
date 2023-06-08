@@ -15,6 +15,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { RedeemCodesDataSource } from '../datasources/RedeemCodesDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -46,7 +47,9 @@ import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 export default class UserMutations {
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
+    @inject(Tokens.RedeemCodesDataSource)
+    private redeemCodeDataSource: RedeemCodesDataSource
   ) {}
 
   createHash(password: string): string {
@@ -160,6 +163,8 @@ export default class UserMutations {
         args,
       });
     } else {
+      await this.redeemCodeDataSource.createRedeemCode(userId, agent.id);
+
       return this.createEmailInviteResponse(userId, agent.id, role);
     }
   }
@@ -502,7 +507,7 @@ export default class UserMutations {
     }
   }
 
-  async logout(token: string): Promise<void | Rejection> {
+  async logout(token: string): Promise<string | Rejection> {
     try {
       const decodedToken = verifyToken<AuthJwtPayload>(token);
 

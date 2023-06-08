@@ -153,7 +153,7 @@ export abstract class UserAuthorization {
     redirectUri: string
   ): Promise<User | null>;
 
-  abstract logout(token: AuthJwtPayload): Promise<void | Rejection>;
+  abstract logout(token: AuthJwtPayload): Promise<string | Rejection>;
 
   abstract isExternalTokenValid(externalToken: string): Promise<boolean>;
 }

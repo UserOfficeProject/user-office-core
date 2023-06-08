@@ -15,6 +15,7 @@ import PostgresProposalEsdDataSource from '../datasources/postgres/ProposalEsdDa
 import PostgresProposalEsiDataSource from '../datasources/postgres/ProposalEsiDataSource';
 import PostgresProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
+import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
@@ -30,8 +31,8 @@ import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
-  createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
+  createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
@@ -51,6 +52,7 @@ mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(Tokens.ProposalEsdDataSource, PostgresProposalEsdDataSource);
 mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
+mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.SEPDataSource, PostgresSEPDataSource);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
@@ -76,7 +78,7 @@ mapClass(Tokens.MailService, SMTPMailService);
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
-mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
+mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));

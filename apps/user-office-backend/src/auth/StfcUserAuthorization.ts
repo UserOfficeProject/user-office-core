@@ -221,13 +221,13 @@ export class StfcUserAuthorization extends UserAuthorization {
     return dummyUser;
   }
 
-  async logout(uosToken: AuthJwtPayload): Promise<void | Rejection> {
+  async logout(uosToken: AuthJwtPayload): Promise<string | Rejection> {
     try {
       const token = uosToken.externalToken;
       if (token) {
         this.uowsTokenCache.remove(token);
 
-        await client.logout(token).catch(() => {
+        return await client.logout(token).catch(() => {
           logger.logWarn('Failed to log out user', { token });
 
           return rejection('Failed to log out user', { token });

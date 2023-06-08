@@ -112,7 +112,9 @@ export default class QuestionaryMutations {
           !(await isMatchingConstraints(questionTemplateRelation, value))
         ) {
           return rejection(
-            'Can not answer topic because provided value is not satisfying constraint',
+            'The input to "' +
+              questionTemplateRelation.question.question +
+              '" is not satisfying a constraint. Please enter a valid input.',
             { answer, questionTemplateRelation }
           );
         }

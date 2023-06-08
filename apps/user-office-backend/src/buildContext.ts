@@ -15,6 +15,7 @@ import ProposalEsiMutations from './mutations/ProposalEsiMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ProposalSettingsMutations from './mutations/ProposalSettingsMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
+import RedeemCodesMutations from './mutations/RedeemCodesMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SampleEsiMutations from './mutations/SampleEsiMutations';
 import SampleMutations from './mutations/SampleMutations';
@@ -91,6 +92,7 @@ const context: BasicResolverContext = {
     proposalEsd: container.resolve(ProposalEsdMutations),
     proposalSettings: container.resolve(ProposalSettingsMutations),
     questionary: container.resolve(QuestionaryMutations),
+    redeemCodes: container.resolve(RedeemCodesMutations),
     review: container.resolve(ReviewMutations),
     sample: container.resolve(SampleMutations),
     sampleEsi: container.resolve(SampleEsiMutations),

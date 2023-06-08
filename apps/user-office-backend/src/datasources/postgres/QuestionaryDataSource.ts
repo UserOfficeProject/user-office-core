@@ -9,6 +9,7 @@ import {
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
 import { FieldDependency, Template, Topic } from '../../models/Template';
+import { ConfigBase } from '../../resolvers/types/FieldConfig';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
@@ -336,6 +337,7 @@ export default class PostgresQuestionaryDataSource
     const answerRecords: Array<
       QuestionRecord &
         QuestionTemplateRelRecord & { value: any; answer_id: number } & {
+          config: ConfigBase;
           dependency_natural_key: string;
         }
     > = (
@@ -365,24 +367,27 @@ export default class PostgresQuestionaryDataSource
       templateId
     );
 
-    const fields = answerRecords.map((record) => {
-      const questionDependencies = dependencies.filter(
-        (dependency) => dependency.questionId === record.question_id
-      );
+    const fields = await Promise.all(
+      answerRecords.map(async (record) => {
+        const questionDependencies = dependencies.filter(
+          (dependency) => dependency.questionId === record.question_id
+        );
 
-      const questionTemplateRelation = createQuestionTemplateRelationObject(
-        record,
-        questionDependencies
-      );
+        const questionTemplateRelation =
+          await createQuestionTemplateRelationObject(
+            record,
+            questionDependencies
+          );
 
-      // if no answer has been saved, return the default answer value
-      const value =
-        record.value === null
-          ? getDefaultAnswerValue(questionTemplateRelation)
-          : record.value.value;
+        // if no answer has been saved, return the default answer value
+        const value =
+          record.value === null
+            ? getDefaultAnswerValue(questionTemplateRelation)
+            : record.value.value;
 
-      return new Answer(record.answer_id, questionTemplateRelation, value);
-    });
+        return new Answer(record.answer_id, questionTemplateRelation, value);
+      })
+    );
 
     const steps = Array<QuestionaryStep>();
     topicRecords.forEach((topic) => {
@@ -440,7 +445,10 @@ export default class PostgresQuestionaryDataSource
     );
   }
 
-  async clone(questionaryId: number): Promise<Questionary> {
+  async clone(
+    questionaryId: number,
+    reviewBeforeSubmit?: boolean
+  ): Promise<Questionary> {
     const sourceQuestionary = await this.getQuestionary(questionaryId);
     if (!sourceQuestionary) {
       logger.logError(
@@ -467,11 +475,11 @@ export default class PostgresQuestionaryDataSource
           :clonedQuestionaryId
         , question_id
         , answer
-      FROM 
+      FROM
         answers
       WHERE
         questionary_id = :sourceQuestionaryId
-    `,
+      `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
@@ -488,14 +496,15 @@ export default class PostgresQuestionaryDataSource
       SELECT 
           :clonedQuestionaryId
         , topic_id
-        , is_complete
+        , :reviewBeforeSubmit
       FROM
         topic_completenesses
       WHERE
         questionary_id = :sourceQuestionaryId
-    `,
+      `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
+        reviewBeforeSubmit: !reviewBeforeSubmit,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
       }
     );

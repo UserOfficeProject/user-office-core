@@ -10,6 +10,7 @@ import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { updatedCall } from '../support/utils';
 
 context('Proposal tests', () => {
   const title = faker.lorem.words(2);
@@ -670,8 +671,29 @@ context('Proposal tests', () => {
         win.location.href = 'about:blank';
       });
 
-      cy.getAndStoreFeaturesEnabled();
       cy.resetDB(true);
+      cy.getAndStoreFeaturesEnabled();
+    });
+
+    it('Should be able to redeem proposal invite user information', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+        this.skip();
+      }
+      cy.login('user2');
+      cy.visit('/');
+      cy.finishedLoading();
+      cy.get('[data-cy="proposal-table"]').should(
+        'not.contain.text',
+        initialDBData.proposal.shortCode
+      );
+      cy.get('[data-cy="join-proposal-btn"]').click();
+      cy.get('#code').clear();
+      cy.get('#code').type(initialDBData.redeemCodes.validRedeemCode.code);
+      cy.get('[data-cy="invitation-submit"]').click();
+      cy.get('[data-cy="proposal-table"]').should(
+        'contain.text',
+        initialDBData.proposal.shortCode
+      );
     });
 
     it('User officer should reopen proposal', () => {
@@ -702,7 +724,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal basic tests', () => {
+  describe('Proposal internal and external basic tests', () => {
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -723,21 +745,21 @@ context('Proposal tests', () => {
       }).then((result) => {
         if (result.createProposalWorkflow) {
           createdWorkflowId = result.createProposalWorkflow.id;
-          cy.updateCall({
-            id: initialDBData.call.id,
-            ...newCall,
-            endCall: yesterday,
-            endCallInternal: faker.date.future(),
-            proposalWorkflowId: result.createProposalWorkflow.id,
-          });
         }
       });
     });
 
-    it('Internal user should be able to create and clone and delete an internal proposal', function () {
+    it('Internal user should be able to create proposal with active internal call', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...updatedCall,
+        endCall: yesterday,
+        endCallInternal: faker.date.future(),
+        proposalWorkflowId: createdWorkflowId,
+      });
       cy.login('user1');
       cy.visit('/');
       cy.contains('New Proposal').click();
@@ -804,18 +826,62 @@ context('Proposal tests', () => {
 
       cy.visit('/');
       cy.contains('Dashboard').click();
+    });
 
-      cy.finishedLoading();
+    it('Internal user should be able to clone proposal to an active internal calls', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      cy.createProposal({ callId: initialDBData.call.id })
+        .then((result) => {
+          const createdProposal = result.createProposal;
+          if (createdProposal) {
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: title,
+              abstract: abstract,
+              proposerId: initialDBData.users.user1.id,
+            });
+          }
+        })
+        .then(() => {
+          cy.updateCall({
+            id: initialDBData.call.id,
+            ...updatedCall,
+            endCall: yesterday,
+            endCallInternal: faker.date.future(),
+            proposalWorkflowId: createdWorkflowId,
+          });
+          cy.createCall({
+            ...newCall,
+            endCall: yesterday,
+            endCallInternal: faker.date.future(),
+            proposalWorkflowId: createdWorkflowId,
+          });
+        });
 
-      cy.createCall({
-        ...newCall,
-        proposalWorkflowId: createdWorkflowId,
-      });
+      cy.login('user1');
+      cy.visit('/');
 
+      cy.contains('Dashboard').click();
+
+      cy.contains(title).parent().contains('draft');
+
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains('Dashboard').click();
       cy.contains(title);
       cy.contains('submitted');
-
-      cy.get('[aria-label="View proposal"]').should('exist');
 
       cy.get('[aria-label="Clone proposal"]').first().click();
 
@@ -834,115 +900,98 @@ context('Proposal tests', () => {
       cy.contains(clonedProposalInternalTitle)
         .parent()
         .should('contain.text', newCall.shortCode);
+    });
 
+    it('Internal user should be able to delete draft proposal with active internal call', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      cy.createProposal({ callId: initialDBData.call.id })
+        .then((result) => {
+          const createdProposal = result.createProposal;
+          if (createdProposal) {
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: title,
+              abstract: abstract,
+              proposerId: initialDBData.users.user1.id,
+            });
+          }
+        })
+        .then(() => {
+          cy.updateCall({
+            id: initialDBData.call.id,
+            ...updatedCall,
+            endCall: yesterday,
+            endCallInternal: faker.date.future(),
+            proposalWorkflowId: createdWorkflowId,
+          });
+          cy.createCall({
+            ...newCall,
+            endCall: yesterday,
+            endCallInternal: faker.date.future(),
+            proposalWorkflowId: createdWorkflowId,
+          });
+        });
+
+      cy.login('user1');
       cy.visit('/');
+
       cy.contains('Dashboard').click();
 
-      cy.finishedLoading();
-
-      cy.contains(clonedProposalInternalTitle).parent().contains('draft');
-      cy.contains(clonedProposalInternalTitle)
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
         .parent()
         .find('[aria-label="Delete proposal"]')
         .click();
 
       cy.contains('OK').click();
 
-      cy.contains(clonedProposalInternalTitle).should('not.exist');
+      cy.contains(title).should('not.exist');
     });
 
-    it('User should not be able to create and submit proposal with inactive internal call', function () {
+    it('User should not be able to edit proposal with inactive internal call', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
+      cy.createProposal({ callId: initialDBData.call.id })
+        .then((result) => {
+          const createdProposal = result.createProposal;
+          if (createdProposal) {
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: title,
+              abstract: abstract,
+              proposerId: initialDBData.users.user1.id,
+            });
+          }
+        })
+        .then(() => {
+          cy.updateCall({
+            id: initialDBData.call.id,
+            ...newCall,
+            startCall: twoDaysAgo,
+            endCall: yesterday,
+            endCallInternal: yesterday,
+            proposalWorkflowId: createdWorkflowId,
+          });
+        });
+
       cy.login('user1');
-      cy.visit('/');
-      createTopicAndQuestionToExistingTemplate();
-      cy.login('user1');
-      cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl'
-      );
-
-      cy.get('[data-cy=edit-proposer-button]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
-        .click();
-
-      cy.contains('Save and continue').click();
-
-      cy.contains('Title is required');
-      cy.contains('Abstract is required');
-
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=title] input')
-        .type(newProposalTitle)
-        .should('have.value', newProposalTitle);
-
-      cy.get('[data-cy=abstract] textarea')
-        .first()
-        .type(abstract)
-        .should('have.value', abstract);
-
-      cy.contains('Save and continue').click();
-
-      cy.finishedLoading();
-
-      cy.notification({ variant: 'success', text: 'Saved' });
-
       cy.visit('/');
       cy.contains('Dashboard').click();
 
-      cy.finishedLoading();
+      cy.contains(title).parent().contains('draft');
 
-      cy.contains(newProposalTitle).parent().contains('draft');
-
-      cy.contains(newProposalTitle)
+      cy.contains(title)
         .parent()
         .find('[aria-label="Edit proposal"]')
-        .click();
+        .should('not.exist');
 
-      cy.contains('label', textQuestion).then(($elem) => {
-        cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
-      });
-      cy.contains('Save and continue').click();
-      cy.notification({ text: 'Saved', variant: 'success' });
-
-      cy.updateCall({
-        id: initialDBData.call.id,
-        ...newCall,
-        startCall: twoDaysAgo,
-        endCall: yesterday,
-        endCallInternal: yesterday,
-        proposalWorkflowId: createdWorkflowId,
-      });
-
-      cy.visit('/');
-
-      cy.contains(newProposalTitle)
+      cy.contains(title)
         .parent()
         .find('[aria-label="View proposal"]')
-        .click();
-
-      cy.contains('Submit').should('be.disabled');
-
-      cy.get('[data-cy="user-menu-items"]')
-        .find('[aria-label="New Proposal"]')
-        .should('have.css', 'pointer-events', 'none');
+        .should('exist');
     });
 
     it('User cannot select inactive internal call for new proposal', function () {
@@ -952,11 +1001,11 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
       let createdCallId: number;
-      const createdCallTitle = 'Created call';
+      const createdCallTitle = faker.random.alphaNumeric(15);
 
       cy.createCall({
         ...newCall,
-        title: createdCallTitle,
+        shortCode: createdCallTitle,
         endCall: yesterday,
         endCallInternal: tomorrow,
         proposalWorkflowId: createdWorkflowId,
@@ -967,7 +1016,7 @@ context('Proposal tests', () => {
 
         cy.contains('New Proposal').click();
 
-        cy.contains(createdCallTitle);
+        cy.get('[data-cy=call-list]').should('contain', createdCallTitle);
 
         cy.updateCall({
           id: createdCallId,
@@ -979,8 +1028,95 @@ context('Proposal tests', () => {
 
         cy.reload();
 
-        cy.contains(createdCallTitle).should('not.exist');
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
       });
+    });
+
+    it('External user should not be able to select an active internal call for a new proposal', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      let createdCallId: number;
+      const createdCallTitle = faker.random.alphaNumeric(15);
+      cy.createCall({
+        ...newCall,
+        shortCode: createdCallTitle,
+        proposalWorkflowId: createdWorkflowId,
+      }).then((response) => {
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
+        }
+        cy.login('user2');
+        cy.visit('/');
+
+        cy.contains('New Proposal').click();
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('contain', createdCallTitle);
+
+        cy.updateCall({
+          id: createdCallId,
+          ...updatedCall,
+          endCall: yesterday,
+          endCallInternal: tomorrow,
+          proposalWorkflowId: createdWorkflowId,
+        });
+
+        cy.reload();
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
+      });
+    });
+
+    it('External user should not be able to submit draft proposal with active internal call', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+      cy.createProposal({ callId: initialDBData.call.id })
+        .then((result) => {
+          if (result.createProposal) {
+            createdProposalPk = result.createProposal.primaryKey;
+
+            cy.updateProposal({
+              proposalPk: result.createProposal.primaryKey,
+              title: title,
+              abstract: abstract,
+              proposerId: initialDBData.users.user2.id,
+            });
+          }
+        })
+        .then(() => {
+          cy.updateCall({
+            id: initialDBData.call.id,
+            ...newCall,
+            startCall: twoDaysAgo,
+            endCall: yesterday,
+            endCallInternal: tomorrow,
+            proposalWorkflowId: createdWorkflowId,
+          });
+        });
+
+      cy.login('user2');
+      cy.visit('/');
+
+      cy.contains('Dashboard').click();
+
+      cy.contains(title).parent().contains('draft');
+
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('not.exist');
+
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .should('exist');
     });
   });
 });

@@ -353,7 +353,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {
-    // ensureDummyUsersExist throws an error if it could not create all users ot was given,
+    // ensureDummyUsersExist throws an error if it could not create all users it was given,
     // so on success it will always return a list of exactly 1 element here.
     // In the code below, always returning the first element should therefore be safe
     return this.ensureDummyUsersExist([userId]).then((users) => users[0]);
@@ -710,5 +710,21 @@ export default class PostgresUserDataSource implements UserDataSource {
         (role: RoleRecord) =>
           new Role(role.role_id, role.short_code, role.title)
       );
+  }
+
+  async mergeUsers(userFrom: number, userInto: number): Promise<void> {
+    type Record = { tableName: string; columnName: string };
+
+    const tablesToUpdate: Record[] = [
+      { tableName: 'proposal_user', columnName: 'user_id' },
+    ];
+
+    for await (const row of tablesToUpdate) {
+      await database(row.tableName)
+        .update({
+          [row.columnName]: userInto,
+        })
+        .where({ [row.columnName]: userFrom });
+    }
   }
 }

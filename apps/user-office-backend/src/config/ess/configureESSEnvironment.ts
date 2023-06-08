@@ -5,6 +5,7 @@ import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
 import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
+import { updateOIDCSettings } from '../updateOIDCSettings';
 
 async function setEssColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
@@ -99,4 +100,5 @@ export async function configureESSDevelopmentEnvironment() {
   await enableDefaultEssFeatures();
   await setTimezone();
   await setDateTimeFormats();
+  await updateOIDCSettings();
 }

@@ -8,11 +8,11 @@ import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
 import { Formik } from 'formik';
+import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import EmailSearchBar from 'components/common/EmailSearchBar';
@@ -69,6 +69,10 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   mtOptions?: Options<T>;
   columns?: Column<T>[];
   preserveSelf?: boolean;
+  selectedParticipants?: BasicUserDetails[];
+  setSelectedParticipants?: React.Dispatch<
+    React.SetStateAction<BasicUserDetails[]>
+  >;
 };
 
 const useStyles = makeStyles({
@@ -86,14 +90,20 @@ const useStyles = makeStyles({
   },
 });
 
-const columns = [
+const localColumns = [
   { title: 'Firstname', field: 'firstname' },
   { title: 'Lastname', field: 'lastname' },
   { title: 'Preferred name', field: 'preferredname' },
   { title: 'Organisation', field: 'organisation' },
 ];
 
-const getTitle = (invitationUserRole?: UserRole): string => {
+const getTitle = ({
+  t,
+  invitationUserRole,
+}: {
+  t: TFunction<'translation', undefined, 'translation'>;
+  invitationUserRole?: UserRole;
+}): string => {
   switch (invitationUserRole) {
     case UserRole.USER_OFFICER:
       return 'Invite User';
@@ -102,7 +112,7 @@ const getTitle = (invitationUserRole?: UserRole): string => {
     case UserRole.SEP_SECRETARY:
       return 'Invite SEP Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
-      return 'Invite Instrument Scientist';
+      return 'Invite ' + t('instrumentSci');
     default:
       return 'Invite User';
   }
@@ -156,7 +166,26 @@ const getUsersTableData = (
   };
 };
 
-const PeopleTable: React.FC<PeopleTableProps> = (props) => {
+const PeopleTable: React.FC<PeopleTableProps> = ({
+  selectedParticipants,
+  selection,
+  setSelectedParticipants,
+  selectedUsers,
+  userRole,
+  isLoading,
+  data,
+  action,
+  emailInvite,
+  invitationUserRole,
+  isFreeAction,
+  showInvitationButtons,
+  columns,
+  mtOptions,
+  onRemove,
+  preserveSelf,
+  search,
+  title,
+}) => {
   const [query, setQuery] = useState<
     GetUsersQueryVariables & { refreshData: boolean }
   >({
@@ -165,8 +194,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     filter: '',
     orderBy: '',
     orderDirection: '',
-    subtractUsers: props.selectedUsers ? props.selectedUsers : [],
-    userRole: props.userRole ? props.userRole : null,
+    subtractUsers: selectedUsers ? selectedUsers : [],
+    userRole: userRole ? userRole : null,
     refreshData: false,
   });
   const featureContext = useContext(FeatureContext);
@@ -177,28 +206,21 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
 
-  const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
   const api = useDataApi();
-  const { isLoading } = props;
   const { usersData, loadingUsersData } = useUsersData(query);
-  const [loading, setLoading] = useState(props.isLoading ?? false);
+  const [loading, setLoading] = useState(isLoading ?? false);
   const [sendUserEmail, setSendUserEmail] = useState(false);
   const [inviteUserModal, setInviteUserModal] = useState({
     show: false,
     title: '',
     userRole: UserRole.USER,
   });
-  const [selectedParticipants, setSelectedParticipants] = useState<
-    BasicUserDetails[]
-  >([]);
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
 
   const classes = useStyles();
-
-  const { data, action } = props;
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isLoading !== undefined) {
@@ -222,13 +244,13 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     setCurrentPageIds(usersData.users.map(({ id }) => id));
   }, [usersData]);
 
-  if (sendUserEmail && props.invitationUserRole && action) {
+  if (sendUserEmail && invitationUserRole && action) {
     return (
       <InviteUserForm
-        title={getTitle(props.invitationUserRole)}
+        title={getTitle({ t, invitationUserRole })}
         action={action.fn}
         close={() => setSendUserEmail(false)}
-        userRole={props.invitationUserRole}
+        userRole={invitationUserRole}
       />
     );
   }
@@ -236,17 +258,17 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
 
   const actionArray = [];
   action &&
-    !props.selection &&
+    !selection &&
     actionArray.push({
       icon: () => action.actionIcon,
-      isFreeAction: props.isFreeAction,
+      isFreeAction: isFreeAction,
       tooltip: action.actionText,
       onClick: (
         event: React.MouseEvent<JSX.Element>,
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
     });
-  props.emailInvite &&
+  emailInvite &&
     isEmailInviteEnabled &&
     actionArray.push({
       icon: EmailIcon,
@@ -257,7 +279,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
 
   const invitationButtons: InvitationButtonProps[] = [];
 
-  if (props.showInvitationButtons) {
+  if (showInvitationButtons) {
     invitationButtons.push(
       {
         title: 'Invite User',
@@ -292,12 +314,12 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       // first clear the current page because if any row was unselected
       // the (un)select all option will select every rows
       // which would result in duplicates
-      setSelectedParticipants((selectedParticipants) =>
+      setSelectedParticipants?.((selectedParticipants) =>
         selectedParticipants.filter(({ id }) => !currentPageIds.includes(id))
       );
 
       if (selectedItems.length > 0) {
-        setSelectedParticipants((selectedParticipants) => [
+        setSelectedParticipants?.((selectedParticipants) => [
           ...selectedParticipants,
           ...(selectedItems.map((selectedItem) => ({
             id: selectedItem.id,
@@ -312,7 +334,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       return;
     }
 
-    setSelectedParticipants((selectedParticipants) =>
+    setSelectedParticipants?.((selectedParticipants) =>
       (
         selectedItem as BasicUserDetails & {
           tableData: { checked: boolean };
@@ -337,36 +359,32 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     orderDirection: 'desc' | 'asc'
   ) => {
     if (
-      columns[orderedColumnId] &&
+      localColumns[orderedColumnId] &&
       query.first &&
       query.first < usersData.totalCount
     ) {
       setQuery((queryParams) => ({
         ...queryParams,
         orderBy:
-          orderedColumnId >= 0 ? columns[orderedColumnId].field : undefined,
+          orderedColumnId >= 0
+            ? localColumns[orderedColumnId].field
+            : undefined,
         orderDirection: orderDirection ? orderDirection : undefined,
       }));
     }
   };
 
   const usersTableData = getUsersTableData(
-    props.data || usersData?.users,
-    selectedParticipants,
+    data || usersData?.users,
+    selectedParticipants || [],
     invitedUsers,
     query,
-    props.data?.length || usersData.totalCount
+    data?.length || usersData.totalCount
   );
 
   const currentPage = (query.offset as number)
     ? ((query.offset as number) + invitedUsers.length) / (query.first as number)
     : 0;
-
-  const onClickHandlerUpdateBtn = () => {
-    if (props.onUpdate) {
-      props.onUpdate(selectedParticipants);
-    }
-  };
 
   return (
     <Formik
@@ -386,7 +404,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             return;
           }
 
-          if (props.selectedUsers?.includes(userDetails.id)) {
+          if (selectedUsers?.includes(userDetails.id)) {
             setFieldError('email', 'User is already on the proposal');
             setLoading(false);
 
@@ -400,9 +418,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             setFieldValue('email', '');
 
             //If we are selecting multiple users add the user as pre selected.
-            if (props.selection)
-              setSelectedParticipants(
-                selectedParticipants.concat([userDetails])
+            if (selection)
+              setSelectedParticipants?.(
+                selectedParticipants?.concat([userDetails]) || []
               );
 
             setQuery({
@@ -458,50 +476,30 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             />
           </DialogContent>
         </Dialog>
-
-        {!isLargeScreen && (
-          <div className={classes.mobileUpdateButton}>
-            {props.selection && (
-              <ActionButtonContainer>
-                <div className={classes.verticalCentered}>
-                  {selectedParticipants.length} user(s) selected
-                </div>
-                <Button
-                  type="button"
-                  onClick={onClickHandlerUpdateBtn}
-                  disabled={selectedParticipants.length === 0}
-                  data-cy="assign-selected-users"
-                >
-                  Update
-                </Button>
-              </ActionButtonContainer>
-            )}
-          </div>
-        )}
         <MaterialTable
           icons={tableIcons}
           title={
             <Typography variant="h6" component="h1">
-              {props.title}
+              {title}
             </Typography>
           }
           page={currentPage}
-          columns={props.columns ?? columns}
+          columns={columns ?? localColumns}
           onSelectionChange={handleColumnSelectionChange}
           onOrderChange={handleColumnOrderChange}
           data={usersTableData.users}
           totalCount={usersTableData.totalCount + invitedUsers.length}
           isLoading={loading || loadingUsersData}
           options={{
-            search: props.search,
+            search: search,
             debounceInterval: 400,
             pageSize: query.first as number,
             emptyRowsWhenPaging: false,
-            selection: props.selection,
+            selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
             },
-            ...props.mtOptions,
+            ...mtOptions,
             selectionProps: (rowdata: BasicUserDetails) => ({
               inputProps: {
                 'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
@@ -510,18 +508,17 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           }}
           actions={actionArray}
           editable={
-            props.onRemove
+            onRemove
               ? {
                   onRowDelete: (oldData) =>
                     new Promise<void>((resolve) => {
                       resolve();
-                      (props.onRemove as FunctionType)(oldData);
+                      (onRemove as FunctionType)(oldData);
                       setQuery({ ...query, refreshData: !query.refreshData });
                     }),
                   isDeletable: (rowData) => {
                     return (
-                      getCurrentUser()?.user.id !== rowData.id ||
-                      !props.preserveSelf
+                      getCurrentUser()?.user.id !== rowData.id || !preserveSelf
                     );
                   },
                 }
@@ -552,22 +549,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             Toolbar: isEmailSearchEnabled ? EmailSearchBar : MTableToolbar,
           }}
         />
-        {isLargeScreen && props.selection && (
-          <ActionButtonContainer>
-            <div className={classes.verticalCentered}>
-              {selectedParticipants.length} user(s) selected
-            </div>
-            <Button
-              type="button"
-              onClick={onClickHandlerUpdateBtn}
-              disabled={selectedParticipants.length === 0}
-              data-cy="assign-selected-users"
-            >
-              Update
-            </Button>
-          </ActionButtonContainer>
-        )}
-        {props.showInvitationButtons && (
+        {showInvitationButtons && (
           <ActionButtonContainer>
             {invitationButtons.map((item: InvitationButtonProps, i) => (
               <Button
