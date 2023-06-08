@@ -4,14 +4,9 @@ mutation createEsd(
   $comment: String!
 ) {
   createEsd(esiId: $esiId, evaluation: $evaluation, comment: $comment) {
-    esd {
-      ...esd
-      reviewer {
-        ...basicUserDetails
-      }
-    }
-    rejection {
-      ...rejection
+    ...esd
+    reviewer {
+      ...basicUserDetails
     }
   }
 }

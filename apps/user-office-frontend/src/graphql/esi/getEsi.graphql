@@ -16,11 +16,12 @@ query getEsi($esiId: Int!) {
     }
 
     proposal {
-      ...proposal
+      primaryKey
+      proposalId
+      title
       samples {
         ...sample
       }
-
       questionary {
         isCompleted
         ...questionary

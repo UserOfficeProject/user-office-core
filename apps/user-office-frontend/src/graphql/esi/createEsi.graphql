@@ -21,19 +21,13 @@ mutation createEsi($scheduledEventId: Int!) {
       samples {
         ...sample
       }
-      proposal {
-        ...proposal
-        samples {
-          ...sample
-        }
-        questionary {
-          isCompleted
-          ...questionary
-        }
+      questionary {
+        isCompleted
+        ...questionary
       }
-      scheduledEvent {
-        ...scheduledEventCore
-      }
+    }
+    scheduledEvent {
+      ...scheduledEventCore
     }
   }
 }

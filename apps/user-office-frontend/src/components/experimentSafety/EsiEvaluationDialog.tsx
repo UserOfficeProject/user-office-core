@@ -112,10 +112,10 @@ export function EsiEvaluationDialog(props: {
               evaluation: values.evaluation as EsdEvaluation,
             });
 
-            if (result.updateEsd.esd) {
+            if (result.updateEsd) {
               onClose({
                 ...esi,
-                esd: { ...esi.esd, ...result.updateEsd.esd },
+                esd: { ...esi.esd, ...result.updateEsd },
               });
             }
           } else {
@@ -128,10 +128,10 @@ export function EsiEvaluationDialog(props: {
               evaluation: values.evaluation as EsdEvaluation,
             });
 
-            if (result.createEsd.esd) {
+            if (result.createEsd) {
               onClose({
                 ...esi,
-                esd: { ...result.createEsd.esd },
+                esd: { ...result.createEsd },
               });
             }
           }

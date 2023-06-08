@@ -168,7 +168,7 @@ const proposalBasisPreSubmit =
       });
     } else {
       const { createProposal } = await api.createProposal({
-        callId: callId,
+        callId: call!.id,
       });
       const { updateProposal } = await api.updateProposal({
         proposalPk: createProposal.primaryKey,

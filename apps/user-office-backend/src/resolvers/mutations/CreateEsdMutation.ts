@@ -10,8 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { EsdEvaluation } from '../../models/EsdEvaluation';
-import { EsdResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { ExperimentSafetyDocument } from '../types/ExperimentSafetyDocument';
 
 @ArgsType()
 export class CreateEsdArgs {
@@ -27,11 +26,8 @@ export class CreateEsdArgs {
 
 @Resolver()
 export class CreateEsdMutation {
-  @Mutation(() => EsdResponseWrap)
+  @Mutation(() => ExperimentSafetyDocument)
   createEsd(@Args() args: CreateEsdArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.proposalEsd.createEsd(context.user, args),
-      EsdResponseWrap
-    );
+    return context.mutations.proposalEsd.createEsd(context.user, args);
   }
 }

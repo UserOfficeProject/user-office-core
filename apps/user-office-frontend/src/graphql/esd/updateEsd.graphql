@@ -4,11 +4,6 @@ mutation updateEsd(
   $comment: String!
 ) {
   updateEsd(esdId: $esdId, evaluation: $evaluation, comment: $comment) {
-    esd {
-      ...esd
-    }
-    rejection {
-      ...rejection
-    }
+    ...esd
   }
 }
