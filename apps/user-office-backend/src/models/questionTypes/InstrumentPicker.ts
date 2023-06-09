@@ -5,7 +5,6 @@ import { GraphQLError } from 'graphql';
 import database from '../../datasources/postgres/database';
 import {
   InstrumentRecord,
-  InstrumentWithAvailabilityTimeRecord,
   ProposalRecord,
   createInstrumentObject,
   createProposalObject,
@@ -51,29 +50,11 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
           );
       }
     },
-    transformConfig: async (config, callId) => {
+    transformConfig: async (config, helpers, callId) => {
       const fallBackConfig = { ...config, instruments: [] };
-
       try {
-        const instruments = await database
-          .select([
-            'i.instrument_id',
-            'name',
-            'short_code',
-            'description',
-            'manager_user_id',
-            'chi.availability_time',
-            'chi.submitted',
-          ])
-          .from('instruments as i')
-          .join('call_has_instruments as chi', {
-            'i.instrument_id': 'chi.instrument_id',
-          })
-          .where('chi.call_id', callId)
-          .distinct('i.instrument_id')
-          .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
-            return instruments;
-          });
+        if (!callId) throw 'Call ID not available. ';
+        const instruments = await helpers.fetchCallInstruments(callId);
 
         return {
           ...config,

@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
+import { InstrumentWithAvailabilityTimeRecord } from '../../datasources/postgres/records';
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import {
   BooleanConfig,
@@ -92,6 +93,14 @@ export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
   ? InstrumentPickerConfig
   : never;
 
+export type QuestionDataTypeHelpersMapping<T> =
+  T extends DataType.INSTRUMENT_PICKER
+    ? {
+        fetchCallInstruments: (
+          callId: number
+        ) => Promise<InstrumentWithAvailabilityTimeRecord[]>;
+      }
+    : never;
 export interface Question<T extends DataType> {
   /**
    * The enum value from DataType
@@ -140,7 +149,8 @@ export interface Question<T extends DataType> {
    */
   readonly transformConfig?: (
     config: QuestionDataTypeConfigMapping<T>,
-    callI?: number
+    helpers: QuestionDataTypeHelpersMapping<T>,
+    callId?: number
   ) => Promise<QuestionDataTypeConfigMapping<T>>;
 
   /**
@@ -224,6 +234,7 @@ export function getDefaultAnswerValue(
 export async function getTransformedConfigData<T extends DataType>(
   dataType: T,
   config: QuestionDataTypeConfigMapping<T>,
+  helpers: QuestionDataTypeHelpersMapping<T>,
   callId?: number
 ) {
   const definition = getQuestionDefinition(dataType);
@@ -232,5 +243,5 @@ export async function getTransformedConfigData<T extends DataType>(
     return config;
   }
 
-  return await definition.transformConfig(config, callId);
+  return await definition.transformConfig(config, helpers, callId);
 }
