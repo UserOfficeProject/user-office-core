@@ -76,6 +76,7 @@ export function QuestionaryComponentInstrumentPicker(
               variant: 'menu',
             }}
             data-natural-key={naturalKey}
+            data-cy="dropdown-ul"
           >
             <MenuItem value={''}>None</MenuItem>
             {config.instruments.map((instrument) => {
@@ -103,6 +104,7 @@ export function QuestionaryComponentInstrumentPicker(
                 ? classes.horizontalLayout
                 : classes.verticalLayout
             }
+            data-cy="radio-ul"
           >
             {config.instruments.map((instrument) => {
               return (

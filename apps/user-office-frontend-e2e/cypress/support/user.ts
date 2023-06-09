@@ -197,6 +197,7 @@ const login = (
         return resp;
       });
   });
+  console.log({ request });
 
   return cy.wrap(request);
 };
