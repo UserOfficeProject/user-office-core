@@ -4,6 +4,7 @@ import { Knex } from 'knex';
 
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import {
+  BooleanConfig,
   DateConfig,
   DynamicMultipleChoiceConfig,
   EmbellishmentConfig,
@@ -48,7 +49,7 @@ import { textInputDefinition } from './TextInput';
 import { visitBasisDefinition } from './VisitBasis';
 
 export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
-  ? DynamicMultipleChoiceConfig
+  ? BooleanConfig
   : T extends DataType.DATE
   ? DateConfig
   : T extends DataType.EMBELLISHMENT
