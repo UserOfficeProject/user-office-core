@@ -158,7 +158,6 @@ fragment fieldConfig on FieldConfig {
 
   ... on InstrumentPickerConfig {
     variant
-
     small_label
     required
     tooltip
