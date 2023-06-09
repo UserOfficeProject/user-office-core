@@ -6,6 +6,7 @@ import createCustomHandler from './customHandler';
 import createLoggingHandler from './logging';
 import { createPostToQueueHandler } from './messageBroker';
 import createProposalWorkflowHandler from './proposalWorkflow';
+import createInstrumentPickerHandler from './questionary/instrumentPicker';
 
 export default function createEventHandlers() {
   const emailHandler = container.resolve<
@@ -18,5 +19,6 @@ export default function createEventHandlers() {
     createPostToQueueHandler(),
     createProposalWorkflowHandler(),
     createCustomHandler(),
+    createInstrumentPickerHandler(),
   ];
 }

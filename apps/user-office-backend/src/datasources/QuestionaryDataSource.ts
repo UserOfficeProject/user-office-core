@@ -3,7 +3,7 @@ import {
   Questionary,
   QuestionaryStep,
 } from '../models/Questionary';
-import { Template } from '../models/Template';
+import { DataType, Question, Template } from '../models/Template';
 
 export interface QuestionaryDataSource {
   getCount(templateId: number): Promise<number>;
@@ -18,6 +18,10 @@ export interface QuestionaryDataSource {
   getBlankQuestionarySteps(templateId: number): Promise<QuestionaryStep[]>;
   getBlankQuestionaryStepsByCallId(callId: number): Promise<QuestionaryStep[]>;
   getAnswers(questionId: string): Promise<AnswerBasic[]>;
+  getLatestAnswerByQuestionaryIdAndDataType(
+    questionaryId: number,
+    dataType: DataType
+  ): Promise<{ answer: AnswerBasic; question: Question } | null>;
   getTemplates(questionId: string): Promise<Template[]>;
   getIsCompleted(questionaryId: number): Promise<boolean>;
   updateAnswer(

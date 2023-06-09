@@ -10,7 +10,6 @@ import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import {
   isMatchingConstraints,
-  proposalAnswerAfterSave,
   transformAnswerValueIfNeeded,
 } from '../models/ProposalModelFunctions';
 import { rejection } from '../models/Rejection';
@@ -135,16 +134,6 @@ export default class QuestionaryMutations {
           questionaryId,
           answer.questionId,
           answer.value
-        );
-
-        /**
-         * After Effect hook for an Answer save. Any operation that needs to be done, when a specific Question has been answered will be executed here
-         * Note: Questionary Component Definition that implements the function afterSave, will only be executed.
-         */
-        await proposalAnswerAfterSave(
-          questionTemplateRelation.question.dataType,
-          questionaryId,
-          value
         );
       }
     }

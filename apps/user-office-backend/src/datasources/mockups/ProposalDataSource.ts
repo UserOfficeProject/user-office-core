@@ -287,6 +287,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return allProposals.find((proposal) => proposal.primaryKey === id) || null;
   }
 
+  async getByQuestionaryid(qestionaryid: number) {
+    return (
+      allProposals.find(
+        (proposal) => proposal.questionaryId === qestionaryid
+      ) || null
+    );
+  }
+
   async create(proposerId: number, callId: number, questionaryId: number) {
     const newProposal = dummyProposalFactory({
       proposerId,

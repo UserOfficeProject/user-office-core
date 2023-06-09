@@ -1,0 +1,67 @@
+import { container } from 'tsyringe';
+
+import { Tokens } from '../../config/Tokens';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
+import { ApplicationEvent } from '../../events/applicationEvents';
+import { Event } from '../../events/event.enum';
+import { DataType } from '../../models/Template';
+
+export default function createHandler() {
+  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
+  );
+
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  return async function proposalWorkflowHandler(event: ApplicationEvent) {
+    if (event.isRejection) {
+      return;
+    }
+
+    switch (event.type) {
+      case Event.TOPIC_ANSWERED: {
+        const {
+          questionarystep: { questionaryId },
+        } = event;
+
+        const instrumentPickerAnswer =
+          await questionaryDataSource.getLatestAnswerByQuestionaryIdAndDataType(
+            questionaryId,
+            DataType.INSTRUMENT_PICKER
+          );
+
+        const instrumentId = instrumentPickerAnswer?.answer.answer.value;
+        if (!instrumentId)
+          throw new Error(`Invalid Instrument id ${instrumentId}`);
+
+        const instrument = await instrumentDataSource.getInstrument(
+          instrumentId
+        );
+
+        if (!instrument)
+          throw new Error(`Instrument with id ${instrumentId} not found`);
+
+        const proposal = await proposalDataSource.getByQuestionaryid(
+          questionaryId
+        );
+        if (!proposal)
+          throw new Error(
+            `Proposal with questionary id ${questionaryId} not found`
+          );
+
+        await instrumentDataSource.assignProposalsToInstrument(
+          [proposal.primaryKey],
+          instrumentId
+        );
+      }
+    }
+  };
+}

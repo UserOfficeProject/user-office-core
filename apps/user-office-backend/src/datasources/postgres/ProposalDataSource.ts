@@ -299,6 +299,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
+  async getByQuestionaryid(questionaryId: number): Promise<Proposal | null> {
+    return database
+      .select()
+      .from('proposals')
+      .where('questionary_id', questionaryId)
+      .first()
+      .then((proposal: ProposalRecord) => {
+        return proposal ? createProposalObject(proposal) : null;
+      });
+  }
+
   async create(
     proposer_id: number,
     call_id: number,

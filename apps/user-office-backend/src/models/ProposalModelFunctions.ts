@@ -5,7 +5,6 @@ import {
 import { Answer, QuestionaryStep } from './Questionary';
 import { getQuestionDefinition } from './questionTypes/QuestionRegistry';
 import {
-  DataType,
   FieldDependency,
   QuestionTemplateRelation,
   TemplateStep,
@@ -124,16 +123,4 @@ export function transformAnswerValueIfNeeded(
   }
 
   return definition.transform(questionTemplateRelation, value);
-}
-
-export async function proposalAnswerAfterSave(
-  dataType: DataType,
-  questionaryId: number,
-  value: any
-) {
-  const definition = getQuestionDefinition(dataType);
-
-  if (definition.afterSave) {
-    await definition.afterSave(questionaryId, value);
-  }
 }

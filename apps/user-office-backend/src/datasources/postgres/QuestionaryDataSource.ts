@@ -15,6 +15,7 @@ import {
 import {
   DataType,
   FieldDependency,
+  Question,
   Template,
   Topic,
 } from '../../models/Template';
@@ -36,6 +37,7 @@ import {
   ProposalRecord,
   createProposalObject,
   InstrumentWithAvailabilityTimeRecord,
+  createQuestionObject,
 } from './records';
 
 type AnswerRecord<T extends DataType> = QuestionRecord &
@@ -128,6 +130,34 @@ export default class PostgresQuestionaryDataSource
         return rows.map((row) => createAnswerBasic(row));
       });
   }
+
+  async getLatestAnswerByQuestionaryIdAndDataType(
+    questionaryId: number,
+    dataType: DataType
+  ): Promise<{ answer: AnswerBasic; question: Question } | null> {
+    return database('answers')
+      .leftJoin(
+        'questions',
+        'questions.question_id',
+        '=',
+        'answers.question_id'
+      )
+      .where('answers.questionary_id', questionaryId)
+      .where('questions.data_type', dataType)
+      .orderBy('answers.created_at', 'desc')
+      .limit(1)
+      .then((rows) => {
+        if (rows.length == 0) {
+          return null;
+        }
+
+        return {
+          answer: createAnswerBasic(rows[0]),
+          question: createQuestionObject(rows[0]),
+        };
+      });
+  }
+
   async getTemplates(questionId: string): Promise<Template[]> {
     return database('templates_has_questions')
       .leftJoin(
