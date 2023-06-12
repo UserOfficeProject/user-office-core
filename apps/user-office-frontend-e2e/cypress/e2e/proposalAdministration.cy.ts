@@ -246,10 +246,6 @@ context('Proposal administration tests', () => {
     });
 
     it('Download proposal is working with dialog window showing up', () => {
-      cy.intercept({
-        method: 'GET',
-        url: '/download/pdf/proposal/**',
-      }).as('downloadFile');
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           const createdProposalId = result.createProposal.proposalId;
@@ -272,11 +268,25 @@ context('Proposal administration tests', () => {
             proposalFixedName
           );
 
-          cy.wait('@downloadFile');
+          const token = window.localStorage.getItem('token');
+
+          if (!token) {
+            throw new Error('Token not provided');
+          }
 
           const currentYear = new Date().getFullYear();
           const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
           const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${createdProposalId}.pdf`;
+          const downloadsFolder = Cypress.config('downloadsFolder');
+          const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
+
+          cy.task('downloadFile', {
+            url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${
+              result.createProposal.primaryKey
+            }`,
+            token,
+            filename: downloadPath,
+          });
 
           /** NOTE: This is pdf content comparisson to some extent.
            * If real pdf comparisson is needed then we might need to consider using some external package:
@@ -286,24 +296,21 @@ context('Proposal administration tests', () => {
             const fixtureFileContentByteLength = Buffer.byteLength(fileContent);
             const fixtureFileContentStringLength =
               fileContent.toString().length;
-            // const downloadsFolder = Cypress.config('downloadsFolder');
-            // const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
-            cy.readFile(`./cypress/downloads/${downloadedFileName}`).then(
-              (downloadedFileContent) => {
-                const downloadedFileContentByteLength = Buffer.byteLength(
-                  downloadedFileContent
-                );
-                const downloadedFileContentStringLength =
-                  fileContent.toString().length;
 
-                expect(downloadedFileContentByteLength).equals(
-                  fixtureFileContentByteLength
-                );
-                expect(downloadedFileContentStringLength).equals(
-                  fixtureFileContentStringLength
-                );
-              }
-            );
+            cy.readFile(downloadPath).then((downloadedFileContent) => {
+              const downloadedFileContentByteLength = Buffer.byteLength(
+                downloadedFileContent
+              );
+              const downloadedFileContentStringLength =
+                fileContent.toString().length;
+
+              expect(downloadedFileContentByteLength).equals(
+                fixtureFileContentByteLength
+              );
+              expect(downloadedFileContentStringLength).equals(
+                fixtureFileContentStringLength
+              );
+            });
           });
 
           cy.contains(proposalName1)

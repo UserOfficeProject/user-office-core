@@ -3,6 +3,8 @@ import { createServer, Server } from 'http';
 
 import { defineConfig } from 'cypress';
 
+import { downloadFile } from './cypress/support/downloadFile';
+
 function replaceLastOccurrenceInString(
   string: string,
   find: string,
@@ -40,7 +42,7 @@ module.exports = defineConfig({
   },
   e2e: {
     baseUrl: 'http://localhost:3000',
-    setupNodeEvents(on, config) {
+    setupNodeEvents(on) {
       // `on` is used to hook into various events Cypress emits
       // `config` is the resolved Cypress config
       on('after:screenshot', (details: Cypress.ScreenshotDetails) => {
@@ -84,6 +86,8 @@ module.exports = defineConfig({
           return null;
         },
       });
+
+      on('task', { downloadFile });
     },
   },
 });
