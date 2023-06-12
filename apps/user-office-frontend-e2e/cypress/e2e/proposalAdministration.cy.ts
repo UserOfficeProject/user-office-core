@@ -248,7 +248,7 @@ context('Proposal administration tests', () => {
     it('Download proposal is working with dialog window showing up', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
-          const createdProposalId = result.createProposal.proposalId;
+          const newlyCreatedProposalId = result.createProposal.proposalId;
           cy.updateProposal({
             proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
@@ -276,7 +276,7 @@ context('Proposal administration tests', () => {
 
           const currentYear = new Date().getFullYear();
           const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
-          const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${createdProposalId}.pdf`;
+          const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${newlyCreatedProposalId}.pdf`;
           const downloadsFolder = Cypress.config('downloadsFolder');
           const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
 
