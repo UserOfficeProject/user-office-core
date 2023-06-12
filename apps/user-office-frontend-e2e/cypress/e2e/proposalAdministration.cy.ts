@@ -286,22 +286,24 @@ context('Proposal administration tests', () => {
             const fixtureFileContentByteLength = Buffer.byteLength(fileContent);
             const fixtureFileContentStringLength =
               fileContent.toString().length;
-            const downloadsFolder = Cypress.config('downloadsFolder');
-            const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
-            cy.readFile(downloadPath).then((downloadedFileContent) => {
-              const downloadedFileContentByteLength = Buffer.byteLength(
-                downloadedFileContent
-              );
-              const downloadedFileContentStringLength =
-                fileContent.toString().length;
+            // const downloadsFolder = Cypress.config('downloadsFolder');
+            // const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
+            cy.readFile(`./cypress/downloads/${downloadedFileName}`).then(
+              (downloadedFileContent) => {
+                const downloadedFileContentByteLength = Buffer.byteLength(
+                  downloadedFileContent
+                );
+                const downloadedFileContentStringLength =
+                  fileContent.toString().length;
 
-              expect(downloadedFileContentByteLength).equals(
-                fixtureFileContentByteLength
-              );
-              expect(downloadedFileContentStringLength).equals(
-                fixtureFileContentStringLength
-              );
-            });
+                expect(downloadedFileContentByteLength).equals(
+                  fixtureFileContentByteLength
+                );
+                expect(downloadedFileContentStringLength).equals(
+                  fixtureFileContentStringLength
+                );
+              }
+            );
           });
 
           cy.contains(proposalName1)
