@@ -227,6 +227,17 @@ export class StfcUserAuthorization extends UserAuthorization {
       if (token) {
         this.uowsTokenCache.remove(token);
 
+        const isValidToken = await this.isExternalTokenValid(token);
+
+        if (!isValidToken) {
+          logger.logInfo(
+            'UOWS token found to be invalid, skipping UOWS logout call',
+            { token }
+          );
+
+          return Promise.resolve('User already logged out');
+        }
+
         return await client.logout(token).catch(() => {
           logger.logWarn('Failed to log out user', { token });
 
