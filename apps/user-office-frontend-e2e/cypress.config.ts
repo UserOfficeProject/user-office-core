@@ -3,7 +3,7 @@ import { createServer, Server } from 'http';
 
 import { defineConfig } from 'cypress';
 
-import { downloadFile } from './cypress/support/downloadFile';
+import { downloadFile, readPdf } from './cypress/support/fileUtilTasks';
 
 function replaceLastOccurrenceInString(
   string: string,
@@ -88,6 +88,10 @@ module.exports = defineConfig({
       });
 
       on('task', { downloadFile });
+
+      on('task', {
+        readPdf,
+      });
     },
   },
 });

@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 import fetch from 'cross-fetch';
+import pdf from 'pdf-parse';
 
 export function downloadFile(args: any) {
   return fetch(args.url, {
@@ -26,3 +27,14 @@ export function downloadFile(args: any) {
       return 'downloadFile ' + args.filename + ' downloaded';
     });
 }
+
+export const readPdf = (pathToPdf: string) => {
+  return new Promise((resolve) => {
+    const dataBuffer = fs.readFileSync(pathToPdf);
+    pdf(dataBuffer).then(function ({ text, ...args }) {
+      const textWithRemovedNewLines = text.replace(/(\r\n|\n|\r)/gm, ' ');
+
+      resolve({ ...args, text: textWithRemovedNewLines });
+    });
+  });
+};

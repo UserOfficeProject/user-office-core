@@ -1,12 +1,14 @@
 import { faker } from '@faker-js/faker';
 import { FeatureId } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
+import PdfParse from 'pdf-parse';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Proposal administration tests', () => {
   const proposalName1 = faker.lorem.words(3);
+  const proposalAbstract1 = faker.lorem.paragraph(3);
   const proposalName2 = faker.lorem.words(3);
   const proposalFixedName = '0000. Alphabetically first title';
   const proposalFixedAbstract =
@@ -18,6 +20,8 @@ context('Proposal administration tests', () => {
   const existingUserId = initialDBData.users.user1.id;
   const existingTopicId = 1;
   const existingQuestionaryId = 1;
+  let createdProposalPk: number;
+  let createdProposalId: string;
 
   beforeEach(() => {
     cy.resetDB();
@@ -28,11 +32,13 @@ context('Proposal administration tests', () => {
     beforeEach(() => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId = result.createProposal.proposalId;
           cy.updateProposal({
             proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalName1,
-            abstract: proposalName1,
+            abstract: proposalAbstract1,
           });
           cy.answerTopic({
             answers: [],
@@ -290,6 +296,7 @@ context('Proposal administration tests', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           const newlyCreatedProposalId = result.createProposal.proposalId;
+          const newlyCreatedProposalPk = result.createProposal.primaryKey;
           cy.updateProposal({
             proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
@@ -310,23 +317,20 @@ context('Proposal administration tests', () => {
           const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
 
           cy.task('downloadFile', {
-            url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${
-              result.createProposal.primaryKey
-            }`,
+            url: `${Cypress.config(
+              'baseUrl'
+            )}/download/pdf/proposal/${newlyCreatedProposalPk}`,
             token,
             filename: downloadPath,
           });
 
-          /** NOTE: This is pdf content comparison to some extent. (https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/testing-dom__download/cypress/e2e/local-download-spec.cy.js)
-           * If real pdf comparison is needed then we might need to consider using some external package:
-           * https://filiphric.com/testing-pdf-file-with-cypress or https://glebbahmutov.com/blog/cypress-pdf/
-           */
           cy.fixture(FIXTURE_FILE_PATH, 'binary', { timeout: 15000 }).then(
             (fixtureBuffer) => {
               const fixtureFileContentByteLength = fixtureBuffer.length;
               // for now just check the file size
               cy.readFile(downloadPath, 'binary', { timeout: 15000 }).should(
                 (buffer) => {
+                  // console.log(buffer);
                   // NOTE: If you run the factory locally inside a docker container and directly(as a node app) on your local machine there could be some file size differences.
                   if (buffer.length !== fixtureFileContentByteLength) {
                     throw new Error(
@@ -337,41 +341,41 @@ context('Proposal administration tests', () => {
               );
             }
           );
-          // });
 
-          /** TODO: This can be fixed in the near future and I want to keep the working example here.
-           * If we want to test the multi proposal download properly we need to get the random file name somehow from downloads folder.
-           * Maybe something like this which is more advanced and will need creating a cypress task:
-           * fs.readdirSync('C:/tmp/').filter((allFilesPaths:string) =>
-           * allFilesPaths.match(/\.csv$/) !== null)
-           */
-          // const MULTI_PROPOSAL_FIXTURE_FILE_PATH =
-          //   '2023_multi_proposal_fixture.pdf';
-          // const downloadedMultiProposalFileName =
-          //   'proposals_2023-06-07_101558.pdf';
+          cy.task('readPdf', downloadPath).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
 
-          // cy.fixture(MULTI_PROPOSAL_FIXTURE_FILE_PATH).then((fileContent) => {
-          //   const fixtureFileContentByteLength = Buffer.byteLength(fileContent);
-          //   const fixtureFileContentStringLength =
-          //     fileContent.toString().length;
-          //   const downloadsFolder = Cypress.config('downloadsFolder');
+            expect(text).to.include(newlyCreatedProposalId);
+            expect(text).to.include(proposalFixedName);
+            expect(text).to.include(proposalFixedAbstract);
 
-          //   const downloadPath = `${downloadsFolder}\\${downloadedFileName}`;
-          //   cy.readFile(downloadPath).then((downloadedFileContent) => {
-          //     const downloadedFileContentByteLength = Buffer.byteLength(
-          //       downloadedFileContent
-          //     );
-          //     const downloadedFileContentStringLength =
-          //       fileContent.toString().length;
+            expect(numpages).to.equal(1);
+          });
 
-          //     expect(downloadedFileContentByteLength).equals(
-          //       fixtureFileContentByteLength
-          //     );
-          //     expect(downloadedFileContentStringLength).equals(
-          //       fixtureFileContentStringLength
-          //     );
-          //   });
-          // });
+          // NOTE: We can't test the multi file download file size because the title and abstract are random and it can vary between some numbers. That's why we only test the file content.
+          const downloadedMultiFileName = `${currentYear}_proposals_${createdProposalPk}_${newlyCreatedProposalPk}.pdf`;
+          const multiFileDownloadPath = `${downloadsFolder}/${downloadedMultiFileName}`;
+
+          cy.task('downloadFile', {
+            url: `${Cypress.config(
+              'baseUrl'
+            )}/download/pdf/proposal/${createdProposalPk},${newlyCreatedProposalPk}`,
+            token,
+            filename: multiFileDownloadPath,
+          });
+
+          cy.task('readPdf', multiFileDownloadPath).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(createdProposalId);
+            expect(text).to.include(proposalName1);
+            expect(text).to.include(proposalAbstract1);
+            expect(text).to.include(newlyCreatedProposalId);
+            expect(text).to.include(proposalFixedName);
+            expect(text).to.include(proposalFixedAbstract);
+
+            expect(numpages).to.equal(2);
+          });
         }
       });
     });
