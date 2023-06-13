@@ -16,7 +16,6 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
-import { eventBus } from '../events';
 import { Event } from '../events/event.enum';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
 import { ProposalPks } from '../models/Proposal';
@@ -126,11 +125,20 @@ export default class InstrumentMutations {
     );
   }
 
+  @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
   async assignProposalsToInstrumentAfterEffect(
-    proposalPks: ProposalPks,
-    instrument: Instrument
+    agent: UserWithRole | null,
+    args: AssignProposalsToInstrumentArgs
   ) {
-    for await (const proposalPk of proposalPks.proposalPks) {
+    const instrument = await this.dataSource.getInstrument(args.instrumentId);
+
+    if (!instrument) {
+      return rejection('Instrument Not found', { agent, args });
+    }
+
+    const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
+
+    for await (const proposalPk of proposalPks) {
       const technicalReview = await this.reviewDataSource.getTechnicalReview(
         proposalPk
       );
@@ -160,14 +168,6 @@ export default class InstrumentMutations {
         });
       }
     }
-
-    eventBus.publish({
-      type: Event.PROPOSAL_INSTRUMENT_SELECTED,
-      loggedInUserId: 0,
-      proposalpks: proposalPks,
-      key: 'proposalpks',
-      isRejection: false,
-    });
   }
 
   @ValidateArgs(assignProposalsToInstrumentValidationSchema)
@@ -209,7 +209,7 @@ export default class InstrumentMutations {
       });
     }
 
-    this.assignProposalsToInstrumentAfterEffect(result, instrument);
+    this.assignProposalsToInstrumentAfterEffect(agent, args);
 
     return result;
   }
