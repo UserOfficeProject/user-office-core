@@ -71,11 +71,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function QuestionaryFilter({
-  templateId,
-  onSubmit,
-  callId,
-}: QuestionaryFilterProps) {
+function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
   const { loading: isLoadingQuestionarySteps, questionarySteps } =
     useBlankQuestionaryStepsDataByCallId(callId);
   const classes = useStyles();

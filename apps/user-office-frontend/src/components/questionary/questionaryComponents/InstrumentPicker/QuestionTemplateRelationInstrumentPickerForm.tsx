@@ -20,7 +20,7 @@ export const QuestionTemplateRelationInstrumentPickerForm = (
         }),
       })}
     >
-      {(formikProps) => (
+      {() => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
           <QuestionInstrumentPickerFormCommon />
