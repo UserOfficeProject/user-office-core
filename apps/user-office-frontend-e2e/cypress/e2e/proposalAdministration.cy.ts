@@ -327,6 +327,7 @@ context('Proposal administration tests', () => {
               // for now just check the file size
               cy.readFile(downloadPath, 'binary', { timeout: 15000 }).should(
                 (buffer) => {
+                  // NOTE: If you run the factory locally inside a docker container and directly(as a node app) on your local machine there could be some file size differences.
                   if (buffer.length !== fixtureFileContentByteLength) {
                     throw new Error(
                       `File size ${buffer.length} is not ${fixtureFileContentByteLength}`
