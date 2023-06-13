@@ -7,6 +7,7 @@ import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { DataType } from '../../models/Template';
+import InstrumentMutations from '../../mutations/InstrumentMutations';
 
 export default function createHandler() {
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
@@ -20,6 +21,8 @@ export default function createHandler() {
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
+
+  const instrumentMutations = container.resolve(InstrumentMutations);
 
   return async function proposalWorkflowHandler(event: ApplicationEvent) {
     if (event.isRejection) {
@@ -57,9 +60,14 @@ export default function createHandler() {
             `Proposal with questionary id ${questionaryId} not found`
           );
 
-        await instrumentDataSource.assignProposalsToInstrument(
+        const result = await instrumentDataSource.assignProposalsToInstrument(
           [proposal.primaryKey],
           instrumentId
+        );
+
+        await instrumentMutations.assignProposalsToInstrumentAfterEffect(
+          result,
+          instrument
         );
       }
     }
