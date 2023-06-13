@@ -238,11 +238,22 @@ export class StfcUserAuthorization extends UserAuthorization {
           return Promise.resolve('User already logged out');
         }
 
-        return await client.logout(token).catch(() => {
-          logger.logWarn('Failed to log out user', { token });
+        return await client
+          .logout(token)
+          .catch((ex: string): Rejection | string => {
+            if (ex === 'The token given is invalid') {
+              logger.logInfo(
+                'Logout failed because the cached token has since expired',
+                { token }
+              );
 
-          return rejection('Failed to log out user', { token });
-        });
+              return 'User already logged out';
+            }
+
+            logger.logWarn('Failed to log out user', { token });
+
+            return rejection('Failed to log out user', { token });
+          });
       } else {
         return rejection('No external token found in JWT', { token });
       }
