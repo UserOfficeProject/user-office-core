@@ -210,6 +210,7 @@ export interface QuestionTemplateRelRecord {
   readonly topic_id: number;
   readonly sort_order: number;
   readonly dependencies_operator?: DependenciesLogicOperator;
+  readonly config: string;
 }
 
 export interface TemplateRecord {
