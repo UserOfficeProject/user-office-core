@@ -317,30 +317,26 @@ context('Proposal administration tests', () => {
             filename: downloadPath,
           });
 
-          /** NOTE: This is pdf content comparison to some extent.
+          /** NOTE: This is pdf content comparison to some extent. (https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/testing-dom__download/cypress/e2e/local-download-spec.cy.js)
            * If real pdf comparison is needed then we might need to consider using some external package:
            * https://filiphric.com/testing-pdf-file-with-cypress or https://glebbahmutov.com/blog/cypress-pdf/
            */
-          cy.fixture(FIXTURE_FILE_PATH).then((fileContent) => {
-            const fixtureFileContentByteLength = Buffer.byteLength(fileContent);
-            const fixtureFileContentStringLength =
-              fileContent.toString().length;
-
-            cy.readFile(downloadPath).then((downloadedFileContent) => {
-              const downloadedFileContentByteLength = Buffer.byteLength(
-                downloadedFileContent
+          cy.fixture(FIXTURE_FILE_PATH, 'binary', { timeout: 15000 }).then(
+            (fixtureBuffer) => {
+              const fixtureFileContentByteLength = fixtureBuffer.length;
+              // for now just check the file size
+              cy.readFile(downloadPath, 'binary', { timeout: 15000 }).should(
+                (buffer) => {
+                  if (buffer.length !== fixtureFileContentByteLength) {
+                    throw new Error(
+                      `File size ${buffer.length} is not ${fixtureFileContentByteLength}`
+                    );
+                  }
+                }
               );
-              const downloadedFileContentStringLength =
-                fileContent.toString().length;
-
-              expect(downloadedFileContentByteLength).equals(
-                fixtureFileContentByteLength
-              );
-              expect(downloadedFileContentStringLength).equals(
-                fixtureFileContentStringLength
-              );
-            });
-          });
+            }
+          );
+          // });
 
           /** TODO: This can be fixed in the near future and I want to keep the working example here.
            * If we want to test the multi proposal download properly we need to get the random file name somehow from downloads folder.
