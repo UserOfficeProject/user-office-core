@@ -815,7 +815,7 @@ export const createQuestionTemplateRelationObject = async <T extends DataType>(
       dependency_natural_key: string;
     },
   dependencies: FieldDependency[],
-  helpers: QuestionDataTypeHelpersMapping<T>,
+  helpers?: QuestionDataTypeHelpersMapping<T>,
   callId?: number
 ) => {
   // The default config data doesn't contain all the data for all the Components. For Components like InstrumentPicker and DynamicMultipleChoice, the config data is being overwritten in the run time.

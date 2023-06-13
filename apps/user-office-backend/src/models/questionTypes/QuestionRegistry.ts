@@ -149,7 +149,7 @@ export interface Question<T extends DataType> {
    */
   readonly transformConfig?: (
     config: QuestionDataTypeConfigMapping<T>,
-    helpers: QuestionDataTypeHelpersMapping<T>,
+    helpers?: QuestionDataTypeHelpersMapping<T>,
     callId?: number
   ) => Promise<QuestionDataTypeConfigMapping<T>>;
 }
@@ -229,7 +229,7 @@ export function getDefaultAnswerValue(
 export async function getTransformedConfigData<T extends DataType>(
   dataType: T,
   config: QuestionDataTypeConfigMapping<T>,
-  helpers: QuestionDataTypeHelpersMapping<T>,
+  helpers?: QuestionDataTypeHelpersMapping<T>,
   callId?: number
 ) {
   const definition = getQuestionDefinition(dataType);

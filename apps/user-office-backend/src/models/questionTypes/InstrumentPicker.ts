@@ -46,6 +46,8 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       const fallBackConfig = { ...config, instruments: [] };
       try {
         if (!callId) throw 'Call ID not available. ';
+        if (!helpers) throw 'Helpers not available. ';
+
         const instruments = await helpers.fetchCallInstruments(callId);
 
         return {
