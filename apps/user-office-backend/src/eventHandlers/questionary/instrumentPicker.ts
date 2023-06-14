@@ -31,54 +31,52 @@ export default function createHandler() {
     }
 
     switch (event.type) {
-      case Event.TOPIC_ANSWERED: {
-        const {
-          questionarystep: { questionaryId },
-        } = event;
+      case Event.TOPIC_ANSWERED:
+        {
+          const {
+            questionarystep: { questionaryId },
+          } = event;
 
-        const instrumentPickerAnswer =
-          await questionaryDataSource.getLatestAnswerByQuestionaryIdAndDataType(
-            questionaryId,
-            DataType.INSTRUMENT_PICKER
+          const instrumentPickerAnswer =
+            await questionaryDataSource.getLatestAnswerByQuestionaryIdAndDataType(
+              questionaryId,
+              DataType.INSTRUMENT_PICKER
+            );
+
+          if (!instrumentPickerAnswer) break;
+          const instrumentId = instrumentPickerAnswer?.answer.answer.value;
+          if (!instrumentId)
+            throw new Error(`Invalid Instrument id ${instrumentId}`);
+
+          const instrument = await instrumentDataSource.getInstrument(
+            instrumentId
           );
-
-        const instrumentId = instrumentPickerAnswer?.answer.answer.value;
-        if (!instrumentId)
-          throw new Error(`Invalid Instrument id ${instrumentId}`);
-
-        const instrument = await instrumentDataSource.getInstrument(
-          instrumentId
-        );
-
-        if (!instrument)
-          throw new Error(`Instrument with id ${instrumentId} not found`);
-
-        const proposal = await proposalDataSource.getByQuestionaryid(
-          questionaryId
-        );
-        if (!proposal)
-          throw new Error(
-            `Proposal with questionary id ${questionaryId} not found`
+          if (!instrument)
+            throw new Error(`Instrument with id ${instrumentId} not found`);
+          const proposal = await proposalDataSource.getByQuestionaryid(
+            questionaryId
           );
+          if (!proposal)
+            throw new Error(
+              `Proposal with questionary id ${questionaryId} not found`
+            );
+          await instrumentMutations.assignProposalsToInstrumentHelper(
+            { id: 0 } as UserWithRole,
+            {
+              proposals: [
+                {
+                  primaryKey: proposal.primaryKey,
+                  callId: proposal.callId,
+                },
+              ],
+              instrumentId,
+            }
+          );
+        }
 
-        await instrumentDataSource.assignProposalsToInstrument(
-          [proposal.primaryKey],
-          instrumentId
-        );
-
-        await instrumentMutations.assignProposalsToInstrumentAfterEffect(
-          {} as UserWithRole,
-          {
-            proposals: [
-              {
-                primaryKey: proposal.primaryKey,
-                callId: proposal.callId,
-              },
-            ],
-            instrumentId,
-          }
-        );
-      }
+        break;
+      default:
+        break;
     }
   };
 }

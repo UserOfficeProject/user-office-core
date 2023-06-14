@@ -45,7 +45,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
     transformConfig: async (config, helpers, callId) => {
       const fallBackConfig = { ...config, instruments: [] };
       try {
-        if (!callId) throw 'Call ID not available. ';
+        if (!callId) return fallBackConfig;
         if (!helpers) throw 'Helpers not available. ';
 
         const instruments = await helpers.fetchCallInstruments(callId);

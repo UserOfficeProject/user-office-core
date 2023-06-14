@@ -126,23 +126,36 @@ export default class InstrumentMutations {
   }
 
   @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
-  async assignProposalsToInstrumentAfterEffect(
+  async assignProposalsToInstrumentHelper(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
   ) {
     const instrument = await this.dataSource.getInstrument(args.instrumentId);
 
     if (!instrument) {
-      return rejection('Instrument Not found', { agent, args });
+      return rejection(
+        'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
+        { agent, args }
+      );
     }
 
     const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
 
+    const result = await this.dataSource.assignProposalsToInstrument(
+      proposalPks,
+      args.instrumentId
+    );
+
+    if (result.proposalPks.length !== proposalPks.length) {
+      return rejection('Could not assign proposal/s to instrument', {
+        agent,
+        args,
+      });
+    }
     for await (const proposalPk of proposalPks) {
       const technicalReview = await this.reviewDataSource.getTechnicalReview(
         proposalPk
       );
-
       if (technicalReview) {
         await this.proposalDataSource.updateProposalTechnicalReviewer({
           userId: instrument.managerUserId,
@@ -168,6 +181,8 @@ export default class InstrumentMutations {
         });
       }
     }
+
+    return result;
   }
 
   @ValidateArgs(assignProposalsToInstrumentValidationSchema)
@@ -186,32 +201,7 @@ export default class InstrumentMutations {
       );
     }
 
-    const instrument = await this.dataSource.getInstrument(args.instrumentId);
-
-    if (!instrument) {
-      return rejection(
-        'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
-        { agent, args }
-      );
-    }
-
-    const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
-
-    const result = await this.dataSource.assignProposalsToInstrument(
-      proposalPks,
-      args.instrumentId
-    );
-
-    if (result.proposalPks.length !== proposalPks.length) {
-      return rejection('Could not assign proposal/s to instrument', {
-        agent,
-        args,
-      });
-    }
-
-    this.assignProposalsToInstrumentAfterEffect(agent, args);
-
-    return result;
+    return this.assignProposalsToInstrumentHelper(agent, args);
   }
 
   @Authorized([Roles.USER_OFFICER])
