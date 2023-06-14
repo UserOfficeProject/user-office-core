@@ -401,7 +401,9 @@ export default class PostgresQuestionaryDataSource
   ): Promise<QuestionaryStep[]> {
     if (!callId && questionaryId > 0) {
       const proposal = await this.getProposalByQuestionaryId(questionaryId);
-      callId = proposal.callId;
+      if (proposal) {
+        callId = proposal.callId;
+      }
     }
 
     const topicRecords: (TopicRecord & {
@@ -600,13 +602,15 @@ export default class PostgresQuestionaryDataSource
 
   private async getProposalByQuestionaryId(
     questionaryId: number
-  ): Promise<Proposal> {
+  ): Promise<Proposal | null> {
     return database('proposals')
       .select('*')
       .where({ questionary_id: questionaryId })
       .first()
       .then((proposal: ProposalRecord) => {
-        return createProposalObject(proposal);
+        if (proposal) return createProposalObject(proposal);
+
+        return null;
       });
   }
 }
