@@ -19,6 +19,7 @@ interface UserContextData {
   handleLogin: React.Dispatch<string | null | undefined>;
   handleNewToken: React.Dispatch<string | null | undefined>;
   handleLogout: () => Promise<void>;
+  handleSessionExpired: () => Promise<void>;
   handleRole: React.Dispatch<string | null | undefined>;
 }
 
@@ -61,6 +62,9 @@ const initUserData: UserContextData = {
   handleLogin: (value) => value,
   handleNewToken: (value) => value,
   handleLogout: async () => {
+    return;
+  },
+  handleSessionExpired: async () => {
     return;
   },
   handleRole: (value) => value,
@@ -198,6 +202,19 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
     }
   }
 
+  async function userSessionExpiredHandler() {
+    const loginUrl = settingsContext.settingsMap.get(
+      SettingsId.EXTERNAL_AUTH_LOGIN_URL
+    )?.settingsValue;
+    clearSession();
+    if (loginUrl) {
+      window.location.assign(loginUrl);
+    } else {
+      // if there is no logout url, just clear the user context
+      dispatch({ type: ActionType.LOGOFFUSER, payload: null });
+    }
+  }
+
   return (
     <UserContext.Provider
       value={{
@@ -205,6 +222,7 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
         handleLogin: (data): void =>
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
         handleLogout: userLogoutHandler,
+        handleSessionExpired: userSessionExpiredHandler,
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(
