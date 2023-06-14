@@ -33,8 +33,8 @@
   "scripts": {
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --quiet --fix",
-    "cy:open": "cypress open --config defaultCommandTimeout=15000 --e2e",
-    "cy:run": "cypress run --config defaultCommandTimeout=15000 --e2e",
-    "cy:run:action": "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --e2e --config defaultCommandTimeout=15000"
+    "cy:open": "cypress open --e2e",
+    "cy:run": "cypress run --e2e",
+    "cy:run:action": "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --e2e"
   }
 }

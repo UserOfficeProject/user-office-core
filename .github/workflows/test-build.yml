@@ -303,7 +303,7 @@ jobs:
       - name: Download required repositories
         run: |
           cd "$GITHUB_WORKSPACE/.."
-          git clone --depth 1 --branch "upgrade-puppeteer-to-latest" https://github.com/UserOfficeProject/user-office-factory.git
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
 
       - name: Run e2e tests stfc
         env:
@@ -324,7 +324,7 @@ jobs:
           SPARKPOST_TOKEN: dummytoken
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
           USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
-          USER_OFFICE_FACTORY_TAG: upgrade-puppeteer-to-latest
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           SCHEMA_URL: http://localhost:4000/graphql
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
@@ -368,7 +368,7 @@ jobs:
           SPARKPOST_TOKEN: dummytoken
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
           USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
-          USER_OFFICE_FACTORY_TAG: upgrade-puppeteer-to-latest
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           SCHEMA_URL: http://localhost:4000/graphql
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
