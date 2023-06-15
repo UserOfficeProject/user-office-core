@@ -1,5 +1,3 @@
-import path from 'path';
-
 import { faker } from '@faker-js/faker';
 import {
   DataType,
@@ -1349,7 +1347,7 @@ context('Template tests', () => {
         const downloadsFolder = Cypress.config('downloadsFolder');
 
         cy.readFile(
-          path.join(downloadsFolder, `${initialDBData.template.name}.json`)
+          `${downloadsFolder}/${initialDBData.template.name}.json`
         ).then((actualExport) => {
           // remove date from the export, because it is not deterministic
           delete expectedExport.metadata.exportDate;
