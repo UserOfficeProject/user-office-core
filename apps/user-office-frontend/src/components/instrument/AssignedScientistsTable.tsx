@@ -1,7 +1,9 @@
 import MaterialTable from '@material-table/core';
 import makeStyles from '@mui/styles/makeStyles';
+import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
 import { Instrument, BasicUserDetails, UserRole } from 'generated/sdk';
@@ -50,6 +52,8 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
 }) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
+
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const removeAssignedScientist = async (scientistId: number) => {
@@ -71,7 +75,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={'Assigned instruments'}
+        title={`Assigned ${i18n.format(t('instrument'), 'plural')}`}
         data={instrument.scientists}
         editable={
           isUserOfficer

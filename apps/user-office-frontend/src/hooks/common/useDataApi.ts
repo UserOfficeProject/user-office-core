@@ -211,7 +211,8 @@ export function useDataApi() {
     FeatureId.STFC_IDLE_TIMER
   )?.isEnabled;
 
-  const { token, handleNewToken, handleLogout } = useContext(UserContext);
+  const { token, handleNewToken, handleSessionExpired } =
+    useContext(UserContext);
   const { handleUserActive, isIdle } = useContext(IdleContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -224,7 +225,7 @@ export function useDataApi() {
               token,
               enqueueSnackbar,
               () => {
-                handleLogout();
+                handleSessionExpired();
               },
               handleUserActive,
               isIdle,
@@ -242,7 +243,7 @@ export function useDataApi() {
       isIdleContextEnabled,
       handleNewToken,
       externalAuthLoginUrl,
-      handleLogout,
+      handleSessionExpired,
     ]
   );
 }

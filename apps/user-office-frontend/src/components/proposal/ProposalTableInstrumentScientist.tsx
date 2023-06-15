@@ -6,7 +6,9 @@ import Visibility from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
+import { TFunction } from 'i18next';
 import React, { useContext, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   NumberParam,
   StringParam,
@@ -66,11 +68,33 @@ let columns: Column<ProposalViewData>[] = [
     removable: false,
     field: 'rowActionButtons',
   },
-  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Proposal ID',
+    field: 'proposalId',
+  },
   {
     title: 'Title',
     field: 'title',
     ...{ width: 'auto' },
+  },
+  {
+    render: (proposalView) => {
+      if (
+        proposalView.principalInvestigator?.lastname &&
+        proposalView.principalInvestigator?.firstname
+      ) {
+        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
+      }
+
+      return '';
+    },
+    title: 'Principal Investigator',
+    emptyValue: '-',
+  },
+  {
+    title: 'PI Email',
+    field: 'principalInvestigator.email',
+    emptyValue: '-',
   },
   {
     title: 'Submitted',
@@ -104,9 +128,9 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
   },
 ];
 
-const instrumentManagementColumns = [
-  { title: 'Instrument', field: 'instrumentName', emptyValue: '-' },
-];
+const instrumentManagementColumns = (
+  t: TFunction<'translation', undefined, 'translation'>
+) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
 const SEPReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
@@ -125,6 +149,7 @@ const ProposalTableInstrumentScientist: React.FC<{
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
   const { settingsMap } = useContext(SettingsContext);
+  const { t } = useTranslation();
   const statusFilterValue =
     settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)?.settingsValue ||
     2;
@@ -411,9 +436,9 @@ const ProposalTableInstrumentScientist: React.FC<{
   }
 
   if (isInstrumentManagementEnabled) {
-    addColumns(columns, instrumentManagementColumns);
+    addColumns(columns, instrumentManagementColumns(t));
   } else {
-    removeColumns(columns, instrumentManagementColumns);
+    removeColumns(columns, instrumentManagementColumns(t));
   }
 
   if (isSEPEnabled) {

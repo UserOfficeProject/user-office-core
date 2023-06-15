@@ -176,6 +176,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       '',
       1,
+      1,
       '',
       '',
       'shortCode',

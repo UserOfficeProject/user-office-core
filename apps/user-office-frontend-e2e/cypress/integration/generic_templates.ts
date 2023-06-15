@@ -21,6 +21,7 @@ context('GenericTemplates tests', () => {
   const proposalTitle = twoFakes(3);
   const addButtonLabel = twoFakes(2);
   const copyButtonLabel = faker.lorem.words(3);
+  const deleteButtonLabel = faker.lorem.words(3);
   const genericTemplateTitle = faker.lorem.words(3);
   const genericTemplateQuestionaryQuestion = twoFakes(3);
   const genericTemplateTitleAnswers = [
@@ -865,6 +866,708 @@ context('GenericTemplates tests', () => {
 
       cy.contains(genericTemplateTitleAnswers[2]);
       cy.contains(genericTemplateTitleAnswers[3]);
+    });
+  });
+
+  describe('Reverting generic template changes tests', () => {
+    beforeEach(() => {
+      createTemplateAndAllQuestions();
+
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
+        } else {
+          throw new Error('Workflow creation failed');
+        }
+      });
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...updatedCall,
+        templateId: createdTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+    });
+
+    it('User should be able to revert deleting a template', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="delete"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        1
+      );
+    });
+
+    it('User should be able to revert deleting multiple templates', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      let longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.get('[data-cy="delete"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="delete"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        2
+      );
+    });
+
+    it('User should be able to revert cloning a template', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="clone"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        1
+      );
+    });
+
+    it('User should be able to revert cloning multiple templates', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="clone"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.get('[data-cy="clone"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 3);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        1
+      );
+    });
+
+    it('User should be able to revert adding a template', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
+    });
+
+    it('User should be able to revert adding multiple templates', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      let longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
+    });
+
+    it('User should be able to revert deleting, cloning and adding templates', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="clone"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="delete"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
+    });
+
+    it('Reverted changes should not be restored after saving', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      const longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get('[data-cy="clone"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+      cy.contains('Save').click();
+
+      cy.get('[data-cy="delete"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save').click();
+
+      cy.get('[data-cy="delete"]').eq(0).click();
+
+      cy.contains('OK').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
+
+      cy.contains('Reset').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+        'have.length',
+        1
+      );
+    });
+
+    it('State is updated after user edits a template', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      let longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.contains('Save').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').first().click();
+
+      cy.finishedLoading();
+
+      longTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(longTitle)
+        .should('have.value', longTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.get(`[aria-label="${longTitle}"]`);
+    });
+
+    it('State is unchanged after user closes edit template prompt', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New proposal', { matchCase: false }).click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains(addButtonLabel[0]).click();
+
+      cy.contains(genericTemplateQuestions[0]);
+
+      cy.get('[data-cy=title-input] textarea').first().clear();
+
+      const firstLongTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(firstLongTitle)
+        .should('have.value', firstLongTitle)
+        .blur();
+
+      cy.get(
+        '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+      cy.get(`[aria-label="${firstLongTitle}"]`);
+
+      cy.contains('Save').click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').first().click();
+
+      cy.finishedLoading();
+
+      const secondLongTitle = faker.lorem.paragraph(5);
+
+      cy.get('[data-cy=title-input] textarea')
+        .first()
+        .clear()
+        .type(secondLongTitle)
+        .should('have.value', secondLongTitle)
+        .blur();
+
+      cy.get('body').click(0, 0);
+
+      cy.finishedLoading();
+
+      cy.get(`[aria-label="${firstLongTitle}"]`);
     });
   });
 });

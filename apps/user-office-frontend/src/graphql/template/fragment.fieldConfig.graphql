@@ -131,6 +131,9 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     url
+    options
+    jsonPath
+    externalApiCall
     isMultipleSelect
     variant
   }

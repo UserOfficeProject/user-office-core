@@ -14,7 +14,6 @@ import React, { useEffect, useState } from 'react';
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { DynamicMultipleChoiceConfig } from 'generated/sdk';
-import { useExternalApi } from 'hooks/common/useExternalApi';
 
 const toArray = (input: string | string[]): string[] => {
   if (typeof input === 'string') {
@@ -48,10 +47,11 @@ export function QuestionaryComponentDynamicMultipleChoice(
   } = answer;
 
   const config = answer.config as DynamicMultipleChoiceConfig;
+
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
-  const { content } = useExternalApi(config.url);
-  const [stateValue, setStateValue] = useState<Array<string>>(content);
+
+  const [stateValue, setStateValue] = useState<Array<string>>(config.options);
 
   useEffect(() => {
     setStateValue(answer.value);
@@ -62,6 +62,8 @@ export function QuestionaryComponentDynamicMultipleChoice(
 
     onComplete(newValue);
   };
+
+  const hasNoContent = 'No available answer found';
 
   const label = (
     <>
@@ -111,7 +113,7 @@ export function QuestionaryComponentDynamicMultipleChoice(
             }}
             data-natural-key={naturalKey}
           >
-            {content.map((option) => {
+            {config.options.map((option) => {
               return (
                 <SelectMenuItem
                   value={option}
@@ -123,6 +125,9 @@ export function QuestionaryComponentDynamicMultipleChoice(
               );
             })}
           </Select>
+          {config.options.length < 1 && (
+            <FormHelperText>{hasNoContent}</FormHelperText>
+          )}
           {isError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );
@@ -137,12 +142,12 @@ export function QuestionaryComponentDynamicMultipleChoice(
             value={stateValue[0] || ''}
             onChange={handleOnChange}
             className={
-              content.length < 3
+              config.options.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
             }
           >
-            {content.map((option) => {
+            {config.options.map((option) => {
               return (
                 <FormControlLabel
                   value={option}
@@ -153,6 +158,9 @@ export function QuestionaryComponentDynamicMultipleChoice(
               );
             })}
           </RadioGroup>
+          {config.options.length < 1 && (
+            <FormHelperText>{hasNoContent}</FormHelperText>
+          )}
           {isError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );

@@ -40,6 +40,13 @@ query getProposalsCore(
       callId
       submitted
       allocationTimeUnit
+      principalInvestigator {
+        firstname
+        lastname
+        preferredname
+        organisation
+        email
+      }
     }
     totalCount
   }

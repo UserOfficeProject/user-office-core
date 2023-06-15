@@ -158,7 +158,26 @@ export default function QuestionaryStepView(props: {
     };
   }, [initialValues, lastSavedFormValues, state.isDirty, dispatch]);
 
+  const actionsTemplateChanges = () => {
+    const promises = [];
+
+    for (let i = 0; i < state.deletedTemplates.length; i++) {
+      promises.push(
+        api().deleteGenericTemplate({
+          genericTemplateId: state.deletedTemplates[i],
+        })
+      );
+    }
+
+    Promise.all(promises).then(() => {
+      dispatch({ type: 'CLEAR_DELETE_LIST' });
+      dispatch({ type: 'CLEAR_CREATED_LIST' });
+    });
+  };
+
   const performSave = async (isPartialSave: boolean): Promise<boolean> => {
+    actionsTemplateChanges();
+
     const questionaryId =
       (
         await Promise.all(
@@ -197,9 +216,35 @@ export default function QuestionaryStepView(props: {
     return true;
   };
 
+  const revertTemplateChanges = () => {
+    const promises = [];
+
+    for (let i = 0; i < state.createdTemplates.length; i++) {
+      promises.push(
+        api().deleteGenericTemplate({
+          genericTemplateId: state.createdTemplates[i],
+        })
+      );
+    }
+    Promise.all(promises).then(() => {
+      dispatch({ type: 'CLEAR_CREATED_LIST' });
+      dispatch({ type: 'CLEAR_DELETE_LIST' });
+      dispatch({ type: 'RESET_CLICKED' });
+    });
+  };
+
   const backHandler = () => dispatch({ type: 'BACK_CLICKED' });
 
-  const resetHandler = () => dispatch({ type: 'RESET_CLICKED' });
+  const confirmNavigation = () =>
+    window.confirm(
+      'You have made changes in this step, which will be discarded. Are you sure?'
+    );
+
+  const resetHandler = () => {
+    if (confirmNavigation()) {
+      revertTemplateChanges();
+    }
+  };
 
   const saveHandler = () => performSave(true);
 
@@ -260,10 +305,7 @@ export default function QuestionaryStepView(props: {
               >
                 Back
               </NavigButton>
-              <NavigButton
-                onClick={resetHandler}
-                disabled={state.isDirty === false}
-              >
+              <NavigButton onClick={resetHandler} disabled={!state.isDirty}>
                 Reset
               </NavigButton>
               {!questionaryStep.isCompleted && (
