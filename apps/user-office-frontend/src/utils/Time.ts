@@ -53,7 +53,9 @@ function getFormattedDate(
 }
 
 // --- Main function
-export function timeAgo(dateParam: Date | Scalars['DateTime'] | null): string {
+export function timeAgo(
+  dateParam: Date | Scalars['DateTime']['input'] | null
+): string {
   if (!dateParam) {
     return 'unknown';
   }
