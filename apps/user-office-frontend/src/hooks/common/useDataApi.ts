@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLClient } from 'graphql-request';
-import {
-  ClientError,
-  RequestOptions,
-  Variables,
-} from 'graphql-request/dist/types';
+import { ClientError, RequestOptions, Variables } from 'graphql-request';
+import { VariablesAndRequestHeadersArgs } from 'graphql-request/build/esm/types';
 import jwtDecode from 'jwt-decode';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
@@ -14,7 +11,7 @@ import { IdleContext } from 'context/IdleContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, getSdk, SettingsId } from 'generated/sdk';
-import { RequestQuery, VariablesAndRequestHeaders } from 'utils/utilTypes';
+import { RequestQuery } from 'utils/utilTypes';
 
 const endpoint = '/graphql';
 
@@ -51,11 +48,11 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
 
   async request<T = unknown, V extends Variables = Variables>(
     query: RequestQuery<T, V> | RequestOptions<V, T>,
-    ...variablesAndRequestHeaders: VariablesAndRequestHeaders<V>
+    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
   ): Promise<T> {
     return super
       .request<T, V>(query as RequestQuery<T, V>, ...variablesAndRequestHeaders)
-      .catch((error: ClientError) => {
+      .catch((error) => {
         // if the `notificationWithClientLog` fails
         // and it fails while reporting an error, it can
         // easily cause an infinite loop
@@ -111,7 +108,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
 
   async request<T = unknown, V extends Variables = Variables>(
     query: RequestQuery<T, V> | RequestOptions<V, T>,
-    ...variablesAndRequestHeaders: VariablesAndRequestHeaders<V>
+    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
   ): Promise<T> {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
@@ -139,7 +136,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
 
     return super
       .request<T, V>(query as RequestQuery<T, V>, ...variablesAndRequestHeaders)
-      .catch((error: ClientError) => {
+      .catch((error) => {
         if (!error || !error.response) {
           notifyAndLog(
             this.enqueueSnackbar,

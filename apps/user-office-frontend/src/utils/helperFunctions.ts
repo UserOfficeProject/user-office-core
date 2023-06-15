@@ -128,8 +128,8 @@ export const removeColumns = <T extends object>(
 };
 
 export const isCallEnded = (
-  startDate: Scalars['DateTime'],
-  endDate: Scalars['DateTime']
+  startDate: Scalars['DateTime']['input'],
+  endDate: Scalars['DateTime']['input']
 ) => {
   if (!startDate || !endDate) {
     return true;

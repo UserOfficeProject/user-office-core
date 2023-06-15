@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { createServer, Server } from 'http';
 
+import webpackPreprocessor from '@cypress/webpack-preprocessor';
 import { defineConfig } from 'cypress';
 
 import { downloadFile, readPdf } from './cypress/support/fileUtilTasks';
@@ -27,6 +28,13 @@ function replaceInvalidFileNameCharacters(filename: string) {
 }
 
 let server: Server;
+
+const preProcessorOptions = {
+  // send in the options from your webpack.config.js, so it works the same
+  // as your app's code
+  webpackOptions: require('./webpack.config'),
+  watchOptions: {},
+};
 
 module.exports = defineConfig({
   video: false,
@@ -66,6 +74,9 @@ module.exports = defineConfig({
           });
         });
       });
+
+      // NOTE: This is needed for newest version of graphql-request to work in the e2e tests because it is commonjs module from version 5.2.0.
+      on('file:preprocessor', webpackPreprocessor(preProcessorOptions));
 
       on('task', {
         mockServer({ interceptUrl, fixture }) {
