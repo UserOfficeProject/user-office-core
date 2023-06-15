@@ -14,6 +14,8 @@
 import fs from 'fs';
 import { createServer, Server } from 'http';
 
+import webpackPreprocessor from '@cypress/webpack-preprocessor';
+
 function replaceLastOccurrenceInString(
   string: string,
   find: string,
@@ -38,6 +40,15 @@ function replaceInvalidFileNameCharacters(filename: string) {
 let server: Server;
 
 module.exports = (on: Cypress.PluginEvents) => {
+  const options = {
+    // send in the options from your webpack.config.js, so it works the same
+    // as your app's code
+    webpackOptions: require('../../webpack.config'),
+    watchOptions: {},
+  };
+
+  // NOTE: This is needed for newest version of graphql-request to work in the e2e tests because it is commonjs module from version 5.2.0.
+  on('file:preprocessor', webpackPreprocessor(options));
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
   on('after:screenshot', (details: Cypress.ScreenshotDetails) => {
