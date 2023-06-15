@@ -1,5 +1,3 @@
-import path from 'path';
-
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 
@@ -143,7 +141,7 @@ context('Units tests', () => {
       cy.fixture(fileName).then((expectedExport) => {
         const downloadsFolder = Cypress.config('downloadsFolder');
 
-        cy.readFile(path.join(downloadsFolder, downloadFileName)).then(
+        cy.readFile(`${downloadsFolder}/${downloadFileName}`).then(
           (actualExport) => {
             // remove date from the export, because it is not deterministic
             delete expectedExport.exportDate;
