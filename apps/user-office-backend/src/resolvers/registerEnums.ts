@@ -11,23 +11,23 @@ import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
-import { ReviewerFilter, ReviewStatus } from '../models/Review';
+import { ReviewStatus, ReviewerFilter } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { SettingsId } from '../models/Settings';
 import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
+  ComparisonStatus,
   ConflictResolutionStrategy,
   DataType,
-  ComparisonStatus,
   TemplateCategoryId,
   TemplateGroupId,
 } from '../models/Template';
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { TrainingStatus } from '../models/VisitRegistration';
-import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { EsdEvaluation } from './../models/EsdEvaluation';
+import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
   EquipmentAssignmentStatus,
