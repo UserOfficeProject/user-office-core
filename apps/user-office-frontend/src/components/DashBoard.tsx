@@ -481,22 +481,24 @@ const Dashboard: React.FC = () => {
               component={ProposalWorkflowEditor}
             />
           )}
-          {isSampleSafetyEnabled && (isSampleSafetyReviewer || isUserOfficer) && (
-            <>
+          {isSampleSafetyEnabled &&
+            (isSampleSafetyReviewer || isUserOfficer) && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Proposal Safety"
                 path="/ExperimentSafety"
                 component={ExperimentSafetyPage}
               />
+            )}
+          {isSampleSafetyEnabled &&
+            (isSampleSafetyReviewer || isUserOfficer) && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Samples Safety"
                 path="/SampleSafety"
                 component={SampleSafetyPage}
               />
-            </>
-          )}
+            )}
           {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
