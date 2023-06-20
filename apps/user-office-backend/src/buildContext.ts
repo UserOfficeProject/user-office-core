@@ -31,6 +31,7 @@ import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
 import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
+import InternalReviewQueries from './queries/InternalReviewQueries';
 import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
@@ -75,6 +76,7 @@ const context: BasicResolverContext = {
     user: container.resolve(UserQueries),
     visit: container.resolve(VisitQueries),
     predefinedMessage: container.resolve(PredefinedMessageQueries),
+    internalReview: container.resolve(InternalReviewQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),

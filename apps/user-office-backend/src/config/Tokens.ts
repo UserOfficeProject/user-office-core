@@ -33,4 +33,5 @@ export const Tokens = {
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
+  InternalReviewDataSource: Symbol('InternalReviewDataSource'),
 };

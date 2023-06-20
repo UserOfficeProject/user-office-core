@@ -30,6 +30,7 @@ import FeedbackQueries from '../queries/FeedbackQueries';
 import FileQueries from '../queries/FileQueries';
 import GenericTemplateQueries from '../queries/GenericTemplateQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
+import InternalReviewQueries from '../queries/InternalReviewQueries';
 import PdfTemplateQueries from '../queries/PdfTemplateQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalEsiQueries from '../queries/ProposalEsiQueries';
@@ -73,6 +74,7 @@ interface ResolverContextQueries {
   user: UserQueries;
   visit: VisitQueries;
   predefinedMessage: PredefinedMessageQueries;
+  internalReview: InternalReviewQueries;
 }
 
 interface ResolverContextMutations {
