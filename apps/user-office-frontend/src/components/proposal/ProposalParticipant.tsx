@@ -33,8 +33,13 @@ export default function ProposalParticipant(props: {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const { userData } = useBasicUserData(props.userId);
   useEffect(() => {
-    setCurUser(userData);
-  }, [userData]);
+    console.log(curUser);
+    if (curUser == null) {
+      setCurUser(userData);
+    } else {
+      setCurUser(curUser);
+    }
+  }, [curUser, userData]);
 
   const classes = useStyles();
 
@@ -49,6 +54,7 @@ export default function ProposalParticipant(props: {
         }}
         selectedUsers={!!curUser ? [curUser?.id] : []}
         addParticipants={(users: BasicUserDetails[]) => {
+          //console.log(users);
           setCurUser(users[0]);
           props.userChanged(users[0]);
           setIsPickerOpen(false);
@@ -57,7 +63,7 @@ export default function ProposalParticipant(props: {
       />
       <FormControl className={classes.container} margin="dense" fullWidth>
         <TextField
-          label="Principal Investigator"
+          label="Principal Investigator" // view of proposal page
           value={
             curUser
               ? `${curUser.firstname} ${curUser.lastname}; ${curUser.organisation}`
