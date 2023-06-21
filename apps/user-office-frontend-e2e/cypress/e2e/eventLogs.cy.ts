@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
-import { TestUserId } from './../support/user';
+import { TestUserId } from '../support/user';
 
 context('Event log tests', () => {
   beforeEach(() => {
