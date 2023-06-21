@@ -36,7 +36,6 @@ import {
   TopicRecord,
   ProposalRecord,
   createProposalObject,
-  InstrumentWithAvailabilityTimeRecord,
   createQuestionObject,
 } from './records';
 
@@ -371,29 +370,6 @@ export default class PostgresQuestionaryDataSource
     });
   }
 
-  private questionTemplateHelper = {
-    fetchCallInstruments: async (callId: number) =>
-      await database
-        .select([
-          'i.instrument_id',
-          'name',
-          'short_code',
-          'description',
-          'manager_user_id',
-          'chi.availability_time',
-          'chi.submitted',
-        ])
-        .from('instruments as i')
-        .join('call_has_instruments as chi', {
-          'i.instrument_id': 'chi.instrument_id',
-        })
-        .where('chi.call_id', callId)
-        .distinct('i.instrument_id')
-        .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
-          return instruments;
-        }),
-  };
-
   private async getQuestionaryStepsWithTemplateId(
     questionaryId: number,
     templateId: number,
@@ -463,7 +439,6 @@ export default class PostgresQuestionaryDataSource
           await createQuestionTemplateRelationObject(
             record,
             questionDependencies,
-            this.questionTemplateHelper,
             callId
           );
 

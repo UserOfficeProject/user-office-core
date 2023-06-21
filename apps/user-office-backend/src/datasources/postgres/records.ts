@@ -23,7 +23,6 @@ import {
   createConfig,
   getTransformedConfigData,
   QuestionDataTypeConfigMapping,
-  QuestionDataTypeHelpersMapping,
 } from '../../models/questionTypes/QuestionRegistry';
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
@@ -31,7 +30,7 @@ import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
+import { SEP, SEPAssignment, SEPProposal, SEPReviewer } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
@@ -816,7 +815,6 @@ export const createQuestionTemplateRelationObject = async <T extends DataType>(
       dependency_natural_key: string;
     },
   dependencies: FieldDependency[],
-  helpers?: QuestionDataTypeHelpersMapping<T>,
   callId?: number
 ) => {
   // The default config data doesn't contain all the data for all the Components. For Components like InstrumentPicker and DynamicMultipleChoice, the config data is being overwritten in the run time.
@@ -824,7 +822,6 @@ export const createQuestionTemplateRelationObject = async <T extends DataType>(
   const mutatedConfig = await getTransformedConfigData(
     record.data_type,
     record.config,
-    helpers,
     callId
   );
 

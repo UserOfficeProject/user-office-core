@@ -33,9 +33,7 @@ export default function createHandler() {
     switch (event.type) {
       case Event.TOPIC_ANSWERED:
         {
-          const {
-            questionarystep: { questionaryId },
-          } = event;
+          const questionaryId = event.questionarystep.questionaryId;
 
           const instrumentPickerAnswer =
             await questionaryDataSource.getLatestAnswerByQuestionaryIdAndDataType(
@@ -53,7 +51,7 @@ export default function createHandler() {
           );
           if (!instrument)
             throw new Error(`Instrument with id ${instrumentId} not found`);
-          const proposal = await proposalDataSource.getByQuestionaryid(
+          const proposal = await proposalDataSource.getByQuestionaryId(
             questionaryId
           );
           if (!proposal)

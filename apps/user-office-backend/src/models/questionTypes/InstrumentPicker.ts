@@ -1,7 +1,10 @@
 /* eslint-disable quotes */
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -42,22 +45,24 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
           );
       }
     },
-    transformConfig: async (config, helpers, callId) => {
+    transformConfig: async (config, callId) => {
       const fallBackConfig = { ...config, instruments: [] };
       try {
         if (!callId) return fallBackConfig;
-        if (!helpers) throw 'Helpers not available. ';
 
-        const instruments = await helpers.fetchCallInstruments(callId);
+        const instrumentDataSource = container.resolve<InstrumentDataSource>(
+          Tokens.InstrumentDataSource
+        );
+
+        const instruments = await instrumentDataSource.getInstrumentsByCallId([
+          callId,
+        ]);
 
         return {
           ...config,
           instruments: instruments.map(
             (instrument) =>
-              new InstrumentOptionClass(
-                instrument.instrument_id,
-                instrument.name
-              )
+              new InstrumentOptionClass(instrument.id, instrument.name)
           ),
         };
       } catch (err) {
