@@ -413,7 +413,7 @@ VALUES
   );
 
 
--- Dynamic multiple choice
+-- Instrument picker
 INSERT INTO questions(
   question_id, data_type, question, 
   default_config, created_at, updated_at, 
