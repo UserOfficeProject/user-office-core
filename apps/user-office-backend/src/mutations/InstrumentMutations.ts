@@ -134,7 +134,7 @@ export default class InstrumentMutations {
 
     if (!instrument) {
       return rejection(
-        'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
+        'Could not assign proposal/s to instrument, instrument not found',
         { agent, args }
       );
     }
