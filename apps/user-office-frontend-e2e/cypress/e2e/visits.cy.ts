@@ -208,14 +208,14 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Invalid date/i).should('exist');
 
-      cy.contains(startQuestion).parent().click().clear().type(endDate);
-      cy.contains(endQuestion).parent().click().clear().type(startDate);
+      cy.contains(startQuestion).parent().find('input').clear().type(endDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(startDate);
 
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/end date can't be before start date/i).should('exist');
 
-      cy.contains(startQuestion).parent().click().clear().type(startDate);
-      cy.contains(endQuestion).parent().click().clear().type(endDate);
+      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 

@@ -1,21 +1,27 @@
 import { faker } from '@faker-js/faker';
 import { FeatureId } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
+import PdfParse from 'pdf-parse';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Proposal administration tests', () => {
   const proposalName1 = faker.lorem.words(3);
+  const proposalAbstract1 = faker.lorem.paragraph(3);
   const proposalName2 = faker.lorem.words(3);
   const proposalFixedName = '0000. Alphabetically first title';
+  const proposalFixedAbstract =
+    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 
   const textUser = faker.lorem.words(5);
   const textManager = faker.lorem.words(5);
 
-  const existingUserId = 1;
+  const existingUserId = initialDBData.users.user1.id;
   const existingTopicId = 1;
   const existingQuestionaryId = 1;
+  let createdProposalPk: number;
+  let createdProposalId: string;
 
   beforeEach(() => {
     cy.resetDB();
@@ -26,11 +32,13 @@ context('Proposal administration tests', () => {
     beforeEach(() => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId = result.createProposal.proposalId;
           cy.updateProposal({
             proposalPk: result.createProposal.primaryKey,
             proposerId: existingUserId,
             title: proposalName1,
-            abstract: proposalName1,
+            abstract: proposalAbstract1,
           });
           cy.answerTopic({
             answers: [],
@@ -277,6 +285,99 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         '2 selected items'
       );
+    });
+
+    it('Should be able to verify pdf download and compare with a fixture', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        //temporarily skipping, until issue is fixed on github actions
+        this.skip();
+      }
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          const newlyCreatedProposalId = result.createProposal.proposalId;
+          const newlyCreatedProposalPk = result.createProposal.primaryKey;
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalFixedName,
+            abstract: proposalFixedAbstract,
+          });
+
+          const token = window.localStorage.getItem('token');
+
+          if (!token) {
+            throw new Error('Token not provided');
+          }
+
+          const currentYear = new Date().getFullYear();
+          const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
+          const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${newlyCreatedProposalId}.pdf`;
+          const downloadsFolder = Cypress.config('downloadsFolder');
+          const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
+
+          cy.task('downloadFile', {
+            url: `${Cypress.config(
+              'baseUrl'
+            )}/download/pdf/proposal/${newlyCreatedProposalPk}`,
+            token,
+            filename: downloadPath,
+          });
+
+          cy.fixture(FIXTURE_FILE_PATH, 'binary', { timeout: 15000 }).then(
+            (fixtureBuffer) => {
+              const fixtureFileContentByteLength = fixtureBuffer.length;
+              // for now just check the file size
+              cy.readFile(downloadPath, 'binary', { timeout: 15000 }).should(
+                (buffer) => {
+                  // console.log(buffer);
+                  // NOTE: If you run the factory locally inside a docker container and directly(as a node app) on your local machine there could be some file size differences.
+                  if (buffer.length !== fixtureFileContentByteLength) {
+                    throw new Error(
+                      `File size ${buffer.length} is not ${fixtureFileContentByteLength}`
+                    );
+                  }
+                }
+              );
+            }
+          );
+
+          cy.task('readPdf', downloadPath).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(newlyCreatedProposalId);
+            expect(text).to.include(proposalFixedName);
+            expect(text).to.include(proposalFixedAbstract);
+
+            expect(numpages).to.equal(1);
+          });
+
+          // NOTE: We can't test the multi file download file size because the title and abstract are random and it can vary between some numbers. That's why we only test the file content.
+          const downloadedMultiFileName = `${currentYear}_proposals_${createdProposalPk}_${newlyCreatedProposalPk}.pdf`;
+          const multiFileDownloadPath = `${downloadsFolder}/${downloadedMultiFileName}`;
+
+          cy.task('downloadFile', {
+            url: `${Cypress.config(
+              'baseUrl'
+            )}/download/pdf/proposal/${createdProposalPk},${newlyCreatedProposalPk}`,
+            token,
+            filename: multiFileDownloadPath,
+          });
+
+          cy.task('readPdf', multiFileDownloadPath).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(createdProposalId);
+            expect(text).to.include(proposalName1);
+            expect(text).to.include(proposalAbstract1);
+            expect(text).to.include(newlyCreatedProposalId);
+            expect(text).to.include(proposalFixedName);
+            expect(text).to.include(proposalFixedAbstract);
+
+            expect(numpages).to.equal(2);
+          });
+        }
+      });
     });
 
     it('Should be able to download proposal pdf', function () {

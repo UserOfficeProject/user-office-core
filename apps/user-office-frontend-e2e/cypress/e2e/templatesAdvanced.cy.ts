@@ -402,10 +402,9 @@ context('Template tests', () => {
         });
       });
 
-      cy.get(`#${richTextInputId}_ifr`)
-        .its('0.contentDocument.body')
-        .should('not.be.empty')
-        .contains(richTextInputQuestion.answer);
+      cy.getTinyMceContent(richTextInputId).then((content) =>
+        expect(content).to.have.string(richTextInputQuestion.answer)
+      );
 
       cy.get('[data-cy="rich-text-char-count"]').then((element) => {
         expect(element.text()).to.be.equal(
