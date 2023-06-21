@@ -1,7 +1,7 @@
-import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import { instrumentPickerValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
+import ScienceIcon from 'components/common/icons/ScienceIcon';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
@@ -21,7 +21,7 @@ export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
     QuestionTemplateRelationInstrumentPickerForm,
   readonly: false,
   creatable: true,
-  icon: <PrecisionManufacturingIcon />,
+  icon: <ScienceIcon />,
   renderers: {
     answerRenderer: (answer) => <InstrumentPickerAnswerRenderer {...answer} />,
     questionRenderer: defaultRenderer.questionRenderer,
