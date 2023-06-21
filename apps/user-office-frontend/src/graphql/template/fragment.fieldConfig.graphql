@@ -134,7 +134,6 @@ fragment fieldConfig on FieldConfig {
     options
     jsonPath
     externalApiCall
-
     isMultipleSelect
     variant
   }
