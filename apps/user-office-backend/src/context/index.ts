@@ -7,6 +7,7 @@ import FeedbackMutations from '../mutations/FeedbackMutations';
 import FileMutations from '../mutations/FileMutations';
 import GenericTemplateMutations from '../mutations/GenericTemplateMutations';
 import InstrumentMutations from '../mutations/InstrumentMutations';
+import InternalReviewMutations from '../mutations/InternalReviewMutations';
 import PdfTemplateMutations from '../mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
@@ -100,6 +101,7 @@ interface ResolverContextMutations {
   user: UserMutations;
   visit: VisitMutations;
   predefinedMessage: PredefinedMessageMutations;
+  internalReview: InternalReviewMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

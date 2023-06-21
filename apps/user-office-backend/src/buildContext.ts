@@ -8,6 +8,7 @@ import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
+import InternalReviewMutations from './mutations/InternalReviewMutations';
 import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
@@ -101,6 +102,7 @@ const context: BasicResolverContext = {
     user: container.resolve(UserMutations),
     visit: container.resolve(VisitMutations),
     predefinedMessage: container.resolve(PredefinedMessageMutations),
+    internalReview: container.resolve(InternalReviewMutations),
   },
   clients: {
     scheduler: async () => {

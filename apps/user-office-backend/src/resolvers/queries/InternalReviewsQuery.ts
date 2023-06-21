@@ -19,4 +19,12 @@ export class InternalReviewsQuery {
   ) {
     return context.queries.internalReview.getAll(context.user, filter);
   }
+
+  @Query(() => InternalReview, { nullable: true })
+  internalReview(
+    @Arg('internalReviewId', () => Int) internalReviewId: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.internalReview.get(context.user, internalReviewId);
+  }
 }

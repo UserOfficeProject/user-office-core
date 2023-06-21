@@ -10,6 +10,7 @@ import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSourc
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
 import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTemplateDataSource';
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
+import { InternalReviewDataSourceMock } from '../datasources/mockups/InternalReviewDataSource';
 import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
@@ -45,6 +46,7 @@ mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);
 mapClass(Tokens.FileDataSource, FileDataSourceMock);
 mapClass(Tokens.GenericTemplateDataSource, GenericTemplateDataSourceMock);
 mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
+mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
 mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);

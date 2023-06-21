@@ -292,6 +292,17 @@ export interface TechnicalReviewRecord {
   readonly technical_review_assignee_id: number | null;
 }
 
+export interface InternalReviewRecord {
+  readonly internal_review_id: number;
+  readonly title: string;
+  readonly comment: string;
+  readonly reviewer_id: number;
+  readonly technical_review_id: number;
+  readonly files: string;
+  readonly created_at: Date;
+  readonly assigned_by: number;
+}
+
 export interface CallRecord {
   readonly call_id: number;
   readonly call_short_code: string;

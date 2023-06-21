@@ -1,12 +1,20 @@
 import { InternalReview } from '../models/InternalReview';
-import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
-import { UpdateCallInput } from '../resolvers/mutations/UpdateCallMutation';
+import { UserWithRole } from '../models/User';
+import { CreateInternalReviewInput } from '../resolvers/mutations/internalReview/CreateInternalReviewMutation';
+import { DeleteInternalReviewInput } from '../resolvers/mutations/internalReview/DeleteInternalReviewMutation';
+import { UpdateInternalReviewInput } from '../resolvers/mutations/internalReview/UpdateInternalReviewMutation';
 import { InternalReviewsFilter } from '../resolvers/queries/InternalReviewsQuery';
 
 export interface InternalReviewDataSource {
   getInternalReview(id: number): Promise<InternalReview | null>;
   getInternalReviews(filter?: InternalReviewsFilter): Promise<InternalReview[]>;
-  create(args: CreateCallInput): Promise<InternalReview>;
-  update(args: UpdateCallInput): Promise<InternalReview>;
-  delete(id: number): Promise<InternalReview>;
+  create(
+    agent: UserWithRole,
+    input: CreateInternalReviewInput
+  ): Promise<InternalReview>;
+  update(
+    agent: UserWithRole,
+    input: UpdateInternalReviewInput
+  ): Promise<InternalReview>;
+  delete(input: DeleteInternalReviewInput): Promise<InternalReview>;
 }
