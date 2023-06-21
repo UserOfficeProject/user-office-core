@@ -299,7 +299,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getByQuestionaryid(questionaryId: number): Promise<Proposal | null> {
+  async getByQuestionaryId(questionaryId: number): Promise<Proposal | null> {
     return database
       .select()
       .from('proposals')
