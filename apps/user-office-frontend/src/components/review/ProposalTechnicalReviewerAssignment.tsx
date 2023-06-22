@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   reassignContainer: {
     padding: theme.spacing(2),
     marginTop: 0,
-    marginBottom: theme.spacing(6),
+    marginBottom: theme.spacing(2),
   },
   reassignContainerDisabled: {
     pointerEvents: 'none',

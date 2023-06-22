@@ -52,6 +52,7 @@ export class InternalReviewResolver {
     );
   }
 
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
   async assignedByUser(
     @Root() internalReview: InternalReview,
     @Ctx() context: ResolverContext

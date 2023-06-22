@@ -5,7 +5,7 @@ import { InternalReview } from '../types/InternalReview';
 
 @InputType()
 export class InternalReviewsFilter {
-  @Field(() => [Int], { nullable: true })
+  @Field(() => Int, { nullable: true })
   public technicalReviewId?: number;
 }
 
