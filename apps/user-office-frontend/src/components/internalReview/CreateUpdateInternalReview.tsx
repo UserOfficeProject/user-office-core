@@ -1,6 +1,8 @@
 import Button from '@mui/material/Button';
+import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
+import { Editor } from '@tinymce/tinymce-react';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import React from 'react';
@@ -15,6 +17,9 @@ import { getFullUserName } from 'utils/user';
 const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
+  },
+  comment: {
+    marginTop: theme.spacing(2),
   },
 }));
 
@@ -32,17 +37,20 @@ const CreateUpdateInternalReview = ({
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { usersData } = useUsersData({
-    userRole: UserRole.INSTRUMENT_SCIENTIST,
+    userRole: UserRole.INTERNAL_REVIEWER,
   });
-
-  console.log(internalReview);
 
   if (!usersData) {
     return <UOLoader />;
   }
 
   const initialValues = internalReview
-    ? internalReview
+    ? {
+        title: internalReview.title,
+        comment: internalReview.comment || '',
+        files: internalReview.files,
+        reviewerId: internalReview.reviewerId,
+      }
     : {
         title: '',
         comment: '',
@@ -94,7 +102,7 @@ const CreateUpdateInternalReview = ({
         }
       }}
     >
-      {() => (
+      {({ isSubmitting, setFieldValue }) => (
         <Form>
           <Typography variant="h6" component="h1">
             {internalReview ? 'Update ' : 'Create new internal review'}
@@ -123,6 +131,34 @@ const CreateUpdateInternalReview = ({
               'data-cy': 'internal-reviewer',
             }}
             required
+          />
+
+          <InputLabel
+            htmlFor="internal_review_comment"
+            shrink
+            className={classes.comment}
+          >
+            Internal review comment
+          </InputLabel>
+          <Editor
+            id="internal_review_comment"
+            initialValue={initialValues.comment}
+            init={{
+              skin: false,
+              content_css: false,
+              plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
+              toolbar: 'bold italic',
+              branding: false,
+            }}
+            onEditorChange={(content, editor) => {
+              const isStartContentDifferentThanCurrent =
+                editor.startContent !== editor.contentDocument.body.innerHTML;
+
+              if (isStartContentDifferentThanCurrent || editor.isDirty()) {
+                setFieldValue('comment', content);
+              }
+            }}
+            disabled={isSubmitting}
           />
 
           <Button
