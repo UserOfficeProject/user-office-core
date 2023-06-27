@@ -5,10 +5,12 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
+import { UserContext } from 'context/UserContextProvider';
 import { InternalReview, UserRole } from 'generated/sdk';
 import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -36,6 +38,8 @@ const CreateUpdateInternalReview = ({
 }: CreateUpdateInternalReviewProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
+  const { user } = useContext(UserContext);
   const { usersData } = useUsersData({
     userRole: UserRole.INTERNAL_REVIEWER,
   });
@@ -57,6 +61,10 @@ const CreateUpdateInternalReview = ({
         files: '',
         reviewerId: null,
       };
+
+  const shouldDisableComment = (isSubmitting: boolean) =>
+    isSubmitting ||
+    (isInternalReviewer && user.id !== internalReview?.reviewerId);
 
   return (
     <Formik
@@ -115,7 +123,7 @@ const CreateUpdateInternalReview = ({
             component={TextField}
             fullWidth
             data-cy="title"
-            disabled={isExecutingCall}
+            disabled={isExecutingCall || isSubmitting || isInternalReviewer}
             required
           />
 
@@ -131,6 +139,7 @@ const CreateUpdateInternalReview = ({
               'data-cy': 'internal-reviewer',
             }}
             required
+            disabled={isExecutingCall || isSubmitting || isInternalReviewer}
           />
 
           <InputLabel
@@ -158,7 +167,7 @@ const CreateUpdateInternalReview = ({
                 setFieldValue('comment', content);
               }
             }}
-            disabled={isSubmitting}
+            disabled={isExecutingCall || shouldDisableComment(isSubmitting)}
           />
 
           <Button
@@ -166,7 +175,7 @@ const CreateUpdateInternalReview = ({
             fullWidth
             className={classes.submit}
             data-cy="submit"
-            disabled={isExecutingCall}
+            disabled={isExecutingCall || shouldDisableComment(isSubmitting)}
           >
             {isExecutingCall && <UOLoader size={14} />}
             {internalReview ? 'Update' : 'Create'}

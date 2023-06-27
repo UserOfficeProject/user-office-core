@@ -63,6 +63,7 @@ const ProposalTechnicalReview = ({
   const classes = useStyles();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { user } = useContext(UserContext);
   const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
 
@@ -162,7 +163,7 @@ const ProposalTechnicalReview = ({
   };
 
   const shouldDisableForm = (isSubmitting: boolean) =>
-    (isSubmitting || data?.submitted) && !isUserOfficer;
+    ((isSubmitting || data?.submitted) && !isUserOfficer) || isInternalReviewer;
 
   return (
     <>
@@ -376,7 +377,9 @@ const ProposalTechnicalReview = ({
                   </Button>
                   {!isUserOfficer && (
                     <Button
-                      disabled={isSubmitting || data?.submitted}
+                      disabled={
+                        isSubmitting || data?.submitted || isInternalReviewer
+                      }
                       type="submit"
                       className={classes.submitButton}
                       onClick={() => setShouldSubmit(true)}

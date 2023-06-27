@@ -1,8 +1,9 @@
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { InternalReview, InternalReviewsFilter } from 'generated/sdk';
+import { InternalReview, InternalReviewsFilter, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInternalReviewsData } from 'hooks/review/useInternalReviewData';
 import { tableIcons } from 'utils/materialIcons';
@@ -36,6 +37,7 @@ const InternalReviewsTable = (filter: InternalReviewsFilter) => {
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
 
   const createModal = (
     onUpdate: FunctionType<void, [InternalReview | null]>,
@@ -78,6 +80,11 @@ const InternalReviewsTable = (filter: InternalReviewsFilter) => {
   return (
     <div data-cy="internal-reviews-table">
       <SuperMaterialTable
+        hasAccess={{
+          create: !isInternalReviewer,
+          remove: !isInternalReviewer,
+          update: true,
+        }}
         title={
           <Typography variant="h6" component="h2">
             Internal reviews
