@@ -9,12 +9,17 @@ import {
 import { MetaBase } from '../../factory/service';
 import { UserWithRole } from '../../models/User';
 
+export type ProposalPdfDownloadOptions = {
+  filter?: string;
+  pdfTemplateId?: number;
+  questionIds?: string[];
+};
 export interface PDFServices {
   getPdfProposals(
     agent: UserWithRole,
     proposalPks: number[],
     proposalFileMeta: MetaBase,
-    proposalFilterType?: string
+    options?: ProposalPdfDownloadOptions
   ): Promise<ProposalPDFData[] | null>;
 }
 @injectable()
@@ -24,7 +29,7 @@ export default class FactoryServices implements PDFServices {
     agent: UserWithRole | null,
     proposalPks: number[],
     proposalFileMeta: MetaBase,
-    proposalFilterType?: string
+    options?: ProposalPdfDownloadOptions
   ): Promise<ProposalPDFData[] | null> {
     let data = null;
     if (agent) {
@@ -34,7 +39,7 @@ export default class FactoryServices implements PDFServices {
             return collectProposalPDFDataTokenAccess(
               proposalPk,
               agent,
-              proposalFilterType ?? undefined,
+              options,
               indx === 0
                 ? (filename: string) =>
                     (proposalFileMeta.singleFilename = filename)
@@ -44,6 +49,7 @@ export default class FactoryServices implements PDFServices {
           return collectProposalPDFData(
             proposalPk,
             agent,
+            options,
             indx === 0
               ? (filename: string) =>
                   (proposalFileMeta.singleFilename = filename)
