@@ -154,6 +154,19 @@ const SamplesMenuListItem = () => {
   );
 };
 
+const ProposalsMenuListItem = () => {
+  return (
+    <Tooltip title="Review Proposals">
+      <ListItem component={NavLink} to="/" exact button>
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Review Proposals" />
+      </ListItem>
+    </Tooltip>
+  );
+};
+
 const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const proposalDisabled = callsData.length === 0;
   const context = useContext(FeatureContext);
@@ -366,6 +379,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     </div>
   );
 
+  const internalReviewer = (
+    <div data-cy="internal-reviewer-menu-items">
+      <ProposalsMenuListItem />
+    </div>
+  );
+
   switch (currentRole) {
     case UserRole.USER:
       return user;
@@ -379,6 +398,8 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
       return SEPRoles;
     case UserRole.SAMPLE_SAFETY_REVIEWER:
       return sampleSafetyReviewer;
+    case UserRole.INTERNAL_REVIEWER:
+      return internalReviewer;
     default:
       return null;
   }

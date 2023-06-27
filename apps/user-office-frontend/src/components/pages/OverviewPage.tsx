@@ -39,6 +39,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
       );
       break;
     case UserRole.INSTRUMENT_SCIENTIST:
+    case UserRole.INTERNAL_REVIEWER:
       roleBasedOverView = (
         <PaperContainer>
           <ProposalTableInstrumentScientist />

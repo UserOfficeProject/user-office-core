@@ -18,22 +18,27 @@ export default class InternalReviewMutations {
     private internalReviewDataSource: InternalReviewDataSource
   ) {}
 
-  // TODO: Check if the instrument scientist is the technical reviewer (or manager of instrument).
+  // TODO: Check if the instrument scientist is part of the technical review instrument.
   @EventBus(Event.INTERNAL_REVIEW_CREATED)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async create(agent: UserWithRole | null, input: CreateInternalReviewInput) {
     return await this.internalReviewDataSource.create(agent!, input);
   }
 
-  // TODO: Check if the instrument scientist is the technical reviewer (or manager of instrument).
+  // TODO: Check if the instrument scientist/internal reviewer is part of the technical review instrument.
   @EventBus(Event.INTERNAL_REVIEW_UPDATED)
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.INTERNAL_REVIEWER,
+  ])
   async update(agent: UserWithRole | null, input: UpdateInternalReviewInput) {
     return await this.internalReviewDataSource.update(agent!, input);
   }
 
-  @EventBus(Event.PREDEFINED_MESSAGE_DELETED)
-  @Authorized([Roles.USER_OFFICER])
+  // TODO: Check if the instrument scientist is part of the technical review instrument.
+  @EventBus(Event.INTERNAL_REVIEW_DELETED)
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async delete(agent: UserWithRole | null, input: DeleteInternalReviewInput) {
     const deletedInternalReview = await this.internalReviewDataSource.delete(
       input

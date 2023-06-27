@@ -494,7 +494,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getInstrumentScientistProposals(
-    scientistId: number,
+    userId: number,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
@@ -512,11 +512,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'instrument_has_scientists.instrument_id':
           'proposal_table_view.instrument_id',
       })
+      .leftJoin(
+        'internal_reviews',
+        'proposal_table_view.technical_review_id',
+        'internal_reviews.technical_review_id'
+      )
       .where(function () {
-        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
-          'instruments.manager_user_id',
-          scientistId
-        );
+        this.where('instrument_has_scientists.user_id', userId)
+          .orWhere('instruments.manager_user_id', userId)
+          .orWhere('internal_reviews.reviewer_id', userId);
       })
       .distinct('proposal_table_view.proposal_pk')
       .orderBy('proposal_table_view.proposal_pk', 'desc')
@@ -529,7 +533,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.reviewer === ReviewerFilter.ME) {
           query.where(
             'proposal_table_view.technical_review_assignee_id',
-            scientistId
+            userId
           );
         }
         if (filter?.callId) {

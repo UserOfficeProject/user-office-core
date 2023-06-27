@@ -605,6 +605,7 @@ const Dashboard: React.FC = () => {
                       UserRole.SEP_CHAIR,
                       UserRole.SEP_SECRETARY,
                       UserRole.INSTRUMENT_SCIENTIST,
+                      UserRole.INTERNAL_REVIEWER,
                     ]}
                     yes={() => (
                       <Route

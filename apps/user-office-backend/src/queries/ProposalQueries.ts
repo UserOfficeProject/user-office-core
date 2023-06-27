@@ -116,7 +116,8 @@ export default class ProposalQueries {
     }
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  // NOTE: Internal reviewer has similar view as instrument scientist and it needs to get the proposals where the one is assigned as reviewer.
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.INTERNAL_REVIEWER])
   async getInstrumentScientistProposals(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,

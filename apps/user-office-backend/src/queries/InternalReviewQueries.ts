@@ -21,7 +21,12 @@ export default class InternalReviewQueries {
     return internalReview;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  // TODO: Check the instrument scientist if it is part of the instrument attached on the proposal and internal reviewer
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.INTERNAL_REVIEWER,
+  ])
   async getAll(agent: UserWithRole | null, filter?: InternalReviewsFilter) {
     const internalReviews = await this.dataSource.getInternalReviews(filter);
 
