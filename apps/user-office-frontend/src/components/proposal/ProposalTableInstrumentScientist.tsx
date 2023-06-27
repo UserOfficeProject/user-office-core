@@ -16,6 +16,7 @@ import {
   withDefault,
 } from 'use-query-params';
 
+import { useCheckAccess } from 'components/common/Can';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -34,6 +35,7 @@ import {
   ReviewerFilter,
   SubmitTechnicalReviewInput,
   SettingsId,
+  UserRole,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -151,12 +153,14 @@ const ProposalTableInstrumentScientist: React.FC<{
   const { api } = useDataApiWithFeedback();
   const { settingsMap } = useContext(SettingsContext);
   const { t } = useTranslation();
-  const statusFilterValue =
-    settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)?.settingsValue ||
-    2;
+  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const statusFilterValue = isInstrumentScientist
+    ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)
+        ?.settingsValue || 2
+    : 0;
   let statusFilter = proposalStatusFilter[statusFilterValue];
   if (statusFilter === undefined || statusFilter === null) {
-    statusFilter = 2;
+    statusFilter = isInstrumentScientist ? 2 : 0;
   }
   const reviewFilterValue =
     settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
@@ -247,7 +251,9 @@ const ProposalTableInstrumentScientist: React.FC<{
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
+    ...(isSEPEnabled && isInstrumentScientist
+      ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN]
+      : []),
   ];
 
   /**
@@ -526,22 +532,26 @@ const ProposalTableInstrumentScientist: React.FC<{
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>
-      <ReviewerFilterComponent
-        reviewer={urlQueryParams.reviewer}
-        onChange={(reviewer) =>
-          setProposalFilter({ ...proposalFilter, reviewer })
-        }
-      />
-      <ProposalFilterBar
-        calls={{ data: calls, isLoading: loadingCalls }}
-        instruments={{ data: instruments, isLoading: loadingInstruments }}
-        proposalStatuses={{
-          data: proposalStatuses,
-          isLoading: loadingProposalStatuses,
-        }}
-        setProposalFilter={setProposalFilter}
-        filter={proposalFilter}
-      />
+      {isInstrumentScientist && (
+        <>
+          <ReviewerFilterComponent
+            reviewer={urlQueryParams.reviewer}
+            onChange={(reviewer) =>
+              setProposalFilter({ ...proposalFilter, reviewer })
+            }
+          />
+          <ProposalFilterBar
+            calls={{ data: calls, isLoading: loadingCalls }}
+            instruments={{ data: instruments, isLoading: loadingInstruments }}
+            proposalStatuses={{
+              data: proposalStatuses,
+              isLoading: loadingProposalStatuses,
+            }}
+            setProposalFilter={setProposalFilter}
+            filter={proposalFilter}
+          />
+        </>
+      )}
       <MaterialTable
         icons={tableIcons}
         title={'Proposals'}

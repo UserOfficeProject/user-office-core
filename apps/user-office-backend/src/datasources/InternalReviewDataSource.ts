@@ -17,4 +17,10 @@ export interface InternalReviewDataSource {
     input: UpdateInternalReviewInput
   ): Promise<InternalReview>;
   delete(input: DeleteInternalReviewInput): Promise<InternalReview>;
+  isInternalReviewerOnTechnicalReview(
+    userId: number,
+    technicalReviewId: number
+  ): Promise<boolean>;
+  isInternalReviewer(userId: number): Promise<boolean>;
+  getRelatedUsersOnInternalReview(id: number): Promise<number[]>;
 }

@@ -57,7 +57,12 @@ const InternalReviewsTable = (filter: InternalReviewsFilter) => {
     try {
       await api({
         toastSuccessMessage: 'Internal review deleted successfully',
-      }).deleteInternalReview({ input: { id: id as number } });
+      }).deleteInternalReview({
+        input: {
+          id: id as number,
+          technicalReviewId: filter.technicalReviewId as number,
+        },
+      });
 
       return true;
     } catch (error) {

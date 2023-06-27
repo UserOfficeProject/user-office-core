@@ -1,7 +1,11 @@
-import { inject, injectable } from 'tsyringe';
+import { GraphQLError } from 'graphql';
+import { container, inject, injectable } from 'tsyringe';
 
+import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InternalReviewDataSource } from '../datasources/InternalReviewDataSource';
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
@@ -13,19 +17,45 @@ import { UpdateInternalReviewInput } from '../resolvers/mutations/internalReview
 
 @injectable()
 export default class InternalReviewMutations {
+  private technicalReviewAuth = container.resolve(TechnicalReviewAuthorization);
   constructor(
     @inject(Tokens.InternalReviewDataSource)
-    private internalReviewDataSource: InternalReviewDataSource
+    private internalReviewDataSource: InternalReviewDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ReviewDataSource)
+    private reviewDataSource: ReviewDataSource
   ) {}
 
-  // TODO: Check if the instrument scientist is part of the technical review instrument.
+  async hasAccessRights(agent: UserWithRole | null, technicalReviewId: number) {
+    const technicalReview = await this.reviewDataSource.getTechnicalReviewById(
+      technicalReviewId
+    );
+
+    if (
+      technicalReview &&
+      (this.userAuth.isUserOfficer(agent) ||
+        (await this.userAuth.isInternalReviewerOnTechnicalReview(
+          agent,
+          technicalReviewId
+        )) ||
+        (await this.technicalReviewAuth.hasWriteRights(agent, technicalReview)))
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @EventBus(Event.INTERNAL_REVIEW_CREATED)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async create(agent: UserWithRole | null, input: CreateInternalReviewInput) {
+    if (!(await this.hasAccessRights(agent, input.technicalReviewId))) {
+      throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
+    }
+
     return await this.internalReviewDataSource.create(agent!, input);
   }
 
-  // TODO: Check if the instrument scientist/internal reviewer is part of the technical review instrument.
   @EventBus(Event.INTERNAL_REVIEW_UPDATED)
   @Authorized([
     Roles.USER_OFFICER,
@@ -33,13 +63,32 @@ export default class InternalReviewMutations {
     Roles.INTERNAL_REVIEWER,
   ])
   async update(agent: UserWithRole | null, input: UpdateInternalReviewInput) {
+    if (!(await this.hasAccessRights(agent, input.technicalReviewId))) {
+      throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
+    }
+
+    // NOTE: Check if the internal reviewer tries to update their own review and not another internal review on the same proposal.
+    if (agent?.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
+      const reviewsThatCanUpdate =
+        await this.internalReviewDataSource.getInternalReviews({
+          reviewerId: agent.id,
+        });
+
+      if (!reviewsThatCanUpdate.some((item) => item.id === input.id)) {
+        throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
+      }
+    }
+
     return await this.internalReviewDataSource.update(agent!, input);
   }
 
-  // TODO: Check if the instrument scientist is part of the technical review instrument.
   @EventBus(Event.INTERNAL_REVIEW_DELETED)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async delete(agent: UserWithRole | null, input: DeleteInternalReviewInput) {
+    if (!(await this.hasAccessRights(agent, input.technicalReviewId))) {
+      throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
+    }
+
     const deletedInternalReview = await this.internalReviewDataSource.delete(
       input
     );
