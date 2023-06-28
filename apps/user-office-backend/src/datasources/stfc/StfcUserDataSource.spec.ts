@@ -140,3 +140,44 @@ describe('Email search tests', () => {
     expect(result).toBeNull();
   });
 });
+
+describe('Searchable user tests', () => {
+  const userDataSource = new StfcUserDataSource();
+
+  const uowsClient = UOWSSoapClient.getInstance();
+
+  const mockGetSearchableBasicPeople = jest.spyOn(
+    uowsClient,
+    'getSearchableBasicPeopleDetailsFromUserNumbers'
+  );
+
+  beforeEach(() => {
+    mockGetSearchableBasicPeople.mockClear();
+  });
+
+  test('When checking whether a searchable user is searchable, the check returns true', async () => {
+    const searchableUser = 1;
+
+    const result = await userDataSource.isSearchableUser(searchableUser);
+
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledTimes(1);
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(
+      expect.any(String),
+      [String(searchableUser)]
+    );
+    expect(result).toBe(true);
+  });
+
+  test('When checking whether a non-searchable user is searchable, the check returns false', async () => {
+    const nonSearchableUser = 0;
+
+    const result = await userDataSource.isSearchableUser(nonSearchableUser);
+
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledTimes(1);
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(
+      expect.any(String),
+      [String(nonSearchableUser)]
+    );
+    expect(result).toBe(false);
+  });
+});
