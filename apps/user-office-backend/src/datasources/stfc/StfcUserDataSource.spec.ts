@@ -161,10 +161,9 @@ describe('Searchable user tests', () => {
     const result = await userDataSource.isSearchableUser(searchableUser);
 
     expect(mockGetSearchableBasicPeople).toHaveBeenCalledTimes(1);
-    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(
-      expect.any(String),
-      [String(searchableUser)]
-    );
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(undefined, [
+      String(searchableUser),
+    ]);
     expect(result).toBe(true);
   });
 
@@ -174,10 +173,9 @@ describe('Searchable user tests', () => {
     const result = await userDataSource.isSearchableUser(nonSearchableUser);
 
     expect(mockGetSearchableBasicPeople).toHaveBeenCalledTimes(1);
-    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(
-      expect.any(String),
-      [String(nonSearchableUser)]
-    );
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(undefined, [
+      String(nonSearchableUser),
+    ]);
     expect(result).toBe(false);
   });
 });
