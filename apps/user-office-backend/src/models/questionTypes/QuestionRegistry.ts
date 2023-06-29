@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
+import { AnswerInput } from '../../resolvers/mutations/AnswerTopicMutation';
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import {
   BooleanConfig,
@@ -142,6 +143,12 @@ export interface Question<T extends DataType> {
     config: QuestionDataTypeConfigMapping<T>,
     callId?: number
   ) => Promise<QuestionDataTypeConfigMapping<T>>;
+
+  onBeforeSave?: (
+    questionaryId: number,
+    questionTemplateRelation: QuestionTemplateRelation,
+    answer: AnswerInput
+  ) => Promise<void>;
 }
 
 // Add new component definitions here

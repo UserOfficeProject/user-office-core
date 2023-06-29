@@ -5,6 +5,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -72,5 +73,27 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       }
 
       return fallBackConfig;
+    },
+    async onBeforeSave(questionaryId, questionTemplateRelation, answer) {
+      const instrumentDataSource = container.resolve<InstrumentDataSource>(
+        Tokens.InstrumentDataSource
+      );
+
+      const proposalDataSource = container.resolve<ProposalDataSource>(
+        Tokens.ProposalDataSource
+      );
+
+      const proposal = await proposalDataSource.getByQuestionaryId(
+        questionaryId
+      );
+      if (!proposal) {
+        throw new GraphQLError('Proposal not found');
+      }
+
+      const { value } = JSON.parse(answer.value);
+      await instrumentDataSource.assignProposalsToInstrument(
+        [proposal?.primaryKey],
+        value
+      );
     },
   };

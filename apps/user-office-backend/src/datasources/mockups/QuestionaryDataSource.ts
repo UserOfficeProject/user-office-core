@@ -387,13 +387,6 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return [];
   }
 
-  async getLatestAnswerByQuestionaryIdAndDataType(
-    questionaryId: number,
-    dataType: DataType
-  ): Promise<{ answer: AnswerBasic; question: Question } | null> {
-    return null;
-  }
-
   async getTemplates(questionId: string): Promise<Template[]> {
     return [];
   }

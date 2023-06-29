@@ -126,36 +126,38 @@ export default class InstrumentMutations {
   }
 
   @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
-  async assignProposalsToInstrumentHelper(
+  @ValidateArgs(assignProposalsToInstrumentValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
-  ) {
+  ): Promise<ProposalPks | Rejection> {
+    const allProposalsAreOnSameCallAsInstrument =
+      await this.checkIfProposalsAreOnSameCallAsInstrument(args);
+
+    if (!allProposalsAreOnSameCallAsInstrument) {
+      return rejection(
+        'One or more proposals can not be assigned to instrument, because instrument is not in the call',
+        { args }
+      );
+    }
+
     const instrument = await this.dataSource.getInstrument(args.instrumentId);
 
     if (!instrument) {
       return rejection(
-        'Could not assign proposal/s to instrument, instrument not found',
+        'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
         { agent, args }
       );
     }
 
     const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
 
-    const result = await this.dataSource.assignProposalsToInstrument(
-      proposalPks,
-      args.instrumentId
-    );
-
-    if (result.proposalPks.length !== proposalPks.length) {
-      return rejection('Could not assign proposal/s to instrument', {
-        agent,
-        args,
-      });
-    }
     for await (const proposalPk of proposalPks) {
       const technicalReview = await this.reviewDataSource.getTechnicalReview(
         proposalPk
       );
+
       if (technicalReview) {
         await this.proposalDataSource.updateProposalTechnicalReviewer({
           userId: instrument.managerUserId,
@@ -182,26 +184,19 @@ export default class InstrumentMutations {
       }
     }
 
-    return result;
-  }
+    const result = await this.dataSource.assignProposalsToInstrument(
+      proposalPks,
+      args.instrumentId
+    );
 
-  @ValidateArgs(assignProposalsToInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
-  async assignProposalsToInstrument(
-    agent: UserWithRole | null,
-    args: AssignProposalsToInstrumentArgs
-  ): Promise<ProposalPks | Rejection> {
-    const allProposalsAreOnSameCallAsInstrument =
-      await this.checkIfProposalsAreOnSameCallAsInstrument(args);
-
-    if (!allProposalsAreOnSameCallAsInstrument) {
-      return rejection(
-        'One or more proposals can not be assigned to instrument, because instrument is not in the call',
-        { args }
-      );
+    if (result.proposalPks.length !== proposalPks.length) {
+      return rejection('Could not assign proposal/s to instrument', {
+        agent,
+        args,
+      });
     }
 
-    return this.assignProposalsToInstrumentHelper(agent, args);
+    return result;
   }
 
   @Authorized([Roles.USER_OFFICER])
