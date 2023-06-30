@@ -287,10 +287,10 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return allProposals.find((proposal) => proposal.primaryKey === id) || null;
   }
 
-  async getByQuestionaryId(qestionaryid: number) {
+  async getByQuestionaryId(questionaryId: number) {
     return (
       allProposals.find(
-        (proposal) => proposal.questionaryId === qestionaryid
+        (proposal) => proposal.questionaryId === questionaryId
       ) || null
     );
   }
