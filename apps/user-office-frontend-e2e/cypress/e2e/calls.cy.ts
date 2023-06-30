@@ -797,7 +797,7 @@ context('Calls tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[data-cy="availability-time"]').type('-10');
+      cy.get('[data-cy="availability-time"] input').type('-10');
       cy.get('[data-cy="availability-time"]').contains(
         'Availability time must be a positive number'
       );
@@ -806,7 +806,7 @@ context('Calls tests', () => {
         .find('[aria-label="Save"] button')
         .should('be.disabled');
 
-      cy.get('[data-cy="availability-time"]')
+      cy.get('[data-cy="availability-time"] input')
         .clear()
         .type(MAX_32_BIT_INTEGER.toString());
 
