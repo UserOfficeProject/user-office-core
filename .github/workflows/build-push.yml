@@ -77,6 +77,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./apps/user-office-backend
+          platforms: linux/amd64,linux/arm64/v8
           file: ./apps/user-office-backend/Dockerfile
           push: true
           tags: ${{ steps.meta-backend.outputs.tags }}
@@ -85,6 +86,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./apps/user-office-frontend
+          platforms: linux/amd64,linux/arm64/v8
           file: ./apps/user-office-frontend/Dockerfile
           push: true
           tags: ${{ steps.meta-frontend.outputs.tags }}

@@ -232,16 +232,16 @@ jobs:
       matrix:
         pattern:
           [
-            "cypress/integration/[a-e]*.ts",
-            "cypress/integration/[f-h]*.ts",
-            "cypress/integration/[i-o]*.ts",
-            "cypress/integration/p[a-m]*.ts",
-            "cypress/integration/p[n-z]*.ts",
-            "cypress/integration/[r-s]*.ts",
-            "cypress/integration/templates_basic.ts",
-            "cypress/integration/templates_advanced.ts",
-            "cypress/integration/[u-z]*.ts",
-            "cypress/integration/[A-Z]*.ts",
+            "cypress/e2e/[a-e]*.ts",
+            "cypress/e2e/[f-h]*.ts",
+            "cypress/e2e/[i-o]*.ts",
+            "cypress/e2e/p[a-m]*.ts",
+            "cypress/e2e/p[n-z]*.ts",
+            "cypress/e2e/[r-s]*.ts",
+            "cypress/e2e/templatesBasic.cy.ts",
+            "cypress/e2e/templatesAdvanced.cy.ts",
+            "cypress/e2e/[u-z]*.ts",
+            "cypress/e2e/[A-Z]*.ts",
           ]
 
     steps:
