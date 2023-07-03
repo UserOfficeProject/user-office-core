@@ -363,7 +363,7 @@ context('Template tests', () => {
       });
       cy.login('user1');
       cy.visit('/');
-
+      cy.finishedLoading();
       cy.contains(proposal.title)
         .parent()
         .find('[aria-label="Edit proposal"]')

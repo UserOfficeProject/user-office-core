@@ -5,13 +5,14 @@ import {
 import { DataType } from '../Template';
 import { Question } from './QuestionRegistry';
 
-export const proposalEsiBasisDefinition: Question = {
-  dataType: DataType.PROPOSAL_ESI_BASIS,
-  createBlankConfig: (): ProposalEsiBasisConfig => {
-    const config = new ProposalBasisConfig();
-    config.tooltip = '';
+export const proposalEsiBasisDefinition: Question<DataType.PROPOSAL_ESI_BASIS> =
+  {
+    dataType: DataType.PROPOSAL_ESI_BASIS,
+    createBlankConfig: (): ProposalEsiBasisConfig => {
+      const config = new ProposalBasisConfig();
+      config.tooltip = '';
 
-    return config;
-  },
-  getDefaultAnswer: () => null,
-};
+      return config;
+    },
+    getDefaultAnswer: () => null,
+  };
