@@ -24,7 +24,7 @@ type FormikUIAutocompleteProps = {
   AdornmentIcon?: MUITextFieldProps;
 };
 
-const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
+const FormikUIAutocomplete = ({
   items,
   name,
   label,
@@ -37,7 +37,7 @@ const FormikUIAutocomplete: React.FC<FormikUIAutocompleteProps> = ({
   multiple = false,
   AdornmentIcon,
   ...props
-}) => {
+}: FormikUIAutocompleteProps) => {
   const [adornmentVisible, setAdornmentVisible] = useState(false);
   const options = items.map((item) => item.value);
 

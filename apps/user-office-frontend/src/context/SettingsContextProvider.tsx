@@ -29,7 +29,9 @@ const initialSettingsData: SettingsContextData = {
 export const SettingsContext =
   React.createContext<SettingsContextData>(initialSettingsData);
 
-export const SettingsContextProvider: React.FC = (props) => {
+export const SettingsContextProvider = (props: {
+  children: React.ReactNode;
+}) => {
   const { settings, loadingSettings, setSettings } = useSettings();
   const classes = useStyles();
 

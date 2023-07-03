@@ -1,7 +1,7 @@
 //import { FormControlLabel } from '@mui/material';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
@@ -9,9 +9,9 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationGenericTemplateBasisForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationGenericTemplateBasisForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   return (
     <QuestionTemplateRelationFormShell
       {...props}

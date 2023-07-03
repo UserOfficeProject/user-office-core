@@ -51,7 +51,7 @@ const columns: Column<Sep>[] = [
   },
 ];
 
-const SEPsTable: React.FC = () => {
+const SEPsTable = () => {
   const { currentRole } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [isActiveFilter, setIsActiveFilter] = useState<undefined | boolean>(

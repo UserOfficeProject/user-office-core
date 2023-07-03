@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import InstitutionTable from './InstitutionTable';
 
-const InstrumentsPage: React.FC = () => {
+const InstrumentsPage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

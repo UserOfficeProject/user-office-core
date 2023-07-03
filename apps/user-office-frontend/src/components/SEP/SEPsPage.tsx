@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import SEPsTable from './SEPsTable';
 
-const SEPsPage: React.FC = () => {
+const SEPsPage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

@@ -25,7 +25,7 @@ import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
 import ExternalAuth from './user/ExternalAuth';
 
-const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
+const PrivateRoute = ({ component, ...rest }: RouteProps) => {
   if (!component) {
     throw Error('component is undefined');
   }
@@ -54,7 +54,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   );
 };
 
-const Routes: React.FC<RouteProps> = () => {
+const Routes = () => {
   return (
     <div className="App">
       <Switch>

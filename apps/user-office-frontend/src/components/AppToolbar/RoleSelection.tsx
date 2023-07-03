@@ -18,7 +18,7 @@ const columns = [
   { title: 'Role', field: 'title' },
 ];
 
-const RoleSelection: React.FC<{ onClose: FunctionType }> = ({ onClose }) => {
+const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
   const { currentRole, token, handleNewToken } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();

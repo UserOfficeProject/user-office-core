@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
+const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const classes = useStyles();
 

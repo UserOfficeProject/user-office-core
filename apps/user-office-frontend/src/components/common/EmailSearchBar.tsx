@@ -22,7 +22,7 @@ const useStyles = makeStyles({
   },
 });
 
-const EmailSearchBar: React.FC = (props) => {
+const EmailSearchBar = (props: any) => {
   const classes = useStyles();
 
   return (

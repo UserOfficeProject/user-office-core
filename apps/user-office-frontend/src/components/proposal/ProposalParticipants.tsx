@@ -32,14 +32,14 @@ type ParticipantsProps = {
   preserveSelf?: boolean;
 };
 
-const Participants: React.FC<ParticipantsProps> = ({
+const Participants = ({
   users,
   setUsers,
   className,
   title,
   principalInvestigator,
   preserveSelf,
-}) => {
+}: ParticipantsProps) => {
   const [modalOpen, setOpen] = useState(false);
 
   const classes = useStyles();

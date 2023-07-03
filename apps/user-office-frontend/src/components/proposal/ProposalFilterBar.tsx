@@ -48,13 +48,13 @@ type ProposalFilterBarProps = {
   filter: ProposalsFilter;
 };
 
-const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
+const ProposalFilterBar = ({
   calls,
   instruments,
   proposalStatuses,
   setProposalFilter,
   filter,
-}) => {
+}: ProposalFilterBarProps) => {
   const { setQuestionFilterQuery } = useQuestionFilterQueryParams();
   const [showQuestionFilter, setShowQuestionFilter] = useState(
     filter.questionFilter !== undefined

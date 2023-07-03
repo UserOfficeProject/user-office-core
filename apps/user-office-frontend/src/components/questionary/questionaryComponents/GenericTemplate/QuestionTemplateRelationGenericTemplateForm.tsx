@@ -2,7 +2,7 @@ import { Collapse, FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import { default as React, FC } from 'react';
+import { default as React } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -15,9 +15,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationGenericTemplateForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationGenericTemplateForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   const templateId = (props.questionRel.question.config as SubTemplateConfig)
     .templateId;
   const { templates } = useTemplates({

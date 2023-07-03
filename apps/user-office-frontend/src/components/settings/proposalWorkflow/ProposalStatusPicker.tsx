@@ -13,9 +13,11 @@ import {
 
 import { ProposalStatus } from 'generated/sdk';
 
-const ProposalStatusPicker: React.FC<{
+const ProposalStatusPicker = ({
+  proposalStatuses,
+}: {
   proposalStatuses: ProposalStatus[];
-}> = ({ proposalStatuses }) => {
+}) => {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const classes = makeStyles((theme) => ({

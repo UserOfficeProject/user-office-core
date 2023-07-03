@@ -17,7 +17,7 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-const ThemeWrapper: React.FC = (props) => {
+const ThemeWrapper = (props: { children: React.ReactNode }) => {
   const { settingsMap } = useContext(SettingsContext);
   const defaultTheme = useTheme();
 

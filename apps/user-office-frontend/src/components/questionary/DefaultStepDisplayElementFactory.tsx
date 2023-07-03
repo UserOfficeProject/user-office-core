@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { ReactElement } from 'react';
 
 import { WizardStep } from 'models/questionary/QuestionarySubmissionState';
 
@@ -8,7 +8,7 @@ export class DefaultStepDisplayElementFactory
   implements StepDisplayElementFactory
 {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(private reviewStep: FC<any>) {}
+  constructor(private reviewStep: (props: any) => ReactElement) {}
 
   getDisplayElement(wizardStep: WizardStep, isReadOnly: boolean) {
     switch (wizardStep.type) {

@@ -35,9 +35,12 @@ type AssignProposalsToInstrumentProps = {
   instrumentIds: (number | null)[];
 };
 
-const AssignProposalsToInstrument: React.FC<
-  AssignProposalsToInstrumentProps
-> = ({ close, assignProposalsToInstrument, callIds, instrumentIds }) => {
+const AssignProposalsToInstrument = ({
+  close,
+  assignProposalsToInstrument,
+  callIds,
+  instrumentIds,
+}: AssignProposalsToInstrumentProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
