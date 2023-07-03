@@ -24,7 +24,7 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }>;
   // Read
   get(primaryKey: number): Promise<Proposal | null>;
-
+  getByQuestionaryId(questionaryId: number): Promise<Proposal | null>;
   getProposals(
     filter?: ProposalsFilter,
     first?: number,

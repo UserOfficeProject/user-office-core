@@ -1,0 +1,5 @@
+query getInstrument($instrumentId: Int!) {
+  instrument(instrumentId: $instrumentId) {
+    ...instrument
+  }
+}

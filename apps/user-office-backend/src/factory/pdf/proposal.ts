@@ -331,6 +331,12 @@ export const collectProposalPDFData = async (
               genericTemplate.questionId === answer.question.id
           )
           .map((genericTemplate) => genericTemplate);
+      } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+        const instrument = await baseContext.queries.instrument.get(
+          user,
+          answer.value as number
+        );
+        answer.value = instrument?.name ?? '';
       }
     }
 

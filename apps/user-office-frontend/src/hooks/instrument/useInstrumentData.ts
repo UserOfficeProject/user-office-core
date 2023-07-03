@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react';
 
-import { Call, InputMaybe } from 'generated/sdk';
+import { Instrument } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useCallData(callId?: InputMaybe<Call['id']>) {
-  const [call, setCall] = useState<Call | null>(null);
+export function useInstrumentData(instrumentId: number | undefined) {
+  const [instrument, setInstrument] = useState<Instrument | null>(null);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();
 
   useEffect(() => {
     let unmounted = false;
-    if (callId) {
+    if (instrumentId) {
       api()
-        .getCall({ callId })
+        .getInstrument({ instrumentId })
         .then((data) => {
           if (unmounted) {
             return;
           }
 
-          if (data.call) {
-            setCall(data.call as Call);
+          if (data.instrument) {
+            setInstrument(data.instrument as Instrument);
           }
           setLoading(false);
         });
@@ -29,7 +29,7 @@ export function useCallData(callId?: InputMaybe<Call['id']>) {
         unmounted = true;
       };
     }
-  }, [api, callId]);
+  }, [api, instrumentId]);
 
-  return { loading, call, setCall };
+  return { loading, instrument, setInstrument };
 }
