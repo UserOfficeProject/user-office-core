@@ -1,4 +1,4 @@
-import { MTableToolbar } from '@material-table/core';
+import { MTableToolbar, Options } from '@material-table/core';
 import Button from '@mui/material/Button';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Field } from 'formik';
@@ -22,7 +22,7 @@ const useStyles = makeStyles({
   },
 });
 
-const EmailSearchBar = (props: any) => {
+const EmailSearchBar = (props: Options<JSX.Element>) => {
   const classes = useStyles();
 
   return (
