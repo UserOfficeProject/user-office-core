@@ -24,6 +24,7 @@ import { feedbackBasisDefinition } from './questionaryComponents/FeedbackBasis/F
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
 import { genericTemplateDefinition } from './questionaryComponents/GenericTemplate/GenericTemplateDefinition';
 import { genericTemplateBasisDefinition } from './questionaryComponents/GenericTemplateBasis/GenericTemplateBasisDefinition';
+import { instrumentPickerDefinition } from './questionaryComponents/InstrumentPicker/InstrumentPickerDefinition';
 import { intervalDefinition } from './questionaryComponents/Interval/IntervalDefinition';
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
@@ -174,6 +175,7 @@ const registry = [
   shipmentBasisDefinition,
   textInputDefinition,
   visitBasisDefinition,
+  instrumentPickerDefinition,
 ];
 
 Object.freeze(registry);
