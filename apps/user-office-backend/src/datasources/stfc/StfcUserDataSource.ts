@@ -524,6 +524,9 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async isSearchableUser(userId: number): Promise<boolean> {
-    return !!(await this.getStfcBasicPersonByUserNumber(String(userId), true));
+    return !!(await this.getStfcBasicPersonByUserNumber(
+      userId.toString(),
+      true
+    ));
   }
 }

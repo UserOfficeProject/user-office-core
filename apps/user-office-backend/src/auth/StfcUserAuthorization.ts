@@ -311,12 +311,9 @@ export class StfcUserAuthorization extends UserAuthorization {
   async canReadUser(agent: UserWithRole | null, id: number): Promise<boolean> {
     const readableUsers = await this.listReadableUsers(agent, [id]);
 
-    if (readableUsers.includes(id)) {
-      return true;
-    }
-
-    const isSearchableUser = await this.userDataSource.isSearchableUser(id);
-
-    return isSearchableUser;
+    return (
+      readableUsers.includes(id) ||
+      (await this.userDataSource.isSearchableUser(id))
+    );
   }
 }
