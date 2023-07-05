@@ -13,7 +13,7 @@ import { DataType, QuestionTemplateRelation } from '../Template';
 import { Unit } from '../Unit';
 import { Question } from './QuestionRegistry';
 
-export const numberInputDefinition: Question = {
+export const numberInputDefinition: Question<DataType.NUMBER_INPUT> = {
   dataType: DataType.NUMBER_INPUT,
   getDefaultAnswer: (field) => {
     return {

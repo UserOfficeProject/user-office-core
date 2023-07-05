@@ -78,6 +78,9 @@ let columns: Column<ProposalViewData>[] = [
     ...{ width: 'auto' },
   },
   {
+    title: 'Principal Investigator',
+    field: 'principalInvestigator',
+    emptyValue: '-',
     render: (proposalView) => {
       if (
         proposalView.principalInvestigator?.lastname &&
@@ -88,8 +91,6 @@ let columns: Column<ProposalViewData>[] = [
 
       return '';
     },
-    title: 'Principal Investigator',
-    emptyValue: '-',
   },
   {
     title: 'PI Email',

@@ -2,7 +2,7 @@ import { SubTemplateConfig } from '../../resolvers/types/FieldConfig';
 import { DataType, TemplateCategoryId } from '../Template';
 import { Question } from './QuestionRegistry';
 
-export const genericTemplateDefinition: Question = {
+export const genericTemplateDefinition: Question<DataType.GENERIC_TEMPLATE> = {
   dataType: DataType.GENERIC_TEMPLATE,
   createBlankConfig: (): SubTemplateConfig => {
     const config = new SubTemplateConfig();
