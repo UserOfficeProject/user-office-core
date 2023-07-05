@@ -413,6 +413,41 @@ VALUES
   );
 
 
+-- Instrument picker
+INSERT INTO questions(
+  question_id, data_type, question, 
+  default_config, created_at, updated_at, 
+  natural_key, category_id
+) 
+VALUES 
+  (
+    'instrument_picker_question', 
+    'INSTRUMENT_PICKER', 'Instrument Picker question from seeds', 
+    '{"variant":"dropdown","options":[1, 2]}', 
+    '2023-02-08 10:23:10.285415+00', 
+    '2023-02-08 10:23:10.285415+00', 
+    'instrument_picker_question', 
+    1
+  );
+
+INSERT INTO templates_has_questions(
+  question_id, template_id, topic_id, 
+  sort_order, config
+) 
+VALUES 
+  (
+    'instrument_picker_question', 
+    1, 5, 6, '{"variant":"dropdown","options":[1, 2]}'
+  );
+INSERT INTO answers(
+  questionary_id, question_id, answer
+) 
+VALUES 
+  (
+    1, 'instrument_picker_question', 
+    '{"value": 1 }'
+  );
+
 
 
 END;

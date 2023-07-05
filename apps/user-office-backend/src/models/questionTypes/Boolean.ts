@@ -7,7 +7,7 @@ import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
-export const booleanDefinition: Question = {
+export const booleanDefinition: Question<DataType.BOOLEAN> = {
   dataType: DataType.BOOLEAN,
   validate: (field: QuestionTemplateRelation, value: boolean) => {
     if (field.question.dataType !== DataType.BOOLEAN) {

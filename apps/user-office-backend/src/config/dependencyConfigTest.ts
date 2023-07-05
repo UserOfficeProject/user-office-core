@@ -80,3 +80,7 @@ mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+
+jest.mock('../decorators/EventBus', () => {
+  return () => jest.fn();
+});

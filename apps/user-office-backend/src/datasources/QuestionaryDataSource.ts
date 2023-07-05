@@ -16,6 +16,7 @@ export interface QuestionaryDataSource {
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
   getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;
   getBlankQuestionarySteps(templateId: number): Promise<QuestionaryStep[]>;
+  getBlankQuestionaryStepsByCallId(callId: number): Promise<QuestionaryStep[]>;
   getAnswers(questionId: string): Promise<AnswerBasic[]>;
   getTemplates(questionId: string): Promise<Template[]>;
   getIsCompleted(questionaryId: number): Promise<boolean>;
