@@ -50,6 +50,8 @@ context('Scheduler tests', () => {
   });
 
   it('User should not be able to see upcoming experiments in DRAFT state', () => {
+    cy.changeActiveRole(initialDBData.roles.user);
+
     cy.contains('Upcoming experiments');
 
     cy.contains(upcomingDraft.startsAt).should('not.exist');
@@ -72,6 +74,8 @@ context('Scheduler tests', () => {
   });
 
   it('User should be able to see upcoming experiments in ACTIVE', () => {
+    cy.changeActiveRole(initialDBData.roles.user);
+
     cy.contains('Upcoming experiments').should('exist');
 
     cy.contains(upcoming.startsAt);
@@ -98,6 +102,8 @@ context('Scheduler tests', () => {
   });
 
   it('User should be able to see upcoming experiments in COMPLETED', () => {
+    cy.changeActiveRole(initialDBData.roles.user);
+
     cy.contains('Upcoming experiments').should('exist');
 
     cy.contains(completed.startsAt);
@@ -124,6 +130,8 @@ context('Scheduler tests', () => {
   });
 
   it('User should be able to see past and upcoming experiments', () => {
+    cy.changeActiveRole(initialDBData.roles.user);
+
     cy.contains('Experiment Times').click();
     cy.finishedLoading();
 
