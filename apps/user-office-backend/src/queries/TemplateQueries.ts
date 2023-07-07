@@ -20,7 +20,7 @@ export default class TemplateQueries {
     return this.dataSource.getTemplate(templateId);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getTemplates(agent: UserWithRole | null, args?: TemplatesArgs) {
     return this.dataSource.getTemplates(args);
   }
