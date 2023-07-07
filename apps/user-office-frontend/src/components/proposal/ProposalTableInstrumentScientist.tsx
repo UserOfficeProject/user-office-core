@@ -192,6 +192,8 @@ const ProposalTableInstrumentScientist: React.FC<{
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: urlQueryParams.call,
+    instrumentId: urlQueryParams.instrument,
+    proposalStatusId: urlQueryParams.proposalStatus,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
