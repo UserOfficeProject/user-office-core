@@ -478,6 +478,13 @@ export default class UserMutations {
         user.id,
         roles[0]
       );
+
+      // Set the current role to the highest possible, user officer, instrument scientist, user
+      const currentRole =
+        roles.find((role) => role.shortCode === Roles.USER_OFFICER) ||
+        roles.find((role) => role.shortCode === Roles.INSTRUMENT_SCIENTIST) ||
+        roles[0];
+
       const uosToken = signToken<AuthJwtPayload>({
         user: {
           created: user.created,
@@ -492,7 +499,7 @@ export default class UserMutations {
           preferredname: user.preferredname,
         },
         roles,
-        currentRole: roles[0],
+        currentRole,
         isInternalUser: isInternalUser,
         externalToken: externalToken,
       });

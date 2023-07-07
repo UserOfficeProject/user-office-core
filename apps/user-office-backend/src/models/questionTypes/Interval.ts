@@ -11,7 +11,7 @@ import { DataType, QuestionTemplateRelation } from '../Template';
 import { Unit } from '../Unit';
 import { Question } from './QuestionRegistry';
 
-export const intervalDefinition: Question = {
+export const intervalDefinition: Question<DataType.INTERVAL> = {
   dataType: DataType.INTERVAL,
   getDefaultAnswer: (field) => {
     return {

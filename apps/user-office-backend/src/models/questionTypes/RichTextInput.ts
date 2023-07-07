@@ -45,7 +45,7 @@ export const sanitizerConfig: IOptions = {
   allowedSchemesAppliedToAttributes: [],
 };
 
-export const richTextInputDefinition: Question = {
+export const richTextInputDefinition: Question<DataType.RICH_TEXT_INPUT> = {
   dataType: DataType.RICH_TEXT_INPUT,
   validate: (field: QuestionTemplateRelation, value: any) => {
     if (field.question.dataType !== DataType.RICH_TEXT_INPUT) {

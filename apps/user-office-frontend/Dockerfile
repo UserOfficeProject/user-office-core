@@ -10,6 +10,8 @@ RUN echo "GENERATE_SOURCEMAP=false" >> .env
 
 COPY package*.json /app/
 
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --loglevel error --no-fund
 
 COPY ./ ./

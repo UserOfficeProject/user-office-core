@@ -6,6 +6,7 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
@@ -14,6 +15,7 @@ import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ProposalPdfDownloadOptions } from '../../middlewares/factory/factoryServices';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Instrument } from '../../models/Instrument';
 import { Proposal } from '../../models/Proposal';
 import {
   areDependenciesSatisfied,
@@ -111,13 +113,14 @@ const getQuestionary = async (questionaryId: number) => {
   return questionary;
 };
 
-const addTopicInformation = (
+const addTopicInformation = async (
   proposalPDFData: ProposalPDFData,
   questionarySteps: QuestionaryStep[],
   samples: Sample[],
   genericTemplates: GenericTemplate[],
   sampleAttachments: Attachment[],
   genericTemplateAttachments: Attachment[],
+  getInstrument: (value: number) => Promise<Instrument | null>,
   questionIds?: string[]
 ) => {
   const updatedProposalPDFData = { ...proposalPDFData };
@@ -168,6 +171,9 @@ const addTopicInformation = (
               genericTemplate.questionId === answer.question.id
           )
           .map((genericTemplate) => genericTemplate);
+      } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+        const instrument = await getInstrument(answer.value as number);
+        answer.value = instrument?.name ?? '';
       }
     }
 
@@ -331,8 +337,14 @@ export const collectProposalPDFData = async (
     }.pdf`
   );
 
+  const getInstrument = function enclosure(user: UserWithRole) {
+    return async function (instrumentId: number) {
+      return await baseContext.queries.instrument.get(user, instrumentId);
+    };
+  };
   // Information from each topic in proposal
-  const proposalPDFData: ProposalPDFData = addTopicInformation(
+
+  const proposalPDFData: ProposalPDFData = await addTopicInformation(
     {
       proposal,
       principalInvestigator,
@@ -348,6 +360,7 @@ export const collectProposalPDFData = async (
     genericTemplates,
     sampleAttachments,
     genericTemplateAttachments,
+    getInstrument(user),
     questionIds
   );
 
@@ -549,8 +562,11 @@ export const collectProposalPDFDataTokenAccess = async (
     }.pdf`
   );
 
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
   // Add information from each topic in proposal
-  const proposalPDFData: ProposalPDFData = addTopicInformation(
+  const proposalPDFData: ProposalPDFData = await addTopicInformation(
     {
       proposal,
       principalInvestigator,
@@ -566,6 +582,7 @@ export const collectProposalPDFDataTokenAccess = async (
     genericTemplates,
     sampleAttachments,
     genericTemplateAttachments,
+    instrumentDataSource.getInstrument,
     questionIds
   );
 
