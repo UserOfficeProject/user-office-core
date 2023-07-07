@@ -299,7 +299,7 @@ const ProposalAttachmentDownload = ({
               proposalIds,
               title,
               selectedPdfTemplate.toString(),
-              selectedAttachmentsQuestions?.join(',')
+              selectedAttachmentsQuestions.join(',')
             );
             close();
           } else {
