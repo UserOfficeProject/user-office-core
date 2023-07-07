@@ -33,12 +33,23 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       collectionFilename: `proposals_${getCurrentTimestamp()}.pdf`,
       singleFilename: '',
     };
+    const options = ((queryParams) => {
+      return {
+        filter: queryParams.filter?.toString(),
+        pdfTemplateId:
+          req.query?.pdfTemplateId &&
+          !isNaN(+req.query?.pdfTemplateId?.toString())
+            ? +req.query?.pdfTemplateId?.toString()
+            : undefined,
+        questionIds: queryParams.questionIds?.toString().split(','),
+      };
+    })(req.query);
 
     const data = await pdfServices.getPdfProposals(
       userWithRole,
       proposalPks,
       meta,
-      req.query?.filter?.toString()
+      options
     );
 
     if (!data) {

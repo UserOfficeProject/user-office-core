@@ -18,6 +18,7 @@ export async function collectGenericTemplatePDFData(
   genericTemplateId: number,
   user: UserWithRole,
   notify?: CallableFunction,
+  questionIds?: string[],
   newGenericTemplate?: GenericTemplate,
   newQuestionary?: Questionary,
   newQuestionarySteps?: QuestionaryStep[]
@@ -68,9 +69,17 @@ export async function collectGenericTemplatePDFData(
 
   const attachments: Attachment[] = [];
 
-  completedFields.forEach((answer) => {
-    attachments.push(...getFileAttachments(answer));
-  });
+  for (const fieldAnswer of completedFields) {
+    if (
+      questionIds &&
+      questionIds.length !== 0 &&
+      !questionIds.includes(fieldAnswer.question.id)
+    ) {
+      continue;
+    }
+
+    attachments.push(...getFileAttachments(fieldAnswer));
+  }
   const out: GenericTemplatePDFData = {
     genericTemplate: {
       ...genericTemplate,
