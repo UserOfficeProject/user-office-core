@@ -115,16 +115,21 @@ export enum PREPARE_DOWNLOAD_TYPE {
   PDF_SAMPLE,
   PDF_SHIPMENT_LABEL,
   PDF_GENERIC_TEMPLATE,
-
   XLSX_PROPOSAL,
   XLSX_SEP,
 }
+
+export type ProposalPdfDownloadOptions = {
+  pdfTemplateId?: string;
+  questionIds?: string;
+};
 
 export interface DownloadContextData {
   prepareDownload: (
     type: PREPARE_DOWNLOAD_TYPE,
     id: Array<number | number[]>,
-    name: string | null
+    name: string | null,
+    options?: ProposalPdfDownloadOptions
   ) => void;
 }
 
@@ -137,10 +142,15 @@ export const DownloadContext = React.createContext<DownloadContextData>({
 
 function generateLink(
   type: PREPARE_DOWNLOAD_TYPE,
-  ids: Array<number | number[]>
+  ids: Array<number | number[]>,
+  options?: ProposalPdfDownloadOptions
 ): string {
   switch (type) {
     case PREPARE_DOWNLOAD_TYPE.PDF_PROPOSAL:
+      if (options) {
+        return `/download/pdf/proposal/${ids}?pdfTemplateId=${options?.pdfTemplateId}&questionIds=${options?.questionIds}`;
+      }
+
       return '/download/pdf/proposal/' + ids;
     case PREPARE_DOWNLOAD_TYPE.PDF_SAMPLE:
       return '/download/pdf/sample/' + ids;
@@ -198,7 +208,8 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
   const prepareDownload = (
     type: PREPARE_DOWNLOAD_TYPE,
     ids: Array<number | number[]>,
-    name: string | null
+    name: string | null,
+    options?: ProposalPdfDownloadOptions
   ) => {
     const id = `${type}__${ids}`;
     if (pendingRequests.current.has(id)) {
@@ -206,7 +217,7 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
     }
 
     const controller = new AbortController();
-    const req = crossFetch(generateLink(type, ids), {
+    const req = crossFetch(generateLink(type, ids, options), {
       signal: controller.signal,
       headers: {
         Authorization: `Bearer ${token}`,
