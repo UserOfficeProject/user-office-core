@@ -5,6 +5,46 @@ query getProposals($filter: ProposalsFilter) {
       proposer {
         ...basicUserDetails
       }
+      questionary {
+        steps {
+          fields {
+            question {
+              id
+              question
+              dataType
+            }
+            value
+          }
+        }
+      }
+      genericTemplates {
+        questionary {
+          steps {
+            fields {
+              question {
+                id
+                question
+                dataType
+              }
+              value
+            }
+          }
+        }
+      }
+      samples {
+        questionary {
+          steps {
+            fields {
+              question {
+                id
+                question
+                dataType
+              }
+              value
+            }
+          }
+        }
+      }
       reviews {
         id
         grade

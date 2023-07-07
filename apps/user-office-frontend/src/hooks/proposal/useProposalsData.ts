@@ -17,6 +17,7 @@ export function useProposalsData(filter: ProposalsFilter) {
     questionaryIds,
     questionFilter,
     text,
+    referenceNumbers,
   } = filter;
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export function useProposalsData(filter: ProposalsFilter) {
           questionaryIds,
           questionFilter,
           text,
+          referenceNumbers,
         },
       })
       .then((data) => {
@@ -58,6 +60,7 @@ export function useProposalsData(filter: ProposalsFilter) {
     text,
     api,
     currentRole,
+    referenceNumbers,
   ]);
 
   return { loading, proposalsData, setProposalsData };
