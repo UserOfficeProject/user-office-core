@@ -3,6 +3,7 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
+import { Dialog, DialogContent } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
@@ -53,12 +54,19 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
+import TableActionsDropdownMenu from './TableActionsDropdownMenu';
 
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
+
+enum DownloadMenuOption {
+  PROPOSAL = 'Proposal',
+  ATTACHMENT = 'Attachment',
+}
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -150,6 +158,9 @@ const ProposalTableInstrumentScientist: React.FC<{
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
   const { settingsMap } = useContext(SettingsContext);
+  const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
+    useState<null | HTMLElement>(null);
+  const [openDownloadAttachment, setOpenDownloadAttachment] = useState(false);
   const { t } = useTranslation();
   const statusFilterValue =
     settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)?.settingsValue ||
@@ -181,8 +192,6 @@ const ProposalTableInstrumentScientist: React.FC<{
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: urlQueryParams.call,
-    instrumentId: urlQueryParams.instrument,
-    proposalStatusId: urlQueryParams.proposalStatus,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
@@ -203,18 +212,34 @@ const ProposalTableInstrumentScientist: React.FC<{
     ProposalViewData[]
   >([]);
 
+  const [selectedProposals, setSelectedProposals] = useState<
+    ProposalViewData[]
+  >([]);
   useEffect(() => {
+    setPreselectedProposalsData(proposalsData);
+  }, [proposalsData, urlQueryParams]);
+
+  useEffect(() => {
+    const selected: ProposalViewData[] = [];
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
 
-      setPreselectedProposalsData(
-        proposalsData.map((proposal) => ({
-          ...proposal,
-          tableData: {
-            checked: selection.has(proposal.primaryKey.toString()),
-          },
-        }))
-      );
+      setPreselectedProposalsData((preselectedProposalsData) => {
+        const preselected = preselectedProposalsData.map((proposal) => {
+          if (selection.has(proposal.primaryKey.toString())) {
+            selected.push(proposal);
+          }
+
+          return {
+            ...proposal,
+            tableData: {
+              checked: selection.has(proposal.primaryKey.toString()),
+            },
+          };
+        });
+
+        return preselected;
+      });
     } else {
       setPreselectedProposalsData(
         proposalsData.map((proposal) => ({
@@ -223,6 +248,7 @@ const ProposalTableInstrumentScientist: React.FC<{
         }))
       );
     }
+    setSelectedProposals(selected);
   }, [proposalsData, urlQueryParams.selection]);
 
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -367,18 +393,21 @@ const ProposalTableInstrumentScientist: React.FC<{
       sortDirection: orderDirection ? orderDirection : undefined,
     });
 
-  const handleBulkDownloadClick = (
-    _: React.MouseEventHandler<HTMLButtonElement>,
-    rowData: ProposalViewData | ProposalViewData[]
+  const handleDownloadActionClick = (
+    event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (!Array.isArray(rowData)) {
-      return;
+    setActionsMenuAnchorElement(event.currentTarget);
+  };
+  const handleClose = (selectedOption: string) => {
+    if (selectedOption === DownloadMenuOption.PROPOSAL) {
+      downloadPDFProposal(
+        selectedProposals.map((proposal) => proposal.primaryKey),
+        selectedProposals[0].title
+      );
+    } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
+      setOpenDownloadAttachment(true);
     }
-
-    downloadPDFProposal(
-      rowData.map((row) => row.primaryKey),
-      rowData[0].title
-    );
+    setActionsMenuAnchorElement(null);
   };
 
   const handleBulkTechnicalReviewsSubmit = async (
@@ -526,6 +555,37 @@ const ProposalTableInstrumentScientist: React.FC<{
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openDownloadAttachment}
+        onClose={(): void => setOpenDownloadAttachment(false)}
+      >
+        <DialogContent>
+          <ProposalAttachmentDownload
+            close={(): void => setOpenDownloadAttachment(false)}
+            referenceNumbers={selectedProposals.map(
+              (selectedProposal) => selectedProposal.proposalId
+            )}
+            downloadProposalAttachment={(
+              proposalIds: number[],
+              title,
+              pdfTemplateId: string,
+              questionIds: string
+            ) =>
+              downloadPDFProposal(proposalIds, title, {
+                pdfTemplateId,
+                questionIds,
+              })
+            }
+          />
+        </DialogContent>
+      </Dialog>
+      <TableActionsDropdownMenu
+        event={actionsMenuAnchorElement}
+        handleClose={handleClose}
+        options={Object.values(DownloadMenuOption)}
+      />
       <ReviewerFilterComponent
         reviewer={urlQueryParams.reviewer}
         onChange={(reviewer) =>
@@ -572,7 +632,9 @@ const ProposalTableInstrumentScientist: React.FC<{
           {
             icon: GetAppIconComponent,
             tooltip: 'Download proposals',
-            onClick: handleBulkDownloadClick,
+            onClick: (event): void => {
+              handleDownloadActionClick(event);
+            },
             position: 'toolbarOnSelect',
           },
           {
