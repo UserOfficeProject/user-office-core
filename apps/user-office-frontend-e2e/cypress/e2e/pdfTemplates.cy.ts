@@ -4,7 +4,7 @@ import { TemplateGroupId } from '@user-office-software-libs/shared-types';
 context('PDF template tests', () => {
   const templateName = faker.lorem.words(3);
   const templateDesc = faker.lorem.words(3);
-  const pdfTemplateData = faker.lorem.paragraphs(2);
+  const pdfTemplateData = faker.lorem.paragraphs(10);
 
   let createdTemplateName: string;
 
