@@ -21,6 +21,8 @@ import {
   UpdateQuestionTemplateRelationSettingsMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
   UpdateTopicMutationVariables,
+  UpdatePdfTemplateMutationVariables,
+  UpdatePdfTemplateMutation,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -86,6 +88,15 @@ function cloneTemplate(
 ): Cypress.Chainable<CloneTemplateMutation> {
   const api = getE2EApi();
   const request = api.cloneTemplate(cloneTemplateInput);
+
+  return cy.wrap(request);
+}
+
+function updatePdfTemplate(
+  updatePdfTemplateInput: UpdatePdfTemplateMutationVariables
+): Cypress.Chainable<UpdatePdfTemplateMutation> {
+  const api = getE2EApi();
+  const request = api.updatePdfTemplate(updatePdfTemplateInput);
 
   return cy.wrap(request);
 }
@@ -661,6 +672,7 @@ const createRichTextInput = (
 
 Cypress.Commands.add('createTemplate', createTemplate);
 Cypress.Commands.add('cloneTemplate', cloneTemplate);
+Cypress.Commands.add('updatePdfTemplate', updatePdfTemplate);
 Cypress.Commands.add('createGenericTemplate', createGenericTemplate);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
