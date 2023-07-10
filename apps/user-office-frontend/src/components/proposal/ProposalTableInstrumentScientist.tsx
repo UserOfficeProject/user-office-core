@@ -64,8 +64,8 @@ const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
 
 enum DownloadMenuOption {
-  PROPOSAL = 'Proposal',
-  ATTACHMENT = 'Attachment',
+  PROPOSAL = 'Proposal(s)',
+  ATTACHMENT = 'Attachment(s)',
 }
 
 let columns: Column<ProposalViewData>[] = [

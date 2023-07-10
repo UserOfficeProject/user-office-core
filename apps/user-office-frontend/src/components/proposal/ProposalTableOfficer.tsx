@@ -199,8 +199,8 @@ const PREFETCH_SIZE = 200;
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
 
 enum DownloadMenuOption {
-  PROPOSAL = 'Proposal',
-  ATTACHMENT = 'Attachment',
+  PROPOSAL = 'Proposal(s)',
+  ATTACHMENT = 'Attachment(s)',
 }
 /**
  * NOTE: This toolbar "select all" option works only with all prefetched proposals. Currently that value is set to "PREFETCH_SIZE=200"
