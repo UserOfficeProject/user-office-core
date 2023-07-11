@@ -166,7 +166,7 @@ const getUsersTableData = (
   };
 };
 
-const PeopleTable: React.FC<PeopleTableProps> = ({
+const PeopleTable = ({
   selectedParticipants,
   selection,
   setSelectedParticipants,
@@ -185,7 +185,7 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
   preserveSelf,
   search,
   title,
-}) => {
+}: PeopleTableProps) => {
   const [query, setQuery] = useState<
     GetUsersQueryVariables & { refreshData: boolean }
   >({

@@ -6,7 +6,7 @@ interface PageProps extends RouteProps {
   setHeader: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const TitledRoute: React.FC<PageProps> = (props: PageProps) => {
+const TitledRoute = (props: PageProps) => {
   document.title = props.title;
   // NOTE: useEffect to fix warning about updating component(Dashboard) while rendering another component(TitledRoute)
   useEffect(() => {

@@ -44,7 +44,7 @@ type InformationDialogProps = {
   linkStyle?: React.CSSProperties;
 };
 
-const InformationDialog: React.FC<InformationDialogProps> = (props) => {
+const InformationDialog = (props: InformationDialogProps) => {
   const [open, setOpen] = React.useState(false);
   const classes = useStyles();
   const handleClickOpen = () => {

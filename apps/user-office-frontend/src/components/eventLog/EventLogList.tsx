@@ -32,10 +32,10 @@ const columns = [
   { title: 'Event type', field: 'eventType' },
 ];
 
-const EventLogList: React.FC<EventLogListProps> = ({
+const EventLogList = ({
   changedObjectId = '*',
   eventType = '*',
-}) => {
+}: EventLogListProps) => {
   const { loading, eventLogsData } = useEventLogsData(
     eventType,
     changedObjectId.toString()

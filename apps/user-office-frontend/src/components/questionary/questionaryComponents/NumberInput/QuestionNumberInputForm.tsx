@@ -9,7 +9,7 @@ import MaterialTextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const QuestionNumberForm: FC<QuestionFormProps> = (props) => {
+export const QuestionNumberForm = (props: QuestionFormProps) => {
   const [show, setShow] = useState(false);
   const field = props.question;
   const numberConfig = props.question.config as NumberInputConfig;

@@ -28,14 +28,14 @@ type PredefinedMessagesModalProps = {
   confirm: WithConfirmType;
 };
 
-const PredefinedMessagesModal: React.FC<PredefinedMessagesModalProps> = ({
+const PredefinedMessagesModal = ({
   open,
   setOpen,
   selectedMessage,
   messageKey,
   setFormFieldValue,
   confirm,
-}) => {
+}: PredefinedMessagesModalProps) => {
   const {
     loadingPredefinedMessages,
     predefinedMessages,

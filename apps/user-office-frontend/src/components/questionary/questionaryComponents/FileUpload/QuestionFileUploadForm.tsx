@@ -1,7 +1,7 @@
 import ListItemText from '@mui/material/ListItemText';
 import { Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
@@ -12,7 +12,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
+export const QuestionFileUploadForm = (props: QuestionFormProps) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const availableFileTypeOptions = [

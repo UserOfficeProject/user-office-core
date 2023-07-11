@@ -23,6 +23,7 @@ import {
 } from '../../models/ProposalModelFunctions';
 import { Answer, QuestionaryStep } from '../../models/Questionary';
 import { isRejection } from '../../models/Rejection';
+import { Review } from '../../models/Review';
 import { Sample } from '../../models/Sample';
 import {
   TechnicalReview,
@@ -44,6 +45,7 @@ export type ProposalPDFData = {
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
   technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
+  sepReviews?: Review[];
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
   genericTemplates: Array<
     Pick<
@@ -378,6 +380,14 @@ export const collectProposalPDFData = async (
     }
   }
 
+  // Get Reviews
+  const reviews = await baseContext.queries.review.reviewsForProposal(
+    user,
+    proposal.primaryKey
+  );
+
+  if (reviews) proposalPDFData.sepReviews = reviews;
+
   return proposalPDFData;
 };
 
@@ -600,6 +610,13 @@ export const collectProposalPDFDataTokenAccess = async (
       };
     }
   }
+  // Get Reviews
+  const reviews = await baseContext.queries.review.reviewsForProposal(
+    user,
+    proposal.primaryKey
+  );
+
+  if (reviews) proposalPDFData.sepReviews = reviews;
 
   return proposalPDFData;
 };

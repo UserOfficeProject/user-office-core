@@ -14,7 +14,7 @@ import { FunctionType } from 'utils/utilTypes';
 
 import CreateUpdateInstitution from './CreateUpdateInstitution';
 
-const InstitutionPage: React.FC = () => {
+const InstitutionPage = () => {
   const { api } = useDataApiWithFeedback();
 
   const {

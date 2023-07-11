@@ -181,7 +181,11 @@ async function delayInTest() {
   }
 }
 
-export const DownloadContextProvider: React.FC = ({ children }) => {
+export const DownloadContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const { token, handleLogout } = useContext(UserContext);
   const [inProgress, setInProgress] = useState<InProgressItem[]>([]);

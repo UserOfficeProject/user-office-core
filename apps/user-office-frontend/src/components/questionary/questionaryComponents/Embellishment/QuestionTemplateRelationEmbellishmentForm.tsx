@@ -1,6 +1,6 @@
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
@@ -10,9 +10,9 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationEmbellishmentForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationEmbellishmentForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   return (
     <QuestionTemplateRelationFormShell
       {...props}
