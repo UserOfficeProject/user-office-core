@@ -6,12 +6,11 @@ type TableActionsDropdownMenuProps = {
   handleClose: (option: string) => void;
   options: string[];
 };
-
-const TableActionsDropdownMenu: React.FC<TableActionsDropdownMenuProps> = ({
+const TableActionsDropdownMenu = ({
   event,
   handleClose,
   options,
-}) => {
+}: TableActionsDropdownMenuProps) => {
   const [anchorElement, setAnchorElement] = React.useState<null | HTMLElement>(
     null
   );
