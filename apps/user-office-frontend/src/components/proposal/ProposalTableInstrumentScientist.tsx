@@ -404,7 +404,7 @@ const ProposalTableInstrumentScientist: React.FC<{
     if (selectedOption === DownloadMenuOption.PROPOSAL) {
       downloadPDFProposal(
         selectedProposals.map((proposal) => proposal.primaryKey),
-        selectedProposals[0].title
+        selectedProposals?.[0].title || ''
       );
     } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
       setOpenDownloadAttachment(true);

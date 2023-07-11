@@ -227,7 +227,7 @@ export const collectProposalPDFData = async (
         },
       })
       .then((pdfTemplates) => {
-        if (pdfTemplates == null) {
+        if (pdfTemplates == null || pdfTemplates.length === 0) {
           throw new Error('Could not fetch pdf template');
         }
 

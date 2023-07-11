@@ -294,10 +294,10 @@ const ProposalAttachmentDownload = ({
           ) {
             const title = proposalsData.filter((proposal) =>
               proposalIds.includes(proposal.primaryKey)
-            )[0].title;
+            );
             downloadProposalAttachment(
               proposalIds,
-              title,
+              title?.[0].title || '',
               selectedPdfTemplate.toString(),
               selectedAttachmentsQuestions.join(',')
             );
