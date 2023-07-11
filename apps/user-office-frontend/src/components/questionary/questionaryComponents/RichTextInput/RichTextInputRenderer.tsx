@@ -14,11 +14,15 @@ import stripHtml from 'utils/stripHtml';
 
 import { truncateString } from '../../../../utils/truncateString';
 
-export const RichTextInputRendererComponent: React.FC<{
+export const RichTextInputRendererComponent = ({
+  id,
+  title,
+  valueToRender,
+}: {
   id: string;
   title: string;
   valueToRender: string;
-}> = ({ id, title, valueToRender }) => {
+}) => {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => setOpen(true);

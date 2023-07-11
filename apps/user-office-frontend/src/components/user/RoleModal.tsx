@@ -13,12 +13,7 @@ type RoleModalProps = {
   activeRoles?: Role[];
 };
 
-const RoleModal: React.FC<RoleModalProps> = ({
-  show,
-  close,
-  add,
-  activeRoles,
-}) => {
+const RoleModal = ({ show, close, add, activeRoles }: RoleModalProps) => {
   return (
     <Dialog
       aria-labelledby="simple-modal-title"

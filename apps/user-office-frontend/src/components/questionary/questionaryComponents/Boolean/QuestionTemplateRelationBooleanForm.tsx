@@ -1,6 +1,6 @@
 import { Field } from 'formik';
 import { CheckboxWithLabel } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
@@ -10,9 +10,9 @@ import { QuestionExcerpt } from 'components/questionary/questionaryComponents/Qu
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationBooleanForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationBooleanForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   return (
     <QuestionTemplateRelationFormShell
       {...props}

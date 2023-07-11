@@ -24,7 +24,7 @@ type CreateUnitProps = {
   unit: Unit | null;
 };
 
-const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
+const CreateUnit = ({ close, unit }: CreateUnitProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { quantities, loadingQuantities } = useQuantities();

@@ -44,13 +44,13 @@ type ProposalReviewModalProps = {
   children: React.ReactElement;
 };
 
-const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
+const ProposalReviewModal = ({
   title,
   proposalReviewModalOpen,
   setProposalReviewModalOpen,
   reviewItemId,
   children,
-}) => {
+}: ProposalReviewModalProps) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
 

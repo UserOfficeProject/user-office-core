@@ -22,7 +22,7 @@ const columns = [
   { title: 'Description', field: 'description' },
 ];
 
-const ProposalWorkflowsTable: React.FC = () => {
+const ProposalWorkflowsTable = () => {
   const { api } = useDataApiWithFeedback();
   const {
     loadingProposalWorkflows,

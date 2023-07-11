@@ -30,10 +30,10 @@ type CreateUpdateProposalStatusProps = {
   proposalStatus: ProposalStatus | null;
 };
 
-const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
+const CreateUpdateProposalStatus = ({
   close,
   proposalStatus,
-}) => {
+}: CreateUpdateProposalStatusProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 

@@ -1,7 +1,7 @@
 fragment unit on Unit {
-    id
-    unit
-    quantity
-    symbol
-    siConversionFormula
+  id
+  unit
+  quantity
+  symbol
+  siConversionFormula
 }

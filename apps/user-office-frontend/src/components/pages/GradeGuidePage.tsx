@@ -10,7 +10,7 @@ import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer } from 'styles/StyledComponents';
 
-const GradeGuidePage: React.FC = () => {
+const GradeGuidePage = () => {
   const [loadingPage, pageContent] = useGetPageContent(PageName.GRADEGUIDEPAGE);
 
   const noContents = (
