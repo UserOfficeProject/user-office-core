@@ -1,6 +1,6 @@
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -8,7 +8,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionSampleBasisForm: FC<QuestionFormProps> = (props) => {
+export const QuestionSampleBasisForm = (props: QuestionFormProps) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 

@@ -20,9 +20,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
   },
 }));
-const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
-  props
-) => {
+const TechnicalReviewInformation = (props: TechnicalReviewInformationProps) => {
   const classes = useStyles();
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
 

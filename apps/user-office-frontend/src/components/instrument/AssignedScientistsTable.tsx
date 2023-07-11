@@ -46,10 +46,10 @@ const assignmentColumns = [
   },
 ];
 
-const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
+const AssignedScientistsTable = ({
   instrument,
   removeAssignedScientistFromInstrument,
-}) => {
+}: AssignedScientistsTableProps) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();

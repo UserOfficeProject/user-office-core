@@ -13,7 +13,7 @@ import {
   UpdateCallMutationVariables,
 } from 'generated/sdk';
 
-const CallCycleInfo: React.FC = () => {
+const CallCycleInfo = () => {
   const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;

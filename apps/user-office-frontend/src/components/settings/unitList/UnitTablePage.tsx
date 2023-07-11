@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import UnitTable from './UnitTable';
 
-const UnitTablePage: React.FC = () => {
+const UnitTablePage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

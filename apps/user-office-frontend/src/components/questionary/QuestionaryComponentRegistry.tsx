@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { FormikProps } from 'formik';
-import React, { FC, ReactNode } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import * as Yup from 'yup';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -92,17 +92,21 @@ export interface QuestionaryComponentDefinition {
   /**
    * The main component that is rendered in the questionary and visible by user
    */
-  readonly questionaryComponent: FC<BasicComponentProps> | null;
+  readonly questionaryComponent:
+    | ((props: BasicComponentProps) => ReactElement | null)
+    | null;
 
   /**
    * A form used in administration panel to define a question (more on this below)
    */
-  readonly questionForm: () => FC<QuestionFormProps>;
+  readonly questionForm: () => (props: QuestionFormProps) => JSX.Element | null;
 
   /**
    * A form used in administration panel to define a question template relation (more on that below)
    */
-  readonly questionTemplateRelationForm: () => FC<QuestionTemplateRelationFormProps>;
+  readonly questionTemplateRelationForm: () => (
+    props: QuestionTemplateRelationFormProps
+  ) => JSX.Element | null;
 
   /**
    * Rendering of the question and answer that is displayed in the review,
@@ -144,7 +148,9 @@ export interface QuestionaryComponentDefinition {
    * Component used in search questions page. Contains UI that user officer
    * can use to specify search criteria for the dataType
    */
-  readonly searchCriteriaComponent?: FC<SearchCriteriaInputProps>;
+  readonly searchCriteriaComponent?: (
+    props: SearchCriteriaInputProps
+  ) => ReactElement;
   readonly preSubmitTransform?: (answer: Answer) => Answer;
 }
 

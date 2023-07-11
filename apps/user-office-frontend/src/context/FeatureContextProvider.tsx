@@ -29,7 +29,9 @@ const initialFeatureData: FeatureContextData = {
 export const FeatureContext =
   React.createContext<FeatureContextData>(initialFeatureData);
 
-export const FeatureContextProvider: React.FC = (props) => {
+export const FeatureContextProvider = (props: {
+  children: React.ReactNode;
+}) => {
   const { features, loadingFeatures, setFeatures } = useFeatures();
   const classes = useStyles();
 

@@ -34,7 +34,7 @@ const columns = [
   },
 ];
 
-const InstrumentTable: React.FC = () => {
+const InstrumentTable = () => {
   const {
     loadingInstruments,
     instruments,

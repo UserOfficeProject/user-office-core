@@ -1,11 +1,9 @@
 fragment scheduledEventCore on ScheduledEventCore {
-    id
-    proposalPk
-    bookingType
-    startsAt
-    endsAt
-    status
-    localContactId
+  id
+  proposalPk
+  bookingType
+  startsAt
+  endsAt
+  status
+  localContactId
 }
-
-

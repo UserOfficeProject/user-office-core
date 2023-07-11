@@ -14,7 +14,7 @@ import SEPMeetingComponentsView from './MeetingComponents/SEPMeetingComponentsVi
 import SEPMembers from './Members/SEPMembers';
 import SEPProposalsAndAssignmentsView from './Proposals/SEPProposalsAndAssignmentsView';
 
-const SEPPage: React.FC = () => {
+const SEPPage = () => {
   const { id } = useParams<{ id: string }>();
   const { loading, sep, setSEP } = useSEPData(parseInt(id));
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);

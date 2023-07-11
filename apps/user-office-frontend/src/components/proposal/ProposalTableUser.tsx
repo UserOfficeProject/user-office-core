@@ -40,7 +40,7 @@ export type UserProposalDataType = {
   data: PartialProposalsDataType[] | undefined;
 };
 
-const ProposalTableUser: React.FC = () => {
+const ProposalTableUser = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
 
