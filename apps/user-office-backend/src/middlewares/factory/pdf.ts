@@ -39,7 +39,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
         pdfTemplateId:
           req.query?.pdfTemplateId &&
           !isNaN(+req.query?.pdfTemplateId?.toString())
-            ? +req.query?.pdfTemplateId?.toString()
+            ? +req.query.pdfTemplateId.toString()
             : undefined,
         questionIds: queryParams.questionIds?.toString().split(','),
       };
