@@ -113,52 +113,68 @@ const ProposalAttachmentDownload = ({
       });
   }
 
-  const getProposalIds = (
+  const getProposalInfo = (
     includeAllProposals: boolean,
     proposals: Proposal[],
     questions: string[]
-  ): number[] => {
+  ) => {
+    let proposalIds: number[] = [];
+    let title = '';
     if (includeAllProposals) {
-      return proposals.map((proposal) => proposal.primaryKey);
+      proposalIds = proposals.map((proposal, index) => {
+        if (index === 0 && proposal.title) {
+          title = proposal.title;
+        }
+
+        return proposal.primaryKey;
+      });
+    } else {
+      proposalIds = proposals
+        .filter((proposal) => {
+          return (
+            proposal.questionary.steps.some((step) => {
+              return step.fields.some((field) => {
+                return (
+                  questions.includes(field.question.id) &&
+                  Array.isArray(field.value) &&
+                  field.value.length > 0
+                );
+              });
+            }) ||
+            proposal.genericTemplates?.some((gen) =>
+              gen.questionary.steps.some((step) => {
+                return step.fields.some((field) => {
+                  return (
+                    questions.includes(field.question.id) &&
+                    Array.isArray(field.value) &&
+                    field.value.length > 0
+                  );
+                });
+              })
+            ) ||
+            proposal.samples?.some((sample) =>
+              sample.questionary.steps.some((step) => {
+                return step.fields.some((field) => {
+                  return (
+                    questions.includes(field.question.id) &&
+                    Array.isArray(field.value) &&
+                    field.value.length > 0
+                  );
+                });
+              })
+            )
+          );
+        })
+        .map((proposal, index) => {
+          if (index === 0 && proposal.title) {
+            title = proposal.title;
+          }
+
+          return proposal.primaryKey;
+        });
     }
 
-    return proposals
-      .filter((proposal) => {
-        return (
-          proposal.questionary.steps.some((step) => {
-            return step.fields.some((field) => {
-              return (
-                questions.includes(field.question.id) &&
-                Array.isArray(field.value) &&
-                field.value.length > 0
-              );
-            });
-          }) ||
-          proposal.genericTemplates?.some((gen) =>
-            gen.questionary.steps.some((step) => {
-              return step.fields.some((field) => {
-                return (
-                  questions.includes(field.question.id) &&
-                  Array.isArray(field.value) &&
-                  field.value.length > 0
-                );
-              });
-            })
-          ) ||
-          proposal.samples?.some((sample) =>
-            sample.questionary.steps.some((step) => {
-              return step.fields.some((field) => {
-                return (
-                  questions.includes(field.question.id) &&
-                  Array.isArray(field.value) &&
-                  field.value.length > 0
-                );
-              });
-            })
-          )
-        );
-      })
-      .map((proposal) => proposal.primaryKey);
+    return { proposalIds, title };
   };
   useEffect(() => {
     if (templates && templates[0]) {
@@ -282,7 +298,7 @@ const ProposalAttachmentDownload = ({
         }
         data-cy="proposalAttachmentDownloadButton"
         onClick={() => {
-          const proposalIds = getProposalIds(
+          const { proposalIds, title } = getProposalInfo(
             includeAllProposals,
             proposalsData,
             selectedAttachmentsQuestions
@@ -292,12 +308,9 @@ const ProposalAttachmentDownload = ({
             selectedPdfTemplate &&
             selectedAttachmentsQuestions.length > 0
           ) {
-            const title = proposalsData.filter((proposal) =>
-              proposalIds.includes(proposal.primaryKey)
-            );
             downloadProposalAttachment(
               proposalIds,
-              title?.[0].title || '',
+              title,
               selectedPdfTemplate.toString(),
               selectedAttachmentsQuestions.join(',')
             );
