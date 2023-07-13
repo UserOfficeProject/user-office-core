@@ -84,10 +84,10 @@ type CreateUpdateApiAccessTokenProps = {
   apiAccessToken: PermissionsWithAccessToken | null;
 };
 
-const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
+const CreateUpdateApiAccessToken = ({
   close,
   apiAccessToken,
-}) => {
+}: CreateUpdateApiAccessTokenProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { queriesMutationsAndServices, loadingQueriesMutationsAndServices } =

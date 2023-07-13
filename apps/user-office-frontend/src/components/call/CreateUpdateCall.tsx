@@ -28,7 +28,7 @@ type CreateUpdateCallProps = {
   call: Call | null;
 };
 
-const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
+const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
   const { api } = useDataApiWithFeedback();
   const { timezone } = useFormattedDateTime();
 

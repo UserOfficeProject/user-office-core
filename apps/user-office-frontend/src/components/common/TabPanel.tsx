@@ -49,12 +49,12 @@ type FullWidthTabsProps = {
   isInsideModal?: boolean;
 };
 
-const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
+const FullWidthTabs = ({
   tabNames,
   children,
   isInsideModal,
   ...other
-}) => {
+}: FullWidthTabsProps) => {
   const theme = useTheme();
   const [query, setQuery] = useQueryParams({
     tab: withDefault(NumberParam, 0),

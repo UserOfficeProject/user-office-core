@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import CallsTable from './CallsTable';
 
-const CallPage: React.FC = () => {
+const CallPage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

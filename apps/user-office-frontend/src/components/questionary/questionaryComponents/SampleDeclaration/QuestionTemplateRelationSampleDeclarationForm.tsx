@@ -2,7 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
-import { ChangeEvent, default as React, FC, useContext } from 'react';
+import { ChangeEvent, default as React, useContext } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -20,9 +20,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationSampleDeclarationForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationSampleDeclarationForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   const config = props.questionRel.config as SampleDeclarationConfig;
 
   const { templates } = useActiveTemplates(

@@ -37,15 +37,13 @@ const columns = [
   { title: 'Organisation', field: 'organisation' },
 ];
 
-const AssignSEPMemberToProposalModal: React.FC<
-  AssignSEPMemberToProposalModalProps
-> = ({
+const AssignSEPMemberToProposalModal = ({
   assignMemberToSEPProposal,
   sepId,
   assignedMembers,
   proposalPk,
   setProposalPk,
-}) => {
+}: AssignSEPMemberToProposalModalProps) => {
   const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]

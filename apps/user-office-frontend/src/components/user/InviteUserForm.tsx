@@ -28,12 +28,12 @@ const useStyles = makeStyles({
   },
 });
 
-const InviteUserForm: React.FC<InviteUserFormProps> = ({
+const InviteUserForm = ({
   action,
   title,
   userRole,
   close,
-}) => {
+}: InviteUserFormProps) => {
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
 
