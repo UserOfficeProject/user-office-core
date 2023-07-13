@@ -154,7 +154,7 @@ const SamplesMenuListItem = () => {
   );
 };
 
-const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
+const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const proposalDisabled = callsData.length === 0;
   const context = useContext(FeatureContext);
   const { t } = useTranslation();

@@ -61,11 +61,11 @@ const assignmentColumns = [
   },
 ];
 
-const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
+const SEPAssignedReviewersTable = ({
   sepProposal,
   removeAssignedReviewer,
   updateView,
-}) => {
+}: SEPAssignedReviewersTableProps) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     reviewerModal: NumberParam,
     modalTab: NumberParam,

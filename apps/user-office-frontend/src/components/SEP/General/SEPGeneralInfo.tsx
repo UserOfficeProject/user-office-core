@@ -29,7 +29,7 @@ const useStyles = makeStyles({
   },
 });
 
-const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
+const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
   const sep = { ...data };
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();

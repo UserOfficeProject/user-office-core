@@ -36,7 +36,7 @@ type ParticipantModalProps = {
   participant?: boolean;
 };
 
-const ParticipantModal: React.FC<ParticipantModalProps> = ({
+const ParticipantModal = ({
   addParticipants,
   close,
   show,
@@ -46,7 +46,7 @@ const ParticipantModal: React.FC<ParticipantModalProps> = ({
   selectedUsers,
   selection,
   userRole,
-}) => {
+}: ParticipantModalProps) => {
   const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]

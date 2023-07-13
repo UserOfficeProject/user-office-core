@@ -1,5 +1,5 @@
 import { TextFieldProps } from '@mui/material';
-import React, { KeyboardEvent } from 'react';
+import React, { KeyboardEvent, ReactElement } from 'react';
 
 interface WithHandleEnterProps {
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => false | undefined;
@@ -12,7 +12,7 @@ interface WithHandleEnterProps {
  */
 const withHandleEnter = <P extends TextFieldProps>(
   WrappedTextField: React.ComponentType<P>
-): React.FC<P & WithHandleEnterProps> => {
+): ((props: P & WithHandleEnterProps) => ReactElement) => {
   return function withHandleEnterComponent({
     onEnter,
     ...props

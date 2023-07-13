@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
@@ -14,9 +14,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationTextInputForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationTextInputForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   return (
     <QuestionTemplateRelationFormShell
       {...props}

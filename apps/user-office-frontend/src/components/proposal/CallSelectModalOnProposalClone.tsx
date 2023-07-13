@@ -32,9 +32,11 @@ type CallSelectModalOnProposalsCloneProps = {
   templateId?: number;
 };
 
-const CallSelectModalOnProposalsClone: React.FC<
-  CallSelectModalOnProposalsCloneProps
-> = ({ close, cloneProposalsToCall, templateId }) => {
+const CallSelectModalOnProposalsClone = ({
+  close,
+  cloneProposalsToCall,
+  templateId,
+}: CallSelectModalOnProposalsCloneProps) => {
   const classes = useStyles();
   const { calls, loadingCalls } = useCallsData({
     isActive: true,

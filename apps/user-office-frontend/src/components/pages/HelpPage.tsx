@@ -5,7 +5,7 @@ import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-const HelpPage: React.FC = () => {
+const HelpPage = () => {
   const [loadingHelpContent, helpPageContent] = useGetPageContent(
     PageName.HELPPAGE
   );

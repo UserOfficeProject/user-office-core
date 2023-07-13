@@ -17,7 +17,7 @@ const ProfilePagePropTypes = {
 
 type ProfilePageProps = PropTypes.InferProps<typeof ProfilePagePropTypes>;
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ match }) => {
+const ProfilePage = ({ match }: ProfilePageProps) => {
   return (
     <StyledContainer>
       <StyledPaper>

@@ -3,8 +3,8 @@ fragment questionComparison on QuestionComparison {
     ...question
   }
   newQuestion {
-  ...question
+    ...question
   }
-  status 
+  status
   conflictResolutionStrategy
 }

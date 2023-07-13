@@ -10,9 +10,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProposalErrorLabel: React.FC<
-  PropsWithChildren<Record<string, unknown>>
-> = ({ children }) => {
+const ProposalErrorLabel = ({
+  children,
+}: PropsWithChildren<Record<string, unknown>>) => {
   const classes = useStyles();
 
   return <span className={classes.error}>{children}</span>;
