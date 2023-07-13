@@ -81,7 +81,7 @@ type BottomNavItemProps = {
   linkText?: string;
 };
 
-const BottomNavItem: React.FC<BottomNavItemProps> = ({ text, linkText }) => {
+const BottomNavItem = ({ text, linkText }: BottomNavItemProps) => {
   return (
     <InformationModal
       text={text}
@@ -159,7 +159,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const [header, setHeader] = useState('User Office');
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const classes = useStyles();

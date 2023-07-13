@@ -39,12 +39,12 @@ type GradeFormType = {
   saveOnly: boolean;
 };
 
-const ProposalGrade: React.FC<ProposalGradeProps> = ({
+const ProposalGrade = ({
   review,
   setReview,
   onChange,
   confirm,
-}) => {
+}: ProposalGradeProps) => {
   const { api } = useDataApiWithFeedback();
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

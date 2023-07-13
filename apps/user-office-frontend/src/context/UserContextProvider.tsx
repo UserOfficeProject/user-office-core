@@ -181,7 +181,9 @@ const reducer = (
   }
 };
 
-export const UserContextProvider: React.FC = (props): JSX.Element => {
+export const UserContextProvider = (props: {
+  children: React.ReactNode;
+}): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);

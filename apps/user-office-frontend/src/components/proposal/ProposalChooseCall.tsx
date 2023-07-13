@@ -27,9 +27,7 @@ type ProposalChooseCallProps = {
   callsData: Call[];
 };
 
-const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
-  callsData,
-}) => {
+const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
   const history = useHistory();
   const classes = useStyles();
   const { toFormattedDateTime } = useFormattedDateTime();

@@ -49,12 +49,12 @@ interface WizardProps
   shouldCreate: boolean;
 }
 
-export const Wizard: React.FC<WizardProps> = ({
+export const Wizard = ({
   children,
   initialValues,
   onSubmit,
   shouldCreate,
-}) => {
+}: WizardProps) => {
   const [stepNumber, setStepNumber] = useState(0);
   const steps = React.Children.toArray(children) as React.ReactElement[];
   const [snapshot, setSnapshot] = useState(initialValues);
@@ -152,7 +152,10 @@ export const Wizard: React.FC<WizardProps> = ({
   );
 };
 
-export const WizardStep: React.FC<{
+export const WizardStep = ({
+  children,
+}: {
   title: string;
   validationSchema: Yup.AnyObjectSchema;
-}> = ({ children }) => <>{children}</>;
+  children: React.ReactNode;
+}) => <>{children}</>;

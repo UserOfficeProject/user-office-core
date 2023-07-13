@@ -38,9 +38,10 @@ type ProposalWorkflowConnectionGroupWithSubGroups =
     subGroups: ProposalWorkflowConnectionGroupWithSubGroups[];
   };
 
-const ProposalWorkflowConnectionsEditor: React.FC<
-  ProposalWorkflowConnectionsEditorProps
-> = ({ proposalWorkflowStatusConnectionGroups, dispatch }) => {
+const ProposalWorkflowConnectionsEditor = ({
+  proposalWorkflowStatusConnectionGroups,
+  dispatch,
+}: ProposalWorkflowConnectionsEditorProps) => {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);

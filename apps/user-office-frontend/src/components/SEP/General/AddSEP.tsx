@@ -22,7 +22,7 @@ type AddSEPProps = {
   close: (sepAdded: Sep | null) => void;
 };
 
-const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
+const AddSEP = ({ close }: AddSEPProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 

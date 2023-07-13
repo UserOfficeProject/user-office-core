@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
 import { Checkbox, Select } from 'formik-mui';
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
@@ -19,9 +19,9 @@ import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFo
 
 const columns = [{ title: 'Answer', field: 'answer' }];
 
-export const QuestionTemplateRelationMultipleChoiceForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationMultipleChoiceForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   const config = props.questionRel.config as SelectionFromOptionsConfig;
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');

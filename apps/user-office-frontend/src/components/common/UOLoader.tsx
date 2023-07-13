@@ -12,11 +12,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const UOLoader: React.FC<
-  CircularProgressProps & {
-    buttonSized?: boolean;
-  }
-> = ({ buttonSized, ...props }) => {
+const UOLoader = ({
+  buttonSized,
+  ...props
+}: CircularProgressProps & {
+  buttonSized?: boolean;
+}) => {
   const classes = useStyles();
 
   return (

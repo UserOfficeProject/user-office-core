@@ -32,12 +32,12 @@ type AssignProposalToSEPProps = {
   callIds?: number[];
 };
 
-const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
+const AssignProposalsToSEP = ({
   close,
   assignProposalsToSEP,
   sepIds,
   callIds,
-}) => {
+}: AssignProposalToSEPProps) => {
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
   const { SEPs, loadingSEPs } = useSEPsData({
