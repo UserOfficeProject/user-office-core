@@ -145,9 +145,11 @@ const proposalStatusFilter: Record<string, number> = {
   FEASIBILITY_REVIEW: 2,
 };
 
-const ProposalTableInstrumentScientist: React.FC<{
+const ProposalTableInstrumentScientist = ({
+  confirm,
+}: {
   confirm: WithConfirmType;
-}> = ({ confirm }) => {
+}) => {
   const { user } = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();

@@ -6,6 +6,7 @@ export const Tokens = {
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
   EmailEventHandler: Symbol('EmailEventHandler'),
+  EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
   FeedbackDataSource: Symbol('FeedbackDataSource'),
   FileDataSource: Symbol('FileDataSource'),

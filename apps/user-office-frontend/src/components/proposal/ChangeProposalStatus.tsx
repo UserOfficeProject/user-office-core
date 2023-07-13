@@ -35,12 +35,12 @@ type ChangeProposalStatusProps = {
   selectedProposalStatuses: number[];
 };
 
-const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
+const ChangeProposalStatus = ({
   close,
   changeStatusOnProposals,
   allSelectedProposalsHaveInstrument,
   selectedProposalStatuses,
-}) => {
+}: ChangeProposalStatusProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const { proposalStatuses, loadingProposalStatuses } =

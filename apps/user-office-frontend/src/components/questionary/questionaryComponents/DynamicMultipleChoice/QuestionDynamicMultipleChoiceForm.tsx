@@ -24,7 +24,7 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
 import { Field } from 'formik';
 import { Checkbox, Select, TextField } from 'formik-mui';
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
@@ -94,9 +94,7 @@ const CustomizedTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export const QuestionDynamicMultipleChoiceForm: FC<QuestionFormProps> = (
-  props
-) => {
+export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as DynamicMultipleChoiceConfig;
 

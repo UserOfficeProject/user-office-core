@@ -1,6 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import { eventBus } from '../events';
+import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Rejection, isRejection } from '../models/Rejection';
@@ -39,6 +39,7 @@ const EventBusDecorator = (eventType: Event) => {
 
       // NOTE: Do not log the event in testing environment.
       if (process.env.NODE_ENV !== 'test') {
+        const eventBus = resolveApplicationEventBus();
         eventBus
           .publish(event)
           .catch((e) =>

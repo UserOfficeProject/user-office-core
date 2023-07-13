@@ -386,6 +386,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   async getAnswers(questionId: string): Promise<AnswerBasic[]> {
     return [];
   }
+
   async getTemplates(questionId: string): Promise<Template[]> {
     return [];
   }
@@ -406,6 +407,12 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async getBlankQuestionarySteps(
+    _templateId: number
+  ): Promise<QuestionaryStep[]> {
+    return dummyQuestionarySteps;
+  }
+
+  async getBlankQuestionaryStepsByCallId(
     _templateId: number
   ): Promise<QuestionaryStep[]> {
     return dummyQuestionarySteps;

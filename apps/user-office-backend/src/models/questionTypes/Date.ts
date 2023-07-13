@@ -8,7 +8,7 @@ import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
-export const dateDefinition: Question = {
+export const dateDefinition: Question<DataType.DATE> = {
   dataType: DataType.DATE,
   validate: (field: QuestionTemplateRelation, value: Date | null) => {
     if (field.question.dataType !== DataType.DATE) {

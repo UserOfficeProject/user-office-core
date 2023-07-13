@@ -125,10 +125,17 @@ export default class InstrumentMutations {
     );
   }
 
-  @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
-  @ValidateArgs(assignProposalsToInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignProposalsToInstrument(
+    agent: UserWithRole | null,
+    args: AssignProposalsToInstrumentArgs
+  ): Promise<ProposalPks | Rejection> {
+    return this.assignProposalsToInstrumentInternal(agent, args);
+  }
+
+  @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
+  @ValidateArgs(assignProposalsToInstrumentValidationSchema)
+  async assignProposalsToInstrumentInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
   ): Promise<ProposalPks | Rejection> {

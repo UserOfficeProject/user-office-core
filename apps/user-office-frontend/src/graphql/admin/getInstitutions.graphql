@@ -1,7 +1,7 @@
 query getInstitutions($filter: InstitutionsFilter) {
-    institutions(filter: $filter) {
-      id
-      name
-      verified
-    }
+  institutions(filter: $filter) {
+    id
+    name
+    verified
+  }
 }

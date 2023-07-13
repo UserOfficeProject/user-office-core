@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import AppSettingsTable from './AppSettingsTable';
 
-const AppSettingsPage: React.FC = () => {
+const AppSettingsPage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

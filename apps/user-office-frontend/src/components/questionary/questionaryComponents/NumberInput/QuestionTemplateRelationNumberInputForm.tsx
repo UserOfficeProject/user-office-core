@@ -2,7 +2,7 @@ import Autocomplete from '@mui/lab/Autocomplete';
 import MaterialTextField from '@mui/material/TextField';
 import { Field, getIn } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -15,9 +15,9 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationNumberForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationNumberForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   const numberConfig = props.questionRel.config as NumberInputConfig;
   const { units } = useUnitsData();
   const [selectedUnits, setSelectedUnits] = useState(numberConfig.units);

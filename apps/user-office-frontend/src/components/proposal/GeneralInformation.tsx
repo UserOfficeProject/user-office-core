@@ -27,10 +27,10 @@ type GeneralInformationProps = {
   onProposalChanged?: (newProposal: ProposalWithQuestionary) => void;
 };
 
-const GeneralInformation: React.FC<GeneralInformationProps> = ({
+const GeneralInformation = ({
   data,
   onProposalChanged,
-}) => {
+}: GeneralInformationProps) => {
   const [isEditable, setIsEditable] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const classes = useStyles();

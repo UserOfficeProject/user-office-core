@@ -36,10 +36,7 @@ type CallStatusFilterProps = {
   onChange: (callStatus: CallStatus) => void;
 };
 
-const CallStatusFilter: React.FC<CallStatusFilterProps> = ({
-  callStatus,
-  onChange,
-}) => {
+const CallStatusFilter = ({ callStatus, onChange }: CallStatusFilterProps) => {
   const classes = useStyles();
 
   return (

@@ -19,9 +19,11 @@ export enum PredefinedMessageKey {
  * This is Textarea which is loading all predefined messages from the database filtered by some specific key.
  * It is easy to just search and select the message you want to use for that specific form input.
  */
-const FormikUIPredefinedMessagesTextField: React.FC<
-  FieldAttributes<TextFieldProps> & { 'message-key'?: PredefinedMessageKey }
-> = (props) => {
+const FormikUIPredefinedMessagesTextField = (
+  props: FieldAttributes<TextFieldProps> & {
+    'message-key'?: PredefinedMessageKey;
+  }
+) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [field, _, helpers] = useField(props.name);
   const [modalOpen, setModalOpen] = useState(false);

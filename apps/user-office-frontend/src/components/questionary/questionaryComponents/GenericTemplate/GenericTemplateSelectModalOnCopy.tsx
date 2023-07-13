@@ -41,9 +41,7 @@ type GenericTemplateSelectModalOnCopyProps = {
 type GenericTemplates =
   GetGenericTemplatesWithProposalDataQuery['genericTemplates'];
 
-const GenericTemplateSelectModalOnCopy: React.FC<
-  GenericTemplateSelectModalOnCopyProps
-> = ({
+const GenericTemplateSelectModalOnCopy = ({
   close,
   filter,
   currentProposalPk,
@@ -51,7 +49,7 @@ const GenericTemplateSelectModalOnCopy: React.FC<
   question,
   isMultipleCopySelect = false,
   handleGenericTemplateOnCopy,
-}) => {
+}: GenericTemplateSelectModalOnCopyProps) => {
   const useStyles = makeStyles((theme) => ({
     mainContainer: {
       margin: theme.spacing(2, 0, 0),

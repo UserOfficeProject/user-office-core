@@ -1,0 +1,5 @@
+query getBlankQuestionaryStepsByCallId($callId: Int!) {
+  blankQuestionaryStepsByCallId(callId: $callId) {
+    ...questionaryStep
+  }
+}
