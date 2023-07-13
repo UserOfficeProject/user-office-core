@@ -24,9 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
-  sepId,
-}) => {
+const SEPMeetingComponentsView = ({ sepId }: SEPMeetingComponentsViewProps) => {
   const classes = useStyles();
   const downloadSEPXLSX = useDownloadXLSXSEP();
   const { loadingCalls, calls } = useCallsData({ sepIds: [sepId] });

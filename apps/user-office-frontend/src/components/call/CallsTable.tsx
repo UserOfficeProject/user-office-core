@@ -52,7 +52,7 @@ const getFilterStatus = (
   }
 };
 
-const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
+const CallsTable = ({ confirm }: WithConfirmProps) => {
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
   const { timezone, toFormattedDateTime } = useFormattedDateTime({

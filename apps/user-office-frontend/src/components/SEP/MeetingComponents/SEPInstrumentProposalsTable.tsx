@@ -176,9 +176,11 @@ const assignmentColumns = [
   },
 ];
 
-const SEPInstrumentProposalsTable: React.FC<
-  SEPInstrumentProposalsTableProps
-> = ({ sepInstrument, sepId, selectedCall }) => {
+const SEPInstrumentProposalsTable = ({
+  sepInstrument,
+  sepId,
+  selectedCall,
+}: SEPInstrumentProposalsTableProps) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     sepMeetingModal: NumberParam,
   });

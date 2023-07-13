@@ -1,5 +1,5 @@
 query getUnits {
-    units {
-      ...unit
-    }
+  units {
+    ...unit
+  }
 }

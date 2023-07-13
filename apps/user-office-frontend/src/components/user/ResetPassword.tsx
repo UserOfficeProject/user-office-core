@@ -47,7 +47,7 @@ const ResetPasswordPropTypes = {
 
 type ResetPasswordProps = PropTypes.InferProps<typeof ResetPasswordPropTypes>;
 
-const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
+const ResetPassword = ({ match }: ResetPasswordProps) => {
   const classes = useStyles();
   const [passwordReset, setPasswordReset] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);

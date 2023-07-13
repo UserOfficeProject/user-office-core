@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
 import { Checkbox, Select, TextField } from 'formik-mui';
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
@@ -18,7 +18,7 @@ import { QuestionFormShell } from '../QuestionFormShell';
 
 const columns = [{ title: 'Answer', field: 'answer' }];
 
-export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
+export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as SelectionFromOptionsConfig;
 

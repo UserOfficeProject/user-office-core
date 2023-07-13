@@ -17,7 +17,7 @@ import CreateUpdateApiAccessToken from './CreateUpdateApiAccessToken';
 
 const columns = [{ title: 'Name', field: 'name' }];
 
-const ApiAccessTokensTable: React.FC = () => {
+const ApiAccessTokensTable = () => {
   const { api } = useDataApiWithFeedback();
   const {
     loadingApiAccessTokens,

@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AccountActionButton: React.FC = () => {
+const AccountActionButton = () => {
   const classes = useStyles();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [show, setShow] = useState(false);
