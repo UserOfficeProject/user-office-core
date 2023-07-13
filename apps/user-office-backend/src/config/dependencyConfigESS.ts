@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
+
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -33,6 +34,7 @@ import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
+import { createApplicationEventBus } from '../events';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
@@ -80,6 +82,7 @@ mapClass(Tokens.MailService, SparkPostMailService);
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
 mapValue(

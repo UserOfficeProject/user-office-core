@@ -33,6 +33,7 @@ import {
   createSkipListeningHandler,
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
+import { EventBus } from '../events/eventBus';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { SampleEsiDataSourceMock } from './../datasources/mockups/SampleEsiDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
@@ -74,6 +75,7 @@ mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
+mapValue(Tokens.EventBus, jest.mocked(new EventBus()));
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapClass(Tokens.MailService, SkipSendMailService);
@@ -82,3 +84,7 @@ mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+
+jest.mock('../decorators/EventBus', () => {
+  return () => jest.fn();
+});

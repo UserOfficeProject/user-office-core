@@ -12,6 +12,7 @@ import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
+import { Instrument } from '../../models/Instrument';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
@@ -20,7 +21,8 @@ import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import {
   createConfig,
-  getExternalApiCallData,
+  getTransformedConfigData,
+  QuestionDataTypeConfigMapping,
 } from '../../models/questionTypes/QuestionRegistry';
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
@@ -28,7 +30,7 @@ import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
+import { SEP, SEPAssignment, SEPProposal, SEPReviewer } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
@@ -49,10 +51,6 @@ import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
-import {
-  ConfigBase,
-  DynamicMultipleChoiceConfig,
-} from '../../resolvers/types/FieldConfig';
 import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
@@ -170,7 +168,7 @@ export interface FieldDependencyRecord {
 export interface QuestionRecord {
   readonly category_id: number;
   readonly question_id: string;
-  readonly data_type: string;
+  readonly data_type: DataType;
   readonly question: string;
   readonly default_config: string;
   readonly sort_order: number;
@@ -210,8 +208,8 @@ export interface QuestionTemplateRelRecord {
   readonly template_id: number;
   readonly topic_id: number;
   readonly sort_order: number;
-  readonly config: string;
   readonly dependencies_operator?: DependenciesLogicOperator;
+  readonly config: string;
 }
 
 export interface TemplateRecord {
@@ -735,6 +733,16 @@ export const createReviewObject = (review: ReviewRecord) => {
   );
 };
 
+export const createInstrumentObject = (instrument: InstrumentRecord) => {
+  return new Instrument(
+    instrument.instrument_id,
+    instrument.name,
+    instrument.short_code,
+    instrument.description,
+    instrument.manager_user_id
+  );
+};
+
 export const createTechnicalReviewObject = (
   technicalReview: TechnicalReviewRecord
 ) => {
@@ -811,24 +819,22 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionTemplateRelationObject = async (
+export const createQuestionTemplateRelationObject = async <T extends DataType>(
   record: QuestionRecord &
     QuestionTemplateRelRecord & {
-      config: string | ConfigBase | DynamicMultipleChoiceConfig;
+      config: QuestionDataTypeConfigMapping<T>;
       dependency_natural_key: string;
     },
-  dependencies: FieldDependency[]
+  dependencies: FieldDependency[],
+  callId?: number
 ) => {
-  let dynamicMultipleChoiceConfig;
-
-  if ((record.config as DynamicMultipleChoiceConfig).externalApiCall) {
-    dynamicMultipleChoiceConfig = await getExternalApiCallData(
-      record.data_type as DataType,
-      record.config as DynamicMultipleChoiceConfig
-    );
-  }
-
-  const mutatedConfig = dynamicMultipleChoiceConfig ?? record.config;
+  // The default config data doesn't contain all the data for all the Components. For Components like InstrumentPicker and DynamicMultipleChoice, the config data is being overwritten in the run time.
+  // Technically, any Questionary Component with a function transformConfig must be doing the config changes.
+  const transformedConfig = await getTransformedConfigData(
+    record.data_type,
+    record.config,
+    callId
+  );
 
   return new QuestionTemplateRelation(
     new Question(
@@ -841,7 +847,7 @@ export const createQuestionTemplateRelationObject = async (
     ),
     record.topic_id,
     record.sort_order,
-    createConfig<any>(record.data_type as DataType, mutatedConfig),
+    createConfig<any>(record.data_type as DataType, transformedConfig),
     dependencies,
     record.dependencies_operator
   );

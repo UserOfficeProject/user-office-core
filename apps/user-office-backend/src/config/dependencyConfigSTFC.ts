@@ -34,6 +34,7 @@ import {
   createPostToRabbitMQHandler,
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
+import { createApplicationEventBus } from '../events';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
@@ -78,6 +79,7 @@ mapClass(Tokens.MailService, SMTPMailService);
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);

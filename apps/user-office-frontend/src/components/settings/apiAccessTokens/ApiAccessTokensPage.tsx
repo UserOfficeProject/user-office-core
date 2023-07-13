@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ApiAccessTokensTable from './ApiAccessTokensTable';
 
-const ApiAccessTokensPage: React.FC = () => {
+const ApiAccessTokensPage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

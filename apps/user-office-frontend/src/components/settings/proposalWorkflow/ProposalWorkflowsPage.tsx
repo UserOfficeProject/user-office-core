@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ProposalWorkflowsTable from './ProposalWorkflowsTable';
 
-const ProposalWorkflowsPage: React.FC = () => {
+const ProposalWorkflowsPage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

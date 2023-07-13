@@ -16,7 +16,7 @@ const columns: Column<Settings>[] = [
   },
 ];
 
-const AppSettingsTable: React.FC = () => {
+const AppSettingsTable = () => {
   const { settings, setSettings } = useContext(SettingsContext);
   const { api } = useDataApiWithFeedback();
 

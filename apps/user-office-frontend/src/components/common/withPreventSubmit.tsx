@@ -1,5 +1,5 @@
 import { TextFieldProps } from '@mui/material';
-import React, { KeyboardEvent } from 'react';
+import React, { KeyboardEvent, ReactElement } from 'react';
 
 interface WithPreventSubmitProps {
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => false | undefined;
@@ -11,7 +11,7 @@ interface WithPreventSubmitProps {
  */
 const withPreventSubmit = <P extends TextFieldProps>(
   WrappedComponent: React.ComponentType<P>
-): React.FC<P & WithPreventSubmitProps> => {
+): ((props: P & WithPreventSubmitProps) => ReactElement) => {
   return function withPreventSubmitComponent({
     onKeyDown,
     multiline,

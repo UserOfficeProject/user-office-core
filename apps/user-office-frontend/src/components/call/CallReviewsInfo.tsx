@@ -17,7 +17,7 @@ import {
 } from 'generated/sdk';
 import { useSEPsData } from 'hooks/SEP/useSEPsData';
 
-const CallReviewAndNotification: React.FC = () => {
+const CallReviewAndNotification = () => {
   const theme = useTheme();
   const { currentRole } = useContext(UserContext);
   const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({

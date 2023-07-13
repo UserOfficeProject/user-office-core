@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { Call } from 'generated/sdk';
+import { Call, InputMaybe } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useCallData(callId: number | undefined) {
+export function useCallData(callId?: InputMaybe<Call['id']>) {
   const [call, setCall] = useState<Call | null>(null);
   const [loading, setLoading] = useState(true);
 

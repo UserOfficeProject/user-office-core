@@ -31,13 +31,13 @@ type ProposalStatusFilterProps = {
   proposalStatusId?: number;
 };
 
-const ProposalStatusFilter: React.FC<ProposalStatusFilterProps> = ({
+const ProposalStatusFilter = ({
   proposalStatuses,
   isLoading,
   proposalStatusId,
   onChange,
   shouldShowAll,
-}) => {
+}: ProposalStatusFilterProps) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
     proposalStatus: NumberParam,

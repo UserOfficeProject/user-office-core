@@ -4,7 +4,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import FeaturesTable from './FeaturesTable';
 
-const FeaturesPage: React.FC = () => {
+const FeaturesPage = () => {
   return (
     <StyledContainer>
       <StyledPaper>

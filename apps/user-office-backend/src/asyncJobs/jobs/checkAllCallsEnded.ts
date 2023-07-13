@@ -1,13 +1,14 @@
 import { logger } from '@user-office-software/duo-logger';
 
 import { CallDataSource } from '../../datasources/CallDataSource';
-import { eventBus } from '../../events';
+import { resolveApplicationEventBus } from '../../events';
 import { Event } from '../../events/event.enum';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
 const checkCallsEnded = async (dataSource: CallDataSource) => {
   const updatedCalls = [];
   try {
+    const eventBus = resolveApplicationEventBus();
     const notEndedCalls = await dataSource.getCalls({
       isCallEndedByEvent: false,
     });
@@ -41,6 +42,7 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
   }
 };
 const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
+  const eventBus = resolveApplicationEventBus();
   const updatedCalls = [];
   try {
     const notEndedInternalCalls = await dataSource.getCalls({
