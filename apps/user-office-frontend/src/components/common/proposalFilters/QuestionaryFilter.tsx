@@ -1,7 +1,7 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { Button, Collapse, Grid, TextField, Autocomplete } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactElement } from 'react';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
@@ -33,7 +33,7 @@ interface QuestionaryFilterProps {
 
 const getSearchCriteriaComponent = (
   questionTemplateRelation: QuestionTemplateRelationFragment | null
-): FC<SearchCriteriaInputProps> => {
+): ((props: SearchCriteriaInputProps) => ReactElement) => {
   if (!questionTemplateRelation) {
     return UnknownSearchCriteriaInput;
   }

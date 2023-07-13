@@ -4,7 +4,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { DatePicker, DateTimePicker } from 'formik-mui-lab';
-import React, { FC, useContext } from 'react';
+import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
@@ -16,7 +16,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
+export const QuestionDateForm = (props: QuestionFormProps) => {
   const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
 

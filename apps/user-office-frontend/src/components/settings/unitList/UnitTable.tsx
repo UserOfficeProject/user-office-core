@@ -27,7 +27,7 @@ const columns = [
   { title: 'Unit', field: 'unit' },
 ];
 
-const UnitTable: React.FC = () => {
+const UnitTable = () => {
   const { api } = useDataApiWithFeedback();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,

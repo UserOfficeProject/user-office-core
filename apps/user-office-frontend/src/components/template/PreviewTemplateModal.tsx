@@ -16,10 +16,10 @@ type PreviewTemplateModalProps = {
   setTemplateId: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
-const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({
+const PreviewTemplateModal = ({
   templateId,
   setTemplateId,
-}) => {
+}: PreviewTemplateModalProps) => {
   const { user } = useContext(UserContext);
 
   const { questionarySteps, loading } =

@@ -30,10 +30,7 @@ type SEPStatusFilterProps = {
   onChange: (sepStatus: SEPStatus) => void;
 };
 
-const SEPStatusFilter: React.FC<SEPStatusFilterProps> = ({
-  sepStatus,
-  onChange,
-}) => {
+const SEPStatusFilter = ({ sepStatus, onChange }: SEPStatusFilterProps) => {
   const classes = useStyles();
 
   return (

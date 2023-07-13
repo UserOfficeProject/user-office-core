@@ -27,7 +27,7 @@ services:
       [
         "/wait-for-frontend.sh",
         "frontend:80",
-        "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --config defaultCommandTimeout=15000"
+        'cypress run --spec "${CYPRES_SPEC_PATTERN}" --browser chrome --config defaultCommandTimeout=15000',
       ]
     depends_on:
       - frontend

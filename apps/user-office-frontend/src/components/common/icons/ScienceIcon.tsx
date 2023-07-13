@@ -1,8 +1,8 @@
-import SvgIcon from '@mui/material/SvgIcon';
+import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import React from 'react';
 
 // NOTE: The icon is taken from: https://materialdesignicons.com/
-const ScienceIcon: React.FC = (props) => {
+const ScienceIcon = (props: SvgIconProps) => {
   return (
     <SvgIcon {...props}>
       <path

@@ -22,10 +22,10 @@ type CreateUpdateInstitutionProps = {
   institution: Institution | null;
 };
 
-const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
+const CreateUpdateInstitution = ({
   close,
   institution,
-}) => {
+}: CreateUpdateInstitutionProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const history = useHistory();
   const countries = useCountries();
