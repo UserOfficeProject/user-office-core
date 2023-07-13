@@ -146,13 +146,13 @@ const OverwriteTimeAllocationDialog = ({
   );
 };
 
-const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
+const TechnicalReviewInfo = ({
   technicalReview,
   sepTimeAllocation,
   hasWriteAccess,
   onSepTimeAllocationEdit,
   ...sepProposalArgs
-}) => {
+}: TechnicalReviewInfoProps) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 

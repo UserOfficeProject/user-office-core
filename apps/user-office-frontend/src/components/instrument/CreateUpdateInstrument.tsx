@@ -30,10 +30,10 @@ type CreateUpdateInstrumentProps = {
   instrument: InstrumentFragment | null;
 };
 
-const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
+const CreateUpdateInstrument = ({
   close,
   instrument,
-}) => {
+}: CreateUpdateInstrumentProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();

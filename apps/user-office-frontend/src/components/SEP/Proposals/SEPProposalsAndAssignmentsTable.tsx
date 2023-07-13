@@ -135,9 +135,13 @@ const SEPProposalColumns: Column<SEPProposalType>[] = [
   },
 ];
 
-const SEPProposalsAndAssignmentsTable: React.FC<
-  SEPProposalsAndAssignmentsTableProps
-> = ({ data, onAssignmentsUpdate, selectedCallId, Toolbar, confirm }) => {
+const SEPProposalsAndAssignmentsTable = ({
+  data,
+  onAssignmentsUpdate,
+  selectedCallId,
+  Toolbar,
+  confirm,
+}: SEPProposalsAndAssignmentsTableProps) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     reviewModal: NumberParam,
   });

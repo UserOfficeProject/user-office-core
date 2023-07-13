@@ -120,13 +120,19 @@ const reducer = (
         impersonatingUserId: action.payload.impersonatingUserId,
       };
     case ActionType.LOGINUSER: {
-      const { user, exp, roles, isInternalUser, impersonatingUserId } =
-        jwtDecode(action.payload) as DecodedTokenData;
+      const {
+        user,
+        exp,
+        roles,
+        isInternalUser,
+        impersonatingUserId,
+        currentRole,
+      } = jwtDecode(action.payload) as DecodedTokenData;
       localStorage.user = JSON.stringify(user);
       localStorage.token = action.payload;
       localStorage.expToken = exp;
       localStorage.isInternalUser = isInternalUser;
-      localStorage.currentRole = roles[0].shortCode.toUpperCase();
+      localStorage.currentRole = currentRole.shortCode.toUpperCase();
       localStorage.impersonatingUserId = impersonatingUserId;
 
       return {
@@ -175,7 +181,9 @@ const reducer = (
   }
 };
 
-export const UserContextProvider: React.FC = (props): JSX.Element => {
+export const UserContextProvider = (props: {
+  children: React.ReactNode;
+}): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);

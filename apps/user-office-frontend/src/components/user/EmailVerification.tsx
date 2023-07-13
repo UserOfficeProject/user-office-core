@@ -37,7 +37,7 @@ type EmailVerificationProps = PropTypes.InferProps<
   typeof EmailVerificationPropTypes
 >;
 
-const EmailVerification: React.FC<EmailVerificationProps> = ({ match }) => {
+const EmailVerification = ({ match }: EmailVerificationProps) => {
   const classes = useStyles();
   const [emailVerified, setEmailVerified] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);

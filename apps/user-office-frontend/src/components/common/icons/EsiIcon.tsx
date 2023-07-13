@@ -1,7 +1,7 @@
-import SvgIcon from '@mui/material/SvgIcon';
+import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import React from 'react';
 
-const EsiIcon: React.FC = (props) => {
+const EsiIcon = (props: SvgIconProps) => {
   return (
     <SvgIcon {...props}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" {...props}>

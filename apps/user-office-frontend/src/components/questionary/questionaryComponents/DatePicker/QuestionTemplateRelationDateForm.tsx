@@ -4,7 +4,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { DatePicker, DateTimePicker } from 'formik-mui-lab';
-import React, { FC, useContext } from 'react';
+import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
@@ -17,9 +17,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationDateForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationDateForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
 

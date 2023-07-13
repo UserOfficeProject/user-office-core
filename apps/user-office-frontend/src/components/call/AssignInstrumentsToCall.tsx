@@ -20,11 +20,11 @@ type AssignInstrumentsToCallProps = {
   assignedInstruments?: InstrumentWithAvailabilityTime[] | null;
 };
 
-const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
+const AssignInstrumentsToCall = ({
   assignInstrumentsToCall,
   callId,
   assignedInstruments,
-}) => {
+}: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]

@@ -14,7 +14,7 @@ type RoleTableProps = {
 
 const columns = [{ title: 'Role', field: 'title' }];
 
-const RoleTable: React.FC<RoleTableProps> = ({ add, activeRoles }) => {
+const RoleTable = ({ add, activeRoles }: RoleTableProps) => {
   const { rolesData, loading } = useRolesData();
   const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
 

@@ -14,7 +14,7 @@ const columns: Column<FeatureWithTableData>[] = [
   { title: 'Description', field: 'description' },
 ];
 
-const FeaturesTable: React.FC<{ confirm: WithConfirmType }> = ({ confirm }) => {
+const FeaturesTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { features, setFeatures } = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
   const [preSelectedFeatures, setPreSelectedFeatures] = useState<

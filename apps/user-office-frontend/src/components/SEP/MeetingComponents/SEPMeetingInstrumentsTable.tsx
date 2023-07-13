@@ -38,12 +38,12 @@ const instrumentTableColumns = [
   },
 ];
 
-const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
+const SEPMeetingInstrumentsTable = ({
   sepId,
   selectedCall,
   Toolbar,
   confirm,
-}) => {
+}: SEPMeetingInstrumentsTableProps) => {
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsBySEPData(sepId, selectedCall?.id);
   const { api } = useDataApiWithFeedback();

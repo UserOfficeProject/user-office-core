@@ -27,11 +27,7 @@ type AppToolbarProps = {
   header: string;
 };
 
-const AppToolbar: React.FC<AppToolbarProps> = ({
-  open,
-  handleDrawerOpen,
-  header,
-}) => {
+const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
   const { settingsMap } = useContext(SettingsContext);
   const location = useLocation();
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');

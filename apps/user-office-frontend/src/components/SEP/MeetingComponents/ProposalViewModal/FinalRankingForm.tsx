@@ -42,13 +42,13 @@ type FinalRankingFormProps = {
   confirm: WithConfirmType;
 };
 
-const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
+const FinalRankingForm = ({
   proposalData,
   hasWriteAccess,
   closeModal,
   meetingSubmitted,
   confirm,
-}) => {
+}: FinalRankingFormProps) => {
   const classes = useStyles();
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const { api } = useDataApiWithFeedback();
