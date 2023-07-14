@@ -1,8 +1,16 @@
-import MaterialTable, { Column } from '@material-table/core';
+import MaterialTable, { Column, MTableToolbar } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
+import {
+  FormControl,
+  FormHelperText,
+  Grid,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
@@ -56,6 +64,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
+import { QueryParameters } from './ProposalTableOfficer';
 
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
@@ -143,6 +152,46 @@ const proposalStatusFilter: Record<string, number> = {
   FEASIBILITY_REVIEW: 2,
 };
 
+const TableToolbar = (props: {
+  selectedValue: number;
+  handleSelection: (arg0: number) => void;
+}) => {
+  const { selectedValue, handleSelection } = props;
+
+  return (
+    <Grid
+      container
+      alignItems="flex-start"
+      justifyContent={'flex-end'}
+      direction={'row'}
+    >
+      <Grid item xs={12}>
+        <MTableToolbar {...props} />
+      </Grid>
+      <Grid item xs={12} alignItems="flex-start" justifyContent={'flex-end'}>
+        <div style={{ marginLeft: '15px' }}>
+          <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <Select
+              id="select-maximum-to-load"
+              value={selectedValue}
+              onChange={(event: SelectChangeEvent<number>) => {
+                handleSelection(+event.target.value);
+              }}
+            >
+              <MenuItem value={2000}>2000</MenuItem>
+              <MenuItem value={3000}>3000</MenuItem>
+              <MenuItem value={5000}>5000</MenuItem>
+              <MenuItem value={10000}>10000</MenuItem>
+              <MenuItem value={50000}>50000</MenuItem>
+              <MenuItem value={-1}>Maximum</MenuItem>
+            </Select>
+            <FormHelperText>Maximum to load</FormHelperText>
+          </FormControl>
+        </div>
+      </Grid>
+    </Grid>
+  );
+};
 const ProposalTableInstrumentScientist = ({
   confirm,
 }: {
@@ -188,18 +237,26 @@ const ProposalTableInstrumentScientist = ({
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
+  const [queryParameters, setQueryParameters] = useState<QueryParameters>({
+    first: 2000,
+  });
+  const [maximumToload, setMaximumToload] = useState(2000);
+
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
 
-  const { loading, proposalsData, setProposalsData } = useProposalsCoreData({
-    proposalStatusId: proposalFilter.proposalStatusId,
-    instrumentId: proposalFilter.instrumentId,
-    callId: proposalFilter.callId,
-    questionFilter: proposalFilter.questionFilter,
-    reviewer: proposalFilter.reviewer,
-  });
+  const { loading, proposalsData, setProposalsData } = useProposalsCoreData(
+    {
+      proposalStatusId: proposalFilter.proposalStatusId,
+      instrumentId: proposalFilter.instrumentId,
+      callId: proposalFilter.callId,
+      questionFilter: proposalFilter.questionFilter,
+      reviewer: proposalFilter.reviewer,
+    },
+    queryParameters
+  );
 
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
@@ -547,6 +604,24 @@ const ProposalTableInstrumentScientist = ({
       <MaterialTable
         icons={tableIcons}
         title={'Proposals'}
+        components={{
+          Toolbar: (props) => (
+            <TableToolbar
+              {...props}
+              selectedValue={maximumToload}
+              handleSelection={(selected: number) => {
+                setMaximumToload(selected);
+                setQueryParameters(
+                  selected === -1
+                    ? {}
+                    : {
+                        first: selected,
+                      }
+                );
+              }}
+            />
+          ),
+        }}
         columns={columns}
         data={proposalDataWithIdAndRowActions}
         isLoading={loading}
