@@ -154,9 +154,10 @@ const proposalStatusFilter: Record<string, number> = {
 
 const TableToolbar = (props: {
   selectedValue: number;
-  handleSelection: (arg0: number) => void;
+  handleSelection: (selected: number) => void;
+  confirm: (selected: number) => void;
 }) => {
-  const { selectedValue, handleSelection } = props;
+  const { selectedValue, handleSelection, confirm } = props;
 
   return (
     <Grid
@@ -175,7 +176,12 @@ const TableToolbar = (props: {
               id="select-maximum-to-load"
               value={selectedValue}
               onChange={(event: SelectChangeEvent<number>) => {
-                handleSelection(+event.target.value);
+                const value = +event.target.value;
+                if (value > 5000) {
+                  confirm(value);
+                } else {
+                  handleSelection(value);
+                }
               }}
             >
               <MenuItem value={2000}>2000</MenuItem>
@@ -618,6 +624,25 @@ const ProposalTableInstrumentScientist = ({
                         first: selected,
                       }
                 );
+              }}
+              confirm={(selected) => {
+                confirm(
+                  () => {
+                    setMaximumToload(selected);
+                    setQueryParameters(
+                      selected === -1
+                        ? {}
+                        : {
+                            first: selected,
+                          }
+                    );
+                  },
+                  {
+                    title: 'Maximum proposals loaded',
+                    description:
+                      'Setting the maximum loaded proposals too high can cause loading delay or errors.',
+                  }
+                )();
               }}
             />
           ),
