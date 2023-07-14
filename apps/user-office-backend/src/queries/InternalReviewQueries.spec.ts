@@ -1,50 +1,64 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { dummyCall, dummyCalls } from '../datasources/mockups/CallDataSource';
+import {
+  anotherDummyReview,
+  dummyReview,
+  dummyReviews,
+} from '../datasources/mockups/InternalReviewDataSource';
 import {
   dummyUserWithRole,
   dummyInstrumentScientist,
+  dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import CallQueries from './CallQueries';
+import InternalReviewQueries from './InternalReviewQueries';
 
-const callQueries = container.resolve(CallQueries);
+const internalReviewQueries = container.resolve(InternalReviewQueries);
 
-test('A user can get a call', () => {
-  return expect(callQueries.get(dummyUserWithRole, 1)).resolves.toBe(dummyCall);
-});
-
-test('A not logged in user can not get a call', () => {
-  return expect(callQueries.get(null, 1)).resolves.toBe(null);
-});
-
-test('A user can get all calls', () => {
-  return expect(callQueries.getAll(dummyUserWithRole)).resolves.toStrictEqual(
-    dummyCalls
+test('A user can not get an internal review', () => {
+  return expect(internalReviewQueries.get(dummyUserWithRole, 1)).resolves.toBe(
+    null
   );
 });
 
-test('A not logged in user can not get all calls', () => {
-  return expect(callQueries.getAll(null)).resolves.toBe(null);
+test('A not logged in user can not get an internal review', () => {
+  return expect(internalReviewQueries.get(null, 1)).resolves.toBe(null);
 });
 
-test('A instrument scientists can get calls assigned to their instruments', () => {
+test('Instrument scientist can get internal review on their instrument', () => {
   return expect(
-    callQueries.getCallsByInstrumentScientist(
-      dummyInstrumentScientist,
-      dummyInstrumentScientist.id
-    )
-  ).resolves.toStrictEqual(dummyCalls);
+    internalReviewQueries.get(dummyInstrumentScientist, 1)
+  ).resolves.toStrictEqual(dummyReview);
 });
 
-test('A instrument scientists can not get other scientists calls', () => {
+test('User officer can get any internal review', () => {
   return expect(
-    callQueries.getCallsByInstrumentScientist(dummyInstrumentScientist, 123)
-  ).resolves.toBe(null);
+    internalReviewQueries.get(dummyUserOfficerWithRole, 2)
+  ).resolves.toStrictEqual(anotherDummyReview);
 });
 
-test('A user can not get instrument scientist calls', () => {
+test('A user can not get all internal reviews', () => {
+  return expect(internalReviewQueries.getAll(dummyUserWithRole)).resolves.toBe(
+    null
+  );
+});
+
+test('A not logged in user can not get all internal reviews', () => {
+  return expect(internalReviewQueries.getAll(null)).resolves.toBe(null);
+});
+
+test('Instrument scientist can get internal reviews on their instrument', () => {
   return expect(
-    callQueries.getCallsByInstrumentScientist(dummyUserWithRole, 1)
-  ).resolves.toBe(null);
+    internalReviewQueries.getAll(dummyInstrumentScientist, {
+      technicalReviewId: 1,
+    })
+  ).resolves.toStrictEqual(dummyReviews);
+});
+
+test('User officer can get all internal reviews', () => {
+  return expect(
+    internalReviewQueries.getAll(dummyUserOfficerWithRole, {
+      technicalReviewId: 1,
+    })
+  ).resolves.toStrictEqual(dummyReviews);
 });
