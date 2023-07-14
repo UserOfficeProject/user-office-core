@@ -106,4 +106,18 @@ export class InternalReviewDataSourceMock implements InternalReviewDataSource {
 
     return removedElement;
   }
+
+  async isInternalReviewerOnTechnicalReview(
+    userId: number,
+    technicalReviewId: number
+  ) {
+    return true;
+  }
+  async isInternalReviewer(userId: number) {
+    return true;
+  }
+
+  async getRelatedUsersOnInternalReview(id: number) {
+    return [1, 2];
+  }
 }
