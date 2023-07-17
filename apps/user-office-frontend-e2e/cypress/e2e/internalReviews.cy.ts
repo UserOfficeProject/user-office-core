@@ -258,10 +258,7 @@ context('Institution tests', () => {
       .should('be.disabled');
 
     // NOTE: For some reason one click on the update button is not enough. Probably because of tinymce content setting.
-    cy.get('[data-cy="create-modal"]')
-      .find('[data-cy="submit"]')
-      .click()
-      .click();
+    cy.get('[data-cy="create-modal"]').find('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'success' });
 
