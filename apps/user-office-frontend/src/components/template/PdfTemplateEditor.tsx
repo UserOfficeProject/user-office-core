@@ -1,7 +1,8 @@
-import { Typography } from '@mui/material';
+import { html } from '@codemirror/lang-html';
+import { Box, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
+import CodeMirror from '@uiw/react-codemirror';
+import { Field, FieldProps, Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -64,21 +65,23 @@ export default function PdfTemplateEditor() {
             }
           }}
         >
-          {({ handleChange }) => (
+          {({ setFieldValue }) => (
             <Form>
-              <Field
-                name="templateData"
-                id="templateData"
-                label="Template contents"
-                type="text"
-                component={TextField}
-                data-cy="template-data"
-                fullWidth
-                multiline
-                minRows={10}
-                variant="outlined"
-                onChange={handleChange}
-              />
+              <Field name="templateData" data-cy="template-data">
+                {({ field }: FieldProps<string>) => (
+                  <Box sx={{ my: 3 }}>
+                    <CodeMirror
+                      minHeight="200px"
+                      maxHeight="600px"
+                      extensions={[html()]}
+                      onChange={(value) => {
+                        setFieldValue('templateData', value);
+                      }}
+                      value={field.value}
+                    />
+                  </Box>
+                )}
+              </Field>
               <StyledButtonContainer>
                 <Button type="submit" data-cy="submit">
                   {'Update'}
