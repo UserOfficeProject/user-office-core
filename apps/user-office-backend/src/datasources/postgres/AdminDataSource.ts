@@ -333,6 +333,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         .select('state')
         .groupBy(2)
         .then(() => this.applyPatches())
+        .then(() => (this.autoUpgradedDBReady = true))
         .catch((e) => {
           initDbFailed++;
 
@@ -343,8 +344,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           }
 
           setTimeout(initDb, 1000);
-        })
-        .finally(() => (this.autoUpgradedDBReady = true));
+        });
     };
 
     setTimeout(initDb, 500);
