@@ -135,11 +135,9 @@ const CreateUpdateInternalReview = ({
               text: getFullUserName(user),
               value: user.id,
             }))}
-            InputProps={{
-              'data-cy': 'internal-reviewer',
-            }}
             required
             disabled={isExecutingCall || isSubmitting || isInternalReviewer}
+            data-cy="internal-reviewer"
           />
 
           <InputLabel
