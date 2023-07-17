@@ -67,7 +67,7 @@ export default function PdfTemplateEditor() {
         >
           {({ setFieldValue }) => (
             <Form>
-              <Field name="templateData" data-cy="template-data">
+              <Field name="templateData">
                 {({ field }: FieldProps<string>) => (
                   <Box sx={{ my: 3 }}>
                     <CodeMirror
@@ -78,6 +78,7 @@ export default function PdfTemplateEditor() {
                         setFieldValue('templateData', value);
                       }}
                       value={field.value}
+                      data-cy="template-data"
                     />
                   </Box>
                 )}

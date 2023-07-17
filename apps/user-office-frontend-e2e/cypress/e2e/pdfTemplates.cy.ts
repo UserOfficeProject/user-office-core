@@ -37,7 +37,7 @@ context('PDF template tests', () => {
 
       cy.contains(templateName);
 
-      cy.get('[data-cy="template-data"] textarea')
+      cy.get('[data-cy="template-data"] .cm-content')
         .first()
         .type(pdfTemplateData)
         .should('have.value', pdfTemplateData);
@@ -77,7 +77,7 @@ context('PDF template tests', () => {
 
       cy.contains(createdTemplateName).should('exist');
 
-      cy.get('[data-cy="template-data"] textarea')
+      cy.get('[data-cy="template-data"] .cm-content')
         .first()
         .type(pdfTemplateData)
         .should('have.value', pdfTemplateData);
@@ -111,7 +111,7 @@ context('PDF template tests', () => {
 
       cy.contains(createdTemplateName).should('exist');
 
-      cy.get('[data-cy="template-data"] textarea')
+      cy.get('[data-cy="template-data"] .cm-content')
         .first()
         .type(pdfTemplateData)
         .should('have.value', pdfTemplateData);
