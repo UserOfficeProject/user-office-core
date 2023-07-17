@@ -44,10 +44,12 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     if (!data) {
       throw new Error('Could not get proposal details');
     }
+
+    const userRole = req.user.currentRole;
     callFactoryService<ProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
-      { data, meta },
+      { data, meta, userRole },
       req,
       res,
       next
@@ -89,10 +91,11 @@ router.get(`/${PDFType.SAMPLE}/:sample_ids`, async (req, res, next) => {
       )
     );
 
+    const userRole = req.user.currentRole;
     callFactoryService(
       DownloadType.PDF,
       PDFType.SAMPLE,
-      { data, meta },
+      { data, meta, userRole },
       req,
       res,
       next
@@ -136,10 +139,11 @@ router.get(
         )
       );
 
+      const userRole = req.user.currentRole;
       callFactoryService(
         DownloadType.PDF,
         PDFType.SHIPMENT_LABEL,
-        { data, meta },
+        { data, meta, userRole },
         req,
         res,
         next
