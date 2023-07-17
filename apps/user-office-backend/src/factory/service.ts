@@ -5,6 +5,7 @@ import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
 import request from 'request';
 
+import { Role } from '../models/Role';
 import { bufferRequestBody } from './util';
 
 export enum DownloadType {
@@ -39,7 +40,7 @@ if (!ENDPOINT) {
 export default function callFactoryService<TData, TMeta extends MetaBase>(
   downloadType: DownloadType,
   type: PDFType | XLSXType,
-  properties: { data: TData[]; meta: TMeta },
+  properties: { data: TData[]; meta: TMeta; userRole: Role },
   req: Request,
   res: Response,
   next: NextFunction
