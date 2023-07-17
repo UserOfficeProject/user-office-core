@@ -9,8 +9,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
-import { Select, CheckboxWithLabel } from 'formik-mui';
-import React, { useState } from 'react';
+import { Select, TextField, CheckboxWithLabel } from 'formik-mui';
+import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
@@ -19,7 +19,8 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import NavigationFragment from 'components/questionary/NavigationFragment';
-import { ReviewStatus, Review, UserRole } from 'generated/sdk';
+import { SettingsContext } from 'context/SettingsContextProvider';
+import { ReviewStatus, Review, UserRole, SettingsId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -50,6 +51,13 @@ const ProposalGrade = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
+  const { settingsMap } = useContext(SettingsContext);
+
+  const gradeDecimalPoints = parseFloat(
+    settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
+  );
+
+  console.log(gradeDecimalPoints);
 
   if (!review) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -170,26 +178,38 @@ const ProposalGrade = ({
             <Field
               name="grade"
               label="Grade"
-              component={Select}
+              component={gradeDecimalPoints === 1 ? Select : TextField}
               MenuProps={{ 'data-cy': 'grade-proposal-options' }}
               formControl={{
                 fullWidth: true,
                 required: true,
                 margin: 'normal',
               }}
-              inputProps={{
-                id: 'grade-proposal',
-              }}
+              inputProps={
+                gradeDecimalPoints === 1
+                  ? {
+                      id: 'grade-proposal',
+                    }
+                  : {
+                      id: 'grade-proposal',
+                      step: gradeDecimalPoints,
+                      inputMode: 'decimal',
+                      type: 'number',
+                      min: '1',
+                      max: '10',
+                    }
+              }
               data-cy="grade-proposal"
               labelId="grade-proposal-label"
             >
-              {[...Array(10)].map((e, i) => {
-                return (
-                  <MenuItem value={i + 1} key={i}>
-                    {(i + 1).toString()}
-                  </MenuItem>
-                );
-              })}
+              {gradeDecimalPoints === 1 &&
+                [...Array(10)].map((e, i) => {
+                  return (
+                    <MenuItem value={i + 1} key={i}>
+                      {(i + 1).toString()}
+                    </MenuItem>
+                  );
+                })}
             </Field>
           </Box>
           <ErrorMessage name="grade" />
