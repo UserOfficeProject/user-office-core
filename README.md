@@ -17,6 +17,14 @@ To be able to start both backend and frontend locally you will need to:
 If .env file is not preset during startup of the project, it will be created using example.env file template
 The `example.env` and `.env` files are located in `apps/user-office-backend` and `apps/user-office-frontend` accordingly.
 
+## Running with docker-compose
+
+If you want to get something running for testing purposes only you can run the docker-compose file located at the root of the repository. Use the following steps:
+
+1. docker-compose up
+2. Visit localhost:33000/login
+3. Use the default users for login, Aaron_Harris49@gmail.com (User Officer) or Javon4@hotmail.com (User) with password "Test1234!"
+
 ## Monorepo future plans
 
 Plan on how to continue with the monorepo in the future:
