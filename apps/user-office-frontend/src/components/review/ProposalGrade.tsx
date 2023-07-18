@@ -57,8 +57,6 @@ const ProposalGrade = ({
     settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
   );
 
-  console.log(gradeDecimalPoints);
-
   if (!review) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
