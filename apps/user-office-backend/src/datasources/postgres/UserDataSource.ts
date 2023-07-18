@@ -353,7 +353,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {
-    // ensureDummyUsersExist throws an error if it could not create all users it was given,
+    // ensureDummyUsersExist throws an error if it could not create all users ot was given,
     // so on success it will always return a list of exactly 1 element here.
     // In the code below, always returning the first element should therefore be safe
     return this.ensureDummyUsersExist([userId]).then((users) => users[0]);
