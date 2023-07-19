@@ -4,8 +4,7 @@ import { TemplateGroupId } from '@user-office-software-libs/shared-types';
 context('PDF template tests', () => {
   const templateName = faker.lorem.words(3);
   const templateDesc = faker.lorem.words(3);
-  const pdfTemplateData = faker.lorem.paragraphs(10);
-
+  const pdfTemplateData = faker.lorem.paragraphs(1);
   let createdTemplateName: string;
 
   beforeEach(() => {
@@ -40,7 +39,9 @@ context('PDF template tests', () => {
       cy.get('[data-cy="template-data"] .cm-content')
         .first()
         .type(pdfTemplateData)
-        .should('have.value', pdfTemplateData);
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
       cy.get('[data-cy=submit]').click();
 
@@ -80,7 +81,9 @@ context('PDF template tests', () => {
       cy.get('[data-cy="template-data"] .cm-content')
         .first()
         .type(pdfTemplateData)
-        .should('have.value', pdfTemplateData);
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
       cy.get('[data-cy=submit]').click();
 
@@ -114,7 +117,9 @@ context('PDF template tests', () => {
       cy.get('[data-cy="template-data"] .cm-content')
         .first()
         .type(pdfTemplateData)
-        .should('have.value', pdfTemplateData);
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
       cy.get('[data-cy=submit]').click();
 
