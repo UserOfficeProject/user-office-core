@@ -64,7 +64,7 @@ function toEssBasicUserDetails(
     '',
     new Date(),
     false,
-    ''
+    stfcUser.email ?? ''
   );
 }
 
