@@ -26,10 +26,10 @@ type QuestionDependencyListProps = {
   form: FormikProps<QuestionTemplateRelation>;
 };
 
-const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
+const QuestionDependencyList = ({
   template,
   form,
-}) => {
+}: QuestionDependencyListProps) => {
   const field: QuestionTemplateRelation = form.values;
   const [logicOperator, setLogicOperator] = useState<DependenciesLogicOperator>(
     field.dependenciesOperator || DependenciesLogicOperator.AND

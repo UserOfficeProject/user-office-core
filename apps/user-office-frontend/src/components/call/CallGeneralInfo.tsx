@@ -57,18 +57,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 0,
   },
 }));
-const CallGeneralInfo: React.FC<{
-  reloadTemplates: () => void;
-  reloadEsi: () => void;
-  reloadPdfTemplates: () => void;
-  reloadProposalWorkflows: () => void;
-  templates: GetTemplatesQuery['templates'];
-  esiTemplates: GetTemplatesQuery['templates'];
-  pdfTemplates: GetTemplatesQuery['templates'];
-  loadingTemplates: boolean;
-  proposalWorkflows: ProposalWorkflow[];
-  loadingProposalWorkflows: boolean;
-}> = ({
+const CallGeneralInfo = ({
   loadingProposalWorkflows,
   proposalWorkflows,
   templates,
@@ -79,6 +68,17 @@ const CallGeneralInfo: React.FC<{
   reloadEsi,
   reloadPdfTemplates,
   reloadProposalWorkflows,
+}: {
+  reloadTemplates: () => void;
+  reloadEsi: () => void;
+  reloadPdfTemplates: () => void;
+  reloadProposalWorkflows: () => void;
+  templates: GetTemplatesQuery['templates'];
+  esiTemplates: GetTemplatesQuery['templates'];
+  pdfTemplates: GetTemplatesQuery['templates'];
+  loadingTemplates: boolean;
+  proposalWorkflows: ProposalWorkflow[];
+  loadingProposalWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();

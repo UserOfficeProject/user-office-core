@@ -68,15 +68,37 @@ export default function ProposalContainer(props: ProposalContainerProps) {
             const questionIds = action.newItems.map((value) => value.id);
             draftState.proposal.genericTemplates = [
               ...state.proposal.genericTemplates.filter(
-                (value) => !questionIds.some((id) => id === value.id)
+                (value) =>
+                  !questionIds.some(
+                    (id) =>
+                      id === value.id || state.deletedTemplates.includes(id)
+                  )
               ),
               ...action.newItems,
             ];
+            //if new templates have been created add them to the list of created templates
+            if (
+              action.newItems.length > state.proposal.genericTemplates.length
+            ) {
+              draftState.createdTemplates = [
+                ...state.createdTemplates,
+                ...questionIds.slice(
+                  -(
+                    action.newItems.length -
+                    state.proposal.genericTemplates.length
+                  )
+                ),
+              ];
+            }
           } else {
             draftState.proposal.genericTemplates = action.newItems;
           }
         }
-        draftState.isDirty = true;
+        if (
+          action.newItems?.length !== state.proposal.genericTemplates?.length
+        ) {
+          draftState.isDirty = true;
+        }
         break;
 
       case GENERIC_TEMPLATE_EVENT.ITEMS_DELETED:
@@ -87,6 +109,10 @@ export default function ProposalContainer(props: ProposalContainerProps) {
               ...state.proposal.genericTemplates.filter(
                 (value) => !questionIds.some((id) => id === value.id)
               ),
+            ];
+            draftState.deletedTemplates = [
+              ...state.deletedTemplates,
+              ...questionIds,
             ];
             action.newItems = [];
           }

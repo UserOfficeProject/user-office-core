@@ -114,6 +114,9 @@ let columns: Column<ProposalViewData>[] = [
     ...{ width: 'auto' },
   },
   {
+    title: 'Principal Investigator',
+    field: 'principalInvestigator',
+    emptyValue: '-',
     render: (proposalView) => {
       if (
         proposalView.principalInvestigator?.lastname &&
@@ -124,8 +127,6 @@ let columns: Column<ProposalViewData>[] = [
 
       return '';
     },
-    title: 'Principal Investigator',
-    emptyValue: '-',
   },
   {
     title: 'PI Email',
@@ -197,11 +198,11 @@ const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
  * For example if we change the PREFETCH_SIZE to 100, that would mean that it can select up to 100 prefetched proposals at once.
  * For now this works but if we want to support option where we really select all proposals in the database this needs to be refactored a bit.
  */
-const ToolbarWithSelectAllPrefetched: React.FC<{
+const ToolbarWithSelectAllPrefetched = (props: {
   actions: Action<ProposalViewData>[];
   selectedRows: ProposalViewData[];
   data: ProposalViewData[];
-}> = (props) => {
+}) => {
   const selectAllAction = props.actions.find(
     (action) => action.hidden && action.tooltip === SELECT_ALL_ACTION_TOOLTIP
   );
@@ -249,12 +250,12 @@ const ToolbarWithSelectAllPrefetched: React.FC<{
   );
 };
 
-const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
+const ProposalTableOfficer = ({
   proposalFilter,
   urlQueryParams,
   setUrlQueryParams,
   confirm,
-}) => {
+}: ProposalTableOfficerProps) => {
   const [openAssignment, setOpenAssignment] = useState(false);
   const [openInstrumentAssignment, setOpenInstrumentAssignment] =
     useState(false);

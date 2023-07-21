@@ -12,6 +12,7 @@ import {
   isMatchingConstraints,
   transformAnswerValueIfNeeded,
 } from '../models/ProposalModelFunctions';
+import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { rejection } from '../models/Rejection';
 import { UserJWT, UserWithRole } from '../models/User';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
@@ -114,7 +115,7 @@ export default class QuestionaryMutations {
           return rejection(
             'The input to "' +
               questionTemplateRelation.question.question +
-              '" not satisfying constraint. Please enter valid input.',
+              '" is not satisfying a constraint. Please enter a valid input.',
             { answer, questionTemplateRelation }
           );
         }
@@ -128,6 +129,18 @@ export default class QuestionaryMutations {
             value: transformedValue,
             ...parsedAnswerRest,
           });
+        }
+
+        const definition = getQuestionDefinition(
+          questionTemplateRelation.question.dataType
+        );
+
+        if (definition.onBeforeSave) {
+          definition.onBeforeSave(
+            questionaryId,
+            questionTemplateRelation,
+            answer
+          );
         }
 
         await this.dataSource.updateAnswer(

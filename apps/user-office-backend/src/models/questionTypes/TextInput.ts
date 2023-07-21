@@ -7,7 +7,7 @@ import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
-export const textInputDefinition: Question = {
+export const textInputDefinition: Question<DataType.TEXT_INPUT> = {
   dataType: DataType.TEXT_INPUT,
   validate: (field: QuestionTemplateRelation, value: any) => {
     if (field.question.dataType !== DataType.TEXT_INPUT) {

@@ -277,7 +277,9 @@ export default function TemplateEditor() {
       row
       style={{ justifyContent: 'flex-end', paddingBottom: '25px' }}
     >
-      {topControlBarElements.map((element) => element)}
+      {topControlBarElements.map((element, index) => (
+        <div key={index}>{element}</div>
+      ))}
     </FormGroup>
   ) : null;
 

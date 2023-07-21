@@ -46,13 +46,13 @@ type ProposalReviewContentProps = {
   isInsideModal?: boolean;
 };
 
-const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
+const ProposalReviewContent = ({
   proposalPk,
   tabNames,
   reviewId,
   sepId,
   isInsideModal,
-}) => {
+}: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);

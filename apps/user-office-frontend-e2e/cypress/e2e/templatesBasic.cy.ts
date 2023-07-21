@@ -1,5 +1,3 @@
-import path from 'path';
-
 import { faker } from '@faker-js/faker';
 import {
   DataType,
@@ -1349,7 +1347,7 @@ context('Template tests', () => {
         const downloadsFolder = Cypress.config('downloadsFolder');
 
         cy.readFile(
-          path.join(downloadsFolder, `${initialDBData.template.name}.json`)
+          `${downloadsFolder}/${initialDBData.template.name}.json`
         ).then((actualExport) => {
           // remove date from the export, because it is not deterministic
           delete expectedExport.metadata.exportDate;
@@ -1579,7 +1577,10 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
     });
 
     it('Identifiable disguised file is uploaded but not accepted', () => {
@@ -1610,7 +1611,10 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
     });
 
     it('Question is not accepted when one of many files is invalid', () => {
@@ -1673,7 +1677,10 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
     });
 
     it('Question is not accepted when PDF file page count is outside limit', () => {
@@ -1704,7 +1711,10 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
     });
 
     it('Question accepted when PDF file page count is within limit', () => {

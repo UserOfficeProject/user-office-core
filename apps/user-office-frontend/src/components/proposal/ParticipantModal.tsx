@@ -37,7 +37,7 @@ type ParticipantModalProps = {
   setPrincipalInvestigator?: (user: BasicUserDetails) => void;
 };
 
-const ParticipantModal: React.FC<ParticipantModalProps> = ({
+const ParticipantModal = ({
   addParticipants,
   close,
   show,
@@ -48,7 +48,7 @@ const ParticipantModal: React.FC<ParticipantModalProps> = ({
   selection,
   userRole,
   setPrincipalInvestigator,
-}) => {
+}: ParticipantModalProps) => {
   const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]

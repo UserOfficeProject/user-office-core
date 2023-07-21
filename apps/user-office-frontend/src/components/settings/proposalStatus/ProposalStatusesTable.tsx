@@ -23,9 +23,7 @@ const columns = [
   { title: 'Description', field: 'description' },
 ];
 
-const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
-  confirm,
-}) => {
+const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { api } = useDataApiWithFeedback();
   const {
     loadingProposalStatuses,

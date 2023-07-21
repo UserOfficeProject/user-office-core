@@ -23,7 +23,11 @@ context('Personal information tests', () => {
     if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
       cy.updateUserRoles({
         id: initialDBData.users.officer.id,
-        roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
+        roles: [
+          initialDBData.roles.user,
+          initialDBData.roles.userOfficer,
+          initialDBData.roles.sepChair,
+        ],
       });
     }
     cy.login('officer');
@@ -37,13 +41,12 @@ context('Personal information tests', () => {
 
     cy.contains('User roles');
 
-    cy.get("[data-cy='role-selection-table'] table tbody tr").should(
-      (element) => {
-        expect(element.text()).to.contain('User Officer');
-
-        expect(element.text()).to.contain('In Use');
-      }
-    );
+    cy.contains(
+      "[data-cy='role-selection-table'] table tbody tr td",
+      'User Officer'
+    )
+      .parent()
+      .contains('In Use');
   });
 
   describe('Personal information advanced tests', () => {

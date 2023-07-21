@@ -58,15 +58,13 @@ type SEPMeetingProposalViewModalProps = {
   setProposalViewModalOpen: (isOpen: boolean) => void;
 };
 
-const SEPMeetingProposalViewModal: React.FC<
-  SEPMeetingProposalViewModalProps
-> = ({
+const SEPMeetingProposalViewModal = ({
   proposalViewModalOpen,
   proposalPk,
   sepId,
   meetingSubmitted,
   setProposalViewModalOpen,
-}) => {
+}: SEPMeetingProposalViewModalProps) => {
   const classes = useStyles();
   const hasWriteAccess = useCheckAccess([
     UserRole.USER_OFFICER,

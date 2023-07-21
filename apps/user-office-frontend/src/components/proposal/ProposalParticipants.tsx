@@ -35,7 +35,7 @@ type ParticipantsProps = {
   loadingPrincipalInvestigator?: boolean;
 };
 
-const Participants: React.FC<ParticipantsProps> = ({
+const Participants = ({
   users,
   setUsers,
   principalInvestigator,
@@ -44,7 +44,7 @@ const Participants: React.FC<ParticipantsProps> = ({
   title,
   preserveSelf,
   loadingPrincipalInvestigator,
-}) => {
+}: ParticipantsProps) => {
   const [modalOpen, setOpen] = useState(false);
 
   const classes = useStyles();

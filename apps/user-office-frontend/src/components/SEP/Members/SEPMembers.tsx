@@ -48,11 +48,11 @@ const columns = [
   },
 ];
 
-const SEPMembers: React.FC<SEPMembersProps> = ({
+const SEPMembers = ({
   data: sepData,
   onSEPUpdate,
   confirm,
-}) => {
+}: SEPMembersProps) => {
   const [modalOpen, setOpen] = useState(false);
   const [sepChairModalOpen, setSepChairModalOpen] = useState(false);
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);

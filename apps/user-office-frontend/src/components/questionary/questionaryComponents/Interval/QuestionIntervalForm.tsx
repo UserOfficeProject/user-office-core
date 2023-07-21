@@ -2,7 +2,7 @@ import Autocomplete from '@mui/lab/Autocomplete';
 import MaterialTextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
@@ -12,7 +12,7 @@ import { IntervalConfig } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
+export const QuestionIntervalForm = (props: QuestionFormProps) => {
   const field = props.question;
   const intervalConfig = props.question.config as IntervalConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
