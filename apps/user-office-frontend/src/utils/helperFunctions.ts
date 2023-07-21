@@ -63,6 +63,7 @@ export const getProposalStatus = (
 export const fromProposalToProposalView = (proposal: Proposal) => {
   return {
     primaryKey: proposal.primaryKey,
+    principalInvestigator: proposal.proposer || null,
     title: proposal.title,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,

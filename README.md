@@ -19,7 +19,7 @@ The `example.env` and `.env` files are located in `apps/user-office-backend` and
 
 ## Running with docker-compose
 
-If you want to get something running for testing purposes only you can run the docker-compose file located at the root of the repository. Use the following steps:
+If you want to get something running for testing purposes only, you can run the docker-compose file located at the root of the repository. Use the following steps:
 
 1. docker-compose up
 2. Visit localhost:33000/login
