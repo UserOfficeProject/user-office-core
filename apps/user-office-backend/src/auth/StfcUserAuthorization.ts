@@ -12,7 +12,7 @@ import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
-import { AuthJwtPayload, User } from '../models/User';
+import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { LRUCache } from '../utils/LRUCache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
@@ -43,6 +43,10 @@ export class StfcUserAuthorization extends UserAuthorization {
   protected instrumentDataSource: InstrumentDataSource = container.resolve(
     Tokens.InstrumentDataSource
   );
+
+  protected userDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
 
   getRequiredInstrumentForRole(roles: stfcRole[]) {
     return roles
@@ -302,5 +306,14 @@ export class StfcUserAuthorization extends UserAuthorization {
             );
           })
       : false;
+  }
+
+  async canReadUser(agent: UserWithRole | null, id: number): Promise<boolean> {
+    const readableUsers = await this.listReadableUsers(agent, [id]);
+
+    return (
+      readableUsers.includes(id) ||
+      (await this.userDataSource.isSearchableUser(id))
+    );
   }
 }
