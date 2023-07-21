@@ -168,7 +168,7 @@ describe('Searchable user tests', () => {
   });
 
   test('When checking whether a non-searchable user is searchable, the check returns false', async () => {
-    const nonSearchableUser = 0;
+    const nonSearchableUser = 2;
 
     const result = await userDataSource.isSearchableUser(nonSearchableUser);
 
