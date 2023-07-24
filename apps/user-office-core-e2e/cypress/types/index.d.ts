@@ -1,0 +1,11 @@
+import './admin';
+import './call';
+import './instrument';
+import './internalReview';
+import './predefinedMessage';
+import './proposal';
+import './template';
+import './user';
+import './utils';
+import './visits';
+import './workflow';

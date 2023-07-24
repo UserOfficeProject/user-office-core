@@ -1,0 +1,3 @@
+{
+  "typescript.tsdk": "./apps/user-office-backend/node_modules/typescript/lib"
+}
