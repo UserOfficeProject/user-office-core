@@ -78,7 +78,7 @@ const TemplateEditor = <
             </Field>
             <StyledButtonContainer>
               <Button type="submit" data-cy={`${name}-submit`}>
-                {'Update'}
+                Update
               </Button>
             </StyledButtonContainer>
           </Form>
