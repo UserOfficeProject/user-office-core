@@ -191,7 +191,6 @@ export default {
     sepReviewer: 6,
     instrumentScientist: 7,
     sampleSafetyReviewer: 8,
-    internalReviewer: 9,
   },
   users: {
     user1: {

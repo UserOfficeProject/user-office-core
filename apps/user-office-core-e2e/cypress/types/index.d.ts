@@ -1,7 +1,6 @@
 import './admin';
 import './call';
 import './instrument';
-import './internalReview';
 import './predefinedMessage';
 import './proposal';
 import './template';
