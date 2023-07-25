@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { UserContext } from 'context/UserContextProvider';
@@ -39,6 +40,7 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
   callIds,
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
   const { currentRole } = useContext(UserContext);
   const { SEPs, loadingSEPs } = useSEPsData({
     filter: '',
@@ -79,30 +81,34 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
               component="h1"
               className={classes.cardHeader}
             >
-              Assign proposal/s to SEP
+              {`Assign proposal/s to ${t('SEP')}`}
             </Typography>
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormikUIAutocomplete
                   name="selectedSEPId"
-                  label="Select SEP"
+                  label={`Select ${t('SEP')}`}
                   loading={loadingSEPs}
                   items={SEPs.map((sep) => ({
                     value: sep.id,
                     text: sep.code,
                   }))}
                   disabled={isSubmitting}
-                  noOptionsText="No SEPs"
+                  noOptionsText={`No ${t('SEP')}`}
                   data-cy="sep-selection"
                 />
               </Grid>
             </Grid>
             {!values.selectedSEPId && (
               <Alert severity="warning" data-cy="remove-sep-alert">
-                Be aware that leaving SEP selection empty will remove assigned
-                SEP from proposal/s and delete all SEP reviews on that
-                assignment.
+                {`Be aware that leaving ${t(
+                  'SEP'
+                )} selection empty will remove assigned
+                ${t('SEP')} from proposal/s and delete all ${t(
+                  'SEP'
+                )} reviews on that
+                assignment.`}
               </Alert>
             )}
             <Button

@@ -1,7 +1,9 @@
 import { Column } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
 import { Typography } from '@mui/material';
+import i18n from 'i18n';
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory } from 'react-router';
 import { useQueryParams } from 'use-query-params';
 
@@ -58,6 +60,7 @@ const SEPsTable: React.FC = () => {
     true
   );
   const history = useHistory();
+  const { t } = useTranslation();
   const {
     loadingSEPs,
     SEPs,
@@ -94,7 +97,9 @@ const SEPsTable: React.FC = () => {
 
   const deleteSEP = async (id: number | string) => {
     try {
-      await api({ toastSuccessMessage: 'SEP deleted successfully' }).deleteSEP({
+      await api({
+        toastSuccessMessage: t('SEP') + ' deleted successfully',
+      }).deleteSEP({
         id: id as number,
       });
 
@@ -146,7 +151,7 @@ const SEPsTable: React.FC = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            Scientific evaluation panels
+            {`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
           </Typography>
         }
         columns={columns}

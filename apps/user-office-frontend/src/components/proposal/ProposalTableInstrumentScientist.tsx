@@ -132,9 +132,11 @@ const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
 ) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const SEPReviewColumns = [
+const SEPReviewColumns = (
+  t: TFunction<'translation', undefined, 'translation'>
+) => [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
-  { title: 'SEP', field: 'sepCode', emptyValue: '-', hidden: true },
+  { title: t('SEP'), field: 'sepCode', emptyValue: '-', hidden: true },
 ];
 
 const proposalStatusFilter: Record<string, number> = {
@@ -442,9 +444,9 @@ const ProposalTableInstrumentScientist: React.FC<{
   }
 
   if (isSEPEnabled) {
-    addColumns(columns, SEPReviewColumns);
+    addColumns(columns, SEPReviewColumns(t));
   } else {
-    removeColumns(columns, SEPReviewColumns);
+    removeColumns(columns, SEPReviewColumns(t));
   }
 
   columns = setSortDirectionOnSortColumn(

@@ -7,6 +7,7 @@ import { IconButton, Tooltip, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -146,6 +147,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   const { api } = useDataApiWithFeedback();
   const [proposalPk, setProposalPk] = useState<null | number>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
+  const { t } = useTranslation();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -175,7 +177,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
           <Visibility />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Assign SEP Member">
+      <Tooltip title={`Assign ${t('SEP')} Member`}>
         <IconButton
           data-cy="assign-sep-member"
           onClick={() => setProposalPk(rowData.proposalPk)}
@@ -230,8 +232,10 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       return;
     }
     confirm(() => removeProposalsFromSEP(proposalsToRemove), {
-      title: 'Remove SEP assignment/s',
-      description: `Are you sure you want to remove the selected proposal/s from this SEP?`,
+      title: 'Remove ' + t('SEP') + ' assignment/s',
+      description: `Are you sure you want to remove the selected proposal/s from this ${t(
+        'SEP'
+      )}?`,
     })();
   };
 
@@ -341,7 +345,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
 
     if (shouldShowWarning) {
       confirm(() => assignMemberToSEPProposal(memberUsers), {
-        title: 'SEP reviewers assignment',
+        title: t('SEP') + ' reviewers assignment',
         description: ' ',
         shouldEnableOKWithAlert: true,
         alertText: (
@@ -379,8 +383,10 @@ const SEPProposalsAndAssignmentsTable: React.FC<
                 )}
               </ul>
             </strong>
-            . Are you sure you want to assign all selected users to the SEP
-            proposal?
+            {`. Are you sure you want to assign all selected users to the ${t(
+              'SEP'
+            )}
+            proposal?`}
           </>
         ),
       })();
@@ -520,7 +526,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   return (
     <>
       <ProposalReviewModal
-        title="SEP - Proposal View"
+        title={`${t('SEP')} - Proposal View`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={() => {
           setUrlQueryParams({ reviewModal: undefined });
@@ -553,7 +559,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
             }}
             title={
               <Typography variant="h6" component="h2" gutterBottom>
-                SEP Proposals
+                {`${t('SEP')} Proposals`}
               </Typography>
             }
             data={SEPProposalsWitIdAndFormattedDate}

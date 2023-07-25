@@ -121,7 +121,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
       field: 'proposalCount',
     },
     {
-      title: '#seps',
+      title: '#' + i18n.format(i18n.format(t('SEP'), 'plural'), 'lowercase'),
       field: 'seps.length',
       emptyValue: '-',
     },
