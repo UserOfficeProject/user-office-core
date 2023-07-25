@@ -64,7 +64,7 @@ export function toEssBasicUserDetails(
     '',
     new Date(),
     false,
-    ''
+    stfcUser.email ?? ''
   );
 }
 
@@ -518,7 +518,15 @@ export class StfcUserDataSource implements UserDataSource {
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     throw new Error('Method not implemented.');
   }
+
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  async isSearchableUser(userId: number): Promise<boolean> {
+    return !!(await this.getStfcBasicPersonByUserNumber(
+      userId.toString(),
+      true
+    ));
   }
 }
