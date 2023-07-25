@@ -189,7 +189,7 @@ const TableToolbar = (props: {
               <MenuItem value={5000}>5000</MenuItem>
               <MenuItem value={10000}>10000</MenuItem>
               <MenuItem value={50000}>50000</MenuItem>
-              <MenuItem value={-1}>Maximum</MenuItem>
+              <MenuItem value={100000}>500000</MenuItem>
             </Select>
             <FormHelperText>Maximum to load</FormHelperText>
           </FormControl>
@@ -246,8 +246,6 @@ const ProposalTableInstrumentScientist = ({
   const [queryParameters, setQueryParameters] = useState<QueryParameters>({
     first: 2000,
   });
-  const [maximumToload, setMaximumToload] = useState(2000);
-
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
   const { proposalStatuses, loadingProposalStatuses } =
@@ -614,9 +612,8 @@ const ProposalTableInstrumentScientist = ({
           Toolbar: (props) => (
             <TableToolbar
               {...props}
-              selectedValue={maximumToload}
+              selectedValue={queryParameters.first}
               handleSelection={(selected: number) => {
-                setMaximumToload(selected);
                 setQueryParameters(
                   selected === -1
                     ? {}
@@ -628,7 +625,6 @@ const ProposalTableInstrumentScientist = ({
               confirm={(selected) => {
                 confirm(
                   () => {
-                    setMaximumToload(selected);
                     setQueryParameters(
                       selected === -1
                         ? {}
