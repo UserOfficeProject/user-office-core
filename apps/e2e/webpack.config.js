@@ -7,7 +7,7 @@ module.exports = {
     alias: {
       '@user-office-software-libs/shared-types': _resolve(
         process.cwd(),
-        '../user-office-frontend/src/generated/sdk.ts'
+        '../frontend/src/generated/sdk.ts'
       ),
     },
   },
