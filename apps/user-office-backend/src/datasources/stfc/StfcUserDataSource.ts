@@ -51,7 +51,7 @@ export interface StfcBasicPersonDetails {
   workPhone: string;
 }
 
-function toEssBasicUserDetails(
+export function toEssBasicUserDetails(
   stfcUser: StfcBasicPersonDetails
 ): BasicUserDetails {
   return new BasicUserDetails(
@@ -129,7 +129,7 @@ export class StfcUserDataSource implements UserDataSource {
     ).then((stfcUsers) => (stfcUsers.length > 0 ? stfcUsers[0] : null));
   }
 
-  private async getStfcBasicPeopleByUserNumbers(
+  public async getStfcBasicPeopleByUserNumbers(
     userNumbers: string[],
     searchableOnly?: boolean
   ): Promise<StfcBasicPersonDetails[]> {
