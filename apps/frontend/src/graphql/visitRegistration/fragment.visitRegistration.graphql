@@ -1,0 +1,9 @@
+fragment visitRegistration on VisitRegistration {
+  userId
+  visitId
+  registrationQuestionaryId
+  isRegistrationSubmitted
+  trainingExpiryDate
+  startsAt
+  endsAt
+}

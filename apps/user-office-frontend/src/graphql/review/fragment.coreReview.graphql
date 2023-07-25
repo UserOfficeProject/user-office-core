@@ -1,8 +1,0 @@
-fragment coreReview on Review {
-  id
-  userID
-  status
-  comment
-  grade
-  sepID
-}

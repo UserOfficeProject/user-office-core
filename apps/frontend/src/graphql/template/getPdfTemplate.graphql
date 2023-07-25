@@ -1,0 +1,7 @@
+query getPdfTemplate($pdfTemplateId: Int!) {
+  pdfTemplate(pdfTemplateId: $pdfTemplateId) {
+    pdfTemplateId
+    templateId
+    templateData
+  }
+}

@@ -30,7 +30,7 @@ services:
       POSTGRES_USER: duouser
       POSTGRES_DB: duo
     volumes:
-      - ./apps/user-office-backend/db_patches/:/docker-entrypoint-initdb.d/
+      - ./apps/backend/db_patches/:/docker-entrypoint-initdb.d/
 
   factory:
     image: "ghcr.io/userofficeproject/user-office-factory:develop"

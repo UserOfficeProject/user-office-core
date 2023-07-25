@@ -1,3 +1,0 @@
-query getActiveTemplateId($templateGroupId: TemplateGroupId!) {
-  activeTemplateId(templateGroupId: $templateGroupId)
-}

@@ -1,0 +1,45 @@
+query getProposals($filter: ProposalsFilter) {
+  proposals(filter: $filter) {
+    proposals {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          id
+        }
+      }
+      users {
+        ...basicUserDetails
+      }
+      technicalReview {
+        ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
+      }
+      instrument {
+        id
+        name
+      }
+      call {
+        id
+        shortCode
+      }
+      sep {
+        id
+        code
+      }
+    }
+    totalCount
+  }
+}

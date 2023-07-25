@@ -1,0 +1,124 @@
+{
+  "id": "6af95db0-6941-4489-bca4-e739ec9ba5de",
+  "name": "LOCAL",
+  "values": [
+    {
+      "key": "Authorization",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQW5kZXJzIiwibWlkZGxlbmFtZSI6IkFkYW0iLCJsYXN0bmFtZSI6IkFuZGVyc3NvbiIsInVzZXJuYW1lIjoidGVzdG9mZmljZXIiLCJwcmVmZXJyZWRuYW1lIjoiUmhpYW5ub24iLCJvcmNpZCI6Ijg3ODMyMTg5NyIsImdlbmRlciI6Im1hbGUiLCJuYXRpb25hbGl0eSI6IkZyZW5jaCIsImJpcnRoZGF0ZSI6IjE5ODEtMDgtMDRUMjI6MDA6MDAuMDAwWiIsIm9yZ2FuaXNhdGlvbiI6IlBmYW5uZXJzdGlsbCBhbmQgU29ucyIsImRlcGFydG1lbnQiOiJJVCBkZXBhcnRtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJDb25nbywgQWxsZW5ldmlsbGUsIDM1ODIzIE11ZWxsZXIgR2xlbnMiLCJwb3NpdGlvbiI6IkxpYWlzb24iLCJlbWFpbCI6IkFhcm9uX0hhcnJpczQ5QGdtYWlsLmNvbSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IjcxMS0zMTYtNTcyOCIsInRlbGVwaG9uZV9hbHQiOiIxLTM1OS04NjQtMzQ4OSB4NzM5MCIsImNyZWF0ZWQiOiIyMDE5LTEwLTE3VDEwOjU4OjM4LjczNVoiLCJ1cGRhdGVkIjoiMjAxOS0xMC0xN1QxMDo1ODozOC43MzVaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU3MTMyNzQ2Mn0.NinmUuwuu0D6syqwd2z5J1BaqhwRPlFaxtML8sA2Ang",
+      "enabled": true
+    },
+    {
+      "key": "NEW_CALL_ID",
+      "value": 12,
+      "enabled": true
+    },
+    {
+      "key": "NEW_USER_ID",
+      "value": 20,
+      "enabled": true
+    },
+    {
+      "key": "NEW_PROPOSAL_ID",
+      "value": 13,
+      "enabled": true
+    },
+    {
+      "key": "NEW_USER_TOKEN",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyMCwidXNlcl90aXRsZSI6Ik1zLiIsImZpcnN0bmFtZSI6Ik1hZGRpc29uIiwibWlkZGxlbmFtZSI6bnVsbCwibGFzdG5hbWUiOiJSdW50ZSIsInVzZXJuYW1lIjoiTWFkZGlzb24uUnVudGUuMGZkYjU5ZDYtYzk3OC00Y2ZhLTg1YjYtNjQ1YzljYmZkMTFiIiwicHJlZmVycmVkbmFtZSI6Ik1hZGRpc29uIiwib3JjaWQiOiIwZmRiNTlkNi1jOTc4LTRjZmEtODViNi02NDVjOWNiZmQxMWIiLCJyZWZyZXNoVG9rZW4iOiIiLCJnZW5kZXIiOiJmZW1hbGUiLCJuYXRpb25hbGl0eSI6OSwiYmlydGhkYXRlIjoiMTk5OS0xMi0zMVQyMzowMDowMC4wMDBaIiwib3JnYW5pc2F0aW9uIjo3LCJkZXBhcnRtZW50IjoiUUEiLCJwb3NpdGlvbiI6IkN1c3RvbWVyIEdyb3VwIEVuZ2luZWVyIiwiZW1haWwiOiJNb25hLkxlc2NoODZAaG90bWFpbC5jb20iLCJlbWFpbFZlcmlmaWVkIjp0cnVlLCJ0ZWxlcGhvbmUiOiI3MzMtNDI0LTQwNDIiLCJ0ZWxlcGhvbmVfYWx0IjpudWxsLCJwbGFjZWhvbGRlciI6ZmFsc2UsImNyZWF0ZWQiOiIyMDIwLTA0LTE5VDEyOjA4OjM5LjI2OVoiLCJ1cGRhdGVkIjoiMjAyMC0wNC0xOVQxMjowODozOS4yOTVaIn0sInJvbGVzIjpbeyJpZCI6MSwic2hvcnRDb2RlIjoidXNlciIsInRpdGxlIjoiVXNlciJ9XSwiaWF0IjoxNTg3Mjk4MTE5LCJleHAiOjE1ODc5MDI5MTl9.RIRGhkpZgtzWBWGMM8-zgPHRimwM2eHPGfwVqd-3O7M",
+      "enabled": true
+    },
+    {
+      "key": "NEW_USER_EMAIL",
+      "value": "Mona.Lesch86@hotmail.com",
+      "enabled": true
+    },
+    {
+      "key": "NEW_USER_POSITION",
+      "value": "Sales manager",
+      "enabled": true
+    },
+    {
+      "key": "PAGE_CONTENT",
+      "value": "Lorem ipsum dolor amet",
+      "enabled": true
+    },
+    {
+      "key": "NEW_REVIEW_ID",
+      "value": 8,
+      "enabled": true
+    },
+    {
+      "key": "NEW_TOPIC_ID",
+      "value": 23,
+      "enabled": true
+    },
+    {
+      "key": "NEW_FIELD_ID",
+      "value": "file_upload_1587298120261",
+      "enabled": true
+    },
+    {
+      "key": "NEW_PROPOSAL_TITLE",
+      "value": "This is a test proposal",
+      "enabled": true
+    },
+    {
+      "key": "NEW_PROPOSAL_ABSTRACT",
+      "value": "This is a test abstract",
+      "enabled": true
+    },
+    {
+      "key": "NEW_TEMPLATE_ID",
+      "value": 17,
+      "enabled": true
+    },
+    {
+      "key": "NEW_QUESTIONARY_ID",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "NEW_SEP_ID",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "NEW_SAMPLE_TEMPLATE_ID",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "USER_PASSWORD",
+      "value": "qweQWE123!@#",
+      "enabled": true
+    },
+    {
+      "key": "NEW_SHIPMENT_TEMPLATE_ID",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "NEW_SHIPMENT_ID",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "NEW_PROPOSAL_PK",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "NEW_VISIT_ID",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "NEW_SAMPLE_ID",
+      "value": "",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2021-09-17T13:56:57.411Z",
+  "_postman_exported_using": "Postman/7.28.0"
+}

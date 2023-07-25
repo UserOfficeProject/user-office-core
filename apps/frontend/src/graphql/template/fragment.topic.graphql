@@ -1,0 +1,7 @@
+fragment topic on Topic {
+  title
+  id
+  templateId
+  sortOrder
+  isEnabled
+}

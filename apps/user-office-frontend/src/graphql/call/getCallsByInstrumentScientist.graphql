@@ -1,5 +1,0 @@
-query getCallsByInstrumentScientist($scientistId: Int!) {
-  callsByInstrumentScientist(scientistId: $scientistId) {
-    ...call
-  }
-}

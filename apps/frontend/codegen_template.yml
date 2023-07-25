@@ -1,0 +1,17 @@
+overwrite: true
+schema: "${SCHEMA_URL}"
+documents: "src/graphql/**/*.graphql"
+generates:
+  src/generated/sdk.ts:
+    config:
+      skipTypename: true
+      namingConvention:
+        enumValues: change-case#upperCase
+      avoidOptionals:
+        field: true
+        object: false
+        inputValue: false
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request

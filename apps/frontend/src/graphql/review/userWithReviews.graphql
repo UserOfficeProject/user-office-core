@@ -1,0 +1,36 @@
+query userWithReviews(
+  $callId: Int
+  $instrumentId: Int
+  $status: ReviewStatus
+  $reviewer: ReviewerFilter
+) {
+  me {
+    id
+    firstname
+    lastname
+    organisation
+    reviews(
+      callId: $callId
+      instrumentId: $instrumentId
+      status: $status
+      reviewer: $reviewer
+    ) {
+      id
+      grade
+      comment
+      status
+      sepID
+      proposal {
+        primaryKey
+        title
+        proposalId
+        call {
+          shortCode
+        }
+        instrument {
+          shortCode
+        }
+      }
+    }
+  }
+}

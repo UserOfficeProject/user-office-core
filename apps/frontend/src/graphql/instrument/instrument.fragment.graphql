@@ -1,0 +1,10 @@
+fragment instrument on Instrument {
+  id
+  name
+  shortCode
+  description
+  managerUserId
+  scientists {
+    ...basicUserDetails
+  }
+}

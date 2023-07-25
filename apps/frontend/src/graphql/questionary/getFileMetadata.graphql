@@ -1,0 +1,5 @@
+query getFileMetadata($fileId: String!) {
+  fileMetadata(fileId: $fileId) {
+    ...fileMetadata
+  }
+}

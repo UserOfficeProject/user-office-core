@@ -15,7 +15,7 @@ To be able to start both backend and frontend locally you will need to:
 
 ## Check the .env file
 If .env file is not preset during startup of the project, it will be created using example.env file template
-The `example.env` and `.env` files are located in `apps/user-office-backend` and `apps/user-office-frontend` accordingly.
+The `example.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
 
 ## Running with docker-compose
 

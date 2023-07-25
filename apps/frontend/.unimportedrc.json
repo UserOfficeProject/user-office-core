@@ -1,0 +1,23 @@
+{
+  "entry": ["src/components/App.tsx"],
+  "extensions": [".ts", ".js", ".tsx"],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/*.tests.{js,jsx,ts,tsx}",
+    "**/*.test.{js,jsx,ts,tsx}",
+    "**/*.spec.{js,jsx,ts,tsx}",
+    "**/tests/**",
+    "**/__tests__/**"
+  ],
+  "ignoreUnimported": [],
+  "ignoreUnused": [],
+  "ignoreUnresolved": [],
+  "aliases": {
+    "hooks/*": ["./hooks", "./hooks/*"],
+    "components/*": ["./components", "./components/*"],
+    "models/*": ["./models", "./models/*"],
+    "utils/*": ["./utils", "./utils/*"],
+    "context/*": ["./context", "./context/*"],
+    "styles/*": ["./styles", "./styles/*"]
+  }
+}

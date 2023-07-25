@@ -1,0 +1,7 @@
+query getMyInstruments {
+  me {
+    instruments {
+      ...instrument
+    }
+  }
+}

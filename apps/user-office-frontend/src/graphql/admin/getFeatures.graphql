@@ -1,7 +1,0 @@
-query getFeatures {
-  features {
-    id
-    isEnabled
-    description
-  }
-}

@@ -1,0 +1,10 @@
+fragment question on Question {
+  id
+  question
+  naturalKey
+  dataType
+  categoryId
+  config {
+    ...fieldConfig
+  }
+}

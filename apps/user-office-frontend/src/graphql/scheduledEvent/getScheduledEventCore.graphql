@@ -1,5 +1,0 @@
-query getScheduledEventCore($scheduledEventId: Int!) {
-  scheduledEventCore(scheduledEventId: $scheduledEventId) {
-    ...scheduledEventCore
-  }
-}

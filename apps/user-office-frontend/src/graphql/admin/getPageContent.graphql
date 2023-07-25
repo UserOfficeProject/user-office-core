@@ -1,3 +1,0 @@
-query getPageContent($pageId: PageName!) {
-  pageContent(pageId: $pageId)
-}

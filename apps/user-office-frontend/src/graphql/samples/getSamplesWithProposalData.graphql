@@ -1,9 +1,0 @@
-query getSamplesWithProposalData($filter: SamplesFilter) {
-  samples(filter: $filter) {
-    ...sample
-    proposal {
-      primaryKey
-      proposalId
-    }
-  }
-}

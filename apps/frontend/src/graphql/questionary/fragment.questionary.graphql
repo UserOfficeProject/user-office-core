@@ -1,0 +1,8 @@
+fragment questionary on Questionary {
+  questionaryId
+  templateId
+  created
+  steps {
+    ...questionaryStep
+  }
+}

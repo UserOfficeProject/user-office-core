@@ -1,0 +1,10 @@
+query getProposalTemplates($filter: ProposalTemplatesFilter) {
+  proposalTemplates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+    questionaryCount
+    callCount
+  }
+}

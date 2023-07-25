@@ -1,5 +1,0 @@
-query getTemplate($templateId: Int!) {
-  template(templateId: $templateId) {
-    ...template
-  }
-}

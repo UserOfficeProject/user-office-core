@@ -1,5 +1,0 @@
-query getBlankQuestionarySteps($templateId: Int!) {
-  blankQuestionarySteps(templateId: $templateId) {
-    ...questionaryStep
-  }
-}

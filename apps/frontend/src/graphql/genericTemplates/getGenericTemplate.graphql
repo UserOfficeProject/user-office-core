@@ -1,0 +1,9 @@
+query getGenericTemplate($genericTemplateId: Int!) {
+  genericTemplate(genericTemplateId: $genericTemplateId) {
+    ...genericTemplate
+    questionary {
+      isCompleted
+      ...questionary
+    }
+  }
+}

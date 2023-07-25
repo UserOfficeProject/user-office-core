@@ -1,0 +1,61 @@
+query getUserProposalBookingsWithEvents(
+  $endsAfter: DateTime
+  $status: [ProposalBookingStatusCore!]
+  $instrumentId: Int
+) {
+  me {
+    proposals(filter: { instrumentId: $instrumentId }) {
+      primaryKey
+      title
+      proposalId
+      finalStatus
+      managementDecisionSubmitted
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
+      proposalBookingCore(filter: { status: $status }) {
+        scheduledEvents(filter: { endsAfter: $endsAfter, status: $status }) {
+          id
+          startsAt
+          endsAt
+          bookingType
+          status
+          visit {
+            ...visit
+            teamLead {
+              ...basicUserDetails
+            }
+            registrations {
+              ...visitRegistration
+              user {
+                ...basicUserDetails
+              }
+            }
+          }
+          esi {
+            ...esi
+          }
+          feedback {
+            ...feedback
+          }
+          shipments {
+            ...shipment
+          }
+          localContact {
+            ...basicUserDetails
+          }
+        }
+      }
+      visits {
+        ...visit
+      }
+      instrument {
+        id
+        name
+      }
+    }
+  }
+}

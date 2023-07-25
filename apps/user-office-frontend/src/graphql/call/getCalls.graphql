@@ -1,5 +1,0 @@
-query getCalls($filter: CallsFilter) {
-  calls(filter: $filter) {
-    ...call
-  }
-}

@@ -1,5 +1,0 @@
-query getMyShipments {
-  myShipments {
-    ...shipment
-  }
-}

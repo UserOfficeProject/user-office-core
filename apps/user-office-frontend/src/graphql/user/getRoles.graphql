@@ -1,7 +1,0 @@
-query getRoles {
-  roles {
-    id
-    shortCode
-    title
-  }
-}

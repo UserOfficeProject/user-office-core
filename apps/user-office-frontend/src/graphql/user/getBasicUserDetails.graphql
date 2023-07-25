@@ -1,5 +1,0 @@
-query getBasicUserDetails($userId: Int!) {
-  basicUserDetails(userId: $userId) {
-    ...basicUserDetails
-  }
-}

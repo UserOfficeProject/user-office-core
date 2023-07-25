@@ -1,0 +1,5 @@
+query getFilesMetadata($filter: FilesMetadataFilter!) {
+  filesMetadata(filter: $filter) {
+    ...fileMetadata
+  }
+}

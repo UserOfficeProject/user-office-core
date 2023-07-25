@@ -1,7 +1,0 @@
-query getSettings {
-  settings {
-    id
-    settingsValue
-    description
-  }
-}

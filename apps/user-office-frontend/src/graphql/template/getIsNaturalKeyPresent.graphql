@@ -1,3 +1,0 @@
-query getIsNaturalKeyPresent($naturalKey: String!) {
-  isNaturalKeyPresent(naturalKey: $naturalKey)
-}

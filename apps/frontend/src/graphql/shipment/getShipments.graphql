@@ -1,0 +1,5 @@
+query getShipments($filter: ShipmentsFilter) {
+  shipments(filter: $filter) {
+    ...shipment
+  }
+}

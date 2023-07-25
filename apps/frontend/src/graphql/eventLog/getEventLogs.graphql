@@ -1,0 +1,15 @@
+query getEventLogs($eventType: String!, $changedObjectId: String!) {
+  eventLogs(eventType: $eventType, changedObjectId: $changedObjectId) {
+    id
+    eventType
+    changedBy {
+      id
+      firstname
+      lastname
+      email
+    }
+    eventTStamp
+    rowData
+    changedObjectId
+  }
+}

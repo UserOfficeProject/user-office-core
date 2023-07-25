@@ -1,0 +1,22 @@
+query getUser($userId: Int!) {
+  user(userId: $userId) {
+    user_title
+    username
+    firstname
+    middlename
+    lastname
+    preferredname
+    gender
+    nationality
+    birthdate
+    organisation
+    department
+    position
+    email
+    telephone
+    telephone_alt
+    oidcSub
+    emailVerified
+    placeholder
+  }
+}

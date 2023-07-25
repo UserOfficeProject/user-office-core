@@ -1,0 +1,16 @@
+query getReview($reviewId: Int!) {
+  review(reviewId: $reviewId) {
+    ...coreReview
+    proposal {
+      primaryKey
+      title
+      abstract
+      proposer {
+        id
+      }
+    }
+    reviewer {
+      ...basicUserDetails
+    }
+  }
+}

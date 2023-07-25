@@ -1,9 +1,0 @@
-query getFeedback($feedbackId: Int!) {
-  feedback(feedbackId: $feedbackId) {
-    ...feedback
-    questionary {
-      ...questionary
-      isCompleted
-    }
-  }
-}

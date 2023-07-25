@@ -1,7 +1,0 @@
-fragment proposalStatus on ProposalStatus {
-  id
-  shortCode
-  name
-  description
-  isDefault
-}

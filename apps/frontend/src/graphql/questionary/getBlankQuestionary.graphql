@@ -1,0 +1,6 @@
+query getBlankQuestionary($templateId: Int!) {
+  blankQuestionary(templateId: $templateId) {
+    isCompleted
+    ...questionary
+  }
+}

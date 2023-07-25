@@ -1,0 +1,12 @@
+query getShipment($shipmentId: Int!) {
+  shipment(shipmentId: $shipmentId) {
+    ...shipment
+    questionary {
+      ...questionary
+      isCompleted
+    }
+    samples {
+      ...sample
+    }
+  }
+}

@@ -1,0 +1,6 @@
+query getTemplateCategories {
+  templateCategories {
+    categoryId
+    name
+  }
+}

@@ -1,6 +1,0 @@
-query getNationalities {
-  nationalities {
-    id
-    value
-  }
-}

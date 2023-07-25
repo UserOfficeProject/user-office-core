@@ -1,8 +1,0 @@
-query getAllApiAccessTokensAndPermissions {
-  allAccessTokensAndPermissions {
-    id
-    name
-    accessToken
-    accessPermissions
-  }
-}

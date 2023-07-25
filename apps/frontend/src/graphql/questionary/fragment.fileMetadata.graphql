@@ -1,0 +1,7 @@
+fragment fileMetadata on FileMetadata {
+  fileId
+  originalFileName
+  mimeType
+  sizeInBytes
+  createdDate
+}

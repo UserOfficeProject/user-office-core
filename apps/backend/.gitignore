@@ -1,0 +1,16 @@
+node_modules
+index.js
+build
+coverage
+.DS_Store
+downloads
+uploads
+
+.idea
+
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/settings.json
+.env
+
+build-version*.txt

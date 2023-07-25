@@ -1,0 +1,12 @@
+fragment templateStep on TemplateStep {
+  topic {
+    title
+    id
+    sortOrder
+    isEnabled
+  }
+
+  fields {
+    ...questionTemplateRelation
+  }
+}
