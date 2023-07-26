@@ -18,6 +18,8 @@ export default class PostgresPdfTemplateDataSource
   async createPdfTemplate({
     templateId,
     templateData,
+    templateHeader,
+    templateFooter,
     creatorId,
   }: CreatePdfTemplateInputWithCreator): Promise<PdfTemplate> {
     const templates: PdfTemplateRecord[] = await database(
@@ -26,6 +28,8 @@ export default class PostgresPdfTemplateDataSource
       {
         template_id: templateId,
         template_data: templateData,
+        template_header: templateHeader,
+        template_footer: templateFooter,
         creator_id: creatorId,
       },
       '*'
@@ -82,6 +86,8 @@ export default class PostgresPdfTemplateDataSource
       .update(
         {
           template_data: args.templateData,
+          template_header: args.templateHeader,
+          template_footer: args.templateFooter,
         },
         '*'
       )
@@ -119,6 +125,8 @@ export default class PostgresPdfTemplateDataSource
     const newTemplate = await this.createPdfTemplate({
       templateId: newTemplateId,
       templateData: sourceTemplate.template_data,
+      templateHeader: sourceTemplate.template_header,
+      templateFooter: sourceTemplate.template_footer,
       creatorId: sourceTemplate.creator_id,
     });
 
@@ -138,6 +146,20 @@ export default class PostgresPdfTemplateDataSource
         }
         if (filter?.pdfTemplateData) {
           query.where('template_data', 'like', `%${filter.pdfTemplateData}%`);
+        }
+        if (filter?.pdfTemplateHeader) {
+          query.where(
+            'template_header',
+            'like',
+            `%${filter.pdfTemplateHeader}%`
+          );
+        }
+        if (filter?.pdfTemplateFooter) {
+          query.where(
+            'template_footer',
+            'like',
+            `%${filter.pdfTemplateFooter}%`
+          );
         }
         if (filter?.creatorId) {
           query.where('creator_id', filter.creatorId);

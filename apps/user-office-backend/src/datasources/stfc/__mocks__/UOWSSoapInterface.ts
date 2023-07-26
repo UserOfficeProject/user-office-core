@@ -85,4 +85,26 @@ export default class UOWSSoapClient {
       ],
     };
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async getSearchableBasicPeopleDetailsFromUserNumbers(
+    Token: any,
+    userNumbers: any[]
+  ): Promise<any> {
+    const searchableUserId = '1';
+
+    if (userNumbers.every((id) => id === searchableUserId)) {
+      return {
+        return: [
+          {
+            userNumber: '1',
+          },
+        ],
+      };
+    } else {
+      return {
+        return: [],
+      };
+    }
+  }
 }
