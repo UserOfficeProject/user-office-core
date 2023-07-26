@@ -3,6 +3,8 @@ export class PdfTemplate {
     public pdfTemplateId: number,
     public templateId: number,
     public templateData: string,
+    public templateHeader: string,
+    public templateFooter: string,
     public creatorId: number,
     public created: Date
   ) {}
