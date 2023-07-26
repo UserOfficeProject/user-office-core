@@ -28,9 +28,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProposalTechnicalReviewerAssignment: React.FC<
-  ProposalTechnicalReviewerAssignmentProps
-> = ({ proposalData, setProposalData }) => {
+const ProposalTechnicalReviewerAssignment = ({
+  proposalData,
+  setProposalData,
+}: ProposalTechnicalReviewerAssignmentProps) => {
   const classes = useStyles();
   const [showReassign, setShowReassign] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);

@@ -9,11 +9,11 @@ type ImpersonateButtonProps = ButtonProps & {
   userId: number;
 };
 
-const ImpersonateButton: React.FC<ImpersonateButtonProps> = ({
+const ImpersonateButton = ({
   userId,
   children,
   ...rest
-}) => {
+}: ImpersonateButtonProps) => {
   const { api } = useDataApiWithFeedback();
   const { handleLogin } = useContext(UserContext);
   const history = useHistory();

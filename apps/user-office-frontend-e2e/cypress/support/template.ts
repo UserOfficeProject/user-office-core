@@ -332,6 +332,38 @@ function createMultipleChoiceQuestion(
   closeQuestionsMenu();
 }
 
+function createInstrumentPickerQuestion(
+  question: string,
+  options?: { type?: 'radio' | 'dropdown'; firstTopic?: boolean; key?: string }
+) {
+  openQuestionsMenu({
+    firstTopic: options?.firstTopic,
+  });
+
+  cy.contains('Add Instrument Picker').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
+
+  cy.get('[data-cy=question]').clear().type(question);
+
+  if (options?.type === undefined || options.type === 'radio') {
+    cy.get('[data-cy=variant]').click();
+    cy.contains('Radio').click();
+  }
+
+  cy.contains('Save').click({ force: true });
+
+  cy.contains(question)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+  cy.finishedLoading();
+
+  closeQuestionsMenu();
+}
+
 function createDynamicMultipleChoiceQuestion(
   question: string,
   options?: {
@@ -658,6 +690,11 @@ Cypress.Commands.add('createDateQuestion', createDateQuestion);
 Cypress.Commands.add(
   'createMultipleChoiceQuestion',
   createMultipleChoiceQuestion
+);
+
+Cypress.Commands.add(
+  'createInstrumentPickerQuestion',
+  createInstrumentPickerQuestion
 );
 
 Cypress.Commands.add(

@@ -2,7 +2,7 @@ import Autocomplete from '@mui/lab/Autocomplete';
 import MaterialTextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
@@ -14,9 +14,9 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationIntervalForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationIntervalForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   const intervalConfig = props.questionRel.config as IntervalConfig;
   const { units } = useUnitsData();
   const [selectedUnits, setSelectedUnits] = useState(intervalConfig.units);

@@ -78,6 +78,9 @@ let columns: Column<ProposalViewData>[] = [
     ...{ width: 'auto' },
   },
   {
+    title: 'Principal Investigator',
+    field: 'principalInvestigator',
+    emptyValue: '-',
     render: (proposalView) => {
       if (
         proposalView.principalInvestigator?.lastname &&
@@ -88,8 +91,6 @@ let columns: Column<ProposalViewData>[] = [
 
       return '';
     },
-    title: 'Principal Investigator',
-    emptyValue: '-',
   },
   {
     title: 'PI Email',
@@ -142,9 +143,11 @@ const proposalStatusFilter: Record<string, number> = {
   FEASIBILITY_REVIEW: 2,
 };
 
-const ProposalTableInstrumentScientist: React.FC<{
+const ProposalTableInstrumentScientist = ({
+  confirm,
+}: {
   confirm: WithConfirmType;
-}> = ({ confirm }) => {
+}) => {
   const { user } = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();

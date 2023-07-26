@@ -117,10 +117,28 @@ const apolloServer = async (app: Express) => {
             request,
           };
 
-          logger.logError('GraphQL response contained error(s)', {
-            errors,
-            context,
+          const filteredErrors = errors.filter((error) => {
+            if (error.extensions.code === 'EXTERNAL_TOKEN_INVALID') {
+              logger.logInfo(
+                'GraphQL response contained error(s) due to expired or invalid external token',
+                {
+                  errors,
+                  context,
+                }
+              );
+
+              return false;
+            }
+
+            return true;
           });
+
+          if (filteredErrors.length > 0) {
+            logger.logError('GraphQL response contained error(s)', {
+              errors: filteredErrors,
+              context,
+            });
+          }
         },
       };
     },

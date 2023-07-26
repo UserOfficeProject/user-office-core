@@ -31,13 +31,13 @@ type CallFilterProps = {
   callId: number | null;
 };
 
-const CallFilter: React.FC<CallFilterProps> = ({
+const CallFilter = ({
   calls,
   isLoading,
   callId,
   onChange,
   shouldShowAll,
-}) => {
+}: CallFilterProps) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
     call: NumberParam,

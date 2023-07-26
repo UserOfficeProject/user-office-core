@@ -47,6 +47,7 @@ context('Shipments tests', () => {
 
   it('Visitor should see that he can declare shipment', () => {
     cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
+    cy.visit('/');
     cy.testActionButton(declareShipmentIconCyTag, 'neutral');
   });
 

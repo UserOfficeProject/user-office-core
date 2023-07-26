@@ -1,5 +1,6 @@
 import { createUnionType, Field, Int, ObjectType } from 'type-graphql';
 
+import { InstrumentOptionClass } from '../../models/questionTypes/InstrumentPicker';
 import { Unit } from './Unit';
 
 @ObjectType()
@@ -105,6 +106,24 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 
   @Field(() => Boolean)
   externalApiCall: boolean;
+}
+
+@ObjectType()
+export class InstrumentOption implements Partial<InstrumentOptionClass> {
+  @Field()
+  id: number;
+
+  @Field()
+  name: string;
+}
+
+@ObjectType()
+export class InstrumentPickerConfig extends ConfigBase {
+  @Field(() => String)
+  variant: string;
+
+  @Field(() => [InstrumentOption])
+  instruments: InstrumentOption[];
 }
 
 @ObjectType()
@@ -251,5 +270,6 @@ export const FieldConfigType = createUnionType({
     VisitBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
+    InstrumentPickerConfig,
   ], // function that returns array of object types classes
 });

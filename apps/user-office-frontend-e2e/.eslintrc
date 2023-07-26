@@ -76,6 +76,7 @@
     "@typescript-eslint/ban-ts-comment": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-non-null-assertion": "off", // already checked by typescript, no need to duplicate
-    "unused-imports/no-unused-imports-ts": 2
+    "unused-imports/no-unused-imports-ts": 2,
+    "cypress/unsafe-to-chain-command": 0 // TODO: Review this because it needs some attention. For now disable
   }
 }

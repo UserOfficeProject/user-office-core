@@ -1,4 +1,4 @@
-FROM cypress/included:9.7.0
+FROM cypress/included:12.13.0
 
 # Copy and install node modules needed for frontend
 WORKDIR /e2e
@@ -10,13 +10,17 @@ RUN npm ci --silent
 
 # Copy e2e tests to container. Install node modules needed for e2e tests
 WORKDIR /e2e
-COPY apps/user-office-frontend-e2e/cypress.json ./user-office-frontend-e2e/
+COPY apps/user-office-frontend-e2e/cypress.config.ts ./user-office-frontend-e2e/
 COPY apps/user-office-frontend-e2e/package* ./user-office-frontend-e2e/
 COPY apps/user-office-frontend-e2e/tsconfig.json ./user-office-frontend-e2e/tsconfig.json
 COPY apps/user-office-frontend-e2e/wait-for-frontend.sh ./user-office-frontend-e2e/
 COPY apps/user-office-frontend-e2e/cypress ./user-office-frontend-e2e/cypress/
+COPY apps/user-office-frontend-e2e/webpack.config.js ./user-office-frontend-e2e/
 
 WORKDIR /e2e/user-office-frontend-e2e
 RUN npm ci --silent
+
+# Install necessary dependencies for wait-for-frontend.sh
+RUN apt-get update && apt-get install curl -y
 
 ENTRYPOINT ["npm", "run", "cy:run"]

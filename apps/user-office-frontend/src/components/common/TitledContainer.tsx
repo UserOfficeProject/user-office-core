@@ -27,12 +27,13 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 0,
   },
 }));
-const TitledContainer: React.FC<
-  PropsWithChildren<{
-    children: NonNullable<React.ReactNode>;
-    label?: string;
-  }>
-> = ({ children, label }) => {
+const TitledContainer = ({
+  children,
+  label,
+}: PropsWithChildren<{
+  children: NonNullable<React.ReactNode>;
+  label?: string;
+}>) => {
   const classes = useStyles();
 
   return (

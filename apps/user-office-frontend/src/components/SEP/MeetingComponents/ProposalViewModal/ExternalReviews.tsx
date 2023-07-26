@@ -28,7 +28,7 @@ type ExternalReviewsProps = {
   reviews: Review[] | null;
 };
 
-const ExternalReviews: React.FC<ExternalReviewsProps> = ({ reviews }) => {
+const ExternalReviews = ({ reviews }: ExternalReviewsProps) => {
   const classes = useStyles();
 
   return (

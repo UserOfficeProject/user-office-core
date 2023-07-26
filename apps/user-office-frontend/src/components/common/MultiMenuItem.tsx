@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const MultiMenuItem: React.FC<MenuItemProps> = (props) => {
+const MultiMenuItem = (props: MenuItemProps) => {
   const classes = useStyles();
 
   return (

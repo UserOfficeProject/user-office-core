@@ -3,12 +3,12 @@ query getProposalWorkflows {
     id
     name
     description
-    proposalWorkflowConnectionGroups{
-        connections{
-          proposalStatus{
-            shortCode
-          }
+    proposalWorkflowConnectionGroups {
+      connections {
+        proposalStatus {
+          shortCode
         }
+      }
     }
   }
 }
