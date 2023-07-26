@@ -1,11 +1,20 @@
-mutation updatePdfTemplate($pdfTemplateId: Int!, $templateData: String) {
+mutation updatePdfTemplate(
+  $pdfTemplateId: Int!
+  $templateData: String
+  $templateHeader: String
+  $templateFooter: String
+) {
   updatePdfTemplate(
     pdfTemplateId: $pdfTemplateId
     templateData: $templateData
+    templateHeader: $templateHeader
+    templateFooter: $templateFooter
   ) {
     pdfTemplateId
     templateId
     templateData
+    templateHeader
+    templateFooter
     created
     creatorId
   }
