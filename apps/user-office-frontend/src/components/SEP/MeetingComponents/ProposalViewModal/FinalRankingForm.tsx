@@ -10,10 +10,8 @@ import { Editor } from '@tinymce/tinymce-react';
 import { saveSepMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select } from 'formik-mui';
-import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -56,7 +54,6 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
-  const { t } = useTranslation();
 
   const initialData = {
     proposalPk: proposalData.primaryKey,
@@ -101,7 +98,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
     };
 
     await api({
-      toastSuccessMessage: `${t('SEP')} meeting decision ${
+      toastSuccessMessage: `SEP meeting decision ${
         shouldSubmitMeetingDecision ? 'submitted' : 'saved'
       } successfully!`,
     }).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
@@ -144,9 +141,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                   {
                     title: 'Please confirm',
                     description:
-                      'I am aware that no further changes to the ' +
-                      i18n.format(t('SEP'), 'lowercase') +
-                      ' meeting are possible after submission.',
+                      'I am aware that no further changes to the sep meeting are possible after submission.',
                   }
                 )();
               } else {
@@ -165,7 +160,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
-                {t('SEP')} Meeting form
+                SEP Meeting form
               </Typography>
               <Grid container spacing={3}>
                 <Grid item sm={6} xs={12}>

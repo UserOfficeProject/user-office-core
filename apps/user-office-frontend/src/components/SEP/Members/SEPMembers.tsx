@@ -10,7 +10,6 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import React, { useState, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { useCheckAccess } from 'components/common/Can';
@@ -58,7 +57,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const [sepChairModalOpen, setSepChairModalOpen] = useState(false);
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
   const { user } = useContext(UserContext);
-  const { t } = useTranslation();
   const { setRenewTokenValue } = useRenewToken();
   const { loadingMembers, SEPReviewersData, setSEPReviewersData } =
     useSEPReviewersData(
@@ -79,7 +77,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     const [sepChair] = value;
 
     await api({
-      toastSuccessMessage: t('SEP') + ' chair assigned successfully!',
+      toastSuccessMessage: 'SEP chair assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepData.id,
@@ -107,7 +105,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     const [sepSecretary] = value;
 
     await api({
-      toastSuccessMessage: t('SEP') + ' secretary assigned successfully!',
+      toastSuccessMessage: 'SEP secretary assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepData.id,
@@ -131,7 +129,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     await api({
-      toastSuccessMessage: t('SEP') + ' member assigned successfully!',
+      toastSuccessMessage: 'SEP member assigned successfully!',
     }).assignReviewersToSEP({
       memberIds: users.map((user) => user.id),
       sepId: sepData.id,
@@ -149,7 +147,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     user: BasicUserDetailsWithRole
   ): Promise<void> => {
     await api({
-      toastSuccessMessage: t('SEP') + ' member removed successfully!',
+      toastSuccessMessage: 'SEP member removed successfully!',
     }).removeMemberFromSep({
       memberId: user.id,
       sepId: sepData.id,
@@ -182,10 +180,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
         });
       },
       {
-        title: 'Remove ' + t('SEP') + ' member',
+        title: 'Remove SEP member',
         description: `Are you sure you want to remove ${getFullUserName(
           memberToRemove
-        )} from this ${t('SEP')}?`,
+        )} from this SEP?`,
       }
     )();
   };
@@ -222,7 +220,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
         close={(): void => setSepChairModalOpen(false)}
         addParticipants={sendSEPChairUpdate}
         selectedUsers={alreadySelectedMembers}
-        title={`${t('SEP')} Chair`}
+        title={'SEP Chair'}
         invitationUserRole={UserRole.SEP_CHAIR}
         userRole={UserRole.SEP_REVIEWER}
       />
@@ -231,19 +229,19 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
         close={(): void => setSepSecretaryModalOpen(false)}
         addParticipants={sendSEPSecretaryUpdate}
         selectedUsers={alreadySelectedMembers}
-        title={`${t('SEP')} Secretary`}
+        title={'SEP Secretary'}
         invitationUserRole={UserRole.SEP_SECRETARY}
         userRole={UserRole.SEP_REVIEWER}
       />
       <Typography variant="h6" component="h2" gutterBottom>
-        {`${t('SEP')} Members`}
+        SEP Members
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>
           <TextField
             name="SEPChair"
             id="SEPChair"
-            label={`${t('SEP')} Chair`}
+            label="SEP Chair"
             type="text"
             value={getFullUserName(sepData.sepChair)}
             margin="none"
@@ -255,7 +253,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               endAdornment: isUserOfficer && (
                 <>
                   {sepData.sepChair && (
-                    <Tooltip title={'Remove ' + t('SEP') + ' Chair'}>
+                    <Tooltip title="Remove SEP Chair">
                       <IconButton
                         aria-label="Remove SEP chair"
                         onClick={() =>
@@ -266,7 +264,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title={'Set ' + t('SEP') + ' Chair'}>
+                  <Tooltip title="Set SEP Chair">
                     <IconButton
                       edge="start"
                       onClick={() => setSepChairModalOpen(true)}
@@ -296,7 +294,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
           <TextField
             name="SEPSecretary"
             id="SEPSecretary"
-            label={`${t('SEP')} Secretary`}
+            label="SEP Secretary"
             type="text"
             value={getFullUserName(sepData.sepSecretary)}
             margin="none"
@@ -308,7 +306,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               endAdornment: isUserOfficer && (
                 <>
                   {sepData.sepSecretary && (
-                    <Tooltip title={'Remove ' + t('SEP') + ' Chair'}>
+                    <Tooltip title="Remove SEP Secretary">
                       <IconButton
                         aria-label="Remove SEP secretary"
                         onClick={() =>
@@ -319,7 +317,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title={'Set ' + t('SEP') + ' Secretary'}>
+                  <Tooltip title="Set SEP Secretary">
                     <IconButton
                       edge="start"
                       onClick={() => setSepSecretaryModalOpen(true)}

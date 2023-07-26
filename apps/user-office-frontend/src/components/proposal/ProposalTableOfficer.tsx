@@ -171,9 +171,7 @@ const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
 ) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const SEPReviewColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
-) => [
+const SEPReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
@@ -189,7 +187,7 @@ const SEPReviewColumns = (
     hidden: true,
   },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
-  { title: t('SEP'), field: 'sepCode', emptyValue: '-' },
+  { title: 'SEP', field: 'sepCode', emptyValue: '-' },
 ];
 
 const PREFETCH_SIZE = 200;
@@ -414,9 +412,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   }
 
   if (isSEPEnabled) {
-    addColumns(columns, SEPReviewColumns(t));
+    addColumns(columns, SEPReviewColumns);
   } else {
-    removeColumns(columns, SEPReviewColumns(t));
+    removeColumns(columns, SEPReviewColumns);
   }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
@@ -469,7 +467,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     if (sep) {
       await api({
         toastSuccessMessage:
-          'Proposal/s assigned to the selected ' + t('SEP') + ' successfully!',
+          'Proposal/s assigned to the selected SEP successfully!',
       }).assignProposalsToSep({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
@@ -482,8 +480,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setTimeout(fetchProposalsData, 500);
     } else {
       await api({
-        toastSuccessMessage:
-          'Proposal/s removed from the ' + t('SEP') + ' successfully!',
+        toastSuccessMessage: 'Proposal/s removed from the SEP successfully!',
       }).removeProposalsFromSep({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
@@ -873,7 +870,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           },
           {
             icon: GroupWorkIcon,
-            tooltip: 'Assign proposals to ' + t('SEP'),
+            tooltip: 'Assign proposals to SEP',
             onClick: () => {
               setOpenAssignment(true);
             },

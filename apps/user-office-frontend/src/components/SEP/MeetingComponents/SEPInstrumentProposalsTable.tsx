@@ -12,7 +12,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import clsx from 'clsx';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -105,6 +104,78 @@ type SEPInstrumentProposalsTableProps = {
   selectedCall?: Call;
 };
 
+const assignmentColumns = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 100 },
+    sorting: false,
+    field: 'rowActions',
+  },
+  {
+    title: 'Title',
+    field: 'proposalTitle',
+  },
+  {
+    title: 'ID',
+    field: 'proposal.proposalId',
+  },
+  { title: 'Status', field: 'proposal.status.name' },
+  {
+    title: 'Average score',
+    field: 'proposalAverageScore',
+    emptyValue: '-',
+  },
+  {
+    title: 'Deviation',
+    field: 'proposalDeviation',
+    customSort: (
+      a: SepProposalWithAverageScoreAndAvailabilityZone,
+      b: SepProposalWithAverageScoreAndAvailabilityZone
+    ) =>
+      (standardDeviation(getGradesFromReviews(a.proposal.reviews ?? [])) || 0) -
+      (standardDeviation(getGradesFromReviews(b.proposal.reviews ?? [])) || 0),
+  },
+  {
+    title: 'Current rank',
+    field: 'proposal.sepMeetingDecision.rankOrder',
+    emptyValue: '-',
+  },
+  {
+    title: 'Time allocation',
+    field: 'timeAllocation',
+    customSort: (
+      a: SepProposalWithAverageScoreAndAvailabilityZone,
+      b: SepProposalWithAverageScoreAndAvailabilityZone
+    ) => {
+      if (a.sepTimeAllocation && b.sepTimeAllocation) {
+        return a.sepTimeAllocation - b.sepTimeAllocation;
+      }
+
+      if (
+        a.proposal.technicalReview?.timeAllocation &&
+        b.proposal.technicalReview?.timeAllocation
+      ) {
+        return (
+          a.proposal.technicalReview.timeAllocation -
+          b.proposal.technicalReview.timeAllocation
+        );
+      } else {
+        return -1;
+      }
+    },
+  },
+  {
+    title: 'SEP meeting submitted',
+    field: 'proposal.sepMeetingDecision.submitted',
+    lookup: { true: 'Yes', false: 'No', undefined: 'No' },
+  },
+  {
+    title: 'Recommendation',
+    field: 'proposal.sepMeetingDecision.recommendation',
+    emptyValue: 'Unset',
+  },
+];
+
 const SEPInstrumentProposalsTable: React.FC<
   SEPInstrumentProposalsTableProps
 > = ({ sepInstrument, sepId, selectedCall }) => {
@@ -123,81 +194,6 @@ const SEPInstrumentProposalsTable: React.FC<
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
-  const { t } = useTranslation();
-
-  const assignmentColumns = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 100 },
-      sorting: false,
-      field: 'rowActions',
-    },
-    {
-      title: 'Title',
-      field: 'proposalTitle',
-    },
-    {
-      title: 'ID',
-      field: 'proposal.proposalId',
-    },
-    { title: 'Status', field: 'proposal.status.name' },
-    {
-      title: 'Average score',
-      field: 'proposalAverageScore',
-      emptyValue: '-',
-    },
-    {
-      title: 'Deviation',
-      field: 'proposalDeviation',
-      customSort: (
-        a: SepProposalWithAverageScoreAndAvailabilityZone,
-        b: SepProposalWithAverageScoreAndAvailabilityZone
-      ) =>
-        (standardDeviation(getGradesFromReviews(a.proposal.reviews ?? [])) ||
-          0) -
-        (standardDeviation(getGradesFromReviews(b.proposal.reviews ?? [])) ||
-          0),
-    },
-    {
-      title: 'Current rank',
-      field: 'proposal.sepMeetingDecision.rankOrder',
-      emptyValue: '-',
-    },
-    {
-      title: 'Time allocation',
-      field: 'timeAllocation',
-      customSort: (
-        a: SepProposalWithAverageScoreAndAvailabilityZone,
-        b: SepProposalWithAverageScoreAndAvailabilityZone
-      ) => {
-        if (a.sepTimeAllocation && b.sepTimeAllocation) {
-          return a.sepTimeAllocation - b.sepTimeAllocation;
-        }
-
-        if (
-          a.proposal.technicalReview?.timeAllocation &&
-          b.proposal.technicalReview?.timeAllocation
-        ) {
-          return (
-            a.proposal.technicalReview.timeAllocation -
-            b.proposal.technicalReview.timeAllocation
-          );
-        } else {
-          return -1;
-        }
-      },
-    },
-    {
-      title: t('SEP') + ' meeting submitted',
-      field: 'proposal.sepMeetingDecision.submitted',
-      lookup: { true: 'Yes', false: 'No', undefined: 'No' },
-    },
-    {
-      title: 'Recommendation',
-      field: 'proposal.sepMeetingDecision.recommendation',
-      emptyValue: 'Unset',
-    },
-  ];
 
   // NOTE: This is needed for adding the allocation time unit information on the column title without causing some console warning on re-rendering.
   const columns = assignmentColumns.map((column) => ({

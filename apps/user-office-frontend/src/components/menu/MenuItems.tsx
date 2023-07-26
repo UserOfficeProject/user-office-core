@@ -273,14 +273,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </Tooltip>
       )}
       {isSEPEnabled && (
-        <Tooltip
-          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
-        >
+        <Tooltip title="Scientific evaluation panels">
           <ListItem component={NavLink} to="/SEPs" button>
             <ListItemIcon>
               <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
+            <ListItemText primary="SEPs" />
           </ListItem>
         </Tooltip>
       )}
@@ -328,10 +326,8 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <Tooltip
-          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
-        >
-          <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
+        <Tooltip title="Scientific evaluation panels">
+          <ListItemText primary="SEPs" />
         </Tooltip>
       </ListItem>
     </div>

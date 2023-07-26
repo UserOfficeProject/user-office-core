@@ -349,7 +349,7 @@ const Dashboard: React.FC = () => {
           {isSEPEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title={t('SEP')}
+              title="SEP"
               path="/SEPPage/:id"
               component={SEPPage}
             />
@@ -357,7 +357,7 @@ const Dashboard: React.FC = () => {
           {isSEPEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title={i18n.format(t('SEP'), 'plural')}
+              title="SEPs"
               path="/SEPs"
               component={SEPsPage}
             />

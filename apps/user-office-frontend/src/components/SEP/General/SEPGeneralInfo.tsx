@@ -7,9 +7,7 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { updateSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
 import { Formik, Form, Field } from 'formik';
-import i18n from 'i18n';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
@@ -36,12 +34,11 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
-  const { t } = useTranslation();
 
   const sendSEPUpdate = async (values: Sep): Promise<void> => {
-    await api({
-      toastSuccessMessage: t('SEP') + ' updated successfully!',
-    }).updateSEP(values);
+    await api({ toastSuccessMessage: 'SEP updated successfully!' }).updateSEP(
+      values
+    );
     onSEPUpdate(values);
   };
 
@@ -68,7 +65,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
       }): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
-            {`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+            Scientific evaluation panel
           </Typography>
           <Grid container spacing={3}>
             <Grid item sm={6} xs={12}>
@@ -158,7 +155,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 data-cy="submit"
               >
                 {isExecutingCall && <UOLoader size={14} />}
-                {`Update ${t('SEP')}`}
+                Update SEP
               </Button>
             </StyledButtonContainer>
           )}

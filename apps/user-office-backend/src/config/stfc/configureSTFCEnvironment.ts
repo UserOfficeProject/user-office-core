@@ -119,21 +119,6 @@ async function setSTFCRoleNames() {
     shortCode: Roles.INSTRUMENT_SCIENTIST,
     title: 'Experiment Scientist',
   });
-
-  await db.updateRoleTitle({
-    shortCode: Roles.SEP_CHAIR,
-    title: 'FAP Chair',
-  });
-
-  await db.updateRoleTitle({
-    shortCode: Roles.SEP_REVIEWER,
-    title: 'FAP Reviewer',
-  });
-
-  await db.updateRoleTitle({
-    shortCode: Roles.SEP_SECRETARY,
-    title: 'FAP Secretary',
-  });
 }
 
 export async function configureSTFCEnvironment() {
