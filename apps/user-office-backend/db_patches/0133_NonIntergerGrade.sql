@@ -10,7 +10,7 @@ BEGIN
 
 			DROP VIEW proposal_table_view;
 
-			ALTER TABLE "SEP_Reviews" ALTER COLUMN grade TYPE FLOAT;
+			ALTER TABLE "SEP_Reviews" ALTER COLUMN grade TYPE FLOAT USING grade::float;
 
 			CREATE VIEW proposal_table_view
 				AS
