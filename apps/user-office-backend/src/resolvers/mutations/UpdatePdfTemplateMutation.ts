@@ -18,6 +18,12 @@ export class UpdatePdfTemplateArgs {
 
   @Field(() => String, { nullable: true })
   templateData?: string;
+
+  @Field(() => String, { nullable: true })
+  templateHeader?: string;
+
+  @Field(() => String, { nullable: true })
+  templateFooter?: string;
 }
 
 @Resolver()

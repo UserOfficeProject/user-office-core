@@ -36,14 +36,40 @@ context('PDF template tests', () => {
 
       cy.contains(templateName);
 
-      cy.get('[data-cy="template-data"] .cm-content')
+      cy.get('[data-cy="templateData"] .cm-content')
         .first()
         .type(pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
 
-      cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=templateData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Header').click();
+
+      cy.get('[data-cy="templateHeader"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateHeader-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Footer').click();
+
+      cy.get('[data-cy="templateFooter"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateFooter-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
@@ -78,14 +104,40 @@ context('PDF template tests', () => {
 
       cy.contains(createdTemplateName).should('exist');
 
-      cy.get('[data-cy="template-data"] .cm-content')
+      cy.get('[data-cy="templateData"] .cm-content')
         .first()
         .type(pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
 
-      cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=templateData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Header').click();
+
+      cy.get('[data-cy="templateHeader"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateHeader-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Footer').click();
+
+      cy.get('[data-cy="templateFooter"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateFooter-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
@@ -114,14 +166,40 @@ context('PDF template tests', () => {
 
       cy.contains(createdTemplateName).should('exist');
 
-      cy.get('[data-cy="template-data"] .cm-content')
+      cy.get('[data-cy="templateData"] .cm-content')
         .first()
         .type(pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
 
-      cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=templateData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Header').click();
+
+      cy.get('[data-cy="templateHeader"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateHeader-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Footer').click();
+
+      cy.get('[data-cy="templateFooter"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateFooter-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
