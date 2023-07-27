@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
+import i18n from 'i18n';
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -95,7 +96,7 @@ const AssignProposalsToSEP = ({
                     text: sep.code,
                   }))}
                   disabled={isSubmitting}
-                  noOptionsText={`No ${t('SEP')}`}
+                  noOptionsText={`No ${i18n.format(t('SEP'), 'plural')}`}
                   data-cy="sep-selection"
                 />
               </Grid>
