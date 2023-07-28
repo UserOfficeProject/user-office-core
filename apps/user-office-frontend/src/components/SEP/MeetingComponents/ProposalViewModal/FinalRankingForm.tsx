@@ -10,7 +10,6 @@ import { Editor } from '@tinymce/tinymce-react';
 import { saveSepMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select } from 'formik-mui';
-import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -145,7 +144,7 @@ const FinalRankingForm = ({
                     title: 'Please confirm',
                     description:
                       'I am aware that no further changes to the ' +
-                      i18n.format(t('SEP'), 'lowercase') +
+                      t('SEP') +
                       ' meeting are possible after submission.',
                   }
                 )();

@@ -149,9 +149,8 @@ const SEPMeetingInstrumentsTable = ({
             },
             {
               title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `No further changes to ${i18n.format(
-                t('SEP'),
-                'lowercase'
+              description: `No further changes to ${t(
+                'SEP'
               )} meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
                 'instrument'
               )}?`,

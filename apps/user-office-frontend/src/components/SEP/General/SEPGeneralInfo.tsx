@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { updateSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
 import { Formik, Form, Field } from 'formik';
-import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -68,7 +67,7 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
       }): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
-            {`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+            {`${t('Scientific evaluation panel')}`}
           </Typography>
           <Grid container spacing={3}>
             <Grid item sm={6} xs={12}>
