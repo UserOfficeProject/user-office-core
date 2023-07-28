@@ -33,7 +33,6 @@ export async function collectSamplePDFData(
   sampleId: number,
   user: UserWithRole,
   notify?: CallableFunction,
-  questionIds?: string[],
   newSample?: Sample,
   newQuestionary?: Questionary,
   newQuestionarySteps?: QuestionaryStep[]
@@ -80,17 +79,10 @@ export async function collectSamplePDFData(
 
   const attachments: Attachment[] = [];
 
-  for (const fieldAnswer of completedFields) {
-    if (
-      questionIds &&
-      questionIds.length !== 0 &&
-      !questionIds.includes(fieldAnswer.question.id)
-    ) {
-      continue;
-    }
+  completedFields.forEach((answer) => {
+    attachments.push(...getFileAttachments(answer));
+  });
 
-    attachments.push(...getFileAttachments(fieldAnswer));
-  }
   const status = getHumanReadableStatus(sample.safetyStatus);
 
   const out: SamplePDFData = {

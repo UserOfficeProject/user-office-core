@@ -6,22 +6,17 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
-import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { ProposalPdfDownloadOptions } from '../../middlewares/factory/factoryServices';
+import { DownloadOptions } from '../../middlewares/factory/factoryServices';
 import { GenericTemplate } from '../../models/GenericTemplate';
-import { Instrument } from '../../models/Instrument';
 import { Proposal } from '../../models/Proposal';
-import {
-  areDependenciesSatisfied,
-  getQuestionaryStepByTopicId,
-} from '../../models/ProposalModelFunctions';
-import { Answer, QuestionaryStep } from '../../models/Questionary';
+import { getTopicActiveAnswers } from '../../models/ProposalModelFunctions';
+import { QuestionaryStep } from '../../models/Questionary';
 import { isRejection } from '../../models/Rejection';
 import { Review } from '../../models/Review';
 import { Sample } from '../../models/Sample';
@@ -71,19 +66,6 @@ const getTechnicalReviewHumanReadableStatus = (
   }
 };
 
-const getTopicActiveAnswers = (
-  questionarySteps: QuestionaryStep[],
-  topicId: number
-) => {
-  const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
-
-  return step
-    ? (step.fields.filter((field) => {
-        return areDependenciesSatisfied(questionarySteps, field.question.id);
-      }) as Answer[])
-    : [];
-};
-
 const getSampleQuestionarySteps = async (
   questionaryId: number
 ): Promise<QuestionaryStep[]> => {
@@ -115,15 +97,13 @@ const getQuestionary = async (questionaryId: number) => {
   return questionary;
 };
 
-const addTopicInformation = async (
+const addTopicInformation = (
   proposalPDFData: ProposalPDFData,
   questionarySteps: QuestionaryStep[],
   samples: Sample[],
   genericTemplates: GenericTemplate[],
   sampleAttachments: Attachment[],
-  genericTemplateAttachments: Attachment[],
-  getInstrument: (value: number) => Promise<Instrument | null>,
-  questionIds?: string[]
+  genericTemplateAttachments: Attachment[]
 ) => {
   const updatedProposalPDFData = { ...proposalPDFData };
   for (const step of questionarySteps) {
@@ -135,18 +115,8 @@ const addTopicInformation = async (
 
     const topic = step.topic;
     const answers = getTopicActiveAnswers(questionarySteps, topic.id).filter(
-      (answer) => {
-        if (
-          answer.question.dataType === DataType.FILE_UPLOAD &&
-          questionIds &&
-          questionIds.length !== 0
-        ) {
-          return questionIds.includes(answer.question.id);
-        }
-
-        // skip `PROPOSAL_BASIS` types
-        return answer.question.dataType !== DataType.PROPOSAL_BASIS;
-      }
+      // skip `PROPOSAL_BASIS` types
+      (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
     );
 
     // if the questionary step has nothing else but `PROPOSAL_BASIS` question
@@ -173,9 +143,6 @@ const addTopicInformation = async (
               genericTemplate.questionId === answer.question.id
           )
           .map((genericTemplate) => genericTemplate);
-      } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
-        const instrument = await getInstrument(answer.value as number);
-        answer.value = instrument?.name ?? '';
       }
     }
 
@@ -194,7 +161,6 @@ const addTopicInformation = async (
 export const collectProposalPDFData = async (
   proposalPk: number,
   user: UserWithRole,
-  options?: ProposalPdfDownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
   const proposalAuth = container.resolve(ProposalAuthorization);
@@ -210,53 +176,22 @@ export const collectProposalPDFData = async (
     throw new Error('User was not allowed to download PDF');
   }
 
+  const call = await baseContext.queries.call.get(user, proposal.callId);
+
   /*
    * Because naming things is hard, the PDF template ID is the templateId for
    * for the PdfTemplate and not the pdfTemplateId.
    */
-  const pdfTemplateId =
-    options?.pdfTemplateId ||
-    (await baseContext.queries.call
-      .get(user, proposal.callId)
-      .then((call) => call?.pdfTemplateId));
-
+  const pdfTemplateId = call?.pdfTemplateId;
   let pdfTemplate: PdfTemplate | null = null;
-  if (pdfTemplateId) {
-    pdfTemplate = await baseContext.queries.pdfTemplate
-      .getPdfTemplates(user, {
+  if (pdfTemplateId !== undefined) {
+    pdfTemplate = (
+      await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
         filter: {
           templateIds: [pdfTemplateId],
         },
       })
-      .then((pdfTemplates) => {
-        if (pdfTemplates == null || pdfTemplates.length === 0) {
-          throw new Error('Could not fetch pdf template');
-        }
-
-        return pdfTemplates[0];
-      });
-  }
-
-  const questionIds = options?.questionIds;
-
-  if (questionIds) {
-    const questionIdsData = await baseContext.queries.template
-      .getQuestions(user, {
-        questionIds,
-      })
-      .then((questions) => {
-        if (questions == null) {
-          throw new Error('Could not fetch questions');
-        }
-
-        return questions.map((question) => question.id);
-      });
-
-    questionIds.forEach((questionId) => {
-      if (!questionIdsData.includes(questionId)) {
-        throw new Error(`Could not fetch question ${questionId}`);
-      }
-    });
+    )[0];
   }
 
   const queries = baseContext.queries.questionary;
@@ -291,9 +226,7 @@ export const collectProposalPDFData = async (
 
   const samplePDFData = (
     await Promise.all(
-      samples.map((sample) =>
-        collectSamplePDFData(sample.id, user, undefined, questionIds)
-      )
+      samples.map((sample) => collectSamplePDFData(sample.id, user))
     )
   ).map(({ sample, sampleQuestionaryFields, attachments }) => {
     sampleAttachments.push(...attachments);
@@ -317,12 +250,7 @@ export const collectProposalPDFData = async (
   const genericTemplatePDFData = (
     await Promise.all(
       genericTemplates.map((genericTemplate) =>
-        collectGenericTemplatePDFData(
-          genericTemplate.id,
-          user,
-          undefined,
-          questionIds
-        )
+        collectGenericTemplatePDFData(genericTemplate.id, user)
       )
     )
   ).map(
@@ -339,32 +267,72 @@ export const collectProposalPDFData = async (
     }.pdf`
   );
 
-  const getInstrument = function enclosure(user: UserWithRole) {
-    return async function (instrumentId: number) {
-      return await baseContext.queries.instrument.get(user, instrumentId);
-    };
+  const out: ProposalPDFData = {
+    proposal,
+    principalInvestigator,
+    coProposers,
+    questionarySteps: [],
+    attachments: [],
+    samples: samplePDFData,
+    genericTemplates: genericTemplatePDFData,
+    pdfTemplate,
   };
-  // Information from each topic in proposal
 
-  const proposalPDFData: ProposalPDFData = await addTopicInformation(
-    {
-      proposal,
-      principalInvestigator,
-      coProposers,
-      questionarySteps: [],
-      attachments: [],
-      samples: samplePDFData,
-      genericTemplates: genericTemplatePDFData,
-      pdfTemplate,
-    },
-    questionarySteps,
-    samples,
-    genericTemplates,
-    sampleAttachments,
-    genericTemplateAttachments,
-    getInstrument(user),
-    questionIds
-  );
+  // Information from each topic in proposal
+  for (const step of questionarySteps) {
+    if (!step) {
+      logger.logError('step not found', { ...questionarySteps }); // TODO: fix type of the second param in the lib (don't use Record<string, unknown>)
+
+      throw 'Could not download generated PDF';
+    }
+
+    const topic = step.topic;
+    const answers = getTopicActiveAnswers(questionarySteps, topic.id).filter(
+      // skip `PROPOSAL_BASIS` types
+      (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
+    );
+
+    // if the questionary step has nothing else but `PROPOSAL_BASIS` question
+    // skip the whole step because the first page already has every related information
+    if (answers.length === 0) {
+      continue;
+    }
+
+    const questionaryAttachments: Attachment[] = [];
+
+    for (let i = 0; i < answers.length; i++) {
+      const answer = answers[i];
+
+      questionaryAttachments.push(...getFileAttachments(answer));
+
+      if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
+        answer.value = samples
+          .filter((sample) => sample.questionId === answer.question.id)
+          .map((sample) => sample);
+      } else if (answer.question.dataType === DataType.GENERIC_TEMPLATE) {
+        answer.value = genericTemplates
+          .filter(
+            (genericTemplate) =>
+              genericTemplate.questionId === answer.question.id
+          )
+          .map((genericTemplate) => genericTemplate);
+      } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+        const instrument = await baseContext.queries.instrument.get(
+          user,
+          answer.value as number
+        );
+        answer.value = instrument?.name ?? '';
+      }
+    }
+
+    out.questionarySteps.push({
+      ...step,
+      fields: answers,
+    });
+    out.attachments.push(...questionaryAttachments);
+    out.attachments.push(...sampleAttachments);
+    out.attachments.push(...genericTemplateAttachments);
+  }
 
   if (await proposalAuth.isReviewerOfProposal(user, proposal.primaryKey)) {
     const technicalReview =
@@ -373,7 +341,7 @@ export const collectProposalPDFData = async (
         proposal.primaryKey
       );
     if (technicalReview) {
-      proposalPDFData.technicalReview = {
+      out.technicalReview = {
         ...technicalReview,
         status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
       };
@@ -386,15 +354,15 @@ export const collectProposalPDFData = async (
     proposal.primaryKey
   );
 
-  if (reviews) proposalPDFData.sepReviews = reviews;
+  if (reviews) out.sepReviews = reviews;
 
-  return proposalPDFData;
+  return out;
 };
 
 export const collectProposalPDFDataTokenAccess = async (
   proposalPk: number,
   user: UserWithRole,
-  options?: ProposalPdfDownloadOptions,
+  options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
   const proposalAuth = container.resolve(ProposalAuthorization);
@@ -405,7 +373,6 @@ export const collectProposalPDFDataTokenAccess = async (
   // Set proposal data
   let proposal = null;
   const proposalFilter = options?.filter ?? null;
-
   if (proposalFilter && proposalFilter === 'id') {
     proposal = await proposalDataSource.getProposalById(proposalPk.toString());
   } else {
@@ -419,55 +386,24 @@ export const collectProposalPDFDataTokenAccess = async (
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
+  const call = await callDataSource.getCall(proposal.callId);
 
   const pdfTemplateDataSource = container.resolve<PdfTemplateDataSource>(
     Tokens.PdfTemplateDataSource
   );
 
-  const pdfTemplateId =
-    options?.pdfTemplateId ||
-    (await callDataSource
-      .getCall(proposal.callId)
-      .then((call) => call?.pdfTemplateId));
-
+  const pdfTemplateId = call?.pdfTemplateId;
   let pdfTemplate: PdfTemplate | null = null;
-  if (pdfTemplateId) {
-    pdfTemplate = await pdfTemplateDataSource
-      .getPdfTemplates({
+  if (pdfTemplateId !== undefined) {
+    pdfTemplate = (
+      await pdfTemplateDataSource.getPdfTemplates({
         filter: {
           templateIds: [pdfTemplateId],
         },
       })
-      .then((pdfTemplates) => {
-        if (!pdfTemplates || pdfTemplates.length === 0) {
-          throw new Error('Could not fetch pdf template');
-        }
-
-        return pdfTemplates[0];
-      });
+    )[0];
   }
 
-  const questionIds = options?.questionIds;
-
-  if (questionIds) {
-    const questionIdsData = await baseContext.queries.template
-      .getQuestions(user, {
-        questionIds,
-      })
-      .then((questions) => {
-        if (questions == null) {
-          throw new Error('Could not fetch questions');
-        }
-
-        return questions.map((question) => question.id);
-      });
-
-    questionIds.forEach((questionId) => {
-      if (!questionIdsData.includes(questionId)) {
-        throw new Error(`Could not fetch question ${questionId}`);
-      }
-    });
-  }
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
@@ -514,7 +450,6 @@ export const collectProposalPDFDataTokenAccess = async (
           sample.id,
           user,
           undefined,
-          questionIds,
           sample,
           await getQuestionary(sample.questionaryId),
           await getSampleQuestionarySteps(sample.questionaryId)
@@ -551,7 +486,6 @@ export const collectProposalPDFDataTokenAccess = async (
           genericTemplate.id,
           user,
           undefined,
-          questionIds,
           genericTemplate,
           await getQuestionary(genericTemplate.questionaryId),
           await getSampleQuestionarySteps(genericTemplate.questionaryId)
@@ -572,11 +506,8 @@ export const collectProposalPDFDataTokenAccess = async (
     }.pdf`
   );
 
-  const instrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
   // Add information from each topic in proposal
-  const proposalPDFData: ProposalPDFData = await addTopicInformation(
+  const proposalPDFData: ProposalPDFData = addTopicInformation(
     {
       proposal,
       principalInvestigator,
@@ -591,9 +522,7 @@ export const collectProposalPDFDataTokenAccess = async (
     samples,
     genericTemplates,
     sampleAttachments,
-    genericTemplateAttachments,
-    instrumentDataSource.getInstrument,
-    questionIds
+    genericTemplateAttachments
   );
 
   const reviewDataSource = container.resolve<ReviewDataSource>(
@@ -610,13 +539,6 @@ export const collectProposalPDFDataTokenAccess = async (
       };
     }
   }
-  // Get Reviews
-  const reviews = await baseContext.queries.review.reviewsForProposal(
-    user,
-    proposal.primaryKey
-  );
-
-  if (reviews) proposalPDFData.sepReviews = reviews;
 
   return proposalPDFData;
 };

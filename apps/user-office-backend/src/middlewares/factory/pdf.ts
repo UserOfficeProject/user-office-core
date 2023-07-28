@@ -10,7 +10,7 @@ import callFactoryService, {
   PDFType,
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
-import FactoryServices, { PDFServices } from './factoryServices';
+import FactoryServices, { DownloadTypeServices } from './factoryServices';
 
 const router = express.Router();
 
@@ -19,7 +19,8 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     if (!req.user) {
       throw new Error('Not authorized');
     }
-    const pdfServices = container.resolve<PDFServices>(FactoryServices);
+    const factoryServices =
+      container.resolve<DownloadTypeServices>(FactoryServices);
 
     const userWithRole = {
       ...res.locals.agent,
@@ -33,23 +34,14 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       collectionFilename: `proposals_${getCurrentTimestamp()}.pdf`,
       singleFilename: '',
     };
-    const options = ((queryParams) => {
-      return {
-        filter: queryParams.filter?.toString(),
-        pdfTemplateId:
-          req.query?.pdfTemplateId &&
-          !isNaN(+req.query?.pdfTemplateId?.toString())
-            ? +req.query.pdfTemplateId.toString()
-            : undefined,
-        questionIds: queryParams.questionIds?.toString().split(','),
-      };
-    })(req.query);
 
-    const data = await pdfServices.getPdfProposals(
+    const data = await factoryServices.getPdfProposals(
       userWithRole,
       proposalPks,
       meta,
-      options
+      {
+        filter: req.query?.filter?.toString(),
+      }
     );
 
     if (!data) {
