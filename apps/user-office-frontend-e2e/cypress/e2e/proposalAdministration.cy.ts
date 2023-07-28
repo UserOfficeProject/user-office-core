@@ -296,7 +296,6 @@ context('Proposal administration tests', () => {
     });
 
     it('Download proposal attachment(s) working with dialog window showing up', () => {
-      const templateName = faker.lorem.words(3);
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           cy.updateProposal({
