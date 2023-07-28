@@ -20,7 +20,6 @@ import {
   CloneTemplateMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
-  UpdatePdfTemplateMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -298,17 +297,6 @@ declare global {
       cloneTemplate: (
         cloneTemplateInput: CloneTemplateMutationVariables
       ) => Cypress.Chainable<CloneTemplateMutation>;
-      /**
-       * Update pdf template
-       *
-       * @returns {typeof updatePdfTemplate}
-       * @memberof Chainable
-       * @example
-       *    cy.updatePdfTemplate('template')
-       */
-      updatePdfTemplate: (
-        updatePdfTemplateInput: UpdatePdfTemplateMutationVariables
-      ) => Cypress.Chainable<UpdatePdfTemplateMutation>;
       /**
        * Creates generic template
        *

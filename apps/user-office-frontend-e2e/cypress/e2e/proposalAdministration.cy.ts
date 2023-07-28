@@ -3,7 +3,6 @@ import {
   DataType,
   FeatureId,
   TemplateCategoryId,
-  TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 import PdfParse from 'pdf-parse';
@@ -308,18 +307,6 @@ context('Proposal administration tests', () => {
           });
         }
       });
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
-      }).then((result) => {
-        if (result.createTemplate.pdfTemplate) {
-          cy.updatePdfTemplate({
-            pdfTemplateId: result.createTemplate.pdfTemplate.pdfTemplateId,
-            templateData: faker.lorem.paragraphs(10),
-          });
-        }
-      });
-
       cy.createTopic({
         templateId: initialDBData.template.id,
         sortOrder: 1,
@@ -360,9 +347,6 @@ context('Proposal administration tests', () => {
 
       cy.contains('Attachment(s)').click();
 
-      cy.get('[data-cy="pdfTemplateName"]').click();
-      cy.get('[role="presentation"]').contains(templateName).click();
-
       cy.get('[data-cy="attachmentQuestionName"]').click();
       cy.get('[role="presentation"]')
         .contains(initialDBData.questions.fileUpload.text)
@@ -372,7 +356,7 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        proposalName1
+        'attachment'
       );
 
       cy.contains(proposalFixedName)
@@ -383,9 +367,6 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Attachment(s)').click();
-
-      cy.get('[data-cy="pdfTemplateName"]').click();
-      cy.get('[role="presentation"]').contains(templateName).click();
 
       cy.get('[data-cy="attachmentQuestionName"]').click();
       cy.get('[role="presentation"]')
