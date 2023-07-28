@@ -115,12 +115,12 @@ export enum PREPARE_DOWNLOAD_TYPE {
   PDF_SAMPLE,
   PDF_SHIPMENT_LABEL,
   PDF_GENERIC_TEMPLATE,
+  ZIP_ATTACHMENT,
   XLSX_PROPOSAL,
   XLSX_SEP,
 }
 
-export type ProposalPdfDownloadOptions = {
-  pdfTemplateId?: string;
+export type DownloadOptions = {
   questionIds?: string;
 };
 
@@ -129,7 +129,7 @@ export interface DownloadContextData {
     type: PREPARE_DOWNLOAD_TYPE,
     id: Array<number | number[]>,
     name: string | null,
-    options?: ProposalPdfDownloadOptions
+    options?: DownloadOptions
   ) => void;
 }
 
@@ -143,14 +143,10 @@ export const DownloadContext = React.createContext<DownloadContextData>({
 function generateLink(
   type: PREPARE_DOWNLOAD_TYPE,
   ids: Array<number | number[]>,
-  options?: ProposalPdfDownloadOptions
+  options?: DownloadOptions
 ): string {
   switch (type) {
     case PREPARE_DOWNLOAD_TYPE.PDF_PROPOSAL:
-      if (options) {
-        return `/download/pdf/proposal/${ids}?pdfTemplateId=${options?.pdfTemplateId}&questionIds=${options?.questionIds}`;
-      }
-
       return '/download/pdf/proposal/' + ids;
     case PREPARE_DOWNLOAD_TYPE.PDF_SAMPLE:
       return '/download/pdf/sample/' + ids;
@@ -170,6 +166,12 @@ function generateLink(
       const [sepId, callId] = params;
 
       return `/download/xlsx/sep/${sepId}/call/${callId}`;
+    case PREPARE_DOWNLOAD_TYPE.ZIP_ATTACHMENT:
+      if (!options?.questionIds) {
+        throw new Error('Question ids are require');
+      }
+
+      return `/download/zip/attachment/${ids}?questionIds=${options?.questionIds}`;
     default:
       throw new Error('Unknown type:' + type);
   }
@@ -213,7 +215,7 @@ export const DownloadContextProvider = ({
     type: PREPARE_DOWNLOAD_TYPE,
     ids: Array<number | number[]>,
     name: string | null,
-    options?: ProposalPdfDownloadOptions
+    options?: DownloadOptions
   ) => {
     const id = `${type}__${ids}`;
     if (pendingRequests.current.has(id)) {

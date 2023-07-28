@@ -1,26 +1,17 @@
 import {
   Autocomplete,
   Button,
-  Checkbox,
   Container,
-  FormControlLabel,
   Grid,
   TextField,
   Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import {
-  DataType,
-  GetTemplatesQuery,
-  Proposal,
-  Question,
-  TemplateGroupId,
-} from 'generated/sdk';
+import { DataType, Question } from 'generated/sdk';
 import { useProposalsData } from 'hooks/proposal/useProposalsData';
-import { useTemplates } from 'hooks/template/useTemplates';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -32,15 +23,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type Templates = GetTemplatesQuery['templates'];
-
 type ProposalAttachmentDownloadProps = {
   close: () => void;
   referenceNumbers: string[];
   downloadProposalAttachment: (
     proposalIds: number[],
-    title: string,
-    pdfTemplateId: string,
     questionIds: string
   ) => void;
 };
@@ -52,16 +39,7 @@ const ProposalAttachmentDownload = ({
 }: ProposalAttachmentDownloadProps) => {
   const classes = useStyles();
   const { proposalsData, loading } = useProposalsData({ referenceNumbers });
-  const [pdfTemplates, setPdfTemplates] = useState<NonNullable<Templates>>([]);
-  const [includeAllProposals, setIncludeAllProposals] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
-  const { templates, loadingTemplates } = useTemplates({
-    isArchived: false,
-    group: TemplateGroupId.PDF_TEMPLATE,
-  });
-  const [selectedPdfTemplate, setSelectedPdfTemplate] = useState<
-    number | null
-  >();
   const [selectedAttachmentsQuestions, setSelectedAttachmentsQuestions] =
     useState<string[]>([]);
   const attachmentQuestions: Question[] = [];
@@ -113,75 +91,6 @@ const ProposalAttachmentDownload = ({
       });
   }
 
-  const getProposalInfo = (
-    includeAllProposals: boolean,
-    proposals: Proposal[],
-    questions: string[]
-  ) => {
-    let proposalIds: number[] = [];
-    let title = '';
-    if (includeAllProposals) {
-      proposalIds = proposals.map((proposal, index) => {
-        if (index === 0 && proposal.title) {
-          title = proposal.title;
-        }
-
-        return proposal.primaryKey;
-      });
-    } else {
-      proposalIds = proposals
-        .filter((proposal) => {
-          return (
-            proposal.questionary.steps.some((step) => {
-              return step.fields.some((field) => {
-                return (
-                  questions.includes(field.question.id) &&
-                  Array.isArray(field.value) &&
-                  field.value.length > 0
-                );
-              });
-            }) ||
-            proposal.genericTemplates?.some((gen) =>
-              gen.questionary.steps.some((step) => {
-                return step.fields.some((field) => {
-                  return (
-                    questions.includes(field.question.id) &&
-                    Array.isArray(field.value) &&
-                    field.value.length > 0
-                  );
-                });
-              })
-            ) ||
-            proposal.samples?.some((sample) =>
-              sample.questionary.steps.some((step) => {
-                return step.fields.some((field) => {
-                  return (
-                    questions.includes(field.question.id) &&
-                    Array.isArray(field.value) &&
-                    field.value.length > 0
-                  );
-                });
-              })
-            )
-          );
-        })
-        .map((proposal, index) => {
-          if (index === 0 && proposal.title) {
-            title = proposal.title;
-          }
-
-          return proposal.primaryKey;
-        });
-    }
-
-    return { proposalIds, title };
-  };
-  useEffect(() => {
-    if (templates && templates[0]) {
-      setPdfTemplates(templates);
-    }
-  }, [templates]);
-
   return (
     <Container
       component="main"
@@ -192,47 +101,12 @@ const ProposalAttachmentDownload = ({
         Download attachment on proposal/s
       </Typography>
 
-      <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <Autocomplete
-            id="pdf-template-select"
-            aria-labelledby="pdf-template-select-label"
-            fullWidth={true}
-            noOptionsText={'No matching pdf template'}
-            disableClearable
-            onChange={(_event, selectedValue) => {
-              setSelectedPdfTemplate(selectedValue.templateId);
-            }}
-            getOptionLabel={(option) => option.name}
-            isOptionEqualToValue={(option, value) =>
-              option.templateId === value.templateId
-            }
-            options={pdfTemplates.filter(
-              (template, index) =>
-                pdfTemplates.findIndex(
-                  (value) => value.templateId == template.templateId
-                ) === index
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                key={params.id}
-                data-cy="pdfTemplateName"
-                label="Pdf Template"
-                placeholder="Select pdf template"
-              />
-            )}
-            renderOption={(props, option) => {
-              return (
-                <li {...props} key={option.templateId}>
-                  {option.name}
-                </li>
-              );
-            }}
-            loading={loadingTemplates}
-          />
-        </Grid>
-
+      <Grid
+        container
+        spacing={1}
+        justifyContent="center"
+        alignItems="flex-start"
+      >
         <Grid item xs={12}>
           <Autocomplete
             id="attachment-question-select"
@@ -273,60 +147,39 @@ const ProposalAttachmentDownload = ({
             loading={loading}
           />
         </Grid>
-        <Grid item xs={12}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={includeAllProposals}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncludeAllProposals(event.target.checked);
-                }}
-              />
-            }
-            label="Include proposal(s) which may not have the selected questions"
-          />
+        <Grid item xs={6}>
+          <Button
+            fullWidth
+            className={classes.submit}
+            disabled={loading || selectedAttachmentsQuestions.length <= 0}
+            data-cy="proposalAttachmentDownloadButton"
+            onClick={() => {
+              const proposalIds = proposalsData.map(
+                (proposal) => proposal.primaryKey
+              );
+              if (
+                proposalIds.length > 0 &&
+                selectedAttachmentsQuestions.length > 0
+              ) {
+                downloadProposalAttachment(
+                  proposalIds,
+                  selectedAttachmentsQuestions.join(',')
+                );
+                close();
+              } else {
+                enqueueSnackbar(
+                  `Could not download proposal attachment(s) of selected question(s)`,
+                  {
+                    variant: 'info',
+                  }
+                );
+              }
+            }}
+          >
+            Download
+          </Button>
         </Grid>
       </Grid>
-      <Button
-        fullWidth
-        className={classes.submit}
-        disabled={
-          loadingTemplates ||
-          loading ||
-          !selectedPdfTemplate ||
-          selectedAttachmentsQuestions.length < 0
-        }
-        data-cy="proposalAttachmentDownloadButton"
-        onClick={() => {
-          const { proposalIds, title } = getProposalInfo(
-            includeAllProposals,
-            proposalsData,
-            selectedAttachmentsQuestions
-          );
-          if (
-            proposalIds.length > 0 &&
-            selectedPdfTemplate &&
-            selectedAttachmentsQuestions.length > 0
-          ) {
-            downloadProposalAttachment(
-              proposalIds,
-              title,
-              selectedPdfTemplate.toString(),
-              selectedAttachmentsQuestions.join(',')
-            );
-            close();
-          } else {
-            enqueueSnackbar(
-              `Could not download attachment(s) selected proposal(s) don't have the selected question`,
-              {
-                variant: 'info',
-              }
-            );
-          }
-        }}
-      >
-        Download
-      </Button>
     </Container>
   );
 };

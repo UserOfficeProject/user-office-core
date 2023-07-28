@@ -47,6 +47,7 @@ import {
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import {
   ProposalViewData,
@@ -282,6 +283,7 @@ const ProposalTableOfficer = ({
     useState<null | HTMLElement>(null);
   const [openDownloadAttachment, setOpenDownloadAttachment] = useState(false);
   const downloadPDFProposal = useDownloadPDFProposal();
+  const downloadProposalAttachment = useDownloadProposalAttachment();
   const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
@@ -779,12 +781,9 @@ const ProposalTableOfficer = ({
             )}
             downloadProposalAttachment={(
               proposalIds: number[],
-              title,
-              pdfTemplateId: string,
               questionIds: string
             ) =>
-              downloadPDFProposal(proposalIds, title, {
-                pdfTemplateId,
+              downloadProposalAttachment(proposalIds, {
                 questionIds,
               })
             }

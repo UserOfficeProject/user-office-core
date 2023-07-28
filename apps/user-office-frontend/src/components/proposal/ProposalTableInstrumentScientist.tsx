@@ -40,6 +40,7 @@ import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScienti
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import {
   ProposalViewData,
   useProposalsCoreData,
@@ -256,6 +257,7 @@ const ProposalTableInstrumentScientist = ({
   }, [proposalsData, urlQueryParams.selection]);
 
   const downloadPDFProposal = useDownloadPDFProposal();
+  const downloadProposalAttachment = useDownloadProposalAttachment();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsInstrumentScientist', null);
@@ -573,12 +575,9 @@ const ProposalTableInstrumentScientist = ({
             )}
             downloadProposalAttachment={(
               proposalIds: number[],
-              title,
-              pdfTemplateId: string,
               questionIds: string
             ) =>
-              downloadPDFProposal(proposalIds, title, {
-                pdfTemplateId,
+              downloadProposalAttachment(proposalIds, {
                 questionIds,
               })
             }
