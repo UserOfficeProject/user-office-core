@@ -32,7 +32,7 @@ export default class InternalReviewMutations {
     return await this.internalReviewDataSource.update(agent!, input);
   }
 
-  @EventBus(Event.PREDEFINED_MESSAGE_DELETED)
+  @EventBus(Event.INTERNAL_REVIEW_DELETED)
   @Authorized([Roles.USER_OFFICER])
   async delete(agent: UserWithRole | null, input: DeleteInternalReviewInput) {
     const deletedInternalReview = await this.internalReviewDataSource.delete(

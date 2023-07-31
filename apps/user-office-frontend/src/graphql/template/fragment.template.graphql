@@ -23,5 +23,7 @@ fragment template on Template {
   pdfTemplate {
     pdfTemplateId
     templateData
+    templateHeader
+    templateFooter
   }
 }
