@@ -7,6 +7,7 @@ import FeedbackMutations from '../mutations/FeedbackMutations';
 import FileMutations from '../mutations/FileMutations';
 import GenericTemplateMutations from '../mutations/GenericTemplateMutations';
 import InstrumentMutations from '../mutations/InstrumentMutations';
+import InternalReviewMutations from '../mutations/InternalReviewMutations';
 import PdfTemplateMutations from '../mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
@@ -30,6 +31,7 @@ import FeedbackQueries from '../queries/FeedbackQueries';
 import FileQueries from '../queries/FileQueries';
 import GenericTemplateQueries from '../queries/GenericTemplateQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
+import InternalReviewQueries from '../queries/InternalReviewQueries';
 import PdfTemplateQueries from '../queries/PdfTemplateQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalEsiQueries from '../queries/ProposalEsiQueries';
@@ -73,6 +75,7 @@ interface ResolverContextQueries {
   user: UserQueries;
   visit: VisitQueries;
   predefinedMessage: PredefinedMessageQueries;
+  internalReview: InternalReviewQueries;
 }
 
 interface ResolverContextMutations {
@@ -98,6 +101,7 @@ interface ResolverContextMutations {
   user: UserMutations;
   visit: VisitMutations;
   predefinedMessage: PredefinedMessageMutations;
+  internalReview: InternalReviewMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

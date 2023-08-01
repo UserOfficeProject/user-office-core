@@ -25,6 +25,11 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   ): Promise<TechnicalReview | null> {
     return dummyProposalTechnicalReview;
   }
+  async getTechnicalReviewById(
+    technicalReviewId: number
+  ): Promise<TechnicalReview | null> {
+    return dummyProposalTechnicalReview;
+  }
   setTechnicalReview(
     args: AddTechnicalReviewInput,
     shouldUpdateReview: boolean
