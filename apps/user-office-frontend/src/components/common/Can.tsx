@@ -23,7 +23,7 @@ type CanProps = {
   no?: () => JSX.Element | null;
 };
 
-const Can: React.FC<CanProps> = ({ allowedRoles, yes, no }) => {
+const Can = ({ allowedRoles, yes, no }: CanProps) => {
   const hasAccessRithgs = useCheckAccess(allowedRoles);
 
   return hasAccessRithgs ? (yes ? yes() : null) : no ? no() : null;

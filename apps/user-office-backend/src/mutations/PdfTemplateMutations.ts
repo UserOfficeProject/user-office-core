@@ -37,6 +37,8 @@ export default class PdfTemplateMutations {
       return await this.pdfTemplateDataSource.createPdfTemplate({
         templateId: template.templateId,
         templateData: args.templateData,
+        templateHeader: args.templateHeader,
+        templateFooter: args.templateFooter,
         creatorId: (agent as UserWithRole).id,
       });
     } catch (error) {

@@ -26,7 +26,7 @@ import ProposalWorkflowEditorModel, {
 } from './ProposalWorkflowEditorModel';
 import ProposalWorkflowMetadataEditor from './ProposalWorkflowMetadataEditor';
 
-const ProposalWorkflowEditor: React.FC = () => {
+const ProposalWorkflowEditor = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();

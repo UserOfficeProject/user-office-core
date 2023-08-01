@@ -1,7 +1,7 @@
-import SvgIcon from '@mui/material/SvgIcon';
+import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import React from 'react';
 
-const ListStatusIcon: React.FC = (props) => {
+const ListStatusIcon = (props: SvgIconProps) => {
   return (
     <SvgIcon {...props}>
       <path

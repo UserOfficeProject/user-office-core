@@ -28,10 +28,10 @@ type ReviewStatusFilterProps = {
   onChange: (reviewStatus: ReviewStatus) => void;
 };
 
-const ReviewStatusFilter: React.FC<ReviewStatusFilterProps> = ({
+const ReviewStatusFilter = ({
   reviewStatus,
   onChange,
-}) => {
+}: ReviewStatusFilterProps) => {
   const classes = useStyles();
 
   return (

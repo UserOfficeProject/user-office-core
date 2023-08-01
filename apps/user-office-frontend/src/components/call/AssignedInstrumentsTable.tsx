@@ -41,11 +41,11 @@ type AssignedInstrumentsTableProps = {
   ) => void;
 };
 
-const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
+const AssignedInstrumentsTable = ({
   call,
   removeAssignedInstrumentFromCall,
   setInstrumentAvailabilityTime,
-}) => {
+}: AssignedInstrumentsTableProps) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();

@@ -40,9 +40,11 @@ type AddNewWorkflowConnectionsRowProps = {
   parentDroppableIds: string[];
 };
 
-const AddNewWorkflowConnectionsRow: React.FC<
-  AddNewWorkflowConnectionsRowProps
-> = ({ close, addNewWorkflowConnectionsRow, parentDroppableIds }) => {
+const AddNewWorkflowConnectionsRow = ({
+  close,
+  addNewWorkflowConnectionsRow,
+  parentDroppableIds,
+}: AddNewWorkflowConnectionsRowProps) => {
   const classes = useStyles();
 
   const initialValues: {

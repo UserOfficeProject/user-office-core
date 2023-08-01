@@ -38,10 +38,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const ProposalWorkflowMetadataEditor: React.FC<{
+const ProposalWorkflowMetadataEditor = ({
+  proposalWorkflow,
+  dispatch,
+}: {
   proposalWorkflow: ProposalWorkflow;
   dispatch: React.Dispatch<Event>;
-}> = ({ proposalWorkflow, dispatch }) => {
+}) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const classes = useStyles();

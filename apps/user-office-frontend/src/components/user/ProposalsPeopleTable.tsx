@@ -131,7 +131,7 @@ const columns = [
   { title: 'Organisation', field: 'organisation' },
 ];
 
-const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
+const ProposalsPeopleTable = ({
   selectedParticipants,
   selection,
   setSelectedParticipants,
@@ -141,7 +141,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = ({
   selectedUsers,
   title,
   userRole,
-}) => {
+}: PeopleTableProps) => {
   const tableRef = React.useRef();
   const [query, setQuery] = useState<
     GetUsersQueryVariables & { refreshData: boolean }

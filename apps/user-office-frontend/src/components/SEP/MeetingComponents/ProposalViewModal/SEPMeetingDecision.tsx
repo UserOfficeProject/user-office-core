@@ -23,10 +23,10 @@ type SEPMeetingDecisionProps = {
   sep: Maybe<Pick<Sep, 'id' | 'code'>>;
 };
 
-const SEPMeetingDecision: React.FC<SEPMeetingDecisionProps> = ({
+const SEPMeetingDecision = ({
   sepMeetingDecision,
   sep,
-}) => {
+}: SEPMeetingDecisionProps) => {
   const classes = useStyles();
 
   return (

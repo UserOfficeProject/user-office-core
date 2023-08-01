@@ -4,8 +4,7 @@ import { TemplateGroupId } from '@user-office-software-libs/shared-types';
 context('PDF template tests', () => {
   const templateName = faker.lorem.words(3);
   const templateDesc = faker.lorem.words(3);
-  const pdfTemplateData = faker.lorem.paragraphs(10);
-
+  const pdfTemplateData = faker.lorem.paragraphs(1);
   let createdTemplateName: string;
 
   beforeEach(() => {
@@ -37,12 +36,40 @@ context('PDF template tests', () => {
 
       cy.contains(templateName);
 
-      cy.get('[data-cy="template-data"] textarea')
+      cy.get('[data-cy="templateData"] .cm-content')
         .first()
         .type(pdfTemplateData)
-        .should('have.value', pdfTemplateData);
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-      cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=templateData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Header').click();
+
+      cy.get('[data-cy="templateHeader"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateHeader-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Footer').click();
+
+      cy.get('[data-cy="templateFooter"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateFooter-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
@@ -77,12 +104,40 @@ context('PDF template tests', () => {
 
       cy.contains(createdTemplateName).should('exist');
 
-      cy.get('[data-cy="template-data"] textarea')
+      cy.get('[data-cy="templateData"] .cm-content')
         .first()
         .type(pdfTemplateData)
-        .should('have.value', pdfTemplateData);
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-      cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=templateData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Header').click();
+
+      cy.get('[data-cy="templateHeader"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateHeader-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Footer').click();
+
+      cy.get('[data-cy="templateFooter"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateFooter-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
@@ -111,12 +166,40 @@ context('PDF template tests', () => {
 
       cy.contains(createdTemplateName).should('exist');
 
-      cy.get('[data-cy="template-data"] textarea')
+      cy.get('[data-cy="templateData"] .cm-content')
         .first()
         .type(pdfTemplateData)
-        .should('have.value', pdfTemplateData);
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-      cy.get('[data-cy=submit]').click();
+      cy.get('[data-cy=templateData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Header').click();
+
+      cy.get('[data-cy="templateHeader"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateHeader-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Footer').click();
+
+      cy.get('[data-cy="templateFooter"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateFooter-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 

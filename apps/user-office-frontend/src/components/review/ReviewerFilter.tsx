@@ -26,10 +26,10 @@ export const reviewFilter: Record<string, ReviewerFilter> = {
   ME: ReviewerFilter.ME,
 };
 
-const ReviewerFilterComponent: React.FC<ReviewerFilterComponentProps> = ({
+const ReviewerFilterComponent = ({
   reviewer,
   onChange,
-}) => {
+}: ReviewerFilterComponentProps) => {
   const { settingsMap } = useContext(SettingsContext);
   const reviewFilterValue =
     settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
