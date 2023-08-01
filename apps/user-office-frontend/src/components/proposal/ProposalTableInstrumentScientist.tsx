@@ -268,7 +268,7 @@ const ProposalTableInstrumentScientist = ({
       first: PREFETCH_SIZE,
       offset: 0,
     },
-    searchText: urlQueryParams?.sortField ?? undefined,
+    searchText: urlQueryParams.search ?? undefined,
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
