@@ -13,6 +13,7 @@ import {
   TechnicalReview,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
+import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
@@ -319,7 +320,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getInstrumentScientistProposals(
-    scientistId: number,
+    scientist: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
