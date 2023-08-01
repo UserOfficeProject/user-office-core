@@ -14,4 +14,5 @@ export enum Roles {
   SEP_REVIEWER = 'sep_reviewer',
   INSTRUMENT_SCIENTIST = 'instrument_scientist',
   SAMPLE_SAFETY_REVIEWER = 'sample_safety_reviewer',
+  INTERNAL_REVIEWER = 'internal_reviewer',
 }
