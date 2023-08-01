@@ -49,6 +49,8 @@ beforeEach(() => {
 test('A userofficer can create a PDF template', async () => {
   const templateId = 1;
   const templateData = '...';
+  const templateHeader = '...';
+  const templateFooter = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -61,6 +63,8 @@ test('A userofficer can create a PDF template', async () => {
     {
       templateId,
       templateData,
+      templateHeader,
+      templateFooter,
     }
   );
 
@@ -75,6 +79,8 @@ test('A userofficer can create a PDF template', async () => {
 test('A user cannot create a PDF template', async () => {
   const templateId = 1;
   const templateData = '...';
+  const templateHeader = '...';
+  const templateFooter = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -87,6 +93,8 @@ test('A user cannot create a PDF template', async () => {
     {
       templateId,
       templateData,
+      templateHeader,
+      templateFooter,
     }
   );
 
@@ -96,6 +104,8 @@ test('A user cannot create a PDF template', async () => {
 test('Template must be correct type for PDF template to be created', async () => {
   const templateId = 1;
   const templateData = '...';
+  const templateHeader = '...';
+  const templateFooter = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -108,6 +118,8 @@ test('Template must be correct type for PDF template to be created', async () =>
     {
       templateId,
       templateData,
+      templateHeader,
+      templateFooter,
     }
   );
 
@@ -117,6 +129,8 @@ test('Template must be correct type for PDF template to be created', async () =>
 test('Create PDF template database error gives friendly error', async () => {
   const templateId = 1;
   const templateData = '...';
+  const templateHeader = '...';
+  const templateFooter = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -131,6 +145,8 @@ test('Create PDF template database error gives friendly error', async () => {
     {
       templateId,
       templateData,
+      templateHeader,
+      templateFooter,
     }
   );
 
@@ -140,12 +156,16 @@ test('Create PDF template database error gives friendly error', async () => {
 test('A userofficer can update a PDF template', async () => {
   const existingPdfTemplateId = 1;
   const newTemplateData = 'new data';
+  const newTemplateHeader = 'new header';
+  const newTemplateFooter = 'new footer';
 
   let template = await pdfTemplateMutations.updatePdfTemplate(
     dummyUserOfficerWithRole,
     {
       pdfTemplateId: existingPdfTemplateId,
       templateData: newTemplateData,
+      templateHeader: newTemplateHeader,
+      templateFooter: newTemplateFooter,
     }
   );
 
@@ -153,17 +173,23 @@ test('A userofficer can update a PDF template', async () => {
   template = template as PdfTemplate;
   expect(template.pdfTemplateId).toEqual(existingPdfTemplateId);
   expect(template.templateData).toEqual(newTemplateData);
+  expect(template.templateHeader).toEqual(newTemplateHeader);
+  expect(template.templateFooter).toEqual(newTemplateFooter);
 });
 
 test('A user cannot update a PDF template', async () => {
   const existingPdfTemplateId = 1;
   const newTemplateData = 'new data';
+  const newTemplateHeader = 'new header';
+  const newTemplateFooter = 'new footer';
 
   const template = await pdfTemplateMutations.updatePdfTemplate(
     dummyUserWithRole,
     {
       pdfTemplateId: existingPdfTemplateId,
       templateData: newTemplateData,
+      templateHeader: newTemplateHeader,
+      templateFooter: newTemplateFooter,
     }
   );
 
@@ -173,6 +199,8 @@ test('A user cannot update a PDF template', async () => {
 test('Update PDF template database error gives friendly error', async () => {
   const existingPdfTemplateId = 1;
   const newTemplateData = 'new data';
+  const newTemplateHeader = 'new header';
+  const newTemplateFooter = 'new footer';
 
   mockUpdatePdfTemplate.mockRejectedValue(new Error('Database error'));
 
@@ -181,6 +209,8 @@ test('Update PDF template database error gives friendly error', async () => {
     {
       pdfTemplateId: existingPdfTemplateId,
       templateData: newTemplateData,
+      templateHeader: newTemplateHeader,
+      templateFooter: newTemplateFooter,
     }
   );
 
