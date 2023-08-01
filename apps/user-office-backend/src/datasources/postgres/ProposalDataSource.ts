@@ -9,8 +9,10 @@ import { Proposal, ProposalPks } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
+import { Roles } from '../../models/Role';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { TechnicalReview } from '../../models/TechnicalReview';
+import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
@@ -505,7 +507,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getInstrumentScientistProposals(
-    userId: number,
+    user: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
@@ -529,9 +531,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'internal_reviews.technical_review_id'
       )
       .where(function () {
-        this.where('instrument_has_scientists.user_id', userId)
-          .orWhere('instruments.manager_user_id', userId)
-          .orWhere('internal_reviews.reviewer_id', userId);
+        if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
+          this.where('internal_reviews.reviewer_id', user.id);
+        } else {
+          this.where('instrument_has_scientists.user_id', user.id).orWhere(
+            'instruments.manager_user_id',
+            user.id
+          );
+          if (filter?.reviewer === ReviewerFilter.ME) {
+            this.where(
+              'proposal_table_view.technical_review_assignee_id',
+              user.id
+            );
+          }
+        }
       })
       .distinct('proposal_table_view.proposal_pk')
       .orderBy('proposal_table_view.proposal_pk', 'desc')
@@ -540,12 +553,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query
             .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('abstract', 'ilike', `%${filter.text}%`);
-        }
-        if (filter?.reviewer === ReviewerFilter.ME) {
-          query.where(
-            'proposal_table_view.technical_review_assignee_id',
-            userId
-          );
         }
         if (filter?.callId) {
           query.where('proposal_table_view.call_id', filter.callId);

@@ -57,6 +57,7 @@ const ProposalReviewContent = ({
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
   const { proposalData, setProposalData, loading } = useProposalData(
     proposalPk || reviewData?.proposal?.primaryKey
@@ -92,7 +93,9 @@ const ProposalReviewContent = ({
 
   const TechnicalReviewTab =
     isUserOfficer ||
-    proposalData.technicalReview?.technicalReviewAssigneeId === user.id ? (
+    (isInstrumentScientist &&
+      proposalData.technicalReview?.technicalReviewAssigneeId === user.id) ||
+    isInternalReviewer ? (
       <>
         {!!proposalData.technicalReview && (
           <InternalReviews

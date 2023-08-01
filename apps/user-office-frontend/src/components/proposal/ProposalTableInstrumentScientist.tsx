@@ -1,4 +1,4 @@
-import MaterialTable, { Column } from '@material-table/core';
+import MaterialTable, { Action, Column } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -156,6 +156,7 @@ const ProposalTableInstrumentScientist = ({
   const { settingsMap } = useContext(SettingsContext);
   const { t } = useTranslation();
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const statusFilterValue = isInstrumentScientist
     ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)
         ?.settingsValue || 2
@@ -265,11 +266,11 @@ const ProposalTableInstrumentScientist = ({
   const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
-      rowData.technicalReviewAssigneeId === user.id;
+      isInstrumentScientist && rowData.technicalReviewAssigneeId === user.id;
 
     const showView =
       rowData.technicalReviewSubmitted ||
-      isCurrentUserTechnicalReviewAssignee === false;
+      (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
     return (
       <>
@@ -491,6 +492,24 @@ const ProposalTableInstrumentScientist = ({
       })
   );
 
+  const tableActions: Action<ProposalViewData>[] = [
+    {
+      icon: GetAppIconComponent,
+      tooltip: 'Download proposals',
+      onClick: handleBulkDownloadClick,
+      position: 'toolbarOnSelect',
+    },
+  ];
+
+  if (isInstrumentScientist) {
+    tableActions.push({
+      icon: DoneAllIcon,
+      tooltip: 'Submit proposal reviews',
+      onClick: handleBulkTechnicalReviewsSubmit,
+      position: 'toolbarOnSelect',
+    });
+  }
+
   return (
     <>
       <ProposalReviewModal
@@ -580,20 +599,7 @@ const ProposalTableInstrumentScientist = ({
         onChangeColumnHidden={handleColumnHiddenChange}
         onSelectionChange={handleColumnSelectionChange}
         onOrderChange={handleColumnSortOrderChange}
-        actions={[
-          {
-            icon: GetAppIconComponent,
-            tooltip: 'Download proposals',
-            onClick: handleBulkDownloadClick,
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: DoneAllIcon,
-            tooltip: 'Submit proposal reviews',
-            onClick: handleBulkTechnicalReviewsSubmit,
-            position: 'toolbarOnSelect',
-          },
-        ]}
+        actions={tableActions}
       />
     </>
   );

@@ -84,7 +84,7 @@ export abstract class UserAuthorization {
 
   async isInternalReviewerOnTechnicalReview(
     agent: UserWithRole | null,
-    technicalReviewId: number
+    technicalReviewId?: number
   ): Promise<boolean> {
     if (!agent || !agent.id || !technicalReviewId) {
       return false;
