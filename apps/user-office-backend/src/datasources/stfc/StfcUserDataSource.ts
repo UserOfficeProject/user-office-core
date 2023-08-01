@@ -51,7 +51,7 @@ export interface StfcBasicPersonDetails {
   workPhone: string;
 }
 
-function toEssBasicUserDetails(
+export function toEssBasicUserDetails(
   stfcUser: StfcBasicPersonDetails
 ): BasicUserDetails {
   return new BasicUserDetails(
@@ -64,7 +64,7 @@ function toEssBasicUserDetails(
     '',
     new Date(),
     false,
-    ''
+    stfcUser.email ?? ''
   );
 }
 
@@ -129,7 +129,7 @@ export class StfcUserDataSource implements UserDataSource {
     ).then((stfcUsers) => (stfcUsers.length > 0 ? stfcUsers[0] : null));
   }
 
-  private async getStfcBasicPeopleByUserNumbers(
+  public async getStfcBasicPeopleByUserNumbers(
     userNumbers: string[],
     searchableOnly?: boolean
   ): Promise<StfcBasicPersonDetails[]> {
@@ -518,7 +518,15 @@ export class StfcUserDataSource implements UserDataSource {
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     throw new Error('Method not implemented.');
   }
+
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  async isSearchableUser(userId: number): Promise<boolean> {
+    return !!(await this.getStfcBasicPersonByUserNumber(
+      userId.toString(),
+      true
+    ));
   }
 }

@@ -3,5 +3,7 @@ query getPdfTemplate($pdfTemplateId: Int!) {
     pdfTemplateId
     templateId
     templateData
+    templateHeader
+    templateFooter
   }
 }
