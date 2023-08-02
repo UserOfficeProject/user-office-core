@@ -92,7 +92,7 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   'Test public comment',
   10,
   TechnicalReviewStatus.FEASIBLE,
-  true,
+  false,
   1,
   '',
   1
