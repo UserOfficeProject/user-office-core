@@ -1,0 +1,16 @@
+mutation updateInternalReview($input: UpdateInternalReviewInput!) {
+  updateInternalReview(updateInternalReviewInput: $input) {
+    id
+    title
+    comment
+    files
+    createdAt
+    assignedByUser {
+      ...basicUserDetails
+    }
+    reviewerId
+    reviewer {
+      ...basicUserDetails
+    }
+  }
+}
