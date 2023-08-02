@@ -4,6 +4,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InternalReviewDataSource } from '../datasources/InternalReviewDataSource';
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
@@ -18,7 +19,9 @@ export default class InternalReviewMutations {
   private technicalReviewAuth = container.resolve(TechnicalReviewAuthorization);
   constructor(
     @inject(Tokens.InternalReviewDataSource)
-    private internalReviewDataSource: InternalReviewDataSource
+    private internalReviewDataSource: InternalReviewDataSource,
+    @inject(Tokens.ReviewDataSource)
+    private reviewDataSource: ReviewDataSource
   ) {}
 
   @EventBus(Event.INTERNAL_REVIEW_CREATED)
@@ -62,6 +65,16 @@ export default class InternalReviewMutations {
       if (!reviewsThatCanUpdate.some((item) => item.id === input.id)) {
         throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
       }
+    }
+
+    const technicalReviewSubmitted = (
+      await this.reviewDataSource.getTechnicalReviewById(
+        input.technicalReviewId
+      )
+    )?.submitted;
+
+    if (technicalReviewSubmitted) {
+      throw new GraphQLError('NOT_ALLOWED');
     }
 
     return await this.internalReviewDataSource.update(agent!, input);

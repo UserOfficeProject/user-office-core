@@ -165,12 +165,15 @@ const ProposalTableInstrumentScientist = ({
   if (statusFilter === undefined || statusFilter === null) {
     statusFilter = isInstrumentScientist ? 2 : 0;
   }
-  const reviewFilterValue =
-    settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
-      ?.settingsValue || 'ME';
+  const reviewFilterValue = isInstrumentScientist
+    ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
+        ?.settingsValue || 'ME'
+    : 'ALL';
   let reviewerFilter = reviewFilter[reviewFilterValue];
   if (!reviewerFilter) {
-    reviewerFilter = ReviewerFilter.ME;
+    reviewerFilter = isInstrumentScientist
+      ? ReviewerFilter.ME
+      : ReviewerFilter.ALL;
   }
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,

@@ -29,12 +29,14 @@ type CreateUpdateInternalReviewProps = {
   close: (internalReviewAdded: InternalReview | null) => void;
   internalReview: InternalReview | null;
   technicalReviewId?: number | null;
+  technicalReviewSubmitted?: boolean;
 };
 
 const CreateUpdateInternalReview = ({
   close,
   internalReview,
   technicalReviewId,
+  technicalReviewSubmitted,
 }: CreateUpdateInternalReviewProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
@@ -167,7 +169,11 @@ const CreateUpdateInternalReview = ({
                 setFieldValue('comment', content);
               }
             }}
-            disabled={isExecutingCall || shouldDisableComment(isSubmitting)}
+            disabled={
+              isExecutingCall ||
+              shouldDisableComment(isSubmitting) ||
+              technicalReviewSubmitted
+            }
           />
 
           <Button
@@ -175,7 +181,11 @@ const CreateUpdateInternalReview = ({
             fullWidth
             className={classes.submit}
             data-cy="submit"
-            disabled={isExecutingCall || shouldDisableComment(isSubmitting)}
+            disabled={
+              isExecutingCall ||
+              shouldDisableComment(isSubmitting) ||
+              technicalReviewSubmitted
+            }
           >
             {isExecutingCall && <UOLoader size={14} />}
             {internalReview ? 'Update' : 'Create'}

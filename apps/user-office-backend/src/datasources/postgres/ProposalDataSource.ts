@@ -538,12 +538,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             'instruments.manager_user_id',
             user.id
           );
-          if (filter?.reviewer === ReviewerFilter.ME) {
-            this.where(
-              'proposal_table_view.technical_review_assignee_id',
-              user.id
-            );
-          }
         }
       })
       .distinct('proposal_table_view.proposal_pk')
@@ -556,6 +550,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
         if (filter?.callId) {
           query.where('proposal_table_view.call_id', filter.callId);
+        }
+        if (filter?.reviewer === ReviewerFilter.ME) {
+          query.where(
+            'proposal_table_view.technical_review_assignee_id',
+            user.id
+          );
         }
         if (filter?.instrumentId) {
           query.where('instruments.instrument_id', filter.instrumentId);

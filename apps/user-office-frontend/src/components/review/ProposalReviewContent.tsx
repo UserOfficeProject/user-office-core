@@ -100,6 +100,7 @@ const ProposalReviewContent = ({
         {!!proposalData.technicalReview && (
           <InternalReviews
             technicalReviewId={proposalData.technicalReview.id}
+            technicalReviewSubmitted={proposalData.technicalReview.submitted}
           />
         )}
         {!!proposalData.instrument && (
