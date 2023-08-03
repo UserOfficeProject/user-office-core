@@ -8,6 +8,7 @@
   },
   "private": true,
   "dependencies": {
+    "@codemirror/lang-html": "^6.4.5",
     "@date-io/luxon": "^2.13.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
@@ -30,6 +31,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/tinymce": "^4.6.5",
     "@types/yup": "^0.29.13",
+    "@uiw/react-codemirror": "^4.21.7",
     "@user-office-software/duo-localisation": "^1.2.0",
     "@user-office-software/duo-validation": "^3.4.7",
     "clsx": "^1.1.1",

@@ -14,7 +14,7 @@ import database from './database';
 import { InternalReviewRecord } from './records';
 
 @injectable()
-export default class PostgresInstrumentDataSource
+export default class PostgresInternalReviewDataSource
   implements InternalReviewDataSource
 {
   constructor(
