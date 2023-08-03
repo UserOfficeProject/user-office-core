@@ -151,7 +151,9 @@ const ProposalTechnicalReview = ({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(result as any)[method].rejection) {
+      const technicalReviewId = (result as any)[method].id;
       setReview({
+        id: technicalReviewId,
         proposalPk: data?.proposalPk,
         timeAllocation: +values.timeAllocation,
         comment: values.comment,

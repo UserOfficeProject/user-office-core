@@ -22,5 +22,5 @@ export interface InternalReviewDataSource {
     technicalReviewId: number
   ): Promise<boolean>;
   isInternalReviewer(userId: number): Promise<boolean>;
-  getRelatedUsersOnInternalReview(id: number): Promise<number[]>;
+  getAllReviewersOnInternalReview(id: number): Promise<number[]>;
 }

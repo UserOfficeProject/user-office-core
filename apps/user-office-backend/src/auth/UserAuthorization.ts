@@ -159,8 +159,8 @@ export abstract class UserAuthorization {
       agent.id
     );
 
-    const relatedInternalReviewUsers =
-      await this.internalReviewDataSource.getRelatedUsersOnInternalReview(
+    const allReviewersOnInternalReview =
+      await this.internalReviewDataSource.getAllReviewersOnInternalReview(
         agent.id
       );
 
@@ -169,7 +169,7 @@ export abstract class UserAuthorization {
       ...ids.filter((id) => relatedProposalUsers.includes(id)),
       ...ids.filter((id) => relatedVisitorUsers.includes(id)),
       ...ids.filter((id) => relatedSepUsers.includes(id)),
-      ...ids.filter((id) => relatedInternalReviewUsers.includes(id)),
+      ...ids.filter((id) => allReviewersOnInternalReview.includes(id)),
     ];
 
     return availableUsers;

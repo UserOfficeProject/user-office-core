@@ -126,7 +126,7 @@ export class InternalReviewDataSourceMock implements InternalReviewDataSource {
     return true;
   }
 
-  async getRelatedUsersOnInternalReview(id: number) {
+  async getAllReviewersOnInternalReview(id: number) {
     return [1, 2];
   }
 }

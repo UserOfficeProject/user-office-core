@@ -170,7 +170,7 @@ export default class PostgresInternalReviewDataSource
     return record !== undefined;
   }
 
-  async getRelatedUsersOnInternalReview(id: number): Promise<number[]> {
+  async getAllReviewersOnInternalReview(id: number): Promise<number[]> {
     const internalReviewsTheReviewerIsPartOf = await this.getInternalReviews({
       reviewerId: id,
     });

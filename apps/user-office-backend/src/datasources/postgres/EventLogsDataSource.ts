@@ -66,6 +66,7 @@ export default class PostgresEventLogsDataSource
       .select('*')
       .from('event_logs')
       .whereRaw(whereRawQuery)
+      .orderBy('event_tstamp', 'asc')
       .then((eventLogs: EventLogRecord[]) => {
         return eventLogs.map((eventLog) => this.createEventLogObject(eventLog));
       });

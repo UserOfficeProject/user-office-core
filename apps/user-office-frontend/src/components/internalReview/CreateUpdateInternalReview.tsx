@@ -64,9 +64,9 @@ const CreateUpdateInternalReview = ({
         reviewerId: null,
       };
 
-  const shouldDisableComment = (isSubmitting: boolean) =>
-    isSubmitting ||
-    (isInternalReviewer && user.id !== internalReview?.reviewerId);
+  const formDisabled =
+    (isInternalReviewer && user.id !== internalReview?.reviewerId) ||
+    (isInternalReviewer && technicalReviewSubmitted);
 
   return (
     <Formik
@@ -115,34 +115,73 @@ const CreateUpdateInternalReview = ({
       {({ isSubmitting, setFieldValue }) => (
         <Form>
           <Typography variant="h6" component="h1">
-            {internalReview ? 'Update ' : 'Create new internal review'}
+            {internalReview
+              ? isInternalReviewer
+                ? `Internal review`
+                : 'Update'
+              : 'Create new internal review'}
           </Typography>
-          <Field
-            name="title"
-            id="title"
-            label="Title"
-            type="text"
-            component={TextField}
-            fullWidth
-            data-cy="title"
-            disabled={isExecutingCall || isSubmitting || isInternalReviewer}
-            required
-          />
 
-          <FormikUIAutocomplete
-            name="reviewerId"
-            label="Internal reviewer"
-            noOptionsText="No one"
-            items={usersData.users.map((user) => ({
-              text: getFullUserName(user),
-              value: user.id,
-            }))}
-            InputProps={{
-              'data-cy': 'internal-reviewer',
-            }}
-            required
-            disabled={isExecutingCall || isSubmitting || isInternalReviewer}
-          />
+          {!isInternalReviewer ? (
+            <Field
+              name="title"
+              id="title"
+              label="Title"
+              type="text"
+              component={TextField}
+              fullWidth
+              data-cy="title"
+              disabled={isExecutingCall || isSubmitting}
+              required
+            />
+          ) : (
+            <>
+              <InputLabel
+                htmlFor="internal_review_comment"
+                shrink
+                className={classes.comment}
+              >
+                Title
+              </InputLabel>
+
+              <Typography variant="body1" gutterBottom>
+                {internalReview?.title}
+              </Typography>
+            </>
+          )}
+
+          {!isInternalReviewer ? (
+            <FormikUIAutocomplete
+              name="reviewerId"
+              label="Internal reviewer"
+              noOptionsText="No one"
+              items={usersData.users.map((user) => ({
+                text: getFullUserName(user),
+                value: user.id,
+              }))}
+              InputProps={{
+                'data-cy': 'internal-reviewer',
+              }}
+              required
+              disabled={isExecutingCall || isSubmitting}
+            />
+          ) : (
+            user.id !== internalReview?.reviewerId && (
+              <>
+                <InputLabel
+                  htmlFor="internal_review_comment"
+                  shrink
+                  className={classes.comment}
+                >
+                  Reviewer
+                </InputLabel>
+
+                <Typography variant="body1" gutterBottom>
+                  {getFullUserName(internalReview?.reviewer)}
+                </Typography>
+              </>
+            )
+          )}
 
           <InputLabel
             htmlFor="internal_review_comment"
@@ -169,27 +208,21 @@ const CreateUpdateInternalReview = ({
                 setFieldValue('comment', content);
               }
             }}
-            disabled={
-              isExecutingCall ||
-              shouldDisableComment(isSubmitting) ||
-              technicalReviewSubmitted
-            }
+            disabled={isSubmitting || isExecutingCall || formDisabled}
           />
 
-          <Button
-            type="submit"
-            fullWidth
-            className={classes.submit}
-            data-cy="submit"
-            disabled={
-              isExecutingCall ||
-              shouldDisableComment(isSubmitting) ||
-              technicalReviewSubmitted
-            }
-          >
-            {isExecutingCall && <UOLoader size={14} />}
-            {internalReview ? 'Update' : 'Create'}
-          </Button>
+          {(!isInternalReviewer || user.id === internalReview?.reviewerId) && (
+            <Button
+              type="submit"
+              fullWidth
+              className={classes.submit}
+              data-cy="submit"
+              disabled={isSubmitting || isExecutingCall || formDisabled}
+            >
+              {isExecutingCall && <UOLoader size={14} />}
+              {internalReview ? 'Update' : 'Create'}
+            </Button>
+          )}
         </Form>
       )}
     </Formik>
