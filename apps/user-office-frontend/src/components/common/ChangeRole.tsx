@@ -13,7 +13,8 @@ type ChangeRouteStateProps = {
 const ChangeRole = (props: RouteComponentProps) => {
   const { handleNewToken } = useContext(UserContext);
   const history = useHistory();
-  const { newToken } = props.history.location.state as ChangeRouteStateProps;
+  const newToken = (props.history.location.state as ChangeRouteStateProps)
+    ?.newToken;
 
   useEffect(() => {
     if (newToken) {
