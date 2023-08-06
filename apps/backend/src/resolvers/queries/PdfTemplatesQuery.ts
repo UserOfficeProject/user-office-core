@@ -23,6 +23,12 @@ class PdfTemplatesFilter {
   @Field(() => String, { nullable: true })
   public pdfTemplateData?: string;
 
+  @Field(() => String, { nullable: true })
+  public pdfTemplateHeader?: string;
+
+  @Field(() => String, { nullable: true })
+  public pdfTemplateFooter?: string;
+
   @Field(() => Int, { nullable: true })
   public creatorId?: number;
 }

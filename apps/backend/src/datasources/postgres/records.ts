@@ -64,6 +64,8 @@ declare module 'knex/types/tables' {
     readonly pdf_template_id: number;
     readonly template_id: number;
     readonly template_data: string;
+    readonly template_header: string;
+    readonly template_footer: string;
     readonly creator_id: number;
     readonly created_at: Date;
   }
@@ -288,6 +290,17 @@ export interface TechnicalReviewRecord {
   readonly reviewer_id: number;
   readonly files: string;
   readonly technical_review_assignee_id: number | null;
+}
+
+export interface InternalReviewRecord {
+  readonly internal_review_id: number;
+  readonly title: string;
+  readonly comment: string;
+  readonly reviewer_id: number;
+  readonly technical_review_id: number;
+  readonly files: string;
+  readonly created_at: Date;
+  readonly assigned_by: number;
 }
 
 export interface CallRecord {
@@ -1190,6 +1203,8 @@ export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
     pdfTemplate.pdf_template_id,
     pdfTemplate.template_id,
     pdfTemplate.template_data,
+    pdfTemplate.template_header,
+    pdfTemplate.template_footer,
     pdfTemplate.creator_id,
     pdfTemplate.created_at
   );

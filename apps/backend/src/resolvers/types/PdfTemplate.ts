@@ -13,6 +13,12 @@ export class PdfTemplate implements Partial<PdfTemplateOrigin> {
   @Field()
   public templateData: string;
 
+  @Field()
+  public templateHeader: string;
+
+  @Field()
+  public templateFooter: string;
+
   @Field(() => Int)
   public creatorId: number;
 

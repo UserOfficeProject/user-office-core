@@ -13,6 +13,8 @@ const dummyPdfTemplateFactory = (values?: Partial<PdfTemplate>) => {
     values?.pdfTemplateId || 1,
     values?.templateId || 1,
     values?.templateData || '...',
+    values?.templateHeader || '...',
+    values?.templateFooter || '...',
     values?.creatorId || 1,
     values?.created || new Date()
   );
@@ -54,11 +56,15 @@ export class PdfTemplateDataSourceMock implements PdfTemplateDataSource {
   async createPdfTemplate({
     templateId,
     templateData,
+    templateHeader,
+    templateFooter,
     creatorId,
   }: CreatePdfTemplateInputWithCreator): Promise<PdfTemplate> {
     dummyPdfTemplate = dummyPdfTemplateFactory({
       templateId,
       templateData,
+      templateHeader,
+      templateFooter,
       creatorId,
     });
 
