@@ -1,0 +1,16 @@
+query getInternalReviews($filter: InternalReviewsFilter) {
+  internalReviews(filter: $filter) {
+    id
+    title
+    comment
+    files
+    createdAt
+    assignedByUser {
+      ...basicUserDetails
+    }
+    reviewerId
+    reviewer {
+      ...basicUserDetails
+    }
+  }
+}
