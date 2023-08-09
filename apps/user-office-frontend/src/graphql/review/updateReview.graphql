@@ -1,6 +1,6 @@
 mutation updateReview(
   $reviewID: Int!
-  $grade: Int!
+  $grade: Float!
   $comment: String!
   $status: ReviewStatus!
   $sepID: Int!

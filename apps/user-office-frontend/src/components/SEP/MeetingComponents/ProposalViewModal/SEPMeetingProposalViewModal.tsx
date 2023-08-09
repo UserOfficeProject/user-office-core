@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
@@ -89,6 +90,7 @@ const SEPMeetingProposalViewModal = ({
   };
 
   const sepTimeAllocation = SEPProposalData?.sepTimeAllocation ?? null;
+  const { t } = useTranslation();
 
   return (
     <>
@@ -111,8 +113,8 @@ const SEPMeetingProposalViewModal = ({
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              SEP Meeting Components - Proposal View: {proposalData?.title} (
-              {proposalData?.proposalId})
+              {t('SEP')} Meeting Components - Proposal View:{' '}
+              {proposalData?.title} ({proposalData?.proposalId})
             </Typography>
           </Toolbar>
         </AppBar>
