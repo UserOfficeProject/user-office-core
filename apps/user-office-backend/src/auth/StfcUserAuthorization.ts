@@ -244,6 +244,9 @@ export class StfcUserAuthorization extends UserAuthorization {
 
         return await client
           .logout(token)
+          .then(() => {
+            return 'Successfully logged out user';
+          })
           .catch((ex: string): Rejection | string => {
             if (ex === 'The token given is invalid') {
               logger.logInfo(
