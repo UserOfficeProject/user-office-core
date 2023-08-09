@@ -63,8 +63,8 @@ export interface ProposalDataSource {
   deleteProposal(primaryKey: number): Promise<Proposal>;
   markEventAsDoneOnProposal(
     event: Event,
-    proposalPk: number
-  ): Promise<ProposalEventsRecord | null>;
+    proposalPk: number[]
+  ): Promise<ProposalEventsRecord[] | null>;
   getCount(callId: number): Promise<number>;
   cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
   resetProposalEvents(

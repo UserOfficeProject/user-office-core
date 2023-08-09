@@ -342,15 +342,10 @@ export async function createListenToRabbitMQHandler() {
     if (!proposalPk) {
       throw new Error('Proposal id not found in the message');
     }
-    const proposal = await proposalDataSource.get(proposalPk);
-
-    if (!proposal) {
-      throw new Error(`Proposal with id ${proposalPk} not found`);
-    }
 
     const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
       eventType,
-      proposal
+      [proposalPk]
     );
 
     if (updatedProposals) {
