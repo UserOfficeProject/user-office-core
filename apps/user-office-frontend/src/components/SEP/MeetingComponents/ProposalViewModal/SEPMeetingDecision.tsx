@@ -5,6 +5,7 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Maybe, Sep, SepMeetingDecision } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
@@ -28,6 +29,7 @@ const SEPMeetingDecision = ({
   sep,
 }: SEPMeetingDecisionProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <div data-cy="SEP-meeting-components-decision">
@@ -38,7 +40,7 @@ const SEPMeetingDecision = ({
           className={classes.heading}
           gutterBottom
         >
-          {sep?.code} - SEP Meeting decision
+          {sep?.code} - {`${t('SEP')} Meeting decision`}
         </Typography>
         <Table>
           <TableBody>
@@ -50,7 +52,7 @@ const SEPMeetingDecision = ({
                 {sepMeetingDecision?.rankOrder || '-'}
               </TableCell>
               <TableCell width="25%" className={classes.textBold}>
-                SEP meeting recommendation
+                {`${t('SEP')} meeting recommendation`}
               </TableCell>
               <TableCell width="25%">
                 {sepMeetingDecision?.recommendation || '-'}

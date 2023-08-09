@@ -82,6 +82,23 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
+  async getTechnicalReviewById(technicalReviewId: number) {
+    const technicalReview = database
+      .select()
+      .from('technical_review')
+      .where('technical_review_id', technicalReviewId)
+      .first()
+      .then((review: TechnicalReviewRecord) => {
+        if (review === undefined) {
+          return null;
+        }
+
+        return createTechnicalReviewObject(review);
+      });
+
+    return technicalReview;
+  }
+
   async getReview(id: number): Promise<Review | null> {
     return database
       .select()
