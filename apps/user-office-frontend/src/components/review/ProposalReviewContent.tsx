@@ -24,6 +24,7 @@ import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
 import { StyledPaper } from 'styles/StyledComponents';
 
+import InternalReviews from '../internalReview/InternalReviews';
 import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
@@ -93,6 +94,11 @@ const ProposalReviewContent = ({
     isUserOfficer ||
     proposalData.technicalReview?.technicalReviewAssigneeId === user.id ? (
       <>
+        {!!proposalData.technicalReview && (
+          <InternalReviews
+            technicalReviewId={proposalData.technicalReview.id}
+          />
+        )}
         {!!proposalData.instrument && (
           <ProposalTechnicalReviewerAssignment
             proposalData={proposalData}

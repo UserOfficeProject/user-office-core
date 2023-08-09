@@ -63,6 +63,9 @@ export enum Event {
   PREDEFINED_MESSAGE_CREATED = 'PREDEFINED_MESSAGE_CREATED',
   PREDEFINED_MESSAGE_UPDATED = 'PREDEFINED_MESSAGE_UPDATED',
   PREDEFINED_MESSAGE_DELETED = 'PREDEFINED_MESSAGE_DELETED',
+  INTERNAL_REVIEW_CREATED = 'INTERNAL_REVIEW_CREATED',
+  INTERNAL_REVIEW_UPDATED = 'INTERNAL_REVIEW_UPDATED',
+  INTERNAL_REVIEW_DELETED = 'INTERNAL_REVIEW_DELETED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -255,5 +258,17 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PREDEFINED_MESSAGE_DELETED,
     'Event occurs when predefined message is removed',
+  ],
+  [
+    Event.INTERNAL_REVIEW_CREATED,
+    'Event occurs when internal (technical) review is created',
+  ],
+  [
+    Event.INTERNAL_REVIEW_UPDATED,
+    'Event occurs when internal (technical) review is updated',
+  ],
+  [
+    Event.INTERNAL_REVIEW_DELETED,
+    'Event occurs when internal (technical) review is removed',
   ],
 ]);

@@ -1,0 +1,5 @@
+mutation deleteInternalReview($input: DeleteInternalReviewInput!) {
+  deleteInternalReview(deleteInternalReviewInput: $input) {
+    id
+  }
+}
