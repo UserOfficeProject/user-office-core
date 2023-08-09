@@ -108,6 +108,10 @@ async function enableDefaultStfcFeatures() {
     settingsId: SettingsId.IDLE_TIMEOUT,
     settingsValue: '1200000',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.GRADE_PRECISION,
+    settingsValue: '0.01',
+  });
 }
 
 async function setSTFCRoleNames() {
