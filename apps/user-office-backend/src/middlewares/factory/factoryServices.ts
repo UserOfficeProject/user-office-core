@@ -75,17 +75,14 @@ export default class FactoryServices implements DownloadTypeServices {
     proposalPks: number[],
     options: DownloadOptions | undefined
   ): Promise<ProposalAttachmentData[] | null> {
-    let data = null;
     if (agent && options) {
-      data = await Promise.all(
+      return await Promise.all(
         proposalPks.map((proposalPk) => {
           return collectProposalAttachmentData(proposalPk, agent, options);
         })
       );
-    } else {
-      return null;
     }
 
-    return data;
+    return null;
   }
 }

@@ -31,6 +31,10 @@ export type ProposalAttachmentData = {
   attachments: Attachment[];
 };
 
+type GetTemplates = (filter: {
+  questionIds: string[];
+}) => Promise<Question[] | null>;
+
 const addProposalAttachments = (
   proposalAttachmentData: ProposalAttachmentData,
   questionarySteps: QuestionaryStep[],
@@ -39,7 +43,7 @@ const addProposalAttachments = (
   const updatedProposalAttachmentData = { ...proposalAttachmentData };
   for (const step of questionarySteps) {
     if (!step) {
-      logger.logError('step not found', { ...questionarySteps }); // TODO: fix type of the second param in the lib (don't use Record<string, unknown>)
+      logger.logError('step not found', { ...questionarySteps });
 
       throw 'Could not download generated PDF';
     }
@@ -70,9 +74,7 @@ const addProposalAttachments = (
   return updatedProposalAttachmentData;
 };
 const getQuestionIdsData = async (
-  getTemplates: (filter: {
-    questionIds: string[];
-  }) => Promise<Question[] | null>,
+  getTemplates: GetTemplates,
   questionIds?: string[]
 ): Promise<string[]> => {
   if (!questionIds) {
@@ -81,7 +83,7 @@ const getQuestionIdsData = async (
   const questionIdsData = await getTemplates({
     questionIds,
   }).then((questions) => {
-    if (questions == null) {
+    if (!questions) {
       throw new Error('Could not fetch questions');
     }
 
