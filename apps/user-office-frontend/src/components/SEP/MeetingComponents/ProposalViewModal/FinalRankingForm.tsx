@@ -12,6 +12,7 @@ import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -54,6 +55,7 @@ const FinalRankingForm = ({
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
+  const { t } = useTranslation();
 
   const initialData = {
     proposalPk: proposalData.primaryKey,
@@ -98,7 +100,7 @@ const FinalRankingForm = ({
     };
 
     await api({
-      toastSuccessMessage: `SEP meeting decision ${
+      toastSuccessMessage: `${t('SEP')} meeting decision ${
         shouldSubmitMeetingDecision ? 'submitted' : 'saved'
       } successfully!`,
     }).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
@@ -141,7 +143,9 @@ const FinalRankingForm = ({
                   {
                     title: 'Please confirm',
                     description:
-                      'I am aware that no further changes to the sep meeting are possible after submission.',
+                      'I am aware that no further changes to the ' +
+                      t('SEP') +
+                      ' meeting are possible after submission.',
                   }
                 )();
               } else {
@@ -160,7 +164,7 @@ const FinalRankingForm = ({
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
-                SEP Meeting form
+                {t('SEP')} Meeting form
               </Typography>
               <Grid container spacing={3}>
                 <Grid item sm={6} xs={12}>
