@@ -2023,4 +2023,66 @@ context('SEP meeting components tests', () => {
       cy.notification({ variant: 'success', text: 'Updated' });
     });
   });
+
+  it('SEP Reviewer should be able to give non integer review', () => {
+    cy.login(initialDBData.users.officer);
+    cy.visit('/');
+    cy.finishedLoading();
+
+    cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
+    cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();
+
+    cy.get('[data-cy="settings-table"]')
+      .get('input[aria-label="Search"]')
+      .type('GRADE_PRECISION');
+
+    cy.get('[data-cy="settings-table"]')
+      .contains('GRADE_PRECISION')
+      .parent()
+      .find('button[aria-label="Edit"]')
+      .click();
+
+    cy.get('[data-cy="settings-table"]')
+      .contains('GRADE_PRECISION')
+      .parent()
+      .find(`input[value="1"]`)
+      .clear()
+      .type('0.01');
+
+    cy.get('[data-cy="settings-table"]')
+      .contains('GRADE_PRECISION')
+      .parent()
+      .find('button[aria-label="Save"]')
+      .click();
+
+    cy.logout();
+
+    cy.login(sepMembers.reviewer);
+    cy.visit('/');
+    cy.finishedLoading();
+
+    cy.get('[data-cy="grade-proposal-icon"]').click();
+
+    cy.setTinyMceContent('comment', faker.lorem.words(3));
+    cy.get('#grade-proposal').type('0.001');
+
+    cy.get('[data-cy="save-grade"]').click();
+
+    cy.contains('Lowest grade is 1');
+
+    cy.get('#grade-proposal').clear().type('1.001');
+
+    cy.get('[data-cy="save-grade"]').click();
+
+    cy.get('[data-cy="grade-proposal"] input').then(($input) => {
+      expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
+        'Please enter a valid value. The two nearest valid values are 1 and 1.01.'
+      );
+    });
+
+    cy.get('#grade-proposal').clear().type('1.01');
+
+    cy.get('[data-cy=save-grade]').click();
+    cy.notification({ variant: 'success', text: 'Updated' });
+  });
 });
