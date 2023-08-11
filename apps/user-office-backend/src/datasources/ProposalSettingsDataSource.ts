@@ -1,4 +1,5 @@
 import { ProposalStatus } from '../models/ProposalStatus';
+import { ProposalStatusAction } from '../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
@@ -43,6 +44,10 @@ export interface ProposalSettingsDataSource {
       sortOrder,
     }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]>;
+  getStatusActionsByConnectionId(
+    proposalWorkflowConnectionId: number,
+    proposalWorkflowId: number
+  ): Promise<ProposalStatusAction[]>;
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection>;

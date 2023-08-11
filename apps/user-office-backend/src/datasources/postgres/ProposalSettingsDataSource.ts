@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 
 import { ProposalStatus } from '../../models/ProposalStatus';
+import { ProposalStatusAction } from '../../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
@@ -17,6 +18,8 @@ import {
   ProposalStatusRecord,
   ProposalWorkflowConnectionRecord,
   ProposalWorkflowRecord,
+  ProposalStatusActionRecord,
+  ProposalWorkflowConnectionHasActionsRecord,
 } from './records';
 
 export default class PostgresProposalSettingsDataSource
@@ -539,5 +542,47 @@ export default class PostgresProposalSettingsDataSource
           this.createStatusChangingEventObject(statusChangingEvent)
         );
       });
+  }
+
+  private createProposalStatusActionObject(
+    proposalActionStatusRecord: ProposalStatusActionRecord &
+      ProposalWorkflowConnectionHasActionsRecord
+  ) {
+    return new ProposalStatusAction(
+      proposalActionStatusRecord.proposal_status_action_id,
+      proposalActionStatusRecord.name,
+      proposalActionStatusRecord.default_config,
+      proposalActionStatusRecord.type,
+      proposalActionStatusRecord.executed,
+      proposalActionStatusRecord.config
+    );
+  }
+
+  async getStatusActionsByConnectionId(
+    proposalWorkflowConnectionId: number,
+    proposalWorkflowId: number
+  ): Promise<ProposalStatusAction[]> {
+    const proposalActionStatusRecords: (ProposalStatusActionRecord &
+      ProposalWorkflowConnectionHasActionsRecord)[] = await database
+      .select()
+      .from('proposal_status_actions as psa')
+      .join('proposal_workflow_connection_has_actions as pwca', {
+        'pwca.action_id': 'psa.proposal_status_action_id',
+      })
+      .where('pwca.workflow_id', proposalWorkflowId)
+      .andWhere('pwca.connection_id', proposalWorkflowConnectionId);
+
+    if (!proposalActionStatusRecords?.length) {
+      throw new GraphQLError(
+        `Could not find proposal status action with connection_id: ${proposalWorkflowConnectionId}`
+      );
+    }
+
+    const proposalStatusActions = proposalActionStatusRecords.map(
+      (proposalActionStatusRecord) =>
+        this.createProposalStatusActionObject(proposalActionStatusRecord)
+    );
+
+    return proposalStatusActions;
   }
 }

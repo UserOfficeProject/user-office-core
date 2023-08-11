@@ -7,7 +7,7 @@ BEGIN
 				proposal_status_action_id serial UNIQUE,
 				name VARCHAR(64) NOT NULL,
 				default_config jsonb,
-				type VARCHAR(512) NOT NULL,
+				type VARCHAR(512) NOT NULL
 			);
     END;
 	END IF;
