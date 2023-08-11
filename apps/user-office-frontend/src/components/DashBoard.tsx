@@ -356,7 +356,7 @@ const Dashboard = () => {
           {isSEPEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title="SEP"
+              title={t('SEP')}
               path="/SEPPage/:id"
               component={SEPPage}
             />
@@ -364,7 +364,7 @@ const Dashboard = () => {
           {isSEPEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title="SEPs"
+              title={i18n.format(t('SEP'), 'plural')}
               path="/SEPs"
               component={SEPsPage}
             />

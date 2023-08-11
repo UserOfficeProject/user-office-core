@@ -93,6 +93,10 @@ async function enableDefaultEssFeatures() {
     settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
     settingsValue: 'FEASIBILITY_REVIEW',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.GRADE_PRECISION,
+    settingsValue: '1',
+  });
 }
 
 export async function configureESSDevelopmentEnvironment() {

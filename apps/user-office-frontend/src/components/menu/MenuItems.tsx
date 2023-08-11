@@ -286,12 +286,14 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         </Tooltip>
       )}
       {isSEPEnabled && (
-        <Tooltip title="Scientific evaluation panels">
+        <Tooltip
+          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+        >
           <ListItem component={NavLink} to="/SEPs" button>
             <ListItemIcon>
               <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary="SEPs" />
+            <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
           </ListItem>
         </Tooltip>
       )}
@@ -339,8 +341,10 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <Tooltip title="Scientific evaluation panels">
-          <ListItemText primary="SEPs" />
+        <Tooltip
+          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+        >
+          <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
         </Tooltip>
       </ListItem>
     </div>

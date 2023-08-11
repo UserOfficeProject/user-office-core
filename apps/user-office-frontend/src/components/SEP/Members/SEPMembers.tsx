@@ -10,6 +10,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import React, { useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { useCheckAccess } from 'components/common/Can';
@@ -57,6 +58,7 @@ const SEPMembers = ({
   const [sepChairModalOpen, setSepChairModalOpen] = useState(false);
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
   const { user } = useContext(UserContext);
+  const { t } = useTranslation();
   const { setRenewTokenValue } = useRenewToken();
   const { loadingMembers, SEPReviewersData, setSEPReviewersData } =
     useSEPReviewersData(
@@ -77,7 +79,7 @@ const SEPMembers = ({
     const [sepChair] = value;
 
     await api({
-      toastSuccessMessage: 'SEP chair assigned successfully!',
+      toastSuccessMessage: t('SEP') + ' chair assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepData.id,
@@ -105,7 +107,7 @@ const SEPMembers = ({
     const [sepSecretary] = value;
 
     await api({
-      toastSuccessMessage: 'SEP secretary assigned successfully!',
+      toastSuccessMessage: t('SEP') + ' secretary assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepData.id,
@@ -129,7 +131,7 @@ const SEPMembers = ({
 
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     await api({
-      toastSuccessMessage: 'SEP member assigned successfully!',
+      toastSuccessMessage: t('SEP') + ' member assigned successfully!',
     }).assignReviewersToSEP({
       memberIds: users.map((user) => user.id),
       sepId: sepData.id,
@@ -147,7 +149,7 @@ const SEPMembers = ({
     user: BasicUserDetailsWithRole
   ): Promise<void> => {
     await api({
-      toastSuccessMessage: 'SEP member removed successfully!',
+      toastSuccessMessage: t('SEP') + ' member removed successfully!',
     }).removeMemberFromSep({
       memberId: user.id,
       sepId: sepData.id,
@@ -180,10 +182,10 @@ const SEPMembers = ({
         });
       },
       {
-        title: 'Remove SEP member',
+        title: 'Remove ' + t('SEP') + ' member',
         description: `Are you sure you want to remove ${getFullUserName(
           memberToRemove
-        )} from this SEP?`,
+        )} from this ${t('SEP')}?`,
       }
     )();
   };
@@ -220,7 +222,7 @@ const SEPMembers = ({
         close={(): void => setSepChairModalOpen(false)}
         addParticipants={sendSEPChairUpdate}
         selectedUsers={alreadySelectedMembers}
-        title={'SEP Chair'}
+        title={`${t('SEP')} Chair`}
         invitationUserRole={UserRole.SEP_CHAIR}
         userRole={UserRole.SEP_REVIEWER}
       />
@@ -229,19 +231,19 @@ const SEPMembers = ({
         close={(): void => setSepSecretaryModalOpen(false)}
         addParticipants={sendSEPSecretaryUpdate}
         selectedUsers={alreadySelectedMembers}
-        title={'SEP Secretary'}
+        title={`${t('SEP')} Secretary`}
         invitationUserRole={UserRole.SEP_SECRETARY}
         userRole={UserRole.SEP_REVIEWER}
       />
       <Typography variant="h6" component="h2" gutterBottom>
-        SEP Members
+        {`${t('SEP')} Members`}
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>
           <TextField
             name="SEPChair"
             id="SEPChair"
-            label="SEP Chair"
+            label={`${t('SEP')} Chair`}
             type="text"
             value={getFullUserName(sepData.sepChair)}
             margin="none"
@@ -253,7 +255,7 @@ const SEPMembers = ({
               endAdornment: isUserOfficer && (
                 <>
                   {sepData.sepChair && (
-                    <Tooltip title="Remove SEP Chair">
+                    <Tooltip title={'Remove ' + t('SEP') + ' Chair'}>
                       <IconButton
                         aria-label="Remove SEP chair"
                         onClick={() =>
@@ -264,7 +266,7 @@ const SEPMembers = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title="Set SEP Chair">
+                  <Tooltip title={'Set ' + t('SEP') + ' Chair'}>
                     <IconButton
                       edge="start"
                       onClick={() => setSepChairModalOpen(true)}
@@ -294,7 +296,7 @@ const SEPMembers = ({
           <TextField
             name="SEPSecretary"
             id="SEPSecretary"
-            label="SEP Secretary"
+            label={`${t('SEP')} Secretary`}
             type="text"
             value={getFullUserName(sepData.sepSecretary)}
             margin="none"
@@ -306,7 +308,7 @@ const SEPMembers = ({
               endAdornment: isUserOfficer && (
                 <>
                   {sepData.sepSecretary && (
-                    <Tooltip title="Remove SEP Secretary">
+                    <Tooltip title={'Remove ' + t('SEP') + ' Secretary'}>
                       <IconButton
                         aria-label="Remove SEP secretary"
                         onClick={() =>
@@ -317,7 +319,7 @@ const SEPMembers = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title="Set SEP Secretary">
+                  <Tooltip title={'Set ' + t('SEP') + ' Secretary'}>
                     <IconButton
                       edge="start"
                       onClick={() => setSepSecretaryModalOpen(true)}
