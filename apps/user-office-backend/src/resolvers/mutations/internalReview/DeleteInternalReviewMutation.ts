@@ -16,6 +16,9 @@ import { InternalReview } from '../../types/InternalReview';
 export class DeleteInternalReviewInput implements Partial<InternalReviewModel> {
   @Field(() => Int)
   public id: number;
+
+  @Field(() => Int)
+  public technicalReviewId: number;
 }
 
 @Resolver()

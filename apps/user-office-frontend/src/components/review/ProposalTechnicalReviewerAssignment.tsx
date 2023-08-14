@@ -35,6 +35,7 @@ const ProposalTechnicalReviewerAssignment = ({
   const classes = useStyles();
   const [showReassign, setShowReassign] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
 
   return (
     <Paper
@@ -67,6 +68,7 @@ const ProposalTechnicalReviewerAssignment = ({
             onClick={() => setShowReassign(true)}
             variant="text"
             data-cy="re-assign"
+            disabled={isInternalReviewer}
           >
             Re-assign...
           </Button>
