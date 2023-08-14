@@ -28,6 +28,7 @@ function AssignTechnicalReview({
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
 
   const [selectedUser, setSelectedUser] = useState(
     proposal.technicalReview?.technicalReviewAssigneeId
@@ -63,7 +64,10 @@ function AssignTechnicalReview({
           value={userIdToUser(selectedUser)}
           disableClearable
           data-cy="user-list"
-          disabled={!isUserOfficer && proposal.technicalReview?.submitted}
+          disabled={
+            (!isUserOfficer && proposal.technicalReview?.submitted) ||
+            isInternalReviewer
+          }
           ListboxProps={{ title: 'user-list-options' }}
         />
       </Grid>
@@ -110,7 +114,10 @@ function AssignTechnicalReview({
           variant="contained"
           color="primary"
           className={classes.submitButton}
-          disabled={!isUserOfficer && proposal.technicalReview?.submitted}
+          disabled={
+            (!isUserOfficer && proposal.technicalReview?.submitted) ||
+            isInternalReviewer
+          }
         >
           Assign
         </Button>

@@ -23,6 +23,7 @@ import {
   CoreTechnicalReviewFragment,
   UserRole,
   Proposal,
+  AddTechnicalReviewMutation,
 } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -63,6 +64,7 @@ const ProposalTechnicalReview = ({
   const classes = useStyles();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { user } = useContext(UserContext);
   const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
 
@@ -150,7 +152,15 @@ const ProposalTechnicalReview = ({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(result as any)[method].rejection) {
+      let technicalReviewId = null;
+
+      if (method === 'addTechnicalReview') {
+        technicalReviewId = (result as AddTechnicalReviewMutation)
+          .addTechnicalReview.id;
+      }
+
       setReview({
+        id: technicalReviewId,
         proposalPk: data?.proposalPk,
         timeAllocation: +values.timeAllocation,
         comment: values.comment,
@@ -162,7 +172,7 @@ const ProposalTechnicalReview = ({
   };
 
   const shouldDisableForm = (isSubmitting: boolean) =>
-    (isSubmitting || data?.submitted) && !isUserOfficer;
+    ((isSubmitting || data?.submitted) && !isUserOfficer) || isInternalReviewer;
 
   return (
     <>
@@ -376,7 +386,9 @@ const ProposalTechnicalReview = ({
                   </Button>
                   {!isUserOfficer && (
                     <Button
-                      disabled={isSubmitting || data?.submitted}
+                      disabled={
+                        isSubmitting || data?.submitted || isInternalReviewer
+                      }
                       type="submit"
                       className={classes.submitButton}
                       onClick={() => setShouldSubmit(true)}
