@@ -19,7 +19,7 @@ const columns = [
 ];
 
 const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
-  const { currentRole, token, handleNewToken } = useContext(UserContext);
+  const { currentRole, token } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
   const history = useHistory();
@@ -64,13 +64,8 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
       selectedRoleId: role.id,
     });
 
-    history.push('/');
-
-    setTimeout(() => {
-      handleNewToken(newToken);
-
-      onClose();
-    }, 500);
+    history.push('/changeRole', { newToken });
+    onClose();
   };
 
   const RoleAction = (rowData: Role) => (

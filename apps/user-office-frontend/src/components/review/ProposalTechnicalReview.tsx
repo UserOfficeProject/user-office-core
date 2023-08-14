@@ -23,6 +23,7 @@ import {
   CoreTechnicalReviewFragment,
   UserRole,
   Proposal,
+  AddTechnicalReviewMutation,
 } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -151,7 +152,15 @@ const ProposalTechnicalReview = ({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(result as any)[method].rejection) {
+      let technicalReviewId = null;
+
+      if (method === 'addTechnicalReview') {
+        technicalReviewId = (result as AddTechnicalReviewMutation)
+          .addTechnicalReview.id;
+      }
+
       setReview({
+        id: technicalReviewId,
         proposalPk: data?.proposalPk,
         timeAllocation: +values.timeAllocation,
         comment: values.comment,

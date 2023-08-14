@@ -10,6 +10,7 @@ import InternalReviewsTable from './InternalReviewsTable';
 
 type InternalReviewsProps = {
   technicalReviewId: number;
+  technicalReviewSubmitted: boolean;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +19,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const InternalReviews = ({ technicalReviewId }: InternalReviewsProps) => {
+const InternalReviews = ({
+  technicalReviewId,
+  technicalReviewSubmitted,
+}: InternalReviewsProps) => {
   const classes = useStyles();
 
   return (
@@ -39,7 +43,10 @@ const InternalReviews = ({ technicalReviewId }: InternalReviewsProps) => {
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <InternalReviewsTable technicalReviewId={technicalReviewId} />
+        <InternalReviewsTable
+          technicalReviewId={technicalReviewId}
+          technicalReviewSubmitted={technicalReviewSubmitted}
+        />
       </AccordionDetails>
     </Accordion>
   );

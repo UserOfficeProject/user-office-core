@@ -34,10 +34,10 @@ BEGIN
             c.allocation_time_unit,
             c.call_id,
             i.instrument_id,
-            ( SELECT round(avg("SEP_Reviews".grade), 1) AS round
+            ( SELECT round(avg("SEP_Reviews".grade)::numeric, 2) AS round
                     FROM "SEP_Reviews"
                     WHERE "SEP_Reviews".proposal_pk = p.proposal_pk) AS average,
-            ( SELECT round(stddev_pop("SEP_Reviews".grade), 1) AS round
+            ( SELECT round(stddev_pop("SEP_Reviews".grade)::numeric, 2) AS round
                     FROM "SEP_Reviews"
                     WHERE "SEP_Reviews".proposal_pk = p.proposal_pk) AS deviation,
             p.submitted

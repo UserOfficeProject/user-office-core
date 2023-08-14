@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { InternalReview, InternalReviewsFilter, UserRole } from 'generated/sdk';
+import { InternalReview, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInternalReviewsData } from 'hooks/review/useInternalReviewData';
 import { tableIcons } from 'utils/materialIcons';
@@ -27,13 +27,21 @@ const columns = [
   },
 ];
 
-const InternalReviewsTable = (filter: InternalReviewsFilter) => {
+type InternalReviewsTableProps = {
+  technicalReviewId: number;
+  technicalReviewSubmitted: boolean;
+};
+
+const InternalReviewsTable = ({
+  technicalReviewId,
+  technicalReviewSubmitted,
+}: InternalReviewsTableProps) => {
   const { api } = useDataApiWithFeedback();
   const {
     loading,
     internalReviews,
     setInternalReviewsWithLoading: setInternalReviews,
-  } = useInternalReviewsData(filter);
+  } = useInternalReviewsData({ technicalReviewId });
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -51,7 +59,8 @@ const InternalReviewsTable = (filter: InternalReviewsFilter) => {
           ? onUpdate(internalReview)
           : onCreate(internalReview)
       }
-      technicalReviewId={filter.technicalReviewId}
+      technicalReviewId={technicalReviewId}
+      technicalReviewSubmitted={technicalReviewSubmitted}
     />
   );
 
@@ -62,7 +71,7 @@ const InternalReviewsTable = (filter: InternalReviewsFilter) => {
       }).deleteInternalReview({
         input: {
           id: id as number,
-          technicalReviewId: filter.technicalReviewId as number,
+          technicalReviewId: technicalReviewId,
         },
       });
 

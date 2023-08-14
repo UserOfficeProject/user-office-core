@@ -2,7 +2,6 @@ import { GraphQLError } from 'graphql';
 import { container, inject, injectable } from 'tsyringe';
 
 import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorization';
-import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InternalReviewDataSource } from '../datasources/InternalReviewDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
@@ -21,35 +20,19 @@ export default class InternalReviewMutations {
   constructor(
     @inject(Tokens.InternalReviewDataSource)
     private internalReviewDataSource: InternalReviewDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource
   ) {}
 
-  async hasAccessRights(agent: UserWithRole | null, technicalReviewId: number) {
-    const technicalReview = await this.reviewDataSource.getTechnicalReviewById(
-      technicalReviewId
-    );
-
-    if (
-      technicalReview &&
-      (this.userAuth.isUserOfficer(agent) ||
-        (await this.userAuth.isInternalReviewerOnTechnicalReview(
-          agent,
-          technicalReviewId
-        )) ||
-        (await this.technicalReviewAuth.hasWriteRights(agent, technicalReview)))
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   @EventBus(Event.INTERNAL_REVIEW_CREATED)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async create(agent: UserWithRole | null, input: CreateInternalReviewInput) {
-    if (!(await this.hasAccessRights(agent, input.technicalReviewId))) {
+    if (
+      !(await this.technicalReviewAuth.hasAccessRightsToInternalReviews(
+        agent,
+        input.technicalReviewId
+      ))
+    ) {
       throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
     }
 
@@ -63,7 +46,12 @@ export default class InternalReviewMutations {
     Roles.INTERNAL_REVIEWER,
   ])
   async update(agent: UserWithRole | null, input: UpdateInternalReviewInput) {
-    if (!(await this.hasAccessRights(agent, input.technicalReviewId))) {
+    if (
+      !(await this.technicalReviewAuth.hasAccessRightsToInternalReviews(
+        agent,
+        input.technicalReviewId
+      ))
+    ) {
       throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
     }
 
@@ -79,13 +67,28 @@ export default class InternalReviewMutations {
       }
     }
 
+    const technicalReviewSubmitted = (
+      await this.reviewDataSource.getTechnicalReviewById(
+        input.technicalReviewId
+      )
+    )?.submitted;
+
+    if (technicalReviewSubmitted) {
+      throw new GraphQLError('NOT_ALLOWED');
+    }
+
     return await this.internalReviewDataSource.update(agent!, input);
   }
 
   @EventBus(Event.INTERNAL_REVIEW_DELETED)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async delete(agent: UserWithRole | null, input: DeleteInternalReviewInput) {
-    if (!(await this.hasAccessRights(agent, input.technicalReviewId))) {
+    if (
+      !(await this.technicalReviewAuth.hasAccessRightsToInternalReviews(
+        agent,
+        input.technicalReviewId
+      ))
+    ) {
       throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
     }
 

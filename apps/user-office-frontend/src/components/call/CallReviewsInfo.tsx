@@ -4,7 +4,9 @@ import useTheme from '@mui/material/styles/useTheme';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
 import { DatePicker } from 'formik-mui-lab';
+import i18n from 'i18n';
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -32,6 +34,7 @@ const CallReviewAndNotification = () => {
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
   const { startReview, startSEPReview } = formik.values;
+  const { t } = useTranslation();
 
   const sepOptions =
     allActiveSeps?.map((sep) => ({
@@ -80,7 +83,7 @@ const CallReviewAndNotification = () => {
         />
         <Field
           name="startSEPReview"
-          label="Start of SEP review"
+          label={'Start of ' + t('SEP') + ' review'}
           id="start-sep-review-input"
           inputFormat={dateFormat}
           mask={mask}
@@ -95,7 +98,7 @@ const CallReviewAndNotification = () => {
         />
         <Field
           name="endSEPReview"
-          label="End of SEP review"
+          label={'End of ' + t('SEP') + ' review'}
           id="end-sep-review-input"
           inputFormat={dateFormat}
           mask={mask}
@@ -112,7 +115,7 @@ const CallReviewAndNotification = () => {
       </LocalizationProvider>
       <FormikUIAutocomplete
         name="seps"
-        label="Call SEPs"
+        label={'Call ' + i18n.format(t('SEP'), 'plural')}
         multiple
         loading={loadingSEPs}
         noOptionsText="No SEPs"
