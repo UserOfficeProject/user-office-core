@@ -7,6 +7,9 @@ import { InternalReview } from '../types/InternalReview';
 export class InternalReviewsFilter {
   @Field(() => Int, { nullable: true })
   public technicalReviewId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public reviewerId?: number;
 }
 
 @Resolver()
