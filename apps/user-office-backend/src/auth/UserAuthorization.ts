@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { InternalReviewDataSource } from '../datasources/InternalReviewDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -21,6 +22,8 @@ export abstract class UserAuthorization {
   protected proposalDataSource: ProposalDataSource = container.resolve(
     Tokens.ProposalDataSource
   );
+  protected internalReviewDataSource: InternalReviewDataSource =
+    container.resolve(Tokens.InternalReviewDataSource);
   protected visitDataSource: VisitDataSource = container.resolve(
     Tokens.VisitDataSource
   );
@@ -79,6 +82,28 @@ export abstract class UserAuthorization {
     );
   }
 
+  async isInternalReviewerOnTechnicalReview(
+    agent: UserWithRole | null,
+    technicalReviewId?: number
+  ): Promise<boolean> {
+    if (!agent || !agent.id || !technicalReviewId) {
+      return false;
+    }
+
+    return this.internalReviewDataSource.isInternalReviewerOnTechnicalReview(
+      agent.id,
+      technicalReviewId
+    );
+  }
+
+  async isInternalReviewer(agent: UserWithRole | null): Promise<boolean> {
+    if (!agent || !agent.id) {
+      return false;
+    }
+
+    return this.internalReviewDataSource.isInternalReviewer(agent.id);
+  }
+
   hasGetAccessByToken(agent: UserWithRole) {
     return !!agent.accessPermissions?.['ProposalQueries.get'];
   }
@@ -108,11 +133,13 @@ export abstract class UserAuthorization {
     const isInstrumentScientist = this.isInstrumentScientist(agent);
     const isSEPMember = await this.isMemberOfSEP(agent);
     const isApiAccessToken = this.isApiToken(agent);
+    const isInternalReviewer = await this.isInternalReviewer(agent);
     if (
       isUserOfficer ||
       isInstrumentScientist ||
       isSEPMember ||
-      isApiAccessToken
+      isApiAccessToken ||
+      isInternalReviewer
     ) {
       return ids;
     }
@@ -132,11 +159,17 @@ export abstract class UserAuthorization {
       agent.id
     );
 
+    const allReviewersOnInternalReview =
+      await this.internalReviewDataSource.getAllReviewersOnInternalReview(
+        agent.id
+      );
+
     const availableUsers = [
       ...self,
       ...ids.filter((id) => relatedProposalUsers.includes(id)),
       ...ids.filter((id) => relatedVisitorUsers.includes(id)),
       ...ids.filter((id) => relatedSepUsers.includes(id)),
+      ...ids.filter((id) => allReviewersOnInternalReview.includes(id)),
     ];
 
     return availableUsers;

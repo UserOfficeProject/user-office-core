@@ -32,7 +32,7 @@ export function useInternalReviewsData(filter: InternalReviewsFilter) {
             return;
           }
 
-          setInternalReviews(data.internalReviews as InternalReview[]);
+          setInternalReviews((data.internalReviews || []) as InternalReview[]);
           setLoading(false);
         });
     }
