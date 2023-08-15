@@ -33,6 +33,7 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from './types/ProposalBooking';
+import { EmailStatusActionRecipients } from './types/ProposalStatusActionConfig';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
@@ -92,5 +93,8 @@ export const registerEnums = () => {
   });
   registerEnumType(QueryMutationAndServicesGroups, {
     name: 'QueryMutationAndServicesGroups',
+  });
+  registerEnumType(EmailStatusActionRecipients, {
+    name: 'EmailStatusActionRecipients',
   });
 };

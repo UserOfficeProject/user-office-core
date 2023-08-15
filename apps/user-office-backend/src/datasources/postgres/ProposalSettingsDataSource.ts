@@ -11,6 +11,7 @@ import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
+import { ProposalStatusActionConfigBase } from '../../resolvers/types/ProposalStatusActionConfig';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
 import {
@@ -546,7 +547,9 @@ export default class PostgresProposalSettingsDataSource
 
   private createProposalStatusActionObject(
     proposalActionStatusRecord: ProposalStatusActionRecord &
-      ProposalWorkflowConnectionHasActionsRecord
+      ProposalWorkflowConnectionHasActionsRecord & {
+        config: ProposalStatusActionConfigBase;
+      }
   ) {
     return new ProposalStatusAction(
       proposalActionStatusRecord.proposal_status_action_id,
@@ -558,12 +561,15 @@ export default class PostgresProposalSettingsDataSource
     );
   }
 
+  // TODO: This might need to be moved to it's own ProposalStatusActionsDataSource.ts file
   async getStatusActionsByConnectionId(
     proposalWorkflowConnectionId: number,
     proposalWorkflowId: number
   ): Promise<ProposalStatusAction[]> {
     const proposalActionStatusRecords: (ProposalStatusActionRecord &
-      ProposalWorkflowConnectionHasActionsRecord)[] = await database
+      ProposalWorkflowConnectionHasActionsRecord & {
+        config: ProposalStatusActionConfigBase;
+      })[] = await database
       .select()
       .from('proposal_status_actions as psa')
       .join('proposal_workflow_connection_has_actions as pwca', {

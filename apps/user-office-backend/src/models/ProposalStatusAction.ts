@@ -1,3 +1,5 @@
+import { ProposalStatusActionConfig } from '../resolvers/types/ProposalStatusActionConfig';
+
 export enum ProposalStatusActionType {
   EMAIL = 'EMAIL',
   RABBITMQ = 'RABBITMQ',
@@ -10,6 +12,6 @@ export class ProposalStatusAction {
     public defaultConfig: string,
     public type: ProposalStatusActionType,
     public executed: boolean,
-    public config: string
+    public config: typeof ProposalStatusActionConfig
   ) {}
 }
