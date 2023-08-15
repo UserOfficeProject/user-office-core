@@ -190,7 +190,6 @@ const GenericTemplateSelectModalOnCopy = ({
                 );
               }}
               loading={isExecutingCall}
-              loadingText={'Please wait loading proposal title(s)'}
             />
 
             <FormControl fullWidth disabled={selectedProposalPk ? false : true}>
