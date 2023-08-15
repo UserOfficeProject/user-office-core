@@ -1,4 +1,4 @@
-import MaterialTable, { Column } from '@material-table/core';
+import MaterialTable, { Action, Column } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -16,6 +16,7 @@ import {
   withDefault,
 } from 'use-query-params';
 
+import { useCheckAccess } from 'components/common/Can';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -34,6 +35,7 @@ import {
   ReviewerFilter,
   SubmitTechnicalReviewInput,
   SettingsId,
+  UserRole,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -155,19 +157,25 @@ const ProposalTableInstrumentScientist = ({
   const { api } = useDataApiWithFeedback();
   const { settingsMap } = useContext(SettingsContext);
   const { t } = useTranslation();
-  const statusFilterValue =
-    settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)?.settingsValue ||
-    2;
+  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
+  const statusFilterValue = isInstrumentScientist
+    ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)
+        ?.settingsValue || 2
+    : 0;
   let statusFilter = proposalStatusFilter[statusFilterValue];
   if (statusFilter === undefined || statusFilter === null) {
-    statusFilter = 2;
+    statusFilter = isInstrumentScientist ? 2 : 0;
   }
-  const reviewFilterValue =
-    settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
-      ?.settingsValue || 'ME';
+  const reviewFilterValue = isInstrumentScientist
+    ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
+        ?.settingsValue || 'ME'
+    : 'ALL';
   let reviewerFilter = reviewFilter[reviewFilterValue];
   if (!reviewerFilter) {
-    reviewerFilter = ReviewerFilter.ME;
+    reviewerFilter = isInstrumentScientist
+      ? ReviewerFilter.ME
+      : ReviewerFilter.ALL;
   }
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
@@ -251,7 +259,9 @@ const ProposalTableInstrumentScientist = ({
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
+    ...(isSEPEnabled && isInstrumentScientist
+      ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN]
+      : []),
   ];
 
   /**
@@ -261,11 +271,11 @@ const ProposalTableInstrumentScientist = ({
   const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
-      rowData.technicalReviewAssigneeId === user.id;
+      isInstrumentScientist && rowData.technicalReviewAssigneeId === user.id;
 
     const showView =
       rowData.technicalReviewSubmitted ||
-      isCurrentUserTechnicalReviewAssignee === false;
+      (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
     return (
       <>
@@ -487,6 +497,24 @@ const ProposalTableInstrumentScientist = ({
       })
   );
 
+  const tableActions: Action<ProposalViewData>[] = [
+    {
+      icon: GetAppIconComponent,
+      tooltip: 'Download proposals',
+      onClick: handleBulkDownloadClick,
+      position: 'toolbarOnSelect',
+    },
+  ];
+
+  if (isInstrumentScientist) {
+    tableActions.push({
+      icon: DoneAllIcon,
+      tooltip: 'Submit proposal reviews',
+      onClick: handleBulkTechnicalReviewsSubmit,
+      position: 'toolbarOnSelect',
+    });
+  }
+
   return (
     <>
       <ProposalReviewModal
@@ -530,22 +558,26 @@ const ProposalTableInstrumentScientist = ({
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>
-      <ReviewerFilterComponent
-        reviewer={urlQueryParams.reviewer}
-        onChange={(reviewer) =>
-          setProposalFilter({ ...proposalFilter, reviewer })
-        }
-      />
-      <ProposalFilterBar
-        calls={{ data: calls, isLoading: loadingCalls }}
-        instruments={{ data: instruments, isLoading: loadingInstruments }}
-        proposalStatuses={{
-          data: proposalStatuses,
-          isLoading: loadingProposalStatuses,
-        }}
-        setProposalFilter={setProposalFilter}
-        filter={proposalFilter}
-      />
+      {isInstrumentScientist && (
+        <>
+          <ReviewerFilterComponent
+            reviewer={urlQueryParams.reviewer}
+            onChange={(reviewer) =>
+              setProposalFilter({ ...proposalFilter, reviewer })
+            }
+          />
+          <ProposalFilterBar
+            calls={{ data: calls, isLoading: loadingCalls }}
+            instruments={{ data: instruments, isLoading: loadingInstruments }}
+            proposalStatuses={{
+              data: proposalStatuses,
+              isLoading: loadingProposalStatuses,
+            }}
+            setProposalFilter={setProposalFilter}
+            filter={proposalFilter}
+          />
+        </>
+      )}
       <MaterialTable
         icons={tableIcons}
         title={'Proposals'}
@@ -572,20 +604,7 @@ const ProposalTableInstrumentScientist = ({
         onChangeColumnHidden={handleColumnHiddenChange}
         onSelectionChange={handleColumnSelectionChange}
         onOrderChange={handleColumnSortOrderChange}
-        actions={[
-          {
-            icon: GetAppIconComponent,
-            tooltip: 'Download proposals',
-            onClick: handleBulkDownloadClick,
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: DoneAllIcon,
-            tooltip: 'Submit proposal reviews',
-            onClick: handleBulkTechnicalReviewsSubmit,
-            position: 'toolbarOnSelect',
-          },
-        ]}
+        actions={tableActions}
       />
     </>
   );
