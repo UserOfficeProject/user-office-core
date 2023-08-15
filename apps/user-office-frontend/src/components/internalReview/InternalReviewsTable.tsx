@@ -71,7 +71,7 @@ const InternalReviewsTable = ({
       }).deleteInternalReview({
         input: {
           id: id as number,
-          technicalReviewId: technicalReviewId,
+          technicalReviewId: technicalReviewId as number,
         },
       });
 
