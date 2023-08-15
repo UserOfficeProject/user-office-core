@@ -255,7 +255,11 @@ context('Institution tests', () => {
 
     cy.get('[data-cy="create-modal"]')
       .find('[data-cy="title"] input')
-      .should('be.disabled');
+      .should('not.exist');
+
+    cy.get('[data-cy="create-modal"]')
+      .find('[data-cy="title"]')
+      .should('have.text', title);
 
     // NOTE: For some reason one click on the update button is not enough. Probably because of tinymce content setting.
     cy.get('[data-cy="create-modal"]').find('[data-cy="submit"]').click();
