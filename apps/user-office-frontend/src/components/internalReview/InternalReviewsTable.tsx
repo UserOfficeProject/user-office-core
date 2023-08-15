@@ -64,14 +64,17 @@ const InternalReviewsTable = ({
     />
   );
 
-  const deleteInternalReview = async (id: string | number) => {
+  const deleteInternalReview = async (
+    id: string | number,
+    reviewId: number
+  ) => {
     try {
       await api({
         toastSuccessMessage: 'Internal review deleted successfully',
       }).deleteInternalReview({
         input: {
           id: id as number,
-          technicalReviewId: technicalReviewId as number,
+          technicalReviewId: reviewId,
         },
       });
 
@@ -99,7 +102,7 @@ const InternalReviewsTable = ({
             Internal reviews
           </Typography>
         }
-        delete={deleteInternalReview}
+        delete={(id) => deleteInternalReview(id, technicalReviewId)}
         createModal={createModal}
         createModalSize="sm"
         setData={setInternalReviews}
