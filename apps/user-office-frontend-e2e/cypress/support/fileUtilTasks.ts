@@ -3,13 +3,17 @@ import fs from 'fs';
 import fetch from 'cross-fetch';
 import pdf from 'pdf-parse';
 
-export function downloadFile(args: any) {
+export function downloadFile(args: {
+  url: string;
+  token: string;
+  filename: string;
+}) {
   return fetch(args.url, {
     headers: {
       authorization: `Bearer ${args.token}`,
     },
   })
-    .then((response: any) => {
+    .then((response: Response) => {
       if (!response) {
         throw new Error('No response');
       }
@@ -20,7 +24,7 @@ export function downloadFile(args: any) {
 
       return response.arrayBuffer();
     })
-    .then(function (arrayBuffer: any) {
+    .then(function (arrayBuffer: ArrayBuffer) {
       const myBuffer = new Uint8Array(arrayBuffer);
       fs.writeFileSync(args.filename, myBuffer);
 

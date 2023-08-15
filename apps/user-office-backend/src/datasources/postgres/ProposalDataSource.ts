@@ -9,8 +9,10 @@ import { Proposal, ProposalPks } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
+import { Roles } from '../../models/Role';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { TechnicalReview } from '../../models/TechnicalReview';
+import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
@@ -505,7 +507,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getInstrumentScientistProposals(
-    scientistId: number,
+    user: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
@@ -523,11 +525,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'instrument_has_scientists.instrument_id':
           'proposal_table_view.instrument_id',
       })
+      .leftJoin(
+        'internal_reviews',
+        'proposal_table_view.technical_review_id',
+        'internal_reviews.technical_review_id'
+      )
       .where(function () {
-        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
-          'instruments.manager_user_id',
-          scientistId
-        );
+        if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
+          this.where('internal_reviews.reviewer_id', user.id);
+        } else {
+          this.where('instrument_has_scientists.user_id', user.id).orWhere(
+            'instruments.manager_user_id',
+            user.id
+          );
+        }
       })
       .distinct('proposal_table_view.proposal_pk')
       .orderBy('proposal_table_view.proposal_pk', 'desc')
@@ -539,14 +550,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
             .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
         }
+        if (filter?.callId) {
+          query.where('proposal_table_view.call_id', filter.callId);
+        }
         if (filter?.reviewer === ReviewerFilter.ME) {
           query.where(
             'proposal_table_view.technical_review_assignee_id',
-            scientistId
+            user.id
           );
-        }
-        if (filter?.callId) {
-          query.where('proposal_table_view.call_id', filter.callId);
         }
         if (filter?.instrumentId) {
           query.where('instruments.instrument_id', filter.instrumentId);

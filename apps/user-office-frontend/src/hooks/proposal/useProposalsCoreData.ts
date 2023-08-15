@@ -34,7 +34,11 @@ export function useProposalsCoreData(
     async (componentController?: { unmounted: boolean }) => {
       setLoading(true);
 
-      if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+      // NOTE: Internal reviewer has similar view as instrument scientist and it needs to get the proposals where the one is assigned as reviewer.
+      if (
+        currentRole === UserRole.INSTRUMENT_SCIENTIST ||
+        currentRole === UserRole.INTERNAL_REVIEWER
+      ) {
         api()
           .getInstrumentScientistProposals({
             filter: {

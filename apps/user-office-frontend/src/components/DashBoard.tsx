@@ -25,6 +25,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
+import ChangeRole from './common/ChangeRole';
 import ExperimentPage from './experiment/ExperimentPage';
 import CreateFeedbackPage from './feedback/CreateFeedbackPage';
 import UpdateFeedbackPage from './feedback/UpdateFeedbackPage';
@@ -346,6 +347,12 @@ const Dashboard = () => {
             path="/HelpPage"
             component={HelpPage}
           />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Change role"
+            path="/changeRole"
+            component={ChangeRole}
+          />
           {isSEPEnabled && (
             <TitledRoute
               setHeader={setHeader}
@@ -605,6 +612,7 @@ const Dashboard = () => {
                       UserRole.SEP_CHAIR,
                       UserRole.SEP_SECRETARY,
                       UserRole.INSTRUMENT_SCIENTIST,
+                      UserRole.INTERNAL_REVIEWER,
                     ]}
                     yes={() => (
                       <Route
