@@ -96,6 +96,7 @@ describe('Test Internal Reviews Mutations', () => {
       dummyUserOfficerWithRole,
       {
         id: 1,
+        technicalReviewId: 1,
       }
     );
 

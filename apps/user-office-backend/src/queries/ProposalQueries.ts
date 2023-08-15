@@ -4,6 +4,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import {
   Proposal,
@@ -31,12 +32,15 @@ export default class ProposalQueries {
 
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
+    @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
   async get(agent: UserWithRole | null, primaryKey: number) {
     let proposal = await this.dataSource.get(primaryKey);
+    const proposalTechnicalReview =
+      await this.reviewDataSource.getTechnicalReview(primaryKey);
 
     if (!proposal) {
       return null;
@@ -55,7 +59,13 @@ export default class ProposalQueries {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
 
-    if ((await this.hasReadRights(agent, proposal)) === true) {
+    if (
+      (await this.hasReadRights(agent, proposal)) === true ||
+      (await this.userAuth.isInternalReviewerOnTechnicalReview(
+        agent,
+        proposalTechnicalReview?.id
+      ))
+    ) {
       return proposal;
     } else {
       return null;
@@ -116,7 +126,8 @@ export default class ProposalQueries {
     }
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  // NOTE: Internal reviewer has similar view as instrument scientist and it needs to get the proposals where the one is assigned as reviewer.
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.INTERNAL_REVIEWER])
   async getInstrumentScientistProposals(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
@@ -124,7 +135,7 @@ export default class ProposalQueries {
     offset?: number
   ) {
     return this.dataSource.getInstrumentScientistProposals(
-      agent?.id as number,
+      agent!,
       filter,
       first,
       offset

@@ -89,6 +89,10 @@ export default class PostgresInternalReviewDataSource
         if (filter?.technicalReviewId) {
           query.where('technical_review_id', filter.technicalReviewId);
         }
+
+        if (filter?.reviewerId) {
+          query.where('reviewer_id', filter.reviewerId);
+        }
       })
       .then((internalReviews: InternalReviewRecord[]) => {
         const result = internalReviews.map((internalReview) =>
@@ -140,5 +144,50 @@ export default class PostgresInternalReviewDataSource
     }
 
     return this.createInternalReviewObject(internalReviewRecord);
+  }
+
+  async isInternalReviewerOnTechnicalReview(
+    userId: number,
+    technicalReviewId: number
+  ) {
+    const record = await database<InternalReviewRecord>('internal_reviews')
+      .select('*')
+      .where('technical_review_id', technicalReviewId)
+      .where((qb) => {
+        qb.where('reviewer_id', userId);
+      })
+      .first();
+
+    return record !== undefined;
+  }
+
+  async isInternalReviewer(userId: number) {
+    const record = await database<InternalReviewRecord>('internal_reviews')
+      .select('*')
+      .where('reviewer_id', userId)
+      .first();
+
+    return record !== undefined;
+  }
+
+  async getAllReviewersOnInternalReview(id: number): Promise<number[]> {
+    const internalReviewsTheReviewerIsPartOf = await this.getInternalReviews({
+      reviewerId: id,
+    });
+
+    const relatedReviewers = await database
+      .select('ir.reviewer_id')
+      .distinct()
+      .from('internal_reviews as ir')
+      .whereIn(
+        'technical_review_id',
+        internalReviewsTheReviewerIsPartOf.map(
+          (review) => review.technicalReviewId
+        )
+      );
+
+    const relatedUsers = [...relatedReviewers.map((r) => r.user_id)];
+
+    return relatedUsers;
   }
 }
