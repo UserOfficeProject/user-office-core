@@ -119,9 +119,18 @@ export const dummySEPSecretaryWithRole: UserWithRole = {
 export const dummySampleReviewer: UserWithRole = {
   ...dummyUser,
   currentRole: {
-    id: 1,
+    id: 9,
     title: 'Sample Reviewer',
     shortCode: 'sample_safety_reviewer',
+  },
+};
+
+export const dummyInternalReviewer: UserWithRole = {
+  ...dummyUser,
+  currentRole: {
+    id: 1,
+    title: 'Internal Reviewer',
+    shortCode: 'internal_reviewer',
   },
 };
 

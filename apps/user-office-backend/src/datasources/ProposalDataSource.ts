@@ -4,6 +4,7 @@ import { Proposal, ProposalPks } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
+import { UserWithRole } from '../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
@@ -24,14 +25,14 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }>;
   // Read
   get(primaryKey: number): Promise<Proposal | null>;
-
+  getByQuestionaryId(questionaryId: number): Promise<Proposal | null>;
   getProposals(
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getInstrumentScientistProposals(
-    scientistId: number,
+    scientistId: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number

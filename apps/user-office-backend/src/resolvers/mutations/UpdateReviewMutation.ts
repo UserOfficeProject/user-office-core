@@ -3,6 +3,7 @@ import {
   ArgsType,
   Ctx,
   Field,
+  Float,
   Int,
   Mutation,
   Resolver,
@@ -20,7 +21,7 @@ export class UpdateReviewArgs {
   @Field()
   public comment: string;
 
-  @Field(() => Int)
+  @Field(() => Float)
   public grade: number;
 
   @Field(() => ReviewStatus)

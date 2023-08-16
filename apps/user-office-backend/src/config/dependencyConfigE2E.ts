@@ -9,6 +9,7 @@ import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSour
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
+import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
 import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
@@ -33,6 +34,7 @@ import {
   createSkipListeningHandler,
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
+import { createApplicationEventBus } from '../events';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
@@ -45,6 +47,7 @@ mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);
 mapClass(Tokens.FileDataSource, PostgresFileDataSource);
 mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
+mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
@@ -76,6 +79,7 @@ mapClass(Tokens.MailService, SkipSendMailService);
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
+mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);

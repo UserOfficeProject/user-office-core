@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
+
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -8,6 +9,7 @@ import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSour
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
+import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
 import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
@@ -32,6 +34,7 @@ import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
+import { createApplicationEventBus } from '../events';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
@@ -64,6 +67,7 @@ mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
+mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
 mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource
@@ -78,6 +82,7 @@ mapClass(Tokens.MailService, SparkPostMailService);
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
 mapValue(

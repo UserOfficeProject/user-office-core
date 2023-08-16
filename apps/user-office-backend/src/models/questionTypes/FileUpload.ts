@@ -18,7 +18,7 @@ import { isRejection } from '../Rejection';
 import { DataType } from '../Template';
 import { Question } from './QuestionRegistry';
 
-export const fileUploadDefinition: Question = {
+export const fileUploadDefinition: Question<DataType.FILE_UPLOAD> = {
   dataType: DataType.FILE_UPLOAD,
   validate: async (field: QuestionTemplateRelation, value: any) => {
     if (!(await fileUploadQuestionValidationSchema(field).isValid(value))) {

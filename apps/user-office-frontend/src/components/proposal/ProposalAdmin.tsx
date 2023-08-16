@@ -34,10 +34,7 @@ type ProposalAdminProps = {
   setAdministration: (data: AdministrationFormData) => void;
 };
 
-const ProposalAdmin: React.FC<ProposalAdminProps> = ({
-  data,
-  setAdministration,
-}) => {
+const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 

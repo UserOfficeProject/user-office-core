@@ -1,14 +1,20 @@
-import React, { FC } from 'react';
+import React, { ReactElement } from 'react';
 
 import { WizardStep } from 'models/questionary/QuestionarySubmissionState';
+import { FunctionType } from 'utils/utilTypes';
+import { WithConfirmType } from 'utils/withConfirm';
 
 import QuestionaryStepView from './QuestionaryStepView';
 
 export class DefaultStepDisplayElementFactory
   implements StepDisplayElementFactory
 {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(private reviewStep: FC<any>) {}
+  constructor(
+    private reviewStep: (props: {
+      onComplete?: FunctionType<void>;
+      confirm: WithConfirmType;
+    }) => ReactElement
+  ) {}
 
   getDisplayElement(wizardStep: WizardStep, isReadOnly: boolean) {
     switch (wizardStep.type) {

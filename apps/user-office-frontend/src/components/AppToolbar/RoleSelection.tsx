@@ -18,8 +18,8 @@ const columns = [
   { title: 'Role', field: 'title' },
 ];
 
-const RoleSelection: React.FC<{ onClose: FunctionType }> = ({ onClose }) => {
-  const { currentRole, token, handleNewToken } = useContext(UserContext);
+const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
+  const { currentRole, token } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
   const history = useHistory();
@@ -64,13 +64,8 @@ const RoleSelection: React.FC<{ onClose: FunctionType }> = ({ onClose }) => {
       selectedRoleId: role.id,
     });
 
-    history.push('/');
-
-    setTimeout(() => {
-      handleNewToken(newToken);
-
-      onClose();
-    }, 500);
+    history.push('/changeRole', { newToken });
+    onClose();
   };
 
   const RoleAction = (rowData: Role) => (

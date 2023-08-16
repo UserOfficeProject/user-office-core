@@ -64,7 +64,7 @@
     "lodash.merge": "^4.6.2",
     "luxon": "^2.3.1",
     "magic-bytes.js": "^1.0.7",
-    "muhammara": "^2.3.0",
+    "muhammara": "^3.8.0",
     "multer": "^1.4.4",
     "openid-client": "^5.4.2",
     "pg": "^8.8.0",
@@ -76,7 +76,7 @@
     "simple-oauth2": "^4.3.0",
     "soap": "^0.45.0",
     "sparkpost": "^2.1.4",
-    "tsyringe": "^4.6.0",
+    "tsyringe": "^4.8.0",
     "type-graphql": "2.0.0-beta.1",
     "yup": "^0.32.11"
   },

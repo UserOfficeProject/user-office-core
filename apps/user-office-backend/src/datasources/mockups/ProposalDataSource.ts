@@ -13,6 +13,7 @@ import {
   TechnicalReview,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
+import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
@@ -91,7 +92,7 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   'Test public comment',
   10,
   TechnicalReviewStatus.FEASIBLE,
-  true,
+  false,
   1,
   '',
   1
@@ -287,6 +288,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return allProposals.find((proposal) => proposal.primaryKey === id) || null;
   }
 
+  async getByQuestionaryId(questionaryId: number) {
+    return (
+      allProposals.find(
+        (proposal) => proposal.questionaryId === questionaryId
+      ) || null
+    );
+  }
+
   async create(proposerId: number, callId: number, questionaryId: number) {
     const newProposal = dummyProposalFactory({
       proposerId,
@@ -311,7 +320,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getInstrumentScientistProposals(
-    scientistId: number,
+    scientist: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number

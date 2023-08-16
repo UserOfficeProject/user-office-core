@@ -48,13 +48,13 @@ type ProposalFilterBarProps = {
   filter: ProposalsFilter;
 };
 
-const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
+const ProposalFilterBar = ({
   calls,
   instruments,
   proposalStatuses,
   setProposalFilter,
   filter,
-}) => {
+}: ProposalFilterBarProps) => {
   const { setQuestionFilterQuery } = useQuestionFilterQueryParams();
   const [showQuestionFilter, setShowQuestionFilter] = useState(
     filter.questionFilter !== undefined
@@ -138,6 +138,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
       {selectedCallTemplateId && (
         <Collapse in={showQuestionFilter}>
           <QuestionaryFilter
+            callId={filter.callId}
             templateId={selectedCallTemplateId}
             onSubmit={(questionFilter) => {
               setProposalFilter({

@@ -16,6 +16,32 @@ export class TechnicalReviewAuthorization {
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
+  async hasAccessRightsToInternalReviews(
+    agent: UserWithRole | null,
+    technicalReviewId?: number
+  ) {
+    if (!technicalReviewId) {
+      return false;
+    }
+
+    const technicalReview = await this.reviewDataSource.getTechnicalReviewById(
+      technicalReviewId
+    );
+
+    if (
+      technicalReview &&
+      ((await this.userAuth.isInternalReviewerOnTechnicalReview(
+        agent,
+        technicalReviewId
+      )) ||
+        (await this.hasWriteRights(agent, technicalReview)))
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private async resolveTechnicalReview(
     technicalreviewOrProposalPk: TechnicalReview | number
   ): Promise<TechnicalReview | null> {
@@ -67,7 +93,17 @@ export class TechnicalReviewAuthorization {
         technicalreview.proposalPk
       );
 
-    if (isScientistToProposal || isInstrumentManagerToProposal) {
+    const isInternalReviewerOnTechnicalReview =
+      await this.userAuth.isInternalReviewerOnTechnicalReview(
+        agent,
+        technicalreview.id
+      );
+
+    if (
+      isScientistToProposal ||
+      isInstrumentManagerToProposal ||
+      isInternalReviewerOnTechnicalReview
+    ) {
       return true;
     }
 

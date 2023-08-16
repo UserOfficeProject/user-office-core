@@ -25,6 +25,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
+import ChangeRole from './common/ChangeRole';
 import ExperimentPage from './experiment/ExperimentPage';
 import CreateFeedbackPage from './feedback/CreateFeedbackPage';
 import UpdateFeedbackPage from './feedback/UpdateFeedbackPage';
@@ -81,7 +82,7 @@ type BottomNavItemProps = {
   linkText?: string;
 };
 
-const BottomNavItem: React.FC<BottomNavItemProps> = ({ text, linkText }) => {
+const BottomNavItem = ({ text, linkText }: BottomNavItemProps) => {
   return (
     <InformationModal
       text={text}
@@ -159,7 +160,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const [header, setHeader] = useState('User Office');
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const classes = useStyles();
@@ -346,10 +347,16 @@ const Dashboard: React.FC = () => {
             path="/HelpPage"
             component={HelpPage}
           />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Change role"
+            path="/changeRole"
+            component={ChangeRole}
+          />
           {isSEPEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title="SEP"
+              title={t('SEP')}
               path="/SEPPage/:id"
               component={SEPPage}
             />
@@ -357,7 +364,7 @@ const Dashboard: React.FC = () => {
           {isSEPEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title="SEPs"
+              title={i18n.format(t('SEP'), 'plural')}
               path="/SEPs"
               component={SEPsPage}
             />
@@ -605,6 +612,7 @@ const Dashboard: React.FC = () => {
                       UserRole.SEP_CHAIR,
                       UserRole.SEP_SECRETARY,
                       UserRole.INSTRUMENT_SCIENTIST,
+                      UserRole.INTERNAL_REVIEWER,
                     ]}
                     yes={() => (
                       <Route

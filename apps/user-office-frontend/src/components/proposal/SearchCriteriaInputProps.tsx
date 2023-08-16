@@ -1,4 +1,6 @@
 import {
+  Call,
+  InputMaybe,
   QuestionFilterCompareOperator,
   QuestionTemplateRelationFragment,
 } from 'generated/sdk';
@@ -12,4 +14,5 @@ export interface SearchCriteriaInputProps {
     value: string | number | boolean | unknown[] | null
   ) => unknown;
   questionTemplateRelation: QuestionTemplateRelationFragment;
+  callId?: InputMaybe<Call['id']>;
 }

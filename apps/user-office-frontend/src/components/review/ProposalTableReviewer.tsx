@@ -79,9 +79,7 @@ const columns: (
   { title: t('instrument') as string, field: 'instrumentShortCode' },
 ];
 
-const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
-  confirm,
-}) => {
+const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();

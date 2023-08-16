@@ -188,6 +188,10 @@ export class ProposalAuthorization {
       return false;
     }
 
+    const technicalReview = await this.reviewDataSource.getTechnicalReview(
+      proposal?.primaryKey
+    );
+
     return (
       this.userAuth.isUserOfficer(agent) ||
       this.userAuth.isInstrumentScientist(agent) ||
@@ -196,6 +200,10 @@ export class ProposalAuthorization {
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
       (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
+      (await this.userAuth.isInternalReviewerOnTechnicalReview(
+        agent,
+        technicalReview?.id
+      )) ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
       (await this.isVisitorOfProposal(agent, proposal.primaryKey))
     );

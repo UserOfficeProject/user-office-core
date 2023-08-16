@@ -32,13 +32,13 @@ type InstrumentFilterProps = {
   instrumentId?: number;
 };
 
-const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
+const InstrumentFilter = ({
   instruments,
   isLoading,
   instrumentId,
   onChange,
   shouldShowAll,
-}) => {
+}: InstrumentFilterProps) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
     instrument: NumberParam,

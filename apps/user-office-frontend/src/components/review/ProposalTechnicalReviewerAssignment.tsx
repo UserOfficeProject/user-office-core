@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   reassignContainer: {
     padding: theme.spacing(2),
     marginTop: 0,
-    marginBottom: theme.spacing(6),
+    marginBottom: theme.spacing(2),
   },
   reassignContainerDisabled: {
     pointerEvents: 'none',
@@ -28,12 +28,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProposalTechnicalReviewerAssignment: React.FC<
-  ProposalTechnicalReviewerAssignmentProps
-> = ({ proposalData, setProposalData }) => {
+const ProposalTechnicalReviewerAssignment = ({
+  proposalData,
+  setProposalData,
+}: ProposalTechnicalReviewerAssignmentProps) => {
   const classes = useStyles();
   const [showReassign, setShowReassign] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
 
   return (
     <Paper
@@ -66,6 +68,7 @@ const ProposalTechnicalReviewerAssignment: React.FC<
             onClick={() => setShowReassign(true)}
             variant="text"
             data-cy="re-assign"
+            disabled={isInternalReviewer}
           >
             Re-assign...
           </Button>

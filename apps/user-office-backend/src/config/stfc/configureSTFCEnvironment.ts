@@ -108,6 +108,10 @@ async function enableDefaultStfcFeatures() {
     settingsId: SettingsId.IDLE_TIMEOUT,
     settingsValue: '1200000',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.GRADE_PRECISION,
+    settingsValue: '0.01',
+  });
 }
 
 async function setSTFCRoleNames() {
@@ -118,6 +122,21 @@ async function setSTFCRoleNames() {
   await db.updateRoleTitle({
     shortCode: Roles.INSTRUMENT_SCIENTIST,
     title: 'Experiment Scientist',
+  });
+
+  await db.updateRoleTitle({
+    shortCode: Roles.SEP_CHAIR,
+    title: 'FAP Chair',
+  });
+
+  await db.updateRoleTitle({
+    shortCode: Roles.SEP_REVIEWER,
+    title: 'FAP Reviewer',
+  });
+
+  await db.updateRoleTitle({
+    shortCode: Roles.SEP_SECRETARY,
+    title: 'FAP Secretary',
   });
 }
 

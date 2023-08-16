@@ -8,6 +8,7 @@ import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
+import InternalReviewMutations from './mutations/InternalReviewMutations';
 import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
@@ -31,6 +32,7 @@ import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
 import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
+import InternalReviewQueries from './queries/InternalReviewQueries';
 import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
@@ -75,6 +77,7 @@ const context: BasicResolverContext = {
     user: container.resolve(UserQueries),
     visit: container.resolve(VisitQueries),
     predefinedMessage: container.resolve(PredefinedMessageQueries),
+    internalReview: container.resolve(InternalReviewQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -99,6 +102,7 @@ const context: BasicResolverContext = {
     user: container.resolve(UserMutations),
     visit: container.resolve(VisitMutations),
     predefinedMessage: container.resolve(PredefinedMessageMutations),
+    internalReview: container.resolve(InternalReviewMutations),
   },
   clients: {
     scheduler: async () => {

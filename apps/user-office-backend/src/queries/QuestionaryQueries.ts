@@ -127,6 +127,13 @@ export default class QuestionaryQueries {
     return this.dataSource.getBlankQuestionarySteps(templateId);
   }
 
+  async getBlankQuestionaryStepsByCallId(
+    agent: UserWithRole | null,
+    callId: number
+  ): Promise<QuestionaryStep[]> {
+    return this.dataSource.getBlankQuestionaryStepsByCallId(callId);
+  }
+
   async getQuestionaryStepsOrDefault(
     agent: UserWithRole | null,
     questionaryId: number,

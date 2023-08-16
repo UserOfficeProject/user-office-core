@@ -61,10 +61,11 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       )
     );
 
+    const userRole = req.user.currentRole;
     callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
-      { data, meta },
+      { data, meta, userRole },
       req,
       res,
       next
@@ -106,10 +107,11 @@ router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
       columns: defaultSEPDataColumns,
     };
 
+    const userRole = req.user.currentRole;
     callFactoryService(
       DownloadType.XLSX,
       XLSXType.SEP,
-      { data, meta },
+      { data, meta, userRole },
       req,
       res,
       next

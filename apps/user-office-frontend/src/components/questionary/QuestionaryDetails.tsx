@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import { TableProps } from '@mui/material/Table';
 import Typography from '@mui/material/Typography';
-import React, { FC } from 'react';
+import React, { ReactElement } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Answer, DataType } from 'generated/sdk';
@@ -16,7 +16,8 @@ export interface TableRowData {
   label: JSX.Element | string | null;
   value: JSX.Element | string | null;
 }
-export interface QuestionaryDetailsProps extends TableProps<FC<unknown>> {
+export interface QuestionaryDetailsProps
+  extends TableProps<(props: unknown) => ReactElement> {
   questionaryId: number;
   additionalDetails?: Array<TableRowData>;
   title?: string;

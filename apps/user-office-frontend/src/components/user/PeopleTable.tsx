@@ -108,9 +108,9 @@ const getTitle = ({
     case UserRole.USER_OFFICER:
       return 'Invite User';
     case UserRole.SEP_CHAIR:
-      return 'Invite SEP Chair';
+      return 'Invite ' + t('SEP') + ' Chair';
     case UserRole.SEP_SECRETARY:
-      return 'Invite SEP Secretary';
+      return 'Invite ' + t('SEP') + ' Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
       return 'Invite ' + t('instrumentSci');
     default:
@@ -166,7 +166,7 @@ const getUsersTableData = (
   };
 };
 
-const PeopleTable: React.FC<PeopleTableProps> = ({
+const PeopleTable = ({
   selectedParticipants,
   selection,
   setSelectedParticipants,
@@ -185,7 +185,7 @@ const PeopleTable: React.FC<PeopleTableProps> = ({
   preserveSelf,
   search,
   title,
-}) => {
+}: PeopleTableProps) => {
   const [query, setQuery] = useState<
     GetUsersQueryVariables & { refreshData: boolean }
   >({

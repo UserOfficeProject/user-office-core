@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -14,10 +15,11 @@ import SEPMeetingComponentsView from './MeetingComponents/SEPMeetingComponentsVi
 import SEPMembers from './Members/SEPMembers';
 import SEPProposalsAndAssignmentsView from './Proposals/SEPProposalsAndAssignmentsView';
 
-const SEPPage: React.FC = () => {
+const SEPPage = () => {
   const { id } = useParams<{ id: string }>();
   const { loading, sep, setSEP } = useSEPData(parseInt(id));
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const { t } = useTranslation();
   const isSEPChairOrSecretary = useCheckAccess([
     UserRole.SEP_CHAIR,
     UserRole.SEP_SECRETARY,
@@ -36,7 +38,7 @@ const SEPPage: React.FC = () => {
   if (!sep) {
     return (
       <StyledContainer>
-        <StyledPaper>SEP not found</StyledPaper>
+        <StyledPaper>{`${t('SEP')} not found`}</StyledPaper>
       </StyledContainer>
     );
   }

@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { eventBus } from '../events';
+import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { searchObjectByKey } from '../utils/helperFunctions';
@@ -25,6 +25,8 @@ export const handleWorkflowEngineChange = async (
     event.type,
     proposal
   );
+
+  const eventBus = resolveApplicationEventBus();
 
   if (updatedProposals) {
     updatedProposals.forEach(
@@ -99,6 +101,8 @@ export default function createHandler() {
                 // NOTE: If proposal status is updated manually then we need to fire another event.
                 // TODO: This could be refactored and we use only one event instead of two. Ref. changeProposalsStatus inside ProposalMutations.ts
                 if (event.type === Event.PROPOSAL_STATUS_UPDATED) {
+                  const eventBus = resolveApplicationEventBus();
+
                   eventBus.publish({
                     type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
                     proposal: proposal,
