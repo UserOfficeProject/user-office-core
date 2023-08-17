@@ -21,7 +21,7 @@ let createdProposalPk: number;
 let technicalReviewId: number;
 let numberOfScientistsAndManagerAssignedToCreatedInstrument: number;
 
-context('Institution tests', () => {
+context('Internal Review tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
@@ -106,7 +106,7 @@ context('Institution tests', () => {
     cy.get('@userMenuItems').should('not.contain', 'Review Proposals');
   });
 
-  it('User Officer should be able to create and update internal review', () => {
+  it('User Officer should be able to create an internal review', () => {
     const title = faker.random.words(2);
     const comment = faker.lorem.paragraph(3);
 
@@ -151,8 +151,37 @@ context('Institution tests', () => {
 
     cy.get('[data-cy="internal-reviews-table"]').contains(title);
     cy.get('[data-cy="internal-reviews-table"]').contains(scientist2.firstName);
+  });
 
-    // Update starts here
+  it('User Officer should be able to update an internal review', () => {
+    const title = faker.random.words(2);
+    const comment = faker.lorem.paragraph(3);
+    const newTitle = faker.random.words(2);
+
+    cy.createInternalReview({
+      input: {
+        title: title,
+        comment: comment,
+        reviewerId: scientist1.id,
+        technicalReviewId: technicalReviewId,
+      },
+    });
+
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.contains(proposal1.title)
+      .parent()
+      .find('[data-cy="view-proposal"]')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[role="tab"]').contains('Technical review').click();
+    cy.get('[data-cy="internal-reviews-accordion"]').click();
+
+    cy.get('[data-cy="internal-reviews-table"]').contains(title);
+    cy.get('[data-cy="internal-reviews-table"]').contains(scientist1.firstName);
 
     cy.get('[data-cy="internal-reviews-table"]')
       .contains(title)
@@ -161,18 +190,24 @@ context('Institution tests', () => {
       .click();
 
     cy.get('[data-cy="create-modal"]')
+      .find('[data-cy="title"] input')
+      .clear()
+      .type(newTitle);
+
+    cy.get('[data-cy="create-modal"]')
       .find('[data-cy="internal-reviewer"] input')
       .click();
 
     cy.get('[data-cy="internal-reviewer-options"]')
-      .contains(scientist1.firstName)
+      .contains(scientist2.firstName)
       .click();
 
     cy.get('[data-cy="create-modal"]').find('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'success' });
 
-    cy.get('[data-cy="internal-reviews-table"]').contains(scientist1.firstName);
+    cy.get('[data-cy="internal-reviews-table"]').contains(newTitle);
+    cy.get('[data-cy="internal-reviews-table"]').contains(scientist2.firstName);
   });
 
   it('User Officer should be able to delete internal review', () => {
