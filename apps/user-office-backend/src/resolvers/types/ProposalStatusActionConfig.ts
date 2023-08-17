@@ -8,15 +8,21 @@ export enum EmailStatusActionRecipients {
 }
 
 @ObjectType()
+export class EmailStatusActionRecipientsWithTemplate {
+  @Field(() => EmailStatusActionRecipients, { nullable: true })
+  recipient: EmailStatusActionRecipients | null;
+
+  @Field(() => String)
+  email_template: string;
+}
+
+@ObjectType()
 export class ProposalStatusActionConfigBase {}
 
 @ObjectType()
 export class EmailActionConfig extends ProposalStatusActionConfigBase {
-  @Field(() => EmailStatusActionRecipients, { nullable: true })
-  recipients: EmailStatusActionRecipients | null;
-
-  @Field(() => String)
-  email_template: string;
+  @Field(() => [EmailStatusActionRecipientsWithTemplate], { nullable: true })
+  recipientsWithTemplate: EmailStatusActionRecipientsWithTemplate[] | null;
 }
 
 @ObjectType()

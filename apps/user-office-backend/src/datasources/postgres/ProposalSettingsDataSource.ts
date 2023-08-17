@@ -578,12 +578,6 @@ export default class PostgresProposalSettingsDataSource
       .where('pwca.workflow_id', proposalWorkflowId)
       .andWhere('pwca.connection_id', proposalWorkflowConnectionId);
 
-    if (!proposalActionStatusRecords?.length) {
-      throw new GraphQLError(
-        `Could not find proposal status action with connection_id: ${proposalWorkflowConnectionId}`
-      );
-    }
-
     const proposalStatusActions = proposalActionStatusRecords.map(
       (proposalActionStatusRecord) =>
         this.createProposalStatusActionObject(proposalActionStatusRecord)

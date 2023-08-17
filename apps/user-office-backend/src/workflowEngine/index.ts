@@ -56,6 +56,7 @@ const updateProposalStatus = (
 
 export type WorkflowEngineProposalType = Proposal & {
   workflowId: number;
+  prevProposalStatusId: number;
 };
 
 export const workflowEngine = async (
@@ -157,7 +158,12 @@ export const workflowEngine = async (
               );
 
               if (updatedProposal) {
-                return { ...updatedProposal, workflowId: proposalWorkflow.id };
+                return {
+                  ...updatedProposal,
+                  workflowId: proposalWorkflow.id,
+                  prevProposalStatusId:
+                    currentWorkflowConnection.proposalStatusId,
+                };
               }
             }
           })
