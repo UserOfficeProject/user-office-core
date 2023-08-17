@@ -2,8 +2,10 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
-import UserDataSource from '../datasources/postgres/UserDataSource';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { SEPDataSource } from '../datasources/SEPDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import {
   ProposalStatusAction,
@@ -17,12 +19,6 @@ import {
   WorkflowEngineProposalType,
   getProposalWorkflowConnectionByStatusId,
 } from '../workflowEngine';
-
-const proposalSettingsDataSource = container.resolve(
-  ProposalSettingsDataSource
-);
-
-const usersDataSource = container.resolve(UserDataSource);
 
 interface GroupedObjectType {
   [key: string]: WorkflowEngineProposalType[];
@@ -60,6 +56,9 @@ const groupProposalsByProperties = (
 export const statusActionEngine = async (
   proposals: WorkflowEngineProposalType[]
 ): Promise<undefined> => {
+  const proposalSettingsDataSource: ProposalSettingsDataSource =
+    container.resolve(Tokens.ProposalSettingsDataSource);
+
   // NOTE: We need to group the proposals by 'workflow' na 'status' because proposals coming in here can be from different workflows/calls.
   const groupByProperties = ['workflowId', 'statusId'];
   // NOTE: Here the result is something like: [[proposalsWithWorkflowStatusIdCombination1], [proposalsWithWorkflowStatusIdCombination2]...]
@@ -116,6 +115,13 @@ const emailActionHandler = async (
   proposalStatusAction: ProposalStatusAction,
   proposals: WorkflowEngineProposalType[]
 ) => {
+  const usersDataSource: UserDataSource = container.resolve(
+    Tokens.UserDataSource
+  );
+  const sepDataSource: SEPDataSource = container.resolve(Tokens.SEPDataSource);
+  const instrumentDataSource: InstrumentDataSource = container.resolve(
+    Tokens.InstrumentDataSource
+  );
   const mailService = container.resolve<MailService>(Tokens.MailService);
 
   const proposalsEmailData = proposals.map((proposal) => {
@@ -146,6 +152,8 @@ const emailActionHandler = async (
 
               return {
                 id: EmailStatusActionRecipients.PI,
+                proposalId: proposal.primaryKey,
+                proposalTitle: proposal.title,
                 template: recipientWithTemplate.email_template,
                 emails: [PIEmail],
               };
@@ -162,6 +170,8 @@ const emailActionHandler = async (
 
               return {
                 id: EmailStatusActionRecipients.CO_PROPOSERS,
+                proposalId: proposal.primaryKey,
+                proposalTitle: proposal.title,
                 template: recipientWithTemplate.email_template,
                 emails: coProposers.map((coProposer) => coProposer.email),
               };
@@ -172,14 +182,61 @@ const emailActionHandler = async (
         case EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS: {
           return Promise.all(
             proposals.map(async (proposal) => {
-              const coProposers = await usersDataSource.getProposalUsers(
-                proposal.primaryKey
+              const proposalInstrument =
+                await instrumentDataSource.getInstrumentByProposalPk(
+                  proposal.primaryKey
+                );
+
+              if (!proposalInstrument) {
+                return;
+              }
+
+              const beamLineManager = await usersDataSource.getBasicUserInfo(
+                proposalInstrument.managerUserId
               );
+
+              if (!beamLineManager) {
+                return;
+              }
+
+              const instrumentScientists =
+                await instrumentDataSource.getInstrumentScientists(
+                  proposalInstrument.id
+                );
+
+              const instrumentScientistsWithManagerEmails = [
+                beamLineManager.email,
+                ...instrumentScientists.map(
+                  (instrumentScientist) => instrumentScientist.email
+                ),
+              ];
 
               return {
                 id: EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
+                proposalId: proposal.primaryKey,
+                proposalTitle: proposal.title,
                 template: recipientWithTemplate.email_template,
-                emails: coProposers.map((coProposer) => coProposer.email),
+                emails: instrumentScientistsWithManagerEmails,
+              };
+            })
+          );
+        }
+
+        case EmailStatusActionRecipients.SEP_REVIEWERS: {
+          return Promise.all(
+            proposals.map(async (proposal) => {
+              const allSepReviewers =
+                await sepDataSource.getSEPUsersByProposalPkAndCallId(
+                  proposal.primaryKey,
+                  proposal.callId
+                );
+
+              return {
+                id: EmailStatusActionRecipients.SEP_REVIEWERS,
+                proposalId: proposal.primaryKey,
+                proposalTitle: proposal.title,
+                template: recipientWithTemplate.email_template,
+                emails: allSepReviewers.map((coProposer) => coProposer.email),
               };
             })
           );
@@ -191,7 +248,7 @@ const emailActionHandler = async (
     })
   );
 
-  // console.log('proposalsWithUsers', proposalsWithUsers);
+  // console.log('proposalsWithUsers', proposalsWithUsers.flat());
 
   logger.logInfo('this is email action type', {});
 

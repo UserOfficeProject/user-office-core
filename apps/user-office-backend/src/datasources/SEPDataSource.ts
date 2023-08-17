@@ -17,6 +17,7 @@ import {
 import { AssignProposalsToSepArgs } from '../resolvers/mutations/AssignProposalsToSepMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPsFilter } from '../resolvers/queries/SEPsQuery';
+import { BasicUserDetails } from '../resolvers/types/BasicUserDetails';
 
 export interface SEPDataSource {
   create(
@@ -58,6 +59,10 @@ export interface SEPDataSource {
     proposalPk: number
   ): Promise<boolean>;
   getSEPProposals(sepId: number, callId: number | null): Promise<SEPProposal[]>;
+  getSEPUsersByProposalPkAndCallId(
+    proposalPk: number,
+    callId: number
+  ): Promise<BasicUserDetails[]>;
   getSEPProposalCount(sepId: number): Promise<number>;
   getSEPReviewerProposalCount(reviewerId: number): Promise<number>;
   getSEPProposal(
