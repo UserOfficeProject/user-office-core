@@ -148,6 +148,51 @@ test('A user not on a proposal can not update it', () => {
   ).resolves.toBeInstanceOf(Rejection);
 });
 
+test('A proposal cannot contain duplicate co-proposers', async () => {
+  const pi = 1;
+  const duplicateCoI = 4;
+  const coIs = [2, 3, duplicateCoI, duplicateCoI];
+
+  const updateResult = await proposalMutations.update(dummyUserWithRole, {
+    proposalPk: 1,
+    title: 'newTitle',
+    abstract: 'newAbstract',
+    users: coIs,
+    proposerId: pi,
+  });
+
+  expect(updateResult).toEqual(
+    expect.objectContaining({
+      reason: 'Proposal contains a duplicate user',
+      context: expect.objectContaining({
+        duplicateUser: duplicateCoI,
+      }),
+    })
+  );
+});
+
+test('A proposal PI cannot also be a co-proposer', async () => {
+  const pi = 1;
+  const coIs = [pi, 2, 3];
+
+  const updateResult = await proposalMutations.update(dummyUserWithRole, {
+    proposalPk: 1,
+    title: 'newTitle',
+    abstract: 'newAbstract',
+    users: coIs,
+    proposerId: pi,
+  });
+
+  expect(updateResult).toEqual(
+    expect.objectContaining({
+      reason: 'Proposal contains a duplicate user',
+      context: expect.objectContaining({
+        duplicateUser: pi,
+      }),
+    })
+  );
+});
+
 //Submit
 
 test('A user officer can not reject a proposal that does not exist', () => {
