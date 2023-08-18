@@ -314,35 +314,35 @@ context('Proposal administration tests', () => {
           const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
           const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${newlyCreatedProposalId}.pdf`;
           const downloadsFolder = Cypress.config('downloadsFolder');
-          const downloadPath = `${downloadsFolder}/${downloadedFileName}`;
+          const downloadFilePath = `${downloadsFolder}/${downloadedFileName}`;
 
           cy.task('downloadFile', {
             url: `${Cypress.config(
               'baseUrl'
             )}/download/pdf/proposal/${newlyCreatedProposalPk}`,
-            token,
-            filename: downloadPath,
+            token: token,
+            filename: downloadedFileName,
+            downloadsFolder: downloadsFolder,
           });
 
           cy.fixture(FIXTURE_FILE_PATH, 'binary', { timeout: 15000 }).then(
             (fixtureBuffer) => {
               const fixtureFileContentByteLength = fixtureBuffer.length;
               // for now just check the file size
-              cy.readFile(downloadPath, 'binary', { timeout: 15000 }).should(
-                (buffer) => {
-                  // console.log(buffer);
-                  // NOTE: If you run the factory locally inside a docker container and directly(as a node app) on your local machine there could be some file size differences.
-                  if (buffer.length !== fixtureFileContentByteLength) {
-                    throw new Error(
-                      `File size ${buffer.length} is not ${fixtureFileContentByteLength}`
-                    );
-                  }
+              cy.readFile(downloadFilePath, 'binary', {
+                timeout: 15000,
+              }).should((buffer) => {
+                // NOTE: If you run the factory locally inside a docker container and directly(as a node app) on your local machine there could be some file size differences.
+                if (buffer.length !== fixtureFileContentByteLength) {
+                  throw new Error(
+                    `File size ${buffer.length} is not ${fixtureFileContentByteLength}`
+                  );
                 }
-              );
+              });
             }
           );
 
-          cy.task('readPdf', downloadPath).then((args) => {
+          cy.task('readPdf', downloadFilePath).then((args) => {
             const { text, numpages } = args as PdfParse.Result;
 
             expect(text).to.include(newlyCreatedProposalId);
@@ -361,7 +361,8 @@ context('Proposal administration tests', () => {
               'baseUrl'
             )}/download/pdf/proposal/${createdProposalPk},${newlyCreatedProposalPk}`,
             token,
-            filename: multiFileDownloadPath,
+            filename: downloadedMultiFileName,
+            downloadsFolder: downloadsFolder,
           });
 
           cy.task('readPdf', multiFileDownloadPath).then((args) => {
