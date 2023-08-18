@@ -68,6 +68,8 @@ export default class SEPMutations {
         args.code,
         args.description,
         args.numberRatingsRequired,
+        args.gradeGuide,
+        args.customGradeGuide,
         args.active
       )
       .catch((err) => {
@@ -92,6 +94,8 @@ export default class SEPMutations {
         args.code,
         args.description,
         args.numberRatingsRequired,
+        args.gradeGuide,
+        args.customGradeGuide,
         args.active
       )
       .catch((err) => {

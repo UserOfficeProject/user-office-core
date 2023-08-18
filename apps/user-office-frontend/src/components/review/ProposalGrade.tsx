@@ -22,6 +22,7 @@ import NavigationFragment from 'components/questionary/NavigationFragment';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { ReviewStatus, Review, UserRole, SettingsId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useSEPData } from 'hooks/SEP/useSEPData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -31,6 +32,7 @@ type ProposalGradeProps = {
   setReview: React.Dispatch<React.SetStateAction<Review | null>>;
   onChange: FunctionType;
   confirm: WithConfirmType;
+  sepId: number;
 };
 
 type GradeFormType = {
@@ -45,7 +47,9 @@ const ProposalGrade = ({
   setReview,
   onChange,
   confirm,
+  sepId,
 }: ProposalGradeProps) => {
+  const { sep } = useSEPData(sepId);
   const { api } = useDataApiWithFeedback();
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,6 +70,7 @@ const ProposalGrade = ({
     comment: review.comment || '',
     submitted: review.status === ReviewStatus.SUBMITTED,
     saveOnly: true,
+    gradeGuide: sep?.gradeGuide,
   };
 
   const PromptIfDirty = () => {
@@ -213,7 +218,7 @@ const ProposalGrade = ({
           <ErrorMessage name="grade" />
           <NavigationFragment isLoading={isSubmitting}>
             <ButtonWithDialog label="Grading guide" disabled={isSubmitting}>
-              <GradeGuidePage />
+              {sep ? <GradeGuidePage sep={sep} /> : <GradeGuidePage />}
             </ButtonWithDialog>
             {hasAccessRights && (
               <Field

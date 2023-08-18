@@ -3,6 +3,8 @@ fragment sep on SEP {
   code
   description
   numberRatingsRequired
+  gradeGuide
+  customGradeGuide
   active
   sepChair {
     ...basicUserDetails
