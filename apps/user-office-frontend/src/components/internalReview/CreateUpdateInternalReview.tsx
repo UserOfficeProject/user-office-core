@@ -137,14 +137,14 @@ const CreateUpdateInternalReview = ({
           ) : (
             <>
               <InputLabel
-                htmlFor="internal_review_comment"
+                htmlFor="internal_review_title"
                 shrink
                 className={classes.comment}
               >
                 Title
               </InputLabel>
 
-              <Typography variant="body1" gutterBottom>
+              <Typography variant="body1" gutterBottom data-cy="title">
                 {internalReview?.title}
               </Typography>
             </>
@@ -159,9 +159,7 @@ const CreateUpdateInternalReview = ({
                 text: getFullUserName(user),
                 value: user.id,
               }))}
-              InputProps={{
-                'data-cy': 'internal-reviewer',
-              }}
+              data-cy="internal-reviewer"
               required
               disabled={isExecutingCall || isSubmitting}
             />
