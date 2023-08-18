@@ -9,8 +9,8 @@ export enum EmailStatusActionRecipients {
 
 @ObjectType()
 export class EmailStatusActionRecipientsWithTemplate {
-  @Field(() => EmailStatusActionRecipients, { nullable: true })
-  recipient: EmailStatusActionRecipients | null;
+  @Field(() => EmailStatusActionRecipients)
+  recipient: EmailStatusActionRecipients;
 
   @Field(() => String)
   email_template: string;

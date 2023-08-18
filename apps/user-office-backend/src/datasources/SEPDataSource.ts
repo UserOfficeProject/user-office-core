@@ -9,6 +9,7 @@ import {
   SEPProposalWithReviewGradesAndRanking,
 } from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
+import { BasicUserDetails } from '../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
@@ -17,7 +18,6 @@ import {
 import { AssignProposalsToSepArgs } from '../resolvers/mutations/AssignProposalsToSepMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPsFilter } from '../resolvers/queries/SEPsQuery';
-import { BasicUserDetails } from '../resolvers/types/BasicUserDetails';
 
 export interface SEPDataSource {
   create(
