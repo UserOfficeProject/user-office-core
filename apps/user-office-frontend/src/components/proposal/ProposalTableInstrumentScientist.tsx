@@ -1,8 +1,13 @@
-import MaterialTable, { Action, Column } from '@material-table/core';
+import MaterialTable, {
+  Action,
+  Column,
+  MTableToolbar,
+} from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
+import { Box, Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
@@ -59,6 +64,13 @@ import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
 
+type QueryParameters = {
+  query: {
+    first?: number;
+    offset?: number;
+  };
+  searchText?: string | undefined;
+};
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
 
@@ -147,11 +159,74 @@ const proposalStatusFilter: Record<string, number> = {
   FEASIBILITY_REVIEW: 2,
 };
 
+const PREFETCH_SIZE = 200;
+const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
+/**
+ * NOTE: This toolbar "select all" option works only with all prefetched proposals. Currently that value is set to "PREFETCH_SIZE=200"
+ * For example if we change the PREFETCH_SIZE to 100, that would mean that it can select up to 100 prefetched proposals at once.
+ * For now this works but if we want to support option where we really select all proposals in the database this needs to be refactored a bit.
+ */
+const ToolbarWithSelectAllPrefetched = (props: {
+  actions: Action<ProposalViewData>[];
+  selectedRows: ProposalViewData[];
+  data: ProposalViewData[];
+}) => {
+  const selectAllAction = props.actions.find(
+    (action) => action.hidden && action.tooltip === SELECT_ALL_ACTION_TOOLTIP
+  );
+  const tableHasData = !!props.data.length;
+  const allItemsSelectedOnThePage =
+    props.selectedRows.length === props.data.length;
+
+  return (
+    <div data-cy="select-all-toolbar">
+      <MTableToolbar {...props} />
+      {tableHasData && !!selectAllAction && allItemsSelectedOnThePage && (
+        <Box
+          textAlign="center"
+          padding={1}
+          bgcolor={(theme) => theme.palette.background.default}
+          data-cy="select-all-proposals"
+        >
+          {selectAllAction.iconProps?.hidden ? (
+            <>
+              All proposals are selected.
+              <Button
+                variant="text"
+                onClick={() => selectAllAction.onClick(null, props.data)}
+                data-cy="clear-all-selection"
+              >
+                Clear selection
+              </Button>
+            </>
+          ) : (
+            <>
+              All {props.selectedRows.length} proposals on this page are
+              selected.
+              <Button
+                variant="text"
+                onClick={() => selectAllAction.onClick(null, props.data)}
+                data-cy="select-all-prefetched-proposals"
+              >
+                Select all {selectAllAction.iconProps?.defaultValue} proposals
+              </Button>
+            </>
+          )}
+        </Box>
+      )}
+    </div>
+  );
+};
 const ProposalTableInstrumentScientist = ({
   confirm,
 }: {
   confirm: WithConfirmType;
 }) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [selectedProposals, setSelectedProposals] = useState<
+    ProposalViewData[]
+  >([]);
   const { user } = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
@@ -198,35 +273,77 @@ const ProposalTableInstrumentScientist = ({
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
+  const [queryParameters, setQueryParameters] = useState<QueryParameters>({
+    query: {
+      first: PREFETCH_SIZE,
+      offset: 0,
+    },
+    searchText: urlQueryParams.search ?? undefined,
+  });
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
 
-  const { loading, proposalsData, setProposalsData } = useProposalsCoreData({
-    proposalStatusId: proposalFilter.proposalStatusId,
-    instrumentId: proposalFilter.instrumentId,
-    callId: proposalFilter.callId,
-    questionFilter: proposalFilter.questionFilter,
-    reviewer: proposalFilter.reviewer,
-  });
+  const { loading, proposalsData, totalCount, setProposalsData } =
+    useProposalsCoreData(
+      {
+        proposalStatusId: proposalFilter.proposalStatusId,
+        instrumentId: proposalFilter.instrumentId,
+        callId: proposalFilter.callId,
+        questionFilter: proposalFilter.questionFilter,
+        reviewer: proposalFilter.reviewer,
+        text: queryParameters.searchText,
+      },
+      queryParameters.query
+    );
 
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
   >([]);
 
   useEffect(() => {
+    setPreselectedProposalsData(proposalsData);
+  }, [proposalsData, queryParameters]);
+
+  useEffect(() => {
+    let isMounted = true;
+    let endSlice = rowsPerPage * (currentPage + 1);
+    endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
+    if (isMounted) {
+      setTableData(
+        preselectedProposalsData.slice(
+          (currentPage * rowsPerPage) % PREFETCH_SIZE,
+          endSlice
+        )
+      );
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentPage, rowsPerPage, preselectedProposalsData, queryParameters]);
+
+  useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
-
+      const selected: ProposalViewData[] = [];
       setPreselectedProposalsData(
-        proposalsData.map((proposal) => ({
-          ...proposal,
-          tableData: {
-            checked: selection.has(proposal.primaryKey.toString()),
-          },
-        }))
+        proposalsData.map((proposal) => {
+          if (selection.has(proposal.primaryKey.toString())) {
+            selected.push(proposal);
+          }
+
+          return {
+            ...proposal,
+            tableData: {
+              checked: selection.has(proposal.primaryKey.toString()),
+            },
+          };
+        })
       );
+      setSelectedProposals(selected);
     } else {
       setPreselectedProposalsData(
         proposalsData.map((proposal) => ({
@@ -234,6 +351,7 @@ const ProposalTableInstrumentScientist = ({
           tableData: { checked: false },
         }))
       );
+      setSelectedProposals([]);
     }
   }, [proposalsData, urlQueryParams.selection]);
 
@@ -344,8 +462,13 @@ const ProposalTableInstrumentScientist = ({
     }
   };
 
-  const handleSearchChange = (searchText: string) =>
+  const handleSearchChange = (searchText: string) => {
+    setQueryParameters({
+      ...queryParameters,
+      searchText: searchText ? searchText : undefined,
+    });
     setUrlQueryParams({ search: searchText ? searchText : undefined });
+  };
 
   const handleColumnHiddenChange = (columnChange: Column<ProposalViewData>) => {
     const proposalColumns = columns.map(
@@ -381,44 +504,30 @@ const ProposalTableInstrumentScientist = ({
       sortDirection: orderDirection ? orderDirection : undefined,
     });
 
-  const handleBulkDownloadClick = (
-    _: React.MouseEventHandler<HTMLButtonElement>,
-    rowData: ProposalViewData | ProposalViewData[]
-  ) => {
-    if (!Array.isArray(rowData)) {
-      return;
-    }
-
+  const handleBulkDownloadClick = () => {
     downloadPDFProposal(
-      rowData.map((row) => row.primaryKey),
-      rowData[0].title
+      selectedProposals.map((proposal) => proposal.primaryKey),
+      selectedProposals[0].title
     );
   };
 
-  const handleBulkTechnicalReviewsSubmit = async (
-    _: React.MouseEventHandler<HTMLButtonElement>,
-    selectedRowsData: ProposalViewData | ProposalViewData[]
-  ) => {
-    if (!Array.isArray(selectedRowsData)) {
-      return;
-    }
-
+  const handleBulkTechnicalReviewsSubmit = async () => {
     const invalid = [];
 
-    for await (const rowData of selectedRowsData) {
+    for await (const proposal of selectedProposals) {
       const isValidSchema =
         await proposalTechnicalReviewValidationSchema.isValid({
-          status: rowData.status,
-          timeAllocation: rowData.technicalTimeAllocation,
+          status: proposal.status,
+          timeAllocation: proposal.technicalTimeAllocation,
         });
       if (!isValidSchema) {
-        invalid.push(rowData);
+        invalid.push(proposal);
       }
     }
 
     confirm(
       async () => {
-        await submitTechnicalReviews(selectedRowsData);
+        await submitTechnicalReviews(selectedProposals);
       },
       {
         title: 'Submit technical reviews',
@@ -483,25 +592,55 @@ const ProposalTableInstrumentScientist = ({
    * Including the id property for https://material-table-core.com/docs/breaking-changes#id
    * Including the action buttons as property to avoid the console warning(https://github.com/material-table-core/core/issues/286)
    */
-  const proposalDataWithIdAndRowActions = preselectedProposalsData.map(
-    (proposal) =>
-      Object.assign(proposal, {
-        id: proposal.primaryKey,
-        rowActionButtons: RowActionButtons(proposal),
-        assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
-          ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
-          : '-',
-        technicalTimeAllocationRendered: proposal.technicalTimeAllocation
-          ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
-          : '-',
-      })
+  const proposalDataWithIdAndRowActions = tableData.map((proposal) =>
+    Object.assign(proposal, {
+      id: proposal.primaryKey,
+      rowActionButtons: RowActionButtons(proposal),
+      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+        : '-',
+      technicalTimeAllocationRendered: proposal.technicalTimeAllocation
+        ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
+        : '-',
+    })
   );
+
+  const shouldShowSelectAllAction =
+    totalCount >= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
+
+  const allPrefetchedProposalsSelected =
+    preselectedProposalsData.length === urlQueryParams.selection.length;
 
   const tableActions: Action<ProposalViewData>[] = [
     {
       icon: GetAppIconComponent,
       tooltip: 'Download proposals',
       onClick: handleBulkDownloadClick,
+      position: 'toolbarOnSelect',
+    },
+    {
+      tooltip: shouldShowSelectAllAction,
+      icon: DoneAllIcon,
+      hidden: true,
+      iconProps: {
+        hidden: allPrefetchedProposalsSelected,
+        defaultValue: preselectedProposalsData.length,
+      },
+      onClick: () => {
+        if (allPrefetchedProposalsSelected) {
+          setUrlQueryParams((params) => ({
+            ...params,
+            selection: undefined,
+          }));
+        } else {
+          setUrlQueryParams((params) => ({
+            ...params,
+            selection: preselectedProposalsData.map((proposal) =>
+              proposal.primaryKey.toString()
+            ),
+          }));
+        }
+      },
       position: 'toolbarOnSelect',
     },
   ];
@@ -581,8 +720,36 @@ const ProposalTableInstrumentScientist = ({
       <MaterialTable
         icons={tableIcons}
         title={'Proposals'}
+        components={{
+          Toolbar: ToolbarWithSelectAllPrefetched,
+        }}
+        onPageChange={(page, pageSize) => {
+          const newOffset =
+            Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
+          if (
+            page !== currentPage &&
+            newOffset != queryParameters.query.offset
+          ) {
+            setQueryParameters({
+              searchText: queryParameters.searchText,
+              query: {
+                ...queryParameters.query,
+                offset: newOffset,
+              },
+            });
+          }
+          setCurrentPage(page);
+        }}
         columns={columns}
         data={proposalDataWithIdAndRowActions}
+        totalCount={totalCount}
+        page={currentPage}
+        localization={{
+          toolbar: {
+            nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
+          },
+        }}
+        onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
         isLoading={loading}
         options={{
           search: true,

@@ -54,6 +54,7 @@ export function useProposalsCoreData(
               },
               text,
             },
+            ...queryParameters,
           })
           .then((data) => {
             if (componentController?.unmounted) {
