@@ -7,6 +7,7 @@ export function downloadFile(args: {
   url: string;
   token: string;
   filename: string;
+  downloadsFolder: string;
 }) {
   return fetch(args.url, {
     headers: {
@@ -25,8 +26,15 @@ export function downloadFile(args: {
       return response.arrayBuffer();
     })
     .then(function (arrayBuffer: ArrayBuffer) {
+      // NOTE: Create the downloads folder if it doesn't exists
+      if (args.downloadsFolder && !fs.existsSync(args.downloadsFolder)) {
+        fs.mkdirSync(args.downloadsFolder);
+      }
+
+      const fullFilePathWithName = `${args.downloadsFolder}/${args.filename}`;
+
       const myBuffer = new Uint8Array(arrayBuffer);
-      fs.writeFileSync(args.filename, myBuffer);
+      fs.writeFileSync(fullFilePathWithName, myBuffer);
 
       return 'downloadFile ' + args.filename + ' downloaded';
     });
