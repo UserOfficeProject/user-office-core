@@ -62,7 +62,7 @@ export interface ProposalDataSource {
     referenceNumber?: string
   ): Promise<Proposal>;
   deleteProposal(primaryKey: number): Promise<Proposal>;
-  markEventAsDoneOnProposal(
+  markEventAsDoneOnProposals(
     event: Event,
     proposalPk: number[]
   ): Promise<ProposalEventsRecord[] | null>;

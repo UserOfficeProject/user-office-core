@@ -171,7 +171,7 @@ export const markProposalEventAsDoneAndCallWorkflowEngine = async (
   eventType: Event,
   proposalPks: number[]
 ) => {
-  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposal(
+  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
     eventType,
     proposalPks
   );

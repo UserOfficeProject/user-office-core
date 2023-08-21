@@ -16,10 +16,13 @@ enum ProposalInformationKeys {
 }
 
 export const handleWorkflowEngineChange = async (
-  proposalDataSource: ProposalDataSource,
   event: ApplicationEvent,
   proposalPks: number[] | number
 ) => {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
   const isArray = Array.isArray(proposalPks);
 
   const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
@@ -84,10 +87,6 @@ const extractProposalInformationFromEvent = (event: ApplicationEvent) => {
 };
 
 export default function createHandler() {
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-
   // Handler to align input for workflowEngine
   return async function proposalWorkflowHandler(event: ApplicationEvent) {
     // if the original method failed
@@ -111,16 +110,11 @@ export default function createHandler() {
       switch (proposalInformationKey) {
         case ProposalInformationKeys.ProposalPKs:
         case ProposalInformationKeys.ProposalPk:
-          handleWorkflowEngineChange(
-            proposalDataSource,
-            event,
-            proposalInformationValue
-          );
+          handleWorkflowEngineChange(event, proposalInformationValue);
 
           break;
         case ProposalInformationKeys.Proposal:
           handleWorkflowEngineChange(
-            proposalDataSource,
             event,
             (proposalInformationValue as Proposal).primaryKey
           );

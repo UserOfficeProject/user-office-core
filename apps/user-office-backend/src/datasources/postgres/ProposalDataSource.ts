@@ -651,7 +651,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
   }
 
-  async markEventAsDoneOnProposal(
+  async markEventAsDoneOnProposals(
     event: Event,
     proposalPks: number[]
   ): Promise<ProposalEventsRecord[] | null> {
