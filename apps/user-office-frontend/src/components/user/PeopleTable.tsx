@@ -109,9 +109,9 @@ const getTitle = ({
     case UserRole.USER_OFFICER:
       return 'Invite User';
     case UserRole.SEP_CHAIR:
-      return 'Invite SEP Chair';
+      return 'Invite ' + t('SEP') + ' Chair';
     case UserRole.SEP_SECRETARY:
-      return 'Invite SEP Secretary';
+      return 'Invite ' + t('SEP') + ' Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
       return 'Invite ' + t('instrumentSci');
     default:
