@@ -1,6 +1,6 @@
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
@@ -10,7 +10,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
+export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 

@@ -10,7 +10,7 @@ import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-const PaperContainer: React.FC = ({ children }) => (
+const PaperContainer = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper>{children}</StyledPaper>
 );
 
@@ -39,6 +39,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
       );
       break;
     case UserRole.INSTRUMENT_SCIENTIST:
+    case UserRole.INTERNAL_REVIEWER:
       roleBasedOverView = (
         <PaperContainer>
           <ProposalTableInstrumentScientist />

@@ -149,19 +149,27 @@ export default class ProposalMutations {
     }
 
     if (users !== undefined) {
-      if (
-        await this.userDataSource
-          .getProposalUsers(proposal.primaryKey)
-          .then((currentUsers) => {
-            return currentUsers.some((currentUser) =>
-              users.includes(currentUser.id)
-            );
-          })
-      ) {
-        return rejection(
-          'Can not associate duplicate co-proposers with proposal',
-          { primaryKey: proposalPk, agent }
+      const allUsers = [proposerId, ...users];
+      const uniqueUsers = new Set(allUsers);
+
+      if (uniqueUsers.size !== allUsers.length) {
+        const duplicateUser = allUsers.find(
+          (user, index) => allUsers.indexOf(user) !== index
         );
+
+        const errorContext = {
+          primaryKey: proposalPk,
+          pi: proposerId,
+          cois: users,
+          duplicateUser: duplicateUser,
+        };
+
+        logger.logError(
+          'Could not update proposal due to duplicate user',
+          errorContext
+        );
+
+        return rejection('Proposal contains a duplicate user', errorContext);
       }
 
       await this.proposalDataSource

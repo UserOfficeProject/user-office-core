@@ -1,7 +1,7 @@
 import ListItemText from '@mui/material/ListItemText';
 import { Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
-import React, { FC } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
@@ -13,9 +13,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationFileUploadForm: FC<
-  QuestionTemplateRelationFormProps
-> = (props) => {
+export const QuestionTemplateRelationFileUploadForm = (
+  props: QuestionTemplateRelationFormProps
+) => {
   const availableFileTypeOptions = [
     { label: '.pdf', value: '.pdf' },
     { label: '.doc', value: '.doc' },

@@ -59,14 +59,12 @@ type AddStatusChangingEventsToConnectionProps = {
   statusName?: string;
 };
 
-const AddStatusChangingEventsToConnection: React.FC<
-  AddStatusChangingEventsToConnectionProps
-> = ({
+const AddStatusChangingEventsToConnection = ({
   statusChangingEvents,
   close,
   addStatusChangingEventsToConnection,
   statusName,
-}) => {
+}: AddStatusChangingEventsToConnectionProps) => {
   const classes = useStyles();
 
   const { proposalEvents, loadingProposalEvents } = useProposalEventsData();

@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { eventBus } from '../events';
+import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
@@ -40,6 +40,7 @@ export default function createCustomHandler() {
       return;
     }
 
+    const eventBus = resolveApplicationEventBus();
     switch (event.type) {
       case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
         if (event.proposal.managementDecisionSubmitted) {

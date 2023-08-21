@@ -154,7 +154,20 @@ const SamplesMenuListItem = () => {
   );
 };
 
-const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
+const ProposalsMenuListItem = () => {
+  return (
+    <Tooltip title="Review Proposals">
+      <ListItem component={NavLink} to="/" exact button>
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Review Proposals" />
+      </ListItem>
+    </Tooltip>
+  );
+};
+
+const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const proposalDisabled = callsData.length === 0;
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
@@ -273,12 +286,14 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </Tooltip>
       )}
       {isSEPEnabled && (
-        <Tooltip title="Scientific evaluation panels">
+        <Tooltip
+          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+        >
           <ListItem component={NavLink} to="/SEPs" button>
             <ListItemIcon>
               <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary="SEPs" />
+            <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
           </ListItem>
         </Tooltip>
       )}
@@ -326,8 +341,10 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <Tooltip title="Scientific evaluation panels">
-          <ListItemText primary="SEPs" />
+        <Tooltip
+          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+        >
+          <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
         </Tooltip>
       </ListItem>
     </div>
@@ -366,6 +383,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     </div>
   );
 
+  const internalReviewer = (
+    <div data-cy="internal-reviewer-menu-items">
+      <ProposalsMenuListItem />
+    </div>
+  );
+
   switch (currentRole) {
     case UserRole.USER:
       return user;
@@ -379,6 +402,8 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
       return SEPRoles;
     case UserRole.SAMPLE_SAFETY_REVIEWER:
       return sampleSafetyReviewer;
+    case UserRole.INTERNAL_REVIEWER:
+      return internalReviewer;
     default:
       return null;
   }

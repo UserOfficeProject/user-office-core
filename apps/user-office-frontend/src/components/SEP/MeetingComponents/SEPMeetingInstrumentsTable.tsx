@@ -38,12 +38,12 @@ const instrumentTableColumns = [
   },
 ];
 
-const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
+const SEPMeetingInstrumentsTable = ({
   sepId,
   selectedCall,
   Toolbar,
   confirm,
-}) => {
+}: SEPMeetingInstrumentsTableProps) => {
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsBySEPData(sepId, selectedCall?.id);
   const { api } = useDataApiWithFeedback();
@@ -113,10 +113,13 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
           setInstrumentsData(newInstrumentsData);
         }
       } else {
-        enqueueSnackbar('All proposal SEP meetings should be submitted', {
-          variant: 'error',
-          className: 'snackbar-error',
-        });
+        enqueueSnackbar(
+          'All proposal ' + t('SEP') + ' meetings should be submitted',
+          {
+            variant: 'error',
+            className: 'snackbar-error',
+          }
+        );
       }
     }
   };
@@ -146,7 +149,9 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
             },
             {
               title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `No further changes to sep meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
+              description: `No further changes to ${t(
+                'SEP'
+              )} meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
                 'instrument'
               )}?`,
             }

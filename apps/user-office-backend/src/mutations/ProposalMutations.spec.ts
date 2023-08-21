@@ -148,17 +148,48 @@ test('A user not on a proposal can not update it', () => {
   ).resolves.toBeInstanceOf(Rejection);
 });
 
-test('A user can not add duplicate co-proposers', async () => {
-  return expect(
-    proposalMutations.update(dummyUserWithRole, {
-      proposalPk: 1,
-      title: 'newTitle',
-      abstract: 'newAbstract',
-      users: [dummyUserWithRole.id],
+test('A proposal cannot contain duplicate co-proposers', async () => {
+  const pi = 1;
+  const duplicateCoI = 4;
+  const coIs = [2, 3, duplicateCoI, duplicateCoI];
+
+  const updateResult = await proposalMutations.update(dummyUserWithRole, {
+    proposalPk: 1,
+    title: 'newTitle',
+    abstract: 'newAbstract',
+    users: coIs,
+    proposerId: pi,
+  });
+
+  expect(updateResult).toEqual(
+    expect.objectContaining({
+      reason: 'Proposal contains a duplicate user',
+      context: expect.objectContaining({
+        duplicateUser: duplicateCoI,
+      }),
     })
-  ).resolves.toHaveProperty(
-    'reason',
-    'Can not associate duplicate co-proposers with proposal'
+  );
+});
+
+test('A proposal PI cannot also be a co-proposer', async () => {
+  const pi = 1;
+  const coIs = [pi, 2, 3];
+
+  const updateResult = await proposalMutations.update(dummyUserWithRole, {
+    proposalPk: 1,
+    title: 'newTitle',
+    abstract: 'newAbstract',
+    users: coIs,
+    proposerId: pi,
+  });
+
+  expect(updateResult).toEqual(
+    expect.objectContaining({
+      reason: 'Proposal contains a duplicate user',
+      context: expect.objectContaining({
+        duplicateUser: pi,
+      }),
+    })
   );
 });
 

@@ -2,7 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
-import React, { FC, useContext, ChangeEvent } from 'react';
+import React, { useContext, ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -19,7 +19,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
+export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as SampleDeclarationConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);

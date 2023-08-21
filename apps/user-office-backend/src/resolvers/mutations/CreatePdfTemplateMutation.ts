@@ -18,6 +18,12 @@ export class CreatePdfTemplateInput {
 
   @Field(() => String)
   templateData: string;
+
+  @Field(() => String)
+  templateHeader: string;
+
+  @Field(() => String)
+  templateFooter: string;
 }
 
 @Resolver()

@@ -63,6 +63,7 @@ export const getProposalStatus = (
 export const fromProposalToProposalView = (proposal: Proposal) => {
   return {
     primaryKey: proposal.primaryKey,
+    principalInvestigator: proposal.proposer || null,
     title: proposal.title,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,
@@ -128,8 +129,8 @@ export const removeColumns = <T extends object>(
 };
 
 export const isCallEnded = (
-  startDate: Scalars['DateTime'],
-  endDate: Scalars['DateTime']
+  startDate: Scalars['DateTime']['input'],
+  endDate: Scalars['DateTime']['input']
 ) => {
   if (!startDate || !endDate) {
     return true;

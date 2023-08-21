@@ -11,10 +11,13 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 // NOTE: This is additional component because of some react warning with hooks when we use the useFormattedDateTime inside default DateAnswerRenderer component.
-const DateAnswerValueRenderer: React.FC<{
+const DateAnswerValueRenderer = ({
+  config,
+  value,
+}: {
   config: FieldConfig;
-  value: Maybe<Scalars['IntStringDateBoolArray']>;
-}> = ({ config, value }) => {
+  value: Maybe<Scalars['IntStringDateBoolArray']['input']>;
+}) => {
   const settingsFormatToUse = (config as DateConfig).includeTime
     ? SettingsId.DATE_TIME_FORMAT
     : SettingsId.DATE_FORMAT;

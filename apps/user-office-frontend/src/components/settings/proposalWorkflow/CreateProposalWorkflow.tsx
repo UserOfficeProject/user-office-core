@@ -21,9 +21,7 @@ type CreateProposalWorkflowProps = {
   close: (proposalWorkflowAdded: ProposalWorkflow | null) => void;
 };
 
-const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
-  close,
-}) => {
+const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 

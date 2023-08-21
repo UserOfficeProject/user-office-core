@@ -52,7 +52,7 @@ const getFilterStatus = (
   }
 };
 
-const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
+const CallsTable = ({ confirm }: WithConfirmProps) => {
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
   const { timezone, toFormattedDateTime } = useFormattedDateTime({
@@ -121,7 +121,7 @@ const CallsTable: React.FC<WithConfirmProps> = ({ confirm }) => {
       field: 'proposalCount',
     },
     {
-      title: '#seps',
+      title: '#' + i18n.format(i18n.format(t('SEP'), 'plural'), 'lowercase'),
       field: 'seps.length',
       emptyValue: '-',
     },

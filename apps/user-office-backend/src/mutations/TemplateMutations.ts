@@ -129,6 +129,8 @@ export default class TemplateMutations {
         await this.pdfTemplateDataSource.createPdfTemplate({
           templateId: newTemplate.templateId,
           templateData: '',
+          templateHeader: '',
+          templateFooter: '',
           creatorId: (agent as UserWithRole).id,
         });
     }

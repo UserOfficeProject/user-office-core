@@ -7,6 +7,7 @@ import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import UOLoader from 'components/common/UOLoader';
 import { Sep } from 'generated/sdk';
@@ -22,9 +23,10 @@ type AddSEPProps = {
   close: (sepAdded: Sep | null) => void;
 };
 
-const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
+const AddSEP = ({ close }: AddSEPProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { t } = useTranslation();
 
   return (
     <Formik
@@ -37,7 +39,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
       onSubmit={async (values): Promise<void> => {
         try {
           const { createSEP } = await api({
-            toastSuccessMessage: 'SEP created successfully!',
+            toastSuccessMessage: t('SEP ') + 'created successfully!',
           }).createSEP(values);
 
           close(createSEP);
@@ -50,7 +52,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
       {(): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h1">
-            Create new SEP
+            Create new {t('SEP')}
           </Typography>
 
           <Field

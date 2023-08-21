@@ -12,7 +12,7 @@ import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
-import { AuthJwtPayload, User } from '../models/User';
+import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { LRUCache } from '../utils/LRUCache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
@@ -43,6 +43,10 @@ export class StfcUserAuthorization extends UserAuthorization {
   protected instrumentDataSource: InstrumentDataSource = container.resolve(
     Tokens.InstrumentDataSource
   );
+
+  protected userDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
 
   getRequiredInstrumentForRole(roles: stfcRole[]) {
     return roles
@@ -227,11 +231,36 @@ export class StfcUserAuthorization extends UserAuthorization {
       if (token) {
         this.uowsTokenCache.remove(token);
 
-        return await client.logout(token).catch(() => {
-          logger.logWarn('Failed to log out user', { token });
+        const isValidToken = await this.isExternalTokenValid(token);
 
-          return rejection('Failed to log out user', { token });
-        });
+        if (!isValidToken) {
+          logger.logInfo(
+            'UOWS token found to be invalid, skipping UOWS logout call',
+            { token }
+          );
+
+          return Promise.resolve('User already logged out');
+        }
+
+        return await client
+          .logout(token)
+          .then(() => {
+            return 'Successfully logged out user';
+          })
+          .catch((ex: string): Rejection | string => {
+            if (ex === 'The token given is invalid') {
+              logger.logInfo(
+                'Logout failed because the cached token has since expired',
+                { token }
+              );
+
+              return 'User already logged out';
+            }
+
+            logger.logWarn('Failed to log out user', { token });
+
+            return rejection('Failed to log out user', { token });
+          });
       } else {
         return rejection('No external token found in JWT', { token });
       }
@@ -280,5 +309,14 @@ export class StfcUserAuthorization extends UserAuthorization {
             );
           })
       : false;
+  }
+
+  async canReadUser(agent: UserWithRole | null, id: number): Promise<boolean> {
+    const readableUsers = await this.listReadableUsers(agent, [id]);
+
+    return (
+      readableUsers.includes(id) ||
+      (await this.userDataSource.isSearchableUser(id))
+    );
   }
 }

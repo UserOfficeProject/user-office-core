@@ -24,6 +24,7 @@ import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
 import { StyledPaper } from 'styles/StyledComponents';
 
+import InternalReviews from '../internalReview/InternalReviews';
 import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
@@ -46,16 +47,17 @@ type ProposalReviewContentProps = {
   isInsideModal?: boolean;
 };
 
-const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
+const ProposalReviewContent = ({
   proposalPk,
   tabNames,
   reviewId,
   sepId,
   isInsideModal,
-}) => {
+}: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
   const { proposalData, setProposalData, loading } = useProposalData(
     proposalPk || reviewData?.proposal?.primaryKey
@@ -91,8 +93,16 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
 
   const TechnicalReviewTab =
     isUserOfficer ||
-    proposalData.technicalReview?.technicalReviewAssigneeId === user.id ? (
+    (isInstrumentScientist &&
+      proposalData.technicalReview?.technicalReviewAssigneeId === user.id) ||
+    isInternalReviewer ? (
       <>
+        {!!proposalData.technicalReview && (
+          <InternalReviews
+            technicalReviewId={proposalData.technicalReview.id}
+            technicalReviewSubmitted={proposalData.technicalReview.submitted}
+          />
+        )}
         {!!proposalData.instrument && (
           <ProposalTechnicalReviewerAssignment
             proposalData={proposalData}

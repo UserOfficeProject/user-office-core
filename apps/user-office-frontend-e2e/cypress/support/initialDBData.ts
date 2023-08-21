@@ -99,6 +99,11 @@ export default {
       text: 'Text input question from seeds',
       type: DataType.TEXT_INPUT,
     },
+    instrumentPicker: {
+      id: 'instrument_picker_question',
+      text: 'Instrument picker question from seeds',
+      type: DataType.INSTRUMENT_PICKER,
+    },
     addSamples: {
       id: 'sample_declaration_question',
       text: 'Add samples',
@@ -156,6 +161,7 @@ export default {
       dynamicMultipleChoice: {
         value: ['One'],
       },
+      instrumentPicker: { value: 1 },
       textInput: {
         value: 'Text input answer from seeds',
       },
@@ -185,6 +191,7 @@ export default {
     sepReviewer: 6,
     instrumentScientist: 7,
     sampleSafetyReviewer: 8,
+    internalReviewer: 9,
   },
   users: {
     user1: {

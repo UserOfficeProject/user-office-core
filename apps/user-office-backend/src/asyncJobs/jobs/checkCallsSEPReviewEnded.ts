@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { SEPDataSource } from '../../datasources/SEPDataSource';
-import { eventBus } from '../../events';
+import { resolveApplicationEventBus } from '../../events';
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
 import { ReviewStatus } from '../../models/Review';
@@ -19,6 +19,7 @@ const checkAndNotifySEPReviewersBeforeReviewEnds = async (
   sepReviewNotEndedCalls: Call[],
   currentDate: DateTime
 ) => {
+  const eventBus = resolveApplicationEventBus();
   const callsThatShouldSendEmailsToSEPReviewers = sepReviewNotEndedCalls.filter(
     (sepReviewNotEndedCall) =>
       sepReviewNotEndedCall.endSEPReview.getTime() <=
@@ -49,6 +50,7 @@ const checkAndNotifySEPReviewersBeforeReviewEnds = async (
 
 // NOTE: This check is for call SEP review ended and for notifying SEP reviewers 2 days before sep review ends.
 const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
+  const eventBus = resolveApplicationEventBus();
   try {
     const sepReviewNotEndedCalls = await dataSource.getCalls({
       isSEPReviewEnded: false,

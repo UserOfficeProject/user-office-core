@@ -2,6 +2,7 @@ import { injectable } from 'tsyringe';
 
 import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
+import { UserWithRole } from '../../models/User';
 import database from '../postgres/database';
 import {
   createProposalViewObject,
@@ -13,7 +14,7 @@ import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
   async getInstrumentScientistProposals(
-    scientistId: number,
+    scientist: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
@@ -45,9 +46,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         'call_has_instruments.instrument_id'
       )
       .where(function () {
-        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
+        this.where('instrument_has_scientists.user_id', scientist.id).orWhere(
           'instruments.manager_user_id',
-          scientistId
+          scientist.id
         );
       })
       .distinct('proposal_table_view.proposal_pk')
@@ -56,12 +57,14 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (filter?.text) {
           query
             .where('title', 'ilike', `%${filter.text}%`)
-            .orWhere('abstract', 'ilike', `%${filter.text}%`);
+            .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
+            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
+            .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           query.where(
             'proposal_table_view.technical_review_assignee_id',
-            scientistId
+            scientist.id
           );
         }
         if (filter?.callId) {

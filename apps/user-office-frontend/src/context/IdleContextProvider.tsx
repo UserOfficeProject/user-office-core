@@ -27,7 +27,9 @@ const initIdleData: IdleContextData = {
 
 export const IdleContext = React.createContext<IdleContextData>(initIdleData);
 
-export const EmptyIdleContextProvider: React.FC = (props) => {
+export const EmptyIdleContextProvider = (props: {
+  children: React.ReactNode;
+}) => {
   const [state] = React.useState(initIdleData);
 
   return (
@@ -41,7 +43,7 @@ export const EmptyIdleContextProvider: React.FC = (props) => {
   );
 };
 
-export const IdleContextProvider: React.FC = (props) => {
+export const IdleContextProvider = (props: { children: React.ReactNode }) => {
   const [state, setState] = React.useState(initIdleData);
   // Separate state to avoid weirdness  s timeouts use the state of when they are started
 
@@ -114,7 +116,11 @@ export const IdleContextProvider: React.FC = (props) => {
 
 IdleContextProvider.propTypes = { children: PropTypes.node.isRequired };
 
-export const IdleContextPicker: React.FC = ({ children }) => {
+export const IdleContextPicker = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const featureContext = useContext(FeatureContext);
 
   const isIdleContextEnabled = featureContext.featuresMap.get(
