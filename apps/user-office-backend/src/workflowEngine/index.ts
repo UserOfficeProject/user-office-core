@@ -167,7 +167,7 @@ export const workflowEngine = async (
   return proposalsWithChangedStatuses.filter((p) => p);
 };
 
-export const markProposalEventAsDoneAndCallWorkflowEngine = async (
+export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
   eventType: Event,
   proposalPks: number[]
 ) => {

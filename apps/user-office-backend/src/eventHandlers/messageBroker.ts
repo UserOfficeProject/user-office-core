@@ -18,7 +18,7 @@ import { AllocationTimeUnits } from '../models/Call';
 import { Instrument } from '../models/Instrument';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
-import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
+import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 const EXCHANGE_NAME =
   process.env.CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
@@ -343,10 +343,10 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
-      eventType,
-      [proposalPk]
-    );
+    const updatedProposals =
+      await markProposalsEventAsDoneAndCallWorkflowEngine(eventType, [
+        proposalPk,
+      ]);
 
     if (updatedProposals) {
       for (const updatedProposal of updatedProposals) {

@@ -7,7 +7,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
-import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
+import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 enum ProposalInformationKeys {
   Proposal = 'proposal',
@@ -25,7 +25,7 @@ export const handleWorkflowEngineChange = async (
 
   const isArray = Array.isArray(proposalPks);
 
-  const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
+  const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
     event.type,
     isArray ? proposalPks : [proposalPks]
   );
