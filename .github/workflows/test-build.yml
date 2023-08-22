@@ -285,7 +285,7 @@ jobs:
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
-      # - You ran 'npm install --force' at an earlier build step but did not persist: /home/runner/.cache/Cypress
+      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
       # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
       # - name: Cache e2e node_modules
       #   env:
