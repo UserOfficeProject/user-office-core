@@ -66,7 +66,7 @@
     "magic-bytes.js": "^1.0.7",
     "muhammara": "^3.8.0",
     "multer": "^1.4.4",
-    "openid-client": "^5.1.9",
+    "openid-client": "^5.4.2",
     "pg": "^8.8.0",
     "pg-large-object": "^2.0.0",
     "reflect-metadata": "^0.1.13",
