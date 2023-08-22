@@ -44,10 +44,6 @@ export interface ProposalSettingsDataSource {
       sortOrder,
     }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]>;
-  getStatusActionsByConnectionId(
-    proposalWorkflowConnectionId: number,
-    proposalWorkflowId: number
-  ): Promise<ProposalStatusAction[]>;
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection>;
@@ -66,4 +62,12 @@ export interface ProposalSettingsDataSource {
   getStatusChangingEventsByConnectionIds(
     proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
+
+  getStatusActionsByConnectionId(
+    proposalWorkflowConnectionId: number,
+    proposalWorkflowId: number
+  ): Promise<ProposalStatusAction[]>;
+  updateStatusAction(
+    proposalStatusAction: ProposalStatusAction
+  ): Promise<ProposalStatusAction>;
 }

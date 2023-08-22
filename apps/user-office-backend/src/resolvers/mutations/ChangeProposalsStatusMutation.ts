@@ -12,12 +12,15 @@ import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 
 @InputType()
-export class ProposalPkWithCallId {
+export class ProposalSelectionInput {
   @Field(() => Int)
   public primaryKey: number;
 
   @Field(() => Int)
   public callId: number;
+
+  @Field(() => Int, { nullable: true })
+  public workflowId?: number;
 }
 
 @InputType()
@@ -25,8 +28,8 @@ export class ChangeProposalsStatusInput {
   @Field(() => Int)
   public statusId: number;
 
-  @Field(() => [ProposalPkWithCallId])
-  public proposals: ProposalPkWithCallId[];
+  @Field(() => [ProposalSelectionInput])
+  public proposals: ProposalSelectionInput[];
 }
 
 @Resolver()

@@ -8,6 +8,7 @@ export enum ProposalStatusActionType {
 export class ProposalStatusAction {
   constructor(
     public id: number,
+    public connectionId: number,
     public name: string,
     public defaultConfig: string,
     public type: ProposalStatusActionType,

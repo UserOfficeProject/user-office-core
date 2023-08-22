@@ -14,6 +14,7 @@ import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -30,6 +31,8 @@ import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposa
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
+import { statusActionEngine } from '../statusActionEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
@@ -41,6 +44,8 @@ export default class ProposalMutations {
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ProposalSettingsDataSource)
+    public proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
@@ -377,7 +382,6 @@ export default class ProposalMutations {
     const {
       proposalPk: primaryKey,
       finalStatus,
-      statusId,
       commentForManagement,
       commentForUser,
       managementTimeAllocation,
@@ -417,28 +421,6 @@ export default class ProposalMutations {
       proposal.finalStatus = finalStatus;
     }
 
-    if (proposal.statusId !== statusId && statusId) {
-      /**
-       * NOTE: Reset proposal events that are coming after given status.
-       * For example if proposal had SEP_REVIEW status and we manually reset to FEASIBILITY_REVIEW then events like:
-       * proposal_feasible, proposal_feasibility_review_submitted and proposal_sep_selected should be reset to false in the proposal_events table
-       */
-      await this.proposalDataSource.resetProposalEvents(
-        proposal.primaryKey,
-        proposal.callId,
-        statusId
-      );
-
-      // NOTE: If status Draft re-open proposal for submission.
-      if (statusId === 1) {
-        proposal.submitted = false;
-      }
-    }
-
-    if (statusId !== undefined) {
-      proposal.statusId = statusId;
-    }
-
     if (commentForUser !== undefined) {
       proposal.commentForUser = commentForUser;
     }
@@ -475,15 +457,36 @@ export default class ProposalMutations {
     );
 
     if (result.proposalPks.length === proposals.length) {
-      await Promise.all(
-        proposals.map((proposal) => {
-          return this.proposalDataSource.resetProposalEvents(
+      const fullProposals = await Promise.all(
+        proposals.map(async (proposal) => {
+          await this.proposalDataSource.resetProposalEvents(
             proposal.primaryKey,
             proposal.callId,
-            statusId
+            statusId,
+            true
           );
+
+          const fullProposal = await this.proposalDataSource.get(
+            proposal.primaryKey
+          );
+
+          if (!fullProposal) {
+            return null;
+          }
+
+          return {
+            ...fullProposal,
+            workflowId: proposal.workflowId,
+          };
         })
       );
+
+      const statusEngineReadyProposals = fullProposals.filter(
+        (item): item is WorkflowEngineProposalType => !!item
+      );
+
+      // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
+      statusActionEngine(statusEngineReadyProposals);
     }
 
     return result || rejection('Can not change proposal status', { result });

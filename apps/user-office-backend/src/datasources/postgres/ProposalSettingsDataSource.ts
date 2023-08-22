@@ -545,6 +545,7 @@ export default class PostgresProposalSettingsDataSource
       });
   }
 
+  // TODO: This might need to be moved to it's own ProposalStatusActionsDataSource.ts file
   private createProposalStatusActionObject(
     proposalActionStatusRecord: ProposalStatusActionRecord &
       ProposalWorkflowConnectionHasActionsRecord & {
@@ -553,6 +554,7 @@ export default class PostgresProposalSettingsDataSource
   ) {
     return new ProposalStatusAction(
       proposalActionStatusRecord.proposal_status_action_id,
+      proposalActionStatusRecord.connection_id,
       proposalActionStatusRecord.name,
       proposalActionStatusRecord.default_config,
       proposalActionStatusRecord.type,
@@ -561,7 +563,6 @@ export default class PostgresProposalSettingsDataSource
     );
   }
 
-  // TODO: This might need to be moved to it's own ProposalStatusActionsDataSource.ts file
   async getStatusActionsByConnectionId(
     proposalWorkflowConnectionId: number,
     proposalWorkflowId: number
@@ -584,5 +585,37 @@ export default class PostgresProposalSettingsDataSource
     );
 
     return proposalStatusActions;
+  }
+
+  async updateStatusAction(
+    proposalStatusAction: ProposalStatusAction
+  ): Promise<ProposalStatusAction> {
+    const [
+      updatedProposalAction,
+    ]: ProposalWorkflowConnectionHasActionsRecord[] = await database
+      .update(
+        {
+          executed: proposalStatusAction.executed,
+          config: proposalStatusAction.config,
+        },
+        ['*']
+      )
+      .from('proposal_workflow_connection_has_actions')
+      .where('connection_id', proposalStatusAction.connectionId)
+      .andWhere('action_id', proposalStatusAction.id);
+
+    if (!updatedProposalAction) {
+      throw new GraphQLError(
+        `ProposalStatusAction not found ${proposalStatusAction.id}`
+      );
+    }
+
+    return this.createProposalStatusActionObject({
+      proposal_status_action_id: proposalStatusAction.id,
+      name: proposalStatusAction.name,
+      default_config: proposalStatusAction.defaultConfig,
+      type: proposalStatusAction.type,
+      ...updatedProposalAction,
+    });
   }
 }

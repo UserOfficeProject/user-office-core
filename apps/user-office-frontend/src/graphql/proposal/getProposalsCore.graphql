@@ -38,6 +38,7 @@ query getProposalsCore(
       reviewDeviation
       instrumentId
       callId
+      workflowId
       submitted
       allocationTimeUnit
       principalInvestigator {

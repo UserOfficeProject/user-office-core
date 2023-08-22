@@ -69,6 +69,7 @@ export const dummyStatusChangingEvent = new StatusChangingEvent(
 
 export const dummyProposalStatusAction = new ProposalStatusAction(
   1,
+  1,
   'Dummy action',
   '{}',
   ProposalStatusActionType.EMAIL,
@@ -205,5 +206,11 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowId: number
   ): Promise<ProposalStatusAction[]> {
     return [dummyProposalStatusAction];
+  }
+
+  async updateStatusAction(
+    proposalStatusAction: ProposalStatusAction
+  ): Promise<ProposalStatusAction> {
+    return dummyProposalStatusAction;
   }
 }

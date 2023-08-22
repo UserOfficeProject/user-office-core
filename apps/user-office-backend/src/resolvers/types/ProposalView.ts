@@ -98,6 +98,9 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int)
   public callId: number;
 
+  @Field(() => Int)
+  public workflowId: number;
+
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
 }
