@@ -153,9 +153,9 @@ export class StfcUserDataSource implements UserDataSource {
       const uowsRequest = searchableOnly
         ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
             token,
-            userNumbers
+            cacheMisses
           )
-        : client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers);
+        : client.getBasicPeopleDetailsFromUserNumbers(token, cacheMisses);
       const usersFromUows: StfcBasicPersonDetails[] | null = (await uowsRequest)
         ?.return;
 
@@ -417,7 +417,7 @@ export class StfcUserDataSource implements UserDataSource {
 
     return {
       users: userDetails.sort((a, b) => a.id - b.id),
-      totalCount: finalTotalCount,
+      totalCount: userDetails.length,
     };
   }
 
