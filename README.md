@@ -10,7 +10,7 @@
 
 To be able to start both backend and frontend locally you will need to:
 
-1. Install all needed dependencies with `npm install`
+1. Install all needed dependencies with `npm install --force`
 2. Start the application using `npm run dev` or `npm run start`
 
 ## Check the .env file
