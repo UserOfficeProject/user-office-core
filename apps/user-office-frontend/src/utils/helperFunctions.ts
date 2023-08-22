@@ -94,6 +94,7 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
+    workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
   } as ProposalViewData;
 };

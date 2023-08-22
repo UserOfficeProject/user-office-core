@@ -55,6 +55,7 @@ query getProposal($primaryKey: Int!) {
       startCall
       endCall
       endCallInternal
+      proposalWorkflowId
     }
     sep {
       id
