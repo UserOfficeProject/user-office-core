@@ -19,13 +19,7 @@ type StfcRolesToEssRole = { [key: string]: Roles[] };
  * Must not contain user role, this is appended at the very last step.
  */
 const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
-  'User Officer': [
-    Roles.USER_OFFICER,
-    Roles.INSTRUMENT_SCIENTIST,
-    Roles.SEP_REVIEWER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-  ],
+  'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
   'CLF Artemis FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'CLF Artemis Link Scientist': [Roles.INSTRUMENT_SCIENTIST],

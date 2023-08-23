@@ -148,7 +148,7 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
                     }}
                   />
                 }
-                label="FAP Grade Guide"
+                label="Custom Grade Guide"
               />
             </Grid>
             <Grid item sm={6} xs={12}>
