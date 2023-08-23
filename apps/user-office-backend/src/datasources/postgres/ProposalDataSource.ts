@@ -842,7 +842,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       return;
     }
 
-    const [updatedProposalStatusActions] = await database
+    const updatedProposalStatusActions = await database
       .update({ executed: false })
       .from('proposal_workflow_connection_has_actions')
       .modify((query) => {
