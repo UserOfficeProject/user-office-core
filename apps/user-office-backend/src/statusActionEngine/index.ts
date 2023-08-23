@@ -1,17 +1,14 @@
-import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
-import {
-  ProposalStatusAction,
-  ProposalStatusActionType,
-} from '../models/ProposalStatusAction';
+import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import {
   WorkflowEngineProposalType,
   getProposalWorkflowConnectionByStatusId,
 } from '../workflowEngine';
 import { emailActionHandler } from './emailActionHandler';
+import { rabbitMQActionHandler } from './rabbitMQHandler';
 import { groupProposalsByProperties } from './statusActionUtils';
 
 export const statusActionEngine = async (
@@ -72,11 +69,4 @@ export const statusActionEngine = async (
       );
     })
   );
-};
-
-const rabbitMQActionHandler = (
-  proposalStatusAction: ProposalStatusAction,
-  proposals: WorkflowEngineProposalType[]
-) => {
-  logger.logInfo('this is rabbitmq action type', {});
 };
