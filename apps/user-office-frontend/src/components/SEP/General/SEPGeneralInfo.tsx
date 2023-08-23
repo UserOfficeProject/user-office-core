@@ -138,7 +138,7 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
                     type="checkbox"
                     inputProps={{ 'aria-label': 'primary checkbox' }}
                     checked={values.customGradeGuide}
-                    data-cy="customGradeGuide"
+                    data-cy="custom-grade-guide"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                       handlecustomGradeGuideChange(event);
                       setFieldValue(

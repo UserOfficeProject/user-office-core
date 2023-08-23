@@ -1776,6 +1776,51 @@ context('SEP meeting components tests', () => {
       );
     });
 
+    it('Officer should be able to add custom grade guide when creating SEP', () => {
+      cy.assignProposalsToSep({
+        sepId: createdSepId,
+        proposals: [
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+        ],
+      });
+      cy.assignReviewersToSep({
+        sepId: createdSepId,
+        memberIds: [sepMembers.reviewer.id],
+      });
+      cy.assignSepReviewersToProposal({
+        sepId: createdSepId,
+        memberIds: [sepMembers.reviewer.id],
+        proposalPk: createdProposalPk,
+      });
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy="grade-guide"]').click();
+
+      cy.contains(sep1.gradeGuide).should('not.exist');
+
+      cy.visit(`/SEPPage/${createdSepId}?`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="custom-grade-guide"]').click();
+      cy.get('[data-cy="submit"]').click();
+
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy="grade-guide"]').click();
+
+      cy.contains(sep1.gradeGuide);
+    });
+
     it('Officer should be able to bulk download SEP proposals as pdf', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then(
         (proposalResult) => {

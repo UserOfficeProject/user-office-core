@@ -217,7 +217,11 @@ const ProposalGrade = ({
           </Box>
           <ErrorMessage name="grade" />
           <NavigationFragment isLoading={isSubmitting}>
-            <ButtonWithDialog label="Grading guide" disabled={isSubmitting}>
+            <ButtonWithDialog
+              label="Grading guide"
+              disabled={isSubmitting}
+              data-cy="grade-guide"
+            >
               {sep ? <GradeGuidePage sep={sep} /> : <GradeGuidePage />}
             </ButtonWithDialog>
             {hasAccessRights && (
