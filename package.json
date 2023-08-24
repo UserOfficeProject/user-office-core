@@ -46,7 +46,8 @@
     "monorepo"
   ],
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "cd apps/user-office-frontend-e2e && npm run lint"
+    "*.{js,ts,jsx,tsx}": "cd apps/user-office-backend && npm run lint",
+    "*.{js,ts,jsx,tsx}": "cd apps/user-office-frontend && npm run lint:fix"
   },
   "husky": {
     "hooks": {
@@ -55,7 +56,6 @@
   },
   "dependencies": {
     "concurrently": "^8.1.0",
-    "react-quill": "^2.0.0",
     "wait-on": "^6.0.1"
   },
   "devDependencies": {
