@@ -377,7 +377,6 @@ export class StfcUserDataSource implements UserDataSource {
     subtractUsers,
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     let userDetails: BasicUserDetails[] = [];
-    let finalTotalCount = 0;
 
     if (filter) {
       userDetails = [];
@@ -389,10 +388,8 @@ export class StfcUserDataSource implements UserDataSource {
       userDetails = stfcBasicPeopleByLastName.map((person) =>
         toEssBasicUserDetails(person)
       );
-
-      finalTotalCount = userDetails.length;
     } else {
-      const { users, totalCount } = await postgresUserDataSource.getUsers({
+      const { users } = await postgresUserDataSource.getUsers({
         filter: undefined,
         first: first,
         offset: offset,
@@ -400,8 +397,6 @@ export class StfcUserDataSource implements UserDataSource {
         subtractUsers: subtractUsers,
         orderDirection: 'asc',
       });
-
-      finalTotalCount = totalCount;
 
       if (users[0]) {
         const userNumbers: string[] = users.map((record) => String(record.id));
