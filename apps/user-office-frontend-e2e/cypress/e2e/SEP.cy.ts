@@ -1777,21 +1777,6 @@ context('SEP meeting components tests', () => {
     });
 
     it('Officer should be able to add custom grade guide when creating SEP', () => {
-      cy.assignProposalsToSep({
-        sepId: createdSepId,
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
-      });
-      cy.assignReviewersToSep({
-        sepId: createdSepId,
-        memberIds: [sepMembers.reviewer.id],
-      });
-      cy.assignSepReviewersToProposal({
-        sepId: createdSepId,
-        memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalPk,
-      });
       cy.login('officer');
       cy.visit(`/SEPPage/${createdSepId}?tab=2`);
 
