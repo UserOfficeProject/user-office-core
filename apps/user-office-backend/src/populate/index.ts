@@ -325,6 +325,8 @@ const createSeps = async () => {
       dummy.word(),
       faker.random.words(5),
       dummy.positiveNumber(5),
+      faker.random.words(5),
+      true,
       true
     );
     await sepDataSource.assignChairOrSecretaryToSEP({
