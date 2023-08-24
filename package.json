@@ -47,7 +47,8 @@
   ],
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "cd apps/user-office-backend && npm run lint",
-    "*.{js,ts,jsx,tsx}": "cd apps/user-office-frontend && npm run lint:fix"
+    "*.{js,ts,jsx,tsx}": "cd apps/user-office-frontend && npm run lint:fix",
+    "*.{js,ts,jsx,tsx}": "cd apps/user-office-frontend-e2e && npm run lint"
   },
   "husky": {
     "hooks": {
