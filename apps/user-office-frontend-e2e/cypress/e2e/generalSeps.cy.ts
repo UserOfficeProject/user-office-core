@@ -103,13 +103,12 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('Officer should be able to create SEP', () => {
-      const { code, description, gradeGuide } = sep1;
+      const { code, description } = sep1;
 
       cy.contains('SEPs').click();
       cy.contains('Create').click();
       cy.get('#code').type(code);
       cy.get('#description').type(description);
-      cy.get('#gradeGuide').type(gradeGuide);
 
       cy.get('[data-cy="sepActive"] input').should('be.checked');
       cy.get('[data-cy="sepActive"] input').uncheck();
@@ -123,7 +122,6 @@ context('General scientific evaluation panel tests', () => {
       cy.contains('Update SEP');
       cy.get('#code').should('contain.value', code);
       cy.get('#description').should('contain.value', description);
-      cy.get('#gradeGuide').should('contain.value', gradeGuide);
     });
 
     it('Officer should be able to edit existing SEP', () => {
