@@ -17,10 +17,11 @@ interface TabPanelProps {
   dir?: string;
   index: number;
   value: number;
+  padding?: number | string;
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, padding, ...other } = props;
 
   return (
     <Typography
@@ -31,7 +32,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
-      {value === index && <Box p={3}>{children}</Box>}
+      {value === index && <Box p={padding}>{children}</Box>}
     </Typography>
   );
 }
@@ -47,12 +48,14 @@ type FullWidthTabsProps = {
   children: React.ReactNode[];
   tabNames: string[];
   isInsideModal?: boolean;
+  tabPanelPadding?: number | string;
 };
 
 const FullWidthTabs = ({
   tabNames,
   children,
   isInsideModal,
+  tabPanelPadding = 3,
   ...other
 }: FullWidthTabsProps) => {
   const theme = useTheme();
@@ -108,6 +111,7 @@ const FullWidthTabs = ({
           value={isInsideModal ? query.modalTab : query.tab}
           index={i}
           dir={theme.direction}
+          padding={tabPanelPadding}
         >
           {tabContent}
         </TabPanel>

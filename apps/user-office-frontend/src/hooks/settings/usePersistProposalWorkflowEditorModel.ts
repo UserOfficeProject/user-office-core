@@ -111,6 +111,22 @@ export function usePersistProposalWorkflowEditorModel() {
         .then((data) => data.addStatusChangingEventsToConnection);
     };
 
+    const addStatusActionToConnection = async (
+      proposalWorkflowConnectionId: number,
+      statusActions: any[]
+    ) => {
+      return;
+
+      // api({
+      //   toastSuccessMessage: 'Status actions added successfully!',
+      // })
+      //   .addStatusActionsToConnection({
+      //     proposalWorkflowConnectionId,
+      //     statusChangingEvents,
+      //   })
+      //   .then((data) => data.addStatusChangingEventsToConnection);
+    };
+
     return (next: FunctionType) => (action: Event) => {
       next(action);
       const state = getState();
@@ -256,6 +272,26 @@ export function usePersistProposalWorkflowEditorModel() {
 
             dispatch({
               type: EventType.NEXT_STATUS_EVENTS_ADDED,
+              payload: {
+                workflowConnection,
+                statusChangingEvents: result,
+              },
+            });
+
+            return result;
+          });
+        }
+        case EventType.ADD_STATUS_ACTION_REQUESTED: {
+          const { workflowConnection, statusAction } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await addStatusActionToConnection(
+              workflowConnection.id,
+              statusAction
+            );
+
+            dispatch({
+              type: EventType.STATUS_ACTION_ADDED,
               payload: {
                 workflowConnection,
                 statusChangingEvents: result,

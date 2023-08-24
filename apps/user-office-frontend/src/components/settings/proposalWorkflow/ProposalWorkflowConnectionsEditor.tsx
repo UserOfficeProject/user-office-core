@@ -22,11 +22,10 @@ import {
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
 } from 'generated/sdk';
-import { Event as ProposalEvent } from 'generated/sdk';
 
 import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
-import AddStatusChangingEventsToConnection from './AddStatusChangingEventsToConnection';
 import { Event, EventType } from './ProposalWorkflowEditorModel';
+import StatusEventsAndActionsDialog from './StatusEventsAndActionsDialog';
 
 type ProposalWorkflowConnectionsEditorProps = {
   proposalWorkflowStatusConnectionGroups: ProposalWorkflowConnectionGroup[];
@@ -60,9 +59,6 @@ const ProposalWorkflowConnectionsEditor = ({
     },
     dialogActions: {
       padding: 0,
-    },
-    dialogContent: {
-      overflow: 'hidden',
     },
     removeButton: {
       position: 'absolute',
@@ -376,38 +372,11 @@ const ProposalWorkflowConnectionsEditor = ({
           />
         </DialogContent>
       </Dialog>
-      <Dialog
-        maxWidth="md"
-        fullWidth={true}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={!!workflowConnection}
-        onClose={(): void => setWorkflowConnection(null)}
-        data-cy="status-changing-events-modal"
-      >
-        <DialogContent className={classes.dialogContent}>
-          <AddStatusChangingEventsToConnection
-            close={(): void => setWorkflowConnection(null)}
-            statusChangingEvents={
-              workflowConnection?.statusChangingEvents?.map(
-                (statusChangingEvent) => statusChangingEvent.statusChangingEvent
-              ) as ProposalEvent[]
-            }
-            statusName={workflowConnection?.proposalStatus.name}
-            addStatusChangingEventsToConnection={(
-              statusChangingEvents: string[]
-            ) =>
-              dispatch({
-                type: EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED,
-                payload: {
-                  statusChangingEvents,
-                  workflowConnection,
-                },
-              })
-            }
-          />
-        </DialogContent>
-      </Dialog>
+      <StatusEventsAndActionsDialog
+        workflowConnection={workflowConnection}
+        setWorkflowConnection={setWorkflowConnection}
+        dispatch={dispatch}
+      />
       <Grid item xs={12} className={classes.title}>
         Proposal workflow
         <Button

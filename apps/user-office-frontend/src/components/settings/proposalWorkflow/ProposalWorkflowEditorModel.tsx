@@ -29,6 +29,8 @@ export enum EventType {
   ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
   NEXT_STATUS_EVENTS_ADDED,
   ADD_NEXT_STATUS_EVENTS_REQUESTED,
+  ADD_STATUS_ACTION_REQUESTED,
+  STATUS_ACTION_ADDED,
 }
 
 export interface Event {
@@ -224,6 +226,19 @@ const ProposalWorkflowEditorModel = (
               workflowConnection,
               statusChangingEvents
             );
+
+          return draft;
+        }
+        case EventType.STATUS_ACTION_ADDED: {
+          const { proposalWorkflowConnectionGroups } = draft;
+          const { workflowConnection, statusActions } = action.payload;
+
+          // draft.proposalWorkflowConnectionGroups =
+          //   addStatusChangingEventsToConnection(
+          //     proposalWorkflowConnectionGroups,
+          //     workflowConnection,
+          //     statusChangingEvents
+          //   );
 
           return draft;
         }
