@@ -1,7 +1,11 @@
 import { GraphQLError } from 'graphql';
 
 import { ProposalStatus } from '../../models/ProposalStatus';
-import { ProposalStatusAction } from '../../models/ProposalStatusAction';
+import {
+  ConnectionHasStatusAction,
+  ProposalStatusAction,
+  ProposalStatusActionType,
+} from '../../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
@@ -546,27 +550,41 @@ export default class PostgresProposalSettingsDataSource
   }
 
   // TODO: This might need to be moved to it's own ProposalStatusActionsDataSource.ts file
-  private createProposalStatusActionObject(
-    proposalActionStatusRecord: ProposalStatusActionRecord &
-      ProposalWorkflowConnectionHasActionsRecord & {
-        config: ProposalStatusActionConfigBase;
-      }
+  private createConnectionStatusActionObject(
+    proposalActionStatusRecord: ProposalWorkflowConnectionHasActionsRecord & {
+      proposal_status_action_id: number;
+      name: string;
+      type: ProposalStatusActionType;
+      config: ProposalStatusActionConfigBase;
+    }
   ) {
-    return new ProposalStatusAction(
-      proposalActionStatusRecord.proposal_status_action_id,
+    return new ConnectionHasStatusAction(
       proposalActionStatusRecord.connection_id,
+      proposalActionStatusRecord.proposal_status_action_id,
+      proposalActionStatusRecord.workflow_id,
       proposalActionStatusRecord.name,
-      proposalActionStatusRecord.default_config,
       proposalActionStatusRecord.type,
       proposalActionStatusRecord.executed,
       proposalActionStatusRecord.config
     );
   }
 
-  async getStatusActionsByConnectionId(
+  private createProposalStatusActionObject(
+    proposalActionStatusRecord: ProposalStatusActionRecord
+  ) {
+    return new ProposalStatusAction(
+      proposalActionStatusRecord.proposal_status_action_id,
+      proposalActionStatusRecord.name,
+      proposalActionStatusRecord.description,
+      JSON.stringify(proposalActionStatusRecord.default_config),
+      proposalActionStatusRecord.type
+    );
+  }
+
+  async getConnectionStatusActions(
     proposalWorkflowConnectionId: number,
     proposalWorkflowId: number
-  ): Promise<ProposalStatusAction[]> {
+  ): Promise<ConnectionHasStatusAction[]> {
     const proposalActionStatusRecords: (ProposalStatusActionRecord &
       ProposalWorkflowConnectionHasActionsRecord & {
         config: ProposalStatusActionConfigBase;
@@ -581,15 +599,15 @@ export default class PostgresProposalSettingsDataSource
 
     const proposalStatusActions = proposalActionStatusRecords.map(
       (proposalActionStatusRecord) =>
-        this.createProposalStatusActionObject(proposalActionStatusRecord)
+        this.createConnectionStatusActionObject(proposalActionStatusRecord)
     );
 
     return proposalStatusActions;
   }
 
-  async updateStatusAction(
-    proposalStatusAction: ProposalStatusAction
-  ): Promise<ProposalStatusAction> {
+  async updateConnectionStatusAction(
+    proposalStatusAction: ConnectionHasStatusAction
+  ): Promise<ConnectionHasStatusAction> {
     const [
       updatedProposalAction,
     ]: ProposalWorkflowConnectionHasActionsRecord[] = await database
@@ -602,20 +620,29 @@ export default class PostgresProposalSettingsDataSource
       )
       .from('proposal_workflow_connection_has_actions')
       .where('connection_id', proposalStatusAction.connectionId)
-      .andWhere('action_id', proposalStatusAction.id);
+      .andWhere('action_id', proposalStatusAction.actionId);
 
     if (!updatedProposalAction) {
       throw new GraphQLError(
-        `ProposalStatusAction not found ${proposalStatusAction.id}`
+        `ProposalStatusAction not found ${proposalStatusAction.actionId}`
       );
     }
 
-    return this.createProposalStatusActionObject({
-      proposal_status_action_id: proposalStatusAction.id,
+    return this.createConnectionStatusActionObject({
+      proposal_status_action_id: proposalStatusAction.actionId,
       name: proposalStatusAction.name,
-      default_config: proposalStatusAction.defaultConfig,
       type: proposalStatusAction.type,
       ...updatedProposalAction,
     });
+  }
+
+  async getStatusActions(): Promise<ProposalStatusAction[]> {
+    const statusActions = await database
+      .select<ProposalStatusActionRecord[]>('*')
+      .from('proposal_status_actions');
+
+    return statusActions.map((statusAction) =>
+      this.createProposalStatusActionObject(statusAction)
+    );
   }
 }

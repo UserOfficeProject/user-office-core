@@ -128,4 +128,11 @@ export default class ProposalSettingsQueries {
 
     return allProposalEvents;
   }
+
+  @Authorized()
+  async getStatusActions(agent: UserWithRole | null) {
+    const statusActions = await this.dataSource.getStatusActions();
+
+    return statusActions;
+  }
 }

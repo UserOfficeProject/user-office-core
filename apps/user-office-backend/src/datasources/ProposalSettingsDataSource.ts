@@ -1,5 +1,8 @@
 import { ProposalStatus } from '../models/ProposalStatus';
-import { ProposalStatusAction } from '../models/ProposalStatusAction';
+import {
+  ConnectionHasStatusAction,
+  ProposalStatusAction,
+} from '../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
@@ -63,11 +66,12 @@ export interface ProposalSettingsDataSource {
     proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
 
-  getStatusActionsByConnectionId(
+  getConnectionStatusActions(
     proposalWorkflowConnectionId: number,
     proposalWorkflowId: number
-  ): Promise<ProposalStatusAction[]>;
-  updateStatusAction(
-    proposalStatusAction: ProposalStatusAction
-  ): Promise<ProposalStatusAction>;
+  ): Promise<ConnectionHasStatusAction[]>;
+  updateConnectionStatusAction(
+    data: ConnectionHasStatusAction
+  ): Promise<ConnectionHasStatusAction>;
+  getStatusActions(): Promise<ProposalStatusAction[]>;
 }

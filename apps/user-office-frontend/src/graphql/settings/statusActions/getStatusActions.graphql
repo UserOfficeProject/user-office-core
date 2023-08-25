@@ -1,0 +1,9 @@
+query getStatusActions {
+  statusActions {
+    id
+    name
+    description
+    defaultConfig
+    type
+  }
+}

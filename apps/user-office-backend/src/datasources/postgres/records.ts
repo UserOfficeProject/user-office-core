@@ -674,6 +674,7 @@ export interface RedeemCodeRecord {
 export interface ProposalStatusActionRecord {
   readonly proposal_status_action_id: number;
   readonly name: string;
+  readonly description: string;
   readonly default_config: string;
   readonly type: ProposalStatusActionType;
 }

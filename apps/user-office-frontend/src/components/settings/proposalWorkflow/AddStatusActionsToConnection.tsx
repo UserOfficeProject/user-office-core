@@ -14,6 +14,8 @@ import * as yup from 'yup';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
+import { ProposalStatusAction } from 'generated/sdk';
+import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
 
 import EmailActionConfig from './EmailActionConfig';
 
@@ -59,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 type AddStatusActionsToConnectionProps = {
   addStatusActionsToConnection: (statusActions: any[]) => void;
   statusName?: string;
-  connectionStatusActions: any[];
+  connectionStatusActions: ProposalStatusAction[];
 };
 
 const AddStatusActionsToConnection = ({
@@ -69,30 +71,10 @@ const AddStatusActionsToConnection = ({
 }: AddStatusActionsToConnectionProps) => {
   const classes = useStyles();
 
-  const { statusActions, loadingStatusActions } = {
-    statusActions: [
-      {
-        id: 1,
-        name: 'Email Action',
-        type: 'EMAIL',
-        defaultConfig: {},
-        description: 'This is description',
-        config: {},
-      },
-      {
-        id: 2,
-        name: 'RabbitMQ Action',
-        type: 'RABBITMQ',
-        defaultConfig: {},
-        description: 'This is not configured yet',
-        config: {},
-      },
-    ],
-    loadingStatusActions: false,
-  };
+  const { statusActions, loadingStatusActions } = useStatusActionsData();
 
   const initialValues: {
-    selectedStatusActions: any[];
+    selectedStatusActions: ProposalStatusAction[];
     emailStatusActionRecipients: any[];
   } = {
     selectedStatusActions: connectionStatusActions || [],
@@ -110,7 +92,10 @@ const AddStatusActionsToConnection = ({
     },
   };
 
-  const renderActionsConfig = (statusAction: any, values: any) => {
+  const renderActionsConfig = (
+    statusAction: ProposalStatusAction,
+    values: typeof initialValues
+  ) => {
     switch (statusAction.type) {
       case 'EMAIL':
         return (

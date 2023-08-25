@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
-import { ProposalStatusAction } from '../models/ProposalStatusAction';
+import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
@@ -19,7 +19,7 @@ import {
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
-  proposalStatusAction: ProposalStatusAction,
+  proposalStatusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[]
 ) => {
   const config = proposalStatusAction.config as EmailActionConfig;
@@ -85,12 +85,12 @@ export const emailActionHandler = async (
 };
 
 const markStatusActionAsExecuted = async (
-  proposalStatusAction: ProposalStatusAction
+  proposalStatusAction: ConnectionHasStatusAction
 ) => {
   const proposalSettingsDataSource: ProposalSettingsDataSource =
     container.resolve(Tokens.ProposalSettingsDataSource);
 
-  await proposalSettingsDataSource.updateStatusAction({
+  await proposalSettingsDataSource.updateConnectionStatusAction({
     ...proposalStatusAction,
     executed: true,
   });
