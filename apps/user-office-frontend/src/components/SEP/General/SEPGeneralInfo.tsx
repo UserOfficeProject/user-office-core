@@ -39,13 +39,13 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { t } = useTranslation();
 
-  const [customGradeGuideChecked, setcustomGradeGuideChecked] = useState(
+  const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
     sep.customGradeGuide
   );
   const handlecustomGradeGuideChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setcustomGradeGuideChecked(event.target.checked);
+    setCustomGradeGuideChecked(event.target.checked);
   };
 
   const sendSEPUpdate = async (values: Sep): Promise<void> => {
