@@ -2,12 +2,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, Form, Formik } from 'formik';
@@ -16,6 +14,8 @@ import * as yup from 'yup';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
+
+import EmailActionConfig from './EmailActionConfig';
 
 const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
   selectedStatusChangingEvents: yup
@@ -78,30 +78,6 @@ const AddStatusActionsToConnection = ({
         defaultConfig: {},
         description: 'This is description',
         config: {},
-        recipients: [
-          {
-            id: 'PI',
-            description: 'Principal investigator on the proposal',
-            template: { id: '', name: '' },
-          },
-          {
-            id: 'CO_PROPOSERS',
-            description: 'Co-proposers on the proposal',
-            template: { id: '', name: '' },
-          },
-          {
-            id: 'INSTRUMENT_SCIENTISTS',
-            description:
-              'Instrument scientists including the manager on the instrument related to the proposal',
-            template: { id: '', name: '' },
-          },
-          {
-            id: 'SEP_REVIEWERS',
-            description:
-              'SEP reviewers that are assigned to review the proposal',
-            template: { id: '', name: '' },
-          },
-        ],
       },
       {
         id: 2,
@@ -114,11 +90,6 @@ const AddStatusActionsToConnection = ({
     ],
     loadingStatusActions: false,
   };
-
-  const emailTemplates = [
-    { id: 'test-template', name: 'test template' },
-    { id: 'test-template-multiple', name: 'test template multiple' },
-  ];
 
   const initialValues: {
     selectedStatusActions: any[];
@@ -139,7 +110,19 @@ const AddStatusActionsToConnection = ({
     },
   };
 
-  console;
+  const renderActionsConfig = (statusAction: any, values: any) => {
+    switch (statusAction.type) {
+      case 'EMAIL':
+        return (
+          <EmailActionConfig
+            emailStatusActionRecipients={values.emailStatusActionRecipients}
+          />
+        );
+
+      default:
+        return <>Not configured</>;
+    }
+  };
 
   return (
     <Formik
@@ -210,104 +193,7 @@ const AddStatusActionsToConnection = ({
                         />
                       </AccordionSummary>
                       <AccordionDetails>
-                        <FieldArray
-                          name="emailStatusActionRecipients"
-                          render={(arrayHelpers) => (
-                            <>
-                              <Typography variant="h6" color="black">
-                                Email recipients:{' '}
-                              </Typography>
-                              {statusAction.recipients?.map(
-                                (recipient, index) => (
-                                  <Grid key={index} container paddingX={1}>
-                                    <Grid item sm={6}>
-                                      <FormControlLabel
-                                        control={
-                                          <Checkbox
-                                            id={recipient.id}
-                                            name="emailStatusActionRecipients"
-                                            value={recipient.id}
-                                            checked={
-                                              !!values.emailStatusActionRecipients.find(
-                                                (item) =>
-                                                  item.id === recipient.id
-                                              )
-                                            }
-                                            data-cy={`action-recipient-${recipient.id}`}
-                                            onChange={(e) => {
-                                              if (e.target.checked)
-                                                arrayHelpers.push(recipient);
-                                              else {
-                                                const idx =
-                                                  values.emailStatusActionRecipients.findIndex(
-                                                    (item) =>
-                                                      item.id === recipient.id
-                                                  );
-                                                arrayHelpers.remove(idx);
-                                              }
-                                            }}
-                                            inputProps={{
-                                              'aria-label': 'primary checkbox',
-                                            }}
-                                          />
-                                        }
-                                        label={recipient.id}
-                                      />
-                                      <p className={classes.eventDescription}>
-                                        {recipient.description}
-                                      </p>
-                                    </Grid>
-                                    <Grid item sm={6}>
-                                      {values.emailStatusActionRecipients.findIndex(
-                                        (item) => item.id === recipient.id
-                                      ) !== -1 && (
-                                        <Autocomplete
-                                          id="recipient-template"
-                                          options={emailTemplates}
-                                          getOptionLabel={(option) =>
-                                            option.name
-                                          }
-                                          renderInput={(params) => (
-                                            <TextField
-                                              {...params}
-                                              margin="none"
-                                              label="Email template"
-                                            />
-                                          )}
-                                          onChange={(_event, newValue) => {
-                                            const idx =
-                                              values.emailStatusActionRecipients.findIndex(
-                                                (item) =>
-                                                  item.id === recipient.id
-                                              );
-                                            const newTemplateValue = {
-                                              ...values
-                                                .emailStatusActionRecipients[
-                                                idx
-                                              ],
-                                              template: newValue,
-                                            };
-
-                                            arrayHelpers.replace(
-                                              idx,
-                                              newTemplateValue
-                                            );
-                                          }}
-                                          value={
-                                            values.emailStatusActionRecipients.find(
-                                              (item) => item.id === recipient.id
-                                            )?.template || null
-                                          }
-                                          data-cy="value"
-                                        />
-                                      )}
-                                    </Grid>
-                                  </Grid>
-                                )
-                              )}
-                            </>
-                          )}
-                        />
+                        {renderActionsConfig(statusAction, values)}
                       </AccordionDetails>
                     </Accordion>
                   ))}
