@@ -97,7 +97,7 @@ jobs:
         if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
         # We use --ignore-scripts flag to ignore the postinstall script which is actually installing dependencies in all other apps.
         # Caution! The option --ignore-scripts disables ALL scripts - even from the dependencies. If the dependencies need to run scripts to e.g. install some binaries they may break / be incomplete. For now this works and if we experience some issues we can try to find better solution.
-        run: npm ci --ignore-scripts --force
+        run: npm ci --ignore-scripts
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
@@ -179,7 +179,7 @@ jobs:
             sdk-frontend-${{ hashFiles('**/**.graphql') }}
             sdk-frontend-
 
-      - run: npm ci --force
+      - run: npm ci
 
       - run: npm run build
         env:
@@ -344,7 +344,7 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          npm run e2e:after:dev
+          npm run e2e:after:dev -- --dns-result-order=ipv4first
   
 
       - name: Run e2e tests stfc

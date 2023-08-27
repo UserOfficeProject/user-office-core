@@ -22,7 +22,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Node.js dependencies
-        run: npm ci --force
+        run: npm ci
 
       - name: Set environment variables
         run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
