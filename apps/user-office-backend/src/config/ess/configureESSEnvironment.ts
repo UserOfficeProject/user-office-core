@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
+import { setDefaultResultOrder } from '../setDefaultResultOrder';
 import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
 import { updateOIDCSettings } from '../updateOIDCSettings';
@@ -100,6 +101,7 @@ async function enableDefaultEssFeatures() {
 }
 
 export async function configureESSDevelopmentEnvironment() {
+  setDefaultResultOrder();
   await setEssColourTheme();
   await enableDefaultEssFeatures();
   await setTimezone();
