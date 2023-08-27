@@ -1,3 +1,5 @@
+import { Country } from '../models/Country';
+import { Institution } from '../models/Institution';
 import { Role, Roles } from '../models/Role';
 import { User, BasicUserDetails, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
@@ -17,6 +19,11 @@ export interface UserDataSource {
   // Read
   me(id: number): Promise<User | null>;
   getUser(id: number): Promise<User | null>;
+  getUserWithInstitution(id: number): Promise<{
+    user: User;
+    institution: Institution;
+    country: Country;
+  } | null>;
   getByUsername(username: string): Promise<User | null>;
   getByEmail(email: string): Promise<User | null>;
   getByOIDCSub(sub: string): Promise<User | null>;
@@ -36,6 +43,13 @@ export interface UserDataSource {
   getRoles(): Promise<Role[]>;
   getProposalUsers(proposalPk: number): Promise<BasicUserDetails[]>;
   getProposalUsersFull(proposalPk: number): Promise<User[]>;
+  getProposalUsersWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  >;
   // Write
   create(
     user_title: string | undefined,
