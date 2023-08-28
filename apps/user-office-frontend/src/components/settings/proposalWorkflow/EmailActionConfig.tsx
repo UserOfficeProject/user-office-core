@@ -8,6 +8,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray } from 'formik';
 import React from 'react';
 
+import { EmailStatusActionRecipients } from 'generated/sdk';
+
 const useStyles = makeStyles((theme) => ({
   eventDescription: {
     margin: '-5px 0',
@@ -17,40 +19,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type EmailActionConfigProps = {
-  emailStatusActionRecipients: {
-    id: string;
-    description: string;
-    template: { id: string; name: string };
-  }[];
+  emailStatusActionConfig: {
+    recipientsWithEmailTemplate: {
+      name: string;
+      description: string;
+      template: { id: string; name: string };
+    }[];
+  };
+  recipients:
+    | { name: EmailStatusActionRecipients; description: string | null }[]
+    | null;
+  emailTemplates: { id: string; name: string }[] | null;
 };
 
 const EmailActionConfig = ({
-  emailStatusActionRecipients,
+  emailStatusActionConfig: { recipientsWithEmailTemplate },
+  recipients,
+  emailTemplates,
 }: EmailActionConfigProps) => {
   const classes = useStyles();
-  const recipients = [
-    {
-      id: 'PI',
-      description: 'Principal investigator on the proposal',
-    },
-    {
-      id: 'CO_PROPOSERS',
-      description: 'Co-proposers on the proposal',
-    },
-    {
-      id: 'INSTRUMENT_SCIENTISTS',
-      description:
-        'Instrument scientists including the manager on the instrument related to the proposal',
-    },
-    {
-      id: 'SEP_REVIEWERS',
-      description: 'SEP reviewers that are assigned to review the proposal',
-    },
-  ];
-  const emailTemplates = [
-    { id: 'test-template', name: 'test template' },
-    { id: 'test-template-multiple', name: 'test template multiple' },
-  ];
 
   return (
     <>
@@ -58,7 +45,7 @@ const EmailActionConfig = ({
         Email recipients:{' '}
       </Typography>
       <FieldArray
-        name="emailStatusActionRecipients"
+        name="emailStatusActionConfig.recipientsWithEmailTemplate"
         render={(arrayHelpers) =>
           recipients?.map((recipient, index) => (
             <Grid key={index} container paddingX={1}>
@@ -66,20 +53,20 @@ const EmailActionConfig = ({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      id={recipient.id}
+                      id={recipient.name}
                       name="statusActionConfig"
-                      value={recipient.id}
+                      value={recipient.name}
                       checked={
-                        !!emailStatusActionRecipients.find(
-                          (item) => item.id === recipient.id
+                        !!recipientsWithEmailTemplate.find(
+                          (item) => item.name === recipient.name
                         )
                       }
-                      data-cy={`action-recipient-${recipient.id}`}
+                      data-cy={`action-recipient-${recipient.name}`}
                       onChange={(e) => {
                         if (e.target.checked) arrayHelpers.push(recipient);
                         else {
-                          const idx = emailStatusActionRecipients.findIndex(
-                            (item) => item.id === recipient.id
+                          const idx = recipientsWithEmailTemplate.findIndex(
+                            (item) => item.name === recipient.name
                           );
                           arrayHelpers.remove(idx);
                         }
@@ -89,19 +76,19 @@ const EmailActionConfig = ({
                       }}
                     />
                   }
-                  label={recipient.id}
+                  label={recipient.name}
                 />
                 <p className={classes.eventDescription}>
                   {recipient.description}
                 </p>
               </Grid>
               <Grid item sm={6}>
-                {emailStatusActionRecipients.findIndex(
-                  (item) => item.id === recipient.id
+                {recipientsWithEmailTemplate.findIndex(
+                  (item) => item.name === recipient.name
                 ) !== -1 && (
                   <Autocomplete
                     id="recipient-template"
-                    options={emailTemplates}
+                    options={emailTemplates || []}
                     getOptionLabel={(option) => option.name}
                     isOptionEqualToValue={(option, value) =>
                       option.id === value.id
@@ -114,19 +101,19 @@ const EmailActionConfig = ({
                       />
                     )}
                     onChange={(_event, newValue) => {
-                      const idx = emailStatusActionRecipients.findIndex(
-                        (item) => item.id === recipient.id
+                      const idx = recipientsWithEmailTemplate.findIndex(
+                        (item) => item.name === recipient.name
                       );
                       const newTemplateValue = {
-                        ...emailStatusActionRecipients[idx],
+                        ...recipientsWithEmailTemplate[idx],
                         template: newValue,
                       };
 
                       arrayHelpers.replace(idx, newTemplateValue);
                     }}
                     value={
-                      emailStatusActionRecipients.find(
-                        (item) => item.id === recipient.id
+                      recipientsWithEmailTemplate.find(
+                        (item) => item.name === recipient.name
                       )?.template || null
                     }
                     data-cy="value"

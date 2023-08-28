@@ -14,7 +14,11 @@ import * as yup from 'yup';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
-import { ProposalStatusAction } from 'generated/sdk';
+import {
+  ConnectionHasActionsInput,
+  EmailActionDefaultConfig,
+  ProposalStatusAction,
+} from 'generated/sdk';
 import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
 
 import EmailActionConfig from './EmailActionConfig';
@@ -59,7 +63,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type AddStatusActionsToConnectionProps = {
-  addStatusActionsToConnection: (statusActions: any[]) => void;
+  addStatusActionsToConnection: (
+    connectionActions: ConnectionHasActionsInput[]
+  ) => void;
   statusName?: string;
   connectionStatusActions: ProposalStatusAction[];
 };
@@ -75,10 +81,10 @@ const AddStatusActionsToConnection = ({
 
   const initialValues: {
     selectedStatusActions: ProposalStatusAction[];
-    emailStatusActionRecipients: any[];
+    emailStatusActionConfig: { recipientsWithEmailTemplate: any[] };
   } = {
     selectedStatusActions: connectionStatusActions || [],
-    emailStatusActionRecipients: [],
+    emailStatusActionConfig: { recipientsWithEmailTemplate: [] },
   };
 
   const accordionSX = {
@@ -100,7 +106,15 @@ const AddStatusActionsToConnection = ({
       case 'EMAIL':
         return (
           <EmailActionConfig
-            emailStatusActionRecipients={values.emailStatusActionRecipients}
+            emailStatusActionConfig={values.emailStatusActionConfig}
+            recipients={
+              (statusAction.defaultConfig as EmailActionDefaultConfig)
+                .recipients
+            }
+            emailTemplates={
+              (statusAction.defaultConfig as EmailActionDefaultConfig)
+                .emailTemplates
+            }
           />
         );
 
@@ -114,7 +128,23 @@ const AddStatusActionsToConnection = ({
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
         console.log(values);
-        // addStatusActionsToConnection(values.selectedStatusActions);
+
+        const emailStatusActionConfig =
+          values.emailStatusActionConfig.recipientsWithEmailTemplate.map(
+            (item) => ({
+              recipient: item.name,
+              emailTemplate: item.template.id,
+            })
+          );
+
+        const connectionActions = values.selectedStatusActions.map(
+          (action) => ({
+            actionId: action.id,
+            config: JSON.stringify(emailStatusActionConfig),
+          })
+        );
+
+        addStatusActionsToConnection(connectionActions);
       }}
       // validationSchema={addStatusChangingEventsToConnectionValidationSchema}
     >

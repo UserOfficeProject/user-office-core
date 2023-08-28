@@ -1,0 +1,15 @@
+fragment statusActionDefaultConfig on ProposalStatusActionDefaultConfig {
+  ... on EmailActionDefaultConfig {
+    recipients {
+      name
+      description
+    }
+    emailTemplates {
+      id
+      name
+    }
+  }
+  ... on RabbitMQActionDefaultConfig {
+    exchanges
+  }
+}

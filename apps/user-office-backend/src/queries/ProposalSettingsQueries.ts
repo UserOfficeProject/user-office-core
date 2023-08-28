@@ -5,9 +5,17 @@ import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized } from '../decorators';
 import { Event, EventLabel } from '../events/event.enum';
+import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { ProposalStatusAction } from '../resolvers/types/ProposalStatusAction';
+import {
+  EmailActionDefaultConfig,
+  EmailStatusActionRecipients,
+  EmailStatusActionRecipientsWithDescription,
+  RabbitMQActionDefaultConfig,
+} from '../resolvers/types/ProposalStatusActionConfig';
 
 @injectable()
 export default class ProposalSettingsQueries {
@@ -134,5 +142,34 @@ export default class ProposalSettingsQueries {
     const statusActions = await this.dataSource.getStatusActions();
 
     return statusActions;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getStatusActionConfig(
+    agent: UserWithRole | null,
+    statusAction: ProposalStatusAction
+  ) {
+    switch (statusAction.type) {
+      case ProposalStatusActionType.EMAIL:
+        const allRecipientsArray = Object.values(EmailStatusActionRecipients);
+        const allEmailRecipients = allRecipientsArray.map((item) => ({
+          name: item,
+          description: EmailStatusActionRecipientsWithDescription.get(item),
+        }));
+
+        // TODO: This should be fetched from SparkPost.
+        const emailTemplates = [
+          { id: 'test-template', name: 'test template' },
+          { id: 'test-template-multiple', name: 'test template multiple' },
+        ];
+
+        return new EmailActionDefaultConfig(allEmailRecipients, emailTemplates);
+
+      case ProposalStatusActionType.RABBITMQ:
+        return new RabbitMQActionDefaultConfig([]);
+
+      default:
+        return null;
+    }
   }
 }

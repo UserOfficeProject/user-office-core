@@ -55,7 +55,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
   newArray: EmailReadyType[],
   array: BasicUserDetails[],
   proposal: WorkflowEngineProposalType,
-  recipientsWithTemplate: EmailStatusActionRecipientsWithTemplate
+  recipientsWithEmailTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   array.forEach((item) => {
     const foundIndex = newArray.findIndex(
@@ -69,7 +69,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
       });
     } else {
       newArray.push({
-        id: recipientsWithTemplate.recipient,
+        id: recipientsWithEmailTemplate.recipient,
         proposals: [
           {
             proposalId: proposal.primaryKey,
@@ -77,7 +77,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
           },
         ],
 
-        template: recipientsWithTemplate.email_template,
+        template: recipientsWithEmailTemplate.emailTemplate,
         email: item.email,
       });
     }

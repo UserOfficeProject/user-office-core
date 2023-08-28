@@ -23,12 +23,12 @@ export const emailActionHandler = async (
   proposals: WorkflowEngineProposalType[]
 ) => {
   const config = proposalStatusAction.config as EmailActionConfig;
-  if (!config.recipientsWithTemplate?.length) {
+  if (!config.recipientsWithEmailTemplate?.length) {
     return;
   }
 
   await Promise.all(
-    config.recipientsWithTemplate.map(async (recipientWithTemplate) => {
+    config.recipientsWithEmailTemplate.map(async (recipientWithTemplate) => {
       switch (recipientWithTemplate.recipient) {
         case EmailStatusActionRecipients.PI: {
           const PIs = await getPIAndFormatOutputForEmailSending(

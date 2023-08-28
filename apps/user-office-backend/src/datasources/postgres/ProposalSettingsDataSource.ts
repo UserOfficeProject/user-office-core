@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
 import { ProposalStatus } from '../../models/ProposalStatus';
@@ -12,10 +13,11 @@ import {
   ProposalWorkflowConnection,
 } from '../../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
+import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
-import { ProposalStatusActionConfigBase } from '../../resolvers/types/ProposalStatusActionConfig';
+import { ProposalStatusActionConfig } from '../../resolvers/types/ProposalStatusActionConfig';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
 import {
@@ -555,7 +557,7 @@ export default class PostgresProposalSettingsDataSource
       proposal_status_action_id: number;
       name: string;
       type: ProposalStatusActionType;
-      config: ProposalStatusActionConfigBase;
+      config: typeof ProposalStatusActionConfig;
     }
   ) {
     return new ConnectionHasStatusAction(
@@ -576,7 +578,6 @@ export default class PostgresProposalSettingsDataSource
       proposalActionStatusRecord.proposal_status_action_id,
       proposalActionStatusRecord.name,
       proposalActionStatusRecord.description,
-      JSON.stringify(proposalActionStatusRecord.default_config),
       proposalActionStatusRecord.type
     );
   }
@@ -587,7 +588,7 @@ export default class PostgresProposalSettingsDataSource
   ): Promise<ConnectionHasStatusAction[]> {
     const proposalActionStatusRecords: (ProposalStatusActionRecord &
       ProposalWorkflowConnectionHasActionsRecord & {
-        config: ProposalStatusActionConfigBase;
+        config: typeof ProposalStatusActionConfig;
       })[] = await database
       .select()
       .from('proposal_status_actions as psa')
@@ -610,7 +611,9 @@ export default class PostgresProposalSettingsDataSource
   ): Promise<ConnectionHasStatusAction> {
     const [
       updatedProposalAction,
-    ]: ProposalWorkflowConnectionHasActionsRecord[] = await database
+    ]: (ProposalWorkflowConnectionHasActionsRecord & {
+      config: typeof ProposalStatusActionConfig;
+    })[] = await database
       .update(
         {
           executed: proposalStatusAction.executed,
@@ -643,6 +646,61 @@ export default class PostgresProposalSettingsDataSource
 
     return statusActions.map((statusAction) =>
       this.createProposalStatusActionObject(statusAction)
+    );
+  }
+
+  async addConnectionStatusActions(
+    input: AddConnectionStatusActionsInput
+  ): Promise<ConnectionHasStatusAction[]> {
+    const dataToInsert = input.actions.map((item) => ({
+      connection_id: input.connectionId,
+      action_id: item.actionId,
+      workflow_id: input.workflowId,
+      executed: false,
+      config: item.config,
+    }));
+    const connectionHasStatusActions:
+      | (ProposalWorkflowConnectionHasActionsRecord &
+          ProposalStatusActionRecord & {
+            config: typeof ProposalStatusActionConfig;
+          })[]
+      | undefined = await database.transaction(async (trx) => {
+      try {
+        await database
+          .delete()
+          .from('proposal_workflow_connection_has_actions')
+          .where('connection_id', input.connectionId)
+          .andWhere('workflow_id', input.workflowId)
+          .transacting(trx);
+
+        const statusActionsInsert = await database()
+          .insert<
+            (ProposalWorkflowConnectionHasActionsRecord &
+              ProposalStatusActionRecord)[]
+          >(dataToInsert)
+          .into('proposal_workflow_connection_has_actions as pwca')
+          .join('proposal_status_actions as psa', {
+            'pwca.action_id': 'psa.proposal_status_action_id ',
+          })
+          .transacting(trx);
+
+        return await trx.commit(statusActionsInsert);
+      } catch (error) {
+        logger.logException(
+          `Failed to add status actions to connection input: ${input}`,
+          error
+        );
+      }
+    });
+
+    if (connectionHasStatusActions?.length !== input.actions.length) {
+      throw new GraphQLError(
+        `Failed to add status actions to connection input: ${input}`
+      );
+    }
+
+    return connectionHasStatusActions.map((item) =>
+      this.createConnectionStatusActionObject(item)
     );
   }
 }

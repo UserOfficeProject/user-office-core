@@ -3,7 +3,9 @@ query getStatusActions {
     id
     name
     description
-    defaultConfig
+    defaultConfig {
+      ...statusActionDefaultConfig
+    }
     type
   }
 }

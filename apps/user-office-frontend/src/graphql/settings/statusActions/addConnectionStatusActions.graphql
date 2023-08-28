@@ -1,0 +1,21 @@
+mutation addConnectionStatusActions(
+  $connectionId: Int!
+  $workflowId: Int!
+  $actions: [ConnectionHasActionsInput!]!
+) {
+  addConnectionStatusActions(
+    newConnectionStatusActionsInput: {
+      connectionId: $connectionId
+      workflowId: $workflowId
+      actions: $actions
+    }
+  ) {
+    connectionId
+    actionId
+    workflowId
+    executed
+    config {
+      ...connectionStatusActionConfig
+    }
+  }
+}

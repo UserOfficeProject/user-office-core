@@ -16,12 +16,14 @@ import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
+import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
+import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnectionMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
@@ -634,5 +636,14 @@ export default class ProposalSettingsMutations {
         error
       );
     }
+  }
+
+  // @ValidateArgs()
+  @Authorized([Roles.USER_OFFICER])
+  async addConnectionStatusActions(
+    agent: UserWithRole | null,
+    input: AddConnectionStatusActionsInput
+  ): Promise<ConnectionHasStatusAction[]> {
+    return this.dataSource.addConnectionStatusActions(input);
   }
 }

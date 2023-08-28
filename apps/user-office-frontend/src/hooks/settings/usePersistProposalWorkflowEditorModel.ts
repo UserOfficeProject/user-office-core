@@ -4,7 +4,12 @@ import {
   Event,
   EventType,
 } from 'components/settings/proposalWorkflow/ProposalWorkflowEditorModel';
-import { IndexWithGroupId, ProposalWorkflow } from 'generated/sdk';
+import {
+  ConnectionHasActionsInput,
+  IndexWithGroupId,
+  ProposalWorkflow,
+  ProposalWorkflowConnection,
+} from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -112,19 +117,20 @@ export function usePersistProposalWorkflowEditorModel() {
     };
 
     const addStatusActionToConnection = async (
-      proposalWorkflowConnectionId: number,
-      statusActions: any[]
+      statusActions: ConnectionHasActionsInput[],
+      workflowConnection: ProposalWorkflowConnection
     ) => {
-      return;
+      console.log('statusActions', statusActions, workflowConnection);
 
-      // api({
-      //   toastSuccessMessage: 'Status actions added successfully!',
-      // })
-      //   .addStatusActionsToConnection({
-      //     proposalWorkflowConnectionId,
-      //     statusChangingEvents,
-      //   })
-      //   .then((data) => data.addStatusChangingEventsToConnection);
+      return api({
+        toastSuccessMessage: 'Status actions added successfully!',
+      })
+        .addConnectionStatusActions({
+          actions: statusActions,
+          workflowId: workflowConnection.proposalWorkflowId,
+          connectionId: workflowConnection.id,
+        })
+        .then((data) => data.addConnectionStatusActions);
     };
 
     return (next: FunctionType) => (action: Event) => {
@@ -282,18 +288,18 @@ export function usePersistProposalWorkflowEditorModel() {
           });
         }
         case EventType.ADD_STATUS_ACTION_REQUESTED: {
-          const { workflowConnection, statusAction } = action.payload;
+          const { workflowConnection, actions } = action.payload;
 
           return executeAndMonitorCall(async () => {
             const result = await addStatusActionToConnection(
-              workflowConnection.id,
-              statusAction
+              actions,
+              workflowConnection
             );
 
             dispatch({
               type: EventType.STATUS_ACTION_ADDED,
               payload: {
-                workflowConnection,
+                connectionId: workflowConnection.id,
                 statusChangingEvents: result,
               },
             });

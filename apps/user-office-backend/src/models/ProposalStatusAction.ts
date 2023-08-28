@@ -10,7 +10,6 @@ export class ProposalStatusAction {
     public id: number,
     public name: string,
     public description: string,
-    public defaultConfig: string,
     public type: ProposalStatusActionType
   ) {}
 }

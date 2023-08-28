@@ -9,6 +9,7 @@ import {
   ProposalWorkflowConnection,
 } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -74,4 +75,7 @@ export interface ProposalSettingsDataSource {
     data: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction>;
   getStatusActions(): Promise<ProposalStatusAction[]>;
+  addConnectionStatusActions(
+    input: AddConnectionStatusActionsInput
+  ): Promise<ConnectionHasStatusAction[]>;
 }

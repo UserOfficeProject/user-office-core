@@ -10,6 +10,7 @@ import {
   ProposalWorkflowConnection,
 } from '../../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
+import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -75,14 +76,13 @@ export const dummyConnectionHasStatusAction = new ConnectionHasStatusAction(
   'Dummy action',
   ProposalStatusActionType.EMAIL,
   false,
-  '{}'
+  {}
 );
 
 export const dummyStatusAction = new ProposalStatusAction(
   1,
   'Dummy action',
   'Dummy action description',
-  '{}',
   ProposalStatusActionType.EMAIL
 );
 
@@ -225,5 +225,11 @@ export class ProposalSettingsDataSourceMock
 
   async getStatusActions(): Promise<ProposalStatusAction[]> {
     return [dummyStatusAction];
+  }
+
+  async addConnectionStatusActions(
+    input: AddConnectionStatusActionsInput
+  ): Promise<ConnectionHasStatusAction[]> {
+    return [dummyConnectionHasStatusAction];
   }
 }
