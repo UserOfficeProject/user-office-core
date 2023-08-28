@@ -5,7 +5,6 @@ import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { Roles } from '../../models/Role';
 import { SettingsId } from '../../models/Settings';
-import { setDefaultResultOrder } from '../setDefaultResultOrder';
 import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
 
@@ -142,7 +141,6 @@ async function setSTFCRoleNames() {
 }
 
 export async function configureSTFCEnvironment() {
-  setDefaultResultOrder();
   await setStfcColourTheme();
   await enableDefaultStfcFeatures();
   await setSTFCRoleNames();
