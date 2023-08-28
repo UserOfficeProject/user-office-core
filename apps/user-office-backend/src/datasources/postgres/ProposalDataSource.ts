@@ -546,7 +546,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.text) {
           query
             .where('title', 'ilike', `%${filter.text}%`)
-            .orWhere('abstract', 'ilike', `%${filter.text}%`);
+            .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
+            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
+            .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
         }
         if (filter?.callId) {
           query.where('proposal_table_view.call_id', filter.callId);

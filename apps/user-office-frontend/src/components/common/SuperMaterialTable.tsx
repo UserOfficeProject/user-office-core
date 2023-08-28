@@ -192,6 +192,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
       <InputDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
+        data-cy="create-modal"
         open={show}
         maxWidth={props.createModalSize}
         fullWidth={!!props.createModalSize}

@@ -26,7 +26,10 @@ const InternalReviews = ({
   const classes = useStyles();
 
   return (
-    <Accordion className={classes.container}>
+    <Accordion
+      className={classes.container}
+      data-cy="internal-reviews-accordion"
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-controls="panel1a-content"
