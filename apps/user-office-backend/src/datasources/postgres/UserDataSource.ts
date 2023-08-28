@@ -674,8 +674,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users as u')
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
-      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
-      .join('countries as c', { 'c.country_id': 'i.country_id' })
+      .leftJoin('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
       .where('p.proposal_pk', proposalPk)
       .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
         return users.map((user) => {
