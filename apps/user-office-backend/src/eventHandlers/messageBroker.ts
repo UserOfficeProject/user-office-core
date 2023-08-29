@@ -15,6 +15,8 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
+import { Country } from '../models/Country';
+import { Institution } from '../models/Institution';
 import { Instrument } from '../models/Instrument';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
@@ -30,6 +32,8 @@ type Member = {
   email: string;
   oidcSub: string | null;
   oauthIssuer: string | null;
+  institution: Institution;
+  country: Country;
 };
 
 type ProposalMessageData = {
@@ -44,6 +48,7 @@ type ProposalMessageData = {
   shortCode: string;
   title: string;
   instrumentId?: number; // instrumentId is here for backwards compatibility.
+  submitted: boolean;
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -108,10 +113,8 @@ const getProposalMessageData = async (proposal: Proposal) => {
     proposal.statusId
   );
 
-  const proposalUsers = await userDataSource.getProposalUsersFull(
-    proposal.primaryKey
-  );
-
+  const proposalUsersWithInstitution =
+    await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
   const maybeInstrument = await instrumentDataSource.getInstrumentByProposalPk(
     proposal.primaryKey
   );
@@ -132,7 +135,6 @@ const getProposalMessageData = async (proposal: Proposal) => {
         shortCode: maybeInstrument.shortCode,
       }
     : undefined;
-
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
@@ -142,27 +144,34 @@ const getProposalMessageData = async (proposal: Proposal) => {
     callId: call.id,
     allocatedTime: proposalAllocatedTime,
     instrumentId: instrument?.id,
-    members: proposalUsers.map((proposalUser) => ({
-      firstName: proposalUser.firstname,
-      lastName: proposalUser.lastname,
-      email: proposalUser.email,
-      id: proposalUser.id.toString(),
-      oidcSub: proposalUser.oidcSub,
-      oauthIssuer: proposalUser.oauthIssuer,
-    })),
+    members: proposalUsersWithInstitution.map(
+      (proposalUserWithInstitution) => ({
+        firstName: proposalUserWithInstitution.user.firstname,
+        lastName: proposalUserWithInstitution.user.lastname,
+        email: proposalUserWithInstitution.user.email,
+        id: proposalUserWithInstitution.user.id.toString(),
+        oidcSub: proposalUserWithInstitution.user.oidcSub,
+        oauthIssuer: proposalUserWithInstitution.user.oauthIssuer,
+        institution: proposalUserWithInstitution.institution,
+        country: proposalUserWithInstitution.country,
+      })
+    ),
     newStatus: proposalStatus?.shortCode,
+    submitted: proposal.submitted,
   };
-
-  const proposer = await userDataSource.getUser(proposal.proposerId);
-
-  if (proposer) {
+  const proposerWithInstitution = await userDataSource.getUserWithInstitution(
+    proposal.proposerId
+  );
+  if (proposerWithInstitution) {
     messageData.proposer = {
-      firstName: proposer.firstname,
-      lastName: proposer.lastname,
-      email: proposer.email,
-      id: proposer.id.toString(),
-      oidcSub: proposer.oidcSub,
-      oauthIssuer: proposer.oauthIssuer,
+      firstName: proposerWithInstitution.user.firstname,
+      lastName: proposerWithInstitution.user.lastname,
+      email: proposerWithInstitution.user.email,
+      id: proposerWithInstitution.user.id.toString(),
+      oidcSub: proposerWithInstitution.user.oidcSub,
+      oauthIssuer: proposerWithInstitution.user.oauthIssuer,
+      institution: proposerWithInstitution.institution,
+      country: proposerWithInstitution.country,
     };
   }
 
@@ -299,6 +308,17 @@ export async function createPostToRabbitMQHandler() {
       }
       case Event.CALL_CREATED: {
         const jsonMessage = JSON.stringify(event.call);
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.USER_UPDATED:
+      case Event.USER_DELETED: {
+        const jsonMessage = JSON.stringify(event.user);
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
