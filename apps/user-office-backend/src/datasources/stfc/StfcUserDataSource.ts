@@ -1,3 +1,5 @@
+import { Country } from '../../models/Country';
+import { Institution } from '../../models/Institution';
 import { Role } from '../../models/Role';
 import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
@@ -362,6 +364,14 @@ export class StfcUserDataSource implements UserDataSource {
     );
   }
 
+  async getUserWithInstitution(id: number): Promise<{
+    user: User;
+    institution: Institution;
+    country: Country;
+  } | null> {
+    return await postgresUserDataSource.getUserWithInstitution(id);
+  }
+
   async ensureDummyUserExists(userId: number): Promise<User> {
     return await postgresUserDataSource.ensureDummyUserExists(userId);
   }
@@ -462,6 +472,14 @@ export class StfcUserDataSource implements UserDataSource {
 
     return this.getStfcBasicPeopleByUserNumbers(userNumbers).then((stfcUsers) =>
       stfcUsers.map((stfcUser) => toEssBasicUserDetails(stfcUser))
+    );
+  }
+
+  async getProposalUsersWithInstitution(
+    proposalPk: number
+  ): Promise<{ user: User; institution: Institution; country: Country }[]> {
+    return await postgresUserDataSource.getProposalUsersWithInstitution(
+      proposalPk
     );
   }
 
