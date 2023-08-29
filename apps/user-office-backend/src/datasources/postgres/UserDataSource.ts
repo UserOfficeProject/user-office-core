@@ -3,6 +3,8 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 
+import { Country } from '../../models/Country';
+import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
 import {
   User,
@@ -22,6 +24,9 @@ import {
   RoleRecord,
   RoleUserRecord,
   InstitutionRecord,
+  createInstitutionObject,
+  createCountryObject,
+  CountryRecord,
 } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -160,7 +165,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         telephone_alt: '',
         placeholder: true,
       })
-      .returning(['user_id'])
+      .returning(['*'])
       .into('users')
       .then((user: UserRecord[]) => user[0].user_id);
   }
@@ -231,6 +236,29 @@ export default class PostgresUserDataSource implements UserDataSource {
       .where('user_id', id)
       .first()
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
+  }
+
+  async getUserWithInstitution(id: number): Promise<{
+    user: User;
+    institution: Institution;
+    country: Country;
+  } | null> {
+    return database
+      .select('i.*', 'c.*', 'u.*')
+      .from('users as u')
+      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .join('countries as c', { 'c.country_id': 'i.country_id' })
+      .where('user_id', id)
+      .first()
+      .then((user: UserRecord & InstitutionRecord & CountryRecord) => {
+        return !user
+          ? null
+          : {
+              user: createUserObject(user),
+              institution: createInstitutionObject(user),
+              country: createCountryObject(user),
+            };
+      });
   }
 
   async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
@@ -629,10 +657,37 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
       .where('p.proposal_pk', proposalPk)
-      .then((users: UserRecord[]) =>
-        users.map((user) => createUserObject(user))
-      );
+      .then((users: UserRecord[]) => {
+        return users.map((user) => createUserObject(user));
+      });
   }
+
+  async getProposalUsersWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  > {
+    return database
+      .select('i.*', 'c.*', 'u.*')
+      .from('users as u')
+      .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
+      .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
+      .leftJoin('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
+      .where('p.proposal_pk', proposalPk)
+      .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
+        return users.map((user) => {
+          return {
+            user: createUserObject(user),
+            institution: createInstitutionObject(user),
+            country: createCountryObject(user),
+          };
+        });
+      });
+  }
+
   async getProposalUsers(id: number): Promise<BasicUserDetails[]> {
     return database
       .select()
