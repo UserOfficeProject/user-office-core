@@ -12,12 +12,17 @@ import {
   NextAndPreviousProposalStatuses,
   ProposalWorkflowConnection,
 } from '../../models/ProposalWorkflowConnections';
+import { Rejection } from '../../models/Rejection';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
-import { ProposalStatusActionConfig } from '../../resolvers/types/ProposalStatusActionConfig';
+import {
+  EmailActionConfig,
+  ProposalStatusActionConfig,
+  RabbitMQActionConfig,
+} from '../../resolvers/types/ProposalStatusActionConfig';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
 import {
@@ -552,6 +557,26 @@ export default class PostgresProposalSettingsDataSource
   }
 
   // TODO: This might need to be moved to it's own ProposalStatusActionsDataSource.ts file
+  private createStatusActionConfig(
+    type: ProposalStatusActionType,
+    config: typeof ProposalStatusActionConfig
+  ) {
+    switch (type) {
+      case ProposalStatusActionType.EMAIL: {
+        const blankConfig = new EmailActionConfig();
+
+        return Object.assign(blankConfig, config);
+      }
+      case ProposalStatusActionType.RABBITMQ: {
+        const blankConfig = new RabbitMQActionConfig();
+
+        return Object.assign(blankConfig, config);
+      }
+      default:
+        return null;
+    }
+  }
+
   private createConnectionStatusActionObject(
     proposalActionStatusRecord: ProposalWorkflowConnectionHasActionsRecord & {
       proposal_status_action_id: number;
@@ -567,7 +592,10 @@ export default class PostgresProposalSettingsDataSource
       proposalActionStatusRecord.name,
       proposalActionStatusRecord.type,
       proposalActionStatusRecord.executed,
-      proposalActionStatusRecord.config
+      this.createStatusActionConfig(
+        proposalActionStatusRecord.type,
+        proposalActionStatusRecord.config
+      )
     );
   }
 
@@ -651,7 +679,7 @@ export default class PostgresProposalSettingsDataSource
 
   async addConnectionStatusActions(
     input: AddConnectionStatusActionsInput
-  ): Promise<ConnectionHasStatusAction[]> {
+  ): Promise<ConnectionHasStatusAction[] | null> {
     const dataToInsert = input.actions.map((item) => ({
       connection_id: input.connectionId,
       action_id: item.actionId,
@@ -666,37 +694,50 @@ export default class PostgresProposalSettingsDataSource
           })[]
       | undefined = await database.transaction(async (trx) => {
       try {
-        await database
+        const removedActions = await database
           .delete()
           .from('proposal_workflow_connection_has_actions')
           .where('connection_id', input.connectionId)
           .andWhere('workflow_id', input.workflowId)
           .transacting(trx);
 
-        const statusActionsInsert = await database()
-          .insert<
-            (ProposalWorkflowConnectionHasActionsRecord &
-              ProposalStatusActionRecord)[]
-          >(dataToInsert)
-          .into('proposal_workflow_connection_has_actions as pwca')
+        if (!dataToInsert.length) {
+          return await trx.commit(removedActions);
+        }
+
+        await database
+          .insert<ProposalWorkflowConnectionHasActionsRecord[]>(dataToInsert)
+          .into('proposal_workflow_connection_has_actions')
+          .returning('*')
+          .transacting(trx);
+
+        const insertedStatusActions = await database
+          .select('*')
+          .from('proposal_workflow_connection_has_actions as pwca')
           .join('proposal_status_actions as psa', {
             'pwca.action_id': 'psa.proposal_status_action_id ',
           })
           .transacting(trx);
 
-        return await trx.commit(statusActionsInsert);
+        return await trx.commit(insertedStatusActions);
       } catch (error) {
         logger.logException(
-          `Failed to add status actions to connection input: ${input}`,
+          `Failed to add status actions to connection input: ${JSON.stringify(
+            input
+          )}`,
           error
         );
       }
     });
 
+    if (!dataToInsert.length) {
+      return null;
+    }
+
     if (connectionHasStatusActions?.length !== input.actions.length) {
-      throw new GraphQLError(
-        `Failed to add status actions to connection input: ${input}`
-      );
+      throw new Rejection('Failed to add status actions to connection', {
+        input,
+      });
     }
 
     return connectionHasStatusActions.map((item) =>

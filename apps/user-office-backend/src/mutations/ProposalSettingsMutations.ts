@@ -643,7 +643,7 @@ export default class ProposalSettingsMutations {
   async addConnectionStatusActions(
     agent: UserWithRole | null,
     input: AddConnectionStatusActionsInput
-  ): Promise<ConnectionHasStatusAction[]> {
+  ): Promise<ConnectionHasStatusAction[] | null> {
     return this.dataSource.addConnectionStatusActions(input);
   }
 }

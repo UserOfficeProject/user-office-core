@@ -33,6 +33,10 @@ export const statusActionEngine = async (
         prevProposalStatusId
       );
 
+      if (!currentConnection) {
+        return;
+      }
+
       const proposalStatusActions =
         await proposalSettingsDataSource.getConnectionStatusActions(
           currentConnection.id,

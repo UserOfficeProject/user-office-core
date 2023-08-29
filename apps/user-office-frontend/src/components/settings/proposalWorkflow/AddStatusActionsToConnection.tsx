@@ -18,6 +18,7 @@ import {
   ConnectionHasActionsInput,
   EmailActionDefaultConfig,
   ProposalStatusAction,
+  ProposalStatusActionType,
 } from 'generated/sdk';
 import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
 
@@ -127,22 +128,36 @@ const AddStatusActionsToConnection = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        console.log(values);
+        const connectionActions = values.selectedStatusActions.map((action) => {
+          switch (action.type) {
+            case ProposalStatusActionType.EMAIL: {
+              const emailStatusActionConfig = {
+                recipientsWithEmailTemplate:
+                  values.emailStatusActionConfig.recipientsWithEmailTemplate.map(
+                    (item) => ({
+                      recipient: item.name,
+                      emailTemplate: item.template.id,
+                    })
+                  ),
+              };
 
-        const emailStatusActionConfig =
-          values.emailStatusActionConfig.recipientsWithEmailTemplate.map(
-            (item) => ({
-              recipient: item.name,
-              emailTemplate: item.template.id,
-            })
-          );
+              return {
+                actionId: action.id,
+                config: JSON.stringify(emailStatusActionConfig),
+              };
+            }
+            case ProposalStatusActionType.RABBITMQ: {
+              const rabbitMQStatusActionConfig = {
+                exchanges: [],
+              };
 
-        const connectionActions = values.selectedStatusActions.map(
-          (action) => ({
-            actionId: action.id,
-            config: JSON.stringify(emailStatusActionConfig),
-          })
-        );
+              return {
+                actionId: action.id,
+                config: JSON.stringify(rabbitMQStatusActionConfig),
+              };
+            }
+          }
+        });
 
         addStatusActionsToConnection(connectionActions);
       }}

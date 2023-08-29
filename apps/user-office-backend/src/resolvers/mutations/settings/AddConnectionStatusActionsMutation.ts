@@ -37,7 +37,7 @@ export class AddConnectionStatusActionsInput
 
 @Resolver()
 export class AddConnectionStatusActionsMutation {
-  @Mutation(() => ConnectionStatusAction)
+  @Mutation(() => [ConnectionStatusAction], { nullable: true })
   async addConnectionStatusActions(
     @Ctx() context: ResolverContext,
     @Arg('newConnectionStatusActionsInput')

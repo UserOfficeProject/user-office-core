@@ -120,10 +120,10 @@ export function usePersistProposalWorkflowEditorModel() {
       statusActions: ConnectionHasActionsInput[],
       workflowConnection: ProposalWorkflowConnection
     ) => {
-      console.log('statusActions', statusActions, workflowConnection);
-
       return api({
-        toastSuccessMessage: 'Status actions added successfully!',
+        toastSuccessMessage: `Status actions ${
+          statusActions.length ? 'added' : 'removed'
+        } successfully!`,
       })
         .addConnectionStatusActions({
           actions: statusActions,
@@ -288,11 +288,11 @@ export function usePersistProposalWorkflowEditorModel() {
           });
         }
         case EventType.ADD_STATUS_ACTION_REQUESTED: {
-          const { workflowConnection, actions } = action.payload;
+          const { workflowConnection, statusActions } = action.payload;
 
           return executeAndMonitorCall(async () => {
             const result = await addStatusActionToConnection(
-              actions,
+              statusActions,
               workflowConnection
             );
 
@@ -300,7 +300,7 @@ export function usePersistProposalWorkflowEditorModel() {
               type: EventType.STATUS_ACTION_ADDED,
               payload: {
                 connectionId: workflowConnection.id,
-                statusChangingEvents: result,
+                statusActions: result,
               },
             });
 
