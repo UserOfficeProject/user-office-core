@@ -33,6 +33,10 @@
     "ts-loader": "^9.4.3",
     "webpack": "^5.84.1"
   },
+  "engines": {
+    "npm": ">=9.0.0",
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --quiet --fix",
