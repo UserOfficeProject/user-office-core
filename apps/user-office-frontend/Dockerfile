@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:16.14.2-alpine as build-stage
+FROM node:18.17.1-alpine as build-stage
 
 ARG ORCID_REDIRECT=
 
