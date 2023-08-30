@@ -33,7 +33,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/server": "^4.7.4",
+    "@apollo/server": "^4.9.3",
     "@apollo/server-plugin-landing-page-graphql-playground": "^4.0.0",
     "@apollo/subgraph": "^2.4.6",
     "@graphql-tools/utils": "^10.0.0",
