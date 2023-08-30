@@ -10,12 +10,6 @@ mutation addConnectionStatusActions(
       actions: $actions
     }
   ) {
-    connectionId
-    actionId
-    workflowId
-    executed
-    config {
-      ...connectionStatusActionConfig
-    }
+    ...connectionStatusAction
   }
 }

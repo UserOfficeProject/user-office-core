@@ -299,7 +299,7 @@ export function usePersistProposalWorkflowEditorModel() {
             dispatch({
               type: EventType.STATUS_ACTION_ADDED,
               payload: {
-                connectionId: workflowConnection.id,
+                workflowConnection: workflowConnection,
                 statusActions: result,
               },
             });

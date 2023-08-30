@@ -74,6 +74,7 @@ export interface ProposalSettingsDataSource {
   updateConnectionStatusAction(
     data: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction>;
+  getStatusAction(actionId: number): Promise<ProposalStatusAction>;
   getStatusActions(): Promise<ProposalStatusAction[]>;
   addConnectionStatusActions(
     input: AddConnectionStatusActionsInput

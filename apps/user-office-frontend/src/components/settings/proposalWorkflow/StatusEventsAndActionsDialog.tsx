@@ -85,7 +85,7 @@ const StatusEventsAndActionsDialog = ({
                 },
               });
             }}
-            connectionStatusActions={[]}
+            connectionStatusActions={workflowConnection?.statusActions}
             statusName={workflowConnection?.proposalStatus.name}
           />
         </SimpleTabs>

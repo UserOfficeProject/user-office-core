@@ -1,6 +1,16 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import {
+  Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
+} from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { ConnectionHasStatusAction } from '../../models/ProposalStatusAction';
+import { ProposalStatusAction } from './ProposalStatusAction';
 import { ProposalStatusActionConfig } from './ProposalStatusActionConfig';
 
 @ObjectType()
@@ -19,6 +29,20 @@ export class ConnectionStatusAction
   @Field(() => Boolean)
   public executed: boolean;
 
-  @Field(() => ProposalStatusActionConfig)
-  public config: typeof ProposalStatusActionConfig;
+  @Field(() => ProposalStatusActionConfig, { nullable: true })
+  public config: typeof ProposalStatusActionConfig | null;
+}
+
+@Resolver(() => ConnectionStatusAction)
+export class ConnectionStatusActionResolver {
+  @FieldResolver(() => ProposalStatusAction)
+  async action(
+    @Root() connectionStatusAction: ConnectionStatusAction,
+    @Ctx() context: ResolverContext
+  ): Promise<ProposalStatusAction> {
+    return context.queries.proposalSettings.getStatusAction(
+      context.user,
+      connectionStatusAction.actionId
+    );
+  }
 }

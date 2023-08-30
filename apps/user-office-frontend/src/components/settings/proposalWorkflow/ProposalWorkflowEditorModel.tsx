@@ -8,6 +8,7 @@ import {
   ProposalWorkflow,
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
+  ConnectionStatusAction,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
@@ -140,6 +141,27 @@ const ProposalWorkflowEditorModel = (
     return workflowConnectionGroups;
   };
 
+  const addStatusActionsToConnection = (
+    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    workflowConnection: ProposalWorkflowConnection,
+    statusActions: ConnectionStatusAction[]
+  ) => {
+    const groupIndexWhereConnectionShouldBeUpdated = findGroupIndexByGroupId(
+      workflowConnectionGroups,
+      workflowConnection.droppableGroupId
+    );
+
+    const connectionToUpdate = workflowConnectionGroups[
+      groupIndexWhereConnectionShouldBeUpdated
+    ].connections.find((connection) => connection.id === workflowConnection.id);
+
+    if (connectionToUpdate) {
+      connectionToUpdate.statusActions = statusActions;
+    }
+
+    return workflowConnectionGroups;
+  };
+
   function reducer(state: ProposalWorkflow, action: Event): ProposalWorkflow {
     return produce(state, (draft) => {
       switch (action.type) {
@@ -233,12 +255,11 @@ const ProposalWorkflowEditorModel = (
           const { proposalWorkflowConnectionGroups } = draft;
           const { workflowConnection, statusActions } = action.payload;
 
-          // draft.proposalWorkflowConnectionGroups =
-          //   addStatusChangingEventsToConnection(
-          //     proposalWorkflowConnectionGroups,
-          //     workflowConnection,
-          //     statusChangingEvents
-          //   );
+          draft.proposalWorkflowConnectionGroups = addStatusActionsToConnection(
+            proposalWorkflowConnectionGroups,
+            workflowConnection,
+            statusActions
+          );
 
           return draft;
         }

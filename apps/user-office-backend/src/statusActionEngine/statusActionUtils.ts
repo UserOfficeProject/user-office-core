@@ -69,7 +69,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
       });
     } else {
       newArray.push({
-        id: recipientsWithEmailTemplate.recipient,
+        id: recipientsWithEmailTemplate.recipient.name,
         proposals: [
           {
             proposalId: proposal.primaryKey,
@@ -77,7 +77,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
           },
         ],
 
-        template: recipientsWithEmailTemplate.emailTemplate,
+        template: recipientsWithEmailTemplate.emailTemplate.id,
         email: item.email,
       });
     }

@@ -29,7 +29,7 @@ export const emailActionHandler = async (
 
   await Promise.all(
     config.recipientsWithEmailTemplate.map(async (recipientWithTemplate) => {
-      switch (recipientWithTemplate.recipient) {
+      switch (recipientWithTemplate.recipient.name) {
         case EmailStatusActionRecipients.PI: {
           const PIs = await getPIAndFormatOutputForEmailSending(
             proposals,

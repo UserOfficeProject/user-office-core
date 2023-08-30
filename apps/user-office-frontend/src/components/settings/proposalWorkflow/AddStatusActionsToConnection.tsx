@@ -16,6 +16,8 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
 import {
   ConnectionHasActionsInput,
+  ConnectionStatusAction,
+  EmailActionConfig as EmailActionConfigType,
   EmailActionDefaultConfig,
   ProposalStatusAction,
   ProposalStatusActionType,
@@ -68,7 +70,7 @@ type AddStatusActionsToConnectionProps = {
     connectionActions: ConnectionHasActionsInput[]
   ) => void;
   statusName?: string;
-  connectionStatusActions: ProposalStatusAction[];
+  connectionStatusActions?: ConnectionStatusAction[] | null;
 };
 
 const AddStatusActionsToConnection = ({
@@ -80,12 +82,21 @@ const AddStatusActionsToConnection = ({
 
   const { statusActions, loadingStatusActions } = useStatusActionsData();
 
+  const emailStatusActionConfig = connectionStatusActions?.find(
+    (item) => item.action.type === ProposalStatusActionType.EMAIL
+  )?.config as EmailActionConfigType;
+
   const initialValues: {
     selectedStatusActions: ProposalStatusAction[];
-    emailStatusActionConfig: { recipientsWithEmailTemplate: any[] };
+    emailStatusActionConfig: EmailActionConfigType;
   } = {
-    selectedStatusActions: connectionStatusActions || [],
-    emailStatusActionConfig: { recipientsWithEmailTemplate: [] },
+    selectedStatusActions:
+      connectionStatusActions?.map(
+        (connectionStatusAction) => connectionStatusAction.action
+      ) || [],
+    emailStatusActionConfig: emailStatusActionConfig || {
+      recipientsWithEmailTemplate: [],
+    },
   };
 
   const accordionSX = {
@@ -133,12 +144,7 @@ const AddStatusActionsToConnection = ({
             case ProposalStatusActionType.EMAIL: {
               const emailStatusActionConfig = {
                 recipientsWithEmailTemplate:
-                  values.emailStatusActionConfig.recipientsWithEmailTemplate.map(
-                    (item) => ({
-                      recipient: item.name,
-                      emailTemplate: item.template.id,
-                    })
-                  ),
+                  values.emailStatusActionConfig.recipientsWithEmailTemplate,
               };
 
               return {

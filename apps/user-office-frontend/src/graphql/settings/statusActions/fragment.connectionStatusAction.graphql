@@ -1,11 +1,15 @@
-fragment connectionStatusActionConfig on ProposalStatusActionConfig {
-  ... on EmailActionConfig {
-    recipientsWithEmailTemplate {
-      recipient
-      emailTemplate
-    }
+fragment connectionStatusAction on ConnectionStatusAction {
+  connectionId
+  actionId
+  workflowId
+  executed
+  action {
+    id
+    name
+    type
+    description
   }
-  ... on RabbitMQActionConfig {
-    exchanges
+  config {
+    ...connectionStatusActionConfig
   }
 }

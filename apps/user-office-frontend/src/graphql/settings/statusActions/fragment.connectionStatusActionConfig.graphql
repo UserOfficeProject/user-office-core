@@ -1,0 +1,17 @@
+fragment connectionStatusActionConfig on ProposalStatusActionConfig {
+  ... on EmailActionConfig {
+    recipientsWithEmailTemplate {
+      recipient {
+        name
+        description
+      }
+      emailTemplate {
+        id
+        name
+      }
+    }
+  }
+  ... on RabbitMQActionConfig {
+    exchanges
+  }
+}

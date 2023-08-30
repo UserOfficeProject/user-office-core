@@ -667,6 +667,20 @@ export default class PostgresProposalSettingsDataSource
     });
   }
 
+  async getStatusAction(actionId: number): Promise<ProposalStatusAction> {
+    const statusAction = await database
+      .select<ProposalStatusActionRecord>()
+      .from('proposal_status_actions')
+      .where('proposal_status_action_id', actionId)
+      .first();
+
+    if (!statusAction) {
+      throw new GraphQLError(`Status action not found ${actionId}`);
+    }
+
+    return this.createProposalStatusActionObject(statusAction);
+  }
+
   async getStatusActions(): Promise<ProposalStatusAction[]> {
     const statusActions = await database
       .select<ProposalStatusActionRecord[]>('*')
@@ -717,6 +731,7 @@ export default class PostgresProposalSettingsDataSource
           .join('proposal_status_actions as psa', {
             'pwca.action_id': 'psa.proposal_status_action_id ',
           })
+          .where('pwca.connection_id', input.connectionId)
           .transacting(trx);
 
         return await trx.commit(insertedStatusActions);

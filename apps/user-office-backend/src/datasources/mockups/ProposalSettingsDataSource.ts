@@ -223,6 +223,10 @@ export class ProposalSettingsDataSourceMock
     return dummyConnectionHasStatusAction;
   }
 
+  async getStatusAction(actionId: number): Promise<ProposalStatusAction> {
+    return dummyStatusAction;
+  }
+
   async getStatusActions(): Promise<ProposalStatusAction[]> {
     return [dummyStatusAction];
   }

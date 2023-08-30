@@ -137,11 +137,26 @@ export default class ProposalSettingsQueries {
     return allProposalEvents;
   }
 
-  @Authorized()
+  @Authorized([Roles.USER_OFFICER])
+  async getStatusAction(agent: UserWithRole | null, actionId: number) {
+    const statusAction = await this.dataSource.getStatusAction(actionId);
+
+    return statusAction;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
   async getStatusActions(agent: UserWithRole | null) {
     const statusActions = await this.dataSource.getStatusActions();
 
     return statusActions;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getConnectionStatusActions(
+    agent: UserWithRole | null,
+    { connectionId, workflowId }: { connectionId: number; workflowId: number }
+  ) {
+    return this.dataSource.getConnectionStatusActions(connectionId, workflowId);
   }
 
   @Authorized([Roles.USER_OFFICER])
