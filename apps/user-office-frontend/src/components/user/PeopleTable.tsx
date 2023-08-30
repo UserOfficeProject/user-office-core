@@ -294,6 +294,7 @@ const PeopleTable = ({
           underline="hover"
           variant="subtitle2"
           component="button"
+          onClick={(event) => event.preventDefault()}
         >
           Assign <br /> as PI
         </Link>
