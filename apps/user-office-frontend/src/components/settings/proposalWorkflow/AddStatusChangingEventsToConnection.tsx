@@ -53,12 +53,14 @@ type AddStatusChangingEventsToConnectionProps = {
   addStatusChangingEventsToConnection: (statusChangingEvents: string[]) => void;
   statusChangingEvents?: Event[];
   statusName?: string;
+  isLoading: boolean;
 };
 
 const AddStatusChangingEventsToConnection = ({
   statusChangingEvents,
   addStatusChangingEventsToConnection,
   statusName,
+  isLoading,
 }: AddStatusChangingEventsToConnectionProps) => {
   const classes = useStyles();
 
@@ -142,9 +144,10 @@ const AddStatusChangingEventsToConnection = ({
             <Grid item>
               <Button
                 type="submit"
-                disabled={isSubmitting || loadingProposalEvents}
+                disabled={isSubmitting || loadingProposalEvents || isLoading}
                 data-cy="submit"
               >
+                {isLoading && <UOLoader size={20} />}
                 Add status changing events
               </Button>
             </Grid>

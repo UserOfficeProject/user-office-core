@@ -1,4 +1,5 @@
 import Delete from '@mui/icons-material/Delete';
+import MoveDownIcon from '@mui/icons-material/MoveDown';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -6,6 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
@@ -30,6 +32,7 @@ import StatusEventsAndActionsDialog from './StatusEventsAndActionsDialog';
 type ProposalWorkflowConnectionsEditorProps = {
   proposalWorkflowStatusConnectionGroups: ProposalWorkflowConnectionGroup[];
   dispatch: React.Dispatch<Event>;
+  isLoading: boolean;
 };
 
 type ProposalWorkflowConnectionGroupWithSubGroups =
@@ -40,6 +43,7 @@ type ProposalWorkflowConnectionGroupWithSubGroups =
 const ProposalWorkflowConnectionsEditor = ({
   proposalWorkflowStatusConnectionGroups,
   dispatch,
+  isLoading,
 }: ProposalWorkflowConnectionsEditorProps) => {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
@@ -198,6 +202,9 @@ const ProposalWorkflowConnectionsEditor = ({
     connections: ProposalWorkflowConnection[]
   ) => {
     return connections.map((proposalWorkflowConnection, index) => {
+      const connectionHasActions =
+        !!proposalWorkflowConnection.statusActions?.length;
+
       return (
         <Draggable
           key={getUniqueKey(proposalWorkflowConnection)}
@@ -267,6 +274,17 @@ const ProposalWorkflowConnectionsEditor = ({
                 <Box fontSize="small" mt={1} color={theme.palette.grey[400]}>
                   {proposalWorkflowConnection.proposalStatus.description}
                 </Box>
+                {connectionHasActions && (
+                  <DialogActions className={classes.dialogActions}>
+                    <Tooltip
+                      title={`Status action attached: ${proposalWorkflowConnection.statusActions?.map(
+                        (item) => item.action.name
+                      )}`}
+                    >
+                      <MoveDownIcon fontSize="small" />
+                    </Tooltip>
+                  </DialogActions>
+                )}
               </Grid>
             </>
           )}
@@ -376,6 +394,7 @@ const ProposalWorkflowConnectionsEditor = ({
         workflowConnection={workflowConnection}
         setWorkflowConnection={setWorkflowConnection}
         dispatch={dispatch}
+        isLoading={isLoading}
       />
       <Grid item xs={12} className={classes.title}>
         Proposal workflow

@@ -71,15 +71,16 @@ type AddStatusActionsToConnectionProps = {
   ) => void;
   statusName?: string;
   connectionStatusActions?: ConnectionStatusAction[] | null;
+  isLoading: boolean;
 };
 
 const AddStatusActionsToConnection = ({
   addStatusActionsToConnection,
   statusName,
   connectionStatusActions,
+  isLoading,
 }: AddStatusActionsToConnectionProps) => {
   const classes = useStyles();
-
   const { statusActions, loadingStatusActions } = useStatusActionsData();
 
   const emailStatusActionConfig = connectionStatusActions?.find(
@@ -244,9 +245,10 @@ const AddStatusActionsToConnection = ({
             <Grid item>
               <Button
                 type="submit"
-                disabled={isSubmitting || loadingStatusActions}
+                disabled={isSubmitting || loadingStatusActions || isLoading}
                 data-cy="submit"
               >
+                {isLoading && <UOLoader size={20} />}
                 Add status actions
               </Button>
             </Grid>

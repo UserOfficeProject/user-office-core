@@ -1,6 +1,8 @@
+import CloseIcon from '@mui/icons-material/Close';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
 import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import React, { Dispatch, SetStateAction } from 'react';
@@ -22,6 +24,11 @@ const useStyles = makeStyles((theme) => ({
       overflow: 'auto',
     },
   },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+  },
 }));
 
 type StatusEventsAndActionsDialogProps = {
@@ -30,15 +37,21 @@ type StatusEventsAndActionsDialogProps = {
     SetStateAction<ProposalWorkflowConnection | null>
   >;
   dispatch: Dispatch<Event>;
+  isLoading: boolean;
 };
 
 const StatusEventsAndActionsDialog = ({
   workflowConnection,
   setWorkflowConnection,
   dispatch,
+  isLoading,
 }: StatusEventsAndActionsDialogProps) => {
   const classes = useStyles();
   const theme = useTheme();
+
+  const close = () => {
+    setWorkflowConnection(null);
+  };
 
   return (
     <Dialog
@@ -47,10 +60,17 @@ const StatusEventsAndActionsDialog = ({
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"
       open={!!workflowConnection}
-      onClose={(): void => setWorkflowConnection(null)}
+      onClose={close}
       data-cy="status-changing-events-modal"
     >
       <DialogTitle>Status events and actions</DialogTitle>
+      <IconButton
+        data-cy="close-modal-btn"
+        className={classes.closeButton}
+        onClick={close}
+      >
+        <CloseIcon />
+      </IconButton>
       <DialogContent className={classes.dialogContent}>
         <SimpleTabs
           tabNames={['Next status events', 'Status actions']}
@@ -74,6 +94,7 @@ const StatusEventsAndActionsDialog = ({
                 },
               })
             }
+            isLoading={isLoading}
           />
           <AddStatusActionsToConnection
             addStatusActionsToConnection={(statusActions) => {
@@ -87,6 +108,7 @@ const StatusEventsAndActionsDialog = ({
             }}
             connectionStatusActions={workflowConnection?.statusActions}
             statusName={workflowConnection?.proposalStatus.name}
+            isLoading={isLoading}
           />
         </SimpleTabs>
       </DialogContent>
