@@ -1,5 +1,5 @@
-import Delete from '@mui/icons-material/Delete';
-import MoveDownIcon from '@mui/icons-material/MoveDown';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -8,7 +8,6 @@ import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import PropTypes from 'prop-types';
@@ -24,6 +23,7 @@ import {
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
 } from 'generated/sdk';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
 import { Event, EventType } from './ProposalWorkflowEditorModel';
@@ -33,6 +33,7 @@ type ProposalWorkflowConnectionsEditorProps = {
   proposalWorkflowStatusConnectionGroups: ProposalWorkflowConnectionGroup[];
   dispatch: React.Dispatch<Event>;
   isLoading: boolean;
+  confirm: WithConfirmType;
 };
 
 type ProposalWorkflowConnectionGroupWithSubGroups =
@@ -44,9 +45,9 @@ const ProposalWorkflowConnectionsEditor = ({
   proposalWorkflowStatusConnectionGroups,
   dispatch,
   isLoading,
+  confirm,
 }: ProposalWorkflowConnectionsEditorProps) => {
   const theme = useTheme();
-  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
   const [workflowConnection, setWorkflowConnection] =
     useState<ProposalWorkflowConnection | null>(null);
@@ -56,18 +57,24 @@ const ProposalWorkflowConnectionsEditor = ({
       alignContent: 'flex-start',
       flexBasis: '100%',
       height: '100%',
-      maxHeight: isExtraLargeScreen ? '1400px' : '850px',
+      maxHeight: theme.breakpoints.up('xl') ? '1400px' : '850px',
       overflowY: 'auto',
       backgroundColor: theme.palette.grey[200],
-      boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
+      boxShadow: theme.shadows[3],
     },
     dialogActions: {
       padding: 0,
     },
     removeButton: {
       position: 'absolute',
-      marginLeft: '5px',
-      marginTop: '5px',
+      top: 0,
+      right: 0,
+    },
+    actionsIcon: {
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+      margin: '5px',
     },
     itemContainer: {
       minHeight: '70px',
@@ -82,13 +89,13 @@ const ProposalWorkflowConnectionsEditor = ({
       flexGrow: 1,
       color: theme.palette.grey[900],
       fontWeight: 'bold',
-      padding: '12px 8px 8px 8px',
+      padding: theme.spacing(1),
     },
     addRowButton: {
       float: 'right',
     },
     groupTitle: {
-      padding: '5px',
+      padding: theme.spacing(1),
       color: theme.palette.grey[500],
     },
     statusChangingEvents: {
@@ -103,11 +110,11 @@ const ProposalWorkflowConnectionsEditor = ({
     isDragging: boolean,
     draggableStyle: DraggingStyle | NotDraggingStyle | undefined
   ) => ({
-    padding: '12px 8px 8px 8px',
+    padding: theme.spacing(1),
     margin: '1px',
     backgroundColor: isDragging ? theme.palette.grey[200] : 'white',
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-    boxShadow: '0px 1px 2px 0px rgba(163,163,163,0.66)',
+    boxShadow: theme.shadows[2],
     maxWidth: '100%',
     ...draggableStyle,
   });
@@ -246,26 +253,57 @@ const ProposalWorkflowConnectionsEditor = ({
               >
                 {!isVeryFirstDraftStatus(proposalWorkflowConnection) && (
                   <DialogActions className={classes.dialogActions}>
-                    <IconButton
-                      size="small"
-                      className={classes.removeButton}
-                      data-cy="remove-workflow-status-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        dispatch({
-                          type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
-                          payload: {
-                            source: {
-                              index,
-                              droppableId:
-                                proposalWorkflowConnection.droppableGroupId,
+                    <Tooltip title="Remove workflow connection">
+                      <IconButton
+                        size="small"
+                        className={classes.removeButton}
+                        data-cy="remove-workflow-status-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirm(
+                            () => {
+                              dispatch({
+                                type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+                                payload: {
+                                  source: {
+                                    index,
+                                    droppableId:
+                                      proposalWorkflowConnection.droppableGroupId,
+                                  },
+                                },
+                              });
                             },
-                          },
-                        });
-                      }}
-                    >
-                      <Delete />
-                    </IconButton>
+                            {
+                              title: 'Remove workflow connection',
+                              description: (
+                                <>
+                                  Are you sure you want to remove{' '}
+                                  <b>
+                                    {
+                                      proposalWorkflowConnection.proposalStatus
+                                        .name
+                                    }
+                                  </b>{' '}
+                                  workflow connection?
+                                </>
+                              ),
+                            }
+                          )();
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    {connectionHasActions && (
+                      <Tooltip
+                        title={`Status actions: ${proposalWorkflowConnection.statusActions?.map(
+                          (item) => item.action.name
+                        )}`}
+                        className={classes.actionsIcon}
+                      >
+                        <PendingActionsIcon fontSize="small" color="action" />
+                      </Tooltip>
+                    )}
                   </DialogActions>
                 )}
                 <Box fontSize="1rem">
@@ -274,17 +312,6 @@ const ProposalWorkflowConnectionsEditor = ({
                 <Box fontSize="small" mt={1} color={theme.palette.grey[400]}>
                   {proposalWorkflowConnection.proposalStatus.description}
                 </Box>
-                {connectionHasActions && (
-                  <DialogActions className={classes.dialogActions}>
-                    <Tooltip
-                      title={`Status action attached: ${proposalWorkflowConnection.statusActions?.map(
-                        (item) => item.action.name
-                      )}`}
-                    >
-                      <MoveDownIcon fontSize="small" />
-                    </Tooltip>
-                  </DialogActions>
-                )}
               </Grid>
             </>
           )}
@@ -416,4 +443,4 @@ ProposalWorkflowConnectionsEditor.propTypes = {
   dispatch: PropTypes.func.isRequired,
 };
 
-export default ProposalWorkflowConnectionsEditor;
+export default withConfirm(ProposalWorkflowConnectionsEditor);

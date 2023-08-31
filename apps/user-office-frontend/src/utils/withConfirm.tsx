@@ -12,7 +12,7 @@ import { FunctionType } from './utilTypes';
 
 const defaultOptions = {
   title: '',
-  description: '',
+  description: null,
   confirmationText: 'OK',
   cancellationText: 'Cancel',
   alertText: null,
@@ -119,7 +119,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
 
 interface Options {
   title: string;
-  description: string;
+  description: ReactElement | string | null;
   confirmationText?: string;
   cancellationText?: string;
   shouldEnableOKWithAlert?: boolean;
