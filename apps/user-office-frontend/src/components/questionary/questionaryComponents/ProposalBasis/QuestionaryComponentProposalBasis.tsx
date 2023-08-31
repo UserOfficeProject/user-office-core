@@ -13,7 +13,6 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useBasicUserData } from 'hooks/user/useUserData';
@@ -46,7 +45,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
-  const { user } = useContext(UserContext);
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
