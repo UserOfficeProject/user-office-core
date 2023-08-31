@@ -26,7 +26,7 @@
     "install:libs:shared-types": "cd libs/shared-types && npm install",
     "install:libs:validation": "cd libs/validation && npm install",
     "postinstall": "concurrently \"npm run install:backend\" \"npm run install:frontend\" \"npm run install:e2e\"",
-    "dev": "concurrently \"npm run dev:backend\" \"wait-on --interval 1000 http://localhost:4000/readiness && npm run dev:frontend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"wait-on --interval 1000 http://127.0.0.1:4000/readiness && npm run dev:frontend\"",
     "dev:e2e": "concurrently \"npm run dev:backend:e2e\" \"npm run dev:frontend\"",
     "dev:e2e:stfc": "concurrently \"npm run dev:backend:e2e:stfc\" \"npm run dev:frontend\"",
     "dev:backend": "cd apps/user-office-backend && node ../../copyIfNotExist.js example.development.env .env && npm run dev",
@@ -34,9 +34,9 @@
     "dev:backend:e2e:stfc": "cd apps/user-office-backend && npm run dev:e2e:stfc",
     "dev:frontend": "cd apps/user-office-frontend && node ../../copyIfNotExist.js example.development.env .env && npm run dev",
     "generate:shared:types": "cd apps/user-office-frontend && npm run generate:local",
-    "e2e:after:dev": "concurrently -k -s first \"wait-on --verbose --interval 5000 http://localhost:4000/readiness && wait-on --verbose --interval 5000 http://localhost:3000 && cd apps/user-office-frontend-e2e && npm run cy:run:action\" \"npm run dev:e2e\"",
-    "e2e:after:dev:stfc": "concurrently -k -s first \"wait-on --verbose --interval 5000 http://localhost:4000/readiness && wait-on --verbose --interval 5000 http://localhost:3000 && cd apps/user-office-frontend-e2e && npm run cy:run:action\" \"npm run dev:e2e:stfc\"",
-    "generate:sdk": "concurrently -k -s first \"npm run dev:backend\" \"wait-on http://localhost:4000/health && npm run generate:shared:types\"",
+    "e2e:after:dev": "concurrently -k -s first \"wait-on --verbose --interval 5000 http://127.0.0.1:4000/readiness && wait-on --verbose --interval 5000 http://127.0.0.1:3000 && cd apps/user-office-frontend-e2e && npm run cy:run:action\" \"npm run dev:e2e\"",
+    "e2e:after:dev:stfc": "concurrently -k -s first \"wait-on --verbose --interval 5000 http://127.0.0.1:4000/readiness && wait-on --verbose --interval 5000 http://127.0.0.1:3000 && cd apps/user-office-frontend-e2e && npm run cy:run:action\" \"npm run dev:e2e:stfc\"",
+    "generate:sdk": "concurrently -k -s first \"npm run dev:backend\" \"wait-on http://127.0.0.1:4000/health && npm run generate:shared:types\"",
     "start": "npm run dev"
   },
   "keywords": [
@@ -56,7 +56,7 @@
     }
   },
   "dependencies": {
-    "concurrently": "^8.1.0",
+    "concurrently": "^8.2.1",
     "wait-on": "^6.0.1"
   },
   "devDependencies": {

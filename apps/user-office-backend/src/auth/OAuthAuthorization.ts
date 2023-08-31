@@ -1,10 +1,8 @@
 import 'reflect-metadata';
 import { logger } from '@user-office-software/duo-logger';
-import {
-  OpenIdClient,
-  ValidTokenSet,
-  ValidUserInfo,
-} from '@user-office-software/openid';
+import { OpenIdClient } from '@user-office-software/openid';
+import { ValidTokenSet } from '@user-office-software/openid/lib/model/ValidTokenSet';
+import { ValidUserInfo } from '@user-office-software/openid/lib/model/ValidUserInfo';
 import { GraphQLError } from 'graphql';
 import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';

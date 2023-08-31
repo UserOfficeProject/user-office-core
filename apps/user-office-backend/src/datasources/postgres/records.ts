@@ -7,6 +7,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
+import { Country } from '../../models/Country';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
@@ -253,6 +254,12 @@ export interface UserRecord {
   readonly full_count: number;
   readonly institution: string;
   readonly placeholder: boolean;
+}
+
+export interface UserRecordWithInstitution {
+  user: UserRecord;
+  institution: InstitutionRecord;
+  country: CountryRecord;
 }
 
 export interface VisitRegistrationRecord {
@@ -1156,6 +1163,10 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.country_id,
     institution.verified
   );
+};
+
+export const createCountryObject = (country: CountryRecord) => {
+  return new Country(country.country_id, country.country);
 };
 
 export const createScheduledEventObject = (
