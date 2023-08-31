@@ -556,7 +556,6 @@ export default class PostgresProposalSettingsDataSource
       proposalActionStatusRecord.proposal_status_action_id,
       proposalActionStatusRecord.connection_id,
       proposalActionStatusRecord.name,
-      proposalActionStatusRecord.default_config,
       proposalActionStatusRecord.type,
       proposalActionStatusRecord.executed,
       proposalActionStatusRecord.config
@@ -613,7 +612,6 @@ export default class PostgresProposalSettingsDataSource
     return this.createProposalStatusActionObject({
       proposal_status_action_id: proposalStatusAction.id,
       name: proposalStatusAction.name,
-      default_config: proposalStatusAction.defaultConfig,
       type: proposalStatusAction.type,
       ...updatedProposalAction,
     });

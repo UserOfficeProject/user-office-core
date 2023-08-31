@@ -10,7 +10,6 @@ export class ProposalStatusAction {
     public id: number,
     public connectionId: number,
     public name: string,
-    public defaultConfig: string,
     public type: ProposalStatusActionType,
     public executed: boolean,
     public config: typeof ProposalStatusActionConfig

@@ -71,7 +71,6 @@ export const dummyProposalStatusAction = new ProposalStatusAction(
   1,
   1,
   'Dummy action',
-  '{}',
   ProposalStatusActionType.EMAIL,
   false,
   '{}'
