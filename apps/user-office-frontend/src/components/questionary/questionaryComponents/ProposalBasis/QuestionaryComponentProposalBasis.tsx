@@ -53,7 +53,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   }
 
   const { proposer, users } = state.proposal;
-  const { loading, userData } = useBasicUserData(user.id); // Get basicUserData from the logged in user
+  const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
   const [piData, setPIData] = useState<BasicUserDetails | null>(null);
 
   useEffect(() => {
