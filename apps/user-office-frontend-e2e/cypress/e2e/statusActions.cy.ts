@@ -1,0 +1,83 @@
+import initialDBData from '../support/initialDBData';
+
+context('Status actions tests', () => {
+  beforeEach(function () {
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled();
+  });
+
+  it('User Officer should be able to add a status action to workflow connection', () => {
+    cy.addProposalWorkflowStatus({
+      droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
+      proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+      sortOrder: 1,
+      prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+    });
+    cy.login('officer');
+    cy.visit('/ProposalWorkflowEditor/1');
+
+    cy.finishedLoading();
+
+    cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+    cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
+    cy.get('[data-cy="status-events-and-actions-modal"]')
+      .contains('Status actions')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="EMAIL-status-action"] input').click();
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    // Testing the form validation here and required fields.
+    cy.get('[data-cy="action-recipient-PI"] input').should('be.focused');
+    cy.get<JQuery<HTMLInputElement>>(
+      '[data-cy="action-recipient-PI"] input'
+    ).then(($input) => {
+      expect($input[0].validity.valid).to.be.false;
+      expect($input[0].validationMessage).to.include(
+        'Please check this box if you want to proceed.'
+      );
+    });
+
+    cy.get('[data-cy="action-recipient-PI"] input').click();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.get('[data-cy="PI-email-template"] input').should('be.focused');
+    cy.get<JQuery<HTMLInputElement>>(
+      '[data-cy="PI-email-template"] input'
+    ).then(($input) => {
+      expect($input[0].validity.valid).to.be.false;
+      expect($input[0].validationMessage).to.include(
+        'Please fill out this field.'
+      );
+    });
+
+    cy.get('[data-cy="PI-email-template"] input').click();
+    cy.get('.MuiAutocomplete-listbox li').first().click();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.notification({ variant: 'success', text: 'success' });
+
+    cy.closeModal();
+
+    cy.get(
+      `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+    ).should('exist');
+    cy.get(
+      `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+    ).realHover();
+
+    cy.get('[role="tooltip"]').contains('Status actions: Email action');
+  });
+
+  // it('User Officer should be able to update a status action added to the workflow connection', () => {
+  // });
+
+  // it('User Officer should be able to delete a status action added to the workflow connection', () => {
+  // });
+});

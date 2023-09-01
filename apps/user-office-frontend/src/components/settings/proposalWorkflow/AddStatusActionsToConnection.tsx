@@ -205,7 +205,7 @@ const AddStatusActionsToConnection = ({
                                   (item) => item.id === statusAction.id
                                 )
                               }
-                              data-cy="status-changing-event"
+                              data-cy={`${statusAction.type}-status-action`}
                               onChange={(e) => {
                                 if (e.target.checked)
                                   arrayHelpers.push(statusAction);
