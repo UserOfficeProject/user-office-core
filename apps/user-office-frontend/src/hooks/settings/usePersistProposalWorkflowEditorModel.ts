@@ -43,9 +43,13 @@ export function usePersistProposalWorkflowEditorModel() {
   }: MiddlewareInputParams<ProposalWorkflow, Event>) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
-      call().then(() => {
-        setIsLoading(false);
-      });
+      call()
+        .then(() => {
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
     };
 
     const insertNewStatusInProposalWorkflow = async (

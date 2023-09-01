@@ -8,7 +8,7 @@ import {
   addProposalWorkflowStatusValidationSchema,
   moveProposalWorkflowStatusValidationSchema,
   deleteProposalWorkflowStatusValidationSchema,
-  // addNextStatusEventsValidationSchema,
+  addStatusActionsToConnectionValidationSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
@@ -16,7 +16,10 @@ import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
-import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
+import {
+  ConnectionHasStatusAction,
+  ProposalStatusActionType,
+} from '../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { rejection, Rejection } from '../models/Rejection';
@@ -33,6 +36,7 @@ import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
 import { omit } from '../utils/helperFunctions';
+
 @injectable()
 export default class ProposalSettingsMutations {
   constructor(
@@ -638,7 +642,13 @@ export default class ProposalSettingsMutations {
     }
   }
 
-  // @ValidateArgs()
+  @ValidateArgs(
+    addStatusActionsToConnectionValidationSchema<ProposalStatusActionType>(
+      ProposalStatusActionType.EMAIL,
+      ProposalStatusActionType.RABBITMQ,
+      Object.values(ProposalStatusActionType)
+    )
+  )
   @Authorized([Roles.USER_OFFICER])
   async addConnectionStatusActions(
     agent: UserWithRole | null,

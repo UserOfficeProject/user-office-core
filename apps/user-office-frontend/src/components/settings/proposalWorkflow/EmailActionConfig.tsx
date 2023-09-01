@@ -26,12 +26,16 @@ type EmailActionConfigProps = {
   emailStatusActionConfig: EmailActionConfigType;
   recipients: EmailStatusActionRecipient[];
   emailTemplates: EmailStatusActionEmailTemplate[];
+  isRecipientRequired?: boolean;
+  isEmailTemplateRequired?: boolean;
 };
 
 const EmailActionConfig = ({
   emailStatusActionConfig: { recipientsWithEmailTemplate },
   recipients,
   emailTemplates,
+  isRecipientRequired = false,
+  isEmailTemplateRequired = false,
 }: EmailActionConfigProps) => {
   const classes = useStyles();
 
@@ -76,6 +80,7 @@ const EmailActionConfig = ({
                         inputProps={{
                           'aria-label': 'primary checkbox',
                         }}
+                        required={isRecipientRequired}
                       />
                     }
                     label={recipient.name}
@@ -98,6 +103,7 @@ const EmailActionConfig = ({
                           {...params}
                           margin="none"
                           label="Email template"
+                          required={isEmailTemplateRequired}
                         />
                       )}
                       onChange={(_event, newValue) => {

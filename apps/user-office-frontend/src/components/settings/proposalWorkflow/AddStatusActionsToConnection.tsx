@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, Form, Formik } from 'formik';
 import React from 'react';
-import * as yup from 'yup';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
@@ -25,14 +24,6 @@ import {
 import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
 
 import EmailActionConfig from './EmailActionConfig';
-
-const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
-  selectedStatusChangingEvents: yup
-    .array()
-    .of(yup.string())
-    .min(1, 'You must select at least one event')
-    .required('You must select at least one event'),
-});
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -128,6 +119,17 @@ const AddStatusActionsToConnection = ({
               (statusAction.defaultConfig as EmailActionDefaultConfig)
                 .emailTemplates
             }
+            isRecipientRequired={
+              !!values.selectedStatusActions.find(
+                (item) => item.type === ProposalStatusActionType.EMAIL
+              ) &&
+              values.emailStatusActionConfig.recipientsWithEmailTemplate
+                .length === 0
+            }
+            isEmailTemplateRequired={
+              values.emailStatusActionConfig.recipientsWithEmailTemplate
+                .length > 0
+            }
           />
         );
 
@@ -150,6 +152,7 @@ const AddStatusActionsToConnection = ({
 
               return {
                 actionId: action.id,
+                actionType: action.type,
                 config: JSON.stringify(emailStatusActionConfig),
               };
             }
@@ -160,6 +163,7 @@ const AddStatusActionsToConnection = ({
 
               return {
                 actionId: action.id,
+                actionType: action.type,
                 config: JSON.stringify(rabbitMQStatusActionConfig),
               };
             }
@@ -168,7 +172,6 @@ const AddStatusActionsToConnection = ({
 
         addStatusActionsToConnection(connectionActions);
       }}
-      // validationSchema={addStatusChangingEventsToConnectionValidationSchema}
     >
       {({ isSubmitting, values }): JSX.Element => (
         <Form>
@@ -241,6 +244,7 @@ const AddStatusActionsToConnection = ({
           <Grid container justifyContent="flex-end" spacing={1} paddingTop={1}>
             <Grid item marginTop={1}>
               <ErrorMessage name="selectedStatusActions" />
+              <ErrorMessage name="emailStatusActionConfig.recipientsWithEmailTemplate" />
             </Grid>
             <Grid item>
               <Button

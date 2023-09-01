@@ -9,13 +9,19 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ConnectionHasStatusAction } from '../../../models/ProposalStatusAction';
+import {
+  ConnectionHasStatusAction,
+  ProposalStatusActionType,
+} from '../../../models/ProposalStatusAction';
 import { ConnectionStatusAction } from '../../types/ConnectionStatusAction';
 
 @InputType()
 export class ConnectionHasActionsInput {
   @Field(() => Int)
   public actionId: number;
+
+  @Field(() => ProposalStatusActionType)
+  public actionType: ProposalStatusActionType;
 
   @Field(() => String, { nullable: true })
   public config: string;
