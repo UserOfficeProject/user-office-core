@@ -68,13 +68,15 @@ export default function ProposalParticipant(props: {
         />
 
         <Tooltip title="Edit Principal Investigator">
-          <IconButton
-            onClick={() => setIsPickerOpen(true)}
-            className={classes.addButton}
-            disabled={props.loadingPrincipalInvestigator}
-          >
-            <EditIcon data-cy="edit-proposer-button" fontSize="small" />
-          </IconButton>
+          <span>
+            <IconButton
+              onClick={() => setIsPickerOpen(true)}
+              className={classes.addButton}
+              disabled={props.loadingPrincipalInvestigator}
+            >
+              <EditIcon data-cy="edit-proposer-button" fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
       </FormControl>
     </div>

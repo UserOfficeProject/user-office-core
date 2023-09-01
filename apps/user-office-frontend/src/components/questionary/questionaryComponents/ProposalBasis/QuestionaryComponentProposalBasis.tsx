@@ -1,7 +1,7 @@
 import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import withPreventSubmit from 'components/common/withPreventSubmit';
@@ -51,12 +51,14 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   }
 
   const { proposer, users } = state.proposal;
+  const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
+  const [piData, setPIData] = useState<BasicUserDetails | null>(null);
 
-  const [principalInvestigatorUserId, setPrincipalInvestigatorUserId] =
-    useState<number | undefined>(
-      state?.proposal.proposer?.id //user that is logged in
-    );
-  const { loading, userData } = useBasicUserData(principalInvestigatorUserId);
+  useEffect(() => {
+    if (userData !== null) {
+      setPIData(userData);
+    }
+  }, [userData]);
 
   const coInvestigatorChanged = (users: BasicUserDetails[]) => {
     formikProps.setFieldValue(
@@ -77,8 +79,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         proposer: user,
       },
     });
-
-    setPrincipalInvestigatorUserId(user.id);
+    setPIData(user);
     coInvestigatorChanged(
       users
         .filter((coInvestigator) => coInvestigator.id !== user.id)
@@ -140,7 +141,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
       </div>
       <ProposalParticipant
-        principalInvestigator={userData}
+        principalInvestigator={piData}
         setPrincipalInvestigator={principalInvestigatorChanged}
         className={classes.container}
         loadingPrincipalInvestigator={loading}
@@ -148,7 +149,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       <Participants
         title="Co-Proposers"
         className={classes.container}
-        principalInvestigator={userData}
+        principalInvestigator={piData}
         setPrincipalInvestigator={principalInvestigatorChanged}
         setUsers={coInvestigatorChanged}
         preserveSelf={true}
