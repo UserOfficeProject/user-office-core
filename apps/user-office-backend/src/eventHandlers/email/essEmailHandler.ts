@@ -44,7 +44,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           },
           recipients: [{ address: event.userlinkresponse.user.email }],
         })
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Email send on for password reset:', {
             result: res,
             event,
@@ -107,7 +107,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           },
           recipients: [{ address: user.email }],
         })
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Successful email transmission', { res });
         })
         .catch((err: string) => {
@@ -157,7 +157,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       mailService
         .sendMail(options)
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Emails sent on proposal submission:', {
             result: res,
             event,
@@ -195,7 +195,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             },
             recipients: [{ address: event.userlinkresponse.user.email }],
           })
-          .then((res: any) => {
+          .then((res) => {
             logger.logInfo('Email sent on user creation:', {
               result: res,
               event,
@@ -254,7 +254,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             },
           ],
         })
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Email sent on proposal notify:', {
             result: res,
             event,
@@ -300,7 +300,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             },
           ],
         })
-        .then(async (res: any) => {
+        .then(async (res) => {
           await sepDataSource.setSEPReviewNotificationEmailSent(
             reviewId,
             userID,

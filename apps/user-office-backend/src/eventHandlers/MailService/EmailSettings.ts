@@ -1,9 +1,9 @@
-export default interface EmailSettings {
+import { CreateTransmission } from 'sparkpost';
+
+export default interface EmailSettings extends CreateTransmission {
   content: {
     template_id: string;
   };
-  //substitution_data should be an object where the key-value pairs are all of type string
-  substitution_data: any;
   recipients: (
     | {
         address: string;

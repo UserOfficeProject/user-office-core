@@ -3,9 +3,10 @@ import path from 'path';
 import { logger } from '@user-office-software/duo-logger';
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
+import { ResultsPromise } from 'sparkpost';
 
 import EmailSettings from './EmailSettings';
-import { MailService, SendMailResults } from './MailService';
+import { MailService, SendMailResults, SparkPostTemplate } from './MailService';
 
 export class SMTPMailService extends MailService {
   private _email: EmailTemplates<any>;
@@ -58,9 +59,7 @@ export class SMTPMailService extends MailService {
     );
   }
 
-  async sendMail(options: EmailSettings): Promise<{
-    results: SendMailResults;
-  }> {
+  async sendMail(options: EmailSettings): ResultsPromise<SendMailResults> {
     const emailPromises: Promise<SendMailResults>[] = [];
 
     const sendMailResults: SendMailResults = {
@@ -98,8 +97,8 @@ export class SMTPMailService extends MailService {
                     address:
                       process.env.NODE_ENV !== 'production'
                         ? <string>process.env.SINK_EMAIL
-                        : participant.address.email,
-                    name: participant.address.header_to,
+                        : participant.address?.email,
+                    name: participant.address?.header_to,
                   },
                 }
               : {
@@ -130,5 +129,12 @@ export class SMTPMailService extends MailService {
         ? Promise.reject({ results: sendMailResults })
         : Promise.resolve({ results: sendMailResults });
     });
+  }
+
+  // TODO: This might need some attention from STFC and return the templates used in their email sending service.
+  async getEmailTemplates(
+    includeDraft = false
+  ): ResultsPromise<SparkPostTemplate[]> {
+    return { results: [] };
   }
 }

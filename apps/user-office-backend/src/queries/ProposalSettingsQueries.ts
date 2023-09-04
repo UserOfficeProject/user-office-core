@@ -4,6 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized } from '../decorators';
+import { MailService } from '../eventHandlers/MailService/MailService';
 import { Event, EventLabel } from '../events/event.enum';
 import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
@@ -21,7 +22,9 @@ import {
 export default class ProposalSettingsQueries {
   constructor(
     @inject(Tokens.ProposalSettingsDataSource)
-    public dataSource: ProposalSettingsDataSource
+    public dataSource: ProposalSettingsDataSource,
+    @inject(Tokens.MailService)
+    public emailService: MailService
   ) {}
 
   @Authorized()
@@ -172,11 +175,13 @@ export default class ProposalSettingsQueries {
           description: EmailStatusActionRecipientsWithDescription.get(item),
         }));
 
-        // TODO: This should be fetched from SparkPost.
-        const emailTemplates = [
-          { id: 'test-template', name: 'test template' },
-          { id: 'test-template-multiple', name: 'test template multiple' },
-        ];
+        const sparkPostEmailTemplates =
+          await this.emailService.getEmailTemplates();
+
+        const emailTemplates = sparkPostEmailTemplates.results.map((item) => ({
+          id: item.id,
+          name: item.name,
+        }));
 
         return new EmailActionDefaultConfig(allEmailRecipients, emailTemplates);
 
