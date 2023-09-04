@@ -188,7 +188,12 @@ const AddStatusActionsToConnection = ({
               render={(arrayHelpers) => (
                 <>
                   {statusActions.map((statusAction, index) => (
-                    <Accordion sx={accordionSX} disableGutters key={index}>
+                    <Accordion
+                      sx={accordionSX}
+                      disableGutters
+                      key={index}
+                      data-cy={`accordion-${statusAction.type}`}
+                    >
                       <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                         aria-controls={`panel${index}- header`}

@@ -1,3 +1,8 @@
+import {
+  EmailStatusActionRecipients,
+  ProposalStatusActionType,
+} from '@user-office-software-libs/shared-types';
+
 import initialDBData from '../support/initialDBData';
 
 context('Status actions tests', () => {
@@ -75,9 +80,149 @@ context('Status actions tests', () => {
     cy.get('[role="tooltip"]').contains('Status actions: Email action');
   });
 
-  // it('User Officer should be able to update a status action added to the workflow connection', () => {
-  // });
+  it('User Officer should be able to update a status action added to the workflow connection', () => {
+    const statusActionConfig = {
+      recipientsWithEmailTemplate: [
+        {
+          recipient: { name: EmailStatusActionRecipients.PI, description: '' },
+          emailTemplate: { id: 'pi-template', name: 'PI template' },
+        },
+      ],
+    };
 
-  // it('User Officer should be able to delete a status action added to the workflow connection', () => {
-  // });
+    cy.addProposalWorkflowStatus({
+      droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
+      proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+      sortOrder: 1,
+      prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+    }).then((result) => {
+      cy.addConnectionStatusActions({
+        actions: [
+          {
+            actionId: 1,
+            actionType: ProposalStatusActionType.EMAIL,
+            config: JSON.stringify(statusActionConfig),
+          },
+        ],
+        connectionId: result.addProposalWorkflowStatus.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+      });
+    });
+
+    cy.login('officer');
+    cy.visit('/ProposalWorkflowEditor/1');
+
+    cy.finishedLoading();
+
+    cy.get(
+      `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+    ).should('exist');
+    cy.get(
+      `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+    ).realHover();
+
+    cy.get('[role="tooltip"]').contains('Status actions: Email action');
+
+    cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+    cy.get('[data-cy="status-events-and-actions-modal"]')
+      .contains('Status actions')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
+
+    cy.get(
+      '[data-cy="accordion-EMAIL"] [data-testid="ExpandMoreIcon"]'
+    ).click();
+
+    cy.get('[data-cy="action-recipient-PI"] input').should('be.checked');
+    cy.get('[data-cy="PI-email-template"] input')
+      .invoke('val')
+      .should('not.be.empty');
+
+    cy.get('[data-cy="action-recipient-CO_PROPOSERS"] input').click();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.get('[data-cy="CO_PROPOSERS-email-template"] input').should(
+      'be.focused'
+    );
+    cy.get<JQuery<HTMLInputElement>>(
+      '[data-cy="CO_PROPOSERS-email-template"] input'
+    ).then(($input) => {
+      expect($input[0].validity.valid).to.be.false;
+      expect($input[0].validationMessage).to.include(
+        'Please fill out this field.'
+      );
+    });
+
+    cy.get('[data-cy="CO_PROPOSERS-email-template"] input').click();
+    cy.get('.MuiAutocomplete-listbox li').last().click();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.notification({ variant: 'success', text: 'success' });
+  });
+
+  it('User Officer should be able to delete a status action added to the workflow connection', () => {
+    const statusActionConfig = {
+      recipientsWithEmailTemplate: [
+        {
+          recipient: { name: EmailStatusActionRecipients.PI, description: '' },
+          emailTemplate: { id: 'pi-template', name: 'PI template' },
+        },
+      ],
+    };
+
+    cy.addProposalWorkflowStatus({
+      droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
+      proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+      sortOrder: 1,
+      prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+    }).then((result) => {
+      cy.addConnectionStatusActions({
+        actions: [
+          {
+            actionId: 1,
+            actionType: ProposalStatusActionType.EMAIL,
+            config: JSON.stringify(statusActionConfig),
+          },
+        ],
+        connectionId: result.addProposalWorkflowStatus.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+      });
+    });
+
+    cy.login('officer');
+    cy.visit('/ProposalWorkflowEditor/1');
+
+    cy.finishedLoading();
+
+    cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+    cy.get('[data-cy="status-events-and-actions-modal"]')
+      .contains('Status actions')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
+
+    cy.get('[data-cy="EMAIL-status-action"] input').uncheck();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.notification({ variant: 'success', text: 'success' });
+
+    cy.closeModal();
+
+    cy.get(
+      `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+    ).should('not.exist');
+  });
+  // TODO: Once the testing environment for email sending is in place we can extend the test cases with testing the actual run of the status actions.
 });
