@@ -10,6 +10,7 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
+import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
@@ -174,15 +175,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
     }
 
     case Event.USER_CREATED: {
-      if (process.env.NODE_ENV === 'development') {
-        await userDataSource.setUserEmailVerified(
-          event.userlinkresponse.user.id
-        );
-        logger.logInfo('Set user as verified without sending email', {
-          userId: event.userlinkresponse.user.id,
-          event,
-        });
-      } else {
+      if (isProduction()) {
         mailService
           .sendMail({
             content: {
@@ -207,6 +200,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
               event,
             });
           });
+      } else {
+        await userDataSource.setUserEmailVerified(
+          event.userlinkresponse.user.id
+        );
+        logger.logInfo('Set user as verified without sending email', {
+          userId: event.userlinkresponse.user.id,
+          event,
+        });
       }
 
       return;

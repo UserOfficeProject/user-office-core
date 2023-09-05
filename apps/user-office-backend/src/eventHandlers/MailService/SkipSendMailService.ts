@@ -1,13 +1,10 @@
 import { logger } from '@user-office-software/duo-logger';
-import EmailTemplates from 'email-templates';
-import { Recipient, ResultsPromise } from 'sparkpost';
+import { ResultsPromise } from 'sparkpost';
 
 import EmailSettings from './EmailSettings';
 import { MailService, SendMailResults, SparkPostTemplate } from './MailService';
 
 export class SkipSendMailService extends MailService {
-  private _email: EmailTemplates<any>;
-
   constructor() {
     super();
   }
@@ -18,7 +15,7 @@ export class SkipSendMailService extends MailService {
     return {
       results: {
         id: 'SkipSendMailService',
-        total_accepted_recipients: (options.recipients as Recipient[]).length,
+        total_accepted_recipients: options.recipients.length,
         total_rejected_recipients: 0,
       },
     };

@@ -5,6 +5,7 @@ import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
 import { ResultsPromise } from 'sparkpost';
 
+import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
 import { MailService, SendMailResults, SparkPostTemplate } from './MailService';
 
@@ -94,18 +95,16 @@ export class SMTPMailService extends MailService {
             ...(typeof participant.address !== 'string'
               ? {
                   to: {
-                    address:
-                      process.env.NODE_ENV !== 'production'
-                        ? <string>process.env.SINK_EMAIL
-                        : participant.address?.email,
+                    address: isProduction()
+                      ? participant.address?.email
+                      : <string>process.env.SINK_EMAIL,
                     name: participant.address?.header_to,
                   },
                 }
               : {
-                  to:
-                    process.env.NODE_ENV !== 'production'
-                      ? <string>process.env.SINK_EMAIL
-                      : participant.address,
+                  to: isProduction()
+                    ? participant.address
+                    : <string>process.env.SINK_EMAIL,
                 }),
           },
           locals: options.substitution_data,

@@ -175,13 +175,6 @@ export default class UserMutations {
     agent: UserWithRole | null,
     args: CreateUserArgs
   ): Promise<UserLinkResponse> {
-    if (process.env.NODE_ENV !== 'development') {
-      throw rejection('Users can only be created on development env', {
-        args,
-        code: ApolloServerErrorCodeExtended.BAD_REQUEST,
-      });
-    }
-
     const hash = this.createHash(args.password);
     let organisationId = args.organisation;
     // Check if user has other org and if so create it

@@ -24,7 +24,7 @@ import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeatu
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
-import { generateUniqueId } from '../utils/helperFunctions';
+import { generateUniqueId, isProduction } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 
@@ -40,7 +40,9 @@ export default class AdminMutations {
     agent: UserWithRole | null,
     includeSeeds: boolean
   ): Promise<string | Rejection> {
-    if (process.env.NODE_ENV === 'development') {
+    if (isProduction()) {
+      return rejection('Resetting database is not allowed');
+    } else {
       logger.logWarn('Resetting database', {});
 
       const log = await this.dataSource.resetDB(includeSeeds);
@@ -49,8 +51,6 @@ export default class AdminMutations {
       )();
 
       return log;
-    } else {
-      return rejection('Resetting database is not allowed');
     }
   }
 
