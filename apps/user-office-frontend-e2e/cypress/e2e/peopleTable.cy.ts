@@ -537,7 +537,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[role="presentation"] [role="dialog"]');
 
       cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
 
