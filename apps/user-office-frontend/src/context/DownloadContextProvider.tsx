@@ -115,16 +115,21 @@ export enum PREPARE_DOWNLOAD_TYPE {
   PDF_SAMPLE,
   PDF_SHIPMENT_LABEL,
   PDF_GENERIC_TEMPLATE,
-
+  ZIP_ATTACHMENT,
   XLSX_PROPOSAL,
   XLSX_SEP,
 }
+
+export type DownloadOptions = {
+  questionIds?: string;
+};
 
 export interface DownloadContextData {
   prepareDownload: (
     type: PREPARE_DOWNLOAD_TYPE,
     id: Array<number | number[]>,
-    name: string | null
+    name: string | null,
+    options?: DownloadOptions
   ) => void;
 }
 
@@ -137,7 +142,8 @@ export const DownloadContext = React.createContext<DownloadContextData>({
 
 function generateLink(
   type: PREPARE_DOWNLOAD_TYPE,
-  ids: Array<number | number[]>
+  ids: Array<number | number[]>,
+  options?: DownloadOptions
 ): string {
   switch (type) {
     case PREPARE_DOWNLOAD_TYPE.PDF_PROPOSAL:
@@ -160,6 +166,12 @@ function generateLink(
       const [sepId, callId] = params;
 
       return `/download/xlsx/sep/${sepId}/call/${callId}`;
+    case PREPARE_DOWNLOAD_TYPE.ZIP_ATTACHMENT:
+      if (!options?.questionIds) {
+        throw new Error('Question ids are require');
+      }
+
+      return `/download/zip/attachment/${ids}?questionIds=${options?.questionIds}`;
     default:
       throw new Error('Unknown type:' + type);
   }
@@ -202,7 +214,8 @@ export const DownloadContextProvider = ({
   const prepareDownload = (
     type: PREPARE_DOWNLOAD_TYPE,
     ids: Array<number | number[]>,
-    name: string | null
+    name: string | null,
+    options?: DownloadOptions
   ) => {
     const id = `${type}__${ids}`;
     if (pendingRequests.current.has(id)) {
@@ -210,7 +223,7 @@ export const DownloadContextProvider = ({
     }
 
     const controller = new AbortController();
-    const req = crossFetch(generateLink(type, ids), {
+    const req = crossFetch(generateLink(type, ids, options), {
       signal: controller.signal,
       headers: {
         Authorization: `Bearer ${token}`,
