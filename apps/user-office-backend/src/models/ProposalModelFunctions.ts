@@ -124,3 +124,16 @@ export function transformAnswerValueIfNeeded(
 
   return definition.transform(questionTemplateRelation, value);
 }
+
+export function getTopicActiveAnswers(
+  questionarySteps: QuestionaryStep[],
+  topicId: number
+) {
+  const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
+
+  return step
+    ? (step.fields.filter((field) => {
+        return areDependenciesSatisfied(questionarySteps, field.question.id);
+      }) as Answer[])
+    : [];
+}

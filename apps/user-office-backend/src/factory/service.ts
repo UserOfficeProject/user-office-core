@@ -11,6 +11,7 @@ import { bufferRequestBody } from './util';
 export enum DownloadType {
   PDF = 'pdf',
   XLSX = 'xlsx',
+  ZIP = 'zip',
 }
 
 export enum XLSXType {
@@ -22,6 +23,9 @@ export enum PDFType {
   PROPOSAL = 'proposal',
   SAMPLE = 'sample',
   SHIPMENT_LABEL = 'shipment-label',
+}
+export enum ZIPType {
+  ATTACHMENT = 'attachment',
 }
 
 export type MetaBase = { collectionFilename: string; singleFilename: string };
@@ -39,7 +43,7 @@ if (!ENDPOINT) {
 
 export default function callFactoryService<TData, TMeta extends MetaBase>(
   downloadType: DownloadType,
-  type: PDFType | XLSXType,
+  type: PDFType | XLSXType | ZIPType,
   properties: { data: TData[]; meta: TMeta; userRole: Role },
   req: Request,
   res: Response,
