@@ -116,6 +116,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         if (filter?.text !== undefined) {
           query.where('question', 'ilike', `%${filter.text}%`);
         }
+        if (filter?.questionIds !== undefined) {
+          query.whereIn('question_id', filter.questionIds);
+        }
       })
       .then((rows: QuestionRecord[]) => {
         return rows.map((row) => createQuestionObject(row));

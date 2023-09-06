@@ -7,24 +7,37 @@ import {
   ProposalPDFData,
 } from '../../factory/pdf/proposal';
 import { MetaBase } from '../../factory/service';
+import {
+  collectProposalAttachmentData,
+  ProposalAttachmentData,
+} from '../../factory/zip/attachment';
 import { UserWithRole } from '../../models/User';
 
-export interface PDFServices {
+export type DownloadOptions = {
+  filter?: string;
+  questionIds?: string[];
+};
+export interface DownloadTypeServices {
   getPdfProposals(
     agent: UserWithRole,
     proposalPks: number[],
     proposalFileMeta: MetaBase,
-    proposalFilterType?: string
+    options?: DownloadOptions
   ): Promise<ProposalPDFData[] | null>;
+  getProposalAttachments(
+    agent: UserWithRole,
+    proposalPks: number[],
+    options: DownloadOptions
+  ): Promise<ProposalAttachmentData[] | null>;
 }
 @injectable()
-export default class FactoryServices implements PDFServices {
+export default class FactoryServices implements DownloadTypeServices {
   @FactoryServicesAuthorized()
   async getPdfProposals(
     agent: UserWithRole | null,
     proposalPks: number[],
     proposalFileMeta: MetaBase,
-    proposalFilterType?: string
+    options?: DownloadOptions
   ): Promise<ProposalPDFData[] | null> {
     let data = null;
     if (agent) {
@@ -34,7 +47,7 @@ export default class FactoryServices implements PDFServices {
             return collectProposalPDFDataTokenAccess(
               proposalPk,
               agent,
-              proposalFilterType ?? undefined,
+              options,
               indx === 0
                 ? (filename: string) =>
                     (proposalFileMeta.singleFilename = filename)
@@ -54,5 +67,22 @@ export default class FactoryServices implements PDFServices {
     }
 
     return data;
+  }
+
+  @FactoryServicesAuthorized()
+  async getProposalAttachments(
+    agent: UserWithRole,
+    proposalPks: number[],
+    options: DownloadOptions | undefined
+  ): Promise<ProposalAttachmentData[] | null> {
+    if (agent && options) {
+      return await Promise.all(
+        proposalPks.map((proposalPk) => {
+          return collectProposalAttachmentData(proposalPk, agent, options);
+        })
+      );
+    }
+
+    return null;
   }
 }
