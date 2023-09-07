@@ -134,6 +134,7 @@ const ProposalReviewContent = ({
       onChange={() => {}}
       review={reviewData}
       setReview={setReviewData}
+      sepId={sepId as number} //grade is only used within SEP
     />
   );
 

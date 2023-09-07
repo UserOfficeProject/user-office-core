@@ -2,12 +2,16 @@ mutation createSEP(
   $code: String!
   $description: String!
   $numberRatingsRequired: Int!
+  $gradeGuide: String
+  $customGradeGuide: Boolean
   $active: Boolean!
 ) {
   createSEP(
     code: $code
     description: $description
     numberRatingsRequired: $numberRatingsRequired
+    gradeGuide: $gradeGuide
+    customGradeGuide: $customGradeGuide
     active: $active
   ) {
     ...sep
