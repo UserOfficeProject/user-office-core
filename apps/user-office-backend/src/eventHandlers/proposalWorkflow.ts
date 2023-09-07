@@ -5,11 +5,9 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
+import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
-import {
-  markProposalEventAsDoneAndCallWorkflowEngine,
-  WorkflowEngineProposalType,
-} from '../workflowEngine';
+import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 enum ProposalInformationKeys {
   Proposal = 'proposal',
@@ -19,16 +17,40 @@ enum ProposalInformationKeys {
 
 export const handleWorkflowEngineChange = async (
   event: ApplicationEvent,
-  proposal: WorkflowEngineProposalType
+  proposalPks: number[] | number
 ) => {
-  const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  const isArray = Array.isArray(proposalPks);
+
+  const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
     event.type,
-    proposal
+    isArray ? proposalPks : [proposalPks]
   );
 
   const eventBus = resolveApplicationEventBus();
 
-  if (updatedProposals) {
+  // NOTE: If proposal status is updated manually then we need to fire another event.
+  // TODO: This could be refactored and we use only one event instead of two. Ref. changeProposalsStatus inside ProposalMutations.ts
+  if (event.type === Event.PROPOSAL_STATUS_UPDATED && isArray) {
+    Promise.all(
+      proposalPks.map(async (proposalPk) => {
+        const proposal = await proposalDataSource.get(proposalPk);
+
+        if (proposal?.primaryKey) {
+          eventBus.publish({
+            type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
+            proposal: proposal,
+            isRejection: false,
+            key: 'proposal',
+            loggedInUserId: event.loggedInUserId,
+          });
+        }
+      })
+    );
+  } else if (updatedProposals?.length) {
     updatedProposals.forEach(
       (updatedProposal) =>
         updatedProposal &&
@@ -65,10 +87,6 @@ const extractProposalInformationFromEvent = (event: ApplicationEvent) => {
 };
 
 export default function createHandler() {
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-
   // Handler to align input for workflowEngine
   return async function proposalWorkflowHandler(event: ApplicationEvent) {
     // if the original method failed
@@ -91,46 +109,15 @@ export default function createHandler() {
     if (proposalInformationValue) {
       switch (proposalInformationKey) {
         case ProposalInformationKeys.ProposalPKs:
-          await Promise.all(
-            (proposalInformationValue as number[]).map(async (proposalPk) => {
-              const proposal = await proposalDataSource.get(proposalPk);
-
-              if (proposal?.primaryKey) {
-                await handleWorkflowEngineChange(event, proposal);
-
-                // NOTE: If proposal status is updated manually then we need to fire another event.
-                // TODO: This could be refactored and we use only one event instead of two. Ref. changeProposalsStatus inside ProposalMutations.ts
-                if (event.type === Event.PROPOSAL_STATUS_UPDATED) {
-                  const eventBus = resolveApplicationEventBus();
-
-                  eventBus.publish({
-                    type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
-                    proposal: proposal,
-                    isRejection: false,
-                    key: 'proposal',
-                    loggedInUserId: event.loggedInUserId,
-                  });
-                }
-              }
-            })
-          );
-          break;
         case ProposalInformationKeys.ProposalPk:
-          const foundProposal = await proposalDataSource.get(
-            proposalInformationValue
-          );
-
-          if (!foundProposal) {
-            throw new Error(
-              `Proposal with id ${proposalInformationValue} not found`
-            );
-          }
-
-          await handleWorkflowEngineChange(event, foundProposal);
+          handleWorkflowEngineChange(event, proposalInformationValue);
 
           break;
         case ProposalInformationKeys.Proposal:
-          await handleWorkflowEngineChange(event, proposalInformationValue);
+          handleWorkflowEngineChange(
+            event,
+            (proposalInformationValue as Proposal).primaryKey
+          );
 
           break;
         default:
