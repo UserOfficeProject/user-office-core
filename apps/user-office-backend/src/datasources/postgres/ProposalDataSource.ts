@@ -653,14 +653,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
   }
 
-  async markEventAsDoneOnProposal(
+  async markEventAsDoneOnProposals(
     event: Event,
-    proposalPk: number
-  ): Promise<ProposalEventsRecord | null> {
-    const dataToInsert = {
+    proposalPks: number[]
+  ): Promise<ProposalEventsRecord[] | null> {
+    const dataToInsert = proposalPks.map((proposalPk) => ({
       proposal_pk: proposalPk,
       [event.toLowerCase()]: true,
-    };
+    }));
 
     const result = await database.raw(
       `? ON CONFLICT (proposal_pk)
@@ -671,7 +671,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     );
 
     if (result.rows && result.rows.length) {
-      return result.rows[0];
+      return result.rows;
     } else {
       return null;
     }

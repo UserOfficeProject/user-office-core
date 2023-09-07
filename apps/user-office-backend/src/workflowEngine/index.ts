@@ -60,101 +60,133 @@ export type WorkflowEngineProposalType = {
 };
 
 export const workflowEngine = async (
-  proposal: WorkflowEngineProposalType & {
-    proposalEvents: ProposalEventsRecord | null;
+  args: {
+    proposalPk: number;
+    proposalEvents?: ProposalEventsRecord;
     currentEvent: Event;
-  }
+  }[]
 ): Promise<Array<Proposal | void> | void> => {
-  const proposalWorkflow = await getProposalWorkflowByCallId(proposal.callId);
-
-  if (!proposalWorkflow) {
-    return;
-  }
-
-  const currentWorkflowConnections =
-    await getProposalWorkflowConnectionByStatusId(
-      proposalWorkflow.id,
-      proposal.statusId
-    );
-
-  if (!currentWorkflowConnections.length) {
-    return;
-  }
-
-  /**
-   * NOTE: We can have more than one current connection because of the multi-column workflows.
-   * This is the way how we store the connection that has multiple next connections.
-   * We have multiple separate connection records pointing to each next connection.
-   * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: SEP_SELECTION and NOT_FEASIBLE.
-   * We store one record of FEASIBILITY_REVIEW with nextProposalStatusId = SEP_SELECTION and another one with nextProposalStatusId = NOT_FEASIBLE.
-   * We go through each record and based on the currentEvent we move the proposal into the right direction
-   */
-  return Promise.all(
-    currentWorkflowConnections.map(async (currentWorkflowConnection) => {
-      if (!currentWorkflowConnection.nextProposalStatusId) {
-        return;
-      }
-
-      if (!proposal.proposalEvents) {
-        return;
-      }
-
-      const nextWorkflowConnections =
-        await getProposalWorkflowConnectionByStatusId(
-          proposalWorkflow.id,
-          currentWorkflowConnection.nextProposalStatusId,
-          currentWorkflowConnection.proposalStatusId
+  const proposalsWithChangedStatuses = (
+    await Promise.all(
+      args.map(async (proposalWithEvents) => {
+        const proposal = await proposalDataSource.get(
+          proposalWithEvents.proposalPk
         );
 
-      if (!nextWorkflowConnections?.length) {
-        return;
-      }
+        if (!proposal) {
+          throw new Error(
+            `Proposal with id ${proposalWithEvents.proposalPk} not found`
+          );
+        }
 
-      const statusChangingEvents =
-        await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
-          nextWorkflowConnections.map((connection) => connection.id)
+        const proposalWorkflow = await getProposalWorkflowByCallId(
+          proposal.callId
         );
 
-      if (!statusChangingEvents) {
-        return;
-      }
+        if (!proposalWorkflow) {
+          return;
+        }
 
-      const eventThatTriggeredStatusChangeIsStatusChangingEvent =
-        statusChangingEvents.find(
-          (statusChangingEvent) =>
-            proposal.currentEvent === statusChangingEvent.statusChangingEvent
+        const currentWorkflowConnections =
+          await getProposalWorkflowConnectionByStatusId(
+            proposalWorkflow.id,
+            proposal.statusId
+          );
+
+        if (!currentWorkflowConnections.length) {
+          return;
+        }
+
+        /**
+         * NOTE: We can have more than one current connection because of the multi-column workflows.
+         * This is the way how we store the connection that has multiple next connections.
+         * We have multiple separate connection records pointing to each next connection.
+         * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: SEP_SELECTION and NOT_FEASIBLE.
+         * We store one record of FEASIBILITY_REVIEW with nextProposalStatusId = SEP_SELECTION and another one with nextProposalStatusId = NOT_FEASIBLE.
+         * We go through each record and based on the currentEvent we move the proposal into the right direction
+         */
+        return Promise.all(
+          currentWorkflowConnections.map(async (currentWorkflowConnection) => {
+            if (!currentWorkflowConnection.nextProposalStatusId) {
+              return;
+            }
+
+            if (!proposalWithEvents.proposalEvents) {
+              return;
+            }
+
+            const nextWorkflowConnections =
+              await getProposalWorkflowConnectionByStatusId(
+                proposalWorkflow.id,
+                currentWorkflowConnection.nextProposalStatusId,
+                currentWorkflowConnection.proposalStatusId
+              );
+
+            if (!nextWorkflowConnections?.length) {
+              return;
+            }
+
+            const statusChangingEvents =
+              await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
+                nextWorkflowConnections.map((connection) => connection.id)
+              );
+
+            if (!statusChangingEvents) {
+              return;
+            }
+
+            const eventThatTriggeredStatusChangeIsStatusChangingEvent =
+              statusChangingEvents.find(
+                (statusChangingEvent) =>
+                  proposalWithEvents.currentEvent ===
+                  statusChangingEvent.statusChangingEvent
+              );
+
+            if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
+              return;
+            }
+
+            if (
+              shouldMoveToNextStatus(
+                statusChangingEvents,
+                proposalWithEvents.proposalEvents
+              )
+            ) {
+              return updateProposalStatus(
+                proposalWithEvents.proposalPk,
+                currentWorkflowConnection.nextProposalStatusId
+              );
+            }
+          })
         );
+      })
+    )
+  ).flat();
 
-      if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
-        return;
-      }
-
-      if (
-        shouldMoveToNextStatus(statusChangingEvents, proposal.proposalEvents)
-      ) {
-        return updateProposalStatus(
-          proposal.primaryKey,
-          currentWorkflowConnection.nextProposalStatusId
-        );
-      }
-    })
-  );
+  // NOTE: Filter the undefined or null items in the array.
+  return proposalsWithChangedStatuses.filter((p) => p);
 };
 
-export const markProposalEventAsDoneAndCallWorkflowEngine = async (
+export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
   eventType: Event,
-  proposal: WorkflowEngineProposalType
+  proposalPks: number[]
 ) => {
-  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposal(
+  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
     eventType,
-    proposal.primaryKey
+    proposalPks
   );
 
-  const updatedProposals = await workflowEngine({
-    ...proposal,
-    proposalEvents: allProposalEvents,
-    currentEvent: eventType,
+  const proposalPksWithEvents = proposalPks.map((proposalPk) => {
+    return {
+      proposalPk,
+      proposalEvents: allProposalEvents?.find(
+        (proposalEvents) => proposalEvents.proposal_pk === proposalPk
+      ),
+      currentEvent: eventType,
+    };
   });
+
+  const updatedProposals = await workflowEngine(proposalPksWithEvents);
 
   return updatedProposals;
 };
