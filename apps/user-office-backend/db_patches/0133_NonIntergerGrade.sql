@@ -6,7 +6,12 @@ BEGIN
 		  INSERT INTO 
 			settings(settings_id, description)
 		  VALUES
-			('GRADE_PRECISION', 'What the increment of the grade number should be');
+			('GRADE_PRECISION', 'What the increment of the grade number should be')
+		  ON
+		    CONFLICT (settings_id)
+		  DO
+		    UPDATE SET description = EXCLUDED.description;
+
 
 			DROP VIEW proposal_table_view;
 
