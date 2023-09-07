@@ -42,7 +42,7 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
   const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
     sep.customGradeGuide
   );
-  const handlecustomGradeGuideChange = (
+  const handleCustomGradeGuideChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setCustomGradeGuideChecked(event.target.checked);
@@ -140,7 +140,7 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
                     checked={values.customGradeGuide}
                     data-cy="custom-grade-guide"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      handlecustomGradeGuideChange(event);
+                      handleCustomGradeGuideChange(event);
                       setFieldValue(
                         'customGradeGuide',
                         !values.customGradeGuide
