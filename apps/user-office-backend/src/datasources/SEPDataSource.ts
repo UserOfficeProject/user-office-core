@@ -24,7 +24,7 @@ export interface SEPDataSource {
     description: string,
     numberRatingsRequired: number,
     gradeGuide: string,
-    customGradeGuide: boolean,
+    customGradeGuide: boolean | null,
     active: boolean
   ): Promise<SEP>;
   update(
@@ -33,7 +33,7 @@ export interface SEPDataSource {
     description: string,
     numberRatingsRequired: number,
     gradeGuide: string,
-    customGradeGuide: boolean,
+    customGradeGuide: boolean | null,
     active: boolean
   ): Promise<SEP>;
   delete(id: number): Promise<SEP>;

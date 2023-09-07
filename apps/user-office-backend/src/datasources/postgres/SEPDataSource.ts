@@ -62,7 +62,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     description: string,
     numberRatingsRequired: number,
     gradeGuide: string,
-    customGradeGuide: boolean,
+    customGradeGuide: boolean | null,
     active: boolean
   ) {
     return database

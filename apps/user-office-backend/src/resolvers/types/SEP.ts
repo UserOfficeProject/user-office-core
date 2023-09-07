@@ -30,7 +30,7 @@ export class SEP implements Partial<SEPBase> {
   public gradeGuide: string;
 
   @Field(() => Boolean, { nullable: true })
-  public customGradeGuide: boolean;
+  public customGradeGuide: boolean | null;
 
   @Field(() => Boolean)
   public active: boolean;

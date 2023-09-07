@@ -213,7 +213,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     description: string,
     numberRatingsRequired: number,
     gradeGuide: string,
-    customGradeGuide: boolean,
+    customGradeGuide: boolean | null,
     active: boolean
   ) {
     const id = 2;
@@ -237,7 +237,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     description: string,
     numberRatingsRequired: number,
     gradeGuide: string,
-    customGradeGuide: boolean,
+    customGradeGuide: boolean | null,
     active: boolean
   ) {
     return new SEP(
