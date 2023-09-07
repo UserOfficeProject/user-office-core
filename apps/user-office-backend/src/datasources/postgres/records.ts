@@ -405,7 +405,7 @@ export interface SEPRecord {
   readonly description: string;
   readonly number_ratings_required: number;
   readonly grade_guide: string;
-  readonly custom_grade_guide: boolean;
+  readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
   readonly sep_chair_user_id: number | null;

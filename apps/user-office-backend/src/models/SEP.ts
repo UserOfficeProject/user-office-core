@@ -5,7 +5,7 @@ export class SEP {
     public description: string,
     public numberRatingsRequired: number,
     public gradeGuide: string,
-    public customGradeGuide: boolean,
+    public customGradeGuide: boolean | null,
     public active: boolean,
     public sepChairUserId: number | null,
     public sepSecretaryUserId: number | null
