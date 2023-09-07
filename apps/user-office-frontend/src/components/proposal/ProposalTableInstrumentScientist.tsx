@@ -7,7 +7,7 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Dialog, DialogContent } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
@@ -46,6 +46,7 @@ import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScienti
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import {
   ProposalViewData,
   useProposalsCoreData,
@@ -60,9 +61,11 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
+import TableActionsDropdownMenu from './TableActionsDropdownMenu';
 
 type QueryParameters = {
   query: {
@@ -73,6 +76,11 @@ type QueryParameters = {
 };
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
+
+enum DownloadMenuOption {
+  PROPOSAL = 'Proposal(s)',
+  ATTACHMENT = 'Attachment(s)',
+}
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -231,6 +239,9 @@ const ProposalTableInstrumentScientist = ({
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
   const { settingsMap } = useContext(SettingsContext);
+  const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
+    useState<null | HTMLElement>(null);
+  const [openDownloadAttachment, setOpenDownloadAttachment] = useState(false);
   const { t } = useTranslation();
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
@@ -356,6 +367,7 @@ const ProposalTableInstrumentScientist = ({
   }, [proposalsData, urlQueryParams.selection]);
 
   const downloadPDFProposal = useDownloadPDFProposal();
+  const downloadProposalAttachment = useDownloadProposalAttachment();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsInstrumentScientist', null);
@@ -504,11 +516,21 @@ const ProposalTableInstrumentScientist = ({
       sortDirection: orderDirection ? orderDirection : undefined,
     });
 
-  const handleBulkDownloadClick = () => {
-    downloadPDFProposal(
-      selectedProposals.map((proposal) => proposal.primaryKey),
-      selectedProposals[0].title
-    );
+  const handleDownloadActionClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setActionsMenuAnchorElement(event.currentTarget);
+  };
+  const handleClose = (selectedOption: string) => {
+    if (selectedOption === DownloadMenuOption.PROPOSAL) {
+      downloadPDFProposal(
+        selectedProposals?.map((proposal) => proposal.primaryKey),
+        selectedProposals?.[0].title || ''
+      );
+    } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
+      setOpenDownloadAttachment(true);
+    }
+    setActionsMenuAnchorElement(null);
   };
 
   const handleBulkTechnicalReviewsSubmit = async () => {
@@ -615,7 +637,7 @@ const ProposalTableInstrumentScientist = ({
     {
       icon: GetAppIconComponent,
       tooltip: 'Download proposals',
-      onClick: handleBulkDownloadClick,
+      onClick: handleDownloadActionClick,
       position: 'toolbarOnSelect',
     },
     {
@@ -697,6 +719,34 @@ const ProposalTableInstrumentScientist = ({
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openDownloadAttachment}
+        onClose={(): void => setOpenDownloadAttachment(false)}
+      >
+        <DialogContent>
+          <ProposalAttachmentDownload
+            close={(): void => setOpenDownloadAttachment(false)}
+            referenceNumbers={selectedProposals.map(
+              (selectedProposal) => selectedProposal.proposalId
+            )}
+            downloadProposalAttachment={(
+              proposalIds: number[],
+              questionIds: string
+            ) =>
+              downloadProposalAttachment(proposalIds, {
+                questionIds,
+              })
+            }
+          />
+        </DialogContent>
+      </Dialog>
+      <TableActionsDropdownMenu
+        event={actionsMenuAnchorElement}
+        handleClose={handleClose}
+        options={Object.values(DownloadMenuOption)}
+      />
       {isInstrumentScientist && (
         <>
           <ReviewerFilterComponent

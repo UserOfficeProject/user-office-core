@@ -9,6 +9,7 @@ import { DownloadType } from '../factory/service';
 import { UserWithRole } from '../models/User';
 import pdfDownload from './factory/pdf';
 import xlsxDownload from './factory/xlsx';
+import zipDownload from './factory/zip';
 
 const defaultErrorMessage = 'Failed to generate the requested file(s)';
 
@@ -68,6 +69,7 @@ const router = express.Router();
 
 router.use(`/${DownloadType.PDF}`, pdfDownload());
 router.use(`/${DownloadType.XLSX}`, xlsxDownload());
+router.use(`/${DownloadType.ZIP}`, zipDownload());
 router.use(
   (
     err: Error | { error: Error; message: string } | string,

@@ -7,7 +7,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
-import { markProposalEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
+import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 enum ProposalInformationKeys {
   Proposal = 'proposal',
@@ -16,13 +16,16 @@ enum ProposalInformationKeys {
 }
 
 export const handleWorkflowEngineChange = async (
-  proposalDataSource: ProposalDataSource,
   event: ApplicationEvent,
   proposalPks: number[] | number
 ) => {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
   const isArray = Array.isArray(proposalPks);
 
-  const updatedProposals = await markProposalEventAsDoneAndCallWorkflowEngine(
+  const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
     event.type,
     isArray ? proposalPks : [proposalPks]
   );
@@ -84,10 +87,6 @@ const extractProposalInformationFromEvent = (event: ApplicationEvent) => {
 };
 
 export default function createHandler() {
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-
   // Handler to align input for workflowEngine
   return async function proposalWorkflowHandler(event: ApplicationEvent) {
     // if the original method failed
@@ -111,16 +110,11 @@ export default function createHandler() {
       switch (proposalInformationKey) {
         case ProposalInformationKeys.ProposalPKs:
         case ProposalInformationKeys.ProposalPk:
-          handleWorkflowEngineChange(
-            proposalDataSource,
-            event,
-            proposalInformationValue
-          );
+          handleWorkflowEngineChange(event, proposalInformationValue);
 
           break;
         case ProposalInformationKeys.Proposal:
           handleWorkflowEngineChange(
-            proposalDataSource,
             event,
             (proposalInformationValue as Proposal).primaryKey
           );

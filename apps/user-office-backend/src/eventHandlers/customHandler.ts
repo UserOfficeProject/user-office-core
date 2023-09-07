@@ -218,7 +218,7 @@ export default function createCustomHandler() {
             const proposalPks = allProposalsOnCall.proposalViews.map(
               (proposal) => proposal.primaryKey
             );
-            handleWorkflowEngineChange(proposalDataSource, event, proposalPks);
+            handleWorkflowEngineChange(event, proposalPks);
           }
         } catch (error) {
           logger.logException(

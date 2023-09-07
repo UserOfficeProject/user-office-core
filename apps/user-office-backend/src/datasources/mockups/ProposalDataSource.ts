@@ -329,7 +329,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return { totalCount: 1, proposals: [dummyProposalView] };
   }
 
-  async markEventAsDoneOnProposal(
+  async markEventAsDoneOnProposals(
     event: Event,
     proposalPk: number[]
   ): Promise<ProposalEventsRecord[] | null> {

@@ -47,6 +47,7 @@ import {
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import {
   ProposalViewData,
@@ -64,7 +65,9 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
+import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
+import TableActionsDropdownMenu from './TableActionsDropdownMenu';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
@@ -73,7 +76,9 @@ type ProposalTableOfficerProps = {
   confirm: WithConfirmType;
 };
 
-type ProposalSelectionType = ProposalSelectionInput & {
+export type ProposalSelectionType = ProposalSelectionInput & {
+  title: string;
+  proposalId: string;
   instrumentId: number | null;
   sepId: number | null;
   statusId: number;
@@ -195,6 +200,11 @@ const SEPReviewColumns = (
 
 const PREFETCH_SIZE = 200;
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
+
+enum DownloadMenuOption {
+  PROPOSAL = 'Proposal(s)',
+  ATTACHMENT = 'Attachment(s)',
+}
 /**
  * NOTE: This toolbar "select all" option works only with all prefetched proposals. Currently that value is set to "PREFETCH_SIZE=200"
  * For example if we change the PREFETCH_SIZE to 100, that would mean that it can select up to 100 prefetched proposals at once.
@@ -271,8 +281,11 @@ const ProposalTableOfficer = ({
     ProposalViewData[]
   >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
-
+  const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
+    useState<null | HTMLElement>(null);
+  const [openDownloadAttachment, setOpenDownloadAttachment] = useState(false);
   const downloadPDFProposal = useDownloadPDFProposal();
+  const downloadProposalAttachment = useDownloadProposalAttachment();
   const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
@@ -298,7 +311,22 @@ const ProposalTableOfficer = ({
     totalCount,
     fetchProposalsData,
   } = useProposalsCoreData(proposalFilter, query);
-
+  const handleDownloadActionClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setActionsMenuAnchorElement(event.currentTarget);
+  };
+  const handleClose = (selectedOption: string) => {
+    if (selectedOption === DownloadMenuOption.PROPOSAL) {
+      downloadPDFProposal(
+        selectedProposals?.map((proposal) => proposal.primaryKey),
+        selectedProposals?.[0].title
+      );
+    } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
+      setOpenDownloadAttachment(true);
+    }
+    setActionsMenuAnchorElement(null);
+  };
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);
   }, [proposalsData, query]);
@@ -335,6 +363,8 @@ const ProposalTableOfficer = ({
               sepId: proposal.sepId,
               statusId: proposal.statusId,
               workflowId: proposal.workflowId,
+              title: proposal.title,
+              proposalId: proposal.proposalId,
             });
           }
 
@@ -742,6 +772,34 @@ const ProposalTableOfficer = ({
           />
         </DialogContent>
       </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openDownloadAttachment}
+        onClose={(): void => setOpenDownloadAttachment(false)}
+      >
+        <DialogContent>
+          <ProposalAttachmentDownload
+            close={(): void => setOpenDownloadAttachment(false)}
+            referenceNumbers={selectedProposals.map(
+              (selectedProposal) => selectedProposal.proposalId
+            )}
+            downloadProposalAttachment={(
+              proposalIds: number[],
+              questionIds: string
+            ) =>
+              downloadProposalAttachment(proposalIds, {
+                questionIds,
+              })
+            }
+          />
+        </DialogContent>
+      </Dialog>
+      <TableActionsDropdownMenu
+        event={actionsMenuAnchorElement}
+        handleClose={handleClose}
+        options={Object.values(DownloadMenuOption)}
+      />
       <ProposalReviewModal
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
@@ -838,11 +896,8 @@ const ProposalTableOfficer = ({
           {
             icon: GetAppIconComponent,
             tooltip: 'Download proposals',
-            onClick: (event, rowData): void => {
-              downloadPDFProposal(
-                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
-                (rowData as ProposalViewData[])[0].title
-              );
+            onClick: (event): void => {
+              handleDownloadActionClick(event);
             },
             position: 'toolbarOnSelect',
           },
