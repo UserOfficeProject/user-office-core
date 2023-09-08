@@ -22,6 +22,12 @@ export class CreateSEPArgs {
   @Field(() => Int, { defaultValue: 2 })
   public numberRatingsRequired: number;
 
+  @Field(() => String, { nullable: true })
+  public gradeGuide: string;
+
+  @Field(() => Boolean, { nullable: true })
+  public customGradeGuide: boolean | null;
+
   @Field(() => Boolean)
   public active: boolean;
 }
