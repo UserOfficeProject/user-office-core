@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { updateSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
 import { Formik, Form, Field } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -15,6 +15,8 @@ import UOLoader from 'components/common/UOLoader';
 import { Sep, UserRole } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+import FAPGradeGuide from '../FAPGradeGuide';
 
 type SEPPageProps = {
   /** SEP data to be shown */
@@ -36,6 +38,15 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { t } = useTranslation();
+
+  const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
+    sep.customGradeGuide
+  );
+  const handleCustomGradeGuideChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCustomGradeGuideChecked(event.target.checked);
+  };
 
   const sendSEPUpdate = async (values: Sep): Promise<void> => {
     await api({
@@ -64,6 +75,7 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
         touched,
         handleChange,
         setFieldValue,
+        setValues,
       }): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
@@ -105,6 +117,38 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
                   errors.numberRatingsRequired
                 }
                 disabled={!hasAccessRights || isExecutingCall}
+              />
+              {customGradeGuideChecked && (
+                <FAPGradeGuide
+                  sep={sep}
+                  onSEPUpdate={(updatedGradeGuide) => {
+                    setValues({
+                      ...values,
+                      gradeGuide: updatedGradeGuide.gradeGuide,
+                    });
+                  }}
+                />
+              )}
+              <FormControlLabel
+                control={
+                  <Field
+                    id="customGradeGuide"
+                    name="customGradeGuide"
+                    component={Checkbox}
+                    type="checkbox"
+                    inputProps={{ 'aria-label': 'primary checkbox' }}
+                    checked={values.customGradeGuide}
+                    data-cy="custom-grade-guide"
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      handleCustomGradeGuideChange(event);
+                      setFieldValue(
+                        'customGradeGuide',
+                        !values.customGradeGuide
+                      );
+                    }}
+                  />
+                }
+                label="Custom Grade Guide"
               />
             </Grid>
             <Grid item sm={6} xs={12}>

@@ -61,6 +61,8 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     code: string,
     description: string,
     numberRatingsRequired: number,
+    gradeGuide: string,
+    customGradeGuide: boolean | null,
     active: boolean
   ) {
     return database
@@ -69,6 +71,8 @@ export default class PostgresSEPDataSource implements SEPDataSource {
           code: code,
           description: description,
           number_ratings_required: numberRatingsRequired,
+          grade_guide: gradeGuide,
+          custom_grade_guide: customGradeGuide,
           active: active,
         },
         ['*']
@@ -82,6 +86,8 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     code: string,
     description: string,
     numberRatingsRequired: number,
+    gradeGuide: string,
+    customGradeGuide: boolean,
     active: boolean
   ) {
     return database
@@ -90,6 +96,8 @@ export default class PostgresSEPDataSource implements SEPDataSource {
           code,
           description,
           number_ratings_required: numberRatingsRequired,
+          grade_guide: gradeGuide,
+          custom_grade_guide: customGradeGuide,
           active,
         },
         ['*']

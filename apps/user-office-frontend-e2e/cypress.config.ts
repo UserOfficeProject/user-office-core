@@ -50,7 +50,7 @@ module.exports = defineConfig({
     DEV_AUTH_SERVER_URL: 'http://localhost:5000',
   },
   e2e: {
-    baseUrl: 'http://localhost:3000',
+    baseUrl: 'http://127.0.0.1:3000',
     setupNodeEvents(on) {
       // `on` is used to hook into various events Cypress emits
       // `config` is the resolved Cypress config

@@ -754,6 +754,8 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="download-proposals"]').click();
 
+      cy.contains('Proposal(s)').click();
+
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         '2 selected items'

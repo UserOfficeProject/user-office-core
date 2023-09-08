@@ -7,6 +7,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
+import { Country } from '../../models/Country';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
@@ -253,6 +254,12 @@ export interface UserRecord {
   readonly placeholder: boolean;
 }
 
+export interface UserRecordWithInstitution {
+  user: UserRecord;
+  institution: InstitutionRecord;
+  country: CountryRecord;
+}
+
 export interface VisitRegistrationRecord {
   user_id: number;
   visit_id: number;
@@ -397,6 +404,8 @@ export interface SEPRecord {
   readonly code: string;
   readonly description: string;
   readonly number_ratings_required: number;
+  readonly grade_guide: string;
+  readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
   readonly sep_chair_user_id: number | null;
@@ -1028,6 +1037,8 @@ export const createSEPObject = (sep: SEPRecord) => {
     sep.code,
     sep.description,
     sep.number_ratings_required,
+    sep.grade_guide,
+    sep.custom_grade_guide,
     sep.active,
     sep.sep_chair_user_id,
     sep.sep_secretary_user_id
@@ -1139,6 +1150,10 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.country_id,
     institution.verified
   );
+};
+
+export const createCountryObject = (country: CountryRecord) => {
+  return new Country(country.country_id, country.country);
 };
 
 export const createScheduledEventObject = (
