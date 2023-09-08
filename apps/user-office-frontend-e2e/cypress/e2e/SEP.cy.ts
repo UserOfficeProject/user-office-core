@@ -99,11 +99,13 @@ const secondProposalTimeAllocation = 5;
 const sep1 = {
   code: faker.lorem.word(10),
   description: faker.random.words(8),
+  gradeGuide: faker.random.words(8),
 };
 
 const sep2 = {
   code: faker.lorem.words(1),
   description: faker.random.words(8),
+  gradeGuide: faker.random.words(8),
 };
 
 const proposal1 = {
@@ -160,6 +162,7 @@ function initializationBeforeTests() {
     code: sep1.code,
     description: sep1.description,
     numberRatingsRequired: 2,
+    gradeGuide: sep1.gradeGuide,
     active: true,
   }).then((result) => {
     if (result.createSEP) {
@@ -1433,6 +1436,7 @@ context('SEP meeting components tests', () => {
               description: sep2.description,
               active: true,
               numberRatingsRequired: 2,
+              gradeGuide: sep2.gradeGuide,
             }).then((sepResult) => {
               if (sepResult.createSEP) {
                 cy.assignProposalsToSep({
@@ -1772,6 +1776,36 @@ context('SEP meeting components tests', () => {
       );
     });
 
+    it('Officer should be able to add custom grade guide when creating SEP', () => {
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy="grade-guide"]').click();
+
+      cy.contains(sep1.gradeGuide).should('not.exist');
+
+      cy.visit(`/SEPPage/${createdSepId}?`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="custom-grade-guide"]').click();
+      cy.get('[data-cy="submit"]').click();
+
+      cy.visit(`/SEPPage/${createdSepId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy="grade-guide"]').click();
+
+      cy.contains(sep1.gradeGuide);
+    });
+
     it('Officer should be able to bulk download SEP proposals as pdf', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then(
         (proposalResult) => {
@@ -1787,6 +1821,7 @@ context('SEP meeting components tests', () => {
               description: sep2.description,
               active: true,
               numberRatingsRequired: 2,
+              gradeGuide: sep2.gradeGuide,
             }).then((sepResult) => {
               if (sepResult.createSEP) {
                 cy.assignProposalsToSep({

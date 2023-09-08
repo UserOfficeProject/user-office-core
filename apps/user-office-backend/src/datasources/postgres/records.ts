@@ -406,6 +406,8 @@ export interface SEPRecord {
   readonly code: string;
   readonly description: string;
   readonly number_ratings_required: number;
+  readonly grade_guide: string;
+  readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
   readonly sep_chair_user_id: number | null;
@@ -1052,6 +1054,8 @@ export const createSEPObject = (sep: SEPRecord) => {
     sep.code,
     sep.description,
     sep.number_ratings_required,
+    sep.grade_guide,
+    sep.custom_grade_guide,
     sep.active,
     sep.sep_chair_user_id,
     sep.sep_secretary_user_id
