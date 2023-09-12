@@ -1,4 +1,4 @@
-version: "3.1"
+version: '3.1'
 
 services:
   # used to proxy the core UI FE and BE requests to the right container
@@ -8,20 +8,20 @@ services:
     image: traefik:2.10 # The official Traefik docker image
     command:
       #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+      - '--api.insecure=true'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entrypoints.web.address=:80'
     ports:
-      - "33000:80" # The HTTP port
-      - "8080:8080" # The Web UI (enabled by --api)
+      - '33000:80' # The HTTP port
+      - '8080:8080' # The Web UI (enabled by --api)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`localhost`)"
-      - "traefik.http.routers.traefik.entrypoints=web"
-      - "traefik.http.routers.traefik.service=api@internal"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.rule=Host(`localhost`)'
+      - 'traefik.http.routers.traefik.entrypoints=web'
+      - 'traefik.http.routers.traefik.service=api@internal'
   db:
     image: postgres:11-alpine
     restart: always
@@ -29,11 +29,13 @@ services:
       POSTGRES_PASSWORD: duopassword
       POSTGRES_USER: duouser
       POSTGRES_DB: duo
+    ports:
+      - '5432:5432'
     volumes:
       - ./apps/user-office-backend/db_patches/:/docker-entrypoint-initdb.d/
 
   factory:
-    image: "ghcr.io/userofficeproject/user-office-factory:develop"
+    image: 'ghcr.io/userofficeproject/user-office-factory:develop'
     init: true
     environment:
       - NODE_ENV=development
@@ -48,20 +50,20 @@ services:
       - db
 
   frontend:
-    image: "ghcr.io/userofficeproject/user-office-frontend:develop"
+    image: 'ghcr.io/userofficeproject/user-office-frontend:develop'
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=(Host(`localhost`) && PathPrefix(`/`))"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.frontend.rule=(Host(`localhost`) && PathPrefix(`/`))'
     depends_on:
       - backend
 
   backend:
-    image: "ghcr.io/userofficeproject/user-office-backend:develop"
+    image: 'ghcr.io/userofficeproject/user-office-backend:develop'
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
       tokenLife: 7d
-      baseURL: localhost:4000
+      baseURL: localhost:33000
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
       UO_FEATURE_DISABLE_EAM: 1
@@ -75,26 +77,21 @@ services:
       DATE_FORMAT: dd-MM-yyyy
       DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.backend.loadbalancer.server.port=4000"
-      - "traefik.http.routers.backend.rule=(Host(`localhost`) && PathPrefix(`/api`, `/downloads`, `/files`, `/download`, `/uploads`, `/graphql`))"
+      - 'traefik.enable=true'
+      - 'traefik.http.services.backend.loadbalancer.server.port=4000'
+      - 'traefik.http.routers.backend.rule=(Host(`localhost`) && PathPrefix(`/api`, `/downloads`, `/files`, `/download`, `/uploads`, `/graphql`))'
     depends_on:
       - duo-development-authorization-server
       - db
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
 
   duo-development-authorization-server:
-    image: "ghcr.io/userofficeproject/user-office-development-authorization-server:develop"
+    image: 'ghcr.io/userofficeproject/user-office-development-authorization-server:develop'
     ports:
       - 5000:5000
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       PORT: 5000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.redirect.rule=(Host(`localhost`) && PathPrefix(`/login`))"
-      - "traefik.http.routers.redirect.entrypoints=web"
-      - "traefik.http.routers.redirect.middlewares=redirect"
-      - "traefik.http.middlewares.redirect.redirectregex.regex=^(.*)$$"
-      - "traefik.http.middlewares.redirect.redirectregex.replacement=http://localhost:5000/auth?client_id=useroffice&scope=openid%20profile%20email&response_type=code&redirect_uri=http://localhost:33000/external-auth"
     depends_on:
       - db
