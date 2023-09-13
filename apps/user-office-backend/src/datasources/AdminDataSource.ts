@@ -28,8 +28,8 @@ export interface AdminDataSource {
   getNationalities(): Promise<Entry[]>;
   get(id: number): Promise<string | null>;
   setPageText(id: number, text: string): Promise<Page>;
-  resetDB(includeSeeds: boolean): Promise<void>;
-  applyPatches(): Promise<void>;
+  resetDB(includeSeeds: boolean): Promise<string[]>;
+  applyPatches(): Promise<string[]>;
   getFeatures(): Promise<Feature[]>;
   setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
   updateFeatures(updatedFeaturesInput: UpdateFeaturesInput): Promise<Feature[]>;

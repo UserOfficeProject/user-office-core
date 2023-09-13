@@ -39,21 +39,25 @@ export default class AdminMutations {
   async resetDB(
     agent: UserWithRole | null,
     includeSeeds: boolean
-  ): Promise<void | Rejection> {
+  ): Promise<string[] | Rejection> {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
-      await this.dataSource.resetDB(includeSeeds);
+      const log = await this.dataSource.resetDB(includeSeeds);
       await container.resolve<() => Promise<void>>(
         Tokens.ConfigureEnvironment
       )();
+
+      return log;
     } else {
       return rejection('Resetting database is not allowed');
     }
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async applyPatches(agent: UserWithRole | null): Promise<void | Rejection> {
+  async applyPatches(
+    agent: UserWithRole | null
+  ): Promise<string[] | Rejection> {
     logger.logWarn('Applying patches', {});
 
     return this.dataSource.applyPatches();

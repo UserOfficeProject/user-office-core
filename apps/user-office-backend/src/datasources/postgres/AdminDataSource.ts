@@ -258,7 +258,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
   }
 
-  async applyPatches(): Promise<void> {
+  async applyPatches(): Promise<string[]> {
     logger.logInfo('Applying patches started', { timestamp: new Date() });
 
     const files = await fs.readdir(dbPatchesFolderPath);
@@ -291,6 +291,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
 
     logger.logInfo('Applying patches finished', { timestamp: new Date() });
+
+    return patches.map(([file]) => file);
   }
 
   private async applySeeds() {

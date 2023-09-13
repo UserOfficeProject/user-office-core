@@ -93,10 +93,10 @@ export class AdminDataSourceMock implements AdminDataSource {
   ): Promise<import('../../models/Institution').Institution[]> {
     return [dummyInstitution];
   }
-  applyPatches(): Promise<void> {
+  applyPatches(): Promise<string[]> {
     throw new Error('Method not implemented.');
   }
-  async resetDB(includeSeeds: boolean): Promise<void> {
+  async resetDB(includeSeeds: boolean): Promise<string[]> {
     throw new Error('Method not implemented.');
   }
 

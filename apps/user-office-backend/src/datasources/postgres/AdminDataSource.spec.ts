@@ -59,8 +59,9 @@ describe('PostgresAdminDataSource', () => {
     });
 
     it('should apply patches correctly', async () => {
-      await adminDataSource.applyPatches();
+      const res = await adminDataSource.applyPatches();
 
+      expect(res).toEqual(['patch1.sql', 'patch2.sql']);
       expect(promises.readdir).toHaveBeenCalledWith(
         'working-directory/db_patches'
       );
