@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+import { cwd, env, exit } from 'node:process';
 import path from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -39,7 +40,7 @@ import {
   UserRecord,
 } from './records';
 
-const dbPatchesFolderPath = path.join(process.cwd(), 'db_patches');
+const dbPatchesFolderPath = path.join(cwd(), 'db_patches');
 const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
@@ -245,7 +246,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 
       const applyPatchesOutput = await this.applyPatches();
 
-      if (process.env.INCLUDE_SEEDS === '1' || includeSeeds) {
+      if (env.INCLUDE_SEEDS === '1' || includeSeeds) {
         await this.applySeeds();
       }
 
@@ -257,41 +258,39 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
   }
 
-  async applyPatches(): Promise<string> {
+  async applyPatches(): Promise<void> {
     logger.logInfo('Applying patches started', { timestamp: new Date() });
-
-    const log: string[] = [];
 
     const files = await fs.readdir(dbPatchesFolderPath);
 
-    for (const file of files) {
-      // ignore everything other than sql files
-      if (!/\.sql$/i.test(file)) {
-        continue;
-      }
+    const patches = await Promise.all(
+      files
+        .filter((file) => /\.sql$/i.test(file))
+        .map(async (file) => {
+          const content = await fs.readFile(
+            path.join(dbPatchesFolderPath, file),
+            'utf8'
+          );
 
-      const contents = await fs.readFile(
-        path.join(dbPatchesFolderPath, file),
-        'utf8'
-      );
+          return [file, content];
+        })
+    );
+
+    if (patches.length > 0) {
       await database.transaction(async (trx) => {
-        trx
-          .raw(contents)
-          .then(() => {
-            const msg = `${file} executed.`;
-            log.push(msg);
-          })
-          .catch((err) => {
-            const msg = `${file} failed: ${err}`;
-            log.push(msg);
-            throw log.join('\n');
-          });
+        for (const [file, patch] of patches) {
+          await database
+            .raw(patch)
+            .transacting(trx)
+            .catch((err) => {
+              logger.logException('Failed to apply patch', err, { file });
+              throw err;
+            });
+        }
       });
     }
 
     logger.logInfo('Applying patches finished', { timestamp: new Date() });
-
-    return log.join('\n');
   }
 
   private async applySeeds() {
@@ -341,7 +340,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           logger.logException('Failed to initialize db', e, { initDbFailed });
 
           if (initDbFailed >= 5) {
-            process.exit(1);
+            exit(1);
           }
 
           setTimeout(initDb, 1000);
