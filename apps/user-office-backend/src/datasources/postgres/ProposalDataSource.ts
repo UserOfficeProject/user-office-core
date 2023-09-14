@@ -787,12 +787,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     if (proposalEventsToReset?.length) {
       const dataToUpdate: Record<string, boolean> = {};
+
       proposalEventsToReset.forEach((event) => {
-        if (
-          !dataToUpdate.hasOwnProperty(
-            event.status_changing_event.toLocaleLowerCase()
-          )
-        ) {
+        const dataToUpdateHasProperty = dataToUpdate.hasOwnProperty(
+          event.status_changing_event.toLocaleLowerCase()
+        );
+        // NOTE: Reset the property only if it is not present in the dataToUpdate otherwise we end up with overwriting existing data.
+        if (!dataToUpdateHasProperty) {
           dataToUpdate[event.status_changing_event.toLocaleLowerCase()] = false;
         }
       });

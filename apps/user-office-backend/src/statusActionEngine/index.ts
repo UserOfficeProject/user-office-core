@@ -17,7 +17,7 @@ export const statusActionEngine = async (
   const proposalSettingsDataSource: ProposalSettingsDataSource =
     container.resolve(Tokens.ProposalSettingsDataSource);
 
-  // NOTE: We need to group the proposals by 'workflow' na 'status' because proposals coming in here can be from different workflows/calls.
+  // NOTE: We need to group the proposals by 'workflow' and 'status' because proposals coming in here can be from different workflows/calls.
   const groupByProperties = ['workflowId', 'statusId'];
   // NOTE: Here the result is something like: [[proposalsWithWorkflowStatusIdCombination1], [proposalsWithWorkflowStatusIdCombination2]...]
   const groupResult = groupProposalsByProperties(proposals, groupByProperties);
