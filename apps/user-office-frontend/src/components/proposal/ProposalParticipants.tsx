@@ -4,11 +4,12 @@ import FormControl from '@mui/material/FormControl';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, UserRole } from 'generated/sdk';
+import { BasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -26,19 +27,23 @@ type ParticipantsProps = {
   users: BasicUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
+  principalInvestigator?: BasicUserData | null;
+  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   className?: string;
   title: string;
-  principalInvestigator?: number;
   preserveSelf?: boolean;
+  loadingPrincipalInvestigator?: boolean;
 };
 
 const Participants = ({
   users,
   setUsers,
+  principalInvestigator,
+  setPrincipalInvestigator,
   className,
   title,
-  principalInvestigator,
   preserveSelf,
+  loadingPrincipalInvestigator,
 }: ParticipantsProps) => {
   const [modalOpen, setOpen] = useState(false);
 
@@ -58,16 +63,6 @@ const Participants = ({
     setOpen(true);
   };
 
-  useEffect(() => {
-    if (
-      !!principalInvestigator &&
-      users.map((user) => user.id).includes(principalInvestigator)
-    ) {
-      const user = users.find((u) => u.id === principalInvestigator);
-      removeUser(user as BasicUserDetails);
-    }
-  });
-
   return (
     <div className={className}>
       <ParticipantModal
@@ -76,13 +71,14 @@ const Participants = ({
         addParticipants={addUsers}
         selectedUsers={
           !!principalInvestigator // add principal investigator if one exists
-            ? users.map((user) => user.id).concat([principalInvestigator])
+            ? users.map((user) => user.id).concat([principalInvestigator.id])
             : users.map((user) => user.id)
         }
         title={title}
         selection={true}
         userRole={UserRole.USER}
         participant={true}
+        setPrincipalInvestigator={setPrincipalInvestigator}
       />
 
       <FormControl margin="dense" fullWidth>
@@ -104,6 +100,7 @@ const Participants = ({
           invitationUserRole={UserRole.USER}
           onRemove={removeUser}
           preserveSelf={preserveSelf}
+          setPrincipalInvestigator={setPrincipalInvestigator}
         />
         <ActionButtonContainer className={classes.StyledButtonContainer}>
           <Button
@@ -112,6 +109,7 @@ const Participants = ({
             data-cy="add-participant-button"
             size="small"
             startIcon={<PersonAddIcon />}
+            disabled={loadingPrincipalInvestigator}
           >
             Add
           </Button>
