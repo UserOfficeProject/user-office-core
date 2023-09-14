@@ -28,6 +28,7 @@ export class ProposalView {
     public instrumentId: number,
     public allocationTimeUnit: AllocationTimeUnits,
     public callId: number,
+    public workflowId: number,
     public submitted: boolean
   ) {}
 }

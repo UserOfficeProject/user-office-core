@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 
 import { ProposalStatus } from '../../models/ProposalStatus';
+import { ProposalStatusAction } from '../../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
@@ -10,6 +11,7 @@ import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
+import { ProposalStatusActionConfigBase } from '../../resolvers/types/ProposalStatusActionConfig';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
 import {
@@ -17,6 +19,8 @@ import {
   ProposalStatusRecord,
   ProposalWorkflowConnectionRecord,
   ProposalWorkflowRecord,
+  ProposalStatusActionRecord,
+  ProposalWorkflowConnectionHasActionsRecord,
 } from './records';
 
 export default class PostgresProposalSettingsDataSource
@@ -539,5 +543,77 @@ export default class PostgresProposalSettingsDataSource
           this.createStatusChangingEventObject(statusChangingEvent)
         );
       });
+  }
+
+  // TODO: This might need to be moved to it's own ProposalStatusActionsDataSource.ts file
+  private createProposalStatusActionObject(
+    proposalActionStatusRecord: ProposalStatusActionRecord &
+      ProposalWorkflowConnectionHasActionsRecord & {
+        config: ProposalStatusActionConfigBase;
+      }
+  ) {
+    return new ProposalStatusAction(
+      proposalActionStatusRecord.proposal_status_action_id,
+      proposalActionStatusRecord.connection_id,
+      proposalActionStatusRecord.name,
+      proposalActionStatusRecord.type,
+      proposalActionStatusRecord.executed,
+      proposalActionStatusRecord.config
+    );
+  }
+
+  async getStatusActionsByConnectionId(
+    proposalWorkflowConnectionId: number,
+    proposalWorkflowId: number
+  ): Promise<ProposalStatusAction[]> {
+    const proposalActionStatusRecords: (ProposalStatusActionRecord &
+      ProposalWorkflowConnectionHasActionsRecord & {
+        config: ProposalStatusActionConfigBase;
+      })[] = await database
+      .select()
+      .from('proposal_status_actions as psa')
+      .join('proposal_workflow_connection_has_actions as pwca', {
+        'pwca.action_id': 'psa.proposal_status_action_id',
+      })
+      .where('pwca.workflow_id', proposalWorkflowId)
+      .andWhere('pwca.connection_id', proposalWorkflowConnectionId);
+
+    const proposalStatusActions = proposalActionStatusRecords.map(
+      (proposalActionStatusRecord) =>
+        this.createProposalStatusActionObject(proposalActionStatusRecord)
+    );
+
+    return proposalStatusActions;
+  }
+
+  async updateStatusAction(
+    proposalStatusAction: ProposalStatusAction
+  ): Promise<ProposalStatusAction> {
+    const [
+      updatedProposalAction,
+    ]: ProposalWorkflowConnectionHasActionsRecord[] = await database
+      .update(
+        {
+          executed: proposalStatusAction.executed,
+          config: proposalStatusAction.config,
+        },
+        ['*']
+      )
+      .from('proposal_workflow_connection_has_actions')
+      .where('connection_id', proposalStatusAction.connectionId)
+      .andWhere('action_id', proposalStatusAction.id);
+
+    if (!updatedProposalAction) {
+      throw new GraphQLError(
+        `ProposalStatusAction not found ${proposalStatusAction.id}`
+      );
+    }
+
+    return this.createProposalStatusActionObject({
+      proposal_status_action_id: proposalStatusAction.id,
+      name: proposalStatusAction.name,
+      type: proposalStatusAction.type,
+      ...updatedProposalAction,
+    });
   }
 }
