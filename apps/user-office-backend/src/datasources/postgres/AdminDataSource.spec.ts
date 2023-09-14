@@ -40,8 +40,8 @@ describe('PostgresAdminDataSource', () => {
       mockLoggerLogInfo = jest.spyOn(logger, 'logInfo');
       mockLogException = jest.spyOn(logger, 'logException');
       (promises.readdir as jest.Mock).mockResolvedValue([
-        'patch1.sql',
-        'patch2.sql',
+        '002_patch.sql',
+        '001_patch.sql',
       ]);
       (promises.readFile as jest.Mock).mockImplementation((path) =>
         Promise.resolve(`${path} query`)
@@ -58,31 +58,32 @@ describe('PostgresAdminDataSource', () => {
       adminDataSource = new PostgresAdminDataSource();
     });
 
-    it('should apply patches correctly', async () => {
+    it('should apply patches in order in one transaction', async () => {
       const res = await adminDataSource.applyPatches();
 
-      expect(res).toEqual(['patch1.sql', 'patch2.sql']);
+      expect(res).toEqual(['001_patch.sql', '002_patch.sql']);
       expect(promises.readdir).toHaveBeenCalledWith(
         'working-directory/db_patches'
       );
       expect(promises.readFile).toHaveBeenNthCalledWith(
         1,
-        'working-directory/db_patches/patch1.sql',
+        'working-directory/db_patches/001_patch.sql',
         'utf8'
       );
       expect(promises.readFile).toHaveBeenNthCalledWith(
         2,
-        'working-directory/db_patches/patch2.sql',
+        'working-directory/db_patches/002_patch.sql',
         'utf8'
       );
+      expect(database.transaction).toHaveBeenCalledTimes(1);
       expect(database.raw).toHaveBeenCalledTimes(2);
       expect(database.raw).toHaveBeenNthCalledWith(
         1,
-        'working-directory/db_patches/patch1.sql query'
+        'working-directory/db_patches/001_patch.sql query'
       );
       expect(database.raw).toHaveBeenNthCalledWith(
         2,
-        'working-directory/db_patches/patch2.sql query'
+        'working-directory/db_patches/002_patch.sql query'
       );
       expect(mockKnexTransacting).toHaveBeenCalledTimes(2);
       expect(mockKnexTransacting).toHaveBeenNthCalledWith(
@@ -120,7 +121,7 @@ describe('PostgresAdminDataSource', () => {
       expect(mockLogException).toHaveBeenCalledWith(
         'Failed to apply patch',
         'transaction error',
-        { file: 'patch1.sql' }
+        { file: '001_patch.sql' }
       );
     });
   });

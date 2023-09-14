@@ -266,6 +266,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     const patches = await Promise.all(
       files
         .filter((file) => /\.sql$/i.test(file))
+        .sort()
         .map(async (file) => {
           const content = await fs.readFile(
             path.join(dbPatchesFolderPath, file),
