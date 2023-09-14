@@ -4,10 +4,10 @@ import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import makeStyles from '@mui/styles/makeStyles';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import { BasicUserDetails, UserRole } from 'generated/sdk';
-import { BasicUserData, useBasicUserData } from 'hooks/user/useUserData';
+import { BasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -23,18 +23,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ProposalParticipant(props: {
-  userId?: number;
-  userChanged: (user: BasicUserDetails) => void;
+  principalInvestigator: BasicUserData | null | undefined;
+  setPrincipalInvestigator: (user: BasicUserDetails) => void;
   className?: string;
+  loadingPrincipalInvestigator?: boolean;
 }) {
-  const [curUser, setCurUser] = useState<BasicUserData | null | undefined>(
-    null
-  );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const { userData } = useBasicUserData(props.userId);
-  useEffect(() => {
-    setCurUser(userData);
-  }, [userData]);
 
   const classes = useStyles();
 
@@ -47,10 +41,11 @@ export default function ProposalParticipant(props: {
         close={() => {
           setIsPickerOpen(false);
         }}
-        selectedUsers={!!curUser ? [curUser?.id] : []}
+        selectedUsers={
+          !!props.principalInvestigator ? [props.principalInvestigator?.id] : []
+        }
         addParticipants={(users: BasicUserDetails[]) => {
-          setCurUser(users[0]);
-          props.userChanged(users[0]);
+          props.setPrincipalInvestigator(users[0]);
           setIsPickerOpen(false);
         }}
         participant={true}
@@ -59,8 +54,8 @@ export default function ProposalParticipant(props: {
         <TextField
           label="Principal Investigator"
           value={
-            curUser
-              ? `${curUser.firstname} ${curUser.lastname}; ${curUser.organisation}`
+            props.principalInvestigator
+              ? `${props.principalInvestigator.firstname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
               : ''
           }
           InputLabelProps={{ shrink: true }}
@@ -73,12 +68,15 @@ export default function ProposalParticipant(props: {
         />
 
         <Tooltip title="Edit Principal Investigator">
-          <IconButton
-            onClick={() => setIsPickerOpen(true)}
-            className={classes.addButton}
-          >
-            <EditIcon data-cy="edit-proposer-button" fontSize="small" />
-          </IconButton>
+          <span>
+            <IconButton
+              onClick={() => setIsPickerOpen(true)}
+              className={classes.addButton}
+              disabled={props.loadingPrincipalInvestigator}
+            >
+              <EditIcon data-cy="edit-proposer-button" fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
       </FormControl>
     </div>

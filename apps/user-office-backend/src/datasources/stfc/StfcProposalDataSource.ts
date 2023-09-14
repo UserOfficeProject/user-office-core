@@ -2,6 +2,7 @@ import { injectable } from 'tsyringe';
 
 import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
+import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
 import database from '../postgres/database';
 import {
@@ -14,7 +15,7 @@ import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
   async getInstrumentScientistProposals(
-    scientist: UserWithRole,
+    user: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
@@ -45,11 +46,20 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'call_has_instruments.instrument_id'
       )
+      .leftJoin(
+        'internal_reviews',
+        'proposal_table_view.technical_review_id',
+        'internal_reviews.technical_review_id'
+      )
       .where(function () {
-        this.where('instrument_has_scientists.user_id', scientist.id).orWhere(
-          'instruments.manager_user_id',
-          scientist.id
-        );
+        if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
+          this.where('internal_reviews.reviewer_id', user.id);
+        } else {
+          this.where('instrument_has_scientists.user_id', user.id).orWhere(
+            'instruments.manager_user_id',
+            user.id
+          );
+        }
       })
       .distinct('proposal_table_view.proposal_pk')
       .orderBy('proposal_table_view.proposal_pk', 'desc')
@@ -64,7 +74,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (filter?.reviewer === ReviewerFilter.ME) {
           query.where(
             'proposal_table_view.technical_review_assignee_id',
-            scientist.id
+            user.id
           );
         }
         if (filter?.callId) {
