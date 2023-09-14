@@ -4,7 +4,7 @@ import MaterialTable, {
   MTableToolbar,
 } from '@material-table/core';
 import Email from '@mui/icons-material/Email';
-import { Link, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -288,27 +288,23 @@ const PeopleTable = ({
     onRemove &&
     actionArray.push({
       icon: () => (
-        <Link
-          href="#"
-          data-cy="assign-as-pi"
-          underline="hover"
-          variant="subtitle2"
-          component="button"
-          onClick={(event) => event.preventDefault()}
-        >
+        <Button data-cy="assign-as-pi" component="a" href="#" variant="text">
           Assign <br /> as PI
-        </Link>
+        </Button>
       ),
       tooltip: 'Set Principal Investigator',
       onClick: (
         event: React.MouseEvent<JSX.Element>,
         rowData: BasicUserDetails | BasicUserDetails[]
-      ) =>
-        new Promise<void>(() => {
+      ) => {
+        event.preventDefault();
+
+        return new Promise<void>(() => {
           const user = Array.isArray(rowData) ? rowData[0] : rowData;
           handleChangeCoIToPi(user);
           setQuery({ ...query, refreshData: !query.refreshData });
-        }),
+        });
+      },
     });
 
   const invitationButtons: InvitationButtonProps[] = [];
