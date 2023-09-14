@@ -96,7 +96,7 @@ export function useBasicUserData(userId?: number) {
   const [userData, setUserData] =
     useState<GetBasicUserDetailsQuery['basicUserDetails']>(null);
   useEffect(() => {
-    if (userId) {
+    if (typeof userId === 'number') {
       setLoading(true);
       api()
         .getBasicUserDetails({ userId })
