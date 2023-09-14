@@ -200,6 +200,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       AllocationTimeUnits.Day,
       1,
+      1,
       false
     );
 

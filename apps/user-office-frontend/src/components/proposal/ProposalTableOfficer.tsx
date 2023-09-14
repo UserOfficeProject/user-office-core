@@ -40,7 +40,7 @@ import {
   Proposal,
   ProposalsFilter,
   ProposalStatus,
-  ProposalPkWithCallId,
+  ProposalSelectionInput,
   Sep,
   InstrumentFragment,
   FeatureId,
@@ -76,7 +76,7 @@ type ProposalTableOfficerProps = {
   confirm: WithConfirmType;
 };
 
-export type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
+export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
   instrumentId: number | null;
@@ -274,7 +274,7 @@ const ProposalTableOfficer = ({
   const [openChangeProposalStatus, setOpenChangeProposalStatus] =
     useState(false);
   const [selectedProposals, setSelectedProposals] = useState<
-    ProposalWithCallInstrumentAndSepId[]
+    ProposalSelectionType[]
   >([]);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
@@ -353,7 +353,7 @@ const ProposalTableOfficer = ({
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
       setPreselectedProposalsData((preselectedProposalsData) => {
-        const selected: ProposalWithCallInstrumentAndSepId[] = [];
+        const selected: ProposalSelectionType[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
           if (selection.has(proposal.primaryKey.toString())) {
             selected.push({
@@ -362,6 +362,7 @@ const ProposalTableOfficer = ({
               instrumentId: proposal.instrumentId,
               sepId: proposal.sepId,
               statusId: proposal.statusId,
+              workflowId: proposal.workflowId,
               title: proposal.title,
               proposalId: proposal.proposalId,
             });
@@ -625,6 +626,7 @@ const ProposalTableOfficer = ({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
+          workflowId: selectedProposal.workflowId,
         })),
         statusId: status.id,
       });

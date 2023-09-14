@@ -19,6 +19,7 @@ import { AssignProposalsToSepArgs } from '../../resolvers/mutations/AssignPropos
 import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPsFilter } from '../../resolvers/queries/SEPsQuery';
 import { SEPDataSource } from '../SEPDataSource';
+import { basicDummyUser } from './UserDataSource';
 
 export const dummySEP = new SEP(
   1,
@@ -344,6 +345,10 @@ export class SEPDataSourceMock implements SEPDataSource {
 
   async getReviewers(sepId: number) {
     return dummySEPMembers.filter((member) => member.sepId === sepId);
+  }
+
+  async getSEPUsersByProposalPkAndCallId(proposalPk: number, callId: number) {
+    return [basicDummyUser];
   }
 
   async getSEPUserRole(id: number, sepId: number) {

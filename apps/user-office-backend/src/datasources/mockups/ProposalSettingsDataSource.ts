@@ -1,4 +1,8 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
+import {
+  ProposalStatusAction,
+  ProposalStatusActionType,
+} from '../../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
@@ -61,6 +65,15 @@ export const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
   1,
   'PROPOSAL_SUBMITTED'
+);
+
+export const dummyProposalStatusAction = new ProposalStatusAction(
+  1,
+  1,
+  'Dummy action',
+  ProposalStatusActionType.EMAIL,
+  false,
+  '{}'
 );
 
 export class ProposalSettingsDataSourceMock
@@ -185,5 +198,18 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     return [dummyStatusChangingEvent];
+  }
+
+  async getStatusActionsByConnectionId(
+    proposalWorkflowConnectionId: number,
+    proposalWorkflowId: number
+  ): Promise<ProposalStatusAction[]> {
+    return [dummyProposalStatusAction];
+  }
+
+  async updateStatusAction(
+    proposalStatusAction: ProposalStatusAction
+  ): Promise<ProposalStatusAction> {
+    return dummyProposalStatusAction;
   }
 }
