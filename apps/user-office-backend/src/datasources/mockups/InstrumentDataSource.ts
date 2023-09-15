@@ -4,7 +4,6 @@ import {
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
-import { ProposalPks } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -109,8 +108,8 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   async assignProposalsToInstrument(
     proposalPks: number[],
     instrumentId: number
-  ): Promise<ProposalPks> {
-    return { proposalPks };
+  ): Promise<InstrumentHasProposals> {
+    return new InstrumentHasProposals(instrumentId, proposalPks, false);
   }
 
   async removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean> {

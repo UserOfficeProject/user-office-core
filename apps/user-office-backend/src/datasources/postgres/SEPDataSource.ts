@@ -12,7 +12,7 @@ import {
   SEPProposalWithReviewGradesAndRanking,
 } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
-import { UserRole } from '../../models/User';
+import { BasicUserDetails, UserRole } from '../../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
@@ -40,6 +40,8 @@ import {
   SepMeetingDecisionRecord,
   SepProposalWithReviewGradesAndRankingRecord,
   createReviewObject,
+  UserRecord,
+  createBasicUserObject,
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
@@ -279,6 +281,28 @@ export default class PostgresSEPDataSource implements SEPDataSource {
 
     return sepProposals.map((sepProposal) =>
       createSEPProposalObject(sepProposal)
+    );
+  }
+
+  async getSEPUsersByProposalPkAndCallId(
+    proposalPk: number,
+    callId: number
+  ): Promise<BasicUserDetails[]> {
+    const sepProposalReviewers: UserRecord[] = await database
+      .select(['users.*'])
+      .from('SEP_Reviews as sr')
+      .join('SEP_Proposals as sp', {
+        'sr.proposal_pk': 'sp.proposal_pk',
+        'sr.sep_id': 'sp.sep_id',
+      })
+      .join('users', {
+        'users.user_id': 'sr.user_id',
+      })
+      .where('sp.proposal_pk', proposalPk)
+      .andWhere('sp.call_id', callId);
+
+    return sepProposalReviewers.map((sepProposalReviewer) =>
+      createBasicUserObject(sepProposalReviewer)
     );
   }
 
