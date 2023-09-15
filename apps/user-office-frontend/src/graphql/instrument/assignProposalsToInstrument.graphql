@@ -1,5 +1,5 @@
 mutation assignProposalsToInstrument(
-  $proposals: [ProposalPkWithCallId!]!
+  $proposals: [ProposalSelectionInput!]!
   $instrumentId: Int!
 ) {
   assignProposalsToInstrument(

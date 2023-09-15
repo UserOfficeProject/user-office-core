@@ -266,6 +266,16 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.PROPOSAL_INSTRUMENT_SELECTED: {
+        const jsonMessage = JSON.stringify(event.instrumenthasproposals);
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
       case Event.INSTRUMENT_CREATED:
       case Event.INSTRUMENT_UPDATED:
       case Event.INSTRUMENT_DELETED: {

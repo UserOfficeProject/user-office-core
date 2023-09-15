@@ -6,6 +6,7 @@ import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { statusActionEngine } from '../statusActionEngine';
 
 const proposalSettingsDataSource = container.resolve(
   ProposalSettingsDataSource
@@ -16,7 +17,7 @@ const getProposalWorkflowByCallId = (callId: number) => {
   return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
 };
 
-const getProposalWorkflowConnectionByStatusId = (
+export const getProposalWorkflowConnectionByStatusId = (
   proposalWorkflowId: number,
   proposalStatusId: number,
   prevProposalStatusId?: number
@@ -53,10 +54,9 @@ const updateProposalStatus = (
   nextProposalStatusId: number
 ) => proposalDataSource.updateProposalStatus(proposalPk, nextProposalStatusId);
 
-export type WorkflowEngineProposalType = {
-  primaryKey: number;
-  callId: number;
-  statusId: number;
+export type WorkflowEngineProposalType = Proposal & {
+  workflowId: number;
+  prevProposalStatusId: number;
 };
 
 export const workflowEngine = async (
@@ -65,7 +65,7 @@ export const workflowEngine = async (
     proposalEvents?: ProposalEventsRecord;
     currentEvent: Event;
   }[]
-): Promise<Array<Proposal | void> | void> => {
+): Promise<Array<WorkflowEngineProposalType | void> | void> => {
   const proposalsWithChangedStatuses = (
     await Promise.all(
       args.map(async (proposalWithEvents) => {
@@ -152,10 +152,19 @@ export const workflowEngine = async (
                 proposalWithEvents.proposalEvents
               )
             ) {
-              return updateProposalStatus(
+              const updatedProposal = await updateProposalStatus(
                 proposalWithEvents.proposalPk,
                 currentWorkflowConnection.nextProposalStatusId
               );
+
+              if (updatedProposal) {
+                return {
+                  ...updatedProposal,
+                  workflowId: proposalWorkflow.id,
+                  prevProposalStatusId:
+                    currentWorkflowConnection.proposalStatusId,
+                };
+              }
             }
           })
         );
@@ -164,7 +173,17 @@ export const workflowEngine = async (
   ).flat();
 
   // NOTE: Filter the undefined or null items in the array.
-  return proposalsWithChangedStatuses.filter((p) => p);
+  const filteredProposalsWithChangedStatuses =
+    proposalsWithChangedStatuses.filter(
+      (p): p is WorkflowEngineProposalType => !!p
+    );
+
+  // NOTE: Call the actions engine here
+  if (filteredProposalsWithChangedStatuses.length) {
+    statusActionEngine(filteredProposalsWithChangedStatuses);
+  }
+
+  return filteredProposalsWithChangedStatuses;
 };
 
 export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
