@@ -65,7 +65,7 @@ const StatusEventsAndActionsDialog = ({
     >
       <DialogTitle>Status events and actions</DialogTitle>
       <IconButton
-        data-cy="close-modal-btn"
+        data-cy="close-modal"
         className={classes.closeButton}
         onClick={close}
       >
