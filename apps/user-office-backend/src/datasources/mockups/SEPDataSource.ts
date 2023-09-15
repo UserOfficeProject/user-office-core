@@ -26,6 +26,8 @@ export const dummySEP = new SEP(
   'SEP 1',
   'Scientific evaluation panel 1',
   2,
+  '',
+  true,
   true,
   null,
   null
@@ -36,6 +38,8 @@ export const anotherDummySEP = new SEP(
   'SEP 2',
   'Scientific evaluation panel 2',
   2,
+  '',
+  true,
   false,
   null,
   null
@@ -46,6 +50,8 @@ export const dummySEPWithoutCode = new SEP(
   '',
   'Scientific evaluation panel 2',
   2,
+  '',
+  true,
   false,
   null,
   null
@@ -207,6 +213,8 @@ export class SEPDataSourceMock implements SEPDataSource {
     code: string,
     description: string,
     numberRatingsRequired: number,
+    gradeGuide: string,
+    customGradeGuide: boolean | null,
     active: boolean
   ) {
     const id = 2;
@@ -216,6 +224,8 @@ export class SEPDataSourceMock implements SEPDataSource {
       code,
       description,
       numberRatingsRequired,
+      gradeGuide,
+      customGradeGuide,
       active,
       null,
       null
@@ -227,6 +237,8 @@ export class SEPDataSourceMock implements SEPDataSource {
     code: string,
     description: string,
     numberRatingsRequired: number,
+    gradeGuide: string,
+    customGradeGuide: boolean | null,
     active: boolean
   ) {
     return new SEP(
@@ -234,6 +246,8 @@ export class SEPDataSourceMock implements SEPDataSource {
       code,
       description,
       numberRatingsRequired,
+      gradeGuide,
+      customGradeGuide,
       active,
       null,
       null

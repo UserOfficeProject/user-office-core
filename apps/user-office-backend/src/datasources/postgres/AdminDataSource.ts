@@ -274,18 +274,19 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         path.join(dbPatchesFolderPath, file),
         'utf8'
       );
-      await database
-        .raw(contents)
-        .then(() => {
-          const msg = `${file} executed.`;
-          log.push(msg);
-        })
-        .catch((err) => {
-          const msg = `${file} failed: ${err}`;
-          log.push(msg);
-
-          throw log.join('\n');
-        });
+      await database.transaction(async (trx) => {
+        trx
+          .raw(contents)
+          .then(() => {
+            const msg = `${file} executed.`;
+            log.push(msg);
+          })
+          .catch((err) => {
+            const msg = `${file} failed: ${err}`;
+            log.push(msg);
+            throw log.join('\n');
+          });
+      });
     }
 
     logger.logInfo('Applying patches finished', { timestamp: new Date() });

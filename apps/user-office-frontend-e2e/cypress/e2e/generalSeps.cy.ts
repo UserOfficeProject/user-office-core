@@ -20,11 +20,13 @@ const sepMembers = {
 const sep1 = {
   code: faker.random.words(3),
   description: faker.random.words(8),
+  gradeGuide: faker.random.words(8),
 };
 
 const sep2 = {
   code: faker.random.words(3),
   description: faker.random.words(8),
+  gradeGuide: faker.random.words(8),
 };
 
 context('General scientific evaluation panel tests', () => {
@@ -127,6 +129,7 @@ context('General scientific evaluation panel tests', () => {
         code: sep1.code,
         description: sep1.description,
         numberRatingsRequired: 2,
+        gradeGuide: sep1.gradeGuide,
         active: true,
       });
       const newCode = faker.random.words(3);
@@ -181,6 +184,7 @@ context('General scientific evaluation panel tests', () => {
         code: sep1.code,
         description: sep1.description,
         numberRatingsRequired: 2,
+        gradeGuide: sep1.gradeGuide,
         active: true,
       }).then((response) => {
         if (response.createSEP) {
@@ -428,6 +432,7 @@ context('General scientific evaluation panel tests', () => {
       cy.createSep({
         code: sep1.code,
         description: sep1.description,
+        gradeGuide: sep1.gradeGuide,
         numberRatingsRequired: 2,
         active: true,
       }).then((response) => {
@@ -521,6 +526,7 @@ context('General scientific evaluation panel tests', () => {
         code: sep2.code,
         description: sep2.description,
         numberRatingsRequired: 2,
+        gradeGuide: sep2.gradeGuide,
         active: true,
       });
 
@@ -547,6 +553,7 @@ context('General scientific evaluation panel tests', () => {
         code: sep1.code,
         description: sep1.description,
         numberRatingsRequired: 2,
+        gradeGuide: sep2.gradeGuide,
         active: true,
       }).then((response) => {
         if (response.createSEP) {

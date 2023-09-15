@@ -186,11 +186,11 @@ export const workflowEngine = async (
   return filteredProposalsWithChangedStatuses;
 };
 
-export const markProposalEventAsDoneAndCallWorkflowEngine = async (
+export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
   eventType: Event,
   proposalPks: number[]
 ) => {
-  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposal(
+  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
     eventType,
     proposalPks
   );

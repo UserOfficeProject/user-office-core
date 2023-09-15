@@ -19,28 +19,26 @@ export const groupProposalsByProperties = (
   proposals: WorkflowEngineProposalType[],
   props: string[]
 ) => {
-  const getGroupedItems = (item: WorkflowEngineProposalType) => {
-    const returnArray = [];
-    let i;
-    for (i = 0; i < props.length; i++) {
-      returnArray.push(item[props[i] as keyof WorkflowEngineProposalType]);
+  const getProposalGroups = (item: WorkflowEngineProposalType) => {
+    const groupItemsArray = [];
+    for (let i = 0; i < props.length; i++) {
+      groupItemsArray.push(item[props[i] as keyof WorkflowEngineProposalType]);
     }
 
-    return returnArray;
+    return groupItemsArray;
   };
 
-  const groups: GroupedObjectType = {};
-  let i;
+  const proposalGroups: GroupedObjectType = {};
 
-  for (i = 0; i < proposals.length; i++) {
-    const arrayRecord = proposals[i];
-    const group = JSON.stringify(getGroupedItems(arrayRecord));
-    groups[group] = groups[group] || [];
-    groups[group].push(arrayRecord);
+  for (let i = 0; i < proposals.length; i++) {
+    const proposal = proposals[i];
+    const proposalGroup = JSON.stringify(getProposalGroups(proposal));
+    proposalGroups[proposalGroup] = proposalGroups[proposalGroup] || [];
+    proposalGroups[proposalGroup].push(proposal);
   }
 
-  return Object.keys(groups).map((group) => {
-    return groups[group];
+  return Object.keys(proposalGroups).map((group) => {
+    return proposalGroups[group];
   });
 };
 
@@ -52,23 +50,24 @@ export type EmailReadyType = {
 };
 
 export const getEmailReadyArrayOfUsersAndProposals = (
-  newArray: EmailReadyType[],
-  array: BasicUserDetails[],
+  emailReadyUsersWithProposals: EmailReadyType[],
+  users: BasicUserDetails[],
   proposal: WorkflowEngineProposalType,
   recipientsWithEmailTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
-  array.forEach((item) => {
-    const foundIndex = newArray.findIndex(
-      (newArrayItem) => newArrayItem.email === item.email
+  users.forEach((user) => {
+    const foundIndex = emailReadyUsersWithProposals.findIndex(
+      (emailReadyUserWithProposals) =>
+        emailReadyUserWithProposals.email === user.email
     );
 
     if (foundIndex !== -1) {
-      newArray[foundIndex].proposals.push({
+      emailReadyUsersWithProposals[foundIndex].proposals.push({
         proposalId: proposal.primaryKey,
         proposalTitle: proposal.title,
       });
     } else {
-      newArray.push({
+      emailReadyUsersWithProposals.push({
         id: recipientsWithEmailTemplate.recipient.name,
         proposals: [
           {
@@ -78,7 +77,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
         ],
 
         template: recipientsWithEmailTemplate.emailTemplate.id,
-        email: item.email,
+        email: user.email,
       });
     }
   });

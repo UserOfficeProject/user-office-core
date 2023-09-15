@@ -121,7 +121,7 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposalpks: ProposalPks;
+  instrumenthasproposals: InstrumentHasProposals;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
