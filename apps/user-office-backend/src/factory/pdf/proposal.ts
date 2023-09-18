@@ -12,13 +12,11 @@ import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
+import { DownloadOptions } from '../../middlewares/factory/factoryServices';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Proposal } from '../../models/Proposal';
-import {
-  areDependenciesSatisfied,
-  getQuestionaryStepByTopicId,
-} from '../../models/ProposalModelFunctions';
-import { Answer, QuestionaryStep } from '../../models/Questionary';
+import { getTopicActiveAnswers } from '../../models/ProposalModelFunctions';
+import { QuestionaryStep } from '../../models/Questionary';
 import { isRejection } from '../../models/Rejection';
 import { Review } from '../../models/Review';
 import { Sample } from '../../models/Sample';
@@ -66,19 +64,6 @@ const getTechnicalReviewHumanReadableStatus = (
     default:
       return `Unknown status: ${status}`;
   }
-};
-
-const getTopicActiveAnswers = (
-  questionarySteps: QuestionaryStep[],
-  topicId: number
-) => {
-  const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
-
-  return step
-    ? (step.fields.filter((field) => {
-        return areDependenciesSatisfied(questionarySteps, field.question.id);
-      }) as Answer[])
-    : [];
 };
 
 const getSampleQuestionarySteps = async (
@@ -377,7 +362,7 @@ export const collectProposalPDFData = async (
 export const collectProposalPDFDataTokenAccess = async (
   proposalPk: number,
   user: UserWithRole,
-  filter?: string,
+  options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
   const proposalAuth = container.resolve(ProposalAuthorization);
@@ -387,7 +372,7 @@ export const collectProposalPDFDataTokenAccess = async (
 
   // Set proposal data
   let proposal = null;
-  const proposalFilter = filter ?? null;
+  const proposalFilter = options?.filter ?? null;
   if (proposalFilter && proposalFilter === 'id') {
     proposal = await proposalDataSource.getProposalById(proposalPk.toString());
   } else {

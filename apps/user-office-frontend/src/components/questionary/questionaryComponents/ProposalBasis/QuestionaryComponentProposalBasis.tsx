@@ -1,7 +1,7 @@
 import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import withPreventSubmit from 'components/common/withPreventSubmit';
@@ -15,6 +15,7 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
+import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
@@ -50,6 +51,41 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   }
 
   const { proposer, users } = state.proposal;
+  const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
+  const [piData, setPIData] = useState<BasicUserDetails | null>(null);
+
+  useEffect(() => {
+    if (userData !== null) {
+      setPIData(userData);
+    }
+  }, [userData]);
+
+  const coInvestigatorChanged = (users: BasicUserDetails[]) => {
+    formikProps.setFieldValue(
+      `${id}.users`,
+      users.map((user) => user.id)
+    );
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: { users: users },
+    });
+  };
+
+  const principalInvestigatorChanged = (user: BasicUserDetails) => {
+    formikProps.setFieldValue(`${id}.proposer`, user.id);
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: {
+        proposer: user,
+      },
+    });
+    setPIData(user);
+    coInvestigatorChanged(
+      users
+        .filter((coInvestigator) => coInvestigator.id !== user.id)
+        .concat(proposer as BasicUserDetails)
+    );
+  };
 
   return (
     <div>
@@ -105,37 +141,22 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
       </div>
       <ProposalParticipant
-        userChanged={(user: BasicUserDetails) => {
-          formikProps.setFieldValue(`${id}.proposer`, user.id);
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: {
-              proposer: user,
-              users: users.concat(proposer as BasicUserDetails),
-            },
-          });
-        }}
+        principalInvestigator={piData}
+        setPrincipalInvestigator={principalInvestigatorChanged}
         className={classes.container}
-        userId={proposer?.id}
+        loadingPrincipalInvestigator={loading}
       />
       <Participants
         title="Co-Proposers"
         className={classes.container}
-        setUsers={(users: BasicUserDetails[]) => {
-          formikProps.setFieldValue(
-            `${id}.users`,
-            users.map((user) => user.id)
-          );
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: { users: users },
-          });
-        }}
+        principalInvestigator={piData}
+        setPrincipalInvestigator={principalInvestigatorChanged}
+        setUsers={coInvestigatorChanged}
         preserveSelf={true}
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
-        principalInvestigator={proposer?.id}
+        loadingPrincipalInvestigator={loading}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>

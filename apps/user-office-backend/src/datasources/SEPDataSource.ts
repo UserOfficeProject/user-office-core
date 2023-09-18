@@ -9,6 +9,7 @@ import {
   SEPProposalWithReviewGradesAndRanking,
 } from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
+import { BasicUserDetails } from '../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
@@ -23,6 +24,8 @@ export interface SEPDataSource {
     code: string,
     description: string,
     numberRatingsRequired: number,
+    gradeGuide: string,
+    customGradeGuide: boolean | null,
     active: boolean
   ): Promise<SEP>;
   update(
@@ -30,6 +33,8 @@ export interface SEPDataSource {
     code: string,
     description: string,
     numberRatingsRequired: number,
+    gradeGuide: string,
+    customGradeGuide: boolean | null,
     active: boolean
   ): Promise<SEP>;
   delete(id: number): Promise<SEP>;
@@ -58,6 +63,10 @@ export interface SEPDataSource {
     proposalPk: number
   ): Promise<boolean>;
   getSEPProposals(sepId: number, callId: number | null): Promise<SEPProposal[]>;
+  getSEPUsersByProposalPkAndCallId(
+    proposalPk: number,
+    callId: number
+  ): Promise<BasicUserDetails[]>;
   getSEPProposalCount(sepId: number): Promise<number>;
   getSEPReviewerProposalCount(reviewerId: number): Promise<number>;
   getSEPProposal(

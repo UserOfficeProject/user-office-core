@@ -7,6 +7,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
+import { Country } from '../../models/Country';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
@@ -16,6 +17,7 @@ import { Instrument } from '../../models/Instrument';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import { ProposalStatusActionType } from '../../models/ProposalStatusAction';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -148,6 +150,7 @@ export interface ProposalViewRecord {
   readonly deviation: number;
   readonly instrument_id: number;
   readonly call_id: number;
+  readonly proposal_workflow_id: number;
   readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
@@ -251,6 +254,12 @@ export interface UserRecord {
   readonly full_count: number;
   readonly institution: string;
   readonly placeholder: boolean;
+}
+
+export interface UserRecordWithInstitution {
+  user: UserRecord;
+  institution: InstitutionRecord;
+  country: CountryRecord;
 }
 
 export interface VisitRegistrationRecord {
@@ -397,6 +406,8 @@ export interface SEPRecord {
   readonly code: string;
   readonly description: string;
   readonly number_ratings_required: number;
+  readonly grade_guide: string;
+  readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
   readonly sep_chair_user_id: number | null;
@@ -669,6 +680,20 @@ export interface RedeemCodeRecord {
   readonly claimed_at: Date | null;
 }
 
+export interface ProposalStatusActionRecord {
+  readonly proposal_status_action_id: number;
+  readonly name: string;
+  readonly type: ProposalStatusActionType;
+}
+
+export interface ProposalWorkflowConnectionHasActionsRecord {
+  readonly connection_id: number;
+  readonly action_id: number;
+  readonly workflow_id: number;
+  readonly executed: boolean;
+  readonly config: string;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,
@@ -790,6 +815,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
+    proposal.proposal_workflow_id,
     proposal.submitted
   );
 };
@@ -1028,6 +1054,8 @@ export const createSEPObject = (sep: SEPRecord) => {
     sep.code,
     sep.description,
     sep.number_ratings_required,
+    sep.grade_guide,
+    sep.custom_grade_guide,
     sep.active,
     sep.sep_chair_user_id,
     sep.sep_secretary_user_id
@@ -1139,6 +1167,10 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.country_id,
     institution.verified
   );
+};
+
+export const createCountryObject = (country: CountryRecord) => {
+  return new Country(country.country_id, country.country);
 };
 
 export const createScheduledEventObject = (

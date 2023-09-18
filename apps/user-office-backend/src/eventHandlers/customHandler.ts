@@ -215,12 +215,10 @@ export default function createCustomHandler() {
             });
 
           if (allProposalsOnCall && allProposalsOnCall.proposalViews.length) {
-            await Promise.all(
-              allProposalsOnCall.proposalViews.map(
-                async (proposalOnCall) =>
-                  await handleWorkflowEngineChange(event, proposalOnCall)
-              )
+            const proposalPks = allProposalsOnCall.proposalViews.map(
+              (proposal) => proposal.primaryKey
             );
+            handleWorkflowEngineChange(event, proposalPks);
           }
         } catch (error) {
           logger.logException(

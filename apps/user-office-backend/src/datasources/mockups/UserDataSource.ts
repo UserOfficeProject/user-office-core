@@ -1,3 +1,5 @@
+import { Country } from '../../models/Country';
+import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
 import {
   BasicUserDetails,
@@ -348,6 +350,14 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
+  async getUserWithInstitution(id: number): Promise<{
+    user: User;
+    institution: Institution;
+    country: Country;
+  } | null> {
+    return null;
+  }
+
   async getUsers(
     args: UsersArgs
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
@@ -371,6 +381,16 @@ export class UserDataSourceMock implements UserDataSource {
 
   async getProposalUsers(id: number) {
     return [basicDummyUser];
+  }
+
+  async getProposalUsersWithInstitution(id: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  > {
+    return [];
   }
 
   async checkScientistToProposal(

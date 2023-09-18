@@ -22,7 +22,7 @@ The `example.env` and `.env` files are located in `apps/user-office-backend` and
 If you want to get something running for testing purposes only, you can run the docker-compose file located at the root of the repository. Use the following steps:
 
 1. docker-compose up
-2. Visit localhost:33000/login
+2. Visit localhost:33000
 3. Use the default users for login, Aaron_Harris49@gmail.com (User Officer) or Javon4@hotmail.com (User) with password "Test1234!"
 
 ## Monorepo future plans

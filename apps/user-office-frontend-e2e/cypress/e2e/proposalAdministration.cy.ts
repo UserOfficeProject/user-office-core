@@ -1,5 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import {
+  DataType,
+  FeatureId,
+  TemplateCategoryId,
+} from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 import PdfParse from 'pdf-parse';
 
@@ -269,6 +273,8 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy="download-proposals"]').click();
 
+      cy.contains('Proposal(s)').click();
+
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         proposalName1
@@ -280,6 +286,93 @@ context('Proposal administration tests', () => {
         .check();
 
       cy.get('[data-cy="download-proposals"]').click();
+
+      cy.contains('Proposal(s)').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        '2 selected items'
+      );
+    });
+
+    it('Download proposal attachment(s) working with dialog window showing up', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalFixedName,
+            abstract: proposalName2,
+          });
+        }
+      });
+      cy.createTopic({
+        templateId: initialDBData.template.id,
+        sortOrder: 1,
+      }).then((topicResult) => {
+        if (topicResult.createTopic) {
+          const topicId =
+            topicResult.createTopic.steps[
+              topicResult.createTopic.steps.length - 1
+            ].topic.id;
+          cy.createQuestion({
+            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+            dataType: DataType.FILE_UPLOAD,
+          }).then((questionResult) => {
+            const createdQuestion = questionResult.createQuestion;
+            if (createdQuestion) {
+              cy.updateQuestion({
+                id: createdQuestion.id,
+                question: initialDBData.questions.fileUpload.text,
+                config: `{"file_type":[".pdf",".docx","image/*"]}`,
+              });
+              cy.createQuestionTemplateRelation({
+                templateId: initialDBData.template.id,
+                sortOrder: 0,
+                topicId: topicId,
+                questionId: createdQuestion.id,
+              });
+            }
+          });
+        }
+      });
+
+      cy.contains(proposalName1)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-proposals"]').click();
+
+      cy.contains('Attachment(s)').click();
+
+      cy.get('[data-cy="attachmentQuestionName"]').click();
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.questions.fileUpload.text)
+        .click();
+
+      cy.get('[data-cy="proposalAttachmentDownloadButton"]').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        'attachment'
+      );
+
+      cy.contains(proposalFixedName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-proposals"]').click();
+
+      cy.contains('Attachment(s)').click();
+
+      cy.get('[data-cy="attachmentQuestionName"]').click();
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.questions.fileUpload.text)
+        .click();
+
+      cy.get('[data-cy="proposalAttachmentDownloadButton"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(

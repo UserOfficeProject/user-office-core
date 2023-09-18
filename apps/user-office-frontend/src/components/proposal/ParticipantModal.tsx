@@ -34,6 +34,7 @@ type ParticipantModalProps = {
   userRole?: UserRole;
   invitationUserRole?: UserRole;
   participant?: boolean;
+  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
 };
 
 const ParticipantModal = ({
@@ -46,6 +47,7 @@ const ParticipantModal = ({
   selectedUsers,
   selection,
   userRole,
+  setPrincipalInvestigator,
 }: ParticipantModalProps) => {
   const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
@@ -77,11 +79,17 @@ const ParticipantModal = ({
     selection: !!selection,
     onUpdate: (data: BasicUserDetails[]) => addParticipants(data),
     invitationUserRole: invitationUserRole || userRole,
+    setPrincipalInvestigator: setPrincipalInvestigator,
+  };
+
+  const peopleTablesProps = {
     selectedParticipants,
     setSelectedParticipants,
+    ...userTableProps,
   };
-  const peopleTable = <PeopleTable {...userTableProps} />;
-  const proposalPeopleTable = <ProposalPeopleTable {...userTableProps} />;
+
+  const peopleTable = <PeopleTable {...peopleTablesProps} />;
+  const proposalPeopleTable = <ProposalPeopleTable {...peopleTablesProps} />;
 
   return (
     <Dialog
