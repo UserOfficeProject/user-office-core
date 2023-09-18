@@ -11,12 +11,12 @@ import {
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 import { SEP } from '../types/SEP';
-import { ProposalPkWithCallId } from './ChangeProposalsStatusMutation';
+import { ProposalSelectionInput } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
 export class AssignProposalsToSepArgs {
-  @Field(() => [ProposalPkWithCallId])
-  public proposals: ProposalPkWithCallId[];
+  @Field(() => [ProposalSelectionInput])
+  public proposals: ProposalSelectionInput[];
 
   @Field(() => Int)
   public sepId: number;

@@ -526,4 +526,32 @@ context('PageTable component tests', () => {
       cy.contains('1 user(s) selected').should('exist');
     });
   });
+
+  describe('PeopleTable component allows swapping between PIs and CoIs', () => {
+    it('Should allow user to swap between PIs and CoIs', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=add-participant-button]').click();
+
+      cy.get('[role="presentation"] [role="dialog"]');
+
+      cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
+
+      cy.get('[data-cy="findUser"]').click();
+
+      cy.get('[data-cy="assign-selected-users"]').click();
+
+      cy.get('[data-cy="assign-as-pi"]').click();
+
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Benjamin'
+      );
+      cy.contains('Carl'); //The name "Carl" should appear in Co-proposers table
+    });
+  });
 });
