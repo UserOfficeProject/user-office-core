@@ -4,7 +4,7 @@ import { ResolverContext } from '../../context';
 
 @Resolver()
 export class ApplyPatchesMutation {
-  @Mutation(() => String)
+  @Mutation(() => [String])
   applyPatches(@Ctx() context: ResolverContext) {
     return context.mutations.admin.applyPatches(context.user);
   }
