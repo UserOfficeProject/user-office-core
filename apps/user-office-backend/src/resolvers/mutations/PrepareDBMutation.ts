@@ -4,7 +4,7 @@ import { ResolverContext } from '../../context';
 
 @Resolver()
 export class PrepareDBMutationMutation {
-  @Mutation(() => String)
+  @Mutation(() => [String])
   prepareDB(
     @Ctx() context: ResolverContext,
     @Arg('includeSeeds', () => Boolean, { nullable: true })

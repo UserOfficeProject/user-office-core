@@ -216,7 +216,12 @@ export const UserContextProvider = (props: {
     )?.settingsValue;
     clearSession();
     if (loginUrl) {
-      window.location.assign(loginUrl);
+      const url = new URL(loginUrl);
+      url.searchParams.set(
+        'redirect_uri',
+        encodeURI(`${window.location.href}external-auth`)
+      );
+      window.location.href = url.toString();
     } else {
       // if there is no logout url, just clear the user context
       dispatch({ type: ActionType.LOGOFFUSER, payload: null });

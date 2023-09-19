@@ -39,7 +39,7 @@ export default class AdminMutations {
   async resetDB(
     agent: UserWithRole | null,
     includeSeeds: boolean
-  ): Promise<string | Rejection> {
+  ): Promise<string[] | Rejection> {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
@@ -55,7 +55,9 @@ export default class AdminMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async applyPatches(agent: UserWithRole | null): Promise<string | Rejection> {
+  async applyPatches(
+    agent: UserWithRole | null
+  ): Promise<string[] | Rejection> {
     logger.logWarn('Applying patches', {});
 
     return this.dataSource.applyPatches();
