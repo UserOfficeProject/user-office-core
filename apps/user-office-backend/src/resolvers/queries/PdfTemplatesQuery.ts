@@ -29,6 +29,9 @@ class PdfTemplatesFilter {
   @Field(() => String, { nullable: true })
   public pdfTemplateFooter?: string;
 
+  @Field(() => String, { nullable: true })
+  public pdfTemplateSampleDeclaration?: string;
+
   @Field(() => Int, { nullable: true })
   public creatorId?: number;
 }
