@@ -16,6 +16,7 @@ import {
 } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import PDFTemplateDocumentation from './documentation';
 interface ITemplateEditorProps<Type extends string> {
   name: Type;
   template: Template | null;
@@ -81,6 +82,7 @@ const TemplateEditor = <
               )}
             </Field>
             <StyledButtonContainer>
+              <PDFTemplateDocumentation />
               <Button type="submit" data-cy={`${name}-submit`}>
                 Update
               </Button>
