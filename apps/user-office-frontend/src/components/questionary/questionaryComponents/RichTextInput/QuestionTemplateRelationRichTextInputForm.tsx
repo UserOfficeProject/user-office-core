@@ -48,9 +48,12 @@ export const QuestionTemplateRelationRichTextInputForm = (
               data-cy="max"
               onChange={({
                 target: { value },
-              }: ChangeEvent<HTMLInputElement>) =>
-                formikProps.setFieldValue('config.max', value || null)
-              }
+              }: ChangeEvent<HTMLInputElement>) => {
+                formikProps.setFieldValue(
+                  'config.max',
+                  value.length === 0 ? null : value
+                );
+              }}
               value={(formikProps.values.config as TextInputConfig).max ?? ''}
             />
           </TitledContainer>
