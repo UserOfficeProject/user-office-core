@@ -40,7 +40,7 @@ const TemplateEditor = <
 }: ITemplateEditorProps<Type>) => {
   const { api } = useDataApiWithFeedback();
 
-  const { persistModel, isLoading } = usePersistQuestionaryEditorModel();
+  const { persistModel } = usePersistQuestionaryEditorModel();
   const { state, dispatch } = QuestionaryEditorModel([persistModel]);
 
   return (
