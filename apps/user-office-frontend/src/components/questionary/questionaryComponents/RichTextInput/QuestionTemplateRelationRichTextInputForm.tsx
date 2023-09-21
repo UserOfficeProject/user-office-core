@@ -1,10 +1,11 @@
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { TextInputConfig } from 'generated/sdk';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
