@@ -73,6 +73,19 @@ context('PDF template tests', () => {
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
+      cy.contains('Sample Declaration').click();
+
+      cy.get('[data-cy="templateSampleDeclaration"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateSampleDeclaration-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
       cy.navigateToTemplatesSubmenu('PDF');
 
       cy.contains(templateName);
@@ -141,6 +154,19 @@ context('PDF template tests', () => {
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
+      cy.contains('Sample Declaration').click();
+
+      cy.get('[data-cy="templateSampleDeclaration"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateSampleDeclaration-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
       cy.navigateToTemplatesSubmenu('PDF');
 
       cy.contains(createdTemplateName)
@@ -200,6 +226,19 @@ context('PDF template tests', () => {
         });
 
       cy.get('[data-cy=templateFooter-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Sample Declaration').click();
+
+      cy.get('[data-cy="templateSampleDeclaration"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=templateSampleDeclaration-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 

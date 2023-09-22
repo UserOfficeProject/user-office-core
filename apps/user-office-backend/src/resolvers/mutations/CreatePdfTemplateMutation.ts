@@ -24,6 +24,9 @@ export class CreatePdfTemplateInput {
 
   @Field(() => String)
   templateFooter: string;
+
+  @Field(() => String)
+  templateSampleDeclaration: string;
 }
 
 @Resolver()
