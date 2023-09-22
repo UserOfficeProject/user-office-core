@@ -20,6 +20,7 @@ export default class PostgresPdfTemplateDataSource
     templateData,
     templateHeader,
     templateFooter,
+    templateSampleDeclaration,
     creatorId,
   }: CreatePdfTemplateInputWithCreator): Promise<PdfTemplate> {
     const templates: PdfTemplateRecord[] = await database(
@@ -30,6 +31,7 @@ export default class PostgresPdfTemplateDataSource
         template_data: templateData,
         template_header: templateHeader,
         template_footer: templateFooter,
+        template_sample_declaration: templateSampleDeclaration,
         creator_id: creatorId,
       },
       '*'
@@ -88,6 +90,7 @@ export default class PostgresPdfTemplateDataSource
           template_data: args.templateData,
           template_header: args.templateHeader,
           template_footer: args.templateFooter,
+          template_sample_declaration: args.templateSampleDeclaration,
         },
         '*'
       )
@@ -127,6 +130,7 @@ export default class PostgresPdfTemplateDataSource
       templateData: sourceTemplate.template_data,
       templateHeader: sourceTemplate.template_header,
       templateFooter: sourceTemplate.template_footer,
+      templateSampleDeclaration: sourceTemplate.template_sample_declaration,
       creatorId: sourceTemplate.creator_id,
     });
 
@@ -157,6 +161,13 @@ export default class PostgresPdfTemplateDataSource
         if (filter?.pdfTemplateFooter) {
           query.where(
             'template_footer',
+            'like',
+            `%${filter.pdfTemplateFooter}%`
+          );
+        }
+        if (filter?.pdfTemplateSampleDeclaration) {
+          query.where(
+            'template_sample_declaration',
             'like',
             `%${filter.pdfTemplateFooter}%`
           );

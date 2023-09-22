@@ -30,7 +30,11 @@ interface ITemplateEditorProps<Type extends string> {
   setPdfTemplate: React.Dispatch<React.SetStateAction<PdfTemplate | null>>;
 }
 const TemplateEditor = <
-  Type extends 'templateData' | 'templateHeader' | 'templateFooter'
+  Type extends
+    | 'templateData'
+    | 'templateHeader'
+    | 'templateFooter'
+    | 'templateSampleDeclaration'
 >({
   name,
   template,
@@ -124,7 +128,9 @@ export default function PdfTemplateEditor() {
     <StyledContainer>
       <StyledPaper>
         {template && pdfTemplate && (
-          <SimpleTabs tabNames={['Body', 'Header', 'Footer']}>
+          <SimpleTabs
+            tabNames={['Body', 'Header', 'Footer', 'Sample Declaration']}
+          >
             <TemplateEditor<'templateData'>
               name="templateData"
               template={template}
@@ -148,6 +154,16 @@ export default function PdfTemplateEditor() {
               template={template}
               initialValues={{
                 templateFooter: pdfTemplate?.templateFooter,
+              }}
+              pdfTemplate={pdfTemplate}
+              setPdfTemplate={setPdfTemplate}
+            />
+            <TemplateEditor<'templateSampleDeclaration'>
+              name="templateSampleDeclaration"
+              template={template}
+              initialValues={{
+                templateSampleDeclaration:
+                  pdfTemplate?.templateSampleDeclaration,
               }}
               pdfTemplate={pdfTemplate}
               setPdfTemplate={setPdfTemplate}

@@ -131,6 +131,7 @@ export default class TemplateMutations {
           templateData: '',
           templateHeader: '',
           templateFooter: '',
+          templateSampleDeclaration: '',
           creatorId: (agent as UserWithRole).id,
         });
     }
