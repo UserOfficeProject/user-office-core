@@ -1,4 +1,4 @@
-FROM cypress/included:12.13.0
+FROM cypress/included:13.2.0
 
 # Copy and install node modules needed for frontend
 WORKDIR /e2e
