@@ -51,6 +51,7 @@ test('A userofficer can create a PDF template', async () => {
   const templateData = '...';
   const templateHeader = '...';
   const templateFooter = '...';
+  const templateSampleDeclaration = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -65,6 +66,7 @@ test('A userofficer can create a PDF template', async () => {
       templateData,
       templateHeader,
       templateFooter,
+      templateSampleDeclaration,
     }
   );
 
@@ -81,6 +83,7 @@ test('A user cannot create a PDF template', async () => {
   const templateData = '...';
   const templateHeader = '...';
   const templateFooter = '...';
+  const templateSampleDeclaration = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -95,6 +98,7 @@ test('A user cannot create a PDF template', async () => {
       templateData,
       templateHeader,
       templateFooter,
+      templateSampleDeclaration,
     }
   );
 
@@ -106,6 +110,7 @@ test('Template must be correct type for PDF template to be created', async () =>
   const templateData = '...';
   const templateHeader = '...';
   const templateFooter = '...';
+  const templateSampleDeclaration = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -120,6 +125,7 @@ test('Template must be correct type for PDF template to be created', async () =>
       templateData,
       templateHeader,
       templateFooter,
+      templateSampleDeclaration,
     }
   );
 
@@ -131,6 +137,7 @@ test('Create PDF template database error gives friendly error', async () => {
   const templateData = '...';
   const templateHeader = '...';
   const templateFooter = '...';
+  const templateSampleDeclaration = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -147,6 +154,7 @@ test('Create PDF template database error gives friendly error', async () => {
       templateData,
       templateHeader,
       templateFooter,
+      templateSampleDeclaration,
     }
   );
 
@@ -158,6 +166,7 @@ test('A userofficer can update a PDF template', async () => {
   const newTemplateData = 'new data';
   const newTemplateHeader = 'new header';
   const newTemplateFooter = 'new footer';
+  const newTemplateSampleDeclaration = 'new sample declaration';
 
   let template = await pdfTemplateMutations.updatePdfTemplate(
     dummyUserOfficerWithRole,
@@ -166,6 +175,7 @@ test('A userofficer can update a PDF template', async () => {
       templateData: newTemplateData,
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
+      templateSampleDeclaration: newTemplateSampleDeclaration,
     }
   );
 
@@ -175,6 +185,9 @@ test('A userofficer can update a PDF template', async () => {
   expect(template.templateData).toEqual(newTemplateData);
   expect(template.templateHeader).toEqual(newTemplateHeader);
   expect(template.templateFooter).toEqual(newTemplateFooter);
+  expect(template.templateSampleDeclaration).toEqual(
+    newTemplateSampleDeclaration
+  );
 });
 
 test('A user cannot update a PDF template', async () => {
@@ -182,6 +195,7 @@ test('A user cannot update a PDF template', async () => {
   const newTemplateData = 'new data';
   const newTemplateHeader = 'new header';
   const newTemplateFooter = 'new footer';
+  const newTemplateSampleDeclaration = 'new sample declaration';
 
   const template = await pdfTemplateMutations.updatePdfTemplate(
     dummyUserWithRole,
@@ -190,6 +204,7 @@ test('A user cannot update a PDF template', async () => {
       templateData: newTemplateData,
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
+      templateSampleDeclaration: newTemplateSampleDeclaration,
     }
   );
 
@@ -201,6 +216,7 @@ test('Update PDF template database error gives friendly error', async () => {
   const newTemplateData = 'new data';
   const newTemplateHeader = 'new header';
   const newTemplateFooter = 'new footer';
+  const newTemplateSampleDeclaration = 'new sample declaration';
 
   mockUpdatePdfTemplate.mockRejectedValue(new Error('Database error'));
 
@@ -211,6 +227,7 @@ test('Update PDF template database error gives friendly error', async () => {
       templateData: newTemplateData,
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
+      templateSampleDeclaration: newTemplateSampleDeclaration,
     }
   );
 

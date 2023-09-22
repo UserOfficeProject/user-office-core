@@ -39,6 +39,7 @@ export default class PdfTemplateMutations {
         templateData: args.templateData,
         templateHeader: args.templateHeader,
         templateFooter: args.templateFooter,
+        templateSampleDeclaration: args.templateSampleDeclaration,
         creatorId: (agent as UserWithRole).id,
       });
     } catch (error) {
