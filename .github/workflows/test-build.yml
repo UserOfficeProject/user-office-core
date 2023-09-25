@@ -103,8 +103,8 @@ jobs:
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Install backend dependencies
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
@@ -114,8 +114,8 @@ jobs:
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
+          path: apps/frontend/node_modules
+          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Install frontend dependencies
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
@@ -125,13 +125,13 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/src/generated
+          path: apps/frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
 
       - name: Generate frontend SDK
         if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
         run: |
-          cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+          cp apps/frontend/example.development.env apps/frontend/.env
           npm run generate:sdk
 
   build:
@@ -159,21 +159,21 @@ jobs:
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
+          path: apps/frontend/node_modules
+          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/src/generated
+          path: apps/frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
           restore-keys: |
             sdk-frontend-${{ hashFiles('**/**.graphql') }}
@@ -204,8 +204,8 @@ jobs:
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Run backend unit tests
         env:
@@ -263,21 +263,21 @@ jobs:
         id: cached-node-modules-backend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/user-office-backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/user-office-frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
+          path: apps/frontend/node_modules
+          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/src/generated
+          path: apps/frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
           restore-keys: |
             sdk-frontend-${{ hashFiles('**/**.graphql') }}
@@ -293,8 +293,8 @@ jobs:
       #   id: cached-node-modules-e2e
       #   uses: actions/cache@v3
       #   with:
-      #     path: apps/user-office-frontend-e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/user-office-frontend-e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
+      #     path: apps/frontend-e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/frontend-e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Install e2e dependencies
         env:
@@ -309,9 +309,9 @@ jobs:
      
       - name: Run e2e tests stfc
         env:
-          USER_OFFICE_BACKEND_DIR: apps/user-office-backend
-          USER_OFFICE_FRONTEND_DIR: apps/user-office-frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/user-office-frontend-e2e
+          USER_OFFICE_BACKEND_DIR: apps/backend
+          USER_OFFICE_FRONTEND_DIR: apps/frontend
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/frontend-e2e
           USER_OFFICE_BACKEND: http://localhost:4000/graphql
           USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
           TZ: Europe/London
@@ -353,9 +353,9 @@ jobs:
   
       - name: Run e2e tests
         env:
-          USER_OFFICE_BACKEND_DIR: apps/user-office-backend
-          USER_OFFICE_FRONTEND_DIR: apps/user-office-frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/user-office-frontend-e2e
+          USER_OFFICE_BACKEND_DIR: apps/backend
+          USER_OFFICE_FRONTEND_DIR: apps/frontend
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/frontend-e2e
           USER_OFFICE_BACKEND: http://localhost:4000/graphql
           USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
           TZ: Europe/Stockholm
@@ -397,7 +397,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots
-          path: apps/user-office-frontend-e2e/cypress/screenshots
+          path: apps/frontend-e2e/cypress/screenshots
 
   push:
     # The type of runner that the job will run on
@@ -432,8 +432,8 @@ jobs:
       - name: Build and push backend
         uses: docker/build-push-action@v4
         with:
-          context: ./apps/user-office-backend
-          file: ./apps/user-office-backend/Dockerfile
+          context: ./apps/backend
+          file: ./apps/backend/Dockerfile
           # Build but don't push if dependabot is creating the PR
           push: ${{ !startsWith(github.head_ref, 'dependabot') }}
           tags: ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
@@ -442,7 +442,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v3
         with:
-          path: apps/user-office-frontend/src/generated
+          path: apps/frontend/src/generated
           key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
           restore-keys: |
             sdk-frontend-${{ hashFiles('**/**.graphql') }}
@@ -451,8 +451,8 @@ jobs:
       - name: Build and push frontend
         uses: docker/build-push-action@v4
         with:
-          context: ./apps/user-office-frontend
-          file: ./apps/user-office-frontend/Dockerfile
+          context: ./apps/frontend
+          file: ./apps/frontend/Dockerfile
           # Build but don't push if dependabot is creating the PR
           push: ${{ !startsWith(github.head_ref, 'dependabot') }}
           tags: ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}
