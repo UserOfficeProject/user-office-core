@@ -2,10 +2,10 @@ FROM cypress/included:13.2.0
 
 # Copy and install node modules needed for frontend
 WORKDIR /e2e
-COPY apps/frontend/src/generated user-office-frontend/src/generated
-COPY apps/frontend/package* user-office-frontend/
+COPY apps/frontend/src/generated frontend/src/generated
+COPY apps/frontend/package* frontend/
 
-WORKDIR /e2e/user-office-frontend
+WORKDIR /e2e/frontend
 RUN npm ci --silent
 
 # Copy e2e tests to container. Install node modules needed for e2e tests
