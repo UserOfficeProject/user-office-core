@@ -18,6 +18,9 @@ import {
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
   InstrumentHasProposalsRecord,
+  ProposalRecord,
+  createProposalObject,
+  CallHasInstrumentRecord,
 } from './records';
 
 @injectable()
@@ -259,6 +262,33 @@ export default class PostgresInstrumentDataSource
           .insert(dataToInsert)
           .returning(['*'])
           .transacting(trx);
+
+        const proposals = await database('proposals')
+          .select('*')
+          .whereIn('proposal_pk', proposalPks)
+          .then((proposals: ProposalRecord[]) => {
+            return proposals.map((proposal) => {
+              return createProposalObject(proposal);
+            });
+          });
+
+        const callHasInstruments = await database('call_has_instruments')
+          .where('call_id', proposals[0].callId)
+          .andWhere('instrument_id', instrumentId)
+          .first()
+          .then((callHasInstrument: CallHasInstrumentRecord) => {
+            return {
+              sepId: callHasInstrument.sep_id,
+            };
+          });
+
+        this.sepDataSource.assignProposalsToSep({
+          proposals: proposals.map((proposal) => ({
+            ...proposal,
+            callId: proposals[0].callId,
+          })),
+          sepId: callHasInstruments.sepId,
+        });
 
         return await trx.commit(result);
       } catch (error) {
