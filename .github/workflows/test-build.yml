@@ -293,8 +293,8 @@ jobs:
       #   id: cached-node-modules-e2e
       #   uses: actions/cache@v3
       #   with:
-      #     path: apps/frontend-e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/frontend-e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
+      #     path: apps/e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Install e2e dependencies
         env:
@@ -311,7 +311,7 @@ jobs:
         env:
           USER_OFFICE_BACKEND_DIR: apps/backend
           USER_OFFICE_FRONTEND_DIR: apps/frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/frontend-e2e
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
           USER_OFFICE_BACKEND: http://localhost:4000/graphql
           USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
           TZ: Europe/London
@@ -355,7 +355,7 @@ jobs:
         env:
           USER_OFFICE_BACKEND_DIR: apps/backend
           USER_OFFICE_FRONTEND_DIR: apps/frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/frontend-e2e
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
           USER_OFFICE_BACKEND: http://localhost:4000/graphql
           USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
           TZ: Europe/Stockholm
@@ -397,7 +397,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots
-          path: apps/frontend-e2e/cypress/screenshots
+          path: apps/e2e/cypress/screenshots
 
   push:
     # The type of runner that the job will run on

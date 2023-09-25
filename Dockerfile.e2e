@@ -10,12 +10,12 @@ RUN npm ci --silent
 
 # Copy e2e tests to container. Install node modules needed for e2e tests
 WORKDIR /e2e
-COPY apps/frontend-e2e/cypress.config.ts ./user-office-core-e2e/
-COPY apps/frontend-e2e/package* ./user-office-core-e2e/
-COPY apps/frontend-e2e/tsconfig.json ./user-office-core-e2e/tsconfig.json
-COPY apps/frontend-e2e/wait-for-frontend.sh ./user-office-core-e2e/
-COPY apps/frontend-e2e/cypress ./user-office-core-e2e/cypress/
-COPY apps/frontend-e2e/webpack.config.js ./user-office-core-e2e/
+COPY apps/e2e/cypress.config.ts ./user-office-core-e2e/
+COPY apps/e2e/package* ./user-office-core-e2e/
+COPY apps/e2e/tsconfig.json ./user-office-core-e2e/tsconfig.json
+COPY apps/e2e/wait-for-frontend.sh ./user-office-core-e2e/
+COPY apps/e2e/cypress ./user-office-core-e2e/cypress/
+COPY apps/e2e/webpack.config.js ./user-office-core-e2e/
 
 WORKDIR /e2e/user-office-core-e2e
 RUN npm ci --silent

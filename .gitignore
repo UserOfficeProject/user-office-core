@@ -1,6 +1,6 @@
 node_modules
 apps/frontend/node_modules
-apps/frontend-e2e/node_modules
-apps/frontend-e2e/cypress/screenshots
+apps/e2e/node_modules
+apps/e2e/cypress/screenshots
 apps/backend/node_modules
 apps/frontend/src/generated
