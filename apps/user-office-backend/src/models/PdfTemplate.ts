@@ -5,6 +5,7 @@ export class PdfTemplate {
     public templateData: string,
     public templateHeader: string,
     public templateFooter: string,
+    public templateSampleDeclaration: string,
     public creatorId: number,
     public created: Date
   ) {}
