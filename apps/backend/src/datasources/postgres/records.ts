@@ -469,6 +469,7 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;
+  readonly sep_id: number;
 }
 
 export interface TemplateCategoryRecord {

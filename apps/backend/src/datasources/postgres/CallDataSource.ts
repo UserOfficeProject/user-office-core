@@ -6,7 +6,9 @@ import { Call } from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
+  AssignSepToCallInstrumentsInput,
   RemoveAssignedInstrumentFromCallInput,
+  RemoveSepFromCallInstrumentsInput,
   UpdateCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
@@ -314,6 +316,41 @@ export default class PostgresCallDataSource implements CallDataSource {
     }));
 
     await database.insert(valuesToInsert).into('call_has_instruments');
+
+    const callUpdated = await this.getCall(args.callId);
+
+    if (callUpdated) {
+      return callUpdated;
+    }
+
+    throw new GraphQLError(`Call not found ${args.callId}`);
+  }
+
+  async assignSepToCallInstruments(
+    args: AssignSepToCallInstrumentsInput
+  ): Promise<Call> {
+    await database
+      .update({ sep_id: args.sepId })
+      .into('call_has_instruments')
+      .whereIn('instrument_id', args.instrumentIds)
+      .andWhere('call_id', args.callId);
+
+    const callUpdated = await this.getCall(args.callId);
+
+    if (callUpdated) {
+      return callUpdated;
+    }
+
+    throw new GraphQLError(`Call not found ${args.callId}`);
+  }
+
+  async removeSepFromCallInstruments(
+    args: RemoveSepFromCallInstrumentsInput
+  ): Promise<Call> {
+    await database('call_has_instruments')
+      .update({ sep_id: null })
+      .whereIn('instrument_id', args.instrumentIds)
+      .andWhere('call_id', args.callId);
 
     const callUpdated = await this.getCall(args.callId);
 

@@ -19,6 +19,8 @@ import {
   UpdateCallInput,
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
+  AssignSepToCallInstrumentsInput,
+  RemoveSepFromCallInstrumentsInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { mergeValidationSchemas } from '../utils/helperFunctions';
 
@@ -121,6 +123,49 @@ export default class CallMutations {
       .catch((error) => {
         return rejection(
           'Could not assign instruments to call',
+          { agent, args },
+          error
+        );
+      });
+  }
+
+  //TODO: Add Validation in duo-validation package
+  // @ValidateArgs(assignInstrumentsToCallValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async assignSepToCallInstruments(
+    agent: UserWithRole | null,
+    args: AssignSepToCallInstrumentsInput
+  ): Promise<Call | Rejection> {
+    return this.dataSource
+      .assignSepToCallInstruments(args)
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        return rejection(
+          'Could not assign sep to call instrument',
+          { agent, args },
+          error
+        );
+      });
+  }
+
+  // Remove SEP from Call Instruments
+  //TODO: Add Validation in duo-validation package
+  // @ValidateArgs(removeAssignedInstrumentFromCallValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async removeSepFromCallInstruments(
+    agent: UserWithRole | null,
+    args: RemoveSepFromCallInstrumentsInput
+  ): Promise<Call | Rejection> {
+    return this.dataSource
+      .removeSepFromCallInstruments(args)
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        return rejection(
+          'Could not remove sep from call instrument',
           { agent, args },
           error
         );

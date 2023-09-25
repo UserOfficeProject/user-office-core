@@ -40,6 +40,9 @@ export class InstrumentWithAvailabilityTime extends Instrument {
 
   @Field(() => Boolean, { defaultValue: false })
   public submitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public sepId: number;
 }
 
 @Resolver(() => Instrument)

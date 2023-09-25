@@ -1,0 +1,10 @@
+mutation removeSEPFromCallInstruments($instrumentIds: [Int!]!, $callId: Int!) {
+  removeSEPFromCallInstruments(
+    removeSEPFromCallInstrumentsInput: {
+      instrumentIds: $instrumentIds
+      callId: $callId
+    }
+  ) {
+    id
+  }
+}
