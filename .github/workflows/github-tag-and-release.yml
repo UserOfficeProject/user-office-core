@@ -45,8 +45,8 @@ jobs:
       - name: Build and push backend
         uses: docker/build-push-action@v3
         with:
-          context: ./apps/user-office-backend
-          file: ./apps/user-office-backend/Dockerfile
+          context: ./apps/backend
+          file: ./apps/backend/Dockerfile
           push: true
           tags: ghcr.io/userofficeproject/user-office-backend:${{ steps.tag_version.outputs.new_tag }}
 
@@ -59,7 +59,7 @@ jobs:
         run: npm ci
 
       - name: Set environment variables
-        run: cp apps/user-office-frontend/example.development.env apps/user-office-frontend/.env
+        run: cp apps/frontend/example.development.env apps/frontend/.env
 
       - name: Generate SDK
         run: npm run generate:sdk
@@ -67,7 +67,7 @@ jobs:
       - name: Build and push frontend
         uses: docker/build-push-action@v3
         with:
-          context: ./apps/user-office-frontend
-          file: ./apps/user-office-frontend/Dockerfile
+          context: ./apps/frontend
+          file: ./apps/frontend/Dockerfile
           push: true
           tags: ghcr.io/userofficeproject/user-office-frontend:${{ steps.tag_version.outputs.new_tag }}

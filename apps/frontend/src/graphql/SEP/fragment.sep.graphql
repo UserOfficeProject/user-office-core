@@ -1,0 +1,18 @@
+fragment sep on SEP {
+  id
+  code
+  description
+  numberRatingsRequired
+  gradeGuide
+  customGradeGuide
+  active
+  sepChair {
+    ...basicUserDetails
+  }
+  sepChairProposalCount
+  sepSecretary {
+    ...basicUserDetails
+  }
+  sepSecretaryProposalCount
+  proposalCount
+}

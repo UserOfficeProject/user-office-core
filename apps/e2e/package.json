@@ -1,0 +1,47 @@
+{
+  "name": "user-office-core-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "proxy": "http://localhost:4000",
+  "dependencies": {
+    "@faker-js/faker": "^7.5.0",
+    "@types/luxon": "^2.4.0",
+    "cypress": "^13.2.0",
+    "cypress-real-events": "^1.10.3",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
+    "graphql-tag": "^2.12.6",
+    "jwt-decode": "^3.1.2",
+    "luxon": "^2.5.0",
+    "pdf-parse": "^1.1.1",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "@cypress/webpack-preprocessor": "^6.0.0",
+    "@types/eslint": "^8.4.3",
+    "@types/luxon": "^2.4.0",
+    "@types/node": "^16.0.0",
+    "@types/pdf-parse": "^1.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-cypress": "^2.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "ts-loader": "^9.4.3",
+    "webpack": "^5.84.1"
+  },
+  "engines": {
+    "npm": ">=9.0.0",
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
+    "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --quiet --fix",
+    "cy:open": "cypress open --e2e",
+    "cy:run": "cypress run --e2e",
+    "cy:run:action": "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --e2e"
+  }
+}
