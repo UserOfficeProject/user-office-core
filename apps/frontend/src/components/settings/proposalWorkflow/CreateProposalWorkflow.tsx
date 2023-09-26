@@ -40,7 +40,7 @@ const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
             toastSuccessMessage: 'Proposal workflow created successfully',
           }).createProposalWorkflow(values);
 
-          close(data.createProposalWorkflow);
+          close(data.createProposalWorkflow as ProposalWorkflow);
         } catch (error) {
           close(null);
         }

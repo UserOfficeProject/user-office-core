@@ -33,8 +33,12 @@ export const statusActionEngine = async (
         prevProposalStatusId
       );
 
+      if (!currentConnection) {
+        return;
+      }
+
       const proposalStatusActions =
-        await proposalSettingsDataSource.getStatusActionsByConnectionId(
+        await proposalSettingsDataSource.getConnectionStatusActions(
           currentConnection.id,
           currentConnection.proposalWorkflowId
         );
@@ -46,7 +50,7 @@ export const statusActionEngine = async (
       Promise.all(
         proposalStatusActions.map(async (proposalStatusAction) => {
           if (
-            !proposalStatusAction.id ||
+            !proposalStatusAction.actionId ||
             !proposalStatusAction.type ||
             proposalStatusAction.executed
           ) {

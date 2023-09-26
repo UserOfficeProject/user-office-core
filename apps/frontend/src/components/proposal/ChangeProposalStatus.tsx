@@ -52,7 +52,7 @@ const ChangeProposalStatus = ({
 
   const selectedProposalsStatus = allSelectedProposalsHaveSameStatus
     ? selectedProposalStatuses[0]
-    : undefined;
+    : null;
 
   return (
     <Container component="main" maxWidth="xs">

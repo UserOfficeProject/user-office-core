@@ -24,6 +24,9 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
           proposalWorkflowConnectionId
           statusChangingEvent
         }
+        statusActions {
+          ...connectionStatusAction
+        }
       }
     }
   }
