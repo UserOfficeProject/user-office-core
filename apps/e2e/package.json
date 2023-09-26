@@ -1,5 +1,5 @@
 {
-  "name": "user-office-frontend-e2e",
+  "name": "user-office-core-e2e",
   "version": "1.0.0",
   "private": true,
   "proxy": "http://localhost:4000",
