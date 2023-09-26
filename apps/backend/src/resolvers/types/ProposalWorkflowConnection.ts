@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalWorkflowConnection as ProposalWorkflowConnectionOrigin } from '../../models/ProposalWorkflowConnections';
 import { isRejection } from '../../models/Rejection';
+import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { ProposalStatus } from './ProposalStatus';
 import { StatusChangingEvent } from './StatusChangingEvent';
 
@@ -69,5 +70,22 @@ export class ProposalWorkflowConnectionResolver {
       );
 
     return isRejection(statusChangingEvents) ? [] : statusChangingEvents;
+  }
+
+  @FieldResolver(() => [ConnectionStatusAction], { nullable: true })
+  async statusActions(
+    @Root() proposalWorkflowConnection: ProposalWorkflowConnection,
+    @Ctx() context: ResolverContext
+  ): Promise<ConnectionStatusAction[]> {
+    const statusActions =
+      await context.queries.proposalSettings.getConnectionStatusActions(
+        context.user,
+        {
+          connectionId: proposalWorkflowConnection.id,
+          workflowId: proposalWorkflowConnection.proposalWorkflowId,
+        }
+      );
+
+    return isRejection(statusActions) ? [] : statusActions;
   }
 }

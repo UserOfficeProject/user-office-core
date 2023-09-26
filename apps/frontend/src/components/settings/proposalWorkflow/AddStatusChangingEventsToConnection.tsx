@@ -5,7 +5,6 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
@@ -18,13 +17,11 @@ const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
   selectedStatusChangingEvents: yup
     .array()
     .of(yup.string())
+    .min(1, 'You must select at least one event')
     .required('You must select at least one event'),
 });
 
 const useStyles = makeStyles((theme) => ({
-  formControl: {
-    width: '100%',
-  },
   cardHeader: {
     fontSize: '20px',
     padding: '22px 0 0',
@@ -34,16 +31,16 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     minHeight: 'auto',
-    maxHeight: 'calc(100vh - 220px)',
-    [theme.breakpoints.down('sm')]: {
-      maxHeight: 'calc(100vh - 255px)',
+    maxHeight: 'calc(100vh - 315px)',
+    [theme.breakpoints.only('sm')]: {
+      maxHeight: 'calc(100vh - 345px)',
+    },
+    [theme.breakpoints.only('xs')]: {
+      maxHeight: 'calc(100vh - 475px)',
     },
     overflowY: 'auto',
     overflowX: 'hidden',
     marginTop: '10px',
-  },
-  submitContainer: {
-    margin: theme.spacing(2, 0, 2),
   },
   eventDescription: {
     margin: '-5px 0',
@@ -53,17 +50,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type AddStatusChangingEventsToConnectionProps = {
-  close: () => void;
   addStatusChangingEventsToConnection: (statusChangingEvents: string[]) => void;
   statusChangingEvents?: Event[];
   statusName?: string;
+  isLoading: boolean;
 };
 
 const AddStatusChangingEventsToConnection = ({
   statusChangingEvents,
-  close,
   addStatusChangingEventsToConnection,
   statusName,
+  isLoading,
 }: AddStatusChangingEventsToConnectionProps) => {
   const classes = useStyles();
 
@@ -82,7 +79,6 @@ const AddStatusChangingEventsToConnection = ({
         addStatusChangingEventsToConnection(
           values.selectedStatusChangingEvents
         );
-        close();
       }}
       validationSchema={addStatusChangingEventsToConnectionValidationSchema}
     >
@@ -141,19 +137,17 @@ const AddStatusChangingEventsToConnection = ({
               />
             )}
           </Grid>
-          <Grid
-            container
-            justifyContent="flex-end"
-            className={classes.submitContainer}
-          >
-            <Grid item>
+          <Grid container justifyContent="flex-end" spacing={1} paddingTop={1}>
+            <Grid item marginTop={1}>
               <ErrorMessage name="selectedStatusChangingEvents" />
-
+            </Grid>
+            <Grid item>
               <Button
                 type="submit"
-                disabled={isSubmitting || loadingProposalEvents}
+                disabled={isSubmitting || loadingProposalEvents || isLoading}
                 data-cy="submit"
               >
+                {isLoading && <UOLoader size={20} />}
                 Add status changing events
               </Button>
             </Grid>
@@ -162,12 +156,6 @@ const AddStatusChangingEventsToConnection = ({
       )}
     </Formik>
   );
-};
-
-AddStatusChangingEventsToConnection.propTypes = {
-  close: PropTypes.func.isRequired,
-  addStatusChangingEventsToConnection: PropTypes.func.isRequired,
-  statusChangingEvents: PropTypes.array,
 };
 
 export default AddStatusChangingEventsToConnection;

@@ -8,6 +8,7 @@ import {
   ProposalWorkflow,
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
+  ConnectionStatusAction,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
@@ -29,6 +30,8 @@ export enum EventType {
   ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
   NEXT_STATUS_EVENTS_ADDED,
   ADD_NEXT_STATUS_EVENTS_REQUESTED,
+  ADD_STATUS_ACTION_REQUESTED,
+  STATUS_ACTION_ADDED,
 }
 
 export interface Event {
@@ -138,6 +141,27 @@ const ProposalWorkflowEditorModel = (
     return workflowConnectionGroups;
   };
 
+  const addStatusActionsToConnection = (
+    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    workflowConnection: ProposalWorkflowConnection,
+    statusActions: ConnectionStatusAction[]
+  ) => {
+    const groupIndexWhereConnectionShouldBeUpdated = findGroupIndexByGroupId(
+      workflowConnectionGroups,
+      workflowConnection.droppableGroupId
+    );
+
+    const connectionToUpdate = workflowConnectionGroups[
+      groupIndexWhereConnectionShouldBeUpdated
+    ].connections.find((connection) => connection.id === workflowConnection.id);
+
+    if (connectionToUpdate) {
+      connectionToUpdate.statusActions = statusActions;
+    }
+
+    return workflowConnectionGroups;
+  };
+
   function reducer(state: ProposalWorkflow, action: Event): ProposalWorkflow {
     return produce(state, (draft) => {
       switch (action.type) {
@@ -224,6 +248,18 @@ const ProposalWorkflowEditorModel = (
               workflowConnection,
               statusChangingEvents
             );
+
+          return draft;
+        }
+        case EventType.STATUS_ACTION_ADDED: {
+          const { proposalWorkflowConnectionGroups } = draft;
+          const { workflowConnection, statusActions } = action.payload;
+
+          draft.proposalWorkflowConnectionGroups = addStatusActionsToConnection(
+            proposalWorkflowConnectionGroups,
+            workflowConnection,
+            statusActions
+          );
 
           return draft;
         }

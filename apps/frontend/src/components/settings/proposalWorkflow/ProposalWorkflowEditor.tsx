@@ -237,6 +237,7 @@ const ProposalWorkflowEditor = () => {
             <Grid item xs={9}>
               <ProposalWorkflowConnectionsEditor
                 dispatch={dispatch}
+                isLoading={isLoading}
                 proposalWorkflowStatusConnectionGroups={
                   state.proposalWorkflowConnectionGroups
                 }

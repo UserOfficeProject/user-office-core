@@ -20,7 +20,7 @@ const ProposalStatusPicker = ({
 }) => {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
-  const classes = makeStyles((theme) => ({
+  const classes = makeStyles({
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
@@ -30,8 +30,8 @@ const ProposalStatusPicker = ({
       overflowY: 'auto',
       overflowX: 'hidden',
       backgroundColor: theme.palette.grey[200],
-      marginLeft: '5px',
-      boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
+      marginLeft: theme.spacing(1),
+      boxShadow: theme.shadows[3],
     },
     itemContainer: {
       minHeight: '180px',
@@ -46,19 +46,19 @@ const ProposalStatusPicker = ({
       flexGrow: 1,
       color: theme.palette.grey[900],
       fontWeight: 'bold',
-      padding: '12px 8px 8px 8px',
+      padding: theme.spacing(1),
     },
-  }))();
+  })();
 
   const getItemStyle = (
     isDragging: boolean,
     draggableStyle: DraggingStyle | NotDraggingStyle | undefined
   ) => ({
-    padding: '12px 8px 8px 8px',
+    padding: theme.spacing(1),
     margin: '1px',
     backgroundColor: isDragging ? theme.palette.grey[200] : 'white',
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-    boxShadow: '0px 1px 2px 0px rgba(163,163,163,0.66)',
+    boxShadow: theme.shadows[2],
     maxWidth: '100%',
     minWidth: '200px',
     ...draggableStyle,
