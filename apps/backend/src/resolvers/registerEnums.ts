@@ -10,6 +10,7 @@ import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
+import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewerFilter, ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
@@ -96,5 +97,8 @@ export const registerEnums = () => {
   });
   registerEnumType(EmailStatusActionRecipients, {
     name: 'EmailStatusActionRecipients',
+  });
+  registerEnumType(ProposalStatusActionType, {
+    name: 'ProposalStatusActionType',
   });
 };

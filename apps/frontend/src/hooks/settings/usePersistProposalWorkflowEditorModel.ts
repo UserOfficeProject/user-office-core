@@ -4,7 +4,12 @@ import {
   Event,
   EventType,
 } from 'components/settings/proposalWorkflow/ProposalWorkflowEditorModel';
-import { IndexWithGroupId, ProposalWorkflow } from 'generated/sdk';
+import {
+  ConnectionHasActionsInput,
+  IndexWithGroupId,
+  ProposalWorkflow,
+  ProposalWorkflowConnection,
+} from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -38,9 +43,13 @@ export function usePersistProposalWorkflowEditorModel() {
   }: MiddlewareInputParams<ProposalWorkflow, Event>) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
-      call().then(() => {
-        setIsLoading(false);
-      });
+      call()
+        .then(() => {
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
     };
 
     const insertNewStatusInProposalWorkflow = async (
@@ -109,6 +118,23 @@ export function usePersistProposalWorkflowEditorModel() {
           statusChangingEvents,
         })
         .then((data) => data.addStatusChangingEventsToConnection);
+    };
+
+    const addStatusActionToConnection = async (
+      statusActions: ConnectionHasActionsInput[],
+      workflowConnection: ProposalWorkflowConnection
+    ) => {
+      return api({
+        toastSuccessMessage: `Status actions ${
+          statusActions.length ? 'added' : 'removed'
+        } successfully!`,
+      })
+        .addConnectionStatusActions({
+          actions: statusActions,
+          workflowId: workflowConnection.proposalWorkflowId,
+          connectionId: workflowConnection.id,
+        })
+        .then((data) => data.addConnectionStatusActions);
     };
 
     return (next: FunctionType) => (action: Event) => {
@@ -259,6 +285,26 @@ export function usePersistProposalWorkflowEditorModel() {
               payload: {
                 workflowConnection,
                 statusChangingEvents: result,
+              },
+            });
+
+            return result;
+          });
+        }
+        case EventType.ADD_STATUS_ACTION_REQUESTED: {
+          const { workflowConnection, statusActions } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await addStatusActionToConnection(
+              statusActions,
+              workflowConnection
+            );
+
+            dispatch({
+              type: EventType.STATUS_ACTION_ADDED,
+              payload: {
+                workflowConnection: workflowConnection,
+                statusActions: result,
               },
             });
 

@@ -8,7 +8,7 @@ import {
   addProposalWorkflowStatusValidationSchema,
   moveProposalWorkflowStatusValidationSchema,
   deleteProposalWorkflowStatusValidationSchema,
-  // addNextStatusEventsValidationSchema,
+  addStatusActionsToConnectionValidationSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
@@ -16,12 +16,17 @@ import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
+import {
+  ConnectionHasStatusAction,
+  ProposalStatusActionType,
+} from '../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
+import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnectionMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
@@ -31,6 +36,7 @@ import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
 import { omit } from '../utils/helperFunctions';
+
 @injectable()
 export default class ProposalSettingsMutations {
   constructor(
@@ -634,5 +640,20 @@ export default class ProposalSettingsMutations {
         error
       );
     }
+  }
+
+  @ValidateArgs(
+    addStatusActionsToConnectionValidationSchema<ProposalStatusActionType>(
+      ProposalStatusActionType.EMAIL,
+      ProposalStatusActionType.RABBITMQ,
+      Object.values(ProposalStatusActionType)
+    )
+  )
+  @Authorized([Roles.USER_OFFICER])
+  async addConnectionStatusActions(
+    agent: UserWithRole | null,
+    input: AddConnectionStatusActionsInput
+  ): Promise<ConnectionHasStatusAction[] | null> {
+    return this.dataSource.addConnectionStatusActions(input);
   }
 }

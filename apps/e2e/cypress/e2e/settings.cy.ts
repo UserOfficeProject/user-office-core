@@ -644,6 +644,8 @@ context('Settings tests', () => {
         text: 'Status changing events added successfully!',
       });
 
+      cy.closeModal();
+
       cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
 
       cy.get('[data-cy="status-changing-events-modal"]').should('exist');
@@ -986,6 +988,13 @@ context('Settings tests', () => {
         'contain.text',
         'FEASIBILITY_REVIEW'
       );
+
+      cy.get('[data-cy="confirmation-dialog"] .MuiDialogContent-root').should(
+        'contain.text',
+        'FEASIBILITY_REVIEW'
+      );
+
+      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',

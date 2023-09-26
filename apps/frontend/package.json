@@ -58,7 +58,7 @@
     "react-router": "^5.3.1",
     "react-router-dom": "^5.3.1",
     "react-scripts": "^5.0.1",
-    "tinymce": "^5.10.4",
+    "tinymce": "^5.10.7",
     "typescript": "^4.6.4",
     "use-query-params": "^1.2.3",
     "yup": "^0.32.11"

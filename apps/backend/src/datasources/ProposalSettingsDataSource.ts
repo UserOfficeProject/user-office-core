@@ -1,11 +1,15 @@
 import { ProposalStatus } from '../models/ProposalStatus';
-import { ProposalStatusAction } from '../models/ProposalStatusAction';
+import {
+  ConnectionHasStatusAction,
+  ProposalStatusAction,
+} from '../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
   ProposalWorkflowConnection,
 } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -63,11 +67,16 @@ export interface ProposalSettingsDataSource {
     proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
 
-  getStatusActionsByConnectionId(
+  getConnectionStatusActions(
     proposalWorkflowConnectionId: number,
     proposalWorkflowId: number
-  ): Promise<ProposalStatusAction[]>;
-  updateStatusAction(
-    proposalStatusAction: ProposalStatusAction
-  ): Promise<ProposalStatusAction>;
+  ): Promise<ConnectionHasStatusAction[]>;
+  updateConnectionStatusAction(
+    data: ConnectionHasStatusAction
+  ): Promise<ConnectionHasStatusAction>;
+  getStatusAction(actionId: number): Promise<ProposalStatusAction>;
+  getStatusActions(): Promise<ProposalStatusAction[]>;
+  addConnectionStatusActions(
+    input: AddConnectionStatusActionsInput
+  ): Promise<ConnectionHasStatusAction[] | null>;
 }
