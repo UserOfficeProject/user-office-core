@@ -9,6 +9,8 @@ import { useParams } from 'react-router';
 import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import { PdfTemplate, Template } from 'generated/sdk';
+import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
+import QuestionaryEditorModel from 'models/questionary/QuestionaryEditorModel';
 import {
   StyledButtonContainer,
   StyledContainer,
@@ -17,6 +19,7 @@ import {
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import PDFTemplateDocumentation from './documentation';
+import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 interface ITemplateEditorProps<Type extends string> {
   name: Type;
   template: Template | null;
@@ -41,11 +44,15 @@ const TemplateEditor = <
 }: ITemplateEditorProps<Type>) => {
   const { api } = useDataApiWithFeedback();
 
+  const { persistModel } = usePersistQuestionaryEditorModel();
+  const { state, dispatch } = QuestionaryEditorModel([persistModel]);
+
   return (
     <>
       <Typography variant="h6" component="h2" gutterBottom>
         {template?.name}
       </Typography>
+      <TemplateMetadataEditor dispatch={dispatch} template={state} />
       <Formik
         initialValues={initialValues}
         onSubmit={async (values): Promise<void> => {
