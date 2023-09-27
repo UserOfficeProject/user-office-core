@@ -1,0 +1,24 @@
+mutation updatePdfTemplate(
+  $pdfTemplateId: Int!
+  $templateData: String
+  $templateHeader: String
+  $templateFooter: String
+  $templateSampleDeclaration: String
+) {
+  updatePdfTemplate(
+    pdfTemplateId: $pdfTemplateId
+    templateData: $templateData
+    templateHeader: $templateHeader
+    templateFooter: $templateFooter
+    templateSampleDeclaration: $templateSampleDeclaration
+  ) {
+    pdfTemplateId
+    templateId
+    templateData
+    templateHeader
+    templateFooter
+    templateSampleDeclaration
+    created
+    creatorId
+  }
+}

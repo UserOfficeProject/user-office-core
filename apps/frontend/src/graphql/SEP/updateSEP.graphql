@@ -1,0 +1,21 @@
+mutation updateSEP(
+  $id: Int!
+  $code: String!
+  $description: String!
+  $numberRatingsRequired: Int!
+  $gradeGuide: String
+  $customGradeGuide: Boolean
+  $active: Boolean!
+) {
+  updateSEP(
+    id: $id
+    code: $code
+    description: $description
+    numberRatingsRequired: $numberRatingsRequired
+    gradeGuide: $gradeGuide
+    customGradeGuide: $customGradeGuide
+    active: $active
+  ) {
+    id
+  }
+}

@@ -1,0 +1,85 @@
+query getProposals($filter: ProposalsFilter) {
+  proposals(filter: $filter) {
+    proposals {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      questionary {
+        steps {
+          fields {
+            question {
+              id
+              question
+              dataType
+            }
+            value
+          }
+        }
+      }
+      genericTemplates {
+        questionary {
+          steps {
+            fields {
+              question {
+                id
+                question
+                dataType
+              }
+              value
+            }
+          }
+        }
+      }
+      samples {
+        questionary {
+          steps {
+            fields {
+              question {
+                id
+                question
+                dataType
+              }
+              value
+            }
+          }
+        }
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          id
+        }
+      }
+      users {
+        ...basicUserDetails
+      }
+      technicalReview {
+        ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
+      }
+      instrument {
+        id
+        name
+      }
+      call {
+        id
+        shortCode
+      }
+      sep {
+        id
+        code
+      }
+    }
+    totalCount
+  }
+}
