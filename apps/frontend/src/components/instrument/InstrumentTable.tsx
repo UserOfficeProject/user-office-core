@@ -11,6 +11,7 @@ import SuperMaterialTable, {
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { columnsWithOverflow } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -23,16 +24,25 @@ import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 
-const columns = [
-  { title: 'Name', field: 'name' },
-  { title: 'Short code', field: 'shortCode' },
-  { title: 'Description', field: 'description' },
+const columns = columnsWithOverflow<InstrumentFragment>([
+  {
+    title: 'Name',
+    field: 'name',
+  },
+  {
+    title: 'Short code',
+    field: 'shortCode',
+  },
+  {
+    title: 'Description',
+    field: 'description',
+  },
   {
     title: 'Scientists',
     field: 'scientists.length',
     emptyValue: '-',
   },
-];
+]);
 
 const InstrumentTable = () => {
   const {

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { Instrument, InstrumentWithAvailabilityTime } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { columnsWithOverflow } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -32,11 +33,11 @@ const AssignInstrumentsToCall = ({
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
-  const columns = [
+  const columns = columnsWithOverflow<Instrument>([
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
-  ];
+  ]);
 
   const notAssignedInstruments = instruments.filter((instrument) => {
     if (

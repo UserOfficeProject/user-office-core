@@ -21,6 +21,7 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { columnsWithOverflow } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -86,7 +87,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   };
 
   // NOTE: Here we keep the columns inside the component just because of the timezone shown in the title
-  const columns = [
+  const columns = columnsWithOverflow<Call>([
     { title: 'Short Code', field: 'shortCode' },
     {
       title: `Start Date (${timezone})`,
@@ -125,7 +126,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       field: 'seps.length',
       emptyValue: '-',
     },
-  ];
+  ]);
 
   const assignInstrumentsToCall = (
     instruments: InstrumentWithAvailabilityTime[]

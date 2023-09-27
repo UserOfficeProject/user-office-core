@@ -55,6 +55,7 @@ import {
 } from 'hooks/proposal/useProposalsCoreData';
 import {
   addColumns,
+  columnsWithOverflow,
   fromProposalToProposalView,
   removeColumns,
   setSortDirectionOnSortColumn,
@@ -92,7 +93,7 @@ export type QueryParameters = {
   searchText?: string | undefined;
 };
 
-let columns: Column<ProposalViewData>[] = [
+let columns = columnsWithOverflow<ProposalViewData>([
   {
     title: 'Actions',
     cellStyle: { padding: 0 },
@@ -156,7 +157,7 @@ let columns: Column<ProposalViewData>[] = [
     title: 'Call',
     field: 'callShortCode',
   },
-];
+]);
 
 const technicalReviewColumns = [
   { title: 'Technical status', field: 'technicalStatus', emptyValue: '-' },

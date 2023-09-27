@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Column } from '@material-table/core';
 import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
+import React from 'react';
 import * as Yup from 'yup';
 
 import { SortDirectionType } from 'components/common/SuperMaterialTable';
@@ -19,8 +21,8 @@ import {
   getGradesFromReviews,
   standardDeviation,
 } from './mathFunctions';
+import { FunctionType } from './utilTypes';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
   const result = [];
   const map = new Map<number, boolean>();
@@ -151,3 +153,52 @@ export const urlValidationSchema = () => {
     )
     .required('URL is required');
 };
+
+export const getValueFromKey = (object: any, key: string | undefined) => {
+  return key?.split('.').reduce((o, i) => o[i], object);
+};
+
+export const columnWithOverflow = <T extends object>(
+  column: Column<T>
+): Column<T> => {
+  const cellStyleIsFunction = typeof column.cellStyle === 'function';
+  const cellStyle = column.cellStyle
+    ? {
+        ...(cellStyleIsFunction
+          ? (column.cellStyle as FunctionType)()
+          : column.cellStyle),
+      }
+    : undefined;
+
+  return {
+    ...column,
+    render(rowData) {
+      const columnData = getValueFromKey(rowData, column.field?.toString());
+
+      // NOTE: If it is more than 50 chars then show the title tooltip
+      if (typeof columnData === 'string' && columnData.length > 50) {
+        return (
+          <span title={columnData}>
+            {column.render ? column.render(rowData, 'row') : columnData}
+          </span>
+        );
+      } else {
+        return (
+          <>{column.render ? column.render(rowData, 'row') : columnData}</>
+        );
+      }
+    },
+    cellStyle: {
+      ...cellStyle,
+      whiteSpace: 'nowrap',
+      maxWidth: '400px',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
+  };
+};
+
+export const columnsWithOverflow = <T extends object>(columns: Column<T>[]) =>
+  columns.map((column) => {
+    return columnWithOverflow(column);
+  });

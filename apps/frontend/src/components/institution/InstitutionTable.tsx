@@ -8,6 +8,7 @@ import SuperMaterialTable, {
 } from 'components/common/SuperMaterialTable';
 import { Institution } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
+import { columnsWithOverflow } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -41,7 +42,7 @@ const InstitutionPage = () => {
     }
   };
 
-  const columns = [
+  const columns = columnsWithOverflow<Institution>([
     { title: 'Name', field: 'name' },
     { title: 'Country', field: 'country.value' },
     {
@@ -49,7 +50,7 @@ const InstitutionPage = () => {
       field: 'verified',
       lookup: { true: 'Yes', false: 'No' },
     },
-  ];
+  ]);
 
   const createModal = (
     onUpdate: FunctionType<void, [Institution | null]>,

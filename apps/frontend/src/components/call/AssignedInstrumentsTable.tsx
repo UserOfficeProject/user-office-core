@@ -1,7 +1,4 @@
-import MaterialTable, {
-  Column,
-  EditComponentProps,
-} from '@material-table/core';
+import MaterialTable, { EditComponentProps } from '@material-table/core';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import i18n from 'i18n';
@@ -10,6 +7,7 @@ import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { columnsWithOverflow } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -71,61 +69,63 @@ const AssignedInstrumentsTable = ({
     />
   );
 
-  const assignmentColumns: Column<InstrumentWithAvailabilityTime>[] = [
-    {
-      title: 'Name',
-      field: 'name',
-      editable: 'never',
-    },
-    {
-      title: 'Short code',
-      field: 'shortCode',
-      editable: 'never',
-    },
-    {
-      title: 'Description',
-      field: 'description',
-      editable: 'never',
-    },
-    {
-      title: `Availability time (${call.allocationTimeUnit}s)`,
-      field: 'availabilityTime',
-      editable: 'onUpdate',
-      type: 'numeric',
-      emptyValue: '-',
-      editComponent: availabilityTimeInput,
-      align: 'left',
-      validate: (
-        rowData: InstrumentWithAvailabilityTime & {
-          tableData?: { editing: string };
-        }
-      ) => {
-        // NOTE: Return valid state if the action is delete and not update
-        if (rowData.tableData?.editing !== 'update') {
-          return { isValid: true };
-        }
-
-        if (rowData.availabilityTime && +rowData.availabilityTime > 0) {
-          // NOTE: Preventing inputs grater than 32-bit integer.
-          if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {
-            return {
-              isValid: false,
-              helperText: `Availability time can not be grater than ${
-                MAX_32_BIT_INTEGER - 1
-              }`,
-            };
+  const assignmentColumns = columnsWithOverflow<InstrumentWithAvailabilityTime>(
+    [
+      {
+        title: 'Name',
+        field: 'name',
+        editable: 'never',
+      },
+      {
+        title: 'Short code',
+        field: 'shortCode',
+        editable: 'never',
+      },
+      {
+        title: 'Description',
+        field: 'description',
+        editable: 'never',
+      },
+      {
+        title: `Availability time (${call.allocationTimeUnit}s)`,
+        field: 'availabilityTime',
+        editable: 'onUpdate',
+        type: 'numeric',
+        emptyValue: '-',
+        editComponent: availabilityTimeInput,
+        align: 'left',
+        validate: (
+          rowData: InstrumentWithAvailabilityTime & {
+            tableData?: { editing: string };
+          }
+        ) => {
+          // NOTE: Return valid state if the action is delete and not update
+          if (rowData.tableData?.editing !== 'update') {
+            return { isValid: true };
           }
 
-          return { isValid: true };
-        } else {
-          return {
-            isValid: false,
-            helperText: 'Availability time must be a positive number',
-          };
-        }
+          if (rowData.availabilityTime && +rowData.availabilityTime > 0) {
+            // NOTE: Preventing inputs grater than 32-bit integer.
+            if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {
+              return {
+                isValid: false,
+                helperText: `Availability time can not be grater than ${
+                  MAX_32_BIT_INTEGER - 1
+                }`,
+              };
+            }
+
+            return { isValid: true };
+          } else {
+            return {
+              isValid: false,
+              helperText: 'Availability time must be a positive number',
+            };
+          }
+        },
       },
-    },
-  ];
+    ]
+  );
 
   const removeAssignedInstrument = async (instrumentId: number) => {
     await api({
