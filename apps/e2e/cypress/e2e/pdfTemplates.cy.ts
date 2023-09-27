@@ -179,6 +179,36 @@ context('PDF template tests', () => {
       cy.contains(pdfTemplateData.replace(/\n|\r/g, ' ')).should('exist');
     });
 
+    it('User officer can change the name and description of the PDF template', () => {
+      const newName = faker.lorem.words(3);
+      const newDescription = faker.lorem.words(5);
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('PDF');
+
+      cy.contains(createdTemplateName)
+        .parent()
+        .find("[aria-label='Edit']")
+        .click();
+
+      cy.contains(createdTemplateName).should('exist');
+
+      cy.get('[data-cy=edit-metadata]').click();
+      cy.get('[data-cy=template-name] input').clear().type(newName);
+      cy.get('[data-cy=template-description] input')
+        .clear()
+        .type(newDescription);
+
+      cy.get('[data-cy="save-metadata-btn"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(newName).should('exist');
+      cy.contains(newDescription).should('exist');
+    });
+
     it('User officer can clone PDF template', () => {
       cy.login('officer');
       cy.visit('/');
