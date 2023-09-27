@@ -32,7 +32,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./apps/user-office-backend/db_patches/:/docker-entrypoint-initdb.d/
+      - ./apps/backend/db_patches/:/docker-entrypoint-initdb.d/
 
   factory:
     image: 'ghcr.io/userofficeproject/user-office-factory:develop'

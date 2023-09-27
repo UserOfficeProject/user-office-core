@@ -1,0 +1,31 @@
+query getProposalWorkflow($proposalWorkflowId: Int!) {
+  proposalWorkflow(proposalWorkflowId: $proposalWorkflowId) {
+    id
+    name
+    description
+    proposalWorkflowConnectionGroups {
+      groupId
+      parentGroupId
+      connections {
+        id
+        sortOrder
+        proposalWorkflowId
+        proposalStatusId
+        proposalStatus {
+          ...proposalStatus
+        }
+        nextProposalStatusId
+        prevProposalStatusId
+        droppableGroupId
+        statusChangingEvents {
+          statusChangingEventId
+          proposalWorkflowConnectionId
+          statusChangingEvent
+        }
+        statusActions {
+          ...connectionStatusAction
+        }
+      }
+    }
+  }
+}
