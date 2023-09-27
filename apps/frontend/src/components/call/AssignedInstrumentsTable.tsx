@@ -2,7 +2,6 @@ import MaterialTable, {
   Column,
   EditComponentProps,
 } from '@material-table/core';
-import { GroupWork } from '@mui/icons-material';
 import { Dialog, DialogContent } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
@@ -43,8 +42,6 @@ type AssignedInstrumentsTableProps = {
     updatingCallId: number
   ) => void;
 };
-
-const GroupWorkIcon = (): JSX.Element => <GroupWork />;
 
 const AssignedInstrumentsTable = ({
   call,
@@ -94,6 +91,12 @@ const AssignedInstrumentsTable = ({
       title: 'Description',
       field: 'description',
       editable: 'never',
+    },
+    {
+      title: 'Sep',
+      field: 'sep.code',
+      editable: 'never',
+      emptyValue: '-',
     },
     {
       title: `Availability time (${call.allocationTimeUnit}s)`,
@@ -246,23 +249,11 @@ const AssignedInstrumentsTable = ({
             search: false,
             paging: false,
             headerStyle: { backgroundColor: '#fafafa' },
-            selection: true,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
             },
             debounceInterval: 400,
-            columnsButton: true,
           }}
-          actions={[
-            {
-              icon: GroupWorkIcon,
-              tooltip: 'Assign proposals to ' + t('SEP'),
-              onClick: () => {
-                setOpenAssignment(true);
-              },
-              position: 'toolbarOnSelect',
-            },
-          ]}
           onSelectionChange={(data) =>
             setSelectedInstruments(data as InstrumentWithAvailabilityTime[])
           }

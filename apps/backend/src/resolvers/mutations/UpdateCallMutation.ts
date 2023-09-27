@@ -109,9 +109,18 @@ export class UpdateCallInput {
 }
 
 @InputType()
+export class InstrumentSepMappingInput {
+  @Field(() => Int)
+  instrumentId: number;
+
+  @Field(() => Int, { nullable: true })
+  sepId: number;
+}
+
+@InputType()
 export class AssignInstrumentsToCallInput {
-  @Field(() => [Int])
-  instrumentIds: number[];
+  @Field(() => [InstrumentSepMappingInput])
+  instrumentSepIds: InstrumentSepMappingInput[];
 
   @Field(() => Int)
   callId: number;

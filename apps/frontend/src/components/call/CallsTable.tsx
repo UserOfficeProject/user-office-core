@@ -283,6 +283,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
+          maxWidth="xl"
+          fullWidth
         >
           <AssignInstrumentsToCall
             assignedInstruments={

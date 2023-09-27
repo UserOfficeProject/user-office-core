@@ -1,7 +1,6 @@
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
-  assignInstrumentsToCallValidationSchema,
   removeAssignedInstrumentFromCallValidationSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
@@ -111,7 +110,8 @@ export default class CallMutations {
     }
   }
 
-  @ValidateArgs(assignInstrumentsToCallValidationSchema)
+  // TODO: Need to add validation to duo-validation library
+  // @ValidateArgs(assignInstrumentsToCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignInstrumentsToCall(
     agent: UserWithRole | null,

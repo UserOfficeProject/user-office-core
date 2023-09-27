@@ -310,8 +310,9 @@ export default class PostgresCallDataSource implements CallDataSource {
   async assignInstrumentsToCall(
     args: AssignInstrumentsToCallInput
   ): Promise<Call> {
-    const valuesToInsert = args.instrumentIds.map((instrumentId) => ({
-      instrument_id: instrumentId,
+    const valuesToInsert = args.instrumentSepIds.map((instrumentSep) => ({
+      instrument_id: instrumentSep.instrumentId,
+      sep_id: instrumentSep.sepId,
       call_id: args.callId,
     }));
 
