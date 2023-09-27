@@ -62,7 +62,7 @@
     "jsonwebtoken": "^9.0.0",
     "knex": "^2.4.0",
     "lodash.merge": "^4.6.2",
-    "luxon": "^2.3.1",
+    "luxon": "^2.5.2",
     "magic-bytes.js": "^1.0.7",
     "muhammara": "^3.8.0",
     "multer": "^1.4.4",
