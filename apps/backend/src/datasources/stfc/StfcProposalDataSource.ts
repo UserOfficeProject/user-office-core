@@ -66,7 +66,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .modify((query) => {
         if (filter?.text) {
           query
-            .where('title', 'ilike', `%${filter.text}%`)
+            .where('proposal_table_view.title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
             .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
