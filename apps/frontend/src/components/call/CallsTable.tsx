@@ -135,7 +135,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
         if (callItem.id === assigningInstrumentsCallId) {
           return {
             ...callItem,
-            instruments: [...callItem.instruments, ...instruments],
+            instruments: instruments,
           };
         } else {
           return callItem;
