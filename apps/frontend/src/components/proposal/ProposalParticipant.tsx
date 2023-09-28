@@ -7,7 +7,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import { BasicUserDetails, UserRole } from 'generated/sdk';
-import { BasicUserData } from 'hooks/user/useUserData';
+//import { BasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ProposalParticipant(props: {
-  principalInvestigator: BasicUserData | null | undefined;
+  principalInvestigator: BasicUserDetails | null;
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
   className?: string;
   loadingPrincipalInvestigator?: boolean;
