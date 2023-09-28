@@ -114,4 +114,4 @@ export function getContextKeys(
   return arrayOfKeys;
 }
 
-export const isProduction = () => process.env.NODE_ENV !== 'production';
+export const isProduction = () => process.env.NODE_ENV === 'production';

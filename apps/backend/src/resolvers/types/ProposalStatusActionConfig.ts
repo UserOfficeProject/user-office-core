@@ -5,6 +5,7 @@ export enum EmailStatusActionRecipients {
   CO_PROPOSERS = 'CO_PROPOSERS',
   INSTRUMENT_SCIENTISTS = 'INSTRUMENT_SCIENTISTS',
   SEP_REVIEWERS = 'SEP_REVIEWERS',
+  OTHER = 'OTHER',
 }
 
 export const EmailStatusActionRecipientsWithDescription = new Map<
@@ -20,6 +21,10 @@ export const EmailStatusActionRecipientsWithDescription = new Map<
   [
     EmailStatusActionRecipients.SEP_REVIEWERS,
     'SEP reviewers that are assigned to review the proposal',
+  ],
+  [
+    EmailStatusActionRecipients.OTHER,
+    'Other email recipients manually added by their email',
   ],
 ]);
 
@@ -47,6 +52,9 @@ export class EmailStatusActionRecipientsWithTemplate {
 
   @Field(() => EmailStatusActionEmailTemplate)
   emailTemplate: EmailStatusActionEmailTemplate;
+
+  @Field(() => [String], { nullable: true })
+  otherEmailRecipients: string[];
 }
 
 @ObjectType()
