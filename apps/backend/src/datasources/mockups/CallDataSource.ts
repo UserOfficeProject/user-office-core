@@ -2,10 +2,9 @@ import { AllocationTimeUnits, Call } from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
-  AssignSepToCallInstrumentsInput,
   RemoveAssignedInstrumentFromCallInput,
-  RemoveSepFromCallInstrumentsInput,
   UpdateCallInput,
+  UpdateSepToCallInstrumentInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -157,11 +156,7 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCall;
   }
 
-  async assignSepToCallInstruments(args: AssignSepToCallInstrumentsInput) {
-    return dummyCall;
-  }
-
-  async removeSepFromCallInstruments(args: RemoveSepFromCallInstrumentsInput) {
+  async updateSepToCallInstrument(args: UpdateSepToCallInstrumentInput) {
     return dummyCall;
   }
 

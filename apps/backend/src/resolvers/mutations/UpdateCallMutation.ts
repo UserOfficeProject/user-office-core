@@ -127,15 +127,15 @@ export class AssignInstrumentsToCallInput {
 }
 
 @InputType()
-export class AssignSepToCallInstrumentsInput {
-  @Field(() => [Int])
-  instrumentIds: number[];
+export class UpdateSepToCallInstrumentInput {
+  @Field(() => Int)
+  instrumentId: number[];
 
   @Field(() => Int)
   callId: number;
 
-  @Field(() => Int)
-  sepId: number;
+  @Field(() => Int, { nullable: true })
+  sepId?: number;
 }
 
 @InputType()
@@ -181,26 +181,14 @@ export class UpdateCallMutation {
   }
 
   @Mutation(() => Call)
-  assignSEPToCallInstruments(
-    @Arg('assignSEPToCallInstrumentsInput')
-    assignSEPToCallInstrumentsInput: AssignSepToCallInstrumentsInput,
+  updateSepToCallInstrument(
+    @Arg('updateSepToCallInstrumentInput')
+    updateSepToCallInstrumentInput: UpdateSepToCallInstrumentInput,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.call.assignSepToCallInstruments(
+    return context.mutations.call.updateSepToCallInstrument(
       context.user,
-      assignSEPToCallInstrumentsInput
-    );
-  }
-
-  @Mutation(() => Call)
-  removeSEPFromCallInstruments(
-    @Arg('removeSEPFromCallInstrumentsInput')
-    removeSEPFromCallInstrumentsInput: RemoveSepFromCallInstrumentsInput,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.call.removeSepFromCallInstruments(
-      context.user,
-      removeSEPFromCallInstrumentsInput
+      updateSepToCallInstrumentInput
     );
   }
 
