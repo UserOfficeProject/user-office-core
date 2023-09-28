@@ -1119,4 +1119,110 @@ context('Proposal tests', () => {
         .should('exist');
     });
   });
+
+  describe('Automatic Instrument assignment', () => {
+    const instrumentPickerQuestion = 'Select your Instrument';
+    const instrument = {
+      name: 'Instrument 1',
+      shortCode: 'Instrument 1',
+      description: 'Instrument 1',
+      managerUserId: initialDBData.users.user1.id,
+    };
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+      cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
+      cy.createTemplate({
+        name: 'Proposal Template with Instrument Picker',
+        groupId: TemplateGroupId.PROPOSAL_ESI,
+      });
+      cy.createProposalWorkflow({
+        name: proposalWorkflow.name,
+        description: proposalWorkflow.description,
+      }).then((result) => {
+        if (result.createProposalWorkflow) {
+          createdWorkflowId = result.createProposalWorkflow.id;
+        }
+      });
+      cy.createInstrument(instrument).then((result) => {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentIds: result.createInstrument.id,
+        });
+      });
+      cy.createTopic({
+        templateId: initialDBData.template.id,
+        sortOrder: 1,
+      }).then((topicResult) => {
+        if (topicResult.createTopic) {
+          const topicId =
+            topicResult.createTopic.steps[
+              topicResult.createTopic.steps.length - 1
+            ].topic.id;
+          cy.createQuestion({
+            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+            dataType: DataType.INSTRUMENT_PICKER,
+          }).then((result) => {
+            cy.updateQuestion({
+              id: result.createQuestion.id,
+              question: instrumentPickerQuestion,
+            });
+            cy.createQuestionTemplateRelation({
+              questionId: result.createQuestion.id,
+              templateId: initialDBData.template.id,
+              sortOrder: 0,
+              topicId: topicId,
+            });
+          });
+        }
+      });
+    });
+    it('Instrument should be automatically assigned to the proposal', () => {
+      cy.login('user1');
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.contains('Save and continue').click();
+      cy.get('[role="button"]').first().click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+    });
+  });
 });
