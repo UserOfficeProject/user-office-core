@@ -141,10 +141,6 @@ const AssignedInstrumentsTable = ({
       editable: 'onUpdate',
       emptyValue: '-',
       editComponent: sepSelectionAutoCompleteInput,
-      validate: (rowData: any) => {
-        //TODO: Need to do validation
-        return { isValid: true };
-      },
       render: (rowData: InstrumentWithAvailabilityTime) => {
         return <span>{rowData.sep?.code}</span>;
       },
