@@ -129,7 +129,7 @@ export class AssignInstrumentsToCallInput {
 @InputType()
 export class UpdateSepToCallInstrumentInput {
   @Field(() => Int)
-  instrumentId: number[];
+  instrumentId: number;
 
   @Field(() => Int)
   callId: number;

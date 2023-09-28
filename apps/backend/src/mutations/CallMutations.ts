@@ -129,7 +129,7 @@ export default class CallMutations {
   }
 
   //TODO: Add Validation in duo-validation package
-  // @ValidateArgs(assignInstrumentsToCallValidationSchema)
+  // @ValidateArgs(updateSepToCallInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateSepToCallInstrument(
     agent: UserWithRole | null,
