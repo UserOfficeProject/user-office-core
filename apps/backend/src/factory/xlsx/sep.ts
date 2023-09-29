@@ -19,18 +19,6 @@ type RowObj = {
   inAvailZone?: string | null;
 };
 
-export const defaultSEPDataColumns = [
-  'Proposal Short Code',
-  'Proposal Title',
-  'Principal Investigator',
-  'Instrument available time',
-  'Technical review allocated time',
-  'SEP allocated time',
-  'Average Score',
-  'Current rank',
-  'Is in availability zone',
-];
-
 const sortByRankOrder = (a: RowObj, b: RowObj) => {
   if (a.propSEPRankOrder === b.propSEPRankOrder) {
     return -1;
@@ -202,11 +190,13 @@ export const collectSEPlXLSXData = async (
         propShortCode: proposal?.proposalId,
         propTitle: proposal?.title,
         principalInv: `${firstname} ${lastname}`,
+        instrName: instrument.name,
         instrAvailTime: instrument.availabilityTime,
         techReviewTimeAllocation: technicalReview?.timeAllocation,
         sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
         propReviewAvgScore: proposalAverageScore,
         propSEPRankOrder: sepMeetingDecision?.rankOrder ?? null,
+        feedback: sepMeetingDecision?.commentForUser,
         inAvailZone: null,
       };
     });
