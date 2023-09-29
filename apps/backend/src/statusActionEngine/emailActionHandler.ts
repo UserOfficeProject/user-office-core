@@ -77,7 +77,7 @@ export const emailActionHandler = async (
 
         case EmailStatusActionRecipients.OTHER: {
           const otherRecipients: EmailReadyType[] =
-            recipientWithTemplate.otherEmailRecipients.map((email) => ({
+            recipientWithTemplate.otherRecipientEmails.map((email) => ({
               id: recipientWithTemplate.recipient.name,
               email: email,
               proposals: proposals.map((proposal) => ({

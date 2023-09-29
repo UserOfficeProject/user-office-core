@@ -9,7 +9,7 @@ fragment connectionStatusActionConfig on ProposalStatusActionConfig {
         id
         name
       }
-      otherEmailRecipients
+      otherRecipientEmails
     }
   }
   ... on RabbitMQActionConfig {

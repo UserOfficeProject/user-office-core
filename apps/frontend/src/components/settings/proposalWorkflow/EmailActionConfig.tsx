@@ -6,8 +6,8 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { FieldArray } from 'formik';
-import React, { useState } from 'react';
+import { FieldArray, FieldArrayRenderProps } from 'formik';
+import React, { useState, KeyboardEvent } from 'react';
 
 import {
   EmailActionConfig as EmailActionConfigType,
@@ -41,6 +41,100 @@ const EmailActionConfig = ({
 }: EmailActionConfigProps) => {
   const classes = useStyles();
   const [otherRecipientsValue, setOtherRecipientsValue] = useState('');
+  const [otherRecipientsFieldError, setOtherRecipientsFieldError] = useState<
+    string | null
+  >(null);
+
+  const getRecipientIndexByName = (
+    recipientName: EmailStatusActionRecipients
+  ) =>
+    recipientsWithEmailTemplate.findIndex(
+      (item) => item.recipient?.name === recipientName
+    );
+
+  const isInList = (email: string, list?: string[] | null) => {
+    return list?.includes(email);
+  };
+
+  const isEmail = (email: string) => {
+    return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email);
+  };
+
+  const isValid = (email: string, foundRecipientIndex: number) => {
+    let error = null;
+
+    const otherRecipientEmails =
+      recipientsWithEmailTemplate[foundRecipientIndex]?.otherRecipientEmails;
+
+    if (isInList(email, otherRecipientEmails)) {
+      error = `${email} has already been added.`;
+    }
+
+    if (!isEmail(email)) {
+      error = `${email} is not a valid email address.`;
+    }
+
+    if (error) {
+      // push the error in the form state.
+      setOtherRecipientsFieldError(error);
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+    arrayHelpers: FieldArrayRenderProps
+  ) => {
+    if (['Enter'].includes(event.key)) {
+      event.preventDefault();
+
+      const value = (event.target as HTMLInputElement).value.trim();
+
+      const foundRecipientIndex = getRecipientIndexByName(
+        EmailStatusActionRecipients.OTHER
+      );
+
+      if (
+        foundRecipientIndex !== -1 &&
+        value &&
+        isValid(value, foundRecipientIndex)
+      ) {
+        const existingRecipients =
+          recipientsWithEmailTemplate[foundRecipientIndex]
+            .otherRecipientEmails || [];
+
+        const newOtherRecipients = existingRecipients.concat([value]);
+
+        const newRecipientConfig = {
+          ...recipientsWithEmailTemplate[foundRecipientIndex],
+          otherRecipientEmails: newOtherRecipients,
+        };
+        arrayHelpers.replace(foundRecipientIndex, newRecipientConfig);
+
+        setOtherRecipientsValue('');
+      }
+    }
+  };
+
+  const handleDelete = (item: string, arrayHelpers: FieldArrayRenderProps) => {
+    const foundRecipientIndex = getRecipientIndexByName(
+      EmailStatusActionRecipients.OTHER
+    );
+
+    const recipient = recipientsWithEmailTemplate[foundRecipientIndex];
+
+    const newRecipientConfig = {
+      ...recipient,
+      otherRecipientEmails: recipient.otherRecipientEmails?.filter(
+        (i) => i !== item
+      ),
+    };
+
+    arrayHelpers.replace(foundRecipientIndex, newRecipientConfig);
+  };
 
   return (
     <>
@@ -52,92 +146,7 @@ const EmailActionConfig = ({
         render={(arrayHelpers) =>
           recipients?.map((recipient, index) => {
             const foundRecipientWithEmailTemplateIndex =
-              recipientsWithEmailTemplate.findIndex(
-                (item) => item.recipient?.name === recipient.name
-              );
-
-            const isInList = (email: string) => {
-              return arrayHelpers.form.values.emailStatusActionConfig.recipientsWithEmailTemplate[
-                foundRecipientWithEmailTemplateIndex
-              ]?.otherEmailRecipients?.includes(email);
-            };
-
-            const isEmail = (email: string) => {
-              return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email);
-            };
-
-            const isValid = (email: string) => {
-              let error = null;
-
-              if (isInList(email)) {
-                error = `${email} has already been added.`;
-              }
-
-              if (!isEmail(email)) {
-                error = `${email} is not a valid email address.`;
-              }
-
-              if (error) {
-                // push the error in the form state.
-                arrayHelpers.form.setFieldError('otherEmailRecipients', error);
-
-                return false;
-              }
-
-              return true;
-            };
-
-            const handleKeyDown = (evt: any) => {
-              if (['Enter'].includes(evt.key)) {
-                evt.preventDefault();
-
-                const value = evt.target.value.trim();
-
-                if (value && isValid(value)) {
-                  const existingValues =
-                    recipientsWithEmailTemplate[
-                      foundRecipientWithEmailTemplateIndex
-                    ].otherEmailRecipients;
-
-                  const newOtherRecipients = existingValues
-                    ? [...existingValues, value]
-                    : [value];
-
-                  const newRecipientConfig = {
-                    ...recipientsWithEmailTemplate[
-                      foundRecipientWithEmailTemplateIndex
-                    ],
-                    otherEmailRecipients: newOtherRecipients,
-                  };
-                  arrayHelpers.replace(
-                    foundRecipientWithEmailTemplateIndex,
-                    newRecipientConfig
-                  );
-
-                  setOtherRecipientsValue('');
-                }
-              }
-            };
-
-            const handleDelete = (item: string) => {
-              const existingValues =
-                recipientsWithEmailTemplate[
-                  foundRecipientWithEmailTemplateIndex
-                ];
-
-              const newRecipientConfig = {
-                ...existingValues,
-                otherEmailRecipients:
-                  existingValues.otherEmailRecipients?.filter(
-                    (i) => i !== item
-                  ),
-              };
-
-              arrayHelpers.replace(
-                foundRecipientWithEmailTemplateIndex,
-                newRecipientConfig
-              );
-            };
+              getRecipientIndexByName(recipient.name);
 
             return (
               <Grid key={index} container paddingX={1}>
@@ -221,47 +230,39 @@ const EmailActionConfig = ({
                             label="Other email recipients"
                             placeholder="Type or paste email address and press `Enter`..."
                             data-cy="other-email-recipients"
-                            onKeyDown={handleKeyDown}
+                            onKeyDown={(e) => handleKeyDown(e, arrayHelpers)}
                             onChange={(e) => {
-                              if (
-                                arrayHelpers.form.errors.otherEmailRecipients
-                              ) {
-                                arrayHelpers.form.setFieldError(
-                                  'otherEmailRecipients',
-                                  ''
-                                );
+                              if (otherRecipientsFieldError) {
+                                setOtherRecipientsFieldError(null);
                               }
                               setOtherRecipientsValue(e.target.value);
                             }}
                             value={otherRecipientsValue}
                             fullWidth
-                            error={
-                              !!arrayHelpers.form.errors.otherEmailRecipients
-                            }
-                            helperText={
-                              arrayHelpers.form.errors.otherEmailRecipients
-                            }
+                            error={!!otherRecipientsFieldError}
+                            helperText={otherRecipientsFieldError}
                             required={
-                              !arrayHelpers.form.values.emailStatusActionConfig
-                                .recipientsWithEmailTemplate[
+                              !recipientsWithEmailTemplate[
                                 foundRecipientWithEmailTemplateIndex
-                              ]?.otherEmailRecipients.length
+                              ]?.otherRecipientEmails?.length
                             }
                           />
-                          <>
-                            {arrayHelpers.form.values.emailStatusActionConfig.recipientsWithEmailTemplate[
+                          <div data-cy="added-email-recipients">
+                            {recipientsWithEmailTemplate[
                               foundRecipientWithEmailTemplateIndex
-                            ]?.otherEmailRecipients?.map(
+                            ]?.otherRecipientEmails?.map(
                               (item: string, index: number) => (
                                 <Chip
                                   key={index}
                                   label={item}
-                                  onDelete={() => handleDelete(item)}
+                                  onDelete={() =>
+                                    handleDelete(item, arrayHelpers)
+                                  }
                                   sx={{ marginBottom: 1, marginRight: 1 }}
                                 />
                               )
                             )}
-                          </>
+                          </div>
                         </>
                       )}
                     </>
