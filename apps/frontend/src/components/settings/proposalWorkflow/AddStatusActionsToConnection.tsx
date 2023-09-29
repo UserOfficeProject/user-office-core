@@ -20,10 +20,12 @@ import {
   EmailActionDefaultConfig,
   ProposalStatusAction,
   ProposalStatusActionType,
+  RabbitMqActionDefaultConfig,
 } from 'generated/sdk';
 import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
 
 import EmailActionConfig from './EmailActionConfig';
+import RabbitMQActionConfig from './RabbitMQActionConfig';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -107,7 +109,7 @@ const AddStatusActionsToConnection = ({
     values: typeof initialValues
   ) => {
     switch (statusAction.type) {
-      case 'EMAIL':
+      case ProposalStatusActionType.EMAIL: {
         return (
           <EmailActionConfig
             emailStatusActionConfig={values.emailStatusActionConfig}
@@ -132,7 +134,18 @@ const AddStatusActionsToConnection = ({
             }
           />
         );
+      }
 
+      case ProposalStatusActionType.RABBITMQ: {
+        return (
+          <RabbitMQActionConfig
+            exchanges={
+              (statusAction.defaultConfig as RabbitMqActionDefaultConfig)
+                .exchanges
+            }
+          />
+        );
+      }
       default:
         return <>Not configured</>;
     }
@@ -158,7 +171,8 @@ const AddStatusActionsToConnection = ({
             }
             case ProposalStatusActionType.RABBITMQ: {
               const rabbitMQStatusActionConfig = {
-                exchanges: [],
+                exchanges: (action.defaultConfig as RabbitMqActionDefaultConfig)
+                  .exchanges,
               };
 
               return {

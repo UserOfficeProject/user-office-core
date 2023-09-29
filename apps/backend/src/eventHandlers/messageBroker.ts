@@ -22,7 +22,7 @@ import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
-const EXCHANGE_NAME =
+export const EXCHANGE_NAME =
   process.env.CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
 
 type Member = {
@@ -53,7 +53,7 @@ type ProposalMessageData = {
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
 
-const getRabbitMQMessageBroker = async () => {
+export const getRabbitMQMessageBroker = async () => {
   if (rabbitMQCachedBroker === null) {
     rabbitMQCachedBroker = await createRabbitMQMessageBroker();
   }
@@ -93,7 +93,7 @@ export function createListenToQueueHandler() {
   );
 }
 
-const getProposalMessageData = async (proposal: Proposal) => {
+export const getProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -211,31 +211,6 @@ export async function createPostToRabbitMQHandler() {
     }
 
     switch (event.type) {
-      case Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW:
-      case Event.PROPOSAL_STATUS_CHANGED_BY_USER: {
-        const proposal = event.proposal;
-        const proposalStatus =
-          await proposalSettingsDataSource.getProposalStatus(proposal.statusId);
-
-        if (!proposalStatus) {
-          logger.logError(`Unknown proposalStatus '${proposal.statusId}'`, {
-            proposal,
-          });
-
-          return;
-        }
-
-        const jsonMessage = await getProposalMessageData(event.proposal);
-
-        rabbitMQ.sendMessageToExchange(EXCHANGE_NAME, event.type, jsonMessage);
-
-        logger.logDebug(
-          'Proposal event successfully sent to the message broker',
-          { eventType: event.type, fullProposalMessage: jsonMessage }
-        );
-
-        break;
-      }
       case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED: {
         switch (event.proposal.finalStatus) {
           case ProposalEndStatus.ACCEPTED:
@@ -373,31 +348,9 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    const updatedProposals =
-      await markProposalsEventAsDoneAndCallWorkflowEngine(eventType, [
-        proposalPk,
-      ]);
-
-    if (updatedProposals) {
-      for (const updatedProposal of updatedProposals) {
-        if (!updatedProposal) {
-          return;
-        }
-
-        const fullProposalMessage = await getProposalMessageData(
-          updatedProposal
-        );
-
-        /**
-         * NOTE: After running the workflow engine, we send the message to the exchange
-         */
-        rabbitMQ.sendMessageToExchange(
-          EXCHANGE_NAME,
-          Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-          fullProposalMessage
-        );
-      }
-    }
+    await markProposalsEventAsDoneAndCallWorkflowEngine(eventType, [
+      proposalPk,
+    ]);
   };
 
   rabbitMQ.listenOn(EVENT_SCHEDULING_QUEUE_NAME, async (type, message) => {
