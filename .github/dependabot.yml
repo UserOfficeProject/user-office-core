@@ -12,3 +12,4 @@ updates:
       separator: '-'
     versioning-strategy: increase-if-necessary
     open-pull-requests-limit: 10
+    rebase-strategy: auto
