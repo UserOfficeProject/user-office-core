@@ -28,16 +28,16 @@ export const rabbitMQActionHandler = async (
           // NOTE: For now we only sent to the default exchange
           rabbitMQ.sendMessageToExchange(
             exchange,
-            Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+            Event.PROPOSAL_STATUS_ACTION_EXECUTED,
             jsonMessage
           );
 
           logger.logDebug(
             'Proposal event successfully sent to the message broker',
             {
-              eventType: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-              fullProposalMessage: jsonMessage,
               exchange,
+              eventType: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
+              fullProposalMessage: jsonMessage,
             }
           );
         })

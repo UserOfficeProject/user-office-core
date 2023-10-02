@@ -1,6 +1,6 @@
 import { Call } from '../models/Call';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalPks } from '../models/Proposal';
+import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
@@ -129,11 +129,6 @@ interface ProposalSEPSelectedEvent extends GeneralEvent {
   proposalpks: ProposalPks;
 }
 
-interface ProposalStatusUpdatedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_STATUS_UPDATED;
-  proposalpks: ProposalPks;
-}
-
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
   instrumenthasproposals: InstrumentHasProposals;
@@ -151,7 +146,7 @@ interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
 
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
-  proposal: Proposal;
+  proposals: Proposals;
 }
 
 interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
@@ -316,7 +311,6 @@ export type ApplicationEvent =
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
-  | ProposalStatusUpdatedEvent
   | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent

@@ -171,8 +171,12 @@ const AddStatusActionsToConnection = ({
             }
             case ProposalStatusActionType.RABBITMQ: {
               const rabbitMQStatusActionConfig = {
-                exchanges: (action.defaultConfig as RabbitMqActionDefaultConfig)
-                  .exchanges,
+                exchanges:
+                  (
+                    statusActions.find(
+                      (statusAction) => statusAction.id === action.id
+                    )?.defaultConfig as RabbitMqActionDefaultConfig
+                  ).exchanges || [],
               };
 
               return {

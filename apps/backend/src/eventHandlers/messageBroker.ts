@@ -18,7 +18,7 @@ import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
 import { Instrument } from '../models/Instrument';
-import { Proposal, ProposalEndStatus } from '../models/Proposal';
+import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
@@ -194,11 +194,6 @@ const getSecondsPerAllocationTimeUnit = (
 export async function createPostToRabbitMQHandler() {
   const rabbitMQ = await getRabbitMQMessageBroker();
 
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
-
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
@@ -211,38 +206,11 @@ export async function createPostToRabbitMQHandler() {
     }
 
     switch (event.type) {
-      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED: {
-        switch (event.proposal.finalStatus) {
-          case ProposalEndStatus.ACCEPTED:
-            const jsonMessage = await getProposalMessageData(event.proposal);
-
-            await rabbitMQ.sendMessageToExchange(
-              EXCHANGE_NAME,
-              Event.PROPOSAL_ACCEPTED,
-              jsonMessage
-            );
-            break;
-          default:
-            break;
-        }
-        break;
-      }
-
-      case Event.PROPOSAL_UPDATED:
-      case Event.PROPOSAL_DELETED:
       case Event.PROPOSAL_CREATED:
-      case Event.PROPOSAL_SUBMITTED: {
+      case Event.PROPOSAL_UPDATED:
+      case Event.PROPOSAL_SUBMITTED:
+      case Event.PROPOSAL_DELETED: {
         const jsonMessage = await getProposalMessageData(event.proposal);
-
-        await rabbitMQ.sendMessageToExchange(
-          EXCHANGE_NAME,
-          event.type,
-          jsonMessage
-        );
-        break;
-      }
-      case Event.PROPOSAL_INSTRUMENT_SELECTED: {
-        const jsonMessage = JSON.stringify(event.instrumenthasproposals);
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,

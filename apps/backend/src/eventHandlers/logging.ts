@@ -61,13 +61,22 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_SEP_SELECTED:
-        case Event.PROPOSAL_STATUS_UPDATED:
           event.proposalpks.proposalPks.forEach(async (proposalPk) => {
             await eventLogsDataSource.set(
               event.loggedInUserId,
               event.type,
               json,
               proposalPk.toString()
+            );
+          });
+          break;
+        case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
+          event.proposals.proposals.forEach(async (proposal) => {
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              proposal.primaryKey.toString()
             );
           });
           break;

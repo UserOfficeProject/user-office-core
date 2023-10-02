@@ -5,7 +5,7 @@ import { Knex } from 'knex';
 import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
-import { Proposal, ProposalPks } from '../../models/Proposal';
+import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
@@ -868,7 +868,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async changeProposalsStatus(
     statusId: number,
     proposalPks: number[]
-  ): Promise<ProposalPks> {
+  ): Promise<Proposals> {
     const dataToUpdate: { status_id: number; submitted?: boolean } = {
       status_id: statusId,
     };
@@ -889,7 +889,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new GraphQLError('Could not change proposals status');
     }
 
-    return new ProposalPks(result.map((item) => item.proposal_pk));
+    return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
   async getProposalBookingByProposalPk(

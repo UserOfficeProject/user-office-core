@@ -26,7 +26,6 @@ export enum Event {
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
   PROPOSAL_RESERVED = 'PROPOSAL_RESERVED',
   PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
-  PROPOSAL_STATUS_UPDATED = 'PROPOSAL_STATUS_UPDATED',
   CALL_CREATED = 'CALL_CREATED',
   CALL_ENDED = 'CALL_ENDED',
   CALL_ENDED_INTERNAL = 'CALL_ENDED_INTERNAL',
@@ -48,6 +47,7 @@ export enum Event {
   SEP_REVIEWER_NOTIFIED = 'SEP_REVIEWER_NOTIFIED',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
+  PROPOSAL_STATUS_ACTION_EXECUTED = 'PROPOSAL_STATUS_ACTION_EXECUTED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
   TOPIC_ANSWERED = 'TOPIC_ANSWERED',
@@ -157,10 +157,6 @@ export const EventLabel = new Map<Event, string>([
   [Event.PROPOSAL_REJECTED, 'Event occurs when proposal gets rejected'],
   [Event.PROPOSAL_RESERVED, 'Event occurs when proposal gets reserved'],
   [
-    Event.PROPOSAL_STATUS_UPDATED,
-    'Event occurs when proposal status gets updated manually',
-  ],
-  [
     Event.CALL_ENDED,
     'Event occurs on a specific call end date set on the call',
   ],
@@ -211,6 +207,10 @@ export const EventLabel = new Map<Event, string>([
   ],
   [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
   [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
+  [
+    Event.PROPOSAL_STATUS_ACTION_EXECUTED,
+    'Event occurs when the proposal status action is being executed in the status engine',
+  ],
   [
     Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
     'Event occurs when the proposal status was changed by the workflow engine',
