@@ -36,6 +36,7 @@ import { DeleteProposalWorkflowStatusInput } from '../resolvers/mutations/settin
 import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings/MoveProposalWorkflowStatusMutation';
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
+import { EmailStatusActionRecipients } from '../resolvers/types/ProposalStatusActionConfig';
 import { omit } from '../utils/helperFunctions';
 
 @injectable()
@@ -646,10 +647,14 @@ export default class ProposalSettingsMutations {
   }
 
   @ValidateArgs(
-    addStatusActionsToConnectionValidationSchema<ProposalStatusActionType>(
+    addStatusActionsToConnectionValidationSchema<
+      ProposalStatusActionType,
+      EmailStatusActionRecipients
+    >(
       ProposalStatusActionType.EMAIL,
       ProposalStatusActionType.RABBITMQ,
-      Object.values(ProposalStatusActionType)
+      Object.values(ProposalStatusActionType),
+      EmailStatusActionRecipients.OTHER
     )
   )
   @Authorized([Roles.USER_OFFICER])
