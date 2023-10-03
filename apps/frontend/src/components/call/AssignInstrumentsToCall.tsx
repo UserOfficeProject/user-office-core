@@ -85,7 +85,6 @@ const AssignInstrumentsToCall = ({
                 });
               }
             }}
-            // value={sep ?? undefined}
           />
         );
       },
