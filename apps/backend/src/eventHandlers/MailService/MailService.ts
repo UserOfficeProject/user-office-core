@@ -6,7 +6,7 @@ export abstract class MailService {
   abstract sendMail(options: EmailSettings): ResultsPromise<SendMailResults>;
   abstract getEmailTemplates(
     includeDraft?: boolean
-  ): ResultsPromise<SparkPostTemplate[]>;
+  ): ResultsPromise<(SparkPostTemplate | STFCEmailTemplate)[]>;
 }
 
 export type SparkPostTemplate = {
@@ -19,6 +19,13 @@ export type SparkPostTemplate = {
   shared_with_subaccounts: boolean;
   has_published: boolean;
   last_update_time: string;
+};
+
+// TODO: This might need some attention from STFC and return the templates used in their email sending service.
+export type STFCEmailTemplate = {
+  id: string;
+  name: string;
+  description: string;
 };
 
 export type SendMailResults = {
