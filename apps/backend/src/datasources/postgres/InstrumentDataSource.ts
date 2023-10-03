@@ -273,22 +273,39 @@ export default class PostgresInstrumentDataSource
           });
 
         const callHasInstruments = await database('call_has_instruments')
-          .where('call_id', proposals[0].callId)
-          .andWhere('instrument_id', instrumentId)
-          .first()
-          .then((callHasInstrument: CallHasInstrumentRecord) => {
-            return {
-              sepId: callHasInstrument.sep_id,
-            };
+          .where('instrument_id', instrumentId)
+          .then((callHasInstrument: CallHasInstrumentRecord[]) => {
+            return callHasInstrument.map((callHasInstrument) => {
+              return {
+                callId: callHasInstrument.call_id,
+                instrumentId: callHasInstrument.instrument_id,
+                sepId: callHasInstrument.sep_id,
+              };
+            });
           });
 
-        this.sepDataSource.assignProposalsToSep({
-          proposals: proposals.map((proposal) => ({
-            ...proposal,
-            callId: proposals[0].callId,
-          })),
-          sepId: callHasInstruments.sepId,
-        });
+        // Seggregate Calls
+        const callIds = [
+          ...new Set(proposals.map((proposal) => proposal.callId)),
+        ];
+
+        // Assign Proposals
+        for (const callId of callIds) {
+          const callHasInstrument = callHasInstruments.find(
+            (callHasInstrument) => callHasInstrument.callId === callId
+          );
+          if (callHasInstrument && callHasInstrument.sepId) {
+            this.sepDataSource.assignProposalsToSep({
+              proposals: proposals
+                .filter((proposal) => proposal.callId === callId)
+                .map((proposal) => ({
+                  ...proposal,
+                  callId: callId,
+                })),
+              sepId: callHasInstrument.sepId,
+            });
+          }
+        }
 
         return await trx.commit(result);
       } catch (error) {
