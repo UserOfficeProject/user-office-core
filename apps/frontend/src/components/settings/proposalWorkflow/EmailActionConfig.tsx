@@ -124,7 +124,7 @@ const EmailActionConfig = ({
                           foundRecipientWithEmailTemplateIndex
                         ].emailTemplate || null
                       }
-                      data-cy="value"
+                      data-cy={`${recipient.name}-email-template`}
                     />
                   )}
                 </Grid>

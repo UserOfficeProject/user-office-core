@@ -633,7 +633,7 @@ context('Settings tests', () => {
 
       cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
 
-      cy.get('[data-cy="status-changing-events-modal"]').should('exist');
+      cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
 
       cy.contains('PROPOSAL_SUBMITTED').click();
 
@@ -648,7 +648,7 @@ context('Settings tests', () => {
 
       cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
 
-      cy.get('[data-cy="status-changing-events-modal"]').should('exist');
+      cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
 
       cy.contains('PROPOSAL_FEASIBLE').click();
 
