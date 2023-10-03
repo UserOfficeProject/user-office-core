@@ -10,7 +10,8 @@ type RabbitMQActionConfigProps = {
 const RabbitMQActionConfig = ({ exchanges }: RabbitMQActionConfigProps) => {
   return (
     <Typography variant="subtitle1" color="black">
-      Messages are sent to following RabbitMQ exchanges:{' '}
+      Messages with <i>proposal data</i> are sent to following RabbitMQ
+      exchanges:{' '}
       <ul style={{ margin: 0 }}>
         {exchanges?.map((exchange, index) => (
           <li key={index}>

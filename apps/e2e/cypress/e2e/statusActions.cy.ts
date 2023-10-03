@@ -367,5 +367,87 @@ context('Status actions tests', () => {
       validEmail
     );
   });
+
+  it('User Officer should be able to add multiple actions per status', () => {
+    const statusActionConfig = {
+      recipientsWithEmailTemplate: [
+        {
+          recipient: {
+            name: EmailStatusActionRecipients.OTHER,
+            description: 'Other email recipients manually added by their email',
+          },
+          emailTemplate: { id: 'my-first-email', name: 'My First Email' },
+          otherRecipientEmails: [faker.internet.email()],
+        },
+      ],
+    };
+
+    cy.addProposalWorkflowStatus({
+      droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
+      proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+      sortOrder: 1,
+      prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+    }).then((result) => {
+      cy.addConnectionStatusActions({
+        actions: [
+          {
+            actionId: 1,
+            actionType: ProposalStatusActionType.EMAIL,
+            config: JSON.stringify(statusActionConfig),
+          },
+        ],
+        connectionId: result.addProposalWorkflowStatus.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+      });
+    });
+
+    cy.login('officer');
+    cy.visit('/ProposalWorkflowEditor/1');
+
+    cy.finishedLoading();
+
+    cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+    cy.get('[data-cy="status-events-and-actions-modal"]')
+      .contains('Status actions')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
+
+    cy.get('[data-cy="RABBITMQ-status-action"] input').should('not.be.checked');
+    cy.get('[data-cy="RABBITMQ-status-action"] input').check();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.notification({ variant: 'success', text: 'success' });
+
+    cy.closeModal();
+
+    cy.get(
+      `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+    ).should('exist');
+    cy.get(
+      `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+    ).realHover();
+
+    cy.get('[role="tooltip"]').contains(
+      'Status actions: Email action,RabbitMQ action'
+    );
+
+    cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+    cy.get('[data-cy="status-events-and-actions-modal"]')
+      .contains('Status actions')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
+
+    cy.get('[data-cy="RABBITMQ-status-action"] input').should('be.checked');
+  });
   // TODO: Try to find a way to test the actual run of the status actions.
 });
