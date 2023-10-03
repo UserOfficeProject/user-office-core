@@ -11,5 +11,4 @@ updates:
       # for example, `dependabot-npm_and_yarn-next_js-acorn-6.4.1`
       separator: '-'
     versioning-strategy: increase-if-necessary
-    open-pull-requests-limit: 10
-    rebase-strategy: auto
+    open-pull-requests-limit: 2
