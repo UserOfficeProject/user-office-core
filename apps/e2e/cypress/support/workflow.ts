@@ -1,4 +1,6 @@
 import {
+  AddConnectionStatusActionsMutation,
+  AddConnectionStatusActionsMutationVariables,
   AddProposalWorkflowStatusMutation,
   AddProposalWorkflowStatusMutationVariables,
   AddStatusChangingEventsToConnectionMutation,
@@ -49,6 +51,17 @@ const addStatusChangingEventsToConnection = (
   return cy.wrap(request);
 };
 
+const addConnectionStatusActions = (
+  addStatusActionToConnectionInput: AddConnectionStatusActionsMutationVariables
+): Cypress.Chainable<AddConnectionStatusActionsMutation> => {
+  const api = getE2EApi();
+  const request = api.addConnectionStatusActions(
+    addStatusActionToConnectionInput
+  );
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createProposalWorkflow', createProposalWorkflow);
 Cypress.Commands.add('createProposalStatus', createProposalStatus);
 Cypress.Commands.add('addProposalWorkflowStatus', addProposalWorkflowStatus);
@@ -56,3 +69,4 @@ Cypress.Commands.add(
   'addStatusChangingEventsToConnection',
   addStatusChangingEventsToConnection
 );
+Cypress.Commands.add('addConnectionStatusActions', addConnectionStatusActions);
