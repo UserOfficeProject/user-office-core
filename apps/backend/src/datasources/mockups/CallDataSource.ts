@@ -1,4 +1,8 @@
-import { AllocationTimeUnits, Call } from '../../models/Call';
+import {
+  AllocationTimeUnits,
+  Call,
+  CallHasInstrument,
+} from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -138,6 +142,12 @@ export class CallDataSourceMock implements CallDataSource {
     }
 
     return dummyCalls;
+  }
+
+  async getCallHasInstrumentsByInstrumentId(
+    instrumentId: number
+  ): Promise<CallHasInstrument[]> {
+    throw new Error('Method not implemented.');
   }
 
   async create(args: CreateCallInput) {

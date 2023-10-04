@@ -33,6 +33,16 @@ export class Call {
   ) {}
 }
 
+export class CallHasInstrument {
+  constructor(
+    public callId: number,
+    public instrumentId: number,
+    public availabilityTime: number,
+    public submitted: boolean,
+    public sepId: number
+  ) {}
+}
+
 export enum AllocationTimeUnits {
   Day = 'day',
   Hour = 'hour',

@@ -1,4 +1,4 @@
-import { Call } from '../models/Call';
+import { Call, CallHasInstrument } from '../models/Call';
 import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
 import {
   UpdateCallInput,
@@ -11,6 +11,9 @@ import { CallsFilter } from './../resolvers/queries/CallsQuery';
 export interface CallDataSource {
   getCall(id: number): Promise<Call | null>;
   getCalls(filter?: CallsFilter): Promise<Call[]>;
+  getCallHasInstrumentsByInstrumentId(
+    instrumentId: number
+  ): Promise<CallHasInstrument[]>;
   create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
   delete(id: number): Promise<Call>;
