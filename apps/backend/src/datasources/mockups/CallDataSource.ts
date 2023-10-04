@@ -4,6 +4,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
+  UpdateSepToCallInstrumentInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -152,6 +153,10 @@ export class CallDataSourceMock implements CallDataSource {
   }
 
   async assignInstrumentsToCall(args: AssignInstrumentsToCallInput) {
+    return dummyCall;
+  }
+
+  async updateSepToCallInstrument(args: UpdateSepToCallInstrumentInput) {
     return dummyCall;
   }
 

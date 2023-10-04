@@ -27,6 +27,11 @@ fragment call on Call {
     description
     availabilityTime
     submitted
+    sepId
+    sep {
+      id
+      code
+    }
     scientists {
       ...basicUserDetails
     }

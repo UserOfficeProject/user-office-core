@@ -459,6 +459,13 @@ export interface InstrumentHasProposalsRecord {
   readonly submitted: boolean;
 }
 
+export interface CallHasInstrumentRecord {
+  readonly call_id: number;
+  readonly instrument_id: number;
+  availability_time: number;
+  submitted: boolean;
+  sep_id: number;
+}
 export interface InstrumentWithAvailabilityTimeRecord {
   readonly instrument_id: number;
   readonly name: string;
@@ -469,6 +476,7 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;
+  readonly sep_id: number;
 }
 
 export interface TemplateCategoryRecord {

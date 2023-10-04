@@ -243,32 +243,6 @@ context('SEP reviews tests', () => {
       );
       cy.get('[data-cy="sep-selection"]').click();
 
-      // NOTE: Check first for empty list because call has no SEPs assigned.
-      cy.get('[role="presentation"] .MuiAutocomplete-noOptions').contains(
-        'No SEPs'
-      );
-
-      // NOTE: Assign SEP to a call.
-      cy.updateCall({
-        id: initialDBData.call.id,
-        ...updatedCall,
-        proposalWorkflowId: createdWorkflowId,
-        esiTemplateId: createdEsiTemplateId,
-        seps: [createdSepId],
-      });
-
-      cy.reload();
-
-      cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
-
-      cy.get("[aria-label='Assign proposals to SEP']").first().click();
-
-      cy.get('[data-cy="sep-selection"] input').should(
-        'not.have.class',
-        'Mui-disabled'
-      );
-      cy.get('[data-cy="sep-selection"]').click();
-
       cy.get('[data-cy="sep-selection-options"]').contains(sep1.code).click();
 
       cy.get('[data-cy="submit"]').click();
@@ -1001,7 +975,7 @@ context('SEP meeting components tests', () => {
 
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentIds: [createdInstrumentId],
+          instrumentSepIds: [{ instrumentId: createdInstrumentId }],
         });
         cy.assignProposalsToInstrument({
           instrumentId: createdInstrumentId,
@@ -1092,7 +1066,7 @@ context('SEP meeting components tests', () => {
         if (createdInstrument2Id) {
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentIds: [createdInstrument2Id],
+            instrumentSepIds: [{ instrumentId: createdInstrument2Id }],
           });
 
           cy.createProposal({ callId: initialDBData.call.id }).then(

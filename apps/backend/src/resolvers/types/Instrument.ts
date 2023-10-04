@@ -13,6 +13,7 @@ import { ResolverContext } from '../../context';
 import { Instrument as InstrumentOrigin } from '../../models/Instrument';
 import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
+import { SEP } from './SEP';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -40,6 +41,22 @@ export class InstrumentWithAvailabilityTime extends Instrument {
 
   @Field(() => Boolean, { defaultValue: false })
   public submitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public sepId: number;
+}
+
+@Resolver(() => InstrumentWithAvailabilityTime)
+export class InstrumentWithAvailabilityTimeResolver {
+  @FieldResolver(() => SEP, { nullable: true })
+  async sep(
+    @Root() instrument: InstrumentWithAvailabilityTime,
+    @Ctx() context: ResolverContext
+  ): Promise<SEP | null> {
+    return (await instrument.sepId)
+      ? context.queries.sep.dataSource.getSEP(instrument.sepId)
+      : null;
+  }
 }
 
 @Resolver(() => Instrument)
