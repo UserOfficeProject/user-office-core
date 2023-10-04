@@ -1,10 +1,13 @@
-mutation assignInstrumentsToCall($instrumentIds: [Int!]!, $callId: Int!) {
+mutation assignInstrumentsToCall(
+  $instrumentSepIds: [InstrumentSepMappingInput!]!
+  $callId: Int!
+) {
   assignInstrumentsToCall(
     assignInstrumentsToCallInput: {
-      instrumentIds: $instrumentIds
+      instrumentSepIds: $instrumentSepIds
       callId: $callId
     }
   ) {
-    id
+    ...call
   }
 }

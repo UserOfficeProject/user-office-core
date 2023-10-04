@@ -8,6 +8,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
+  UpdateSepToCallInstrumentInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -308,12 +309,31 @@ export default class PostgresCallDataSource implements CallDataSource {
   async assignInstrumentsToCall(
     args: AssignInstrumentsToCallInput
   ): Promise<Call> {
-    const valuesToInsert = args.instrumentIds.map((instrumentId) => ({
-      instrument_id: instrumentId,
+    const valuesToInsert = args.instrumentSepIds.map((instrumentSep) => ({
+      instrument_id: instrumentSep.instrumentId,
+      sep_id: instrumentSep.sepId,
       call_id: args.callId,
     }));
 
     await database.insert(valuesToInsert).into('call_has_instruments');
+
+    const callUpdated = await this.getCall(args.callId);
+
+    if (callUpdated) {
+      return callUpdated;
+    }
+
+    throw new GraphQLError(`Call not found ${args.callId}`);
+  }
+
+  async updateSepToCallInstrument(
+    args: UpdateSepToCallInstrumentInput
+  ): Promise<Call> {
+    await database
+      .update({ sep_id: args.sepId ?? null })
+      .into('call_has_instruments')
+      .where('instrument_id', args.instrumentId)
+      .andWhere('call_id', args.callId);
 
     const callUpdated = await this.getCall(args.callId);
 

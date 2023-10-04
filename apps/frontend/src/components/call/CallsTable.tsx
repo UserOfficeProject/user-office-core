@@ -128,20 +128,20 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   ];
 
   const assignInstrumentsToCall = (
+    callId: number,
     instruments: InstrumentWithAvailabilityTime[]
   ) => {
     if (calls) {
       const callsWithInstruments = calls.map((callItem) => {
-        if (callItem.id === assigningInstrumentsCallId) {
+        if (callItem.id === callId) {
           return {
             ...callItem,
-            instruments: [...callItem.instruments, ...instruments],
+            instruments: instruments,
           };
         } else {
           return callItem;
         }
       });
-
       setCalls(callsWithInstruments);
       setAssigningInstrumentsCallId(null);
     }
@@ -240,6 +240,9 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       return (
         <AssignedInstrumentsTable
           call={rowData}
+          assignInstrumentsToCall={(
+            instruments: InstrumentWithAvailabilityTime[]
+          ) => assignInstrumentsToCall(rowData.id, instruments)}
           removeAssignedInstrumentFromCall={removeAssignedInstrumentFromCall}
           setInstrumentAvailabilityTime={setInstrumentAvailabilityTime}
         />
@@ -283,6 +286,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
+          maxWidth="xl"
+          fullWidth
         >
           <AssignInstrumentsToCall
             assignedInstruments={
@@ -291,7 +296,9 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             callId={assigningInstrumentsCallId}
             assignInstrumentsToCall={(
               instruments: InstrumentWithAvailabilityTime[]
-            ) => assignInstrumentsToCall(instruments)}
+            ) =>
+              assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
+            }
           />
         </InputDialog>
       )}
