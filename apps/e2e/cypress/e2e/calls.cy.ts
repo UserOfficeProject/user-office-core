@@ -838,7 +838,7 @@ context('Calls tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[data-cy="availability-time"]').type('10');
+      cy.get('[data-cy="availability-time"] input').type('10');
 
       cy.contains(instrumentAssignedToCall.shortCode)
         .parent()
