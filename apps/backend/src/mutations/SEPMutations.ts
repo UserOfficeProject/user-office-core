@@ -34,6 +34,7 @@ import {
 } from '../resolvers/mutations/AssignMembersToSepMutation';
 import {
   AssignProposalsToSepArgs,
+  AssignProposalsToSepUsingCallInstrumentArgs,
   RemoveProposalsFromSepArgs,
 } from '../resolvers/mutations/AssignProposalsToSepMutation';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
@@ -233,6 +234,12 @@ export default class SEPMutations {
         );
       });
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async assignProposalsToSEPUsingCallInstrument(
+    agent: UserWithRole | null,
+    args: AssignProposalsToSepUsingCallInstrumentArgs
+  ): Promise<ProposalPks | Rejection> {}
 
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.PROPOSAL_SEP_SELECTED)

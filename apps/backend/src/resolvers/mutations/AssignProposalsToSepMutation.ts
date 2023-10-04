@@ -22,6 +22,14 @@ export class AssignProposalsToSepArgs {
   public sepId: number;
 }
 
+export class AssignProposalsToSepUsingCallInstrumentArgs {
+  @Field(() => [Int])
+  public proposalPks: number[];
+
+  @Field(() => Int)
+  public instrumentId: number;
+}
+
 @ArgsType()
 export class RemoveProposalsFromSepArgs {
   @Field(() => [Int])
