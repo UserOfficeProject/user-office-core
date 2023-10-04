@@ -781,7 +781,7 @@ context('Calls tests', () => {
       const MAX_32_BIT_INTEGER = Math.pow(2, 31);
       cy.assignInstrumentToCall({
         callId: createdCallId,
-        instrumentIds: [createdInstrumentId],
+        instrumentSepIds: [{ instrumentId: createdInstrumentId }],
       });
 
       cy.contains('Calls').click();
@@ -822,7 +822,7 @@ context('Calls tests', () => {
     it('A user-officer should be able to set availability time on instrument per call', () => {
       cy.assignInstrumentToCall({
         callId: createdCallId,
-        instrumentIds: [createdInstrumentId],
+        instrumentSepIds: [{ instrumentId: createdInstrumentId }],
       });
 
       cy.contains('Calls').click();
@@ -862,7 +862,7 @@ context('Calls tests', () => {
     it('A user-officer should be able to remove instrument from a call', () => {
       cy.assignInstrumentToCall({
         callId: createdCallId,
-        instrumentIds: [createdInstrumentId],
+        instrumentSepIds: [{ instrumentId: createdInstrumentId }],
       });
       cy.contains('Calls').click();
 

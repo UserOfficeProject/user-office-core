@@ -1001,7 +1001,7 @@ context('SEP meeting components tests', () => {
 
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentIds: [createdInstrumentId],
+          instrumentSepIds: [{ instrumentId: createdInstrumentId }],
         });
         cy.assignProposalsToInstrument({
           instrumentId: createdInstrumentId,
@@ -1092,7 +1092,7 @@ context('SEP meeting components tests', () => {
         if (createdInstrument2Id) {
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentIds: [createdInstrument2Id],
+            instrumentSepIds: [{ instrumentId: createdInstrument2Id }],
           });
 
           cy.createProposal({ callId: initialDBData.call.id }).then(
