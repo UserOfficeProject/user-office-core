@@ -1,0 +1,15 @@
+mutation updateSepToCallInstrument(
+  $instrumentId: Int!
+  $sepId: Int
+  $callId: Int!
+) {
+  updateSepToCallInstrument(
+    updateSepToCallInstrumentInput: {
+      instrumentId: $instrumentId
+      sepId: $sepId
+      callId: $callId
+    }
+  ) {
+    ...call
+  }
+}

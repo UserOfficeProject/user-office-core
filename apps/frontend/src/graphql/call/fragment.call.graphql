@@ -1,0 +1,59 @@
+fragment call on Call {
+  id
+  shortCode
+  startCall
+  endCall
+  endCallInternal
+  startReview
+  endReview
+  startSEPReview
+  endSEPReview
+  startNotify
+  endNotify
+  startCycle
+  endCycle
+  cycleComment
+  surveyComment
+  referenceNumberFormat
+  proposalWorkflowId
+  templateId
+  esiTemplateId
+  pdfTemplateId
+  allocationTimeUnit
+  instruments {
+    id
+    name
+    shortCode
+    description
+    availabilityTime
+    submitted
+    sepId
+    sep {
+      id
+      code
+    }
+    scientists {
+      ...basicUserDetails
+    }
+  }
+  seps {
+    id
+    code
+  }
+  proposalWorkflow {
+    id
+    name
+    description
+  }
+  template {
+    templateId
+    name
+    isArchived
+  }
+  proposalCount
+  title
+  description
+  submissionMessage
+  isActive
+  isActiveInternal
+}

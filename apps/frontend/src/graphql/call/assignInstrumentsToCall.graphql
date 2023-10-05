@@ -1,0 +1,13 @@
+mutation assignInstrumentsToCall(
+  $instrumentSepIds: [InstrumentSepMappingInput!]!
+  $callId: Int!
+) {
+  assignInstrumentsToCall(
+    assignInstrumentsToCallInput: {
+      instrumentSepIds: $instrumentSepIds
+      callId: $callId
+    }
+  ) {
+    ...call
+  }
+}
