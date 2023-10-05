@@ -36,4 +36,5 @@ export const Tokens = {
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
   SEPDataColumns: Symbol('SEPDataColumns'),
+  SEPDataRow: Symbol('SEPDataRow'),
 };

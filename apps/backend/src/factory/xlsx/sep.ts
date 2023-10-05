@@ -1,4 +1,12 @@
+import { container } from 'tsyringe';
+
 import baseContext from '../../buildContext';
+import { Tokens } from '../../config/Tokens';
+import { InstrumentWithAvailabilityTime } from '../../models/Instrument';
+import { Proposal } from '../../models/Proposal';
+import { SEPProposal } from '../../models/SEP';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import { TechnicalReview } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { average, getGrades } from '../../utils/mathFunctions';
 
@@ -11,13 +19,65 @@ type RowObj = {
   propShortCode?: string;
   propTitle?: string;
   principalInv: string;
+  instrName?: string;
   instrAvailTime?: number;
   techReviewTimeAllocation?: number | null;
   sepTimeAllocation: number | null;
   propReviewAvgScore?: number;
   propSEPRankOrder: number | null;
+  feedback?: string;
   inAvailZone?: string | null;
 };
+
+export const getRowData = (
+  piName: string,
+  proposalAverageScore: number,
+  instrument: InstrumentWithAvailabilityTime,
+  sepMeetingDecision: SepMeetingDecision | null,
+  proposal: Proposal | null,
+  technicalReview: TechnicalReview | null,
+  sepProposal?: SEPProposal
+) => {
+  return {
+    propShortCode: proposal?.proposalId,
+    propTitle: proposal?.title,
+    principalInv: piName,
+    instrAvailTime: instrument.availabilityTime,
+    techReviewTimeAllocation: technicalReview?.timeAllocation,
+    sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
+    propReviewAvgScore: proposalAverageScore,
+    propSEPRankOrder: sepMeetingDecision?.rankOrder ?? null,
+    inAvailZone: null,
+  };
+};
+
+export const getStfcRowData = (
+  piName: string,
+  proposalAverageScore: number,
+  instrument: InstrumentWithAvailabilityTime,
+  sepMeetingDecision: SepMeetingDecision | null,
+  proposal: Proposal | null,
+  technicalReview: TechnicalReview | null,
+  sepProposal?: SEPProposal
+) => {
+  return {
+    ...getRowData(
+      piName,
+      proposalAverageScore,
+      instrument,
+      sepMeetingDecision,
+      proposal,
+      technicalReview,
+      sepProposal
+    ),
+    instrName: instrument.name,
+    feedback: sepMeetingDecision?.commentForUser,
+  };
+};
+
+const sepDataRow = container.resolve<typeof getRowData | typeof getStfcRowData>(
+  Tokens.SEPDataRow
+);
 
 const sortByRankOrder = (a: RowObj, b: RowObj) => {
   if (a.propSEPRankOrder === b.propSEPRankOrder) {
@@ -186,19 +246,15 @@ export const collectSEPlXLSXData = async (
 
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
-      return {
-        propShortCode: proposal?.proposalId,
-        propTitle: proposal?.title,
-        principalInv: `${firstname} ${lastname}`,
-        instrName: instrument.name,
-        instrAvailTime: instrument.availabilityTime,
-        techReviewTimeAllocation: technicalReview?.timeAllocation,
-        sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
-        propReviewAvgScore: proposalAverageScore,
-        propSEPRankOrder: sepMeetingDecision?.rankOrder ?? null,
-        feedback: sepMeetingDecision?.commentForUser,
-        inAvailZone: null,
-      };
+      return sepDataRow(
+        `${firstname} ${lastname}`,
+        proposalAverageScore,
+        instrument,
+        sepMeetingDecision,
+        proposal,
+        technicalReview,
+        sepProposal
+      );
     });
 
     out.push({
@@ -209,12 +265,14 @@ export const collectSEPlXLSXData = async (
       rows: sortByRankOrAverageScore(rows).map((row) => [
         row.propShortCode ?? '<missing>',
         row.propTitle ?? '<missing>',
+        row.instrName ?? '',
         row.principalInv,
         row.instrAvailTime ?? '<missing>',
         row.techReviewTimeAllocation ?? '<missing>',
         row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
         row.propReviewAvgScore ?? '<missing>',
         row.propSEPRankOrder ?? '<missing>',
+        row.feedback ?? '',
         row.inAvailZone ?? '<missing>',
       ]),
     });
