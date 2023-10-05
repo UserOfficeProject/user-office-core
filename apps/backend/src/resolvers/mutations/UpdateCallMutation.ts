@@ -114,7 +114,7 @@ export class InstrumentSepMappingInput {
   instrumentId: number;
 
   @Field(() => Int, { nullable: true })
-  sepId: number;
+  sepId?: number;
 }
 
 @InputType()

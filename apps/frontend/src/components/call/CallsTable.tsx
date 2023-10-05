@@ -2,7 +2,7 @@ import Archive from '@mui/icons-material/Archive';
 import Unarchive from '@mui/icons-material/Unarchive';
 import { Typography } from '@mui/material';
 import i18n from 'i18n';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
@@ -127,25 +127,25 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     },
   ];
 
-  const assignInstrumentsToCall = (
-    callId: number,
-    instruments: InstrumentWithAvailabilityTime[]
-  ) => {
-    if (calls) {
-      const callsWithInstruments = calls.map((callItem) => {
-        if (callItem.id === callId) {
-          return {
-            ...callItem,
-            instruments: instruments,
-          };
-        } else {
-          return callItem;
-        }
-      });
-      setCalls(callsWithInstruments);
-      setAssigningInstrumentsCallId(null);
-    }
-  };
+  const assignInstrumentsToCall = useCallback(
+    (callId: number, instruments: InstrumentWithAvailabilityTime[]) => {
+      if (calls) {
+        const callsWithInstruments = calls.map((callItem) => {
+          if (callItem.id === callId) {
+            return {
+              ...callItem,
+              instruments: instruments,
+            };
+          } else {
+            return callItem;
+          }
+        });
+        setCalls(callsWithInstruments);
+        setAssigningInstrumentsCallId(null);
+      }
+    },
+    [calls, setCalls, setAssigningInstrumentsCallId]
+  );
 
   const changeCallActiveStatus = (call: Call) => {
     const shouldActivateCall = !call.isActive;
@@ -248,7 +248,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
         />
       );
     },
-    [calls, setCalls, setAssigningInstrumentsCallId]
+    [calls, setCalls, assignInstrumentsToCall]
   );
 
   const callAssignments = calls.find(
