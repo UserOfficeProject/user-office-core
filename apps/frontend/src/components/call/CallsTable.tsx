@@ -144,7 +144,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
         setAssigningInstrumentsCallId(null);
       }
     },
-    [calls, setCalls, setAssigningInstrumentsCallId]
+    [calls, setCalls]
   );
 
   const changeCallActiveStatus = (call: Call) => {
