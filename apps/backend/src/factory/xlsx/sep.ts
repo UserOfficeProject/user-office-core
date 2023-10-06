@@ -11,7 +11,7 @@ type SEPXLSXData = Array<{
   rows: Array<Array<string | number>>;
 }>;
 
-type RowObj = {
+export type RowObj = {
   propShortCode?: string;
   propTitle?: string;
   principalInv: string;
@@ -27,6 +27,10 @@ type RowObj = {
 
 const sepDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
   Tokens.SEPDataRow
+);
+
+const populateRow = container.resolve<(row: RowObj) => (string | number)[]>(
+  Tokens.PopulateRow
 );
 
 const sortByRankOrder = (a: RowObj, b: RowObj) => {
@@ -212,19 +216,7 @@ export const collectSEPlXLSXData = async (
         // Sheet names can't exceed 31 characters
         // use the short code and cut everything after 30 chars
         instrument.shortCode.substr(0, 30),
-      rows: sortByRankOrAverageScore(rows).map((row) => [
-        row.propShortCode ?? '<missing>',
-        row.propTitle ?? '<missing>',
-        row.principalInv,
-        row.instrName ?? '',
-        row.instrAvailTime ?? '<missing>',
-        row.techReviewTimeAllocation ?? '<missing>',
-        row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
-        row.propReviewAvgScore ?? '<missing>',
-        row.propSEPRankOrder ?? '<missing>',
-        row.inAvailZone ?? '<missing>',
-        row.feedback ?? '',
-      ]),
+      rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
     });
   });
 

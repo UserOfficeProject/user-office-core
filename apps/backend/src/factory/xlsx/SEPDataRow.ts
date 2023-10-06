@@ -3,6 +3,7 @@ import { Proposal } from '../../models/Proposal';
 import { SEPProposal } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { TechnicalReview } from '../../models/TechnicalReview';
+import { RowObj } from './sep';
 
 export function getDataRow(
   piName: string,
@@ -48,4 +49,34 @@ export function getStfcDataRow(
     instrName: instrument.name,
     feedback: sepMeetingDecision?.commentForUser,
   };
+}
+
+export function populateRow(row: RowObj) {
+  return [
+    row.propShortCode ?? '<missing>',
+    row.propTitle ?? '<missing>',
+    row.principalInv,
+    row.instrAvailTime ?? '<missing>',
+    row.techReviewTimeAllocation ?? '<missing>',
+    row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
+    row.propReviewAvgScore ?? '<missing>',
+    row.propSEPRankOrder ?? '<missing>',
+    row.inAvailZone ?? '<missing>',
+  ];
+}
+
+export function populateStfcRow(row: RowObj) {
+  return [
+    row.propShortCode ?? '<missing>',
+    row.propTitle ?? '<missing>',
+    row.principalInv,
+    row.instrName ?? '<missing>',
+    row.instrAvailTime ?? '<missing>',
+    row.techReviewTimeAllocation ?? '<missing>',
+    row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
+    row.propReviewAvgScore ?? '<missing>',
+    row.propSEPRankOrder ?? '<missing>',
+    row.inAvailZone ?? '<missing>',
+    row.feedback ?? '<missing>',
+  ];
 }

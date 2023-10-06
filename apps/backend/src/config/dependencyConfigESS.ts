@@ -36,7 +36,7 @@ import {
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
 import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
-import { getDataRow } from '../factory/xlsx/SEPDataRow';
+import { getDataRow, populateRow } from '../factory/xlsx/SEPDataRow';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
@@ -83,6 +83,7 @@ mapClass(Tokens.MailService, SparkPostMailService);
 
 mapValue(Tokens.SEPDataColumns, SEPDataColumns);
 mapValue(Tokens.SEPDataRow, getDataRow);
+mapValue(Tokens.PopulateRow, populateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 

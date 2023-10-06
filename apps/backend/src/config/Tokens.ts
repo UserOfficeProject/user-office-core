@@ -37,4 +37,5 @@ export const Tokens = {
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
   SEPDataColumns: Symbol('SEPDataColumns'),
   SEPDataRow: Symbol('SEPDataRow'),
+  PopulateRow: Symbol('PopulateRow'),
 };
