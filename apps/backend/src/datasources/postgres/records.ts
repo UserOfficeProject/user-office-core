@@ -2,11 +2,8 @@ import { PdfTemplateRecord } from 'knex/types/tables';
 
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
-import {
-  AllocationTimeUnits,
-  Call,
-  CallHasInstrument,
-} from '../../models/Call';
+import { AllocationTimeUnits, Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,

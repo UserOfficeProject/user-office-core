@@ -1,4 +1,5 @@
-import { Call, CallHasInstrument } from '../models/Call';
+import { Call } from '../models/Call';
+import { CallHasInstrument } from '../models/CallHasInstrument';
 import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
 import {
   UpdateCallInput,
