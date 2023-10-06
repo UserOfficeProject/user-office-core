@@ -4,6 +4,6 @@ export class CallHasInstrument {
     public instrumentId: number,
     public availabilityTime: number,
     public submitted: boolean,
-    public sepId?: number
+    public sepId: number | null
   ) {}
 }
