@@ -35,7 +35,7 @@ import {
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { getStfcRowData } from '../factory/xlsx/sep';
+import { getStfcDataRow } from '../factory/xlsx/SEPDataRow';
 import { StfcSEPDataColumns } from '../factory/xlsx/StfcSEPDataColumns';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
@@ -58,7 +58,6 @@ mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.SEPDataSource, PostgresSEPDataSource);
 
-//mapClass(Tokens.SEPDataRow, StfcSEPDataRow);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
 mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
 mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
@@ -81,7 +80,7 @@ mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 mapClass(Tokens.MailService, SMTPMailService);
 
 mapValue(Tokens.SEPDataColumns, StfcSEPDataColumns);
-mapValue(Tokens.SEPDataRow, getStfcRowData);
+mapValue(Tokens.SEPDataRow, getStfcDataRow);
 
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 

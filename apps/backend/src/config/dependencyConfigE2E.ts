@@ -36,12 +36,11 @@ import {
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
 import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
-import SEPDataRow from '../factory/xlsx/SEPDataRow';
+import { getDataRow } from '../factory/xlsx/SEPDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
-import { getRowData } from '../factory/xlsx/sep';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
@@ -59,8 +58,6 @@ mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.SEPDataSource, PostgresSEPDataSource);
-//mapClass(Tokens.SEPDataColumns, SEPDataColumns);
-//mapClass(Tokens.SEPDataRow, SEPDataRow);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
 mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
 mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
@@ -82,7 +79,7 @@ mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 mapClass(Tokens.MailService, SkipSendMailService);
 
 mapValue(Tokens.SEPDataColumns, SEPDataColumns);
-mapValue(Tokens.SEPDataRow, getRowData);
+mapValue(Tokens.SEPDataRow, getDataRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 

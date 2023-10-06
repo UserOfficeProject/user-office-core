@@ -2,13 +2,9 @@ import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
-import { InstrumentWithAvailabilityTime } from '../../models/Instrument';
-import { Proposal } from '../../models/Proposal';
-import { SEPProposal } from '../../models/SEP';
-import { SepMeetingDecision } from '../../models/SepMeetingDecision';
-import { TechnicalReview } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { average, getGrades } from '../../utils/mathFunctions';
+import { getDataRow, getStfcDataRow } from './SEPDataRow';
 
 type SEPXLSXData = Array<{
   sheetName: string;
@@ -29,53 +25,7 @@ type RowObj = {
   inAvailZone?: string | null;
 };
 
-export const getRowData = (
-  piName: string,
-  proposalAverageScore: number,
-  instrument: InstrumentWithAvailabilityTime,
-  sepMeetingDecision: SepMeetingDecision | null,
-  proposal: Proposal | null,
-  technicalReview: TechnicalReview | null,
-  sepProposal?: SEPProposal
-) => {
-  return {
-    propShortCode: proposal?.proposalId,
-    propTitle: proposal?.title,
-    principalInv: piName,
-    instrAvailTime: instrument.availabilityTime,
-    techReviewTimeAllocation: technicalReview?.timeAllocation,
-    sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
-    propReviewAvgScore: proposalAverageScore,
-    propSEPRankOrder: sepMeetingDecision?.rankOrder ?? null,
-    inAvailZone: null,
-  };
-};
-
-export const getStfcRowData = (
-  piName: string,
-  proposalAverageScore: number,
-  instrument: InstrumentWithAvailabilityTime,
-  sepMeetingDecision: SepMeetingDecision | null,
-  proposal: Proposal | null,
-  technicalReview: TechnicalReview | null,
-  sepProposal?: SEPProposal
-) => {
-  return {
-    ...getRowData(
-      piName,
-      proposalAverageScore,
-      instrument,
-      sepMeetingDecision,
-      proposal,
-      technicalReview,
-      sepProposal
-    ),
-    instrName: instrument.name,
-    feedback: sepMeetingDecision?.commentForUser,
-  };
-};
-
-const sepDataRow = container.resolve<typeof getRowData | typeof getStfcRowData>(
+const sepDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
   Tokens.SEPDataRow
 );
 
@@ -246,7 +196,9 @@ export const collectSEPlXLSXData = async (
 
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
-      return sepDataRow(
+      return {};
+
+      /*return sepDataRow(
         `${firstname} ${lastname}`,
         proposalAverageScore,
         instrument,
@@ -254,7 +206,7 @@ export const collectSEPlXLSXData = async (
         proposal,
         technicalReview,
         sepProposal
-      );
+      );*/
     });
 
     out.push({
@@ -262,7 +214,8 @@ export const collectSEPlXLSXData = async (
         // Sheet names can't exceed 31 characters
         // use the short code and cut everything after 30 chars
         instrument.shortCode.substr(0, 30),
-      rows: sortByRankOrAverageScore(rows).map((row) => [
+      rows: [],
+      /*rows: sortByRankOrAverageScore(rows).map((row) => [
         row.propShortCode ?? '<missing>',
         row.propTitle ?? '<missing>',
         row.instrName ?? '',
@@ -274,7 +227,7 @@ export const collectSEPlXLSXData = async (
         row.propSEPRankOrder ?? '<missing>',
         row.feedback ?? '',
         row.inAvailZone ?? '<missing>',
-      ]),
+      ]),*/
     });
   });
 

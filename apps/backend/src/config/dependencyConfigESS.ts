@@ -36,13 +36,12 @@ import {
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
 import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
-import SEPDataRow from '../factory/xlsx/SEPDataRow';
+import { getDataRow } from '../factory/xlsx/SEPDataRow';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
-import { getRowData } from '../factory/xlsx/sep';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -61,8 +60,6 @@ mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.SEPDataSource, PostgresSEPDataSource);
-//mapClass(Tokens.SEPDataColumns, SEPDataColumns);
-//mapClass(Tokens.SEPDataRow, SEPDataRow);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
 mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
 mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
@@ -85,7 +82,7 @@ mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 mapClass(Tokens.MailService, SparkPostMailService);
 
 mapValue(Tokens.SEPDataColumns, SEPDataColumns);
-mapValue(Tokens.SEPDataRow, getRowData);
+mapValue(Tokens.SEPDataRow, getDataRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
