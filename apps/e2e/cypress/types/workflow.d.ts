@@ -7,6 +7,8 @@ import {
   CreateProposalStatusMutation,
   AddProposalWorkflowStatusMutationVariables,
   AddProposalWorkflowStatusMutation,
+  AddConnectionStatusActionsMutation,
+  AddConnectionStatusActionsMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -59,6 +61,17 @@ declare global {
       addProposalWorkflowStatus: (
         addProposalWorkflowStatusInput: AddProposalWorkflowStatusMutationVariables
       ) => Cypress.Chainable<AddProposalWorkflowStatusMutation>;
+      /**
+       * Add proposal status action to workflow connection.
+       *
+       * @returns {typeof addConnectionStatusActions}
+       * @memberof Chainable
+       * @example
+       *    cy.addConnectionStatusActions(addConnectionStatusActionsInput: AddConnectionStatusActionsMutationVariables)
+       */
+      addConnectionStatusActions: (
+        addConnectionStatusActionsInput: AddConnectionStatusActionsMutationVariables
+      ) => Cypress.Chainable<AddConnectionStatusActionsMutation>;
     }
   }
 }
