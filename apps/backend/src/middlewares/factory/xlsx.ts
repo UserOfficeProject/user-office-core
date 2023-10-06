@@ -15,7 +15,7 @@ import {
 } from '../../factory/xlsx/proposal';
 import { collectSEPlXLSXData } from '../../factory/xlsx/sep';
 
-//const sepDataColumns = container.resolve<string[]>(Tokens.SEPDataColumns);
+const sepDataColumns = container.resolve<string[]>(Tokens.SEPDataColumns);
 
 const router = express.Router();
 
@@ -103,7 +103,7 @@ router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
     const meta: XLSXMetaBase = {
       singleFilename: filename,
       collectionFilename: filename,
-      columns: [], //sepDataColumns,
+      columns: sepDataColumns, //sepDataColumns,
     };
 
     const userRole = req.user.currentRole;

@@ -21,8 +21,8 @@ type RowObj = {
   sepTimeAllocation: number | null;
   propReviewAvgScore?: number;
   propSEPRankOrder: number | null;
-  feedback?: string;
   inAvailZone?: string | null;
+  feedback?: string;
 };
 
 const sepDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
@@ -196,9 +196,7 @@ export const collectSEPlXLSXData = async (
 
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
-      return {};
-
-      /*return sepDataRow(
+      return sepDataRow(
         `${firstname} ${lastname}`,
         proposalAverageScore,
         instrument,
@@ -206,7 +204,7 @@ export const collectSEPlXLSXData = async (
         proposal,
         technicalReview,
         sepProposal
-      );*/
+      );
     });
 
     out.push({
@@ -214,20 +212,19 @@ export const collectSEPlXLSXData = async (
         // Sheet names can't exceed 31 characters
         // use the short code and cut everything after 30 chars
         instrument.shortCode.substr(0, 30),
-      rows: [],
-      /*rows: sortByRankOrAverageScore(rows).map((row) => [
+      rows: sortByRankOrAverageScore(rows).map((row) => [
         row.propShortCode ?? '<missing>',
         row.propTitle ?? '<missing>',
-        row.instrName ?? '',
         row.principalInv,
+        row.instrName ?? '',
         row.instrAvailTime ?? '<missing>',
         row.techReviewTimeAllocation ?? '<missing>',
         row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
         row.propReviewAvgScore ?? '<missing>',
         row.propSEPRankOrder ?? '<missing>',
-        row.feedback ?? '',
         row.inAvailZone ?? '<missing>',
-      ]),*/
+        row.feedback ?? '',
+      ]),
     });
   });
 
