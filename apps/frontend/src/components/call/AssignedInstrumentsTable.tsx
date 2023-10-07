@@ -2,14 +2,22 @@ import MaterialTable, {
   Column,
   EditComponentProps,
 } from '@material-table/core';
+import { Autocomplete } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import {
+  Call,
+  InstrumentWithAvailabilityTime,
+  UpdateSepToCallInstrumentMutation,
+  UserRole,
+} from 'generated/sdk';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -39,16 +47,32 @@ type AssignedInstrumentsTableProps = {
     updatedInstruments: InstrumentWithAvailabilityTime[],
     updatingCallId: number
   ) => void;
+  assignInstrumentsToCall: (
+    instruments: InstrumentWithAvailabilityTime[]
+  ) => void;
 };
 
 const AssignedInstrumentsTable = ({
   call,
   removeAssignedInstrumentFromCall,
   setInstrumentAvailabilityTime,
+  assignInstrumentsToCall,
 }: AssignedInstrumentsTableProps) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
+  const { currentRole } = useContext(UserContext);
+  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+  });
+
+  const sepOptions =
+    allActiveSeps?.map((sep) => ({
+      label: sep.code,
+      value: sep.id,
+    })) || [];
 
   const availabilityTimeInput = (
     props: EditComponentProps<InstrumentWithAvailabilityTime> & {
@@ -71,6 +95,30 @@ const AssignedInstrumentsTable = ({
     />
   );
 
+  const sepSelectionAutoCompleteInput = (
+    props: EditComponentProps<InstrumentWithAvailabilityTime> & {
+      helperText?: string;
+    }
+  ) => {
+    return (
+      <Autocomplete
+        loading={loadingSEPs}
+        id="sepSelection"
+        options={sepOptions}
+        renderInput={(params) => (
+          <TextField {...params} label="SEPs" margin="none" />
+        )}
+        onChange={(_event, newValue) => {
+          props.onChange(newValue?.value ?? null);
+        }}
+        style={{ margin: '0' }}
+        defaultValue={
+          sepOptions.find((item) => item.value === props.rowData.sep?.id)!
+        }
+      />
+    );
+  };
+
   const assignmentColumns: Column<InstrumentWithAvailabilityTime>[] = [
     {
       title: 'Name',
@@ -86,6 +134,16 @@ const AssignedInstrumentsTable = ({
       title: 'Description',
       field: 'description',
       editable: 'never',
+    },
+    {
+      title: 'Sep',
+      field: 'sepId',
+      editable: 'onUpdate',
+      emptyValue: '-',
+      editComponent: sepSelectionAutoCompleteInput,
+      render: (rowData: InstrumentWithAvailabilityTime) => {
+        return <span>{rowData.sep?.code}</span>;
+      },
     },
     {
       title: `Availability time (${call.allocationTimeUnit}s)`,
@@ -167,44 +225,104 @@ const AssignedInstrumentsTable = ({
     setInstrumentAvailabilityTime(newUpdatedData, call.id);
   };
 
+  const updateSepToCallInstrument = async (
+    instrumentUpdatedData: InstrumentWithAvailabilityTime
+  ) => {
+    const response = await api({
+      toastSuccessMessage: 'Sep updated successfully!',
+    }).updateSepToCallInstrument({
+      callId: call.id,
+      instrumentId: instrumentUpdatedData.id,
+      sepId: instrumentUpdatedData.sepId,
+    });
+
+    assignInstrumentsToCall(
+      response.updateSepToCallInstrument
+        .instruments as InstrumentWithAvailabilityTime[]
+    );
+
+    return response;
+  };
+
   return (
-    <div className={classes.root} data-cy="call-instrument-assignments-table">
-      <MaterialTable
-        icons={tableIcons}
-        columns={assignmentColumns}
-        title={
-          'Assigned ' +
-          i18n.format(i18n.format(t('instrument'), 'plural'), 'lowercase')
-        }
-        data={call.instruments}
-        editable={{
-          onRowDelete: (
-            rowAssignmentsData: InstrumentWithAvailabilityTime
-          ): Promise<void> => removeAssignedInstrument(rowAssignmentsData.id),
-          onRowUpdate: (instrumentUpdatedData) =>
-            new Promise<void>(async (resolve, reject) => {
-              if (
-                instrumentUpdatedData &&
-                instrumentUpdatedData.availabilityTime
-              ) {
-                await updateInstrument({
-                  id: instrumentUpdatedData.id,
-                  availabilityTime: instrumentUpdatedData.availabilityTime,
-                });
-                resolve();
-              } else {
-                reject();
-              }
-            }),
-        }}
-        options={{
-          search: false,
-          paging: false,
-          toolbar: false,
-          headerStyle: { backgroundColor: '#fafafa' },
-        }}
-      />
-    </div>
+    <>
+      <div className={classes.root} data-cy="call-instrument-assignments-table">
+        <MaterialTable
+          icons={tableIcons}
+          columns={assignmentColumns}
+          title={
+            'Assigned ' +
+            i18n.format(i18n.format(t('instrument'), 'plural'), 'lowercase')
+          }
+          data={call.instruments}
+          editable={{
+            onRowDelete: (
+              rowAssignmentsData: InstrumentWithAvailabilityTime
+            ): Promise<void> => removeAssignedInstrument(rowAssignmentsData.id),
+            onRowUpdate: (instrumentUpdatedData) => {
+              const selectedInstrument = call.instruments.find(
+                (instrument) => instrument.id === instrumentUpdatedData.id
+              );
+              const instrumentUpdatePromise = new Promise<void>(
+                async (resolve, reject) => {
+                  if (
+                    instrumentUpdatedData &&
+                    instrumentUpdatedData.availabilityTime &&
+                    selectedInstrument?.availabilityTime !==
+                      instrumentUpdatedData.availabilityTime
+                  ) {
+                    await updateInstrument({
+                      id: instrumentUpdatedData.id,
+                      availabilityTime: instrumentUpdatedData.availabilityTime,
+                    });
+                    resolve();
+                  } else {
+                    reject();
+                  }
+                }
+              );
+
+              const sepUpdatePromise =
+                new Promise<UpdateSepToCallInstrumentMutation>(
+                  async (resolve, reject) => {
+                    if (
+                      instrumentUpdatedData &&
+                      selectedInstrument?.sepId !== instrumentUpdatedData.sepId
+                    ) {
+                      const response = await updateSepToCallInstrument({
+                        ...instrumentUpdatedData,
+                      });
+                      resolve(response);
+                    } else {
+                      reject();
+                    }
+                  }
+                );
+
+              return Promise.all([
+                instrumentUpdatePromise,
+                sepUpdatePromise,
+              ]).then((values) => {
+                console.log(values[1].updateSepToCallInstrument.instruments);
+                assignInstrumentsToCall(
+                  values[1].updateSepToCallInstrument
+                    .instruments as InstrumentWithAvailabilityTime[]
+                );
+              });
+            },
+          }}
+          options={{
+            search: false,
+            paging: false,
+            headerStyle: { backgroundColor: '#fafafa' },
+            headerSelectionProps: {
+              inputProps: { 'aria-label': 'Select All Rows' },
+            },
+            debounceInterval: 400,
+          }}
+        />
+      </div>
+    </>
   );
 };
 

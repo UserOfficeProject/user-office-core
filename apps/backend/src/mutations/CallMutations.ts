@@ -1,7 +1,6 @@
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
-  assignInstrumentsToCallValidationSchema,
   removeAssignedInstrumentFromCallValidationSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
@@ -19,6 +18,7 @@ import {
   UpdateCallInput,
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
+  UpdateSepToCallInstrumentInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { mergeValidationSchemas } from '../utils/helperFunctions';
 
@@ -109,7 +109,8 @@ export default class CallMutations {
     }
   }
 
-  @ValidateArgs(assignInstrumentsToCallValidationSchema)
+  // TODO: Need to add validation to duo-validation library
+  // @ValidateArgs(assignInstrumentsToCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignInstrumentsToCall(
     agent: UserWithRole | null,
@@ -121,6 +122,27 @@ export default class CallMutations {
       .catch((error) => {
         return rejection(
           'Could not assign instruments to call',
+          { agent, args },
+          error
+        );
+      });
+  }
+
+  //TODO: Add Validation in duo-validation package
+  // @ValidateArgs(updateSepToCallInstrumentValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async updateSepToCallInstrument(
+    agent: UserWithRole | null,
+    args: UpdateSepToCallInstrumentInput
+  ): Promise<Call | Rejection> {
+    return this.dataSource
+      .updateSepToCallInstrument(args)
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        return rejection(
+          'Could not assign sep to call instrument',
           { agent, args },
           error
         );
