@@ -73,6 +73,16 @@ export class TemplateResolver {
     );
   }
 
+  @FieldResolver(() => Int, { nullable: true })
+  async pdfCallCount(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<number> {
+    return context.queries.call
+      .getAll(context.user, { pdfTemplateIds: [template.templateId] })
+      .then((result) => result?.length || 0);
+  }
+
   @FieldResolver(() => TemplateGroup)
   async group(@Root() template: Template): Promise<TemplateGroup> {
     const templateDataSource = container.resolve(TemplateDataSource);

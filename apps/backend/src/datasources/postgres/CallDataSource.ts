@@ -48,6 +48,10 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('template_id', filter.templateIds);
     }
 
+    if (filter?.pdfTemplateIds) {
+      query.whereIn('pdf_template_id', filter.pdfTemplateIds);
+    }
+
     // if filter is explicitly set to true or false
     if (filter?.isActive === true) {
       query.where('is_active', true);
