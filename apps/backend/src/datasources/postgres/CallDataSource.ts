@@ -3,6 +3,7 @@ import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -14,7 +15,12 @@ import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
 import { calculateReferenceNumber } from './ProposalDataSource';
-import { CallRecord, createCallObject } from './records';
+import {
+  CallHasInstrumentRecord,
+  CallRecord,
+  createCallHasInstrumentObject,
+  createCallObject,
+} from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
   async delete(id: number): Promise<Call> {
@@ -114,6 +120,20 @@ export default class PostgresCallDataSource implements CallDataSource {
     return query.then((callDB: CallRecord[]) =>
       callDB.map((call) => createCallObject(call))
     );
+  }
+
+  async getCallHasInstrumentsByInstrumentId(
+    instrumentId: number
+  ): Promise<CallHasInstrument[]> {
+    return database
+      .select()
+      .from('call_has_instruments')
+      .where('instrument_id', instrumentId)
+      .then((callHasInstrument: CallHasInstrumentRecord[]) =>
+        callHasInstrument.map((callHasInstrument) =>
+          createCallHasInstrumentObject(callHasInstrument)
+        )
+      );
   }
 
   async create(args: CreateCallInput): Promise<Call> {
