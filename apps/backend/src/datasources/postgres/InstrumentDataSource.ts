@@ -18,9 +18,6 @@ import {
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
   InstrumentHasProposalsRecord,
-  ProposalRecord,
-  createProposalObject,
-  CallHasInstrumentRecord,
 } from './records';
 
 @injectable()
@@ -262,50 +259,6 @@ export default class PostgresInstrumentDataSource
           .insert(dataToInsert)
           .returning(['*'])
           .transacting(trx);
-
-        const proposals = await database('proposals')
-          .select('*')
-          .whereIn('proposal_pk', proposalPks)
-          .then((proposals: ProposalRecord[]) => {
-            return proposals.map((proposal) => {
-              return createProposalObject(proposal);
-            });
-          });
-
-        const callHasInstruments = await database('call_has_instruments')
-          .where('instrument_id', instrumentId)
-          .then((callHasInstrument: CallHasInstrumentRecord[]) => {
-            return callHasInstrument.map((callHasInstrument) => {
-              return {
-                callId: callHasInstrument.call_id,
-                instrumentId: callHasInstrument.instrument_id,
-                sepId: callHasInstrument.sep_id,
-              };
-            });
-          });
-
-        // Seggregate Calls
-        const callIds = [
-          ...new Set(proposals.map((proposal) => proposal.callId)),
-        ];
-
-        // Assign Proposals
-        for (const callId of callIds) {
-          const callHasInstrument = callHasInstruments.find(
-            (callHasInstrument) => callHasInstrument.callId === callId
-          );
-          if (callHasInstrument && callHasInstrument.sepId) {
-            this.sepDataSource.assignProposalsToSep({
-              proposals: proposals
-                .filter((proposal) => proposal.callId === callId)
-                .map((proposal) => ({
-                  ...proposal,
-                  callId: callId,
-                })),
-              sepId: callHasInstrument.sepId,
-            });
-          }
-        }
 
         return await trx.commit(result);
       } catch (error) {
