@@ -2,6 +2,7 @@ import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
   removeAssignedInstrumentFromCallValidationSchema,
+  updateCallValidationSchemaBackend,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
@@ -90,7 +91,7 @@ export default class CallMutations {
     }
   }
 
-  @ValidateArgs(updateCallValidationSchema)
+  @ValidateArgs(updateCallValidationSchemaBackend)
   @Authorized([Roles.USER_OFFICER])
   async update(
     agent: UserWithRole | null,
