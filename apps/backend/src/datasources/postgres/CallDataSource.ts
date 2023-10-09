@@ -3,17 +3,24 @@ import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
+  UpdateSepToCallInstrumentInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
 import { calculateReferenceNumber } from './ProposalDataSource';
-import { CallRecord, createCallObject } from './records';
+import {
+  CallHasInstrumentRecord,
+  CallRecord,
+  createCallHasInstrumentObject,
+  createCallObject,
+} from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
   async delete(id: number): Promise<Call> {
@@ -113,6 +120,20 @@ export default class PostgresCallDataSource implements CallDataSource {
     return query.then((callDB: CallRecord[]) =>
       callDB.map((call) => createCallObject(call))
     );
+  }
+
+  async getCallHasInstrumentsByInstrumentId(
+    instrumentId: number
+  ): Promise<CallHasInstrument[]> {
+    return database
+      .select()
+      .from('call_has_instruments')
+      .where('instrument_id', instrumentId)
+      .then((callHasInstrument: CallHasInstrumentRecord[]) =>
+        callHasInstrument.map((callHasInstrument) =>
+          createCallHasInstrumentObject(callHasInstrument)
+        )
+      );
   }
 
   async create(args: CreateCallInput): Promise<Call> {
@@ -308,12 +329,31 @@ export default class PostgresCallDataSource implements CallDataSource {
   async assignInstrumentsToCall(
     args: AssignInstrumentsToCallInput
   ): Promise<Call> {
-    const valuesToInsert = args.instrumentIds.map((instrumentId) => ({
-      instrument_id: instrumentId,
+    const valuesToInsert = args.instrumentSepIds.map((instrumentSep) => ({
+      instrument_id: instrumentSep.instrumentId,
+      sep_id: instrumentSep.sepId,
       call_id: args.callId,
     }));
 
     await database.insert(valuesToInsert).into('call_has_instruments');
+
+    const callUpdated = await this.getCall(args.callId);
+
+    if (callUpdated) {
+      return callUpdated;
+    }
+
+    throw new GraphQLError(`Call not found ${args.callId}`);
+  }
+
+  async updateSepToCallInstrument(
+    args: UpdateSepToCallInstrumentInput
+  ): Promise<Call> {
+    await database
+      .update({ sep_id: args.sepId ?? null })
+      .into('call_has_instruments')
+      .where('instrument_id', args.instrumentId)
+      .andWhere('call_id', args.callId);
 
     const callUpdated = await this.getCall(args.callId);
 
