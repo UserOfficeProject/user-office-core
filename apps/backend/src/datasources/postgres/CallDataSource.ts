@@ -2,7 +2,8 @@ import { logger } from '@user-office-software/duo-logger';
 import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 
-import { Call, CallHasInstrument } from '../../models/Call';
+import { Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
