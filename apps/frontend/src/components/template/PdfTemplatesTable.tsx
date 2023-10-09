@@ -125,7 +125,7 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
       <CallsModal
         templateId={selectedTemplateId}
         onClose={() => setSelectedTemplateId(undefined)}
-      ></CallsModal>
+      />
     </>
   );
 }
