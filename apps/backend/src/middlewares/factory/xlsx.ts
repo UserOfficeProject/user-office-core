@@ -103,7 +103,7 @@ router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
     const meta: XLSXMetaBase = {
       singleFilename: filename,
       collectionFilename: filename,
-      columns: sepDataColumns, //sepDataColumns,
+      columns: sepDataColumns,
     };
 
     const userRole = req.user.currentRole;
