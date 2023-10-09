@@ -3,6 +3,7 @@ import { PdfTemplateRecord } from 'knex/types/tables';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
@@ -981,6 +982,18 @@ export const createCallObject = (call: CallRecord) => {
     call.description,
     call.pdf_template_id,
     call.is_active
+  );
+};
+
+export const createCallHasInstrumentObject = (
+  callHasInstrument: CallHasInstrumentRecord
+) => {
+  return new CallHasInstrument(
+    callHasInstrument.call_id,
+    callHasInstrument.instrument_id,
+    callHasInstrument.availability_time,
+    callHasInstrument.submitted,
+    callHasInstrument.sep_id
   );
 };
 
