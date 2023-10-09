@@ -1,0 +1,10 @@
+query getPdfTemplates($filter: TemplatesFilter) {
+  templates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+    questionaryCount
+    pdfCallCount
+  }
+}
