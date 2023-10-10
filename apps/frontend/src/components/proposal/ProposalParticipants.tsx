@@ -9,7 +9,6 @@ import React, { useState } from 'react';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, UserRole } from 'generated/sdk';
-import { BasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -27,7 +26,7 @@ type ParticipantsProps = {
   users: BasicUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
-  principalInvestigator?: BasicUserData | null;
+  principalInvestigator?: BasicUserDetails | null;
   setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   className?: string;
   title: string;

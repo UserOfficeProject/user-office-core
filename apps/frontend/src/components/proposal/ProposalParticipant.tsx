@@ -7,7 +7,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import { BasicUserDetails, UserRole } from 'generated/sdk';
-import { BasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ProposalParticipant(props: {
-  principalInvestigator: BasicUserData | null;
+  principalInvestigator: BasicUserDetails | null | undefined;
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
   className?: string;
   loadingPrincipalInvestigator?: boolean;
@@ -55,9 +54,7 @@ export default function ProposalParticipant(props: {
           label="Principal Investigator"
           value={
             props.principalInvestigator
-              ? `${props.principalInvestigator.preferredname}`
-                ? `${props.principalInvestigator.preferredname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
-                : `${props.principalInvestigator.firstname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
+              ? `${props.principalInvestigator.preferredname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
               : ''
           }
           InputLabelProps={{ shrink: true }}
