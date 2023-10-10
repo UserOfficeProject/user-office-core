@@ -219,11 +219,7 @@ describe('Test Call Mutations', () => {
     return expect(
       callMutations.assignInstrumentsToCall(dummyUserWithRole, {
         callId: 1,
-        instrumentSepIds: [
-          {
-            instrumentId: 1,
-          },
-        ],
+        instrumentSepIds: [{ instrumentId: 1 }],
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -232,11 +228,7 @@ describe('Test Call Mutations', () => {
     return expect(
       callMutations.assignInstrumentsToCall(dummyUserOfficerWithRole, {
         callId: 1,
-        instrumentSepIds: [
-          {
-            instrumentId: 1,
-          },
-        ],
+        instrumentSepIds: [{ instrumentId: 1 }],
       })
     ).resolves.toBe(dummyCall);
   });
