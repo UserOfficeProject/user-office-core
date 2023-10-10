@@ -643,10 +643,14 @@ export default class ProposalSettingsMutations {
   }
 
   @ValidateArgs(
-    addStatusActionsToConnectionValidationSchema<ProposalStatusActionType>(
+    addStatusActionsToConnectionValidationSchema<
+      ProposalStatusActionType,
+      string[]
+    >(
       ProposalStatusActionType.EMAIL,
       ProposalStatusActionType.RABBITMQ,
-      Object.values(ProposalStatusActionType)
+      Object.values(ProposalStatusActionType),
+      []
     )
   )
   @Authorized([Roles.USER_OFFICER])
