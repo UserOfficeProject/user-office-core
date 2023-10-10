@@ -55,7 +55,9 @@ export default function ProposalParticipant(props: {
           label="Principal Investigator"
           value={
             props.principalInvestigator
-              ? `${props.principalInvestigator.preferredname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
+              ? `${props.principalInvestigator.preferredname}`
+                ? `${props.principalInvestigator.preferredname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
+                : `${props.principalInvestigator.firstname} ${props.principalInvestigator.lastname}; ${props.principalInvestigator.organisation}`
               : ''
           }
           InputLabelProps={{ shrink: true }}
