@@ -34,7 +34,7 @@ type AssignedScientistsTableProps = {
 const assignmentColumns = [
   {
     title: 'Name',
-    field: 'preferredname',
+    field: 'firstname',
   },
   {
     title: 'Surname',

@@ -1,16 +1,8 @@
 import { BasicUserDetails } from 'generated/sdk';
 
 export const getFullUserName = (
-  user?: Pick<
-    BasicUserDetails,
-    'preferredname' | 'lastname' | 'firstname'
-  > | null
-): string =>
-  user
-    ? `${user.preferredname}`
-      ? `${user.preferredname} ${user.lastname}`
-      : `${user.firstname} ${user.lastname}`
-    : 'None';
+  user?: Pick<BasicUserDetails, 'firstname' | 'lastname'> | null
+): string => (user ? `${user.firstname} ${user.lastname}` : 'None');
 
 export const getFullUserNameWithEmail = (
   user?: Pick<
