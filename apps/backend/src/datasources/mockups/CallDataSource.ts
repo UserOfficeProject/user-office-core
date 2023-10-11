@@ -1,9 +1,11 @@
 import { AllocationTimeUnits, Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
+  UpdateSepToCallInstrumentInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -139,6 +141,12 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCalls;
   }
 
+  async getCallHasInstrumentsByInstrumentId(
+    instrumentId: number
+  ): Promise<CallHasInstrument[]> {
+    throw new Error('Method not implemented.');
+  }
+
   async create(args: CreateCallInput) {
     return { ...dummyCall, ...args };
   }
@@ -152,6 +160,10 @@ export class CallDataSourceMock implements CallDataSource {
   }
 
   async assignInstrumentsToCall(args: AssignInstrumentsToCallInput) {
+    return dummyCall;
+  }
+
+  async updateSepToCallInstrument(args: UpdateSepToCallInstrumentInput) {
     return dummyCall;
   }
 

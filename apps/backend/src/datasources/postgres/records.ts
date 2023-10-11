@@ -3,6 +3,7 @@ import { PdfTemplateRecord } from 'knex/types/tables';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
@@ -459,6 +460,13 @@ export interface InstrumentHasProposalsRecord {
   readonly submitted: boolean;
 }
 
+export interface CallHasInstrumentRecord {
+  readonly call_id: number;
+  readonly instrument_id: number;
+  availability_time: number;
+  submitted: boolean;
+  sep_id: number;
+}
 export interface InstrumentWithAvailabilityTimeRecord {
   readonly instrument_id: number;
   readonly name: string;
@@ -469,6 +477,7 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;
+  readonly sep_id: number;
 }
 
 export interface TemplateCategoryRecord {
@@ -973,6 +982,18 @@ export const createCallObject = (call: CallRecord) => {
     call.description,
     call.pdf_template_id,
     call.is_active
+  );
+};
+
+export const createCallHasInstrumentObject = (
+  callHasInstrument: CallHasInstrumentRecord
+) => {
+  return new CallHasInstrument(
+    callHasInstrument.call_id,
+    callHasInstrument.instrument_id,
+    callHasInstrument.availability_time,
+    callHasInstrument.submitted,
+    callHasInstrument.sep_id
   );
 };
 

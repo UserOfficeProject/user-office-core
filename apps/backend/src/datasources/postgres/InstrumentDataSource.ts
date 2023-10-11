@@ -47,7 +47,8 @@ export default class PostgresInstrumentDataSource
       instrument.description,
       instrument.manager_user_id,
       instrument.availability_time,
-      instrument.submitted
+      instrument.submitted,
+      instrument.sep_id
     );
   }
 
@@ -132,6 +133,7 @@ export default class PostgresInstrumentDataSource
         'manager_user_id',
         'chi.availability_time',
         'chi.submitted',
+        'chi.sep_id',
       ])
       .from('instruments as i')
       .join('call_has_instruments as chi', {
