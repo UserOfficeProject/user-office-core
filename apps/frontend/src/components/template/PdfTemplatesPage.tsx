@@ -2,30 +2,41 @@ import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
 import { TemplateGroupId } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import DefaultTemplatesTable from './DefaultTemplatesTable';
+import PdfTemplatesTable from './PdfTemplatesTable';
 
 export default function PdfTemplatesPage() {
-  const templateGroup = TemplateGroupId.PDF_TEMPLATE;
-  const itemCountLabel = '# templates';
-  const isRowRemovable = () => false;
+  const api = useDataApi();
 
   return (
     <StyledContainer>
       <StyledPaper>
         <SimpleTabs tabNames={['Current', 'Archived']}>
-          <DefaultTemplatesTable
-            templateGroup={templateGroup}
-            itemCountLabel={itemCountLabel}
-            isArchived={false}
-            isRowRemovable={isRowRemovable}
+          <PdfTemplatesTable
+            dataProvider={() =>
+              api()
+                .getPdfTemplates({
+                  filter: {
+                    isArchived: false,
+                    group: TemplateGroupId.PDF_TEMPLATE,
+                  },
+                })
+                .then((data) => data.templates || [])
+            }
           />
-          <DefaultTemplatesTable
-            templateGroup={templateGroup}
-            itemCountLabel={itemCountLabel}
-            isArchived={true}
-            isRowRemovable={isRowRemovable}
+          <PdfTemplatesTable
+            dataProvider={() =>
+              api()
+                .getPdfTemplates({
+                  filter: {
+                    isArchived: true,
+                    group: TemplateGroupId.PDF_TEMPLATE,
+                  },
+                })
+                .then((data) => data.templates || [])
+            }
           />
         </SimpleTabs>
       </StyledPaper>
