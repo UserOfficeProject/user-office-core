@@ -95,14 +95,14 @@ export class SMTPMailService extends MailService {
             ...(typeof participant.address !== 'string'
               ? {
                   to: {
-                    address: isProduction()
+                    address: isProduction
                       ? participant.address?.email
                       : <string>process.env.SINK_EMAIL,
                     name: participant.address?.header_to,
                   },
                 }
               : {
-                  to: isProduction()
+                  to: isProduction
                     ? participant.address
                     : <string>process.env.SINK_EMAIL,
                 }),

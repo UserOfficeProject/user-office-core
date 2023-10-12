@@ -34,7 +34,6 @@ const checkAndNotifySEPReviewersBeforeReviewEnds = async (
     );
 
   for (const sepReviewThatShouldBeNotified of sepReviewsThatShouldBeNotified) {
-    // NOTE: Fire the "SEP_REVIEWER_NOTIFIED" event.
     eventBus.publish({
       type: Event.SEP_REVIEWER_NOTIFIED,
       sepReview: sepReviewThatShouldBeNotified,
@@ -74,7 +73,6 @@ const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
         callSEPReviewEnded: true,
       });
 
-      // NOTE: Fire the "CALL_SEP_REVIEW_ENDED" event.
       eventBus.publish({
         type: Event.CALL_SEP_REVIEW_ENDED,
         call: updatedCall,

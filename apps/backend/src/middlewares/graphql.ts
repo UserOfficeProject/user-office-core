@@ -148,7 +148,7 @@ const apolloServer = async (app: Express) => {
   const plugins = [
     ApolloServerPluginInlineTraceDisabled(),
     // Explicitly disable playground in prod
-    isProduction()
+    isProduction
       ? ApolloServerPluginLandingPageDisabled()
       : ApolloServerPluginLandingPageGraphQLPlayground({
           settings: { 'schema.polling.enable': false },
@@ -180,7 +180,7 @@ const apolloServer = async (app: Express) => {
     plugins: plugins,
     formatError(formattedError) {
       // NOTE: Prevent exposing some sensitive data to the client in production.
-      if (isProduction()) {
+      if (isProduction) {
         delete formattedError.extensions?.context;
         delete formattedError.extensions?.exception;
       }

@@ -3,10 +3,10 @@ import {
   UpdateUserRolesMutationVariables,
   UpdateUserMutationVariables,
   UpdateUserMutation,
-  CreateUserMutationVariables,
-  CreateUserMutation,
   SetUserEmailVerifiedMutationVariables,
   SetUserEmailVerifiedMutation,
+  CreateUserByEmailInviteMutationVariables,
+  CreateUserByEmailInviteMutation,
 } from '@user-office-software-libs/shared-types';
 
 import { TestUserId } from './../support/user';
@@ -47,16 +47,16 @@ declare global {
       logout: () => void;
 
       /**
-       * Crete user
+       * Create user by email invite
        *
-       * @returns {typeof createUser}
+       * @returns {typeof createUserByEmailInvite}
        * @memberof Chainable
        * @example
-       *    cy.createUser(createUserInput: CreateUserMutationVariables)
+       *    cy.createUserByEmailInvite(createUserByEmailInviteInput: CreateUserByEmailInviteMutationVariables)
        */
-      createUser: (
-        createUserInput: CreateUserMutationVariables
-      ) => Cypress.Chainable<CreateUserMutation>;
+      createUserByEmailInvite: (
+        createUserByEmailInviteInput: CreateUserByEmailInviteMutationVariables
+      ) => Cypress.Chainable<CreateUserByEmailInviteMutation>;
       /**
        * Update user roles
        *

@@ -86,6 +86,6 @@ mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
 mapValue(
   Tokens.ConfigureEnvironment,
-  isProduction() ? () => {} : configureESSDevelopmentEnvironment
+  isProduction ? () => {} : configureESSDevelopmentEnvironment
 );
 mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
