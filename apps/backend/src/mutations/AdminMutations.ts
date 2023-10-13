@@ -40,7 +40,7 @@ export default class AdminMutations {
     agent: UserWithRole | null,
     includeSeeds: boolean
   ): Promise<string[] | Rejection> {
-    if (isProduction()) {
+    if (isProduction) {
       return rejection('Resetting database is not allowed');
     } else {
       logger.logWarn('Resetting database', {});

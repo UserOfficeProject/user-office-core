@@ -68,67 +68,50 @@ const createUniqueIntArray = (size: number, max: number) => {
 
 const createUsers = async () => {
   return execute(async () => {
-    const user = await userDataSource.create(
-      dummy.title(),
-      faker.name.firstName(),
-      faker.name.firstName(),
-      faker.name.lastName(),
-      faker.internet.userName(),
-      '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
-      faker.name.firstName(),
-      faker.random.alphaNumeric(16),
-      faker.random.alphaNumeric(16),
-      faker.random.alphaNumeric(16),
-      faker.random.alphaNumeric(16),
-      dummy.gender(),
-      dummy.positiveNumber(20),
-      faker.date.past(30),
-      dummy.positiveNumber(20),
-      faker.commerce.department(),
-      faker.name.jobTitle(),
-      faker.internet.email(),
-      faker.phone.number(),
-      faker.phone.number()
-    );
-    userDataSource.addUserRole({ userID: user.id, roleID: UserRole.USER });
+    const userId = await userDataSource.createInviteUser({
+      firstname: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      email: faker.internet.email(),
+      userRole: UserRole.USER,
+    });
     if (Math.random() > 0.8) {
       userDataSource.addUserRole({
-        userID: user.id,
+        userID: userId,
         roleID: UserRole.SEP_REVIEWER,
       });
     }
     if (Math.random() > 0.8) {
       userDataSource.addUserRole({
-        userID: user.id,
+        userID: userId,
         roleID: UserRole.SEP_REVIEWER,
       });
     }
     if (Math.random() > 0.8) {
       userDataSource.addUserRole({
-        userID: user.id,
+        userID: userId,
         roleID: UserRole.INSTRUMENT_SCIENTIST,
       });
     }
     if (Math.random() > 0.9) {
       userDataSource.addUserRole({
-        userID: user.id,
+        userID: userId,
         roleID: UserRole.SEP_CHAIR,
       });
     }
     if (Math.random() > 0.9) {
       userDataSource.addUserRole({
-        userID: user.id,
+        userID: userId,
         roleID: UserRole.SEP_SECRETARY,
       });
     }
     if (Math.random() > 0.95) {
       userDataSource.addUserRole({
-        userID: user.id,
+        userID: userId,
         roleID: UserRole.USER_OFFICER,
       });
     }
 
-    return user;
+    return userId;
   }, MAX_USERS);
 };
 

@@ -1151,7 +1151,7 @@ context('Proposal tests', () => {
       cy.createInstrument(instrument).then((result) => {
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentIds: result.createInstrument.id,
+          instrumentSepIds: [{ instrumentId: result.createInstrument.id }],
         });
       });
       cy.createTopic({

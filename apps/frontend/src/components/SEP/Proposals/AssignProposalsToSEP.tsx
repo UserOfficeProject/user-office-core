@@ -31,14 +31,12 @@ type AssignProposalToSEPProps = {
   close: () => void;
   assignProposalsToSEP: (sep: Sep | null) => Promise<void>;
   sepIds: (number | null)[];
-  callIds?: number[];
 };
 
 const AssignProposalsToSEP = ({
   close,
   assignProposalsToSEP,
   sepIds,
-  callIds,
 }: AssignProposalToSEPProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -47,7 +45,6 @@ const AssignProposalsToSEP = ({
     filter: '',
     active: true,
     role: currentRole as UserRole,
-    callIds: callIds,
   });
   const allSelectedProposalsHaveSameSep = sepIds.every(
     (item) => item === sepIds[0]
@@ -128,9 +125,4 @@ const AssignProposalsToSEP = ({
   );
 };
 
-// NOTE: This comparison is done to prevent component re-rendering on modal close
-export default React.memo(
-  AssignProposalsToSEP,
-  (prevProps, nextProps) =>
-    JSON.stringify(prevProps.callIds) === JSON.stringify(nextProps.callIds)
-);
+export default AssignProposalsToSEP;

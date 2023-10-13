@@ -28,7 +28,6 @@ const checkCallsReviewEnded = async (dataSource: CallDataSource) => {
         callReviewEnded: true,
       });
 
-      // NOTE: Fire the "CALL_REVIEW_ENDED" event if not in testing mode.
       eventBus.publish({
         type: Event.CALL_REVIEW_ENDED,
         call: updatedCall,
