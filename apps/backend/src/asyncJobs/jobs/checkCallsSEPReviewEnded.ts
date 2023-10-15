@@ -11,7 +11,6 @@ import { Call } from '../../models/Call';
 import { ReviewStatus } from '../../models/Review';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
-const isTestingMode = process.env.NODE_ENV === 'test';
 const DAYS_BEFORE_SENDING_NOTIFICATION_EMAILS = 2;
 const sepDataSource = container.resolve<SEPDataSource>(Tokens.SEPDataSource);
 
@@ -35,16 +34,13 @@ const checkAndNotifySEPReviewersBeforeReviewEnds = async (
     );
 
   for (const sepReviewThatShouldBeNotified of sepReviewsThatShouldBeNotified) {
-    if (!isTestingMode) {
-      // NOTE: Fire the "SEP_REVIEWER_NOTIFIED" event.
-      eventBus.publish({
-        type: Event.SEP_REVIEWER_NOTIFIED,
-        sepReview: sepReviewThatShouldBeNotified,
-        isRejection: false,
-        key: 'sepReview',
-        loggedInUserId: 0,
-      });
-    }
+    eventBus.publish({
+      type: Event.SEP_REVIEWER_NOTIFIED,
+      sepReview: sepReviewThatShouldBeNotified,
+      isRejection: false,
+      key: 'sepReview',
+      loggedInUserId: 0,
+    });
   }
 };
 
@@ -77,16 +73,13 @@ const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
         callSEPReviewEnded: true,
       });
 
-      if (!isTestingMode) {
-        // NOTE: Fire the "CALL_SEP_REVIEW_ENDED" event.
-        eventBus.publish({
-          type: Event.CALL_SEP_REVIEW_ENDED,
-          call: updatedCall,
-          isRejection: false,
-          key: 'call',
-          loggedInUserId: 0,
-        });
-      }
+      eventBus.publish({
+        type: Event.CALL_SEP_REVIEW_ENDED,
+        call: updatedCall,
+        isRejection: false,
+        key: 'call',
+        loggedInUserId: 0,
+      });
 
       updatedCalls.push(updatedCall);
     }

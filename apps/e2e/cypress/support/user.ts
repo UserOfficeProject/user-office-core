@@ -1,6 +1,6 @@
 import {
-  CreateUserMutation,
-  CreateUserMutationVariables,
+  CreateUserByEmailInviteMutation,
+  CreateUserByEmailInviteMutationVariables,
   ExternalTokenLoginMutation,
   FeatureId,
   GetFeaturesQuery,
@@ -210,11 +210,11 @@ const logout = () => {
   cy.visit('/');
 };
 
-const createUser = (
-  createUserInput: CreateUserMutationVariables
-): Cypress.Chainable<CreateUserMutation> => {
+const createUserByEmailInvite = (
+  createUserByEmailInviteInput: CreateUserByEmailInviteMutationVariables
+): Cypress.Chainable<CreateUserByEmailInviteMutation> => {
   const api = getE2EApi();
-  const request = api.createUser(createUserInput);
+  const request = api.createUserByEmailInvite(createUserByEmailInviteInput);
 
   return cy.wrap(request);
 };
@@ -249,7 +249,7 @@ function updateUserRoles(
 Cypress.Commands.add('login', login);
 
 Cypress.Commands.add('logout', logout);
-Cypress.Commands.add('createUser', createUser);
+Cypress.Commands.add('createUserByEmailInvite', createUserByEmailInvite);
 
 Cypress.Commands.add('updateUserRoles', updateUserRoles);
 Cypress.Commands.add('updateUserDetails', updateUserDetails);

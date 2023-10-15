@@ -36,12 +36,11 @@ import {
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
+import { isProduction } from '../utils/helperFunctions';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
-
-const isProduction = process.env.NODE_ENV === 'production';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
