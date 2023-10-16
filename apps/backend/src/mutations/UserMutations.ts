@@ -1,7 +1,6 @@
 import {
   addUserRoleValidationSchema,
   createUserByEmailInviteValidationSchema,
-  createUserValidationSchema,
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   resetPasswordByEmailValidationSchema,
@@ -20,7 +19,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { isRejection, rejection, Rejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import {
   AuthJwtPayload,
@@ -35,7 +34,6 @@ import {
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
 import {
   UpdateUserArgs,
   UpdateUserRolesArgs,
@@ -167,128 +165,6 @@ export default class UserMutations {
 
       return this.createEmailInviteResponse(userId, agent.id, role);
     }
-  }
-
-  @ValidateArgs(createUserValidationSchema)
-  @EventBus(Event.USER_CREATED)
-  async create(
-    agent: UserWithRole | null,
-    args: CreateUserArgs
-  ): Promise<UserLinkResponse> {
-    if (process.env.NODE_ENV !== 'development') {
-      throw rejection('Users can only be created on development env', {
-        args,
-        code: ApolloServerErrorCodeExtended.BAD_REQUEST,
-      });
-    }
-
-    const hash = this.createHash(args.password);
-    let organisationId = args.organisation;
-    // Check if user has other org and if so create it
-    if (args.otherOrganisation) {
-      organisationId = await this.dataSource.createOrganisation(
-        args.otherOrganisation,
-        false,
-        args.organizationCountry
-      );
-    }
-
-    //Check if email exist in database and if user has been invited
-    let user = await this.dataSource.getByEmail(args.email);
-
-    if (user && user.placeholder) {
-      const changePassword = await this.updatePassword(agent, {
-        id: user.id,
-        password: args.password,
-      });
-      //update user record and set placeholder flag to false
-      const updatedUser = await this.dataSource
-        .update({
-          ...user,
-          ...args,
-          placeholder: false,
-        })
-        .then((user) => user)
-        .catch((err) => {
-          throw rejection('Could not update user', { user }, err);
-        });
-
-      if (isRejection(updatedUser) || !changePassword) {
-        throw rejection('Can not create user', {
-          updatedUser,
-          changePassword,
-        });
-      }
-      user = updatedUser;
-    } else if (user) {
-      throw rejection('Can not create user because account already exists', {
-        args,
-      });
-    } else {
-      try {
-        user = await this.dataSource.create(
-          args.user_title,
-          args.firstname,
-          args.middlename,
-          args.lastname,
-          `${args.firstname}.${args.lastname}`, // This is just for now, while we decide on the final format
-          hash,
-          args.preferredname,
-          '',
-          '',
-          '',
-          '',
-          args.gender,
-          args.nationality,
-          args.birthdate,
-          organisationId,
-          args.department,
-          args.position,
-          args.email,
-          args.telephone,
-          args.telephone_alt
-        );
-      } catch (error) {
-        // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
-        const errorCode = (error as { code: string }).code;
-
-        if (errorCode === '23503' || errorCode === '23505') {
-          throw rejection(
-            'Can not create user because account already exists',
-            { args },
-            error
-          );
-        }
-      }
-    }
-
-    if (!user) {
-      throw rejection('Can not create user', { args });
-    }
-
-    const roles = await this.dataSource.getUserRoles(user.id);
-
-    // If user has no role assign it the user role
-    if (!roles.length) {
-      this.dataSource.setUserRoles(user.id, [UserRole.USER]);
-    }
-
-    const token = signToken<EmailVerificationJwtPayload>(
-      {
-        id: user.id,
-        type: 'emailVerification',
-        updated: user.updated,
-      },
-      { expiresIn: '24h' }
-    );
-
-    // Email verification link
-    const link = process.env.baseURL + '/emailVerification/' + token;
-
-    // NOTE: This uses UserLinkResponse class because output should be standardized for all events where we use EventBusDecorator.
-    const userLinkResponse = new UserLinkResponse(user, link);
-
-    return userLinkResponse;
   }
 
   @ValidateArgs(updateUserValidationSchema)
