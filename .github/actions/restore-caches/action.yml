@@ -1,0 +1,44 @@
+name: Restore caches
+description: Restores caches for the repository
+inputs:
+  node-version:
+    required: true
+    description: The version of Node.js to use
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Restore node_modules
+      id: cached-node-modules-root
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ inputs.node-version }}
+
+    - name: Restore backend node_modules
+      id: cached-node-modules-backend
+      uses: actions/cache@v3
+      with:
+        path: apps/backend/node_modules
+        key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ inputs.node-version }}
+
+    - name: Restore frontend node_modules
+      id: cached-node-modules-frontend
+      uses: actions/cache@v3
+      with:
+        path: apps/frontend/node_modules
+        key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ inputs.node-version }}
+
+    - name: Restore frontend SDK
+      id: cached-sdk-frontend
+      uses: actions/cache@v3
+      with:
+        path: apps/frontend/src/generated
+        key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+        restore-keys: |
+          sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          sdk-frontend-

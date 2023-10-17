@@ -142,42 +142,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      
+      - uses: ./.github/actions/restore-caches
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore node_modules
-        id: cached-node-modules-root
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v3
-        with:
-          path: apps/backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend node_modules
-        id: cached-node-modules-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-          restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
-            sdk-frontend-
 
       - run: npm ci
 
@@ -223,7 +191,8 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run test:backend
-  e2e:
+  
+  e2e_stfc:
     runs-on: ubuntu-latest
     needs: [resolve_dep, install-and-cache]
 
@@ -247,54 +216,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: ./.github/actions/restore-caches
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore node_modules
-        id: cached-node-modules-root
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v3
-        with:
-          path: apps/backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend node_modules
-        id: cached-node-modules-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-          restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
-            sdk-frontend-
-
-      # TODO: See how to proceed with e2e caching because there is some error:
-      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
-      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
-      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
-      # - name: Cache e2e node_modules
-      #   env:
-      #     CYPRESS_CACHE_FOLDER: cache/Cypress
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: apps/e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Install e2e dependencies
         env:
@@ -307,7 +231,7 @@ jobs:
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
      
-      - name: Run e2e tests stfc
+      - name: Run e2e tests (STFC config)
         env:
           USER_OFFICE_BACKEND_DIR: apps/backend
           USER_OFFICE_FRONTEND_DIR: apps/frontend
@@ -350,8 +274,54 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run e2e:after:dev:stfc
-  
-      - name: Run e2e tests
+
+      - name: Upload cypres screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-screenshots
+          path: apps/e2e/cypress/screenshots
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [resolve_dep, install-and-cache]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        pattern:
+          [
+            "cypress/e2e/[a-e]*.ts",
+            "cypress/e2e/[f-h]*.ts",
+            "cypress/e2e/[i-o]*.ts",
+            "cypress/e2e/p[a-m]*.ts",
+            "cypress/e2e/p[n-z]*.ts",
+            "cypress/e2e/[r-s]*.ts",
+            "cypress/e2e/templatesBasic.cy.ts",
+            "cypress/e2e/templatesAdvanced.cy.ts",
+            "cypress/e2e/[u-z]*.ts",
+            "cypress/e2e/[A-Z]*.ts",
+          ]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: ./.github/actions/restore-caches
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install e2e dependencies
+        env:
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+        if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
+        run: npm run install:e2e
+
+      - name: Download required repositories
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+     
+      - name: Run e2e tests (E2E config)
         env:
           USER_OFFICE_BACKEND_DIR: apps/backend
           USER_OFFICE_FRONTEND_DIR: apps/frontend
@@ -389,9 +359,7 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run e2e:after:dev -- --dns-result-order=ipv4first
-  
-
-
+          
       - name: Upload cypres screenshots
         if: failure()
         uses: actions/upload-artifact@v3
