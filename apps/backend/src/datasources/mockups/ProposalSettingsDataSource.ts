@@ -1,16 +1,10 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
-import {
-  ConnectionHasStatusAction,
-  ProposalStatusAction,
-  ProposalStatusActionType,
-} from '../../models/ProposalStatusAction';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
   ProposalWorkflowConnection,
 } from '../../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
-import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -67,23 +61,6 @@ export const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
   1,
   'PROPOSAL_SUBMITTED'
-);
-
-export const dummyConnectionHasStatusAction = new ConnectionHasStatusAction(
-  1,
-  1,
-  1,
-  'Dummy action',
-  ProposalStatusActionType.EMAIL,
-  false,
-  {}
-);
-
-export const dummyStatusAction = new ProposalStatusAction(
-  1,
-  'Dummy action',
-  'Dummy action description',
-  ProposalStatusActionType.EMAIL
 );
 
 export class ProposalSettingsDataSourceMock
@@ -208,32 +185,5 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     return [dummyStatusChangingEvent];
-  }
-
-  async getConnectionStatusActions(
-    proposalWorkflowConnectionId: number,
-    proposalWorkflowId: number
-  ): Promise<ConnectionHasStatusAction[]> {
-    return [dummyConnectionHasStatusAction];
-  }
-
-  async updateConnectionStatusAction(
-    proposalStatusAction: ConnectionHasStatusAction
-  ): Promise<ConnectionHasStatusAction> {
-    return dummyConnectionHasStatusAction;
-  }
-
-  async getStatusAction(actionId: number): Promise<ProposalStatusAction> {
-    return dummyStatusAction;
-  }
-
-  async getStatusActions(): Promise<ProposalStatusAction[]> {
-    return [dummyStatusAction];
-  }
-
-  async addConnectionStatusActions(
-    input: AddConnectionStatusActionsInput
-  ): Promise<ConnectionHasStatusAction[]> {
-    return [dummyConnectionHasStatusAction];
   }
 }
