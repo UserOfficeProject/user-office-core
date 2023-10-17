@@ -71,6 +71,7 @@ export default function QuestionaryEditorModel(
     },
     json: '',
     pdfTemplate: null,
+    pdfCallCount: 0,
   };
 
   function reducer(state: Template, action: Event): Template {

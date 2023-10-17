@@ -180,7 +180,7 @@ context('Instrument tests', () => {
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentIds: [createdInstrumentId],
+            instrumentSepIds: [{ instrumentId: createdInstrumentId }],
           });
         }
       });
@@ -555,7 +555,7 @@ context('Instrument tests', () => {
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentIds: [createdInstrumentId],
+            instrumentSepIds: [{ instrumentId: createdInstrumentId }],
           });
 
           cy.assignScientistsToInstrument({
@@ -570,7 +570,7 @@ context('Instrument tests', () => {
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentIds: [createdInstrument2Id],
+            instrumentSepIds: [{ instrumentId: createdInstrument2Id }],
           });
 
           cy.assignScientistsToInstrument({

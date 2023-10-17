@@ -10,7 +10,6 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
-import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
@@ -174,44 +173,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
       return;
     }
 
-    case Event.USER_CREATED: {
-      if (isProduction()) {
-        mailService
-          .sendMail({
-            content: {
-              template_id: 'user-office-account-verification',
-            },
-            substitution_data: {
-              title: 'ESS User portal verify account',
-              buttonText: 'Click to verify',
-              link: event.userlinkresponse.link,
-            },
-            recipients: [{ address: event.userlinkresponse.user.email }],
-          })
-          .then((res) => {
-            logger.logInfo('Email sent on user creation:', {
-              result: res,
-              event,
-            });
-          })
-          .catch((err: string) => {
-            logger.logError('Could not send email on user creation:', {
-              error: err,
-              event,
-            });
-          });
-      } else {
-        await userDataSource.setUserEmailVerified(
-          event.userlinkresponse.user.id
-        );
-        logger.logInfo('Set user as verified without sending email', {
-          userId: event.userlinkresponse.user.id,
-          event,
-        });
-      }
-
-      return;
-    }
     case Event.PROPOSAL_NOTIFIED: {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId

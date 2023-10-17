@@ -51,7 +51,7 @@ context('Internal Review tests', () => {
 
             cy.assignInstrumentToCall({
               callId: initialDBData.call.id,
-              instrumentIds: [createdInstrumentId],
+              instrumentSepIds: [{ instrumentId: createdInstrumentId }],
             });
           }
         });

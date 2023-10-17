@@ -22,7 +22,7 @@ export class SparkPostMailService extends MailService {
     return {
       ...options,
       recipients: options.recipients.map((recipient) =>
-        isProduction()
+        isProduction
           ? recipient
           : typeof recipient.address === 'string'
           ? {
@@ -43,17 +43,15 @@ export class SparkPostMailService extends MailService {
 
   sendMail = (options: EmailSettings): ResultsPromise<SendMailResults> => {
     // NOTE: If it is not production and there is no sinkEmail we are not sending emails.
-    if (!isProduction() && !this.sinkEmail) {
+    if (!isProduction && !this.sinkEmail) {
       logger.logInfo('Pretending to send an email', { ...options });
 
-      return new Promise((resolve) => {
-        resolve({
-          results: {
-            id: 'SparkPostMailService',
-            total_accepted_recipients: options.recipients.length,
-            total_rejected_recipients: 0,
-          },
-        });
+      return Promise.resolve({
+        results: {
+          id: 'SparkPostMailService',
+          total_accepted_recipients: options.recipients.length,
+          total_rejected_recipients: 0,
+        },
       });
     }
 
