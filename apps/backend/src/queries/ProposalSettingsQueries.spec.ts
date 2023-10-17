@@ -8,6 +8,10 @@ import {
   dummyProposalWorkflowConnection,
 } from '../datasources/mockups/ProposalSettingsDataSource';
 import {
+  dummyStatusAction,
+  dummyStatusActions,
+} from '../datasources/mockups/StatusActionsDataSource';
+import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -77,5 +81,20 @@ describe('Test Proposal Workflows Queries', () => {
         ],
       },
     ]);
+  });
+
+  test('A userofficer can get Proposal Workflow status actions', () => {
+    return expect(
+      ProposalSettingsQueriesInstance.getStatusActions(dummyUserOfficerWithRole)
+    ).resolves.toStrictEqual(dummyStatusActions);
+  });
+
+  test('A userofficer can get single Proposal Workflow status action', () => {
+    return expect(
+      ProposalSettingsQueriesInstance.getStatusAction(
+        dummyUserOfficerWithRole,
+        1
+      )
+    ).resolves.toStrictEqual(dummyStatusAction);
   });
 });
