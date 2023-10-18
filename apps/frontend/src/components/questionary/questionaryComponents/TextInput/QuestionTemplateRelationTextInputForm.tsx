@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
@@ -54,6 +54,15 @@ export const QuestionTemplateRelationTextInputForm = (
               component={TextField}
               fullWidth
               data-cy="min"
+              onChange={({
+                target: { value },
+              }: ChangeEvent<HTMLInputElement>) => {
+                formikProps.setFieldValue(
+                  'config.min',
+                  value.length === 0 ? null : value
+                );
+              }}
+              value={(formikProps.values.config as TextInputConfig).min ?? ''}
             />
 
             <Field
@@ -64,6 +73,15 @@ export const QuestionTemplateRelationTextInputForm = (
               component={TextField}
               fullWidth
               data-cy="max"
+              onChange={({
+                target: { value },
+              }: ChangeEvent<HTMLInputElement>) => {
+                formikProps.setFieldValue(
+                  'config.max',
+                  value.length === 0 ? null : value
+                );
+              }}
+              value={(formikProps.values.config as TextInputConfig).max ?? ''}
             />
           </TitledContainer>
           <TitledContainer label="Options">
