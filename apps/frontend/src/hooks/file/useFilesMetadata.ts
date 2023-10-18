@@ -15,6 +15,11 @@ export function useFilesMetadata(filesFilter: FilesMetadataFilter) {
   useEffect(() => {
     let unmounted = false;
 
+    // If there are no fileIds, do not fetch anything
+    if (filter.fileIds?.length === 0) {
+      return;
+    }
+
     api()
       .getFilesMetadata({ filter: filter })
       .then((data) => {
@@ -22,9 +27,8 @@ export function useFilesMetadata(filesFilter: FilesMetadataFilter) {
           return;
         }
 
-        if (data.filesMetadata) {
-          setFiles(data.filesMetadata);
-        }
+        // Update the state based on the previous state
+        setFiles((prevFiles) => [...prevFiles, ...data.filesMetadata]);
       });
 
     return () => {
