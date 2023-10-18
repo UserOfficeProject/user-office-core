@@ -192,14 +192,6 @@ interface UserRoleUpdateEvent extends GeneralEvent {
   user: User;
 }
 
-interface UserCreateEvent extends GeneralEvent {
-  type: Event.USER_CREATED;
-  userlinkresponse: {
-    user: User;
-    link: string;
-  };
-}
-
 interface UserDeletedEvent extends GeneralEvent {
   type: Event.USER_DELETED;
   user: User;
@@ -317,7 +309,6 @@ export type ApplicationEvent =
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
   | ProposalStatusUpdatedEvent
-  | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent
   | UserUpdateEvent

@@ -14,6 +14,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
 import {
@@ -41,7 +42,9 @@ import { omit } from '../utils/helperFunctions';
 export default class ProposalSettingsMutations {
   constructor(
     @inject(Tokens.ProposalSettingsDataSource)
-    private dataSource: ProposalSettingsDataSource
+    private dataSource: ProposalSettingsDataSource,
+    @inject(Tokens.StatusActionsDataSource)
+    private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
   @ValidateArgs(createProposalStatusValidationSchema)
@@ -654,6 +657,6 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     input: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null> {
-    return this.dataSource.addConnectionStatusActions(input);
+    return this.statusActionsDataSource.addConnectionStatusActions(input);
   }
 }
