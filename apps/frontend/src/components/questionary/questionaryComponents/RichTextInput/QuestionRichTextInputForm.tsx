@@ -1,10 +1,11 @@
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { TextInputConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
@@ -24,7 +25,7 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
         }),
       })}
     >
-      {() => (
+      {(formikProps) => (
         <>
           <Field
             name="naturalKey"
@@ -63,6 +64,15 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
               component={TextField}
               fullWidth
               data-cy="max"
+              onChange={({
+                target: { value },
+              }: ChangeEvent<HTMLInputElement>) => {
+                formikProps.setFieldValue(
+                  'config.max',
+                  value.length === 0 ? null : value
+                );
+              }}
+              value={(formikProps.values.config as TextInputConfig).max ?? ''}
             />
           </TitledContainer>
         </>
