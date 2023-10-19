@@ -115,9 +115,6 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 
   @Field(() => [ApiCallRequestHeader])
   apiCallRequestHeaders: ApiCallRequestHeader[];
-
-  @Field(() => Boolean)
-  externalApiCall: boolean;
 }
 
 @ObjectType()

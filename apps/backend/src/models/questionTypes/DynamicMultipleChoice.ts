@@ -36,7 +36,6 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
       config.jsonPath = '';
       config.isMultipleSelect = false;
       config.apiCallRequestHeaders = [];
-      config.externalApiCall = true;
 
       return config;
     },
@@ -63,9 +62,13 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
     transformConfig: async (config) => {
       const fallBackConfig = { ...config, options: [] };
 
+      if (!config.url) {
+        return fallBackConfig;
+      }
+
       try {
         const resp = await axios.get(config.url, {
-          headers: config.apiCallRequestHeaders.reduce(
+          headers: config.apiCallRequestHeaders?.reduce(
             (acc, header) => ({
               ...acc,
               [header.name]: header.value,

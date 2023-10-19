@@ -133,7 +133,6 @@ fragment fieldConfig on FieldConfig {
     url
     options
     jsonPath
-    externalApiCall
     apiCallRequestHeaders {
       name
       value
