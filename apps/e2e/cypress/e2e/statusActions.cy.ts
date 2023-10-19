@@ -335,6 +335,14 @@ context('Status actions tests', () => {
 
     cy.get('[data-cy="other-email-recipients"] input').clear().type(validEmail);
 
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.get('[data-cy="other-email-recipients"]').contains(
+      'Please add the typed value by pressing Enter'
+    );
+
+    cy.get('[data-cy="other-email-recipients"] input').focus();
+
     cy.realPress('Enter');
 
     cy.get('[data-cy="added-email-recipients"]').should(

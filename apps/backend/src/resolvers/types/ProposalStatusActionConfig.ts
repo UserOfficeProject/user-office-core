@@ -54,7 +54,7 @@ export class EmailStatusActionRecipientsWithTemplate {
   emailTemplate: EmailStatusActionEmailTemplate;
 
   @Field(() => [String], { nullable: true })
-  otherRecipientEmails: string[];
+  otherRecipientEmails?: string[];
 }
 
 @ObjectType()
