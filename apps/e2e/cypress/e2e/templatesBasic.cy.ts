@@ -1467,6 +1467,7 @@ context('Template tests', () => {
           url: dynamicMultipleChoiceQuestion.url,
           isMultipleSelect: true,
           firstTopic: true,
+          headers: { Authorization: 'Bearer 1234' },
         }
       );
       createProposalAndClickDropdownBehavior();
