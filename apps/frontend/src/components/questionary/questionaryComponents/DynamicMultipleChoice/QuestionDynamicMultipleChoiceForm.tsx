@@ -102,11 +102,6 @@ const CustomizedTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const HeaderWrapper = styled(Paper)`
-  padding: 10px 5px;
-  margin: 20px 0 0 0;
-`;
-
 export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as DynamicMultipleChoiceConfig;
