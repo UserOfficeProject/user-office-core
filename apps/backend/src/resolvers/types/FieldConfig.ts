@@ -88,6 +88,15 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class ApiCallRequestHeader {
+  @Field()
+  name: string;
+
+  @Field()
+  value: string;
+}
+
+@ObjectType()
 export class DynamicMultipleChoiceConfig extends ConfigBase {
   @Field(() => String)
   variant: string;
@@ -103,6 +112,9 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 
   @Field(() => [String])
   options: string[];
+
+  @Field(() => [ApiCallRequestHeader])
+  apiCallRequestHeaders: ApiCallRequestHeader[];
 
   @Field(() => Boolean)
   externalApiCall: boolean;

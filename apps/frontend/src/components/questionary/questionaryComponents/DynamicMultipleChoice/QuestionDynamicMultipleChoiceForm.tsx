@@ -27,13 +27,21 @@ import { Checkbox, Select, TextField } from 'formik-mui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
+import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { DynamicMultipleChoiceConfig } from 'generated/sdk';
+import {
+  ApiCallRequestHeader,
+  DynamicMultipleChoiceConfig,
+} from 'generated/sdk';
 import { urlValidationSchema } from 'utils/helperFunctions';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
+const columns = [
+  { title: 'Name', field: 'name' },
+  { title: 'Value', field: 'value' },
+];
 
 const jsonPathFieldsDocRows = [
   {
@@ -94,6 +102,11 @@ const CustomizedTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const HeaderWrapper = styled(Paper)`
+  padding: 10px 5px;
+  margin: 20px 0 0 0;
+`;
+
 export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as DynamicMultipleChoiceConfig;
@@ -121,6 +134,8 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
           url: urlValidation,
+          jsonPath: Yup.string(),
+          apiRequestHeaders: Yup.array(),
         }),
       })}
     >
@@ -345,6 +360,22 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                   ),
                 }}
               />
+            </FormControl>
+            <FormControl>
+              <TitledContainer label="Api request headers">
+                <Field
+                  title=""
+                  name="config.apiCallRequestHeaders"
+                  component={FormikUICustomTable}
+                  columns={columns}
+                  dataTransforms={{
+                    toTable: (options: ApiCallRequestHeader[]) => options,
+                    fromTable: (rows: Record<string, unknown>[]) => rows,
+                  }}
+                  fullWidth
+                  data-cy="options"
+                />
+              </TitledContainer>
             </FormControl>
           </TitledContainer>
         </>
