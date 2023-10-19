@@ -2,7 +2,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -27,17 +27,19 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 0,
   },
 }));
-const TitledContainer = ({
-  children,
-  label,
-}: PropsWithChildren<{
+
+type TitledContainerProps = {
   children: NonNullable<React.ReactNode>;
   label?: string;
-}>) => {
+} & React.HTMLProps<HTMLDivElement>;
+
+const TitledContainer = (props: TitledContainerProps) => {
+  const { children, label, ...rest } = props;
   const classes = useStyles();
+  console.log(props);
 
   return (
-    <div className={classes.container}>
+    <div className={classes.container} {...rest}>
       <Typography variant="h6" component="h2" className={classes.heading}>
         {label}
       </Typography>

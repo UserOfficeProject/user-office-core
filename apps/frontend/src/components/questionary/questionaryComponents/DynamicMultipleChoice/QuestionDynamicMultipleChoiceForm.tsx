@@ -361,8 +361,11 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                 }}
               />
             </FormControl>
-            <FormControl>
-              <TitledContainer label="Api request headers">
+            <FormControl fullWidth>
+              <TitledContainer
+                label="Api request headers"
+                data-cy="api-headers-container"
+              >
                 <Field
                   title=""
                   name="config.apiCallRequestHeaders"

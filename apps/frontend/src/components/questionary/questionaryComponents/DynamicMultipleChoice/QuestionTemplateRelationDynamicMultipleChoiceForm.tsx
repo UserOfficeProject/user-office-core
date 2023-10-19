@@ -135,8 +135,11 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                 inputProps={{ 'data-cy': 'dynamic-url-jsonPath' }}
               />
             </FormControl>
-            <FormControl>
-              <TitledContainer label="Api request headers">
+            <FormControl fullWidth>
+              <TitledContainer
+                label="Api request headers"
+                data-cy="api-headers-container"
+              >
                 <Field
                   title=""
                   name="config.apiCallRequestHeaders"
