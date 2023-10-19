@@ -19,6 +19,12 @@ const ExternalAuthQueryParams = {
   error_description: StringParam,
 };
 
+const getCurrentUrlWithoutQueryParams = () => {
+  const { protocol, host, pathname } = window.location;
+
+  return [protocol, '//', host, pathname].join('');
+};
+
 function ExternalAuth() {
   const [urlQueryParams] = useQueryParams(ExternalAuthQueryParams);
 
@@ -100,8 +106,7 @@ function ExternalAuth() {
     );
 
     const handleAuthorizationCode = (authorizationCode: string) => {
-      const { protocol, host, pathname } = window.location;
-      const currentUrlWithoutParams = [protocol, '//', host, pathname].join('');
+      const currentUrlWithoutParams = getCurrentUrlWithoutQueryParams();
 
       setView(<ContactingAuthorizationServerMessage />);
 
@@ -129,7 +134,8 @@ function ExternalAuth() {
         return;
       }
       const url = new URL(externalAuthLoginUrl);
-      url.searchParams.set('redirect_uri', encodeURI(window.location.href));
+      const currentUrlWithoutParams = getCurrentUrlWithoutQueryParams();
+      url.searchParams.set('redirect_uri', currentUrlWithoutParams);
       window.location.href = url.toString();
     };
 
