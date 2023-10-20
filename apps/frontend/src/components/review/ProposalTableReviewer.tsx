@@ -3,6 +3,7 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
@@ -376,30 +377,41 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
 
   return (
     <>
-      <ReviewStatusFilter
-        reviewStatus={urlQueryParams.reviewStatus}
-        onChange={handleStatusFilterChange}
-      />
-      <CallFilter
-        shouldShowAll
-        calls={calls}
-        isLoading={loadingCalls}
-        callId={selectedCallId}
-        onChange={(callId) => {
-          setSelectedCallId(callId);
-          setUserWithReviewsFilter((filters) => ({ ...filters, callId }));
-        }}
-      />
-      <InstrumentFilter
-        shouldShowAll
-        instruments={instruments}
-        isLoading={loadingInstruments}
-        instrumentId={selectedInstrumentId}
-        onChange={(instrumentId) => {
-          setSelectedInstrumentId(instrumentId);
-          setUserWithReviewsFilter((filters) => ({ ...filters, instrumentId }));
-        }}
-      />
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <ReviewStatusFilter
+            reviewStatus={urlQueryParams.reviewStatus}
+            onChange={handleStatusFilterChange}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <CallFilter
+            shouldShowAll
+            calls={calls}
+            isLoading={loadingCalls}
+            callId={selectedCallId}
+            onChange={(callId) => {
+              setSelectedCallId(callId);
+              setUserWithReviewsFilter((filters) => ({ ...filters, callId }));
+            }}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <InstrumentFilter
+            shouldShowAll
+            instruments={instruments}
+            isLoading={loadingInstruments}
+            instrumentId={selectedInstrumentId}
+            onChange={(instrumentId) => {
+              setSelectedInstrumentId(instrumentId);
+              setUserWithReviewsFilter((filters) => ({
+                ...filters,
+                instrumentId,
+              }));
+            }}
+          />
+        </Grid>
+      </Grid>
       <ProposalReviewModal
         title={`Proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}

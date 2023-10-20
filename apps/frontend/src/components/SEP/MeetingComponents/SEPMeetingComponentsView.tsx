@@ -1,7 +1,7 @@
 import { Options, MTableToolbar } from '@material-table/core';
 import GridOnIcon from '@mui/icons-material/GridOn';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
@@ -45,32 +45,36 @@ const SEPMeetingComponentsView = ({ sepId }: SEPMeetingComponentsViewProps) => {
   const Toolbar = (data: Options<JSX.Element>): JSX.Element => (
     <>
       <MTableToolbar {...data} />
-      <Stack alignItems="center" direction="row">
-        <CallFilter
-          calls={calls}
-          isLoading={loadingCalls}
-          callId={query.call}
-        />
-        <Tooltip title="Export in Excel">
-          <IconButton
-            aria-label="export in excel"
-            className={classes.spacing}
-            data-cy="download-sep-xlsx"
-            onClick={() => {
-              if (query.call) {
-                downloadSEPXLSX(
-                  sepId,
-                  query.call,
-                  calls.find(({ id }) => id === query.call)?.shortCode ??
-                    'unknown'
-                );
-              }
-            }}
-          >
-            <GridOnIcon />
-          </IconButton>
-        </Tooltip>
-      </Stack>
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <CallFilter
+            calls={calls}
+            isLoading={loadingCalls}
+            callId={query.call}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <Tooltip title="Export in Excel">
+            <IconButton
+              aria-label="export in excel"
+              className={classes.spacing}
+              data-cy="download-sep-xlsx"
+              onClick={() => {
+                if (query.call) {
+                  downloadSEPXLSX(
+                    sepId,
+                    query.call,
+                    calls.find(({ id }) => id === query.call)?.shortCode ??
+                      'unknown'
+                  );
+                }
+              }}
+            >
+              <GridOnIcon />
+            </IconButton>
+          </Tooltip>
+        </Grid>
+      </Grid>
     </>
   );
 

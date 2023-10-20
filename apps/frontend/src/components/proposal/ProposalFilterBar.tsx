@@ -1,6 +1,8 @@
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Button, Collapse } from '@mui/material';
+import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
+import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { DecodedValueMap } from 'use-query-params';
@@ -65,91 +67,99 @@ const ProposalFilterBar = ({
   )?.templateId;
 
   return (
-    <>
-      <CallFilter
-        callId={filter.callId as number}
-        calls={calls?.data}
-        isLoading={calls?.isLoading}
-        shouldShowAll={true}
-        onChange={(callId) => {
-          if (!callId) {
-            setShowQuestionFilter(false);
-          }
+    <Grid container spacing={2}>
+      <Grid item sm={3} xs={12}>
+        <CallFilter
+          callId={filter.callId as number}
+          calls={calls?.data}
+          isLoading={calls?.isLoading}
+          shouldShowAll={true}
+          onChange={(callId) => {
+            if (!callId) {
+              setShowQuestionFilter(false);
+            }
 
-          setProposalFilter({
-            ...filter,
-            callId,
-          });
-        }}
-      />
-
-      <InstrumentFilter
-        instrumentId={filter.instrumentId as number}
-        instruments={instruments?.data}
-        isLoading={instruments?.isLoading}
-        shouldShowAll={true}
-        onChange={(instrumentId) => {
-          setProposalFilter({
-            ...filter,
-            instrumentId,
-          });
-        }}
-      />
-
-      <ProposalStatusFilter
-        proposalStatusId={filter.proposalStatusId as number}
-        proposalStatuses={proposalStatuses?.data}
-        isLoading={proposalStatuses?.isLoading}
-        shouldShowAll={true}
-        onChange={(proposalStatusId) => {
-          setProposalFilter({
-            ...filter,
-            proposalStatusId,
-          });
-        }}
-      />
-
-      <Button
-        variant="outlined"
-        endIcon={showQuestionFilter ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        style={{
-          marginTop: '17px',
-          marginLeft: '8px',
-          textTransform: 'none',
-          fontSize: '16px',
-        }}
-        onClick={() => {
-          const shouldShowQuestionFilter = !showQuestionFilter;
-          setShowQuestionFilter(shouldShowQuestionFilter);
-          if (!shouldShowQuestionFilter) {
-            setQuestionFilterQuery(undefined);
             setProposalFilter({
               ...filter,
-              questionFilter: undefined,
-            }); // submitting because it feels intuitive that filter is cleared when menu is closed
-          }
-        }}
-        disabled={!selectedCallTemplateId}
-        data-cy="question-search-toggle"
-      >
-        {showQuestionFilter ? 'close' : 'more'}
-      </Button>
+              callId,
+            });
+          }}
+        />
+      </Grid>
 
-      {selectedCallTemplateId && (
-        <Collapse in={showQuestionFilter}>
-          <QuestionaryFilter
-            callId={filter.callId}
-            templateId={selectedCallTemplateId}
-            onSubmit={(questionFilter) => {
+      <Grid item sm={3} xs={12}>
+        <InstrumentFilter
+          instrumentId={filter.instrumentId as number}
+          instruments={instruments?.data}
+          isLoading={instruments?.isLoading}
+          shouldShowAll={true}
+          onChange={(instrumentId) => {
+            setProposalFilter({
+              ...filter,
+              instrumentId,
+            });
+          }}
+        />
+      </Grid>
+
+      <Grid item sm={3} xs={12}>
+        <ProposalStatusFilter
+          proposalStatusId={filter.proposalStatusId as number}
+          proposalStatuses={proposalStatuses?.data}
+          isLoading={proposalStatuses?.isLoading}
+          shouldShowAll={true}
+          onChange={(proposalStatusId) => {
+            setProposalFilter({
+              ...filter,
+              proposalStatusId,
+            });
+          }}
+        />
+      </Grid>
+
+      <Grid item sm={3} xs={12}>
+        <Button
+          variant="outlined"
+          endIcon={showQuestionFilter ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          style={{
+            textTransform: 'none',
+            fontSize: '16px',
+          }}
+          onClick={() => {
+            const shouldShowQuestionFilter = !showQuestionFilter;
+            setShowQuestionFilter(shouldShowQuestionFilter);
+            if (!shouldShowQuestionFilter) {
+              setQuestionFilterQuery(undefined);
               setProposalFilter({
                 ...filter,
-                questionFilter,
-              });
-            }}
-          />
-        </Collapse>
+                questionFilter: undefined,
+              }); // submitting because it feels intuitive that filter is cleared when menu is closed
+            }
+          }}
+          disabled={!selectedCallTemplateId}
+          data-cy="question-search-toggle"
+        >
+          {showQuestionFilter ? 'close' : 'more'}
+        </Button>
+      </Grid>
+
+      {selectedCallTemplateId && (
+        <Grid item sm={6} xs={12}>
+          <Collapse in={showQuestionFilter}>
+            <QuestionaryFilter
+              callId={filter.callId}
+              templateId={selectedCallTemplateId}
+              onSubmit={(questionFilter) => {
+                setProposalFilter({
+                  ...filter,
+                  questionFilter,
+                });
+              }}
+            />
+          </Collapse>
+        </Grid>
       )}
-    </>
+    </Grid>
   );
 };
 
