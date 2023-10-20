@@ -44,7 +44,7 @@ export const groupProposalsByProperties = (
 
 export type EmailReadyType = {
   id: EmailStatusActionRecipients;
-  proposals: { proposalId: number; proposalTitle: string }[];
+  proposals: { proposalId: string; proposalTitle: string }[];
   template: string;
   email: string;
 };
@@ -63,7 +63,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
 
     if (foundIndex !== -1) {
       emailReadyUsersWithProposals[foundIndex].proposals.push({
-        proposalId: proposal.primaryKey,
+        proposalId: proposal.proposalId,
         proposalTitle: proposal.title,
       });
     } else {
@@ -71,7 +71,7 @@ export const getEmailReadyArrayOfUsersAndProposals = (
         id: recipientsWithEmailTemplate.recipient.name,
         proposals: [
           {
-            proposalId: proposal.primaryKey,
+            proposalId: proposal.proposalId,
             proposalTitle: proposal.title,
           },
         ],
