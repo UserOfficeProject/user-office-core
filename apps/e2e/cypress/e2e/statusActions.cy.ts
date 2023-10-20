@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   EmailStatusActionRecipients,
   ProposalStatusActionType,
@@ -224,5 +225,155 @@ context('Status actions tests', () => {
       `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
     ).should('not.exist');
   });
-  // TODO: Once the testing environment for email sending is in place we can extend the test cases with testing the actual run of the status actions.
+
+  it('User Officer should be able to add other recipients by email', () => {
+    const statusActionConfig = {
+      recipientsWithEmailTemplate: [
+        {
+          recipient: { name: EmailStatusActionRecipients.PI, description: '' },
+          emailTemplate: { id: 'pi-template', name: 'PI template' },
+        },
+      ],
+    };
+    const invalidEmail = 'test@test';
+    const validEmail = faker.internet.email();
+
+    cy.addProposalWorkflowStatus({
+      droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
+      proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+      sortOrder: 1,
+      prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+    }).then((result) => {
+      cy.addConnectionStatusActions({
+        actions: [
+          {
+            actionId: 1,
+            actionType: ProposalStatusActionType.EMAIL,
+            config: JSON.stringify(statusActionConfig),
+          },
+        ],
+        connectionId: result.addProposalWorkflowStatus.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+      });
+    });
+
+    cy.login('officer');
+    cy.visit('/ProposalWorkflowEditor/1');
+
+    cy.finishedLoading();
+
+    cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+    cy.get('[data-cy="status-events-and-actions-modal"]')
+      .contains('Status actions')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
+
+    cy.get(
+      '[data-cy="accordion-EMAIL"] [data-testid="ExpandMoreIcon"]'
+    ).click();
+
+    cy.get('[data-cy="action-recipient-PI"] input').should('be.checked');
+    cy.get('[data-cy="PI-email-template"] input')
+      .invoke('val')
+      .should('not.be.empty');
+
+    cy.get('[data-cy="action-recipient-OTHER"] input').click();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.get('[data-cy="OTHER-email-template"] input').should('be.focused');
+    cy.get<JQuery<HTMLInputElement>>(
+      '[data-cy="OTHER-email-template"] input'
+    ).then(($input) => {
+      expect($input[0].validity.valid).to.be.false;
+      expect($input[0].validationMessage).to.include(
+        'Please fill out this field.'
+      );
+    });
+
+    cy.get('[data-cy="OTHER-email-template"] input').click();
+    cy.get('.MuiAutocomplete-listbox li').first().click();
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.get('[data-cy="other-email-recipients"] input').should('be.focused');
+    cy.get<JQuery<HTMLInputElement>>(
+      '[data-cy="other-email-recipients"] input'
+    ).then(($input) => {
+      expect($input[0].validity.valid).to.be.false;
+      expect($input[0].validationMessage).to.include(
+        'Please fill out this field.'
+      );
+    });
+
+    cy.get('[data-cy="other-email-recipients"] input')
+      .clear()
+      .type(invalidEmail);
+
+    cy.realPress('Enter');
+
+    cy.get('[data-cy="other-email-recipients"]').contains(
+      `${invalidEmail} is not a valid email address.`
+    );
+
+    cy.get('[data-cy="other-email-recipients"] input')
+      .clear()
+      .type(invalidEmail);
+
+    cy.realPress('Enter');
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.notification({ variant: 'error', text: 'Input validation errors' });
+
+    cy.closeNotification();
+
+    cy.get('[data-cy="other-email-recipients"] input').clear().type(validEmail);
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.get('[data-cy="other-email-recipients"]').contains(
+      'Please add the typed value by pressing Enter'
+    );
+
+    cy.get('[data-cy="other-email-recipients"] input').focus();
+
+    cy.realPress('Enter');
+
+    cy.get('[data-cy="added-email-recipients"]').should(
+      'contain.text',
+      validEmail
+    );
+
+    cy.get('[data-cy="submit"]').contains('Add status actions').click();
+
+    cy.notification({ variant: 'success', text: 'success' });
+
+    cy.closeModal();
+
+    cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+    cy.get('[data-cy="status-events-and-actions-modal"]')
+      .contains('Status actions')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get(
+      '[data-cy="accordion-EMAIL"] [data-testid="ExpandMoreIcon"]'
+    ).click();
+
+    cy.get('[data-cy="action-recipient-OTHER"] input').should('be.checked');
+
+    cy.get('[data-cy="added-email-recipients"]').should(
+      'contain.text',
+      validEmail
+    );
+  });
+  // TODO: Try to find a way to test the actual run of the status actions.
 });
