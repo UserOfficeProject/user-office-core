@@ -716,9 +716,6 @@ const ProposalTableOfficer = ({
             sepIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.sepId
             )}
-            callIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.callId
-            )}
           />
         </DialogContent>
       </Dialog>

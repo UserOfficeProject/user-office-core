@@ -301,4 +301,10 @@ export default {
       createdBy: 1,
     },
   },
+  workflows: {
+    defaultWorkflow: {
+      id: 1,
+    },
+    defaultDroppableGroup: 'proposalWorkflowConnections_0',
+  },
 };

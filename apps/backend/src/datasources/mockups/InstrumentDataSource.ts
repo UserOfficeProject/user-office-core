@@ -25,7 +25,8 @@ export const dummyInstrumentWithAvailabilityTime =
     'This is test instrument.',
     1,
     10,
-    false
+    false,
+    1
   );
 
 const dummyInstruments = [dummyInstrument];

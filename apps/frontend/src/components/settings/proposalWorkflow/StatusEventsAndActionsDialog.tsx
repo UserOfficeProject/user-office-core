@@ -61,7 +61,7 @@ const StatusEventsAndActionsDialog = ({
       aria-describedby="simple-modal-description"
       open={!!workflowConnection}
       onClose={close}
-      data-cy="status-changing-events-modal"
+      data-cy="status-events-and-actions-modal"
     >
       <DialogTitle>Status events and actions</DialogTitle>
       <IconButton

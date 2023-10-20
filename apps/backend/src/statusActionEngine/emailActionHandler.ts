@@ -2,7 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import {
@@ -75,6 +75,27 @@ export const emailActionHandler = async (
           break;
         }
 
+        case EmailStatusActionRecipients.OTHER: {
+          if (!recipientWithTemplate.otherRecipientEmails?.length) {
+            break;
+          }
+
+          const otherRecipients: EmailReadyType[] =
+            recipientWithTemplate.otherRecipientEmails.map((email) => ({
+              id: recipientWithTemplate.recipient.name,
+              email: email,
+              proposals: proposals.map((proposal) => ({
+                proposalId: proposal.proposalId,
+                proposalTitle: proposal.title,
+              })),
+              template: recipientWithTemplate.emailTemplate.id,
+            }));
+
+          sendMail(otherRecipients);
+
+          break;
+        }
+
         default:
           break;
       }
@@ -87,10 +108,11 @@ export const emailActionHandler = async (
 const markStatusActionAsExecuted = async (
   proposalStatusAction: ConnectionHasStatusAction
 ) => {
-  const proposalSettingsDataSource: ProposalSettingsDataSource =
-    container.resolve(Tokens.ProposalSettingsDataSource);
+  const statusActionsDataSource: StatusActionsDataSource = container.resolve(
+    Tokens.StatusActionsDataSource
+  );
 
-  await proposalSettingsDataSource.updateConnectionStatusAction({
+  await statusActionsDataSource.updateConnectionStatusAction({
     ...proposalStatusAction,
     executed: true,
   });

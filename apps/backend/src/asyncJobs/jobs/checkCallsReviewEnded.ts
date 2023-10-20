@@ -8,8 +8,6 @@ import { UserOfficeAsyncJob } from '../startAsyncJobs';
 const checkCallsReviewEnded = async (dataSource: CallDataSource) => {
   const eventBus = resolveApplicationEventBus();
 
-  const isTestingMode = process.env.NODE_ENV === 'test';
-
   try {
     const reviewNotEndedCalls = await dataSource.getCalls({
       isReviewEnded: false,
@@ -30,16 +28,13 @@ const checkCallsReviewEnded = async (dataSource: CallDataSource) => {
         callReviewEnded: true,
       });
 
-      if (!isTestingMode) {
-        // NOTE: Fire the "CALL_REVIEW_ENDED" event if not in testing mode.
-        eventBus.publish({
-          type: Event.CALL_REVIEW_ENDED,
-          call: updatedCall,
-          isRejection: false,
-          key: 'call',
-          loggedInUserId: 0,
-        });
-      }
+      eventBus.publish({
+        type: Event.CALL_REVIEW_ENDED,
+        call: updatedCall,
+        isRejection: false,
+        key: 'call',
+        loggedInUserId: 0,
+      });
 
       updatedCalls.push(updatedCall);
     }

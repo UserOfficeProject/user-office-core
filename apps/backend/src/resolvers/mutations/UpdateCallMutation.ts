@@ -109,7 +109,37 @@ export class UpdateCallInput {
 }
 
 @InputType()
+export class InstrumentSepMappingInput {
+  @Field(() => Int)
+  instrumentId: number;
+
+  @Field(() => Int, { nullable: true })
+  sepId?: number;
+}
+
+@InputType()
 export class AssignInstrumentsToCallInput {
+  @Field(() => [InstrumentSepMappingInput])
+  instrumentSepIds: InstrumentSepMappingInput[];
+
+  @Field(() => Int)
+  callId: number;
+}
+
+@InputType()
+export class UpdateSepToCallInstrumentInput {
+  @Field(() => Int)
+  instrumentId: number;
+
+  @Field(() => Int)
+  callId: number;
+
+  @Field(() => Int, { nullable: true })
+  sepId?: number;
+}
+
+@InputType()
+export class RemoveSepFromCallInstrumentsInput {
   @Field(() => [Int])
   instrumentIds: number[];
 
@@ -137,6 +167,7 @@ export class UpdateCallMutation {
     return context.mutations.call.update(context.user, updateCallInput);
   }
 
+  //todo: Create test case
   @Mutation(() => Call)
   assignInstrumentsToCall(
     @Arg('assignInstrumentsToCallInput')
@@ -146,6 +177,18 @@ export class UpdateCallMutation {
     return context.mutations.call.assignInstrumentsToCall(
       context.user,
       assignInstrumentsToCallInput
+    );
+  }
+
+  @Mutation(() => Call)
+  updateSepToCallInstrument(
+    @Arg('updateSepToCallInstrumentInput')
+    updateSepToCallInstrumentInput: UpdateSepToCallInstrumentInput,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.mutations.call.updateSepToCallInstrument(
+      context.user,
+      updateSepToCallInstrumentInput
     );
   }
 

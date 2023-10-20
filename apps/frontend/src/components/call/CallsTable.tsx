@@ -2,7 +2,7 @@ import Archive from '@mui/icons-material/Archive';
 import Unarchive from '@mui/icons-material/Unarchive';
 import { Typography } from '@mui/material';
 import i18n from 'i18n';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
@@ -128,25 +128,25 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     },
   ]);
 
-  const assignInstrumentsToCall = (
-    instruments: InstrumentWithAvailabilityTime[]
-  ) => {
-    if (calls) {
-      const callsWithInstruments = calls.map((callItem) => {
-        if (callItem.id === assigningInstrumentsCallId) {
-          return {
-            ...callItem,
-            instruments: [...callItem.instruments, ...instruments],
-          };
-        } else {
-          return callItem;
-        }
-      });
-
-      setCalls(callsWithInstruments);
-      setAssigningInstrumentsCallId(null);
-    }
-  };
+  const assignInstrumentsToCall = useCallback(
+    (callId: number, instruments: InstrumentWithAvailabilityTime[]) => {
+      if (calls) {
+        const callsWithInstruments = calls.map((callItem) => {
+          if (callItem.id === callId) {
+            return {
+              ...callItem,
+              instruments: instruments,
+            };
+          } else {
+            return callItem;
+          }
+        });
+        setCalls(callsWithInstruments);
+        setAssigningInstrumentsCallId(null);
+      }
+    },
+    [calls, setCalls, setAssigningInstrumentsCallId]
+  );
 
   const changeCallActiveStatus = (call: Call) => {
     const shouldActivateCall = !call.isActive;
@@ -241,12 +241,15 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       return (
         <AssignedInstrumentsTable
           call={rowData}
+          assignInstrumentsToCall={(
+            instruments: InstrumentWithAvailabilityTime[]
+          ) => assignInstrumentsToCall(rowData.id, instruments)}
           removeAssignedInstrumentFromCall={removeAssignedInstrumentFromCall}
           setInstrumentAvailabilityTime={setInstrumentAvailabilityTime}
         />
       );
     },
-    [calls, setCalls, setAssigningInstrumentsCallId]
+    [calls, setCalls, assignInstrumentsToCall]
   );
 
   const callAssignments = calls.find(
@@ -284,6 +287,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
+          maxWidth="xl"
+          fullWidth
         >
           <AssignInstrumentsToCall
             assignedInstruments={
@@ -292,7 +297,9 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             callId={assigningInstrumentsCallId}
             assignInstrumentsToCall={(
               instruments: InstrumentWithAvailabilityTime[]
-            ) => assignInstrumentsToCall(instruments)}
+            ) =>
+              assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
+            }
           />
         </InputDialog>
       )}

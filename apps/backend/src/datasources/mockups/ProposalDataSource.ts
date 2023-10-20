@@ -320,6 +320,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return allProposals.filter((proposal) => proposal.proposerId === id);
   }
 
+  async getProposalsByIds(proposalIds: number[]): Promise<Proposal[]> {
+    return allProposals.filter((proposal) =>
+      proposalIds.includes(proposal.primaryKey)
+    );
+  }
   async getInstrumentScientistProposals(
     scientist: UserWithRole,
     filter?: ProposalsFilter,
