@@ -75,6 +75,27 @@ export const emailActionHandler = async (
           break;
         }
 
+        case EmailStatusActionRecipients.OTHER: {
+          if (!recipientWithTemplate.otherRecipientEmails?.length) {
+            break;
+          }
+
+          const otherRecipients: EmailReadyType[] =
+            recipientWithTemplate.otherRecipientEmails.map((email) => ({
+              id: recipientWithTemplate.recipient.name,
+              email: email,
+              proposals: proposals.map((proposal) => ({
+                proposalId: proposal.proposalId,
+                proposalTitle: proposal.title,
+              })),
+              template: recipientWithTemplate.emailTemplate.id,
+            }));
+
+          sendMail(otherRecipients);
+
+          break;
+        }
+
         default:
           break;
       }
