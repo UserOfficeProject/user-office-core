@@ -26,6 +26,7 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import {
   capitalize,
+  columnsWithOverflow,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -61,24 +62,25 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
 
 const columns: (
   t: TFunction<'translation', undefined, 'translation'>
-) => Column<UserWithReview>[] = (t) => [
-  {
-    title: 'Actions',
-    cellStyle: { padding: 0, minWidth: 120 },
-    sorting: false,
-    field: 'rowActions',
-  },
-  { title: 'Proposal ID', field: 'proposalId' },
-  { title: 'Title', field: 'title' },
-  { title: 'Grade', field: 'grade' },
-  {
-    title: 'Review status',
-    render: (user) => capitalize(user.status),
-    customSort: (a, b) => a.status.localeCompare(b.status),
-  },
-  { title: 'Call', field: 'callShortCode' },
-  { title: t('instrument') as string, field: 'instrumentShortCode' },
-];
+) => Column<UserWithReview>[] = (t) =>
+  columnsWithOverflow([
+    {
+      title: 'Actions',
+      cellStyle: { padding: 0, minWidth: 120 },
+      sorting: false,
+      field: 'rowActions',
+    },
+    { title: 'Proposal ID', field: 'proposalId' },
+    { title: 'Title', field: 'title' },
+    { title: 'Grade', field: 'grade' },
+    {
+      title: 'Review status',
+      render: (user) => capitalize(user.status),
+      customSort: (a, b) => a.status.localeCompare(b.status),
+    },
+    { title: 'Call', field: 'callShortCode' },
+    { title: t('instrument') as string, field: 'instrumentShortCode' },
+  ]);
 
 const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const downloadPDFProposal = useDownloadPDFProposal();

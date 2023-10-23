@@ -4,7 +4,7 @@ import Edit from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import makeStyles from '@mui/styles/makeStyles';
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useMemo, useState } from 'react';
 import {
   DecodedValueMap,
   DelimitedArrayParam,
@@ -17,7 +17,10 @@ import {
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
+import {
+  columnsWithOverflow,
+  setSortDirectionOnSortColumn,
+} from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -126,6 +129,8 @@ export function SuperMaterialTable<Entry extends EntryID>({
     urlQueryParams?.sortColumn,
     urlQueryParams?.sortDirection
   );
+
+  columns = useMemo(() => columnsWithOverflow(columns), []);
 
   const onCreated = (
     objectAdded: Entry | null,

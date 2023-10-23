@@ -20,7 +20,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
@@ -93,7 +93,7 @@ export type QueryParameters = {
   searchText?: string | undefined;
 };
 
-let columns = columnsWithOverflow<ProposalViewData>([
+let columns: Column<ProposalViewData>[] = [
   {
     title: 'Actions',
     cellStyle: { padding: 0 },
@@ -157,7 +157,7 @@ let columns = columnsWithOverflow<ProposalViewData>([
     title: 'Call',
     field: 'callShortCode',
   },
-]);
+];
 
 const technicalReviewColumns = [
   { title: 'Technical status', field: 'technicalStatus', emptyValue: '-' },
@@ -661,6 +661,8 @@ const ProposalTableOfficer = ({
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
+
+  columns = useMemo(() => columnsWithOverflow(columns), []);
 
   const proposalToReview = proposalsData.find(
     (proposal) => proposal.primaryKey === urlQueryParams.reviewModal

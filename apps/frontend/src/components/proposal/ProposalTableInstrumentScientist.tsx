@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   NumberParam,
@@ -54,6 +54,7 @@ import {
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import {
   addColumns,
+  columnsWithOverflow,
   removeColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
@@ -598,6 +599,8 @@ const ProposalTableInstrumentScientist = ({
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
+
+  columns = useMemo(() => columnsWithOverflow(columns), []);
 
   const GetAppIconComponent = (): JSX.Element => (
     <GetAppIcon data-cy="download-proposals" />
