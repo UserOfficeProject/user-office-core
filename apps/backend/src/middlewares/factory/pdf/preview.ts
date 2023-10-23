@@ -77,7 +77,7 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       };
 
       payload = {
-        data: [dummyData.data],
+        data: [{ ...dummyData.data, pdfTemplate: pdfTemplate }],
         meta,
         userRole: dummyData.userRole,
       };
