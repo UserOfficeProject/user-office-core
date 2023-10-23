@@ -38,7 +38,7 @@ jobs:
           fi
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.PR_APPROVE_TOKEN}}
+          GH_TOKEN: ${{secrets.PR_APPROVE_TOKEN}}
 
       ## NOTE: Requirements for merge has to be configured in the Branch protection rule page.
       ## To do so, go to repository > Settings > Branches > Edit
