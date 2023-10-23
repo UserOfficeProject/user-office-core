@@ -49,9 +49,12 @@ export default function callFactoryService<TData, TMeta extends MetaBase>(
   res: Response,
   next: NextFunction
 ) {
-  const factoryReq = request.post(`${ENDPOINT}/${downloadType}/${type}`, {
-    json: properties,
-  });
+  const factoryReq = request.post(
+    `${ENDPOINT}/generate/${downloadType}/${type}`,
+    {
+      json: properties,
+    }
+  );
 
   let gotResponse = false;
 
