@@ -59,7 +59,7 @@ const CallFilter = ({
 
   return (
     <>
-      <FormControl fullWidth>
+      <FormControl fullWidth sx={{ minWidth: '30%' }}>
         <InputLabel id="call-select-label" shrink>
           Call
         </InputLabel>
