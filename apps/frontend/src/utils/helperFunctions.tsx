@@ -183,6 +183,10 @@ export const columnWithOverflow = <T extends object>(
           </span>
         );
       } else {
+        if (column.lookup) {
+          return column.lookup[columnData as keyof object];
+        }
+
         return (
           <>{column.render ? column.render(rowData, 'row') : columnData}</>
         );
