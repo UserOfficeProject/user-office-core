@@ -1,5 +1,5 @@
 import { html } from '@codemirror/lang-html';
-import { Box, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import CodeMirror from '@uiw/react-codemirror';
 import { Field, FieldProps, Form, Formik } from 'formik';
@@ -11,14 +11,11 @@ import UOLoader from 'components/common/UOLoader';
 import { PdfTemplate, Template } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel from 'models/questionary/QuestionaryEditorModel';
-import {
-  StyledButtonContainer,
-  StyledContainer,
-  StyledPaper,
-} from 'styles/StyledComponents';
+import { StyledButtonContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import PDFTemplateDocumentation from './documentation';
+import PdfTemplateEditorViewer from './PdfTemplateEditorViewer';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 interface ITemplateEditorProps<Type extends string> {
   name: Type;
@@ -125,52 +122,59 @@ export default function PdfTemplateEditor() {
   return loading ? (
     <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
   ) : (
-    <StyledContainer>
-      <StyledPaper>
-        {template && pdfTemplate && (
-          <SimpleTabs
-            tabNames={['Body', 'Header', 'Footer', 'Sample Declaration']}
-          >
-            <TemplateEditor<'templateData'>
-              name="templateData"
-              template={template}
-              initialValues={{
-                templateData: pdfTemplate?.templateData,
-              }}
-              pdfTemplate={pdfTemplate}
-              setPdfTemplate={setPdfTemplate}
-            />
-            <TemplateEditor<'templateHeader'>
-              name="templateHeader"
-              template={template}
-              initialValues={{
-                templateHeader: pdfTemplate?.templateHeader,
-              }}
-              pdfTemplate={pdfTemplate}
-              setPdfTemplate={setPdfTemplate}
-            />
-            <TemplateEditor<'templateFooter'>
-              name="templateFooter"
-              template={template}
-              initialValues={{
-                templateFooter: pdfTemplate?.templateFooter,
-              }}
-              pdfTemplate={pdfTemplate}
-              setPdfTemplate={setPdfTemplate}
-            />
-            <TemplateEditor<'templateSampleDeclaration'>
-              name="templateSampleDeclaration"
-              template={template}
-              initialValues={{
-                templateSampleDeclaration:
-                  pdfTemplate?.templateSampleDeclaration,
-              }}
-              pdfTemplate={pdfTemplate}
-              setPdfTemplate={setPdfTemplate}
-            />
-          </SimpleTabs>
-        )}
-      </StyledPaper>
-    </StyledContainer>
+    <Grid container spacing={2} padding={2}>
+      <Grid item sm={6}>
+        <StyledPaper>
+          {template && pdfTemplate && (
+            <SimpleTabs
+              tabNames={['Body', 'Header', 'Footer', 'Sample Declaration']}
+            >
+              <TemplateEditor<'templateData'>
+                name="templateData"
+                template={template}
+                initialValues={{
+                  templateData: pdfTemplate?.templateData,
+                }}
+                pdfTemplate={pdfTemplate}
+                setPdfTemplate={setPdfTemplate}
+              />
+              <TemplateEditor<'templateHeader'>
+                name="templateHeader"
+                template={template}
+                initialValues={{
+                  templateHeader: pdfTemplate?.templateHeader,
+                }}
+                pdfTemplate={pdfTemplate}
+                setPdfTemplate={setPdfTemplate}
+              />
+              <TemplateEditor<'templateFooter'>
+                name="templateFooter"
+                template={template}
+                initialValues={{
+                  templateFooter: pdfTemplate?.templateFooter,
+                }}
+                pdfTemplate={pdfTemplate}
+                setPdfTemplate={setPdfTemplate}
+              />
+              <TemplateEditor<'templateSampleDeclaration'>
+                name="templateSampleDeclaration"
+                template={template}
+                initialValues={{
+                  templateSampleDeclaration:
+                    pdfTemplate?.templateSampleDeclaration,
+                }}
+                pdfTemplate={pdfTemplate}
+                setPdfTemplate={setPdfTemplate}
+              />
+            </SimpleTabs>
+          )}
+        </StyledPaper>
+      </Grid>
+      <Grid item sm={6}>
+        <StyledPaper>
+          {pdfTemplate && <PdfTemplateEditorViewer pdfTemplate={pdfTemplate} />}
+        </StyledPaper>
+      </Grid>
+    </Grid>
   );
 }
