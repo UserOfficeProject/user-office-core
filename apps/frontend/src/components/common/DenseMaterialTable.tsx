@@ -10,9 +10,9 @@ import { columnsWithOverflow } from 'utils/helperFunctions';
 export function DenseMaterialTable<RowData extends object>(
   props: MaterialTableProps<RowData>
 ) {
-  // NOTE: Using useMemo() with an empty dependencies array will calculate the value only once, on mount.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const columns = useMemo(() => columnsWithOverflow(props.columns), []);
+  const getColumnsWithOverflow = () => columnsWithOverflow(props.columns);
+
+  const columns = useMemo(getColumnsWithOverflow, [getColumnsWithOverflow]);
 
   return <MaterialTable {...props} columns={columns} />;
 }
