@@ -238,7 +238,6 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
   async assignProposalsToSEPUsingCallInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToSepUsingCallInstrumentArgs
@@ -253,7 +252,6 @@ export default class SEPMutations {
       );
 
     const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
-
     for (const callId of callIds) {
       const callHasInstrument = callHasInstruments.find(
         (callHasInstrument) => callHasInstrument.callId === callId
@@ -274,7 +272,6 @@ export default class SEPMutations {
     return true;
   }
 
-  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.PROPOSAL_SEP_SELECTED)
   async assignProposalsToSep(
     agent: UserWithRole | null,
