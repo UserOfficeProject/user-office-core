@@ -8,6 +8,7 @@ import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import InstrumentMutations from '../../mutations/InstrumentMutations';
 import SEPMutations from '../../mutations/SEPMutations';
+import SEPQueries from '../../queries/SEPQueries';
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -83,6 +84,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       );
       const instrumentMutations = container.resolve(InstrumentMutations);
       const sepMutation = container.resolve(SEPMutations);
+      const sepQuery = container.resolve(SEPQueries);
 
       const proposal = await proposalDataSource.getByQuestionaryId(
         questionaryId
@@ -103,10 +105,13 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         ],
       });
 
-      // Assign the Proposals to SEP using Call Instrument
-      await sepMutation.assignProposalsToSEPUsingCallInstrument(null, {
-        instrumentId: instrumentId,
-        proposalPks: [proposal.primaryKey],
-      });
+      const seps = await sepQuery.getProposalsSeps(null, [proposal.primaryKey]);
+      // Assign the Proposals to SEP using Call Instrument, if a SEP has not been assigned before
+      if (seps.length === 0) {
+        await sepMutation.assignProposalsToSEPUsingCallInstrument(null, {
+          instrumentId: instrumentId,
+          proposalPks: [proposal.primaryKey],
+        });
+      }
     },
   };

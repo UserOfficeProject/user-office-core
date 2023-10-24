@@ -510,6 +510,20 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
+  async getSEPsByProposalPks(proposalPks: number[]): Promise<SEPProposal[]> {
+    const sepProposal: SEPProposalRecord[] = await database
+      .select(['sp.*'])
+      .from('SEP_Proposals as sp')
+      .join('proposals as p', {
+        'p.proposal_pk': 'sp.proposal_pk',
+      })
+      .whereIn('sp.proposal_pk', proposalPks);
+
+    return sepProposal.map((sepProposal) =>
+      createSEPProposalObject(sepProposal)
+    );
+  }
+
   async assignChairOrSecretaryToSEP(
     args: AssignChairOrSecretaryToSEPInput
   ): Promise<SEP> {
