@@ -158,7 +158,7 @@ export const getValueFromKey = (object: any, key: string | undefined) => {
   return key?.split('.').reduce((o, i) => o[i], object);
 };
 
-export const columnWithOverflow = <T extends object>(
+export const denseTableColumn = <T extends object>(
   column: Column<T>
 ): Column<T> => {
   const cellStyleIsFunction = typeof column.cellStyle === 'function';
@@ -202,7 +202,11 @@ export const columnWithOverflow = <T extends object>(
   };
 };
 
-export const columnsWithOverflow = <T extends object>(columns: Column<T>[]) =>
+/**NOTE:
+ * This helper function improves the space usage in the MaterialTable Columns by limiting column content to one line
+ * and showing indicator(three dots) if there is more to be seen on hover.
+ */
+export const denseTableColumns = <T extends object>(columns: Column<T>[]) =>
   columns.map((column) => {
-    return columnWithOverflow(column);
+    return denseTableColumn(column);
   });

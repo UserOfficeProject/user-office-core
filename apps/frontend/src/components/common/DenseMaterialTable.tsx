@@ -1,7 +1,7 @@
 import MaterialTable, { MaterialTableProps } from '@material-table/core';
 import React, { useMemo } from 'react';
 
-import { columnsWithOverflow } from 'utils/helperFunctions';
+import { denseTableColumns } from 'utils/helperFunctions';
 
 /**NOTE:
  * This wrapper component improves the space usage in the MaterialTable by limiting row content to one line
@@ -10,9 +10,9 @@ import { columnsWithOverflow } from 'utils/helperFunctions';
 export function DenseMaterialTable<RowData extends object>(
   props: MaterialTableProps<RowData>
 ) {
-  const getColumnsWithOverflow = () => columnsWithOverflow(props.columns);
-
-  const columns = useMemo(getColumnsWithOverflow, [getColumnsWithOverflow]);
+  // NOTE: Using useMemo() with an empty dependencies array will calculate the value only once, on mount.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const columns = useMemo(() => denseTableColumns(props.columns), []);
 
   return <MaterialTable {...props} columns={columns} />;
 }

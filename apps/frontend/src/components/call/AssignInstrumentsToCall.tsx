@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import { Autocomplete, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import i18n from 'i18n';
@@ -7,6 +6,7 @@ import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
   Instrument,
@@ -15,7 +15,6 @@ import {
 } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useSEPsData } from 'hooks/SEP/useSEPsData';
-import { columnsWithOverflow } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -56,7 +55,7 @@ const AssignInstrumentsToCall = ({
       value: sep.id,
     })) || [];
 
-  const columns = columnsWithOverflow<Instrument>([
+  const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
@@ -88,7 +87,7 @@ const AssignInstrumentsToCall = ({
         );
       },
     },
-  ]);
+  ];
 
   const notAssignedInstruments = instruments.filter((instrument) => {
     if (

@@ -1,4 +1,4 @@
-import MaterialTable, { EditComponentProps } from '@material-table/core';
+import { Column, EditComponentProps } from '@material-table/core';
 import { Autocomplete } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
   Call,
@@ -15,7 +16,6 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { useSEPsData } from 'hooks/SEP/useSEPsData';
-import { columnsWithOverflow } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -117,73 +117,71 @@ const AssignedInstrumentsTable = ({
     );
   };
 
-  const assignmentColumns = columnsWithOverflow<InstrumentWithAvailabilityTime>(
-    [
-      {
-        title: 'Name',
-        field: 'name',
-        editable: 'never',
+  const assignmentColumns: Column<InstrumentWithAvailabilityTime>[] = [
+    {
+      title: 'Name',
+      field: 'name',
+      editable: 'never',
+    },
+    {
+      title: 'Short code',
+      field: 'shortCode',
+      editable: 'never',
+    },
+    {
+      title: 'Description',
+      field: 'description',
+      editable: 'never',
+    },
+    {
+      title: 'Sep',
+      field: 'sepId',
+      editable: 'onUpdate',
+      emptyValue: '-',
+      editComponent: sepSelectionAutoCompleteInput,
+      render: (rowData: InstrumentWithAvailabilityTime) => {
+        return <span>{rowData.sep?.code}</span>;
       },
-      {
-        title: 'Short code',
-        field: 'shortCode',
-        editable: 'never',
-      },
-      {
-        title: 'Description',
-        field: 'description',
-        editable: 'never',
-      },
-      {
-        title: 'Sep',
-        field: 'sepId',
-        editable: 'onUpdate',
-        emptyValue: '-',
-        editComponent: sepSelectionAutoCompleteInput,
-        render: (rowData: InstrumentWithAvailabilityTime) => {
-          return <span>{rowData.sep?.code}</span>;
-        },
-      },
-      {
-        title: `Availability time (${call.allocationTimeUnit}s)`,
-        field: 'availabilityTime',
-        editable: 'onUpdate',
-        type: 'numeric',
-        emptyValue: '-',
-        editComponent: availabilityTimeInput,
-        align: 'left',
-        validate: (
-          rowData: InstrumentWithAvailabilityTime & {
-            tableData?: { editing: string };
-          }
-        ) => {
-          // NOTE: Return valid state if the action is delete and not update
-          if (rowData.tableData?.editing !== 'update') {
-            return { isValid: true };
-          }
+    },
+    {
+      title: `Availability time (${call.allocationTimeUnit}s)`,
+      field: 'availabilityTime',
+      editable: 'onUpdate',
+      type: 'numeric',
+      emptyValue: '-',
+      editComponent: availabilityTimeInput,
+      align: 'left',
+      validate: (
+        rowData: InstrumentWithAvailabilityTime & {
+          tableData?: { editing: string };
+        }
+      ) => {
+        // NOTE: Return valid state if the action is delete and not update
+        if (rowData.tableData?.editing !== 'update') {
+          return { isValid: true };
+        }
 
-          if (rowData.availabilityTime && +rowData.availabilityTime > 0) {
-            // NOTE: Preventing inputs grater than 32-bit integer.
-            if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {
-              return {
-                isValid: false,
-                helperText: `Availability time can not be grater than ${
-                  MAX_32_BIT_INTEGER - 1
-                }`,
-              };
-            }
-
-            return { isValid: true };
-          } else {
+        if (rowData.availabilityTime && +rowData.availabilityTime > 0) {
+          // NOTE: Preventing inputs grater than 32-bit integer.
+          if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {
             return {
               isValid: false,
-              helperText: 'Availability time must be a positive number',
+              helperText: `Availability time can not be grater than ${
+                MAX_32_BIT_INTEGER - 1
+              }`,
             };
           }
-        },
+
+          return { isValid: true };
+        } else {
+          return {
+            isValid: false,
+            helperText: 'Availability time must be a positive number',
+          };
+        }
       },
-    ]
-  );
+    },
+  ];
 
   const removeAssignedInstrument = async (instrumentId: number) => {
     await api({

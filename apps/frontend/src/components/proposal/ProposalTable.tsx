@@ -20,7 +20,7 @@ import { Call, FeatureId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
-import { columnsWithOverflow, isCallEnded } from 'utils/helperFunctions';
+import { denseTableColumns, isCallEnded } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -47,7 +47,7 @@ type ProposalTableProps = {
   confirm: WithConfirmType;
 };
 
-const columns = columnsWithOverflow<PartialProposalsDataType>([
+const columns = denseTableColumns<PartialProposalsDataType>([
   {
     title: 'Proposal ID',
     field: 'proposalId',

@@ -26,7 +26,7 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import {
   capitalize,
-  columnsWithOverflow,
+  denseTableColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -63,7 +63,7 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
 const columns: (
   t: TFunction<'translation', undefined, 'translation'>
 ) => Column<UserWithReview>[] = (t) =>
-  columnsWithOverflow([
+  denseTableColumns([
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
