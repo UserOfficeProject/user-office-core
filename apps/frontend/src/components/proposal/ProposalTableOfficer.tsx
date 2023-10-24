@@ -1,8 +1,4 @@
-import MaterialTable, {
-  Action,
-  Column,
-  MTableToolbar,
-} from '@material-table/core';
+import { Action, Column, MTableToolbar } from '@material-table/core';
 import Delete from '@mui/icons-material/Delete';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Email from '@mui/icons-material/Email';
@@ -20,12 +16,13 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
@@ -55,7 +52,6 @@ import {
 } from 'hooks/proposal/useProposalsCoreData';
 import {
   addColumns,
-  columnsWithOverflow,
   fromProposalToProposalView,
   removeColumns,
   setSortDirectionOnSortColumn,
@@ -661,8 +657,6 @@ const ProposalTableOfficer = ({
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
-
-  columns = useMemo(() => columnsWithOverflow(columns), []);
 
   const proposalToReview = proposalsData.find(
     (proposal) => proposal.primaryKey === urlQueryParams.reviewModal

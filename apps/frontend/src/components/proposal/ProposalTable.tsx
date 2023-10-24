@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -14,6 +13,7 @@ import { Redirect } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import CopyToClipboard from 'components/common/CopyToClipboard';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId } from 'generated/sdk';

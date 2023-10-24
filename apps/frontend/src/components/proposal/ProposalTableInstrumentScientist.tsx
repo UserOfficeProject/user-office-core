@@ -1,8 +1,4 @@
-import MaterialTable, {
-  Action,
-  Column,
-  MTableToolbar,
-} from '@material-table/core';
+import { Action, Column, MTableToolbar } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -12,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
-import React, { useContext, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   NumberParam,
@@ -22,6 +18,7 @@ import {
 } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -54,7 +51,6 @@ import {
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import {
   addColumns,
-  columnsWithOverflow,
   removeColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
@@ -599,8 +595,6 @@ const ProposalTableInstrumentScientist = ({
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
-
-  columns = useMemo(() => columnsWithOverflow(columns), []);
 
   const GetAppIconComponent = (): JSX.Element => (
     <GetAppIcon data-cy="download-proposals" />
