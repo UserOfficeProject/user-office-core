@@ -5,8 +5,6 @@ import React, { useCallback } from 'react';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import { PdfTemplate } from 'generated/sdk';
 
-import pdfTemplateEditorViewerSampleData from './PdfTemplateEditorViewerSampleData';
-
 function PdfTemplateEditorViewer({
   pdfTemplate,
 }: {
@@ -22,7 +20,7 @@ function PdfTemplateEditorViewer({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(pdfTemplateEditorViewerSampleData(pdfTemplate)),
+        body: '',
       }
     );
     const pdfBlob = await pdf.blob();

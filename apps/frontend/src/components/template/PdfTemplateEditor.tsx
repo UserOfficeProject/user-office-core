@@ -32,6 +32,7 @@ const TemplateEditor = <
     | 'templateHeader'
     | 'templateFooter'
     | 'templateSampleDeclaration'
+    | 'dummyData'
 >({
   name,
   template,
@@ -127,7 +128,13 @@ export default function PdfTemplateEditor() {
         <StyledPaper>
           {template && pdfTemplate && (
             <SimpleTabs
-              tabNames={['Body', 'Header', 'Footer', 'Sample Declaration']}
+              tabNames={[
+                'Body',
+                'Header',
+                'Footer',
+                'Sample Declaration',
+                'Dummy Data',
+              ]}
             >
               <TemplateEditor<'templateData'>
                 name="templateData"
@@ -162,6 +169,15 @@ export default function PdfTemplateEditor() {
                 initialValues={{
                   templateSampleDeclaration:
                     pdfTemplate?.templateSampleDeclaration,
+                }}
+                pdfTemplate={pdfTemplate}
+                setPdfTemplate={setPdfTemplate}
+              />
+              <TemplateEditor<'dummyData'>
+                name="dummyData"
+                template={template}
+                initialValues={{
+                  dummyData: pdfTemplate?.dummyData,
                 }}
                 pdfTemplate={pdfTemplate}
                 setPdfTemplate={setPdfTemplate}

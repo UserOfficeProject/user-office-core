@@ -26,5 +26,6 @@ fragment template on Template {
     templateHeader
     templateFooter
     templateSampleDeclaration
+    dummyData
   }
 }
