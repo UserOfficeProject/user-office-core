@@ -334,18 +334,16 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
-  if (await proposalAuth.isReviewerOfProposal(user, proposal.primaryKey)) {
-    const technicalReview =
-      await baseContext.queries.review.technicalReviewForProposal(
-        user,
-        proposal.primaryKey
-      );
-    if (technicalReview) {
-      out.technicalReview = {
-        ...technicalReview,
-        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-      };
-    }
+  const technicalReview =
+    await baseContext.queries.review.technicalReviewForProposal(
+      user,
+      proposal.primaryKey
+    );
+  if (technicalReview) {
+    out.technicalReview = {
+      ...technicalReview,
+      status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+    };
   }
 
   // Get Reviews
