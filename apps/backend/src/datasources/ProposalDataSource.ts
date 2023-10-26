@@ -71,8 +71,7 @@ export interface ProposalDataSource {
   resetProposalEvents(
     proposalPk: number,
     callId: number,
-    statusId: number,
-    shouldResetStatusActions?: boolean
+    statusId: number
   ): Promise<boolean>;
   getProposalEvents(proposalPk: number): Promise<ProposalEventsRecord | null>;
   changeProposalsStatus(

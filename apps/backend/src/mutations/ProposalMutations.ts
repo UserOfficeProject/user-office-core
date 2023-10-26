@@ -461,8 +461,7 @@ export default class ProposalMutations {
           await this.proposalDataSource.resetProposalEvents(
             proposal.primaryKey,
             proposal.callId,
-            statusId,
-            true
+            statusId
           );
 
           const fullProposal = result.proposals.find(

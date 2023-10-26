@@ -33,7 +33,6 @@ import {
   createTechnicalReviewObject,
   ProposalEventsRecord,
   ProposalRecord,
-  ProposalStatusActionRecord,
   ProposalViewRecord,
   ProposalWorkflowConnectionRecord,
   ScheduledEventRecord,
@@ -757,8 +756,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async resetProposalEvents(
     proposalPk: number,
     callId: number,
-    statusId: number,
-    shouldResetStatusActions = false
+    statusId: number
   ): Promise<boolean> {
     const proposalCall: CallRecord = await database('call')
       .select('*')
@@ -819,58 +817,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       }
     }
 
-    if (shouldResetStatusActions) {
-      await this.resetProposalStatusActions(
-        proposalEventsToReset,
-        statusId,
-        proposalWorkflowId
-      );
-    }
-
     return true;
-  }
-
-  async resetProposalStatusActions(
-    proposalEventsToReset: (StatusChangingEventRecord &
-      ProposalWorkflowConnectionRecord)[],
-    currentStatusId: number,
-    proposalWorkflowId: number
-  ) {
-    const connectionIds = proposalEventsToReset
-      .filter((item) => item.proposal_status_id === currentStatusId)
-      .map(
-        (proposalEventToReset) =>
-          proposalEventToReset.proposal_workflow_connection_id
-      );
-
-    //NOTE: DRAFT proposal status has always id of 1
-    const DRAFT_STATUS_ID = 1;
-    const isDraftStatus = currentStatusId === DRAFT_STATUS_ID;
-
-    if (!connectionIds.length && !isDraftStatus) {
-      return;
-    }
-
-    const updatedProposalStatusActions = await database
-      .update({ executed: false })
-      .from('proposal_workflow_connection_has_actions')
-      .modify((query) => {
-        if (isDraftStatus) {
-          // NOTE: If proposal status is set to draft we need to reset all actions related to that workflow.
-          query.where('workflow_id', proposalWorkflowId);
-        } else {
-          query.whereIn('connection_id', connectionIds);
-        }
-      })
-      .returning<ProposalStatusActionRecord[]>('*');
-
-    if (!updatedProposalStatusActions) {
-      logger.logError('Could not reset proposal status actions', {
-        proposalEventsToReset,
-      });
-
-      throw new GraphQLError('Could not reset proposal status actions');
-    }
   }
 
   async changeProposalsStatus(

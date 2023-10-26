@@ -2,7 +2,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import {
@@ -101,21 +100,6 @@ export const emailActionHandler = async (
       }
     })
   );
-
-  await markStatusActionAsExecuted(proposalStatusAction);
-};
-
-const markStatusActionAsExecuted = async (
-  proposalStatusAction: ConnectionHasStatusAction
-) => {
-  const statusActionsDataSource: StatusActionsDataSource = container.resolve(
-    Tokens.StatusActionsDataSource
-  );
-
-  await statusActionsDataSource.updateConnectionStatusAction({
-    ...proposalStatusAction,
-    executed: true,
-  });
 };
 
 const sendMail = (recipientsWithData: EmailReadyType[]) => {
