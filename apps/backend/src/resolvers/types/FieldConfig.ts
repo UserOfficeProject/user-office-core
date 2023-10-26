@@ -1,7 +1,19 @@
-import { createUnionType, Field, Int, ObjectType } from 'type-graphql';
+import {
+  createUnionType,
+  Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
+} from 'type-graphql';
 
 import { InstrumentOptionClass } from '../../models/questionTypes/InstrumentPicker';
+import { Roles } from '../../models/Role';
+import { UserWithRole } from '../../models/User';
 import { Unit } from './Unit';
+import { ResolverContext } from '../../context';
 
 @ObjectType()
 export class ConfigBase {
@@ -115,6 +127,22 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 
   @Field(() => [ApiCallRequestHeader])
   apiCallRequestHeaders: ApiCallRequestHeader[];
+}
+
+@Resolver(() => DynamicMultipleChoiceConfig)
+export class DynamicMultipleChoiceConfigResolver {
+  @FieldResolver(() => [ApiCallRequestHeader])
+  async apiCallRequestHeaders(
+    @Ctx() context: ResolverContext,
+    @Root() config: DynamicMultipleChoiceConfig
+  ): Promise<ApiCallRequestHeader[]> {
+    // Only user officer can see the apiCallRequestHeaders
+    if (context.user?.currentRole?.shortCode === Roles.USER_OFFICER) {
+      return config.apiCallRequestHeaders;
+    } else {
+      return [];
+    }
+  }
 }
 
 @ObjectType()

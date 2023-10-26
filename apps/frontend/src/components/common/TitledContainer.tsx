@@ -36,7 +36,6 @@ type TitledContainerProps = {
 const TitledContainer = (props: TitledContainerProps) => {
   const { children, label, ...rest } = props;
   const classes = useStyles();
-  console.log(props);
 
   return (
     <div className={classes.container} {...rest}>
