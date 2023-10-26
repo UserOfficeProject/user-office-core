@@ -324,6 +324,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
+  // NOTE: This is used in the OAuthAuthorization only where we upsert users returned from Auth server.
   async create(
     user_title: string | undefined,
     firstname: string,

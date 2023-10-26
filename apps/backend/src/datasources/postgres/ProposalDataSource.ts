@@ -654,6 +654,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
   }
 
+  async getProposalsByIds(proposalIds: number[]): Promise<Proposal[]> {
+    return database('proposals')
+      .whereIn('proposal_pk', proposalIds)
+      .then((proposals: ProposalRecord[]) =>
+        proposals.map((proposal) => createProposalObject(proposal))
+      );
+  }
+
   async markEventAsDoneOnProposals(
     event: Event,
     proposalPks: number[]

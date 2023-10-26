@@ -7,7 +7,7 @@ import { ResultsPromise } from 'sparkpost';
 
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
-import { MailService, SendMailResults, SparkPostTemplate } from './MailService';
+import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
 
 export class SMTPMailService extends MailService {
   private _email: EmailTemplates<any>;
@@ -95,14 +95,14 @@ export class SMTPMailService extends MailService {
             ...(typeof participant.address !== 'string'
               ? {
                   to: {
-                    address: isProduction()
+                    address: isProduction
                       ? participant.address?.email
                       : <string>process.env.SINK_EMAIL,
                     name: participant.address?.header_to,
                   },
                 }
               : {
-                  to: isProduction()
+                  to: isProduction
                     ? participant.address
                     : <string>process.env.SINK_EMAIL,
                 }),
@@ -133,7 +133,20 @@ export class SMTPMailService extends MailService {
   // TODO: This might need some attention from STFC and return the templates used in their email sending service.
   async getEmailTemplates(
     includeDraft = false
-  ): ResultsPromise<SparkPostTemplate[]> {
-    return { results: [] };
+  ): ResultsPromise<STFCEmailTemplate[]> {
+    return {
+      results: [
+        {
+          id: 'my-first-email',
+          name: 'My First Email',
+          description: 'A test message from STFC',
+        },
+        {
+          id: 'my-second-email',
+          name: 'My Second Email',
+          description: 'A test message from STFC',
+        },
+      ],
+    };
   }
 }

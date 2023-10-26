@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, FieldArrayRenderProps } from 'formik';
 import React, { useState, KeyboardEvent } from 'react';
+import * as Yup from 'yup';
 
 import {
   EmailActionConfig as EmailActionConfigType,
@@ -56,10 +57,6 @@ const EmailActionConfig = ({
     return list?.includes(email);
   };
 
-  const isEmail = (email: string) => {
-    return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email);
-  };
-
   const isValid = (email: string, foundRecipientIndex: number) => {
     let error = null;
 
@@ -70,7 +67,7 @@ const EmailActionConfig = ({
       error = `${email} has already been added.`;
     }
 
-    if (!isEmail(email)) {
+    if (!Yup.string().email().isValidSync(email)) {
       error = `${email} is not a valid email address.`;
     }
 
@@ -115,6 +112,7 @@ const EmailActionConfig = ({
         arrayHelpers.replace(foundRecipientIndex, newRecipientConfig);
 
         setOtherRecipientsValue('');
+        setOtherRecipientsFieldError(null);
       }
     }
   };
@@ -134,6 +132,17 @@ const EmailActionConfig = ({
     };
 
     arrayHelpers.replace(foundRecipientIndex, newRecipientConfig);
+  };
+
+  const handleBlur = (index: number) => {
+    const hasOtherRecipientEmailValues =
+      recipientsWithEmailTemplate[index].otherRecipientEmails?.length;
+
+    if (otherRecipientsValue && !hasOtherRecipientEmailValues) {
+      setOtherRecipientsFieldError(
+        'Please add the typed value by pressing Enter'
+      );
+    }
   };
 
   return (
@@ -237,6 +246,9 @@ const EmailActionConfig = ({
                               }
                               setOtherRecipientsValue(e.target.value);
                             }}
+                            onBlur={() =>
+                              handleBlur(foundRecipientWithEmailTemplateIndex)
+                            }
                             value={otherRecipientsValue}
                             fullWidth
                             error={!!otherRecipientsFieldError}

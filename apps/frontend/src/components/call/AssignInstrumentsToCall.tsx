@@ -1,14 +1,20 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@mui/material';
+import { Autocomplete, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { Instrument, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import {
+  Instrument,
+  InstrumentWithAvailabilityTime,
+  UserRole,
+} from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -26,16 +32,61 @@ const AssignInstrumentsToCall = ({
   assignedInstruments,
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
+  const { currentRole } = useContext(UserContext);
+  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+  });
+
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]
   >([]);
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
+  const [instrumentSepMapping, setInstrumentSepMapping] = useState<{
+    [instrumentId: number]: number | null;
+  }>({});
+
+  const sepOptions =
+    allActiveSeps?.map((sep) => ({
+      label: sep.code,
+      value: sep.id,
+    })) || [];
+
   const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
+    {
+      title: 'SEP',
+      field: 'sep',
+      render: (rowData: Instrument) => {
+        return (
+          <Autocomplete
+            loading={loadingSEPs}
+            id="sepSelection"
+            options={sepOptions}
+            renderInput={(params) => <TextField {...params} label="SEPs" />}
+            onChange={(_event, newValue) => {
+              if (newValue) {
+                setInstrumentSepMapping({
+                  ...instrumentSepMapping,
+                  [rowData.id]: newValue.value,
+                });
+              } else {
+                // remove from mapping and set to state
+                setInstrumentSepMapping({
+                  ...instrumentSepMapping,
+                  [rowData.id]: null,
+                });
+              }
+            }}
+          />
+        );
+      },
+    },
   ];
 
   const notAssignedInstruments = instruments.filter((instrument) => {
@@ -51,16 +102,20 @@ const AssignInstrumentsToCall = ({
   }) as Instrument[];
 
   const onAssignButtonClick = async () => {
-    await api({
+    const response = await api({
       toastSuccessMessage: t('instrument') + '/s assigned successfully!',
     }).assignInstrumentsToCall({
       callId,
-      instrumentIds: selectedInstruments.map(
-        (instrumentToAssign) => instrumentToAssign.id
-      ),
+      instrumentSepIds: selectedInstruments.map((instrumentToAssign) => ({
+        instrumentId: instrumentToAssign.id,
+        sepId: instrumentSepMapping[instrumentToAssign.id],
+      })),
     });
 
-    assignInstrumentsToCall(selectedInstruments);
+    assignInstrumentsToCall(
+      response.assignInstrumentsToCall
+        .instruments as InstrumentWithAvailabilityTime[]
+    );
   };
 
   return (
