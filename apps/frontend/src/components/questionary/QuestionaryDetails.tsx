@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import React, { ReactElement } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Answer, DataType } from 'generated/sdk';
+import { Answer, DataType, Questionary } from 'generated/sdk';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { areDependenciesSatisfied } from 'models/questionary/QuestionaryFunctions';
 
@@ -19,15 +19,25 @@ export interface TableRowData {
 export interface QuestionaryDetailsProps
   extends TableProps<(props: unknown) => ReactElement> {
   questionaryId: number;
+  questionaryData?: Questionary; // If provided, it will be used instead of fetching the questionary
   additionalDetails?: Array<TableRowData>;
   title?: string;
   answerRenderer?: (answer: Answer) => JSX.Element | null;
 }
 
 function QuestionaryDetails(props: QuestionaryDetailsProps) {
-  const { answerRenderer, questionaryId, additionalDetails, title } = props;
+  const {
+    answerRenderer,
+    questionaryId,
+    questionaryData,
+    additionalDetails,
+    title,
+  } = props;
 
-  const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
+  const { questionary, loadingQuestionary } = useQuestionary(
+    questionaryId,
+    questionaryData
+  );
 
   if (loadingQuestionary) {
     return (
