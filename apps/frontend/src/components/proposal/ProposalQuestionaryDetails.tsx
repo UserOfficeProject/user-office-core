@@ -12,11 +12,13 @@ interface ProposalQuestionaryDetailsProps extends QuestionaryDetailsProps {
 }
 
 function ProposalQuestionaryDetails(props: ProposalQuestionaryDetailsProps) {
-  const { proposalPk, questionaryId, additionalDetails } = props;
+  const { proposalPk, questionaryId, questionaryData, additionalDetails } =
+    props;
 
   return (
     <QuestionaryDetails
       questionaryId={questionaryId}
+      questionaryData={questionaryData}
       additionalDetails={additionalDetails}
       answerRenderer={(answer) => {
         if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
