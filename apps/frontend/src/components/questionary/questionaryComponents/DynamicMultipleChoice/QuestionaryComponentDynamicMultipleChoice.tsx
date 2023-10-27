@@ -12,8 +12,10 @@ import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
+import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { DynamicMultipleChoiceConfig } from 'generated/sdk';
+import { useGetDynamicMultipleChoiceOptions } from 'hooks/template/useGetDynamicMultipleChoiceOptions';
 
 const toArray = (input: string | string[]): string[] => {
   if (typeof input === 'string') {
@@ -51,7 +53,8 @@ export function QuestionaryComponentDynamicMultipleChoice(
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
 
-  const [stateValue, setStateValue] = useState<Array<string>>(config.options);
+  const { options, loadingOptions } = useGetDynamicMultipleChoiceOptions(id);
+  const [stateValue, setStateValue] = useState<Array<string>>([]);
 
   useEffect(() => {
     setStateValue(answer.value);
@@ -78,6 +81,16 @@ export function QuestionaryComponentDynamicMultipleChoice(
   );
 
   const SelectMenuItem = config.isMultipleSelect ? MultiMenuItem : MenuItem;
+
+  const helperTexts = (
+    <>
+      {options.length < 1 && !loadingOptions && (
+        <FormHelperText>{hasNoContent}</FormHelperText>
+      )}
+      {loadingOptions && <UOLoader size={14} />}
+      {isError && <FormHelperText>{fieldError}</FormHelperText>}
+    </>
+  );
 
   switch (config.variant) {
     case 'dropdown':
@@ -113,7 +126,7 @@ export function QuestionaryComponentDynamicMultipleChoice(
             }}
             data-natural-key={naturalKey}
           >
-            {config.options.map((option) => {
+            {options.map((option) => {
               return (
                 <SelectMenuItem
                   value={option}
@@ -125,10 +138,7 @@ export function QuestionaryComponentDynamicMultipleChoice(
               );
             })}
           </Select>
-          {config.options.length < 1 && (
-            <FormHelperText>{hasNoContent}</FormHelperText>
-          )}
-          {isError && <FormHelperText>{fieldError}</FormHelperText>}
+          {helperTexts}
         </FormControl>
       );
 
@@ -142,12 +152,12 @@ export function QuestionaryComponentDynamicMultipleChoice(
             value={stateValue[0] || ''}
             onChange={handleOnChange}
             className={
-              config.options.length < 3
+              options.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
             }
           >
-            {config.options.map((option) => {
+            {options.map((option) => {
               return (
                 <FormControlLabel
                   value={option}
@@ -158,10 +168,7 @@ export function QuestionaryComponentDynamicMultipleChoice(
               );
             })}
           </RadioGroup>
-          {config.options.length < 1 && (
-            <FormHelperText>{hasNoContent}</FormHelperText>
-          )}
-          {isError && <FormHelperText>{fieldError}</FormHelperText>}
+          {helperTexts}
         </FormControl>
       );
   }

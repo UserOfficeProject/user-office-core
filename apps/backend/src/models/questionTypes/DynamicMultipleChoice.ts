@@ -1,9 +1,5 @@
 /* eslint-disable quotes */
 
-import { logger } from '@user-office-software/duo-logger';
-import axios from 'axios';
-import jp from 'jsonpath';
-
 import { DynamicMultipleChoiceConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -32,7 +28,6 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
       config.tooltip = '';
       config.variant = 'radio';
       config.url = '';
-      config.options = [];
       config.jsonPath = '';
       config.isMultipleSelect = false;
       config.externalApiCall = true;
@@ -58,29 +53,5 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
             `Unsupported comparator for SelectionFromOptions ${filter.compareOperator}`
           );
       }
-    },
-    transformConfig: async (config) => {
-      const fallBackConfig = { ...config, options: [] };
-
-      try {
-        const resp = await axios.get(config.url);
-
-        if (
-          Array.isArray(resp.data) &&
-          resp.data.every((el) => typeof el === 'string')
-        ) {
-          return { ...config, options: resp.data };
-        } else {
-          const jsonPathFilteredData = jp.query(resp.data, config.jsonPath);
-
-          return { ...config, options: jsonPathFilteredData };
-        }
-      } catch (err) {
-        logger.logError('Dynamic multiple choice external api fetch failed', {
-          err,
-        });
-      }
-
-      return fallBackConfig;
     },
   };

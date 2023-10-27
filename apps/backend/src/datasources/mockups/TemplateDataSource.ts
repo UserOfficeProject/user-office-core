@@ -22,7 +22,10 @@ import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/muta
 import { UpdateTemplateArgs } from '../../resolvers/mutations/template/UpdateTemplateMutation';
 import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
-import { SampleDeclarationConfig } from '../../resolvers/types/FieldConfig';
+import {
+  DynamicMultipleChoiceConfig,
+  SampleDeclarationConfig,
+} from '../../resolvers/types/FieldConfig';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
   TemplateExport,
@@ -115,6 +118,42 @@ const dummyTemplateStepsFactory = () => {
     }),
   });
 
+  const dmcQuestionEmptyUrl = dummyQuestionTemplateRelationFactory({
+    question: dummyQuestionFactory({
+      id: 'dmcQuestionEmptyUrl',
+      naturalKey: 'dmcQuestionEmptyUrl',
+      dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
+      config: {
+        url: '',
+        jsonPath: '',
+      } as DynamicMultipleChoiceConfig,
+    }),
+  });
+
+  const dmcQuestionEmptyJsonPath = dummyQuestionTemplateRelationFactory({
+    question: dummyQuestionFactory({
+      id: 'dmcQuestionEmptyJsonPath',
+      naturalKey: 'dmcQuestionEmptyJsonPath',
+      dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
+      config: {
+        url: 'api-url',
+        jsonPath: '',
+      } as DynamicMultipleChoiceConfig,
+    }),
+  });
+
+  const dmcQuestionWithUrlAndJsonPath = dummyQuestionTemplateRelationFactory({
+    question: dummyQuestionFactory({
+      id: 'dmcQuestionWithUrlAndJsonPath',
+      naturalKey: 'dmcQuestionWithUrlAndJsonPath',
+      dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
+      config: {
+        url: 'api-url',
+        jsonPath: '$..option',
+      } as DynamicMultipleChoiceConfig,
+    }),
+  });
+
   return [
     new TemplateStep(new Topic(1, 'General information', 1, 1, true), [
       hasLinksToField,
@@ -123,6 +162,9 @@ const dummyTemplateStepsFactory = () => {
       enableCrystallization,
       proposalBasis,
       samplesField,
+      dmcQuestionEmptyUrl,
+      dmcQuestionEmptyJsonPath,
+      dmcQuestionWithUrlAndJsonPath,
     ]),
   ];
 };

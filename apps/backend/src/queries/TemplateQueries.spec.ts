@@ -1,4 +1,7 @@
+jest.mock('axios');
+
 import 'reflect-metadata';
+import axios from 'axios';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -74,4 +77,63 @@ test('User officer should be able to get question by natural key', async () => {
   );
 
   return expect(question).not.toBe(null);
+});
+
+describe('getDynamicMultipleChoiceOptions', () => {
+  it('should return empty array if there is no question', async () => {
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'unknown_question_id'
+    );
+
+    expect(options).toEqual([]);
+  });
+
+  it('should return empty array if url is empty', async () => {
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionEmptyUrl'
+    );
+
+    expect(options).toEqual([]);
+  });
+
+  it('should return the options if the response is an array of strings', async () => {
+    (axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce({
+      data: ['option1', 'option2'],
+    });
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionEmptyJsonPath'
+    );
+
+    expect(options).toEqual(['option1', 'option2']);
+  });
+
+  it('should return empty array if the response is not an array and jsonPath is empty', async () => {
+    (axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce({
+      data: 'not an array',
+    });
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionEmptyJsonPath'
+    );
+
+    expect(options).toEqual([]);
+  });
+
+  it('should return the options if the response is not an array and jsonPath is set', async () => {
+    (axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce({
+      data: [{ option: 'option1' }, { option: 'option2' }],
+    });
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionWithUrlAndJsonPath'
+    );
+
+    expect(options).toEqual(['option1', 'option2']);
+  });
 });
