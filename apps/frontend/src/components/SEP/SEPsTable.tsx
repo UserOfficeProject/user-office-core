@@ -1,6 +1,7 @@
 import { Column } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
-import { Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
 import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -136,10 +137,14 @@ const SEPsTable = () => {
 
   return (
     <div data-cy="SEPs-table">
-      <SEPStatusFilter
-        sepStatus={urlQueryParams.sepStatus}
-        onChange={handleStatusFilterChange}
-      />
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <SEPStatusFilter
+            sepStatus={urlQueryParams.sepStatus}
+            onChange={handleStatusFilterChange}
+          />
+        </Grid>
+      </Grid>
       <SuperMaterialTable
         createModal={createModal}
         hasAccess={{
