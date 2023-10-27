@@ -1,7 +1,4 @@
-import MaterialTable, {
-  Column,
-  EditComponentProps,
-} from '@material-table/core';
+import { Column, EditComponentProps } from '@material-table/core';
 import { Autocomplete } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
@@ -10,6 +7,7 @@ import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
   Call,

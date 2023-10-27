@@ -37,7 +37,7 @@ const CreateUpdateInstitution = ({
       }
     : {
         name: '',
-        country: 0,
+        country: null,
         verified: false,
       };
 
