@@ -1,16 +1,25 @@
 import { useEffect, useState } from 'react';
 
-import { GetQuestionaryQuery } from 'generated/sdk';
+import { GetQuestionaryQuery, Questionary } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useQuestionary(questionaryId: number) {
-  const [loadingQuestionary, setLoadingQuestionary] = useState<boolean>(true);
-  const [questionary, setQuestionary] =
-    useState<GetQuestionaryQuery['questionary']>(null);
+export function useQuestionary(
+  questionaryId: number,
+  questionaryData?: Questionary
+) {
+  const [loadingQuestionary, setLoadingQuestionary] = useState<boolean>(
+    !questionaryData
+  );
+  const [questionary, setQuestionary] = useState<
+    GetQuestionaryQuery['questionary']
+  >(questionaryData ?? null);
 
   const api = useDataApi();
 
   useEffect(() => {
+    // If questionaryData is provided, we don't need to fetch it
+    if (questionaryData) return;
+
     let unmounted = false;
 
     setLoadingQuestionary(true);
@@ -30,7 +39,7 @@ export function useQuestionary(questionaryId: number) {
     return () => {
       unmounted = true;
     };
-  }, [api, questionaryId]);
+  }, [api, questionaryId, questionaryData]);
 
   return { questionary, loadingQuestionary };
 }

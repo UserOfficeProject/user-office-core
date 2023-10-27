@@ -9,14 +9,7 @@ import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { Call } from 'generated/sdk';
 
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
+const useStyles = makeStyles(() => ({
   loadingText: {
     minHeight: '32px',
     marginTop: '16px',
@@ -66,7 +59,7 @@ const CallFilter = ({
 
   return (
     <>
-      <FormControl className={classes.formControl}>
+      <FormControl fullWidth>
         <InputLabel id="call-select-label" shrink>
           Call
         </InputLabel>
