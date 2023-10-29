@@ -1,8 +1,10 @@
 import { Viewer } from '@react-pdf-viewer/core';
 import { Worker } from '@react-pdf-viewer/core';
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
+
+import { UserContext } from 'context/UserContextProvider';
 import { PdfTemplate } from 'generated/sdk';
 
 function PdfTemplateEditorViewer({
@@ -10,23 +12,22 @@ function PdfTemplateEditorViewer({
 }: {
   pdfTemplate: PdfTemplate;
 }) {
+  const { token } = useContext(UserContext);
   const [generatedPdfPreviewBlob, setGeneratedPdfPreviewBlob] =
     React.useState<Blob>();
   const fetchGeneratedPdfPreviewData = useCallback(async () => {
-    const pdf = await fetch(
-      `${process.env.USER_OFFICE_FACTORY_ENDPOINT}/generate/pdf/proposal`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: '',
-      }
-    );
+    const pdf = await fetch('/preview/pdf/proposal/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: pdfTemplate.dummyData,
+    });
     const pdfBlob = await pdf.blob();
 
     return pdfBlob;
-  }, [pdfTemplate]);
+  }, [pdfTemplate.dummyData, token]);
 
   React.useEffect(() => {
     fetchGeneratedPdfPreviewData().then((pdfBlob) => {
