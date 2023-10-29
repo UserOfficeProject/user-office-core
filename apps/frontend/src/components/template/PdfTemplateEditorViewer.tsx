@@ -16,18 +16,19 @@ function PdfTemplateEditorViewer({
   const [generatedPdfPreviewBlob, setGeneratedPdfPreviewBlob] =
     React.useState<Blob>();
   const fetchGeneratedPdfPreviewData = useCallback(async () => {
-    const pdf = await fetch('/preview/pdf/proposal/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: pdfTemplate.dummyData,
-    });
+    const pdf = await fetch(
+      `/preview/pdf/proposal?pdfTemplateId=${pdfTemplate.pdfTemplateId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const pdfBlob = await pdf.blob();
 
     return pdfBlob;
-  }, [pdfTemplate.dummyData, token]);
+  }, [pdfTemplate, token]);
 
   React.useEffect(() => {
     fetchGeneratedPdfPreviewData().then((pdfBlob) => {

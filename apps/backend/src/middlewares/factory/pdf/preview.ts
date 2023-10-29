@@ -12,16 +12,14 @@ import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
 
-router.post(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
+router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
   try {
     if (!req.user) {
       throw new Error('Not authorized');
     }
-    const { proposalPk } = req.query;
-    const dummyData = req.body.data as ProposalPDFData | null;
-    const dummyUserRole = req.body.userRole as Role | null;
+    const { proposalPk, pdfTemplateId } = req.query;
 
-    if (!proposalPk && !dummyData && !dummyUserRole) {
+    if (!proposalPk && !pdfTemplateId) {
       res.status(400).send('Invalid request');
     }
     const factoryServices =
@@ -36,14 +34,11 @@ router.post(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       singleFilename: '',
     };
 
-    let proposalPdfData: ProposalPDFData[] | null = null;
-    let userRole: Role | null = null;
+    let payload = null;
 
-    // Check if proposalPk is present and is a number
     const proposalPkNumber = parseInt(proposalPk as string);
-
     if (!isNaN(proposalPkNumber)) {
-      proposalPdfData = await factoryServices.getPdfProposals(
+      const proposalPdfData = await factoryServices.getPdfProposals(
         userWithRole,
         [proposalPkNumber],
         meta,
@@ -56,20 +51,46 @@ router.post(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
         throw new Error('Could not get proposal details');
       }
 
-      userRole = req.user.currentRole;
-    } else {
-      if (!dummyData || !dummyUserRole) {
-        throw new Error('Invalid request');
+      const userRole = req.user.currentRole;
+
+      payload = {
+        data: proposalPdfData,
+        meta,
+        userRole,
+      };
+    }
+
+    const pdfTemplateIdNumber = parseInt(pdfTemplateId as string);
+    if (!isNaN(pdfTemplateIdNumber)) {
+      const pdfTemplate = await factoryServices.getPdfTemplate(
+        userWithRole,
+        pdfTemplateIdNumber
+      );
+
+      if (!pdfTemplate) {
+        throw new Error('Could not get pdf template');
       }
 
-      proposalPdfData = [dummyData];
-      userRole = dummyUserRole;
+      const dummyData = JSON.parse(pdfTemplate.dummyData) as {
+        data: ProposalPDFData;
+        userRole: Role;
+      };
+
+      payload = {
+        data: [dummyData.data],
+        meta,
+        userRole: dummyData.userRole,
+      };
+    }
+
+    if (!payload) {
+      throw new Error('Invalid request');
     }
 
     callFactoryService<ProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
-      { data: proposalPdfData, meta, userRole },
+      payload,
       req,
       res,
       next
