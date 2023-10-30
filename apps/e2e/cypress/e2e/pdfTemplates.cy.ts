@@ -306,28 +306,28 @@ context('PDF template tests', () => {
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
+
+      cy.get('[data-cy=dummyData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.navigateToTemplatesSubmenu('PDF');
+
+      cy.contains(createdTemplateName)
+        .parent()
+        .find("[aria-label='Clone']")
+        .click();
+
+      cy.contains('Yes').click();
+
+      cy.contains(`Copy of ${createdTemplateName}`)
+        .parent()
+        .find("[aria-label='Edit']")
+        .click();
+
+      cy.contains(`Copy of ${createdTemplateName}`).should('exist');
+
+      cy.contains(pdfTemplateData.replace(/\n|\r/g, ' ')).should('exist');
     });
-
-    cy.get('[data-cy=dummyData-submit]').click();
-
-    cy.notification({ variant: 'success', text: 'successfully' });
-
-    cy.navigateToTemplatesSubmenu('PDF');
-
-    cy.contains(createdTemplateName)
-      .parent()
-      .find("[aria-label='Clone']")
-      .click();
-
-    cy.contains('Yes').click();
-
-    cy.contains(`Copy of ${createdTemplateName}`)
-      .parent()
-      .find("[aria-label='Edit']")
-      .click();
-
-    cy.contains(`Copy of ${createdTemplateName}`).should('exist');
-
-    cy.contains(pdfTemplateData.replace(/\n|\r/g, ' ')).should('exist');
   });
 });
