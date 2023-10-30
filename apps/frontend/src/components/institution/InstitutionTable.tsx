@@ -14,6 +14,16 @@ import { FunctionType } from 'utils/utilTypes';
 
 import CreateUpdateInstitution from './CreateUpdateInstitution';
 
+const columns = [
+  { title: 'Name', field: 'name' },
+  { title: 'Country', field: 'country.value' },
+  {
+    title: 'Verified',
+    field: 'verified',
+    lookup: { true: 'Yes', false: 'No' },
+  },
+];
+
 const InstitutionPage = () => {
   const { api } = useDataApiWithFeedback();
 
@@ -40,16 +50,6 @@ const InstitutionPage = () => {
       return false;
     }
   };
-
-  const columns = [
-    { title: 'Name', field: 'name' },
-    { title: 'Country', field: 'country.value' },
-    {
-      title: 'Verified',
-      field: 'verified',
-      lookup: { true: 'Yes', false: 'No' },
-    },
-  ];
 
   const createModal = (
     onUpdate: FunctionType<void, [Institution | null]>,
