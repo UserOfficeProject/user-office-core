@@ -238,7 +238,15 @@ export default class SEPMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async assignProposalsToSEPUsingCallInstrument(
+    agent: UserWithRole | null,
+    args: AssignProposalsToSepUsingCallInstrumentArgs
+  ): Promise<boolean | Rejection> {
+    return this.assignProposalsToSEPUsingCallInstrumentInternal(agent, args);
+  }
+
+  async assignProposalsToSEPUsingCallInstrumentInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToSepUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
@@ -257,7 +265,7 @@ export default class SEPMutations {
         (callHasInstrument) => callHasInstrument.callId === callId
       );
       if (callHasInstrument && callHasInstrument.sepId) {
-        await this.assignProposalsToSep(agent, {
+        await this.assignProposalsToSepInternal(agent, {
           proposals: proposals
             .filter((proposal) => proposal.callId === callId)
             .map((proposal) => ({
@@ -272,8 +280,16 @@ export default class SEPMutations {
     return true;
   }
 
-  @EventBus(Event.PROPOSAL_SEP_SELECTED)
+  @Authorized([Roles.USER_OFFICER])
   async assignProposalsToSep(
+    agent: UserWithRole | null,
+    args: AssignProposalsToSepArgs
+  ): Promise<ProposalPks | Rejection> {
+    return this.assignProposalsToSepInternal(agent, args);
+  }
+
+  @EventBus(Event.PROPOSAL_SEP_SELECTED)
+  async assignProposalsToSepInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
   ): Promise<ProposalPks | Rejection> {
