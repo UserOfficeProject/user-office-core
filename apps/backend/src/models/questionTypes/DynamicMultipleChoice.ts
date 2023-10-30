@@ -30,7 +30,7 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
       config.url = '';
       config.jsonPath = '';
       config.isMultipleSelect = false;
-      config.externalApiCall = true;
+      config.apiCallRequestHeaders = [];
 
       return config;
     },
