@@ -138,6 +138,16 @@ const dummyTemplateStepsFactory = () => {
       config: {
         url: 'api-url',
         jsonPath: '',
+        apiCallRequestHeaders: [
+          {
+            name: 'header1',
+            value: 'value1',
+          },
+          {
+            name: 'header2',
+            value: 'value2',
+          },
+        ],
       } as DynamicMultipleChoiceConfig,
     }),
   });

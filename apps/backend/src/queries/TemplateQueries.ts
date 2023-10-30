@@ -1,5 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
-import axios from 'axios';
+import axios, { AxiosRequestHeaders } from 'axios';
 import jp from 'jsonpath';
 import { inject, injectable } from 'tsyringe';
 
@@ -93,7 +93,15 @@ export default class TemplateQueries {
     if (config.url === '') return [];
 
     try {
-      const { data } = await axios.get(config.url);
+      const { data } = await axios.get(config.url, {
+        headers: config.apiCallRequestHeaders?.reduce(
+          (acc, header) => ({
+            ...acc,
+            [header.name]: header.value,
+          }),
+          {} as AxiosRequestHeaders
+        ),
+      });
 
       if (Array.isArray(data) && data.every((el) => typeof el === 'string')) {
         return data;

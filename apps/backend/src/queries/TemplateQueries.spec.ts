@@ -109,6 +109,14 @@ describe('getDynamicMultipleChoiceOptions', () => {
     );
 
     expect(options).toEqual(['option1', 'option2']);
+
+    // Check that the request was made with the correct url and headers
+    expect(axios.get).toHaveBeenCalledWith('api-url', {
+      headers: {
+        header1: 'value1',
+        header2: 'value2',
+      },
+    });
   });
 
   it('should return empty array if the response is not an array and jsonPath is empty', async () => {
