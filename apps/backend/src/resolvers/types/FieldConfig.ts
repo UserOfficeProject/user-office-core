@@ -1,6 +1,17 @@
-import { createUnionType, Field, Int, ObjectType } from 'type-graphql';
+import {
+  createUnionType,
+  Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
+} from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { InstrumentOptionClass } from '../../models/questionTypes/InstrumentPicker';
+import { Roles } from '../../models/Role';
 import { Unit } from './Unit';
 
 @ObjectType()
@@ -88,6 +99,15 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class ApiCallRequestHeader {
+  @Field()
+  name: string;
+
+  @Field()
+  value: string;
+}
+
+@ObjectType()
 export class DynamicMultipleChoiceConfig extends ConfigBase {
   @Field(() => String)
   variant: string;
@@ -104,8 +124,24 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
   @Field(() => [String])
   options: string[];
 
-  @Field(() => Boolean)
-  externalApiCall: boolean;
+  @Field(() => [ApiCallRequestHeader])
+  apiCallRequestHeaders: ApiCallRequestHeader[];
+}
+
+@Resolver(() => DynamicMultipleChoiceConfig)
+export class DynamicMultipleChoiceConfigResolver {
+  @FieldResolver(() => [ApiCallRequestHeader])
+  async apiCallRequestHeaders(
+    @Ctx() context: ResolverContext,
+    @Root() config: DynamicMultipleChoiceConfig
+  ): Promise<ApiCallRequestHeader[]> {
+    // Only user officer can see the apiCallRequestHeaders
+    if (context.user?.currentRole?.shortCode === Roles.USER_OFFICER) {
+      return config.apiCallRequestHeaders;
+    } else {
+      return [];
+    }
+  }
 }
 
 @ObjectType()

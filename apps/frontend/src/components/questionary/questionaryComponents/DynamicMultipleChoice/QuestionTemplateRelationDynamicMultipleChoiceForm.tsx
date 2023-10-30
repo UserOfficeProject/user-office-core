@@ -8,15 +8,22 @@ import { Checkbox, Select, TextField } from 'formik-mui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
+import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { DynamicMultipleChoiceConfig } from 'generated/sdk';
+import {
+  ApiCallRequestHeader,
+  DynamicMultipleChoiceConfig,
+} from 'generated/sdk';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-const columns = [{ title: 'Answer', field: 'answer' }];
+const columns = [
+  { title: 'Name', field: 'name' },
+  { title: 'Value', field: 'value' },
+];
 
 export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
   props: QuestionTemplateRelationFormProps
@@ -111,7 +118,6 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                 id="config.url"
                 type="text"
                 component={TextField}
-                columns={columns}
                 fullWidth
                 inputProps={{ 'data-cy': 'dynamic-url' }}
               />
@@ -125,10 +131,28 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                 id="config.jsonPath"
                 type="text"
                 component={TextField}
-                columns={columns}
                 fullWidth
                 inputProps={{ 'data-cy': 'dynamic-url-jsonPath' }}
               />
+            </FormControl>
+            <FormControl fullWidth>
+              <TitledContainer
+                label="Api request headers"
+                data-cy="api-headers-container"
+              >
+                <Field
+                  title=""
+                  name="config.apiCallRequestHeaders"
+                  component={FormikUICustomTable}
+                  columns={columns}
+                  dataTransforms={{
+                    toTable: (options: ApiCallRequestHeader[]) => options,
+                    fromTable: (rows: Record<string, unknown>[]) => rows,
+                  }}
+                  fullWidth
+                  data-cy="options"
+                />
+              </TitledContainer>
             </FormControl>
           </TitledContainer>
         </>
