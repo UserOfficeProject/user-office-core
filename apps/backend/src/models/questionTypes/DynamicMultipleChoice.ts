@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 
 import { logger } from '@user-office-software/duo-logger';
-import axios from 'axios';
+import axios, { AxiosRequestHeaders } from 'axios';
 import jp from 'jsonpath';
 
 import { DynamicMultipleChoiceConfig } from '../../resolvers/types/FieldConfig';
@@ -35,7 +35,7 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
       config.options = [];
       config.jsonPath = '';
       config.isMultipleSelect = false;
-      config.externalApiCall = true;
+      config.apiCallRequestHeaders = [];
 
       return config;
     },
@@ -62,8 +62,20 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
     transformConfig: async (config) => {
       const fallBackConfig = { ...config, options: [] };
 
+      if (!config.url) {
+        return fallBackConfig;
+      }
+
       try {
-        const resp = await axios.get(config.url);
+        const resp = await axios.get(config.url, {
+          headers: config.apiCallRequestHeaders?.reduce(
+            (acc, header) => ({
+              ...acc,
+              [header.name]: header.value,
+            }),
+            {} as AxiosRequestHeaders
+          ),
+        });
 
         if (
           Array.isArray(resp.data) &&

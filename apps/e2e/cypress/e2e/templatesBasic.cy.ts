@@ -1475,6 +1475,32 @@ context('Template tests', () => {
       cy.get('[data-cy=dropdown-li]').each(($el) => {
         cy.wrap($el).click();
       });
+
+      cy.contains(dynamicMultipleChoiceQuestion.answers.arrayString[0]);
+    });
+
+    it('Should be able to add headers', () => {
+      cy.task('mockServer', {
+        interceptUrl: dynamicMultipleChoiceQuestion.url,
+        fixture: dynamicMultipleChoiceQuestion.answers.arrayString,
+      });
+
+      cy.createDynamicMultipleChoiceQuestion(
+        dynamicMultipleChoiceQuestion.title,
+        {
+          url: dynamicMultipleChoiceQuestion.url,
+          isMultipleSelect: true,
+          firstTopic: true,
+          headers: { Authorization: 'Bearer 1234', 'Content-Type': 'text/' },
+        }
+      );
+
+      cy.contains(dynamicMultipleChoiceQuestion.title).parent().click();
+
+      cy.get('[data-cy=api-headers-container]').contains('Authorization');
+      cy.get('[data-cy=api-headers-container]').contains('Content-Type');
+      cy.get('[data-cy=api-headers-container]').contains('Bearer 1234');
+      cy.get('[data-cy=api-headers-container]').contains('text');
     });
   });
 
