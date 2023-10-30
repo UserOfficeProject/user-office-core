@@ -1,3 +1,4 @@
+import Grid from '@mui/material/Grid';
 import React from 'react';
 import { DateParam, NumberParam, useQueryParams } from 'use-query-params';
 
@@ -23,29 +24,33 @@ function ExperimentFilterBar() {
   const { calls, loadingCalls } = useCallsData();
 
   return (
-    <>
-      <CallFilter
-        callId={urlQueryParams.call ?? null}
-        calls={calls}
-        isLoading={loadingCalls}
-        shouldShowAll={true}
-        data-cy="call-filter"
-      />
-
-      <InstrumentFilter
-        instrumentId={urlQueryParams.instrument ?? undefined}
-        instruments={instruments}
-        isLoading={loadingInstruments}
-        shouldShowAll={true}
-        data-cy="instrument-filter"
-      />
-
-      <DateFilter
-        from={urlQueryParams.from ?? undefined}
-        to={urlQueryParams.to ?? undefined}
-        data-cy="date-filter"
-      />
-    </>
+    <Grid container spacing={2}>
+      <Grid item sm={3} xs={12}>
+        <CallFilter
+          callId={urlQueryParams.call ?? null}
+          calls={calls}
+          isLoading={loadingCalls}
+          shouldShowAll={true}
+          data-cy="call-filter"
+        />
+      </Grid>
+      <Grid item sm={3} xs={12}>
+        <InstrumentFilter
+          instrumentId={urlQueryParams.instrument ?? undefined}
+          instruments={instruments}
+          isLoading={loadingInstruments}
+          shouldShowAll={true}
+          data-cy="instrument-filter"
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <DateFilter
+          from={urlQueryParams.from ?? undefined}
+          to={urlQueryParams.to ?? undefined}
+          data-cy="date-filter"
+        />
+      </Grid>
+    </Grid>
   );
 }
 
