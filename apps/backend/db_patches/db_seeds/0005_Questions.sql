@@ -357,7 +357,7 @@ VALUES
   (
     'dynamic_multiple_choice_question', 
     'DYNAMIC_MULTIPLE_CHOICE', 'Dynamic multiple choice question from seeds', 
-    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}', 
+    '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}', 
     '2023-02-08 10:23:10.285415+00', 
     '2023-02-08 10:23:10.285415+00', 
     'dynamic_multiple_choice_question', 
@@ -370,7 +370,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'dynamic_multiple_choice_question', 
-    1, 5, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+    1, 5, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
