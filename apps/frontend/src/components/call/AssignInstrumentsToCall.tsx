@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import { Autocomplete, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import i18n from 'i18n';
@@ -7,6 +6,7 @@ import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
   Instrument,

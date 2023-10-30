@@ -1,4 +1,5 @@
 import { MTableToolbar, Options } from '@material-table/core';
+import Grid from '@mui/material/Grid';
 import React from 'react';
 import { NumberParam, useQueryParams, withDefault } from 'use-query-params';
 
@@ -27,12 +28,16 @@ const SEPProposalsAndAssignments = ({
   const Toolbar = (data: Options<JSX.Element>): JSX.Element => (
     <>
       <MTableToolbar {...data} />
-      <CallFilter
-        calls={calls}
-        isLoading={loadingCalls}
-        shouldShowAll={true}
-        callId={query.call}
-      />
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <CallFilter
+            calls={calls}
+            isLoading={loadingCalls}
+            shouldShowAll={true}
+            callId={query.call}
+          />
+        </Grid>
+      </Grid>
     </>
   );
 
