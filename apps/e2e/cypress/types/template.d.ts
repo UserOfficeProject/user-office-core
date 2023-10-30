@@ -171,6 +171,7 @@ declare global {
           type?: 'radio' | 'dropdown';
           firstTopic?: boolean;
           key?: string;
+          headers?: Record<string, string>;
         }
       ) => void;
 
