@@ -14,6 +14,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
 import {
@@ -35,13 +36,16 @@ import { DeleteProposalWorkflowStatusInput } from '../resolvers/mutations/settin
 import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings/MoveProposalWorkflowStatusMutation';
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
+import { EmailStatusActionRecipients } from '../resolvers/types/ProposalStatusActionConfig';
 import { omit } from '../utils/helperFunctions';
 
 @injectable()
 export default class ProposalSettingsMutations {
   constructor(
     @inject(Tokens.ProposalSettingsDataSource)
-    private dataSource: ProposalSettingsDataSource
+    private dataSource: ProposalSettingsDataSource,
+    @inject(Tokens.StatusActionsDataSource)
+    private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
   @ValidateArgs(createProposalStatusValidationSchema)
@@ -645,12 +649,12 @@ export default class ProposalSettingsMutations {
   @ValidateArgs(
     addStatusActionsToConnectionValidationSchema<
       ProposalStatusActionType,
-      string[]
+      EmailStatusActionRecipients
     >(
       ProposalStatusActionType.EMAIL,
       ProposalStatusActionType.RABBITMQ,
       Object.values(ProposalStatusActionType),
-      []
+      EmailStatusActionRecipients.OTHER
     )
   )
   @Authorized([Roles.USER_OFFICER])
@@ -658,6 +662,6 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     input: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null> {
-    return this.dataSource.addConnectionStatusActions(input);
+    return this.statusActionsDataSource.addConnectionStatusActions(input);
   }
 }

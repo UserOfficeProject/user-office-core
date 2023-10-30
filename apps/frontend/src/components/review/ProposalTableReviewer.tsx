@@ -3,6 +3,7 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
@@ -25,6 +26,7 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import {
   capitalize,
+  denseTableColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -60,24 +62,25 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
 
 const columns: (
   t: TFunction<'translation', undefined, 'translation'>
-) => Column<UserWithReview>[] = (t) => [
-  {
-    title: 'Actions',
-    cellStyle: { padding: 0, minWidth: 120 },
-    sorting: false,
-    field: 'rowActions',
-  },
-  { title: 'Proposal ID', field: 'proposalId' },
-  { title: 'Title', field: 'title' },
-  { title: 'Grade', field: 'grade' },
-  {
-    title: 'Review status',
-    render: (user) => capitalize(user.status),
-    customSort: (a, b) => a.status.localeCompare(b.status),
-  },
-  { title: 'Call', field: 'callShortCode' },
-  { title: t('instrument') as string, field: 'instrumentShortCode' },
-];
+) => Column<UserWithReview>[] = (t) =>
+  denseTableColumns([
+    {
+      title: 'Actions',
+      cellStyle: { padding: 0, minWidth: 120 },
+      sorting: false,
+      field: 'rowActions',
+    },
+    { title: 'Proposal ID', field: 'proposalId' },
+    { title: 'Title', field: 'title' },
+    { title: 'Grade', field: 'grade' },
+    {
+      title: 'Review status',
+      render: (user) => capitalize(user.status),
+      customSort: (a, b) => a.status.localeCompare(b.status),
+    },
+    { title: 'Call', field: 'callShortCode' },
+    { title: t('instrument') as string, field: 'instrumentShortCode' },
+  ]);
 
 const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -376,30 +379,41 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
 
   return (
     <>
-      <ReviewStatusFilter
-        reviewStatus={urlQueryParams.reviewStatus}
-        onChange={handleStatusFilterChange}
-      />
-      <CallFilter
-        shouldShowAll
-        calls={calls}
-        isLoading={loadingCalls}
-        callId={selectedCallId}
-        onChange={(callId) => {
-          setSelectedCallId(callId);
-          setUserWithReviewsFilter((filters) => ({ ...filters, callId }));
-        }}
-      />
-      <InstrumentFilter
-        shouldShowAll
-        instruments={instruments}
-        isLoading={loadingInstruments}
-        instrumentId={selectedInstrumentId}
-        onChange={(instrumentId) => {
-          setSelectedInstrumentId(instrumentId);
-          setUserWithReviewsFilter((filters) => ({ ...filters, instrumentId }));
-        }}
-      />
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <ReviewStatusFilter
+            reviewStatus={urlQueryParams.reviewStatus}
+            onChange={handleStatusFilterChange}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <CallFilter
+            shouldShowAll
+            calls={calls}
+            isLoading={loadingCalls}
+            callId={selectedCallId}
+            onChange={(callId) => {
+              setSelectedCallId(callId);
+              setUserWithReviewsFilter((filters) => ({ ...filters, callId }));
+            }}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <InstrumentFilter
+            shouldShowAll
+            instruments={instruments}
+            isLoading={loadingInstruments}
+            instrumentId={selectedInstrumentId}
+            onChange={(instrumentId) => {
+              setSelectedInstrumentId(instrumentId);
+              setUserWithReviewsFilter((filters) => ({
+                ...filters,
+                instrumentId,
+              }));
+            }}
+          />
+        </Grid>
+      </Grid>
       <ProposalReviewModal
         title={`Proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}

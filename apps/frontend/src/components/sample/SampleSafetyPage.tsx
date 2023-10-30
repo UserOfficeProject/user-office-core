@@ -2,6 +2,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
@@ -237,15 +238,19 @@ function SampleSafetyPage() {
       )}
       <StyledContainer>
         <StyledPaper>
-          <CallFilter
-            callId={selectedCallId}
-            calls={calls}
-            isLoading={loadingCalls}
-            onChange={(callId) => {
-              setSelectedCallId(callId);
-            }}
-            shouldShowAll={true}
-          />
+          <Grid container spacing={2}>
+            <Grid item sm={3} xs={12}>
+              <CallFilter
+                callId={selectedCallId}
+                calls={calls}
+                isLoading={loadingCalls}
+                onChange={(callId) => {
+                  setSelectedCallId(callId);
+                }}
+                shouldShowAll={true}
+              />
+            </Grid>
+          </Grid>
           <SamplesTable
             data={samplesWithRowActions}
             isLoading={isExecutingCall}
