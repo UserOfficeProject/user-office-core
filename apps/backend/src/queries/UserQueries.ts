@@ -164,7 +164,7 @@ export default class UserQueries {
       isValid = 'user' in payload || 'accessTokenId' in payload;
 
       if (!isValid) {
-        throw new Error('Unknown or malformed token');
+        logger.logWarn('Unknown or malformed token', { token, payload });
       }
     } catch (error) {
       logger.logWarn('The given token is invalid', { token, error });

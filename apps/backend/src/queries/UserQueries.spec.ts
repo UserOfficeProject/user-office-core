@@ -126,8 +126,8 @@ describe('UserQueries', () => {
       });
 
       expect(logger.logWarn).toHaveBeenCalledWith(
-        'The given token is invalid',
-        { error: Error('Unknown or malformed token'), token: 'malformedToken' }
+        'Unknown or malformed token',
+        { token: 'malformedToken', payload: invalidPayload }
       );
     });
   });
