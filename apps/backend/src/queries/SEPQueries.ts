@@ -185,4 +185,8 @@ export default class SEPQueries {
       return null;
     }
   }
+
+  async getProposalsSeps(agent: UserWithRole | null, proposalPks: number[]) {
+    return await this.dataSource.getSEPsByProposalPks(proposalPks);
+  }
 }

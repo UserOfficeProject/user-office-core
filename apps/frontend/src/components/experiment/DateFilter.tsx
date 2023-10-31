@@ -1,6 +1,7 @@
 import { DatePicker, LocalizationProvider } from '@mui/lab';
 import DateAdapter from '@mui/lab/AdapterLuxon';
-import { Stack, TextField } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -81,59 +82,67 @@ function DateFilter(props: DateFilterProps) {
   const inputDateFormat = format ?? 'yyyy-MM-dd';
 
   return (
-    <Stack direction="row" margin={(theme) => theme.spacing(1)} minWidth={120}>
+    <Grid container spacing={2}>
       <LocalizationProvider dateAdapter={DateAdapter}>
-        <DatePicker
-          inputFormat={inputDateFormat}
-          label="From"
-          value={props.from ?? null}
-          onChange={(startsAt: unknown) => {
-            setQuery({
-              from: (startsAt as DateTime)?.toJSDate(),
-              to: props.to,
-            });
-            setPresetValue(null);
-          }}
-          className={classes.datePicker}
-          renderInput={(tfProps) => (
-            <TextField
-              {...tfProps}
-              style={{ margin: '0 16px 16px 0' }}
-              data-cy="from-date-picker"
-            />
-          )}
-        />
+        <Grid item sm={3} xs={12}>
+          <DatePicker
+            inputFormat={inputDateFormat}
+            label="From"
+            value={props.from ?? null}
+            onChange={(startsAt: unknown) => {
+              setQuery({
+                from: (startsAt as DateTime)?.toJSDate(),
+                to: props.to,
+              });
+              setPresetValue(null);
+            }}
+            className={classes.datePicker}
+            renderInput={(tfProps) => (
+              <TextField
+                {...tfProps}
+                fullWidth
+                data-cy="from-date-picker"
+                margin="none"
+              />
+            )}
+          />
+        </Grid>
 
-        <DatePicker
-          inputFormat={inputDateFormat}
-          label="To"
-          value={props.to ?? null}
-          onChange={(endsAt: unknown) => {
-            setQuery({
-              from: props.from,
-              to: (endsAt as DateTime)?.toJSDate(),
-            });
-            setPresetValue(null);
-          }}
-          className={classes.datePicker}
-          renderInput={(tfProps) => (
-            <TextField
-              {...tfProps}
-              style={{ margin: '0 16px 16px 0' }}
-              data-cy="to-date-picker"
-            />
-          )}
-        />
-        <PresetDateSelector
-          value={presetValue}
-          setValue={(val) => {
-            const { from, to } = getRelativeDatesFromToday(val);
-            setQuery({ from, to });
-            setPresetValue(val);
-          }}
-        />
+        <Grid item sm={3} xs={12}>
+          <DatePicker
+            inputFormat={inputDateFormat}
+            label="To"
+            value={props.to ?? null}
+            onChange={(endsAt: unknown) => {
+              setQuery({
+                from: props.from,
+                to: (endsAt as DateTime)?.toJSDate(),
+              });
+              setPresetValue(null);
+            }}
+            className={classes.datePicker}
+            renderInput={(tfProps) => (
+              <TextField
+                {...tfProps}
+                fullWidth
+                margin="none"
+                data-cy="to-date-picker"
+              />
+            )}
+          />
+        </Grid>
+        <Grid item sm={6} xs={12}>
+          <PresetDateSelector
+            value={presetValue}
+            setValue={(val) => {
+              const { from, to } = getRelativeDatesFromToday(val);
+              setQuery({ from, to });
+              setPresetValue(val);
+            }}
+          />
+        </Grid>
       </LocalizationProvider>
-    </Stack>
+    </Grid>
   );
 }
 

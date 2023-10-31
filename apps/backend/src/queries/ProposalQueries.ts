@@ -6,11 +6,7 @@ import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
-import {
-  Proposal,
-  ProposalEndStatus,
-  ProposalPublicStatus,
-} from '../models/Proposal';
+import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
@@ -20,11 +16,6 @@ import {
 import { omit } from '../utils/helperFunctions';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
-
-const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
-statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
-statusMap.set(ProposalEndStatus.REJECTED, ProposalPublicStatus.rejected);
-statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 
 @injectable()
 export default class ProposalQueries {
@@ -140,21 +131,6 @@ export default class ProposalQueries {
       first,
       offset
     );
-  }
-
-  async getPublicStatus(agent: UserWithRole | null, id: number) {
-    const proposal = await this.get(agent, id);
-    if (!proposal) {
-      return ProposalPublicStatus.unknown;
-    }
-
-    if (proposal.submitted) {
-      return (
-        statusMap.get(proposal.finalStatus) || ProposalPublicStatus.submitted
-      );
-    } else {
-      return ProposalPublicStatus.draft;
-    }
   }
 
   @Authorized()
