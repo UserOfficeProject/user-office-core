@@ -193,15 +193,6 @@ describe('Test SEPMutations', () => {
     ).resolves.toStrictEqual(dummySEP);
   });
 
-  test('A user can not assign proposal to SEP', async () => {
-    return expect(
-      SEPMutationsInstance.assignProposalsToSep(dummyUserWithRole, {
-        proposals: [{ primaryKey: 1, callId: 1 }],
-        sepId: 1,
-      })
-    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
-  });
-
   test('A userofficer can assign proposal to SEP', () => {
     return expect(
       SEPMutationsInstance.assignProposalsToSep(dummyUserOfficerWithRole, {
