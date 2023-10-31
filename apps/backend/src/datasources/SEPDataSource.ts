@@ -47,6 +47,7 @@ export interface SEPDataSource {
   getUserSeps(id: number, role: Role): Promise<SEP[]>;
   getSepsByCallId(callId: number): Promise<SEP[]>;
   getSEPByProposalPk(proposalPk: number): Promise<SEP | null>;
+  getSEPsByProposalPks(proposalPks: number[]): Promise<SEPProposal[]>;
   getSEPs(filter?: SEPsFilter): Promise<{ totalCount: number; seps: SEP[] }>;
   getSEPProposalAssignments(
     sepId: number,
