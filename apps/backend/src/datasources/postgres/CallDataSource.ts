@@ -106,7 +106,15 @@ export default class PostgresCallDataSource implements CallDataSource {
     if (filter?.sepIds?.length) {
       query
         .leftJoin('call_has_seps as chs', 'chs.call_id', 'call.call_id')
-        .whereIn('chs.sep_id', filter.sepIds);
+        .whereIn('chs.sep_id', filter.sepIds)
+        .distinctOn('call.call_id');
+    }
+
+    if (filter?.instrumentIds?.length) {
+      query
+        .leftJoin('call_has_instruments as chi', 'chi.call_id', 'call.call_id')
+        .whereIn('chi.instrument_id', filter.instrumentIds)
+        .distinctOn('call.call_id');
     }
 
     if (filter?.isSEPReviewEnded === true) {

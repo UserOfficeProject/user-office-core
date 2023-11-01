@@ -292,7 +292,7 @@ const ProposalTableOfficer = ({
   const featureContext = useContext(FeatureContext);
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [query, setQuery] = useState<QueryParameters>({
     first: PREFETCH_SIZE,

@@ -1,5 +1,6 @@
-import MaterialTable, { Options } from '@material-table/core';
+import MaterialTable from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
+import GridOnIcon from '@mui/icons-material/GridOn';
 import { Typography } from '@mui/material';
 import i18n from 'i18n';
 import { useSnackbar } from 'notistack';
@@ -9,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useCheckAccess } from 'components/common/Can';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useInstrumentsBySEPData } from 'hooks/instrument/useInstrumentsBySEPData';
+import { useDownloadXLSXSEP } from 'hooks/SEP/useDownloadXLSXSEP';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -17,7 +19,6 @@ import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
 type SEPMeetingInstrumentsTableProps = {
   sepId: number;
-  Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   selectedCall?: Call;
   confirm: WithConfirmType;
 };
@@ -41,7 +42,6 @@ const instrumentTableColumns = [
 const SEPMeetingInstrumentsTable = ({
   sepId,
   selectedCall,
-  Toolbar,
   confirm,
 }: SEPMeetingInstrumentsTableProps) => {
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
@@ -54,6 +54,7 @@ const SEPMeetingInstrumentsTable = ({
   ]);
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
+  const downloadSEPXLSX = useDownloadXLSXSEP();
 
   const columns = instrumentTableColumns.map((column) => ({
     ...column,
@@ -126,10 +127,10 @@ const SEPMeetingInstrumentsTable = ({
 
   const DoneAllIcon = (): JSX.Element => <DoneAll />;
 
-  const actions = [];
+  const accessDependentActions = [];
 
   if (hasAccessRights) {
-    actions.push(
+    accessDependentActions.push(
       (
         rowData:
           | InstrumentWithAvailabilityTime
@@ -171,12 +172,25 @@ const SEPMeetingInstrumentsTable = ({
           </Typography>
         }
         columns={columns}
-        components={{
-          Toolbar: Toolbar,
-        }}
         data={instrumentsData}
         isLoading={loadingInstruments}
-        actions={actions}
+        actions={[
+          ...accessDependentActions,
+          {
+            icon: GridOnIcon,
+            tooltip: 'Export in Excel',
+            onClick: (): void => {
+              if (selectedCall?.id) {
+                downloadSEPXLSX(
+                  sepId,
+                  selectedCall.id,
+                  selectedCall.shortCode ?? 'unknown'
+                );
+              }
+            },
+            position: 'toolbar',
+          },
+        ]}
         detailPanel={[
           {
             tooltip: 'Show proposals',

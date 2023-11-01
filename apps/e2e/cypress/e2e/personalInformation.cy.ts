@@ -41,12 +41,7 @@ context('Personal information tests', () => {
 
     cy.contains('User roles');
 
-    cy.contains(
-      "[data-cy='role-selection-table'] table tbody tr td",
-      'User Officer'
-    )
-      .parent()
-      .contains('In Use');
+    cy.get('data-cy="selected-role-user_officer"').contains('In Use');
   });
 
   describe('Personal information advanced tests', () => {
@@ -152,11 +147,9 @@ context('Personal information tests', () => {
 
       cy.get('[data-cy="role-selection-table"]').contains('User roles');
 
-      cy.get('[data-cy="role-selection-table"]')
-        .contains('SEP Chair', { matchCase: false })
-        .parent()
-        .find('button')
-        .click();
+      cy.get(
+        '[data-cy="role-selection-table"] [data-cy="select-role-sep_chair"]'
+      ).click();
 
       cy.finishedLoading();
 
@@ -202,10 +195,7 @@ context('Personal information tests', () => {
 
       cy.contains('User roles');
 
-      cy.contains('SEP Chair', { matchCase: false })
-        .parent()
-        .find('button')
-        .click();
+      cy.get('[data-cy="select-role-sep_chair"]').click();
 
       cy.finishedLoading();
 
