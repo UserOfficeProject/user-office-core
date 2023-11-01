@@ -36,6 +36,8 @@ import {
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { StfcSEPDataColumns } from '../factory/xlsx/SEPDataColumns';
+import { getStfcDataRow, populateStfcRow } from '../factory/xlsx/SEPDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
@@ -77,6 +79,10 @@ mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
+
+mapValue(Tokens.SEPDataColumns, StfcSEPDataColumns);
+mapValue(Tokens.SEPDataRow, getStfcDataRow);
+mapValue(Tokens.PopulateRow, populateStfcRow);
 
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 

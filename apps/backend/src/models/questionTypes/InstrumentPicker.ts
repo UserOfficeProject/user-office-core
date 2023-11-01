@@ -104,7 +104,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       });
 
       // Assign the Proposals to SEP using Call Instrument
-      await sepMutation.assignProposalsToSEPUsingCallInstrument(null, {
+      await sepMutation.assignProposalsToSEPUsingCallInstrumentInternal(null, {
         instrumentId: instrumentId,
         proposalPks: [proposal.primaryKey],
       });
