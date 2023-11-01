@@ -19,29 +19,31 @@ export const rabbitMQActionHandler = async (
     return;
   }
 
-  Promise.all(
-    config.exchanges.map((exchange) => {
+  return Promise.all(
+    config.exchanges.map((exchange) =>
       Promise.all(
         proposals.map(async (proposal) => {
           const jsonMessage = await getProposalMessageData(proposal);
 
           // NOTE: For now we only sent to the default exchange
-          rabbitMQ.sendMessageToExchange(
-            exchange,
-            Event.PROPOSAL_STATUS_ACTION_EXECUTED,
-            jsonMessage
-          );
-
-          logger.logDebug(
-            'Proposal event successfully sent to the message broker',
-            {
+          return rabbitMQ
+            .sendMessageToExchange(
               exchange,
-              eventType: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
-              fullProposalMessage: jsonMessage,
-            }
-          );
+              Event.PROPOSAL_STATUS_ACTION_EXECUTED,
+              jsonMessage
+            )
+            .then(() => {
+              logger.logDebug(
+                'Proposal event successfully sent to the message broker',
+                {
+                  exchange,
+                  eventType: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
+                  fullProposalMessage: jsonMessage,
+                }
+              );
+            });
         })
-      );
-    })
+      )
+    )
   );
 };

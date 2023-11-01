@@ -758,25 +758,30 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     callId: number,
     statusId: number
   ): Promise<boolean> {
-    const proposalCall: CallRecord = await database('call')
-      .select('*')
-      .where('call_id', callId)
-      .first();
+    return database.transaction(async (trx) => {
+      try {
+        const proposalCall: CallRecord = await database('call')
+          .select('*')
+          .where('call_id', callId)
+          .first()
+          .transacting(trx);
 
-    if (!proposalCall) {
-      logger.logError(
-        'Could not reset proposal events because proposal call does not exist',
-        { callId }
-      );
+        if (!proposalCall) {
+          logger.logError(
+            'Could not reset proposal events because proposal call does not exist',
+            { callId }
+          );
 
-      throw new GraphQLError('Could not reset proposal events');
-    }
+          throw new GraphQLError('Could not reset proposal events');
+        }
 
-    const proposalWorkflowId = proposalCall.proposal_workflow_id;
+        const proposalWorkflowId = proposalCall.proposal_workflow_id;
 
-    const proposalEventsToReset: (StatusChangingEventRecord &
-      ProposalWorkflowConnectionRecord)[] = (
-      await database.raw(`
+        const proposalEventsToReset: (StatusChangingEventRecord &
+          ProposalWorkflowConnectionRecord)[] = (
+          await database
+            .raw(
+              `
         SELECT *
         FROM proposal_workflow_connections AS pwc
         JOIN status_changing_events
@@ -788,36 +793,51 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           AND proposal_status_id = ${statusId}
         )
         AND pwc.proposal_workflow_id = ${proposalWorkflowId};
-      `)
-    ).rows;
+      `
+            )
+            .transacting(trx)
+        ).rows;
 
-    if (proposalEventsToReset?.length) {
-      const dataToUpdate: Record<string, boolean> = {};
+        if (proposalEventsToReset?.length) {
+          const dataToUpdate: Record<string, boolean> = {};
 
-      proposalEventsToReset.forEach((event) => {
-        const dataToUpdateHasProperty = dataToUpdate.hasOwnProperty(
-          event.status_changing_event.toLocaleLowerCase()
-        );
-        // NOTE: Reset the property only if it is not present in the dataToUpdate otherwise we end up with overwriting existing data.
-        if (!dataToUpdateHasProperty) {
-          dataToUpdate[event.status_changing_event.toLocaleLowerCase()] = false;
+          proposalEventsToReset.forEach((event) => {
+            const dataToUpdateHasProperty = dataToUpdate.hasOwnProperty(
+              event.status_changing_event.toLocaleLowerCase()
+            );
+            // NOTE: Reset the property only if it is not present in the dataToUpdate otherwise we end up with overwriting existing data.
+            if (!dataToUpdateHasProperty) {
+              dataToUpdate[event.status_changing_event.toLocaleLowerCase()] =
+                false;
+            }
+          });
+
+          const [updatedProposalEvents] = await database
+            .update(dataToUpdate)
+            .from('proposal_events')
+            .where('proposal_pk', proposalPk)
+            .returning<ProposalEventsRecord[]>('*')
+            .transacting(trx);
+
+          if (!updatedProposalEvents) {
+            logger.logError('Could not reset proposal events', {
+              dataToUpdate,
+            });
+
+            throw new GraphQLError('Could not reset proposal events');
+          }
         }
-      });
 
-      const [updatedProposalEvents] = await database
-        .update(dataToUpdate)
-        .from('proposal_events')
-        .where('proposal_pk', proposalPk)
-        .returning<ProposalEventsRecord[]>('*');
+        return true;
+      } catch (error) {
+        logger.logException(
+          `Failed to reset proposal events proposalPk: ${proposalPk}`,
+          error
+        );
 
-      if (!updatedProposalEvents) {
-        logger.logError('Could not reset proposal events', { dataToUpdate });
-
-        throw new GraphQLError('Could not reset proposal events');
+        return false;
       }
-    }
-
-    return true;
+    });
   }
 
   async changeProposalsStatus(

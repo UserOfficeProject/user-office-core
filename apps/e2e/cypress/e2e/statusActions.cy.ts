@@ -135,10 +135,6 @@ context('Status actions tests', () => {
 
     cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
 
-    cy.get(
-      '[data-cy="accordion-EMAIL"] [data-testid="ExpandMoreIcon"]'
-    ).click();
-
     cy.get('[data-cy="action-recipient-PI"] input').should('be.checked');
     cy.get('[data-cy="PI-email-template"] input')
       .invoke('val')
@@ -273,10 +269,6 @@ context('Status actions tests', () => {
 
     cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
 
-    cy.get(
-      '[data-cy="accordion-EMAIL"] [data-testid="ExpandMoreIcon"]'
-    ).click();
-
     cy.get('[data-cy="action-recipient-PI"] input').should('be.checked');
     cy.get('[data-cy="PI-email-template"] input')
       .invoke('val')
@@ -363,10 +355,6 @@ context('Status actions tests', () => {
       .click();
 
     cy.finishedLoading();
-
-    cy.get(
-      '[data-cy="accordion-EMAIL"] [data-testid="ExpandMoreIcon"]'
-    ).click();
 
     cy.get('[data-cy="action-recipient-OTHER"] input').should('be.checked');
 

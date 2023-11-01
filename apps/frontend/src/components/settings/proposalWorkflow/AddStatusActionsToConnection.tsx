@@ -210,6 +210,22 @@ const AddStatusActionsToConnection = ({
                       sx={accordionSX}
                       disableGutters
                       key={index}
+                      expanded={
+                        !!values.selectedStatusActions.find(
+                          (item) => item.id === statusAction.id
+                        )
+                      }
+                      onChange={(event) => {
+                        event.preventDefault();
+                        const idx = values.selectedStatusActions.findIndex(
+                          (item) => item.id === statusAction.id
+                        );
+                        if (idx === -1) {
+                          arrayHelpers.push(statusAction);
+                        } else {
+                          arrayHelpers.remove(idx);
+                        }
+                      }}
                       data-cy={`accordion-${statusAction.type}`}
                     >
                       <AccordionSummary
@@ -229,17 +245,6 @@ const AddStatusActionsToConnection = ({
                                 )
                               }
                               data-cy={`${statusAction.type}-status-action`}
-                              onChange={(e) => {
-                                if (e.target.checked)
-                                  arrayHelpers.push(statusAction);
-                                else {
-                                  const idx =
-                                    values.selectedStatusActions.findIndex(
-                                      (item) => item.id === statusAction.id
-                                    );
-                                  arrayHelpers.remove(idx);
-                                }
-                              }}
                               inputProps={{
                                 'aria-label': 'primary checkbox',
                               }}

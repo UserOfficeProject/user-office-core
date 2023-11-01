@@ -396,7 +396,7 @@ export interface FileRecord {
 
 export interface EventLogRecord {
   readonly id: number;
-  readonly changed_by: number;
+  readonly changed_by: number | null;
   readonly event_type: string;
   readonly row_data: string;
   readonly event_tstamp: Date;
