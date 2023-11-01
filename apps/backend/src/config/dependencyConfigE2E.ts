@@ -36,6 +36,8 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
+import { getDataRow, populateRow } from '../factory/xlsx/SEPDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
@@ -77,6 +79,10 @@ mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SkipSendMailService);
+
+mapValue(Tokens.SEPDataColumns, SEPDataColumns);
+mapValue(Tokens.SEPDataRow, getDataRow);
+mapValue(Tokens.PopulateRow, populateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 

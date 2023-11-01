@@ -36,6 +36,8 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
+import { getDataRow, populateRow } from '../factory/xlsx/SEPDataRow';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { isProduction } from '../utils/helperFunctions';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
@@ -79,6 +81,10 @@ mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
 mapClass(Tokens.MailService, SparkPostMailService);
+
+mapValue(Tokens.SEPDataColumns, SEPDataColumns);
+mapValue(Tokens.SEPDataRow, getDataRow);
+mapValue(Tokens.PopulateRow, populateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
