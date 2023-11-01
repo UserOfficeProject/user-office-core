@@ -157,7 +157,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             shouldActivateCall ? 'activated' : 'deactivated'
           } successfully`,
         }).updateCall({
-          ...call,
+          id: call.id,
           isActive: shouldActivateCall,
         } as UpdateCallInput);
 
