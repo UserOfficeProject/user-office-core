@@ -32,6 +32,11 @@ import { SepMeetingDecision } from './SepMeetingDecision';
 import { TechnicalReview } from './TechnicalReview';
 import { Visit } from './Visit';
 
+const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
+statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
+statusMap.set(ProposalEndStatus.REJECTED, ProposalPublicStatus.rejected);
+statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
+
 @ObjectType()
 @Directive('@key(fields: "primaryKey")')
 export class Proposal implements Partial<ProposalOrigin> {
@@ -126,13 +131,11 @@ export class ProposalResolver {
 
   @FieldResolver(() => ProposalPublicStatus)
   async publicStatus(
-    @Root() proposal: Proposal,
-    @Ctx() context: ResolverContext
+    @Root() proposal: ProposalOrigin
   ): Promise<ProposalPublicStatus> {
-    return context.queries.proposal.getPublicStatus(
-      context.user,
-      proposal.primaryKey
-    );
+    return proposal.submitted
+      ? statusMap.get(proposal.finalStatus) || ProposalPublicStatus.submitted
+      : ProposalPublicStatus.draft;
   }
 
   @FieldResolver(() => [Review], { nullable: true })
