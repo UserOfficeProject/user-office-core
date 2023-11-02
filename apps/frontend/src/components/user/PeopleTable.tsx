@@ -1,8 +1,4 @@
-import MaterialTable, {
-  Options,
-  Column,
-  MTableToolbar,
-} from '@material-table/core';
+import { Options, Column, MTableToolbar } from '@material-table/core';
 import Email from '@mui/icons-material/Email';
 import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -15,6 +11,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import EmailSearchBar from 'components/common/EmailSearchBar';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
@@ -524,7 +521,6 @@ const PeopleTable = ({
             search: search,
             debounceInterval: 400,
             pageSize: query.first as number,
-            emptyRowsWhenPaging: false,
             selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
