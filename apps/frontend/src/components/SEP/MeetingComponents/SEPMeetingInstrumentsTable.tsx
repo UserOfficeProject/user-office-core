@@ -179,6 +179,7 @@ const SEPMeetingInstrumentsTable = ({
           {
             icon: GridOnIcon,
             tooltip: 'Export in Excel',
+            disabled: !selectedCall || loadingInstruments,
             onClick: (): void => {
               if (selectedCall?.id) {
                 downloadSEPXLSX(

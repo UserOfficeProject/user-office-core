@@ -41,7 +41,7 @@ context('Personal information tests', () => {
 
     cy.contains('User roles');
 
-    cy.get('data-cy="selected-role-user_officer"').contains('In Use');
+    cy.get('[data-cy="selected-role-user_officer"]').contains('In Use');
   });
 
   describe('Personal information advanced tests', () => {

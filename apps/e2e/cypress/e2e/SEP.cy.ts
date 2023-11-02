@@ -1641,7 +1641,9 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Export in Excel"]').click();
+      cy.get('button[aria-label="Export in Excel"]')
+        .should('not.be.disabled')
+        .click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
