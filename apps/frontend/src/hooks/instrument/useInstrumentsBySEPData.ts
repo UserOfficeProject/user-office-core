@@ -22,6 +22,8 @@ export function useInstrumentsBySEPData(
 
   useEffect(() => {
     if (!callId) {
+      setLoadingInstruments(false);
+
       return;
     }
 

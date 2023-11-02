@@ -270,8 +270,8 @@ context('Proposal tests', () => {
     });
 
     it('User officer should be able to select all prefetched proposals in the table', function () {
-      const NUMBER_OF_PROPOSALS = 6;
-      const DEFAULT_ROWS_PER_PAGE = 5;
+      const NUMBER_OF_PROPOSALS = 11;
+      const DEFAULT_ROWS_PER_PAGE = 10;
 
       for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
         cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
