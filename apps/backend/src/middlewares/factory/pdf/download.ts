@@ -1,16 +1,16 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
-import { ProposalPDFData } from '../../factory/pdf/proposal';
-import { collectSamplePDFData } from '../../factory/pdf/sample';
-import { collectShipmentPDFData } from '../../factory/pdf/shipmentLabel';
+import { ProposalPDFData } from '../../../factory/pdf/proposal';
+import { collectSamplePDFData } from '../../../factory/pdf/sample';
+import { collectShipmentPDFData } from '../../../factory/pdf/shipmentLabel';
 import callFactoryService, {
   DownloadType,
   MetaBase,
   PDFType,
-} from '../../factory/service';
-import { getCurrentTimestamp } from '../../factory/util';
-import FactoryServices, { DownloadTypeServices } from './factoryServices';
+} from '../../../factory/service';
+import { getCurrentTimestamp } from '../../../factory/util';
+import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
 
