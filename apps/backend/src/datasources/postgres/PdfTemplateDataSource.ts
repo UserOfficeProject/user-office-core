@@ -21,6 +21,7 @@ export default class PostgresPdfTemplateDataSource
     templateHeader,
     templateFooter,
     templateSampleDeclaration,
+    dummyData,
     creatorId,
   }: CreatePdfTemplateInputWithCreator): Promise<PdfTemplate> {
     const templates: PdfTemplateRecord[] = await database(
@@ -32,6 +33,7 @@ export default class PostgresPdfTemplateDataSource
         template_header: templateHeader,
         template_footer: templateFooter,
         template_sample_declaration: templateSampleDeclaration,
+        dummy_data: dummyData,
         creator_id: creatorId,
       },
       '*'
@@ -91,6 +93,7 @@ export default class PostgresPdfTemplateDataSource
           template_header: args.templateHeader,
           template_footer: args.templateFooter,
           template_sample_declaration: args.templateSampleDeclaration,
+          dummy_data: args.dummyData,
         },
         '*'
       )
@@ -131,6 +134,7 @@ export default class PostgresPdfTemplateDataSource
       templateHeader: sourceTemplate.template_header,
       templateFooter: sourceTemplate.template_footer,
       templateSampleDeclaration: sourceTemplate.template_sample_declaration,
+      dummyData: sourceTemplate.dummy_data,
       creatorId: sourceTemplate.creator_id,
     });
 
