@@ -2,7 +2,6 @@ import { promises } from 'fs';
 import { join } from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
-import rp from 'request-promise';
 import { Resolver, Query } from 'type-graphql';
 
 let cachedVersion: string;
@@ -34,13 +33,20 @@ export class SystemQuery {
   @Query(() => String)
   async factoryVersion() {
     try {
-      // For some reasons it can't find the global URL type for Node.js
-      //  override the default endpoint path end use the version
-      // @ts-ignore
-      const url = new URL(process.env.USER_OFFICE_FACTORY_ENDPOINT!);
+      const url = new URL(process.env.USER_OFFICE_FACTORY_ENDPOINT as string);
       url.pathname = '/version';
 
-      return await rp.get(url.toString());
+      const response = await fetch(url.toString());
+
+      if (!response.ok) {
+        return response.text().then((text) => {
+          throw new Error(
+            `An error occurred while sending the request: ${text}`
+          );
+        });
+      }
+
+      return await response.text();
     } catch (err) {
       logger.logException(
         'Unknown error while requesting factory build-version.txt',
