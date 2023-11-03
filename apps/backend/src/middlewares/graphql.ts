@@ -3,7 +3,6 @@ import {
   ApolloServer,
   ContextFunction,
 } from '@apollo/server';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import {
   ExpressContextFunctionArgument,
   expressMiddleware,
@@ -12,6 +11,7 @@ import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
 } from '@apollo/server/plugin/disabled';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
 import { logger } from '@user-office-software/duo-logger';
 import { json } from 'body-parser';
@@ -150,8 +150,9 @@ const apolloServer = async (app: Express) => {
     // Explicitly disable playground in prod
     isProduction
       ? ApolloServerPluginLandingPageDisabled()
-      : ApolloServerPluginLandingPageGraphQLPlayground({
-          settings: { 'schema.polling.enable': false },
+      : ApolloServerPluginLandingPageLocalDefault({
+          footer: false,
+          embed: { initialState: { pollForSchemaUpdates: false } },
         }),
     errorLoggingPlugin,
   ];
