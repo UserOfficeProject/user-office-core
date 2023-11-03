@@ -22,6 +22,9 @@ export class PdfTemplate implements Partial<PdfTemplateOrigin> {
   @Field()
   public templateSampleDeclaration: string;
 
+  @Field()
+  public dummyData: string;
+
   @Field(() => Int)
   public creatorId: number;
 
