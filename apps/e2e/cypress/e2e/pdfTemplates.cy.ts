@@ -86,6 +86,19 @@ context('PDF template tests', () => {
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
+      cy.contains('Dummy Data').click();
+
+      cy.get('[data-cy="dummyData"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=dummyData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
       cy.navigateToTemplatesSubmenu('PDF');
 
       cy.contains(templateName);
@@ -164,6 +177,19 @@ context('PDF template tests', () => {
         });
 
       cy.get('[data-cy=templateSampleDeclaration-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Dummy Data').click();
+
+      cy.get('[data-cy="dummyData"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=dummyData-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
@@ -269,6 +295,19 @@ context('PDF template tests', () => {
         });
 
       cy.get('[data-cy=templateSampleDeclaration-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.contains('Dummy Data').click();
+
+      cy.get('[data-cy="dummyData"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
+
+      cy.get('[data-cy=dummyData-submit]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 

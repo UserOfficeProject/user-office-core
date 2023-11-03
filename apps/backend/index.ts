@@ -20,7 +20,8 @@ import readinessCheck from './src/middlewares/readinessCheck';
 async function bootstrap() {
   const PORT = process.env.PORT || 4000;
   const app = express();
-
+  app.use(express.json({ limit: '5mb' }));
+  app.use(express.urlencoded({ extended: false }));
   app
     .use(authorization())
     .use(jwtErrorHandler)
