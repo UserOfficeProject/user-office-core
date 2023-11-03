@@ -48,7 +48,7 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_INSTRUMENT_SELECTED:
-          Promise.all(
+          await Promise.all(
             event.instrumenthasproposals.proposalPks.map((proposalPk) =>
               eventLogsDataSource.set(
                 event.loggedInUserId,
@@ -60,7 +60,7 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_SEP_SELECTED:
-          Promise.all(
+          await Promise.all(
             event.proposalpks.proposalPks.map((proposalPk) =>
               eventLogsDataSource.set(
                 event.loggedInUserId,
@@ -72,7 +72,7 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
-          Promise.all(
+          await Promise.all(
             event.proposals.proposals.map((proposal) =>
               eventLogsDataSource.set(
                 event.loggedInUserId,
