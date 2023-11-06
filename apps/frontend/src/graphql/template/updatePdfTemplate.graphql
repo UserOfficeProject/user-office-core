@@ -4,6 +4,7 @@ mutation updatePdfTemplate(
   $templateHeader: String
   $templateFooter: String
   $templateSampleDeclaration: String
+  $dummyData: String
 ) {
   updatePdfTemplate(
     pdfTemplateId: $pdfTemplateId
@@ -11,6 +12,7 @@ mutation updatePdfTemplate(
     templateHeader: $templateHeader
     templateFooter: $templateFooter
     templateSampleDeclaration: $templateSampleDeclaration
+    dummyData: $dummyData
   ) {
     pdfTemplateId
     templateId
@@ -18,6 +20,7 @@ mutation updatePdfTemplate(
     templateHeader
     templateFooter
     templateSampleDeclaration
+    dummyData
     created
     creatorId
   }

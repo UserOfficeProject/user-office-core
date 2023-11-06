@@ -70,6 +70,7 @@ declare module 'knex/types/tables' {
     readonly template_header: string;
     readonly template_footer: string;
     readonly template_sample_declaration: string;
+    readonly dummy_data: string;
     readonly creator_id: number;
     readonly created_at: Date;
   }
@@ -1261,6 +1262,7 @@ export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
     pdfTemplate.template_header,
     pdfTemplate.template_footer,
     pdfTemplate.template_sample_declaration,
+    pdfTemplate.dummy_data,
     pdfTemplate.creator_id,
     pdfTemplate.created_at
   );
