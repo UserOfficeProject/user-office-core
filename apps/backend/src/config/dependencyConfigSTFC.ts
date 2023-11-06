@@ -36,8 +36,11 @@ import {
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { StfcSEPDataColumns } from '../factory/xlsx/SEPDataColumns';
-import { getStfcDataRow, populateStfcRow } from '../factory/xlsx/SEPDataRow';
+import { StfcSEPDataColumns } from '../factory/xlsx/stfc/StfcSEPDataColumns';
+import {
+  getStfcDataRow,
+  populateStfcRow,
+} from '../factory/xlsx/stfc/StfcSEPDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
