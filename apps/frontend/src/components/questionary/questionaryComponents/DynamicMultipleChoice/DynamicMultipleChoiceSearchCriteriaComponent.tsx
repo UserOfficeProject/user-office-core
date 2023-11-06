@@ -1,10 +1,8 @@
 import { Grid, TextField, Autocomplete } from '@mui/material';
 import React, { useState } from 'react';
 
-import {
-  QuestionFilterCompareOperator,
-  DynamicMultipleChoiceConfig,
-} from 'generated/sdk';
+import { QuestionFilterCompareOperator } from 'generated/sdk';
+import { useGetDynamicMultipleChoiceOptions } from 'hooks/template/useGetDynamicMultipleChoiceOptions';
 
 import { SearchCriteriaInputProps } from '../../../proposal/SearchCriteriaInputProps';
 
@@ -14,16 +12,17 @@ function DynamicMultipleChoiceSearchCriteriaComponent({
   searchCriteria,
 }: SearchCriteriaInputProps) {
   const [value, setValue] = useState(searchCriteria?.value ?? '');
-  const content = (
-    questionTemplateRelation.config as DynamicMultipleChoiceConfig
-  ).options;
+  const { options, loadingOptions } = useGetDynamicMultipleChoiceOptions(
+    questionTemplateRelation.question.id
+  );
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Autocomplete
           id="answer"
-          options={content}
+          loading={loadingOptions}
+          options={options}
           getOptionLabel={(option) => option as string}
           renderInput={(params) => (
             <TextField {...params} margin="none" label="Answer" />

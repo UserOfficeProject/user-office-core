@@ -1,0 +1,3 @@
+query getDynamicMultipleChoiceOptions($questionId: String!) {
+  options: getDynamicMultipleChoiceOptions(questionId: $questionId)
+}
