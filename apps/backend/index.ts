@@ -14,6 +14,7 @@ import factory from './src/middlewares/factory';
 import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
 import healthCheck from './src/middlewares/healthCheck';
+import jwtErrorHandler from './src/middlewares/jwtErrorHandler';
 import readinessCheck from './src/middlewares/readinessCheck';
 
 async function bootstrap() {
@@ -23,6 +24,7 @@ async function bootstrap() {
   app.use(express.urlencoded({ extended: false }));
   app
     .use(authorization())
+    .use(jwtErrorHandler)
     .use(files())
     .use(factory())
     .use(healthCheck())

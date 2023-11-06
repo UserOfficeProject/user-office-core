@@ -1,3 +1,6 @@
+import { logger } from '@user-office-software/duo-logger';
+import axios, { AxiosRequestHeaders } from 'axios';
+import jp from 'jsonpath';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -8,6 +11,7 @@ import { Question, TemplateGroupId, TemplateStep } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
+import { DynamicMultipleChoiceConfig } from '../resolvers/types/FieldConfig';
 
 @injectable()
 export default class TemplateQueries {
@@ -75,5 +79,44 @@ export default class TemplateQueries {
   @Authorized()
   async getQuestionByNaturalKey(user: UserWithRole | null, naturalKey: string) {
     return this.dataSource.getQuestionByNaturalKey(naturalKey);
+  }
+
+  @Authorized()
+  async getDynamicMultipleChoiceOptions(
+    user: UserWithRole | null,
+    questionId: string
+  ) {
+    const question = await this.dataSource.getQuestion(questionId);
+    if (!question) return [];
+
+    const config = question.config as DynamicMultipleChoiceConfig;
+    if (config.url === '') return [];
+
+    try {
+      const { data } = await axios.get(config.url, {
+        headers: config.apiCallRequestHeaders?.reduce(
+          (acc, header) => ({
+            ...acc,
+            [header.name]: header.value,
+          }),
+          {} as AxiosRequestHeaders
+        ),
+      });
+
+      if (Array.isArray(data) && data.every((el) => typeof el === 'string')) {
+        return data;
+      }
+
+      if (config.jsonPath !== '') {
+        return jp.query(data, config.jsonPath);
+      }
+    } catch (error) {
+      logger.logWarn('Dynamic multiple choice external api fetch failed', {
+        config,
+        error,
+      });
+    }
+
+    return [];
   }
 }
