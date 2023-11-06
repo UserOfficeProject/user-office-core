@@ -101,7 +101,6 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
 
     res.setHeader('Content-Disposition', contentDisposition(filename));
     res.setHeader('x-download-filename', querystring.escape(filename));
-    res.setHeader('Content-Type', 'application/pdf');
 
     readableStream.pipe(res);
   } catch (error) {
