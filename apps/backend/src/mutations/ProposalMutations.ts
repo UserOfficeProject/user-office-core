@@ -21,7 +21,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, ProposalEndStatus, ProposalPks } from '../models/Proposal';
+import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
@@ -442,13 +442,12 @@ export default class ProposalMutations {
     return result || rejection('Can not administer proposal', { result });
   }
 
-  // TODO: Instead of having two events like: PROPOSAL_STATUS_UPDATED and PROPOSAL_STATUS_CHANGED_BY_USER we can have only one and refactor a bit to contain the right information.
-  @EventBus(Event.PROPOSAL_STATUS_UPDATED)
+  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
   @Authorized([Roles.USER_OFFICER])
   async changeProposalsStatus(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
-  ): Promise<ProposalPks | Rejection> {
+  ): Promise<Proposals | Rejection> {
     const { statusId, proposals } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(
@@ -456,18 +455,18 @@ export default class ProposalMutations {
       proposals.map((proposal) => proposal.primaryKey)
     );
 
-    if (result.proposalPks.length === proposals.length) {
+    if (result.proposals.length === proposals.length) {
       const fullProposals = await Promise.all(
         proposals.map(async (proposal) => {
           await this.proposalDataSource.resetProposalEvents(
             proposal.primaryKey,
             proposal.callId,
-            statusId,
-            true
+            statusId
           );
 
-          const fullProposal = await this.proposalDataSource.get(
-            proposal.primaryKey
+          const fullProposal = result.proposals.find(
+            (updatedProposal) =>
+              updatedProposal.primaryKey === proposal.primaryKey
           );
 
           if (!fullProposal) {
@@ -487,6 +486,10 @@ export default class ProposalMutations {
 
       // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
       statusActionEngine(statusEngineReadyProposals);
+    } else {
+      rejection('Could not change statuses to all of the selected proposals', {
+        result,
+      });
     }
 
     return result || rejection('Can not change proposal status', { result });

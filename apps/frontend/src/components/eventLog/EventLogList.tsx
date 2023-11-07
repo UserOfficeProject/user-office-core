@@ -23,7 +23,9 @@ const columns = [
   {
     title: 'Changed by',
     render: (rowData: EventLog): string =>
-      `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
+      rowData.changedBy
+        ? `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`
+        : 'System',
   },
   {
     title: 'Changed on',
