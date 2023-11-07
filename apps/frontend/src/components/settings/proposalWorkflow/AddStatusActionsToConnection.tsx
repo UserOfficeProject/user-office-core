@@ -20,10 +20,12 @@ import {
   EmailActionDefaultConfig,
   ProposalStatusAction,
   ProposalStatusActionType,
+  RabbitMqActionDefaultConfig,
 } from 'generated/sdk';
 import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
 
 import EmailActionConfig from './EmailActionConfig';
+import RabbitMQActionConfig from './RabbitMQActionConfig';
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -107,7 +109,7 @@ const AddStatusActionsToConnection = ({
     values: typeof initialValues
   ) => {
     switch (statusAction.type) {
-      case 'EMAIL':
+      case ProposalStatusActionType.EMAIL: {
         return (
           <EmailActionConfig
             emailStatusActionConfig={values.emailStatusActionConfig}
@@ -132,7 +134,18 @@ const AddStatusActionsToConnection = ({
             }
           />
         );
+      }
 
+      case ProposalStatusActionType.RABBITMQ: {
+        return (
+          <RabbitMQActionConfig
+            exchanges={
+              (statusAction.defaultConfig as RabbitMqActionDefaultConfig)
+                .exchanges
+            }
+          />
+        );
+      }
       default:
         return <>Not configured</>;
     }
@@ -158,7 +171,12 @@ const AddStatusActionsToConnection = ({
             }
             case ProposalStatusActionType.RABBITMQ: {
               const rabbitMQStatusActionConfig = {
-                exchanges: [],
+                exchanges:
+                  (
+                    statusActions.find(
+                      (statusAction) => statusAction.id === action.id
+                    )?.defaultConfig as RabbitMqActionDefaultConfig
+                  ).exchanges || [],
               };
 
               return {
@@ -192,6 +210,22 @@ const AddStatusActionsToConnection = ({
                       sx={accordionSX}
                       disableGutters
                       key={index}
+                      expanded={
+                        !!values.selectedStatusActions.find(
+                          (item) => item.id === statusAction.id
+                        )
+                      }
+                      onChange={(event) => {
+                        event.preventDefault();
+                        const idx = values.selectedStatusActions.findIndex(
+                          (item) => item.id === statusAction.id
+                        );
+                        if (idx === -1) {
+                          arrayHelpers.push(statusAction);
+                        } else {
+                          arrayHelpers.remove(idx);
+                        }
+                      }}
                       data-cy={`accordion-${statusAction.type}`}
                     >
                       <AccordionSummary
@@ -211,17 +245,6 @@ const AddStatusActionsToConnection = ({
                                 )
                               }
                               data-cy={`${statusAction.type}-status-action`}
-                              onChange={(e) => {
-                                if (e.target.checked)
-                                  arrayHelpers.push(statusAction);
-                                else {
-                                  const idx =
-                                    values.selectedStatusActions.findIndex(
-                                      (item) => item.id === statusAction.id
-                                    );
-                                  arrayHelpers.remove(idx);
-                                }
-                              }}
                               inputProps={{
                                 'aria-label': 'primary checkbox',
                               }}

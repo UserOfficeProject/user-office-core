@@ -6,6 +6,7 @@ import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataS
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
+import { EXCHANGE_NAME } from '../eventHandlers/messageBroker';
 import { Event, EventLabel } from '../events/event.enum';
 import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
@@ -194,7 +195,10 @@ export default class ProposalSettingsQueries {
         return new EmailActionDefaultConfig(allEmailRecipients, emailTemplates);
 
       case ProposalStatusActionType.RABBITMQ:
-        return new RabbitMQActionDefaultConfig([]);
+        // NOTE: For now we return just the default exchange.
+        const rabbitMQDefaultExchange = EXCHANGE_NAME;
+
+        return new RabbitMQActionDefaultConfig([rabbitMQDefaultExchange]);
 
       default:
         return null;
