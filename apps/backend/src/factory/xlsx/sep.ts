@@ -4,7 +4,8 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { UserWithRole } from '../../models/User';
 import { average, getGrades } from '../../utils/mathFunctions';
-import { getDataRow, getStfcDataRow } from './SEPDataRow';
+import { getDataRow } from './SEPDataRow';
+import { getStfcDataRow } from './stfc/StfcSEPDataRow';
 
 type SEPXLSXData = Array<{
   sheetName: string;
