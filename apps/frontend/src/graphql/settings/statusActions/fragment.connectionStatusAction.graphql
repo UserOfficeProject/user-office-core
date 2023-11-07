@@ -2,7 +2,6 @@ fragment connectionStatusAction on ConnectionStatusAction {
   connectionId
   actionId
   workflowId
-  executed
   action {
     id
     name

@@ -48,27 +48,40 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_INSTRUMENT_SELECTED:
-          event.instrumenthasproposals.proposalPks.forEach(
-            async (proposalPk) => {
-              await eventLogsDataSource.set(
+          await Promise.all(
+            event.instrumenthasproposals.proposalPks.map((proposalPk) =>
+              eventLogsDataSource.set(
                 event.loggedInUserId,
                 event.type,
                 json,
                 proposalPk.toString()
-              );
-            }
+              )
+            )
           );
           break;
         case Event.PROPOSAL_SEP_SELECTED:
-        case Event.PROPOSAL_STATUS_UPDATED:
-          event.proposalpks.proposalPks.forEach(async (proposalPk) => {
-            await eventLogsDataSource.set(
-              event.loggedInUserId,
-              event.type,
-              json,
-              proposalPk.toString()
-            );
-          });
+          await Promise.all(
+            event.proposalpks.proposalPks.map((proposalPk) =>
+              eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                proposalPk.toString()
+              )
+            )
+          );
+          break;
+        case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
+          await Promise.all(
+            event.proposals.proposals.map((proposal) =>
+              eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                proposal.primaryKey.toString()
+              )
+            )
+          );
           break;
         case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
           await eventLogsDataSource.set(

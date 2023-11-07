@@ -1,35 +1,38 @@
+import { container } from 'tsyringe';
+
 import baseContext from '../../buildContext';
+import { Tokens } from '../../config/Tokens';
 import { UserWithRole } from '../../models/User';
 import { average, getGrades } from '../../utils/mathFunctions';
+import { getDataRow } from './SEPDataRow';
+import { getStfcDataRow } from './stfc/StfcSEPDataRow';
 
 type SEPXLSXData = Array<{
   sheetName: string;
   rows: Array<Array<string | number>>;
 }>;
 
-type RowObj = {
+export type RowObj = {
   propShortCode?: string;
   propTitle?: string;
   principalInv: string;
+  instrName?: string;
   instrAvailTime?: number;
   techReviewTimeAllocation?: number | null;
   sepTimeAllocation: number | null;
   propReviewAvgScore?: number;
   propSEPRankOrder: number | null;
   inAvailZone?: string | null;
+  feedback?: string;
 };
 
-export const defaultSEPDataColumns = [
-  'Proposal Short Code',
-  'Proposal Title',
-  'Principal Investigator',
-  'Instrument available time',
-  'Technical review allocated time',
-  'SEP allocated time',
-  'Average Score',
-  'Current rank',
-  'Is in availability zone',
-];
+const sepDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
+  Tokens.SEPDataRow
+);
+
+const populateRow = container.resolve<(row: RowObj) => (string | number)[]>(
+  Tokens.PopulateRow
+);
 
 const sortByRankOrder = (a: RowObj, b: RowObj) => {
   if (a.propSEPRankOrder === b.propSEPRankOrder) {
@@ -198,17 +201,15 @@ export const collectSEPlXLSXData = async (
 
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
-      return {
-        propShortCode: proposal?.proposalId,
-        propTitle: proposal?.title,
-        principalInv: `${firstname} ${lastname}`,
-        instrAvailTime: instrument.availabilityTime,
-        techReviewTimeAllocation: technicalReview?.timeAllocation,
-        sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
-        propReviewAvgScore: proposalAverageScore,
-        propSEPRankOrder: sepMeetingDecision?.rankOrder ?? null,
-        inAvailZone: null,
-      };
+      return sepDataRow(
+        `${firstname} ${lastname}`,
+        proposalAverageScore,
+        instrument,
+        sepMeetingDecision,
+        proposal,
+        technicalReview,
+        sepProposal
+      );
     });
 
     out.push({
@@ -216,17 +217,7 @@ export const collectSEPlXLSXData = async (
         // Sheet names can't exceed 31 characters
         // use the short code and cut everything after 30 chars
         instrument.shortCode.substr(0, 30),
-      rows: sortByRankOrAverageScore(rows).map((row) => [
-        row.propShortCode ?? '<missing>',
-        row.propTitle ?? '<missing>',
-        row.principalInv,
-        row.instrAvailTime ?? '<missing>',
-        row.techReviewTimeAllocation ?? '<missing>',
-        row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
-        row.propReviewAvgScore ?? '<missing>',
-        row.propSEPRankOrder ?? '<missing>',
-        row.inAvailZone ?? '<missing>',
-      ]),
+      rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
     });
   });
 

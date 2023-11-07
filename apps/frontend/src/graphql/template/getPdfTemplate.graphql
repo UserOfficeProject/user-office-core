@@ -6,5 +6,6 @@ query getPdfTemplate($pdfTemplateId: Int!) {
     templateHeader
     templateFooter
     templateSampleDeclaration
+    dummyData
   }
 }

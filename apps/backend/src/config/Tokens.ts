@@ -36,4 +36,7 @@ export const Tokens = {
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
+  SEPDataColumns: Symbol('SEPDataColumns'),
+  SEPDataRow: Symbol('SEPDataRow'),
+  PopulateRow: Symbol('PopulateRow'),
 };

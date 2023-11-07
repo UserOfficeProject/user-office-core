@@ -1,4 +1,4 @@
-import MaterialTable, { MaterialTableProps } from '@material-table/core';
+import { MaterialTableProps } from '@material-table/core';
 import CloseIcon from '@mui/icons-material/Close';
 import Edit from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
@@ -16,6 +16,7 @@ import {
 } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import InputDialog from 'components/common/InputDialog';
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';

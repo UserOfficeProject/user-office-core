@@ -1,7 +1,4 @@
-import MaterialTable, {
-  Column,
-  EditComponentProps,
-} from '@material-table/core';
+import { Column, EditComponentProps } from '@material-table/core';
 import { Autocomplete } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
@@ -10,6 +7,7 @@ import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
   Call,
@@ -52,15 +50,11 @@ type AssignedInstrumentsTableProps = {
   ) => void;
 };
 
-const AssignedInstrumentsTable = ({
-  call,
-  removeAssignedInstrumentFromCall,
-  setInstrumentAvailabilityTime,
-  assignInstrumentsToCall,
-}: AssignedInstrumentsTableProps) => {
-  const classes = useStyles();
-  const { api } = useDataApiWithFeedback();
-  const { t } = useTranslation();
+const SepSelectionEditComponent = (
+  props: EditComponentProps<InstrumentWithAvailabilityTime> & {
+    helperText?: string;
+  }
+) => {
   const { currentRole } = useContext(UserContext);
   const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
     filter: '',
@@ -74,50 +68,52 @@ const AssignedInstrumentsTable = ({
       value: sep.id,
     })) || [];
 
-  const availabilityTimeInput = (
-    props: EditComponentProps<InstrumentWithAvailabilityTime> & {
-      helperText?: string;
-    }
-  ) => (
-    <TextField
-      type="number"
-      data-cy="availability-time"
-      placeholder={`Availability time (${call.allocationTimeUnit}s)`}
-      value={props.value || ''}
-      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-        props.onChange(e.target.value)
-      }
-      InputProps={{ inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } }}
-      required
-      fullWidth
-      error={props.error}
-      helperText={props.helperText}
+  const value = sepOptions.find((item) => item.value === props.value) || null;
+
+  return (
+    <Autocomplete
+      loading={loadingSEPs}
+      id="sepSelection"
+      options={sepOptions}
+      renderInput={(params) => <TextField {...params} placeholder="Sep" />}
+      onChange={(_event, newValue) => {
+        props.onChange(newValue?.value ?? null);
+      }}
+      value={value}
     />
   );
+};
 
-  const sepSelectionAutoCompleteInput = (
-    props: EditComponentProps<InstrumentWithAvailabilityTime> & {
-      helperText?: string;
+const AvailabilityTimeEditComponent = (
+  props: EditComponentProps<InstrumentWithAvailabilityTime> & {
+    helperText?: string;
+  }
+) => (
+  <TextField
+    type="number"
+    data-cy="availability-time"
+    placeholder={props.columnDef.title}
+    value={props.value || ''}
+    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+      props.onChange(e.target.value)
     }
-  ) => {
-    return (
-      <Autocomplete
-        loading={loadingSEPs}
-        id="sepSelection"
-        options={sepOptions}
-        renderInput={(params) => (
-          <TextField {...params} label="SEPs" margin="none" />
-        )}
-        onChange={(_event, newValue) => {
-          props.onChange(newValue?.value ?? null);
-        }}
-        style={{ margin: '0' }}
-        defaultValue={
-          sepOptions.find((item) => item.value === props.rowData.sep?.id)!
-        }
-      />
-    );
-  };
+    InputProps={{ inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } }}
+    required
+    fullWidth
+    error={props.error}
+    helperText={props.helperText}
+  />
+);
+
+const AssignedInstrumentsTable = ({
+  call,
+  removeAssignedInstrumentFromCall,
+  setInstrumentAvailabilityTime,
+  assignInstrumentsToCall,
+}: AssignedInstrumentsTableProps) => {
+  const classes = useStyles();
+  const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
 
   const assignmentColumns: Column<InstrumentWithAvailabilityTime>[] = [
     {
@@ -140,7 +136,7 @@ const AssignedInstrumentsTable = ({
       field: 'sepId',
       editable: 'onUpdate',
       emptyValue: '-',
-      editComponent: sepSelectionAutoCompleteInput,
+      editComponent: SepSelectionEditComponent,
       render: (rowData: InstrumentWithAvailabilityTime) => {
         return <span>{rowData.sep?.code}</span>;
       },
@@ -151,7 +147,7 @@ const AssignedInstrumentsTable = ({
       editable: 'onUpdate',
       type: 'numeric',
       emptyValue: '-',
-      editComponent: availabilityTimeInput,
+      editComponent: AvailabilityTimeEditComponent,
       align: 'left',
       validate: (
         rowData: InstrumentWithAvailabilityTime & {

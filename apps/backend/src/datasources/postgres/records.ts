@@ -70,6 +70,7 @@ declare module 'knex/types/tables' {
     readonly template_header: string;
     readonly template_footer: string;
     readonly template_sample_declaration: string;
+    readonly dummy_data: string;
     readonly creator_id: number;
     readonly created_at: Date;
   }
@@ -396,7 +397,7 @@ export interface FileRecord {
 
 export interface EventLogRecord {
   readonly id: number;
-  readonly changed_by: number;
+  readonly changed_by: number | null;
   readonly event_type: string;
   readonly row_data: string;
   readonly event_tstamp: Date;
@@ -701,7 +702,6 @@ export interface ProposalWorkflowConnectionHasActionsRecord {
   readonly connection_id: number;
   readonly action_id: number;
   readonly workflow_id: number;
-  readonly executed: boolean;
   readonly config: string;
 }
 
@@ -1261,6 +1261,7 @@ export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
     pdfTemplate.template_header,
     pdfTemplate.template_footer,
     pdfTemplate.template_sample_declaration,
+    pdfTemplate.dummy_data,
     pdfTemplate.creator_id,
     pdfTemplate.created_at
   );

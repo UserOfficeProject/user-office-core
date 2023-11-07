@@ -1,8 +1,4 @@
-import MaterialTable, {
-  Action,
-  Column,
-  MTableToolbar,
-} from '@material-table/core';
+import { Action, Column, MTableToolbar } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -22,6 +18,7 @@ import {
 } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,

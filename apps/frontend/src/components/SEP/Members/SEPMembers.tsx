@@ -351,7 +351,7 @@ const SEPMembers = ({
           <MaterialTable
             icons={tableIcons}
             title={
-              <Typography variant="h6" component="h3" gutterBottom>
+              <Typography variant="h6" component="h3">
                 Reviewers
               </Typography>
             }

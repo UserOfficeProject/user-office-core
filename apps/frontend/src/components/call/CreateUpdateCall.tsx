@@ -13,6 +13,7 @@ import {
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
+  CreateCallInput,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
@@ -128,7 +129,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
           } else {
             const { createCall } = await api({
               toastSuccessMessage: 'Call created successfully!',
-            }).createCall(values as UpdateCallInput);
+            }).createCall(values as CreateCallInput);
 
             close(createCall as Call);
           }

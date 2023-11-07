@@ -8,4 +8,5 @@ module.exports = {
   collectCoverage: true,
   setupFilesAfterEnv: ['<rootDir>/src/config/dependencyConfigTest.ts'],
   setupFiles: ['dotenv/config'],
+  workerIdleMemoryLimit: 0.5,
 };
