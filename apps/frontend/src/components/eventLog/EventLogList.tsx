@@ -1,8 +1,8 @@
-import MaterialTable from '@material-table/core';
 import { Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { EventLog } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
@@ -23,7 +23,9 @@ const columns = [
   {
     title: 'Changed by',
     render: (rowData: EventLog): string =>
-      `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
+      rowData.changedBy
+        ? `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`
+        : 'System',
   },
   {
     title: 'Changed on',

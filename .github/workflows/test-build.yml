@@ -325,7 +325,7 @@ jobs:
           tokenLife: 7d
           SPARKPOST_TOKEN: dummytoken
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
-          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
           USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           SCHEMA_URL: http://localhost:4000/graphql
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
@@ -369,7 +369,7 @@ jobs:
           tokenLife: 7d
           SPARKPOST_TOKEN: dummytoken
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
-          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
           USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           SCHEMA_URL: http://localhost:4000/graphql
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
