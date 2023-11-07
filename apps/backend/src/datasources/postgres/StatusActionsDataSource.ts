@@ -57,7 +57,6 @@ export default class PostgresStatusActionsDataSource
       proposalActionStatusRecord.workflow_id,
       proposalActionStatusRecord.name,
       proposalActionStatusRecord.type,
-      proposalActionStatusRecord.executed,
       this.createStatusActionConfig(
         proposalActionStatusRecord.type,
         proposalActionStatusRecord.config
@@ -110,7 +109,6 @@ export default class PostgresStatusActionsDataSource
     })[] = await database
       .update(
         {
-          executed: proposalStatusAction.executed,
           config: proposalStatusAction.config,
         },
         ['*']
@@ -164,7 +162,6 @@ export default class PostgresStatusActionsDataSource
       connection_id: input.connectionId,
       action_id: item.actionId,
       workflow_id: input.workflowId,
-      executed: false,
       config: item.config,
     }));
     const connectionHasStatusActions:

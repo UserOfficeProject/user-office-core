@@ -1,7 +1,3 @@
-import { container } from 'tsyringe';
-
-import { Tokens } from '../config/Tokens';
-import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -19,10 +15,6 @@ export const handleWorkflowEngineChange = async (
   event: ApplicationEvent,
   proposalPks: number[] | number
 ) => {
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-
   const isArray = Array.isArray(proposalPks);
 
   const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
@@ -32,25 +24,10 @@ export const handleWorkflowEngineChange = async (
 
   const eventBus = resolveApplicationEventBus();
 
-  // NOTE: If proposal status is updated manually then we need to fire another event.
-  // TODO: This could be refactored and we use only one event instead of two. Ref. changeProposalsStatus inside ProposalMutations.ts
-  if (event.type === Event.PROPOSAL_STATUS_UPDATED && isArray) {
-    Promise.all(
-      proposalPks.map(async (proposalPk) => {
-        const proposal = await proposalDataSource.get(proposalPk);
-
-        if (proposal?.primaryKey) {
-          eventBus.publish({
-            type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
-            proposal: proposal,
-            isRejection: false,
-            key: 'proposal',
-            loggedInUserId: event.loggedInUserId,
-          });
-        }
-      })
-    );
-  } else if (updatedProposals?.length) {
+  if (
+    event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&
+    updatedProposals?.length
+  ) {
     updatedProposals.forEach(
       (updatedProposal) =>
         updatedProposal &&

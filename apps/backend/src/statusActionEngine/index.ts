@@ -50,11 +50,7 @@ export const statusActionEngine = async (
 
       Promise.all(
         proposalStatusActions.map(async (proposalStatusAction) => {
-          if (
-            !proposalStatusAction.actionId ||
-            !proposalStatusAction.type ||
-            proposalStatusAction.executed
-          ) {
+          if (!proposalStatusAction.actionId || !proposalStatusAction.type) {
             return;
           }
 

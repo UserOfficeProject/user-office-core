@@ -26,9 +26,6 @@ export class ConnectionStatusAction
   @Field(() => Int)
   public workflowId: number;
 
-  @Field(() => Boolean)
-  public executed: boolean;
-
   @Field(() => ProposalStatusActionConfig, { nullable: true })
   public config: typeof ProposalStatusActionConfig | null;
 }
