@@ -1,6 +1,6 @@
 import { Call } from '../models/Call';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
+import { Proposal, ProposalPks } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
@@ -16,6 +16,8 @@ interface GeneralEvent {
   key: string;
   loggedInUserId: number | null;
   isRejection: boolean;
+  description?: string;
+  exchange?: string;
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
@@ -144,9 +146,14 @@ interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalStatusActionExecutedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_ACTION_EXECUTED;
+  proposal: Proposal;
+}
+
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
-  proposals: Proposals;
+  proposal: Proposal;
 }
 
 interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
@@ -342,4 +349,5 @@ export type ApplicationEvent =
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
-  | SEPReviewerNotified;
+  | SEPReviewerNotified
+  | ProposalStatusActionExecutedEvent;

@@ -71,18 +71,6 @@ export default function createHandler() {
             )
           );
           break;
-        case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
-          await Promise.all(
-            event.proposals.proposals.map((proposal) =>
-              eventLogsDataSource.set(
-                event.loggedInUserId,
-                event.type,
-                json,
-                proposal.primaryKey.toString()
-              )
-            )
-          );
-          break;
         case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
           await eventLogsDataSource.set(
             event.loggedInUserId,
