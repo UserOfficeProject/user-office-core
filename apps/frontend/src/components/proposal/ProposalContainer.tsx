@@ -46,7 +46,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
           window.history.replaceState(
             null,
             '',
-            `/proposalEdit/${state.proposal.primaryKey}`
+            `/ProposalEdit/${state.proposal.primaryKey}`
           );
           break;
         case 'ITEM_WITH_QUESTIONARY_MODIFIED':
