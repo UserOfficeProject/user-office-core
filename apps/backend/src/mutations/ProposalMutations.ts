@@ -19,8 +19,6 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
-import { resolveApplicationEventBus } from '../events';
-import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
@@ -43,7 +41,6 @@ import { CloneUtils } from './../utils/CloneUtils';
 export default class ProposalMutations {
   private proposalAuth = container.resolve(ProposalAuthorization);
   private cloneUtils = container.resolve(CloneUtils);
-  private eventBus = resolveApplicationEventBus();
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
@@ -445,18 +442,13 @@ export default class ProposalMutations {
     return result || rejection('Can not administer proposal', { result });
   }
 
-  // @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
+  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
   @Authorized([Roles.USER_OFFICER])
   async changeProposalsStatus(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
     const { statusId, proposals } = args;
-
-    const proposalsBeforeUpdate =
-      await this.proposalDataSource.getProposalsByIds(
-        proposals.map((proposal) => proposal.primaryKey)
-      );
 
     const result = await this.proposalDataSource.changeProposalsStatus(
       statusId,
@@ -500,45 +492,7 @@ export default class ProposalMutations {
       });
     }
 
-    if (!result) {
-      return rejection('Can not change proposal status', { result });
-    }
-
-    Promise.all(
-      result.proposals.map(async (updatedProposal) => {
-        const proposalStatus =
-          await this.proposalSettingsDataSource.getProposalStatus(
-            updatedProposal.statusId
-          );
-        const foundProposalBeforeUpdate = proposalsBeforeUpdate.find(
-          (proposal) => proposal.primaryKey === updatedProposal.primaryKey
-        );
-        const previousProposalStatus = foundProposalBeforeUpdate
-          ? await this.proposalSettingsDataSource.getProposalStatus(
-              foundProposalBeforeUpdate.statusId
-            )
-          : null;
-
-        const messageDescription = `From status: "${previousProposalStatus?.name}" to status: "${proposalStatus?.name}"`;
-
-        const event = {
-          type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
-          proposal: updatedProposal,
-          key: 'proposal',
-          loggedInUserId: null,
-          isRejection: false,
-          description: messageDescription,
-        } as ApplicationEvent;
-
-        this.eventBus
-          .publish(event)
-          .catch((e) =>
-            logger.logError(`EventBus publish failed ${event.type}`, e)
-          );
-      })
-    );
-
-    return result;
+    return result || rejection('Can not change proposal status', { result });
   }
 
   @Authorized()

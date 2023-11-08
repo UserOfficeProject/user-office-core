@@ -51,6 +51,9 @@ export type EmailReadyType = {
   proposals: WorkflowEngineProposalType[];
   template: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
+  preferredName?: string;
 };
 
 export const getEmailReadyArrayOfUsersAndProposals = (
@@ -71,9 +74,11 @@ export const getEmailReadyArrayOfUsersAndProposals = (
       emailReadyUsersWithProposals.push({
         id: recipientsWithEmailTemplate.recipient.name,
         proposals: [proposal],
-
         template: recipientsWithEmailTemplate.emailTemplate.id,
         email: user.email,
+        firstName: user.firstname,
+        lastName: user.lastname,
+        preferredName: user.preferredname,
       });
     }
   });

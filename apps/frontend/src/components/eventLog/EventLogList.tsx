@@ -32,14 +32,14 @@ const columns: Column<EventLog>[] = [
     title: 'Changed on',
     field: 'changedOnFormatted',
   },
-  { title: 'Event type', field: 'eventType' },
+  {
+    title: 'Event type',
+    field: 'eventType',
+    cellStyle: { fontSize: 'smaller' },
+  },
   {
     title: 'Description',
-    render: (data) => {
-      const description = JSON.parse(data.rowData).description || '-';
-
-      return <span title={description}>{description}</span>;
-    },
+    field: 'description',
   },
 ];
 

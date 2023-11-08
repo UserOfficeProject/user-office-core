@@ -1,6 +1,6 @@
 import { Call } from '../models/Call';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalPks } from '../models/Proposal';
+import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
@@ -16,6 +16,7 @@ interface GeneralEvent {
   key: string;
   loggedInUserId: number | null;
   isRejection: boolean;
+  inputArgs?: string;
   description?: string;
   exchange?: string;
 }
@@ -153,7 +154,7 @@ interface ProposalStatusActionExecutedEvent extends GeneralEvent {
 
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
-  proposal: Proposal;
+  proposals: Proposals;
 }
 
 interface ProposalSEPMeetingSavedEvent extends GeneralEvent {

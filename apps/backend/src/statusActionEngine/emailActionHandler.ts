@@ -112,6 +112,9 @@ const sendMail = async (recipientsWithData: EmailReadyType[]) => {
           },
           substitution_data: {
             proposals: recipientWithData.proposals,
+            firstName: recipientWithData.firstName,
+            lastName: recipientWithData.lastName,
+            preferredName: recipientWithData.preferredName,
           },
           recipients: [{ address: recipientWithData.email }],
         })

@@ -55,7 +55,7 @@ export const handleWorkflowEngineChange = async (
             isRejection: false,
             key: 'proposal',
             loggedInUserId: null,
-            description: `From status: "${previousProposalStatus?.name}" to status: "${proposalStatus?.name}"`,
+            description: `From "${previousProposalStatus?.name}" to "${proposalStatus?.name}"`,
           });
         }
       })

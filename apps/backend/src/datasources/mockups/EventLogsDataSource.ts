@@ -7,7 +7,8 @@ export const dummyEventLogUserUpdated = new EventLog(
   'USER_UPDATED',
   'row data that is updated',
   new Date('2020-03-09 08:25:12.23043+00'),
-  '1'
+  '1',
+  ''
 );
 
 export const dummyEventLogProposalCreated = new EventLog(
@@ -16,7 +17,8 @@ export const dummyEventLogProposalCreated = new EventLog(
   'PROPOSAL_CREATED',
   'row data of created proposal',
   new Date('2020-03-09 08:30:12.23043+00'),
-  '2'
+  '2',
+  ''
 );
 
 export const dummyEventLogs = [
