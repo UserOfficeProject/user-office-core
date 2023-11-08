@@ -696,6 +696,46 @@ context('Proposal tests', () => {
         cy.contains(createdCallTitle).should('not.exist');
       });
     });
+
+    it('During Proposal creation, User should not lose data when refreshing the page', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title]').type(title);
+      cy.get('[data-cy=abstract]').type(abstract);
+
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.url().should('contains', '/ProposalEdit');
+
+      cy.reload();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.get('[data-cy=title] input').should('have.value', title);
+      cy.get('[data-cy=abstract] textarea').should('have.value', abstract);
+
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+
+      cy.get('[aria-label="View proposal"]').should('exist');
+    });
   });
 
   describe('Proposal advanced tests', () => {
