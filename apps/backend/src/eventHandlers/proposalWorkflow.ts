@@ -49,7 +49,7 @@ export const handleWorkflowEngineChange = async (
               updatedProposal.prevProposalStatusId
             );
 
-          await eventBus.publish({
+          return eventBus.publish({
             type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
             proposal: updatedProposal,
             isRejection: false,
