@@ -244,6 +244,41 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
+    it('User should be able to have a preferred name', () => {
+      cy.login('user2');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Ben '
+      );
+
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().find('[aria-label="Edit proposal"]').click();
+      cy.contains('Ben ');
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('Ben ');
+    });
+
     it('User officer should be able to save proposal column selection', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
