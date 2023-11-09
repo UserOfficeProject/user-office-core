@@ -1,0 +1,5 @@
+{
+  "apps/e2e/**/*.{js,ts,jsx,tsx}": ["npm run lint:e2e"],
+  "apps/frontend/**/*.{js,ts,jsx,tsx}": ["npm run lint:frontend"],
+  "apps/backend/**/*.{js,ts,jsx,tsx}": ["npm run lint:backend"]
+}

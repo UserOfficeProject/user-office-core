@@ -1,23 +1,23 @@
-FROM cypress/included:12.13.0
+FROM cypress/included:13.2.0
 
 # Copy and install node modules needed for frontend
 WORKDIR /e2e
-COPY apps/user-office-frontend/src/generated user-office-frontend/src/generated
-COPY apps/user-office-frontend/package* user-office-frontend/
+COPY apps/frontend/src/generated frontend/src/generated
+COPY apps/frontend/package* frontend/
 
-WORKDIR /e2e/user-office-frontend
+WORKDIR /e2e/frontend
 RUN npm ci --silent
 
 # Copy e2e tests to container. Install node modules needed for e2e tests
 WORKDIR /e2e
-COPY apps/user-office-frontend-e2e/cypress.config.ts ./user-office-frontend-e2e/
-COPY apps/user-office-frontend-e2e/package* ./user-office-frontend-e2e/
-COPY apps/user-office-frontend-e2e/tsconfig.json ./user-office-frontend-e2e/tsconfig.json
-COPY apps/user-office-frontend-e2e/wait-for-frontend.sh ./user-office-frontend-e2e/
-COPY apps/user-office-frontend-e2e/cypress ./user-office-frontend-e2e/cypress/
-COPY apps/user-office-frontend-e2e/webpack.config.js ./user-office-frontend-e2e/
+COPY apps/e2e/cypress.config.ts ./user-office-core-e2e/
+COPY apps/e2e/package* ./user-office-core-e2e/
+COPY apps/e2e/tsconfig.json ./user-office-core-e2e/tsconfig.json
+COPY apps/e2e/wait-for-frontend.sh ./user-office-core-e2e/
+COPY apps/e2e/cypress ./user-office-core-e2e/cypress/
+COPY apps/e2e/webpack.config.js ./user-office-core-e2e/
 
-WORKDIR /e2e/user-office-frontend-e2e
+WORKDIR /e2e/user-office-core-e2e
 RUN npm ci --silent
 
 # Install necessary dependencies for wait-for-frontend.sh

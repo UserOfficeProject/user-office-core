@@ -1,0 +1,33 @@
+mutation createProposalWorkflow($name: String!, $description: String!) {
+  createProposalWorkflow(
+    newProposalWorkflowInput: { name: $name, description: $description }
+  ) {
+    id
+    name
+    description
+    proposalWorkflowConnectionGroups {
+      groupId
+      parentGroupId
+      connections {
+        id
+        sortOrder
+        proposalWorkflowId
+        proposalStatusId
+        proposalStatus {
+          ...proposalStatus
+        }
+        nextProposalStatusId
+        prevProposalStatusId
+        droppableGroupId
+        statusChangingEvents {
+          statusChangingEventId
+          proposalWorkflowConnectionId
+          statusChangingEvent
+        }
+        statusActions {
+          ...connectionStatusAction
+        }
+      }
+    }
+  }
+}

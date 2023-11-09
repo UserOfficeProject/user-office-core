@@ -1,0 +1,14 @@
+fragment connectionStatusAction on ConnectionStatusAction {
+  connectionId
+  actionId
+  workflowId
+  action {
+    id
+    name
+    type
+    description
+  }
+  config {
+    ...connectionStatusActionConfig
+  }
+}

@@ -1,0 +1,170 @@
+fragment fieldConfig on FieldConfig {
+  ... on BooleanConfig {
+    small_label
+    required
+    tooltip
+  }
+  ... on DateConfig {
+    small_label
+    required
+    tooltip
+    minDate
+    maxDate
+    defaultDate
+    includeTime
+  }
+  ... on EmbellishmentConfig {
+    html
+    plain
+    omitFromPdf
+  }
+  ... on FileUploadConfig {
+    file_type
+    max_files
+    pdf_page_limit
+
+    small_label
+    required
+    tooltip
+  }
+
+  ... on IntervalConfig {
+    units {
+      ...unit
+    }
+
+    small_label
+    required
+    tooltip
+  }
+
+  ... on NumberInputConfig {
+    units {
+      ...unit
+    }
+    numberValueConstraint
+
+    small_label
+    required
+    tooltip
+  }
+
+  ... on ProposalBasisConfig {
+    tooltip
+  }
+
+  ... on ProposalEsiBasisConfig {
+    tooltip
+  }
+
+  ... on SampleEsiBasisConfig {
+    tooltip
+  }
+
+  ... on SampleBasisConfig {
+    titlePlaceholder
+  }
+
+  ... on SampleDeclarationConfig {
+    addEntryButtonLabel
+    minEntries
+    maxEntries
+    templateId
+    esiTemplateId
+    templateCategory
+    required
+    small_label
+  }
+
+  ... on SubTemplateConfig {
+    addEntryButtonLabel
+    copyButtonLabel
+    canCopy
+    isMultipleCopySelect
+    isCompleteOnCopy
+    minEntries
+    maxEntries
+    templateId
+    templateCategory
+    required
+    small_label
+  }
+
+  ... on SelectionFromOptionsConfig {
+    variant
+    options
+    isMultipleSelect
+
+    small_label
+    required
+    tooltip
+  }
+  ... on TextInputConfig {
+    min
+    max
+    multiline
+    placeholder
+
+    small_label
+    required
+    tooltip
+    htmlQuestion
+    isHtmlQuestion
+    isCounterHidden
+  }
+
+  ... on ShipmentBasisConfig {
+    small_label
+    required
+    tooltip
+  }
+
+  ... on RichTextInputConfig {
+    small_label
+    required
+    tooltip
+    max
+  }
+
+  ... on DynamicMultipleChoiceConfig {
+    small_label
+    required
+    tooltip
+    url
+    jsonPath
+    apiCallRequestHeaders {
+      name
+      value
+    }
+    isMultipleSelect
+    variant
+  }
+
+  ... on VisitBasisConfig {
+    small_label
+    required
+    tooltip
+  }
+
+  ... on GenericTemplateBasisConfig {
+    titlePlaceholder
+    questionLabel
+  }
+
+  ... on FeedbackBasisConfig {
+    small_label
+    required
+    tooltip
+  }
+
+  ... on InstrumentPickerConfig {
+    variant
+    small_label
+    required
+    tooltip
+    instruments {
+      id
+      name
+    }
+  }
+}
