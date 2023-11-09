@@ -527,7 +527,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
-        'Benjamin'
+        'Ben'
       );
       cy.contains('Carl'); //The name "Carl" should appear in Co-proposers table
     });
