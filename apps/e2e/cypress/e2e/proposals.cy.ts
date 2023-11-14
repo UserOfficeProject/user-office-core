@@ -254,6 +254,14 @@ context('Proposal tests', () => {
         lastname: 'Beckley',
         gender: 'male',
         preferredname: 'Ben',
+        nationality: 1,
+        birthdate: new Date('2000/04/02'),
+        organisation: 1,
+        department: 'IT department',
+        position: 'Management',
+        email: faker.internet.email(),
+        telephone: '(288) 221-4533',
+        organizationCountry: 1,
       });
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -296,6 +304,14 @@ context('Proposal tests', () => {
         lastname: 'Carlsson',
         gender: 'male',
         preferredname: '',
+        nationality: 1,
+        birthdate: new Date('2000/04/02'),
+        organisation: 1,
+        department: 'IT department',
+        position: 'Strategist',
+        email: faker.internet.email(),
+        telephone: '(288) 431-1443',
+        organizationCountry: 1,
       });
 
       cy.contains('New Proposal').click();
