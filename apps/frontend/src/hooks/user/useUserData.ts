@@ -115,5 +115,5 @@ export interface BasicUserData {
   lastname: string;
   organisation: string;
   id: number;
-  preferredname: string | undefined | null;
+  preferredname?: string | null;
 }

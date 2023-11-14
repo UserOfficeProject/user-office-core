@@ -247,7 +247,14 @@ context('Proposal tests', () => {
     it('User should be able to have a preferred name', () => {
       cy.login('user2');
       cy.visit('/');
-
+      cy.updateUserDetails({
+        id: 4,
+        firstname: 'Benjamin',
+        user_title: 'Mr.',
+        lastname: 'Beckley',
+        gender: 'male',
+        preferredname: 'Ben',
+      });
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
@@ -277,6 +284,27 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('Ben ');
+    });
+
+    it('User should be able to not have a preferred name', () => {
+      cy.login('user1');
+      cy.visit('/');
+      cy.updateUserDetails({
+        id: 1,
+        firstname: 'Carl',
+        user_title: 'Mr.',
+        lastname: 'Carlsson',
+        gender: 'male',
+        preferredname: '',
+      });
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
     });
 
     it('User officer should be able to save proposal column selection', function () {
