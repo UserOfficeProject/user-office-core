@@ -245,8 +245,6 @@ context('Proposal tests', () => {
     });
 
     it('User should be able to have a preferred name', () => {
-      cy.login('user2');
-      cy.visit('/');
       cy.updateUserDetails({
         id: 4,
         firstname: 'Benjamin',
@@ -263,6 +261,8 @@ context('Proposal tests', () => {
         telephone: '(288) 221-4533',
         organizationCountry: 1,
       });
+      cy.login('user2');
+      cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
@@ -295,8 +295,6 @@ context('Proposal tests', () => {
     });
 
     it('User should be able to not have a preferred name', () => {
-      cy.login('user1');
-      cy.visit('/');
       cy.updateUserDetails({
         id: 1,
         firstname: 'Carl',
@@ -313,6 +311,8 @@ context('Proposal tests', () => {
         telephone: '(288) 431-1443',
         organizationCountry: 1,
       });
+      cy.login('user1');
+      cy.visit('/');
 
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
