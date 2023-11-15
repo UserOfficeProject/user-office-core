@@ -1,3 +1,7 @@
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -15,6 +19,11 @@ export const handleWorkflowEngineChange = async (
   event: ApplicationEvent,
   proposalPks: number[] | number
 ) => {
+  const proposalSettingsDataSource =
+    container.resolve<ProposalSettingsDataSource>(
+      Tokens.ProposalSettingsDataSource
+    );
+
   const isArray = Array.isArray(proposalPks);
 
   const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
@@ -28,16 +37,28 @@ export const handleWorkflowEngineChange = async (
     event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&
     updatedProposals?.length
   ) {
-    updatedProposals.forEach(
-      (updatedProposal) =>
-        updatedProposal &&
-        eventBus.publish({
-          type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-          proposal: updatedProposal,
-          isRejection: false,
-          key: 'proposal',
-          loggedInUserId: event.loggedInUserId,
-        })
+    await Promise.all(
+      updatedProposals.map(async (updatedProposal) => {
+        if (updatedProposal) {
+          const proposalStatus =
+            await proposalSettingsDataSource.getProposalStatus(
+              updatedProposal.statusId
+            );
+          const previousProposalStatus =
+            await proposalSettingsDataSource.getProposalStatus(
+              updatedProposal.prevProposalStatusId
+            );
+
+          return eventBus.publish({
+            type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+            proposal: updatedProposal,
+            isRejection: false,
+            key: 'proposal',
+            loggedInUserId: null,
+            description: `From "${previousProposalStatus?.name}" to "${proposalStatus?.name}"`,
+          });
+        }
+      })
     );
   }
 };
