@@ -46,6 +46,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./apps/backend
+          platforms: linux/amd64,linux/arm64/v8
           file: ./apps/backend/Dockerfile
           push: true
           tags: ghcr.io/userofficeproject/user-office-backend:${{ steps.tag_version.outputs.new_tag }}
@@ -68,6 +69,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./apps/frontend
+          platforms: linux/amd64,linux/arm64/v8
           file: ./apps/frontend/Dockerfile
           push: true
           tags: ghcr.io/userofficeproject/user-office-frontend:${{ steps.tag_version.outputs.new_tag }}
