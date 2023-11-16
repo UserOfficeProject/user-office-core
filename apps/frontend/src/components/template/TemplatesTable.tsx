@@ -1,7 +1,4 @@
-import MaterialTable, {
-  Column,
-  MaterialTableProps,
-} from '@material-table/core';
+import { Column, MaterialTableProps } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
 import Delete from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -16,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import InputDialog from 'components/common/InputDialog';
 import { GetTemplatesQuery, Template, TemplateGroupId } from 'generated/sdk';
 import { downloadBlob } from 'utils/downloadBlob';

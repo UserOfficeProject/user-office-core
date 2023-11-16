@@ -124,7 +124,7 @@ function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
   const SearchCriteriaComponent = getSearchCriteriaComponent(selectedQuestion);
 
   return (
-    <Grid container style={{ maxWidth: '400px', margin: '0 8px' }}>
+    <Grid container>
       <Grid item xs={12}>
         <Autocomplete
           id={'question-list'}

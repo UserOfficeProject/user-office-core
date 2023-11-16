@@ -1,10 +1,9 @@
-import MaterialTable, { Action, Column, Options } from '@material-table/core';
+import { Action, Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +11,7 @@ import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
 import CopyToClipboard from 'components/common/CopyToClipboard';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
@@ -44,8 +44,6 @@ type SEPProposalsAndAssignmentsTableProps = {
   data: Sep;
   /** Call this function in case of SEP assigned members update */
   onAssignmentsUpdate: (sep: Sep) => void;
-  /** Toolbar component shown in the table */
-  Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   /** Call id that we want to filter by */
   selectedCallId: number | null;
   /** Confirmation function that comes from withConfirm HOC */
@@ -140,7 +138,6 @@ const SEPProposalsAndAssignmentsTable = ({
   data,
   onAssignmentsUpdate,
   selectedCallId,
-  Toolbar,
   confirm,
 }: SEPProposalsAndAssignmentsTableProps) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
@@ -553,46 +550,41 @@ const SEPProposalsAndAssignmentsTable = ({
         }
         assignMemberToSEPProposal={handleMemberAssignmentToSEPProposal}
       />
-      <Grid container spacing={3}>
-        <Grid data-cy="sep-assignments-table" item xs={12}>
-          <MaterialTable
-            icons={tableIcons}
-            columns={SEPProposalColumns}
-            components={{
-              Toolbar: Toolbar,
-            }}
-            title={
-              <Typography variant="h6" component="h2" gutterBottom>
-                {`${t('SEP')} Proposals`}
-              </Typography>
-            }
-            data={SEPProposalsWitIdAndFormattedDate}
-            isLoading={loadingSEPProposals}
-            localization={{
-              toolbar: {
-                nRowsSelected: '{0} proposal(s) selected',
+      <div data-cy="sep-assignments-table">
+        <MaterialTable
+          icons={tableIcons}
+          columns={SEPProposalColumns}
+          title={
+            <Typography variant="h6" component="h2">
+              {`${t('SEP')} Proposals`}
+            </Typography>
+          }
+          data={SEPProposalsWitIdAndFormattedDate}
+          isLoading={loadingSEPProposals}
+          localization={{
+            toolbar: {
+              nRowsSelected: '{0} proposal(s) selected',
+            },
+          }}
+          detailPanel={[
+            {
+              tooltip: 'Show Reviewers',
+              render: ReviewersTable,
+            },
+          ]}
+          actions={tableActions}
+          options={{
+            search: true,
+            selection: true,
+            headerSelectionProps: {
+              inputProps: {
+                'aria-label': 'Select all rows',
+                'data-cy': 'select-all-table-rows',
               },
-            }}
-            detailPanel={[
-              {
-                tooltip: 'Show Reviewers',
-                render: ReviewersTable,
-              },
-            ]}
-            actions={tableActions}
-            options={{
-              search: true,
-              selection: true,
-              headerSelectionProps: {
-                inputProps: {
-                  'aria-label': 'Select all rows',
-                  'data-cy': 'select-all-table-rows',
-                },
-              },
-            }}
-          />
-        </Grid>
-      </Grid>
+            },
+          }}
+        />
+      </div>
     </>
   );
 };

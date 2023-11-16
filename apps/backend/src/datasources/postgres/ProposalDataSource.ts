@@ -5,7 +5,7 @@ import { Knex } from 'knex';
 import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
-import { Proposal, ProposalPks } from '../../models/Proposal';
+import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
@@ -33,7 +33,6 @@ import {
   createTechnicalReviewObject,
   ProposalEventsRecord,
   ProposalRecord,
-  ProposalStatusActionRecord,
   ProposalViewRecord,
   ProposalWorkflowConnectionRecord,
   ScheduledEventRecord,
@@ -654,6 +653,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
   }
 
+  async getProposalsByIds(proposalIds: number[]): Promise<Proposal[]> {
+    return database('proposals')
+      .whereIn('proposal_pk', proposalIds)
+      .then((proposals: ProposalRecord[]) =>
+        proposals.map((proposal) => createProposalObject(proposal))
+      );
+  }
+
   async markEventAsDoneOnProposals(
     event: Event,
     proposalPks: number[]
@@ -749,28 +756,32 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async resetProposalEvents(
     proposalPk: number,
     callId: number,
-    statusId: number,
-    shouldResetStatusActions = false
+    statusId: number
   ): Promise<boolean> {
-    const proposalCall: CallRecord = await database('call')
-      .select('*')
-      .where('call_id', callId)
-      .first();
+    return database.transaction(async (trx) => {
+      try {
+        const proposalCall: CallRecord = await database('call')
+          .select('*')
+          .where('call_id', callId)
+          .first()
+          .transacting(trx);
 
-    if (!proposalCall) {
-      logger.logError(
-        'Could not reset proposal events because proposal call does not exist',
-        { callId }
-      );
+        if (!proposalCall) {
+          logger.logError(
+            'Could not reset proposal events because proposal call does not exist',
+            { callId }
+          );
 
-      throw new GraphQLError('Could not reset proposal events');
-    }
+          throw new GraphQLError('Could not reset proposal events');
+        }
 
-    const proposalWorkflowId = proposalCall.proposal_workflow_id;
+        const proposalWorkflowId = proposalCall.proposal_workflow_id;
 
-    const proposalEventsToReset: (StatusChangingEventRecord &
-      ProposalWorkflowConnectionRecord)[] = (
-      await database.raw(`
+        const proposalEventsToReset: (StatusChangingEventRecord &
+          ProposalWorkflowConnectionRecord)[] = (
+          await database
+            .raw(
+              `
         SELECT *
         FROM proposal_workflow_connections AS pwc
         JOIN status_changing_events
@@ -782,93 +793,57 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           AND proposal_status_id = ${statusId}
         )
         AND pwc.proposal_workflow_id = ${proposalWorkflowId};
-      `)
-    ).rows;
+      `
+            )
+            .transacting(trx)
+        ).rows;
 
-    if (proposalEventsToReset?.length) {
-      const dataToUpdate: Record<string, boolean> = {};
+        if (proposalEventsToReset?.length) {
+          const dataToUpdate: Record<string, boolean> = {};
 
-      proposalEventsToReset.forEach((event) => {
-        const dataToUpdateHasProperty = dataToUpdate.hasOwnProperty(
-          event.status_changing_event.toLocaleLowerCase()
+          proposalEventsToReset.forEach((event) => {
+            const dataToUpdateHasProperty = dataToUpdate.hasOwnProperty(
+              event.status_changing_event.toLocaleLowerCase()
+            );
+            // NOTE: Reset the property only if it is not present in the dataToUpdate otherwise we end up with overwriting existing data.
+            if (!dataToUpdateHasProperty) {
+              dataToUpdate[event.status_changing_event.toLocaleLowerCase()] =
+                false;
+            }
+          });
+
+          const [updatedProposalEvents] = await database
+            .update(dataToUpdate)
+            .from('proposal_events')
+            .where('proposal_pk', proposalPk)
+            .returning<ProposalEventsRecord[]>('*')
+            .transacting(trx);
+
+          if (!updatedProposalEvents) {
+            logger.logError('Could not reset proposal events', {
+              dataToUpdate,
+            });
+
+            throw new GraphQLError('Could not reset proposal events');
+          }
+        }
+
+        return true;
+      } catch (error) {
+        logger.logException(
+          `Failed to reset proposal events proposalPk: ${proposalPk}`,
+          error
         );
-        // NOTE: Reset the property only if it is not present in the dataToUpdate otherwise we end up with overwriting existing data.
-        if (!dataToUpdateHasProperty) {
-          dataToUpdate[event.status_changing_event.toLocaleLowerCase()] = false;
-        }
-      });
 
-      const [updatedProposalEvents] = await database
-        .update(dataToUpdate)
-        .from('proposal_events')
-        .where('proposal_pk', proposalPk)
-        .returning<ProposalEventsRecord[]>('*');
-
-      if (!updatedProposalEvents) {
-        logger.logError('Could not reset proposal events', { dataToUpdate });
-
-        throw new GraphQLError('Could not reset proposal events');
+        return false;
       }
-    }
-
-    if (shouldResetStatusActions) {
-      await this.resetProposalStatusActions(
-        proposalEventsToReset,
-        statusId,
-        proposalWorkflowId
-      );
-    }
-
-    return true;
-  }
-
-  async resetProposalStatusActions(
-    proposalEventsToReset: (StatusChangingEventRecord &
-      ProposalWorkflowConnectionRecord)[],
-    currentStatusId: number,
-    proposalWorkflowId: number
-  ) {
-    const connectionIds = proposalEventsToReset
-      .filter((item) => item.proposal_status_id === currentStatusId)
-      .map(
-        (proposalEventToReset) =>
-          proposalEventToReset.proposal_workflow_connection_id
-      );
-
-    //NOTE: DRAFT proposal status has always id of 1
-    const DRAFT_STATUS_ID = 1;
-    const isDraftStatus = currentStatusId === DRAFT_STATUS_ID;
-
-    if (!connectionIds.length && !isDraftStatus) {
-      return;
-    }
-
-    const updatedProposalStatusActions = await database
-      .update({ executed: false })
-      .from('proposal_workflow_connection_has_actions')
-      .modify((query) => {
-        if (isDraftStatus) {
-          // NOTE: If proposal status is set to draft we need to reset all actions related to that workflow.
-          query.where('workflow_id', proposalWorkflowId);
-        } else {
-          query.whereIn('connection_id', connectionIds);
-        }
-      })
-      .returning<ProposalStatusActionRecord[]>('*');
-
-    if (!updatedProposalStatusActions) {
-      logger.logError('Could not reset proposal status actions', {
-        proposalEventsToReset,
-      });
-
-      throw new GraphQLError('Could not reset proposal status actions');
-    }
+    });
   }
 
   async changeProposalsStatus(
     statusId: number,
     proposalPks: number[]
-  ): Promise<ProposalPks> {
+  ): Promise<Proposals> {
     const dataToUpdate: { status_id: number; submitted?: boolean } = {
       status_id: statusId,
     };
@@ -889,7 +864,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new GraphQLError('Could not change proposals status');
     }
 
-    return new ProposalPks(result.map((item) => item.proposal_pk));
+    return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
   async getProposalBookingByProposalPk(

@@ -13,6 +13,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
@@ -34,6 +35,7 @@ import {
 } from '../resolvers/mutations/AssignMembersToSepMutation';
 import {
   AssignProposalsToSepArgs,
+  AssignProposalsToSepUsingCallInstrumentArgs,
   RemoveProposalsFromSepArgs,
 } from '../resolvers/mutations/AssignProposalsToSepMutation';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
@@ -53,6 +55,8 @@ export default class SEPMutations {
     private userDataSource: UserDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.CallDataSource)
+    private callDataSource: CallDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -235,8 +239,57 @@ export default class SEPMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.PROPOSAL_SEP_SELECTED)
+  async assignProposalsToSEPUsingCallInstrument(
+    agent: UserWithRole | null,
+    args: AssignProposalsToSepUsingCallInstrumentArgs
+  ): Promise<boolean | Rejection> {
+    return this.assignProposalsToSEPUsingCallInstrumentInternal(agent, args);
+  }
+
+  async assignProposalsToSEPUsingCallInstrumentInternal(
+    agent: UserWithRole | null,
+    args: AssignProposalsToSepUsingCallInstrumentArgs
+  ): Promise<boolean | Rejection> {
+    const proposals = await this.proposalDataSource.getProposalsByIds(
+      args.proposalPks
+    );
+
+    const callHasInstruments =
+      await this.callDataSource.getCallHasInstrumentsByInstrumentId(
+        args.instrumentId
+      );
+
+    const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
+    for (const callId of callIds) {
+      const callHasInstrument = callHasInstruments.find(
+        (callHasInstrument) => callHasInstrument.callId === callId
+      );
+      if (callHasInstrument && callHasInstrument.sepId) {
+        await this.assignProposalsToSepInternal(agent, {
+          proposals: proposals
+            .filter((proposal) => proposal.callId === callId)
+            .map((proposal) => ({
+              ...proposal,
+              callId: callId,
+            })),
+          sepId: callHasInstrument.sepId,
+        });
+      }
+    }
+
+    return true;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
   async assignProposalsToSep(
+    agent: UserWithRole | null,
+    args: AssignProposalsToSepArgs
+  ): Promise<ProposalPks | Rejection> {
+    return this.assignProposalsToSepInternal(agent, args);
+  }
+
+  @EventBus(Event.PROPOSAL_SEP_SELECTED)
+  async assignProposalsToSepInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToSepArgs
   ): Promise<ProposalPks | Rejection> {

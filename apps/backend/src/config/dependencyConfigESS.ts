@@ -23,6 +23,7 @@ import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSo
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
 import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
+import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
@@ -35,13 +36,14 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
+import { getDataRow, populateRow } from '../factory/xlsx/SEPDataRow';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
+import { isProduction } from '../utils/helperFunctions';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
-
-const isProduction = process.env.NODE_ENV === 'production';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
@@ -54,6 +56,7 @@ mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
+mapClass(Tokens.StatusActionsDataSource, PostgresStatusActionsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
@@ -78,6 +81,10 @@ mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
 mapClass(Tokens.MailService, SparkPostMailService);
+
+mapValue(Tokens.SEPDataColumns, SEPDataColumns);
+mapValue(Tokens.SEPDataRow, getDataRow);
+mapValue(Tokens.PopulateRow, populateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 

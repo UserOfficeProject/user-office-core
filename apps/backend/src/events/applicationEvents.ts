@@ -1,6 +1,6 @@
 import { Call } from '../models/Call';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalPks } from '../models/Proposal';
+import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
@@ -16,6 +16,9 @@ interface GeneralEvent {
   key: string;
   loggedInUserId: number | null;
   isRejection: boolean;
+  inputArgs?: string;
+  description?: string;
+  exchange?: string;
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
@@ -129,11 +132,6 @@ interface ProposalSEPSelectedEvent extends GeneralEvent {
   proposalpks: ProposalPks;
 }
 
-interface ProposalStatusUpdatedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_STATUS_UPDATED;
-  proposalpks: ProposalPks;
-}
-
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
   instrumenthasproposals: InstrumentHasProposals;
@@ -149,9 +147,14 @@ interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalStatusActionExecutedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_ACTION_EXECUTED;
+  proposal: Proposal;
+}
+
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
-  proposal: Proposal;
+  proposals: Proposals;
 }
 
 interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
@@ -190,14 +193,6 @@ interface UserUpdateEvent extends GeneralEvent {
 interface UserRoleUpdateEvent extends GeneralEvent {
   type: Event.USER_ROLE_UPDATED;
   user: User;
-}
-
-interface UserCreateEvent extends GeneralEvent {
-  type: Event.USER_CREATED;
-  userlinkresponse: {
-    user: User;
-    link: string;
-  };
 }
 
 interface UserDeletedEvent extends GeneralEvent {
@@ -316,8 +311,6 @@ export type ApplicationEvent =
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
-  | ProposalStatusUpdatedEvent
-  | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent
   | UserUpdateEvent
@@ -357,4 +350,5 @@ export type ApplicationEvent =
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
-  | SEPReviewerNotified;
+  | SEPReviewerNotified
+  | ProposalStatusActionExecutedEvent;

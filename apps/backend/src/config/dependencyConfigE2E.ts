@@ -23,6 +23,7 @@ import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSo
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
 import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
+import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
@@ -35,6 +36,8 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
+import { getDataRow, populateRow } from '../factory/xlsx/SEPDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
@@ -52,6 +55,7 @@ mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
+mapClass(Tokens.StatusActionsDataSource, PostgresStatusActionsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
@@ -75,6 +79,10 @@ mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SkipSendMailService);
+
+mapValue(Tokens.SEPDataColumns, SEPDataColumns);
+mapValue(Tokens.SEPDataRow, getDataRow);
+mapValue(Tokens.PopulateRow, populateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 

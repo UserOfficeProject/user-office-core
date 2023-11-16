@@ -9,7 +9,13 @@ export class CallsFilter {
   public templateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
+  public pdfTemplateIds?: number[];
+
+  @Field(() => [Int], { nullable: true })
   public sepIds?: number[];
+
+  @Field(() => [Int], { nullable: true })
+  public instrumentIds?: number[];
 
   @Field(() => Boolean, { nullable: true })
   public isActive?: boolean;

@@ -19,6 +19,7 @@ export const Tokens = {
   ProposalDataSource: Symbol('ProposalDataSource'),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),
   ProposalSettingsDataSource: Symbol('ProposalSettingsDataSource'),
+  StatusActionsDataSource: Symbol('StatusActionsDataSource'),
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
   RedeemCodesDataSource: Symbol('RedeemCodesDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),
@@ -35,4 +36,7 @@ export const Tokens = {
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
+  SEPDataColumns: Symbol('SEPDataColumns'),
+  SEPDataRow: Symbol('SEPDataRow'),
+  PopulateRow: Symbol('PopulateRow'),
 };

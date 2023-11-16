@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import {
   WorkflowEngineProposalType,
@@ -14,8 +14,9 @@ import { groupProposalsByProperties } from './statusActionUtils';
 export const statusActionEngine = async (
   proposals: WorkflowEngineProposalType[]
 ) => {
-  const proposalSettingsDataSource: ProposalSettingsDataSource =
-    container.resolve(Tokens.ProposalSettingsDataSource);
+  const statusActionsDataSource: StatusActionsDataSource = container.resolve(
+    Tokens.StatusActionsDataSource
+  );
 
   // NOTE: We need to group the proposals by 'workflow' and 'status' because proposals coming in here can be from different workflows/calls.
   const groupByProperties = ['workflowId', 'statusId'];
@@ -38,7 +39,7 @@ export const statusActionEngine = async (
       }
 
       const proposalStatusActions =
-        await proposalSettingsDataSource.getConnectionStatusActions(
+        await statusActionsDataSource.getConnectionStatusActions(
           currentConnection.id,
           currentConnection.proposalWorkflowId
         );
@@ -49,11 +50,7 @@ export const statusActionEngine = async (
 
       Promise.all(
         proposalStatusActions.map(async (proposalStatusAction) => {
-          if (
-            !proposalStatusAction.actionId ||
-            !proposalStatusAction.type ||
-            proposalStatusAction.executed
-          ) {
+          if (!proposalStatusAction.actionId || !proposalStatusAction.type) {
             return;
           }
 

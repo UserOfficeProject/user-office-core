@@ -131,7 +131,7 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
       <CallsModal
         templateId={selectedTemplateId}
         onClose={() => setSelectedTemplateId(undefined)}
-      ></CallsModal>
+      />
     </>
   );
 }

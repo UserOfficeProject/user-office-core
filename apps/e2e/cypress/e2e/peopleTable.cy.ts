@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import { FeatureId, UserRole } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -175,19 +175,11 @@ context('PageTable component tests', () => {
     it('should preserve the selected users after pagination', () => {
       // NOTE: Create 5 users
       new Array(5).fill(0).map((elem, index) => {
-        cy.createUser({
-          user_title: faker.name.prefix(),
+        cy.createUserByEmailInvite({
           firstname: faker.name.firstName(),
           lastname: faker.name.lastName(),
-          password: 'Test1234!',
-          gender: '-',
-          nationality: 1,
-          birthdate: faker.date.between('1950', '1990').toISOString(),
-          organisation: 1,
-          department: faker.commerce.department(),
-          position: faker.name.jobTitle(),
           email: emails[index],
-          telephone: faker.phone.number('0##########'),
+          userRole: UserRole.USER,
         });
       });
 
@@ -204,7 +196,7 @@ context('PageTable component tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('10 rows').click();
+      cy.get('@modal').contains('10 rows').click();
       cy.get('[data-value=5]').click();
 
       for (const email of emails) {
@@ -339,19 +331,11 @@ context('PageTable component tests', () => {
     it('Should preserve the selected users after pagination', () => {
       // NOTE: Create 10 users
       new Array(10).fill(0).map((elem, index) => {
-        cy.createUser({
-          user_title: faker.name.prefix(),
+        cy.createUserByEmailInvite({
           firstname: faker.name.firstName(),
           lastname: faker.name.lastName(),
-          password: 'Test1234!',
-          gender: '-',
-          nationality: 1,
-          birthdate: faker.date.between('1950', '1990').toISOString(),
-          organisation: 1,
-          department: faker.commerce.department(),
-          position: faker.name.jobTitle(),
           email: emails[index],
-          telephone: faker.phone.number('0##########'),
+          userRole: UserRole.USER,
         });
       });
       cy.login('officer');
@@ -367,7 +351,9 @@ context('PageTable component tests', () => {
 
       cy.get('[role="presentation"] [role="dialog"]').as('modal');
 
-      cy.contains('10 rows').click();
+      cy.finishedLoading();
+
+      cy.get('@modal').contains('10 rows').click();
       cy.get('[data-value=5]').click();
 
       cy.get('@modal').contains('0 user(s) selected');
@@ -409,19 +395,11 @@ context('PageTable component tests', () => {
     it('PeopleTable should sort all people when using column sort', () => {
       // NOTE: Create 5 users
       new Array(5).fill(0).map((elem, index) => {
-        cy.createUser({
-          user_title: faker.name.prefix(),
+        cy.createUserByEmailInvite({
           firstname: faker.name.firstName(),
           lastname: faker.name.lastName(),
-          password: 'Test1234!',
-          gender: '-',
-          nationality: 1,
-          birthdate: faker.date.between('1950', '1990').toISOString(),
-          organisation: 1,
-          department: faker.commerce.department(),
-          position: faker.name.jobTitle(),
           email: emails[index],
-          telephone: faker.phone.number('0##########'),
+          userRole: UserRole.USER,
         });
       });
       let firstTableRowTextBeforeSorting: string;

@@ -39,6 +39,24 @@ export class AssignProposalsToInstrumentMutation {
       args
     );
 
+    const proposalsSeps = await context.queries.sep.getProposalsSeps(
+      context.user,
+      args.proposals.map((proposal) => proposal.primaryKey)
+    );
+
+    await context.mutations.sep.assignProposalsToSEPUsingCallInstrument(
+      context.user,
+      {
+        instrumentId: args.instrumentId,
+        proposalPks: args.proposals
+          .filter(
+            (proposal) =>
+              !proposalsSeps.find((ps) => ps.proposalPk === proposal.primaryKey)
+          )
+          .map((proposal) => proposal.primaryKey),
+      }
+    );
+
     return isRejection(res) ? res : true;
   }
 

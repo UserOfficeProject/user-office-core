@@ -304,19 +304,19 @@ function createMultipleChoiceQuestion(
   }
 
   if (options?.option1) {
-    cy.get('[data-cy=add-answer-button]').closest('button').click();
+    cy.get('[data-cy=add-item-button]').closest('button').click();
     cy.get('[placeholder=Answer]').type(options?.option1);
     cy.get('[aria-label="Save"]').click();
   }
 
   if (options?.option2) {
-    cy.get('[data-cy=add-answer-button]').closest('button').click();
+    cy.get('[data-cy=add-item-button]').closest('button').click();
     cy.get('[placeholder=Answer]').type(options.option2);
     cy.get('[aria-label="Save"]').click();
   }
 
   if (options?.option3) {
-    cy.get('[data-cy=add-answer-button]').closest('button').click();
+    cy.get('[data-cy=add-item-button]').closest('button').click();
     cy.get('[placeholder=Answer]').type(options.option3);
     cy.get('[aria-label="Save"]').click();
   }
@@ -373,6 +373,7 @@ function createDynamicMultipleChoiceQuestion(
     firstTopic?: boolean;
     isMultipleSelect?: boolean;
     type?: 'radio' | 'dropdown';
+    headers?: Record<string, string>;
   }
 ) {
   openQuestionsMenu({
@@ -403,6 +404,13 @@ function createDynamicMultipleChoiceQuestion(
 
   if (options?.jsonPath) {
     cy.get('[data-cy=dynamic-url-jsonPath]').type(options?.jsonPath);
+  }
+
+  for (const [key, value] of Object.entries(options?.headers || {})) {
+    cy.get('[data-cy=add-item-button]').closest('button').click();
+    cy.get('[placeholder=Name]').type(key);
+    cy.get('[placeholder=Value]').type(value);
+    cy.get('[aria-label="Save"]').click();
   }
 
   cy.contains('Save').click({ force: true });

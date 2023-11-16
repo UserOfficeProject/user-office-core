@@ -3,6 +3,7 @@ import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -14,7 +15,13 @@ import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
 import { calculateReferenceNumber } from './ProposalDataSource';
-import { CallRecord, createCallObject } from './records';
+import {
+  CallHasInstrumentRecord,
+  CallRecord,
+  createCallHasInstrumentObject,
+  createCallObject,
+  ProposalRecord,
+} from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
   async delete(id: number): Promise<Call> {
@@ -40,6 +47,10 @@ export default class PostgresCallDataSource implements CallDataSource {
     const query = database('call').select(['*']);
     if (filter?.templateIds) {
       query.whereIn('template_id', filter.templateIds);
+    }
+
+    if (filter?.pdfTemplateIds) {
+      query.whereIn('pdf_template_id', filter.pdfTemplateIds);
     }
 
     // if filter is explicitly set to true or false
@@ -96,7 +107,15 @@ export default class PostgresCallDataSource implements CallDataSource {
     if (filter?.sepIds?.length) {
       query
         .leftJoin('call_has_seps as chs', 'chs.call_id', 'call.call_id')
-        .whereIn('chs.sep_id', filter.sepIds);
+        .whereIn('chs.sep_id', filter.sepIds)
+        .distinctOn('call.call_id');
+    }
+
+    if (filter?.instrumentIds?.length) {
+      query
+        .leftJoin('call_has_instruments as chi', 'chi.call_id', 'call.call_id')
+        .whereIn('chi.instrument_id', filter.instrumentIds)
+        .distinctOn('call.call_id');
     }
 
     if (filter?.isSEPReviewEnded === true) {
@@ -114,6 +133,20 @@ export default class PostgresCallDataSource implements CallDataSource {
     return query.then((callDB: CallRecord[]) =>
       callDB.map((call) => createCallObject(call))
     );
+  }
+
+  async getCallHasInstrumentsByInstrumentId(
+    instrumentId: number
+  ): Promise<CallHasInstrument[]> {
+    return database
+      .select()
+      .from('call_has_instruments')
+      .where('instrument_id', instrumentId)
+      .then((callHasInstrument: CallHasInstrumentRecord[]) =>
+        callHasInstrument.map((callHasInstrument) =>
+          createCallHasInstrumentObject(callHasInstrument)
+        )
+      );
   }
 
   async create(args: CreateCallInput): Promise<Call> {
@@ -186,7 +219,13 @@ export default class PostgresCallDataSource implements CallDataSource {
          * Check if the reference number format has been changed,
          * in which case all proposals in the call need to be updated.
          */
-        const preUpdateCall = await database
+        const preUpdateCall: Pick<
+          CallRecord,
+          | 'call_id'
+          | 'reference_number_format'
+          | 'call_ended_internal'
+          | 'call_ended'
+        > = await database
           .select(
             'c.call_id',
             'c.reference_number_format',
@@ -203,12 +242,15 @@ export default class PostgresCallDataSource implements CallDataSource {
           args.referenceNumberFormat &&
           args.referenceNumberFormat !== preUpdateCall.reference_number_format
         ) {
-          const proposals = await database
+          const proposals = (await database
             .select('p.proposal_pk', 'p.reference_number_sequence')
             .from('proposals as p')
             .where({ 'p.call_id': preUpdateCall.call_id, 'p.submitted': true })
             .forUpdate()
-            .transacting(trx);
+            .transacting(trx)) as Pick<
+            ProposalRecord,
+            'proposal_pk' | 'reference_number_sequence'
+          >[];
 
           await BluePromise.map(
             proposals,
@@ -216,7 +258,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               await database
                 .update({
                   proposal_id: await calculateReferenceNumber(
-                    args.referenceNumberFormat,
+                    args.referenceNumberFormat!,
                     p.reference_number_sequence
                   ),
                 })
@@ -270,6 +312,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               proposal_workflow_id: args.proposalWorkflowId,
               call_ended:
                 preUpdateCall.call_ended &&
+                args.endCall &&
                 args.endCall.getTime() < currentDate.getTime(),
               call_ended_internal: args.endCallInternal
                 ? preUpdateCall.call_ended_internal &&

@@ -21,6 +21,7 @@ import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSo
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
 import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
+import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
@@ -35,6 +36,11 @@ import {
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { StfcSEPDataColumns } from '../factory/xlsx/stfc/StfcSEPDataColumns';
+import {
+  getStfcDataRow,
+  populateStfcRow,
+} from '../factory/xlsx/stfc/StfcSEPDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
@@ -51,6 +57,7 @@ mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, StfcProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
+mapClass(Tokens.StatusActionsDataSource, PostgresStatusActionsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
@@ -75,6 +82,10 @@ mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
+
+mapValue(Tokens.SEPDataColumns, StfcSEPDataColumns);
+mapValue(Tokens.SEPDataRow, getStfcDataRow);
+mapValue(Tokens.PopulateRow, populateStfcRow);
 
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 

@@ -3,6 +3,7 @@ import { PdfTemplateRecord } from 'knex/types/tables';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
+import { CallHasInstrument } from '../../models/CallHasInstrument';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
@@ -69,6 +70,7 @@ declare module 'knex/types/tables' {
     readonly template_header: string;
     readonly template_footer: string;
     readonly template_sample_declaration: string;
+    readonly dummy_data: string;
     readonly creator_id: number;
     readonly created_at: Date;
   }
@@ -395,11 +397,12 @@ export interface FileRecord {
 
 export interface EventLogRecord {
   readonly id: number;
-  readonly changed_by: number;
+  readonly changed_by: number | null;
   readonly event_type: string;
   readonly row_data: string;
   readonly event_tstamp: Date;
   readonly changed_object_id: string;
+  readonly description: string;
 }
 
 export interface SEPRecord {
@@ -700,7 +703,6 @@ export interface ProposalWorkflowConnectionHasActionsRecord {
   readonly connection_id: number;
   readonly action_id: number;
   readonly workflow_id: number;
-  readonly executed: boolean;
   readonly config: string;
 }
 
@@ -984,6 +986,18 @@ export const createCallObject = (call: CallRecord) => {
   );
 };
 
+export const createCallHasInstrumentObject = (
+  callHasInstrument: CallHasInstrumentRecord
+) => {
+  return new CallHasInstrument(
+    callHasInstrument.call_id,
+    callHasInstrument.instrument_id,
+    callHasInstrument.availability_time,
+    callHasInstrument.submitted,
+    callHasInstrument.sep_id
+  );
+};
+
 export const createQuestionaryObject = (questionary: QuestionaryRecord) => {
   return new Questionary(
     questionary.questionary_id,
@@ -1248,6 +1262,7 @@ export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
     pdfTemplate.template_header,
     pdfTemplate.template_footer,
     pdfTemplate.template_sample_declaration,
+    pdfTemplate.dummy_data,
     pdfTemplate.creator_id,
     pdfTemplate.created_at
   );

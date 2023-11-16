@@ -3,7 +3,6 @@ import {
   ApolloServer,
   ContextFunction,
 } from '@apollo/server';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import {
   ExpressContextFunctionArgument,
   expressMiddleware,
@@ -12,6 +11,7 @@ import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
 } from '@apollo/server/plugin/disabled';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
 import { logger } from '@user-office-software/duo-logger';
 import { json } from 'body-parser';
@@ -29,6 +29,7 @@ import { UserWithRole } from '../models/User';
 import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
+import { isProduction } from '../utils/helperFunctions';
 import initGraphQLClient from './graphqlClient';
 
 export const context: ContextFunction<
@@ -147,10 +148,11 @@ const apolloServer = async (app: Express) => {
   const plugins = [
     ApolloServerPluginInlineTraceDisabled(),
     // Explicitly disable playground in prod
-    process.env.NODE_ENV === 'production'
+    isProduction
       ? ApolloServerPluginLandingPageDisabled()
-      : ApolloServerPluginLandingPageGraphQLPlayground({
-          settings: { 'schema.polling.enable': false },
+      : ApolloServerPluginLandingPageLocalDefault({
+          footer: false,
+          embed: { initialState: { pollForSchemaUpdates: false } },
         }),
     errorLoggingPlugin,
   ];
@@ -178,10 +180,8 @@ const apolloServer = async (app: Express) => {
     schema: schema,
     plugins: plugins,
     formatError(formattedError) {
-      const isProd = process.env.NODE_ENV === 'production';
-
       // NOTE: Prevent exposing some sensitive data to the client in production.
-      if (isProd) {
+      if (isProduction) {
         delete formattedError.extensions?.context;
         delete formattedError.extensions?.exception;
       }

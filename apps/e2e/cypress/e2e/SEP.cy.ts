@@ -1641,7 +1641,9 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="download-sep-xlsx"]').click();
+      cy.get('button[aria-label="Export in Excel"]')
+        .should('not.be.disabled')
+        .click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -2093,5 +2095,64 @@ context('SEP meeting components tests', () => {
 
     cy.get('[data-cy=save-grade]').click();
     cy.notification({ variant: 'success', text: 'Updated' });
+  });
+});
+
+context('Automatic SEP assignment to Proposal', () => {
+  const scientist1 = initialDBData.users.user1;
+  const instrument1 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+  };
+
+  beforeEach(function () {
+    cy.resetDB();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        this.skip();
+      }
+      updateUsersRoles();
+    });
+    initializationBeforeTests();
+  });
+
+  it('Automatic SEP assignment to Proposal, when an Instrument is assigned to a Proposal', () => {
+    cy.createInstrument(instrument1).then((result) => {
+      if (result.createInstrument) {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentSepIds: [
+            {
+              instrumentId: result.createInstrument.id,
+              sepId: initialDBData.sep.id,
+            },
+          ],
+        });
+
+        cy.createProposal({ callId: initialDBData.call.id }).then(
+          (response) => {
+            if (response.createProposal) {
+              createdProposalPk = response.createProposal.primaryKey;
+            }
+          }
+        );
+
+        cy.assignProposalsToInstrument({
+          proposals: [
+            { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+          ],
+          instrumentId: result.createInstrument.id,
+        });
+
+        cy.login('officer');
+        cy.visit('/Proposals');
+
+        cy.contains('td', createdProposalId)
+          .siblings()
+          .should('contain.text', initialDBData.sep.code);
+      }
+    });
   });
 });

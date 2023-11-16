@@ -44,7 +44,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           },
           recipients: [{ address: event.userlinkresponse.user.email }],
         })
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Email send on for password reset:', {
             result: res,
             event,
@@ -107,7 +107,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           },
           recipients: [{ address: user.email }],
         })
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Successful email transmission', { res });
         })
         .catch((err: string) => {
@@ -157,7 +157,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       mailService
         .sendMail(options)
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Emails sent on proposal submission:', {
             result: res,
             event,
@@ -173,44 +173,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
       return;
     }
 
-    case Event.USER_CREATED: {
-      if (process.env.NODE_ENV === 'development') {
-        await userDataSource.setUserEmailVerified(
-          event.userlinkresponse.user.id
-        );
-        logger.logInfo('Set user as verified without sending email', {
-          userId: event.userlinkresponse.user.id,
-          event,
-        });
-      } else {
-        mailService
-          .sendMail({
-            content: {
-              template_id: 'user-office-account-verification',
-            },
-            substitution_data: {
-              title: 'ESS User portal verify account',
-              buttonText: 'Click to verify',
-              link: event.userlinkresponse.link,
-            },
-            recipients: [{ address: event.userlinkresponse.user.email }],
-          })
-          .then((res: any) => {
-            logger.logInfo('Email sent on user creation:', {
-              result: res,
-              event,
-            });
-          })
-          .catch((err: string) => {
-            logger.logError('Could not send email on user creation:', {
-              error: err,
-              event,
-            });
-          });
-      }
-
-      return;
-    }
     case Event.PROPOSAL_NOTIFIED: {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
@@ -254,7 +216,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             },
           ],
         })
-        .then((res: any) => {
+        .then((res) => {
           logger.logInfo('Email sent on proposal notify:', {
             result: res,
             event,
@@ -300,7 +262,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             },
           ],
         })
-        .then(async (res: any) => {
+        .then(async (res) => {
           await sepDataSource.setSEPReviewNotificationEmailSent(
             reviewId,
             userID,

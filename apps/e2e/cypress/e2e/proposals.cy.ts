@@ -270,8 +270,8 @@ context('Proposal tests', () => {
     });
 
     it('User officer should be able to select all prefetched proposals in the table', function () {
-      const NUMBER_OF_PROPOSALS = 6;
-      const DEFAULT_ROWS_PER_PAGE = 5;
+      const NUMBER_OF_PROPOSALS = 11;
+      const DEFAULT_ROWS_PER_PAGE = 10;
 
       for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
         cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
@@ -587,6 +587,41 @@ context('Proposal tests', () => {
       cy.contains(newProposalTitle).should('not.exist');
     });
 
+    it('Proposals with long title should fit in one line rows', () => {
+      const longProposalTitle = faker.lorem.paragraph(2);
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: longProposalTitle,
+            abstract: newProposalAbstract,
+            proposerId: proposer.id,
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains(longProposalTitle).should(
+        'have.attr',
+        'title',
+        longProposalTitle
+      );
+
+      cy.contains(longProposalTitle).invoke('outerWidth').should('be.gt', 400);
+      cy.contains(longProposalTitle)
+        .parent()
+        .invoke('outerWidth')
+        .should('eq', 400);
+
+      cy.contains(longProposalTitle)
+        .parent()
+        .should('have.css', 'text-overflow', 'ellipsis')
+        .and('have.css', 'white-space', 'nowrap');
+    });
+
     it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
       cy.login('user1');
@@ -660,6 +695,46 @@ context('Proposal tests', () => {
 
         cy.contains(createdCallTitle).should('not.exist');
       });
+    });
+
+    it('During Proposal creation, User should not lose data when refreshing the page', () => {
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title]').type(title);
+      cy.get('[data-cy=abstract]').type(abstract);
+
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.url().should('contains', '/ProposalEdit');
+
+      cy.reload();
+
+      cy.finishedLoading();
+
+      cy.contains('Back').click();
+
+      cy.get('[data-cy=title] input').should('have.value', title);
+      cy.get('[data-cy=abstract] textarea').should('have.value', abstract);
+
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+
+      cy.get('[aria-label="View proposal"]').should('exist');
     });
   });
 

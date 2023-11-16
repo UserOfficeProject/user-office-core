@@ -1,8 +1,9 @@
-import MaterialTable from '@material-table/core';
+import { Column } from '@material-table/core';
 import { Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { EventLog } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
@@ -19,17 +20,27 @@ type EventLogListProps = {
   eventType?: string;
 };
 
-const columns = [
+const columns: Column<EventLog>[] = [
   {
     title: 'Changed by',
     render: (rowData: EventLog): string =>
-      `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
+      rowData.changedBy
+        ? `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`
+        : 'System',
   },
   {
     title: 'Changed on',
     field: 'changedOnFormatted',
   },
-  { title: 'Event type', field: 'eventType' },
+  {
+    title: 'Event type',
+    field: 'eventType',
+    cellStyle: { fontSize: 'smaller' },
+  },
+  {
+    title: 'Description',
+    field: 'description',
+  },
 ];
 
 const EventLogList = ({

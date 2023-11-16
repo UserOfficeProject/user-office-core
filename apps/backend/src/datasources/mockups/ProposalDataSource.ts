@@ -1,11 +1,7 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
-import {
-  Proposal,
-  ProposalEndStatus,
-  ProposalPks,
-} from '../../models/Proposal';
+import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
@@ -320,6 +316,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return allProposals.filter((proposal) => proposal.proposerId === id);
   }
 
+  async getProposalsByIds(proposalIds: number[]): Promise<Proposal[]> {
+    return allProposals.filter((proposal) =>
+      proposalIds.includes(proposal.primaryKey)
+    );
+  }
   async getInstrumentScientistProposals(
     scientist: UserWithRole,
     filter?: ProposalsFilter,
@@ -361,8 +362,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async changeProposalsStatus(
     statusId: number,
     proposalPks: number[]
-  ): Promise<ProposalPks> {
-    return { proposalPks: [1] };
+  ): Promise<Proposals> {
+    return new Proposals(allProposals);
   }
 
   async getProposalBookingByProposalPk(
