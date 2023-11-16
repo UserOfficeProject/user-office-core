@@ -81,6 +81,8 @@ async function enableDefaultStfcFeatures() {
       FeatureId.EMAIL_SEARCH,
       FeatureId.INSTRUMENT_MANAGEMENT,
       FeatureId.STFC_IDLE_TIMER,
+      FeatureId.TECHNICAL_REVIEW,
+      FeatureId.SEP_REVIEW,
     ],
     true
   );
