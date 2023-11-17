@@ -16,6 +16,9 @@ interface GeneralEvent {
   key: string;
   loggedInUserId: number | null;
   isRejection: boolean;
+  inputArgs?: string;
+  description?: string;
+  exchange?: string;
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
@@ -141,6 +144,11 @@ interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
 
 interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW;
+  proposal: Proposal;
+}
+
+interface ProposalStatusActionExecutedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_ACTION_EXECUTED;
   proposal: Proposal;
 }
 
@@ -342,4 +350,5 @@ export type ApplicationEvent =
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
-  | SEPReviewerNotified;
+  | SEPReviewerNotified
+  | ProposalStatusActionExecutedEvent;

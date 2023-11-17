@@ -176,7 +176,7 @@ export const denseTableColumn = <T extends object>(
       const columnData = getValueFromKey(rowData, column.field?.toString());
 
       // NOTE: If it is more than 50 chars then show the title tooltip
-      if (typeof columnData === 'string' && columnData.length > 50) {
+      if (typeof columnData === 'string' && columnData.length > 45) {
         return (
           <span title={columnData}>
             {column.render ? column.render(rowData, 'row') : columnData}

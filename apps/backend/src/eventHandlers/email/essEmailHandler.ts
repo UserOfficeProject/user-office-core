@@ -23,7 +23,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
     Tokens.UserDataSource
   );
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
-    Tokens.UserDataSource
+    Tokens.RedeemCodesDataSource
   );
 
   if (event.isRejection) {
