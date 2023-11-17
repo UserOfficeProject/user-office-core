@@ -28,6 +28,9 @@ export class EventLog {
 
   @Field(() => String)
   public changedObjectId: string;
+
+  @Field(() => String)
+  public description: string;
 }
 
 @Resolver(() => EventLog)
