@@ -225,7 +225,7 @@ jobs:
           npm run test:backend
   e2e:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [resolve_dep, build]
 
     strategy:
       fail-fast: false
