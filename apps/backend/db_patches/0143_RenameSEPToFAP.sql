@@ -79,6 +79,57 @@ BEGIN
     SET feature_id = 'FAP_REVIEW', description = 'FAP (facility access panels) functionality'
     WHERE feature_id = 'SEP_REVIEW';
 
+    UPDATE roles
+    SET short_code = 'fap_chair', title = 'FAP Chair'
+    WHERE short_code = 'sep_chair';
+    UPDATE roles
+    SET short_code = 'fap_secretary', title = 'FAP Secretary'
+    WHERE short_code = 'sep_secretary';
+    UPDATE roles
+    SET short_code = 'fap_reviewer', title = 'FAP Reviewer'
+    WHERE short_code = 'sep_reviewer';
+
+    -- Replace SEP with FAP in the status_changing_events
+    WITH sce_subquery AS (
+        SELECT status_changing_event_id, status_changing_event
+        FROM  status_changing_events
+        WHERE status_changing_event LIKE '%SEP%'
+    )
+    UPDATE status_changing_events
+    SET status_changing_event = REPLACE(status_changing_events.status_changing_event, 'SEP', 'FAP')
+    FROM sce_subquery
+    WHERE status_changing_events.status_changing_event_id = sce_subquery.status_changing_event_id;
+    --
+
+    -- Replace SEP with FAP in the proposal_statuses
+    WITH ps_subquery AS (
+        SELECT proposal_status_id, name, description, short_code
+        FROM  proposal_statuses
+        WHERE short_code LIKE '%SEP%'
+    )
+    UPDATE proposal_statuses
+    SET name = REPLACE(proposal_statuses.name, 'SEP', 'FAP'),
+        description = REPLACE(proposal_statuses.description, 'SEP', 'FAP'),
+        short_code = REPLACE(proposal_statuses.short_code, 'SEP', 'FAP')
+    FROM ps_subquery
+    WHERE proposal_statuses.proposal_status_id = ps_subquery.proposal_status_id;
+    -- 
+
+     -- Replace SEP with FAP in the event_logs
+    WITH el_subquery AS (
+        SELECT id, event_type, description, row_data
+        FROM  event_logs
+        WHERE event_type LIKE '%SEP%'
+        OR row_data LIKE '%SEP%'
+    )
+    UPDATE event_logs
+    SET event_type = REPLACE(event_logs.event_type, 'SEP', 'FAP'),
+        description = REPLACE(event_logs.description, 'SEP', 'FAP'),
+        row_data = REPLACE(REPLACE(event_logs.row_data, 'SEP', 'FAP'), 'sep', 'fap')
+    FROM el_subquery
+    WHERE event_logs.id = el_subquery.id;
+    -- 
+
     END;
 	END IF;
 END;
