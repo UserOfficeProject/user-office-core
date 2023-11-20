@@ -75,6 +75,10 @@ BEGIN
 
     ALTER SEQUENCE "SEPs_sep_id_seq" RENAME TO "faps_fap_id_seq";
 
+    UPDATE features
+    SET feature_id = 'FAP_REVIEW', description = 'FAP (facility access panels) functionality'
+    WHERE feature_id = 'SEP_REVIEW';
+
     END;
 	END IF;
 END;

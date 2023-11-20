@@ -9,8 +9,8 @@ import {
 } from '../../models/Instrument';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
+import { FapDataSource } from '../FapDataSource';
 import { InstrumentDataSource } from '../InstrumentDataSource';
-import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
 import {
   InstrumentRecord,
@@ -25,7 +25,7 @@ export default class PostgresInstrumentDataSource
   implements InstrumentDataSource
 {
   constructor(
-    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource
+    @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource
   ) {}
   private createInstrumentObject(instrument: InstrumentRecord) {
     return new Instrument(
@@ -48,7 +48,7 @@ export default class PostgresInstrumentDataSource
       instrument.manager_user_id,
       instrument.availability_time,
       instrument.submitted,
-      instrument.sep_id
+      instrument.fap_id
     );
   }
 
@@ -133,7 +133,7 @@ export default class PostgresInstrumentDataSource
         'manager_user_id',
         'chi.availability_time',
         'chi.submitted',
-        'chi.sep_id',
+        'chi.fap_id',
       ])
       .from('instruments as i')
       .join('call_has_instruments as chi', {
@@ -331,7 +331,7 @@ export default class PostgresInstrumentDataSource
 
   async checkIfAllProposalsOnInstrumentSubmitted(
     instruments: InstrumentWithAvailabilityTimeRecord[],
-    sepId: number,
+    fapId: number,
     callId: number
   ): Promise<InstrumentWithAvailabilityTimeRecord[]> {
     const instrumentsWithSubmittedFlag: InstrumentWithAvailabilityTimeRecord[] =
@@ -339,8 +339,8 @@ export default class PostgresInstrumentDataSource
 
     for (const instrument of instruments) {
       const allProposalsOnInstrument =
-        await this.sepDataSource.getSEPProposalsByInstrument(
-          sepId,
+        await this.fapDataSource.getFapProposalsByInstrument(
+          fapId,
           instrument.instrument_id,
           callId
         );
@@ -358,8 +358,8 @@ export default class PostgresInstrumentDataSource
     return instrumentsWithSubmittedFlag;
   }
 
-  async getInstrumentsBySepId(
-    sepId: number,
+  async getInstrumentsByFapId(
+    fapId: number,
     callId: number
   ): Promise<InstrumentWithAvailabilityTime[]> {
     return database
@@ -372,7 +372,7 @@ export default class PostgresInstrumentDataSource
         'chi.availability_time',
         'chi.submitted',
         database.raw(
-          `count(sp.proposal_pk) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) as proposal_count`
+          `count(sp.proposal_pk) filter (where sp.fap_id = ${fapId} and sp.call_id = ${callId}) as proposal_count`
         ),
         database.raw(
           `count(*) filter (where sp.call_id = ${callId}) as full_count`
@@ -382,7 +382,7 @@ export default class PostgresInstrumentDataSource
       .join('instrument_has_proposals as ihp', {
         'i.instrument_id': 'ihp.instrument_id',
       })
-      .join('SEP_Proposals as sp', {
+      .join('fap_proposals as sp', {
         'sp.proposal_pk': 'ihp.proposal_pk',
       })
       .join('call_has_instruments as chi', {
@@ -392,26 +392,26 @@ export default class PostgresInstrumentDataSource
       .groupBy(['i.instrument_id', 'chi.availability_time', 'chi.submitted'])
       .having(
         database.raw(
-          `count(sp.proposal_pk) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) > 0`
+          `count(sp.proposal_pk) filter (where sp.fap_id = ${fapId} and sp.call_id = ${callId}) > 0`
         )
       )
       .then(async (instruments: InstrumentWithAvailabilityTimeRecord[]) => {
         const instrumentsWithSubmittedFlag =
           await this.checkIfAllProposalsOnInstrumentSubmitted(
             instruments,
-            sepId,
+            fapId,
             callId
           );
 
         const result = instrumentsWithSubmittedFlag.map((instrument) => {
-          const calculatedInstrumentAvailabilityTimePerSEP = Math.round(
+          const calculatedInstrumentAvailabilityTimePerFap = Math.round(
             (instrument.proposal_count / instrument.full_count) *
               instrument.availability_time
           );
 
           return this.createInstrumentWithAvailabilityTimeObject({
             ...instrument,
-            availability_time: calculatedInstrumentAvailabilityTimePerSEP,
+            availability_time: calculatedInstrumentAvailabilityTimePerFap,
           });
         });
 

@@ -29,9 +29,9 @@ const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
   'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
   'CLF LSF FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'FAP Member': [Roles.SEP_REVIEWER],
-  'FAP Secretary': [Roles.SEP_SECRETARY],
-  'FAP Chair': [Roles.SEP_CHAIR],
+  'FAP Member': [Roles.FAP_REVIEWER],
+  'FAP Secretary': [Roles.FAP_SECRETARY],
+  'FAP Chair': [Roles.FAP_CHAIR],
   'Internal Reviewer': [Roles.INTERNAL_REVIEWER],
 };
 

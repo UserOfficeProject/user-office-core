@@ -6,8 +6,8 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import FapMutations from '../../mutations/FapMutations';
 import InstrumentMutations from '../../mutations/InstrumentMutations';
-import SEPMutations from '../../mutations/SEPMutations';
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -82,7 +82,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         Tokens.ProposalDataSource
       );
       const instrumentMutations = container.resolve(InstrumentMutations);
-      const sepMutation = container.resolve(SEPMutations);
+      const fapMutation = container.resolve(FapMutations);
 
       const proposal = await proposalDataSource.getByQuestionaryId(
         questionaryId
@@ -103,8 +103,8 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         ],
       });
 
-      // Assign the Proposals to SEP using Call Instrument
-      await sepMutation.assignProposalsToSEPUsingCallInstrumentInternal(null, {
+      // Assign the Proposals to Fap using Call Instrument
+      await fapMutation.assignProposalsToFapUsingCallInstrumentInternal(null, {
         instrumentId: instrumentId,
         proposalPks: [proposal.primaryKey],
       });

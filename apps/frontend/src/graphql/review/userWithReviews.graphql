@@ -19,7 +19,7 @@ query userWithReviews(
       grade
       comment
       status
-      sepID
+      fapID
       proposal {
         primaryKey
         title

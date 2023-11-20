@@ -4,8 +4,8 @@ import sinon from 'sinon';
 
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import checkCallsEndedJob from './jobs/checkAllCallsEnded';
+import checkCallsFAPReviewEndedJob from './jobs/checkCallsFAPReviewEnded';
 import checkCallsReviewEndedJob from './jobs/checkCallsReviewEnded';
-import checkCallsSEPReviewEndedJob from './jobs/checkCallsSEPReviewEnded';
 import { runAsyncJobs } from './startAsyncJobs';
 
 describe('Test if predefined async jobs are running correctly', () => {
@@ -108,16 +108,16 @@ describe('Test if predefined async jobs are running correctly', () => {
     expect(mockedFunction).toHaveBeenCalledTimes(1);
   });
 
-  it('Should run callSEPReviewEnded job once in 24 hours', (done) => {
+  it('Should run callFAPReviewEnded job once in 24 hours', (done) => {
     const functionWithMockedDataSource = async () => {
-      const callsWithEndedSEPReview =
-        await checkCallsSEPReviewEndedJob.functionToRun(callDataSourceMock);
+      const callsWithEndedFAPReview =
+        await checkCallsFAPReviewEndedJob.functionToRun(callDataSourceMock);
 
-      expect(callsWithEndedSEPReview.length).toBeGreaterThan(0);
+      expect(callsWithEndedFAPReview.length).toBeGreaterThan(0);
 
-      for (const callWithEndedSEPReview of callsWithEndedSEPReview) {
-        expect(callWithEndedSEPReview).toHaveProperty(
-          'callSEPReviewEnded',
+      for (const callWithEndedFAPReview of callsWithEndedFAPReview) {
+        expect(callWithEndedFAPReview).toHaveProperty(
+          'callFAPReviewEnded',
           true
         );
       }
@@ -126,14 +126,14 @@ describe('Test if predefined async jobs are running correctly', () => {
     };
 
     const mockedFunction = jest.spyOn(
-      checkCallsSEPReviewEndedJob,
+      checkCallsFAPReviewEndedJob,
       'functionToRun'
     );
 
     const allJobs = [
       {
         functionToRun: functionWithMockedDataSource,
-        options: checkCallsSEPReviewEndedJob.options,
+        options: checkCallsFAPReviewEndedJob.options,
       },
     ];
 

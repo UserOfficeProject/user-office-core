@@ -1,0 +1,44 @@
+query getFapProposals($fapId: Int!, $callId: Int) {
+  fapProposals(fapId: $fapId, callId: $callId) {
+    proposalPk
+    dateAssigned
+    fapId
+    fapTimeAllocation
+    proposal {
+      title
+      primaryKey
+      proposalId
+      proposer {
+        id
+        organizationId
+      }
+      status {
+        ...proposalStatus
+      }
+      users {
+        id
+        organizationId
+      }
+    }
+    assignments {
+      proposalPk
+      fapMemberUserId
+      dateAssigned
+      user {
+        ...basicUserDetails
+      }
+      role {
+        id
+        shortCode
+        title
+      }
+      review {
+        id
+        status
+        comment
+        grade
+        fapID
+      }
+    }
+  }
+}

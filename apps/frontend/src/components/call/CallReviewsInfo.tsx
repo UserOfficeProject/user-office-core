@@ -17,12 +17,12 @@ import {
   UpdateCallMutationVariables,
   UserRole,
 } from 'generated/sdk';
-import { useSEPsData } from 'hooks/SEP/useSEPsData';
+import { useFapsData } from 'hooks/fap/useFapsData';
 
 const CallReviewAndNotification = () => {
   const theme = useTheme();
   const { currentRole } = useContext(UserContext);
-  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
+  const { Faps: allActiveFaps, loadingFaps } = useFapsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
@@ -33,13 +33,13 @@ const CallReviewAndNotification = () => {
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
-  const { startReview, startSEPReview } = formik.values;
+  const { startReview, startFapReview } = formik.values;
   const { t } = useTranslation();
 
-  const sepOptions =
-    allActiveSeps?.map((sep) => ({
-      text: sep.code,
-      value: sep.id,
+  const fapOptions =
+    allActiveFaps?.map((fap) => ({
+      text: fap.code,
+      value: fap.id,
     })) || [];
 
   return (
@@ -82,9 +82,9 @@ const CallReviewAndNotification = () => {
           required
         />
         <Field
-          name="startSEPReview"
-          label={'Start of ' + t('SEP') + ' review'}
-          id="start-sep-review-input"
+          name="startFapReview"
+          label={'Start of ' + t('Fap') + ' review'}
+          id="start-fap-review-input"
           inputFormat={dateFormat}
           mask={mask}
           ampm={false}
@@ -97,14 +97,14 @@ const CallReviewAndNotification = () => {
           desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
         <Field
-          name="endSEPReview"
-          label={'End of ' + t('SEP') + ' review'}
-          id="end-sep-review-input"
+          name="endFapReview"
+          label={'End of ' + t('Fap') + ' review'}
+          id="end-fap-review-input"
           inputFormat={dateFormat}
           mask={mask}
           ampm={false}
           allowSameDateSelection
-          minDate={startSEPReview}
+          minDate={startFapReview}
           component={DatePicker}
           inputProps={{ placeholder: dateFormat }}
           textField={{
@@ -114,13 +114,13 @@ const CallReviewAndNotification = () => {
         />
       </LocalizationProvider>
       <FormikUIAutocomplete
-        name="seps"
-        label={'Call ' + i18n.format(t('SEP'), 'plural')}
+        name="faps"
+        label={'Call ' + i18n.format(t('Fap'), 'plural')}
         multiple
-        loading={loadingSEPs}
-        noOptionsText="No SEPs"
-        data-cy="call-seps"
-        items={sepOptions}
+        loading={loadingFaps}
+        noOptionsText="No Faps"
+        data-cy="call-faps"
+        items={fapOptions}
       />
       <Field
         name="surveyComment"

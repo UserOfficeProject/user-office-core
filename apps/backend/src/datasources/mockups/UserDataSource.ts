@@ -108,14 +108,14 @@ export const dummyUserWithRole: UserWithRole = {
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
 };
 
-export const dummySEPChairWithRole: UserWithRole = {
+export const dummyFapChairWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 4, title: 'SEP Chair', shortCode: 'sep_chair' },
+  currentRole: { id: 4, title: 'Fap Chair', shortCode: 'fap_chair' },
 };
 
-export const dummySEPSecretaryWithRole: UserWithRole = {
+export const dummyFapSecretaryWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 5, title: 'SEP Secretary', shortCode: 'sep_secretary' },
+  currentRole: { id: 5, title: 'Fap Secretary', shortCode: 'fap_secretary' },
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -319,9 +319,9 @@ export class UserDataSourceMock implements UserDataSource {
         },
       ];
     } else if (id === 1001) {
-      return [{ id: 2, shortCode: 'sep_reviewer', title: 'User' }];
-    } else if (id === dummySEPChairWithRole.id) {
-      return [{ id: 4, shortCode: 'sep_chair', title: 'SEP Chair' }];
+      return [{ id: 2, shortCode: 'FAP_REVIEWER', title: 'User' }];
+    } else if (id === dummyFapChairWithRole.id) {
+      return [{ id: 4, shortCode: 'fap_chair', title: 'Fap Chair' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }

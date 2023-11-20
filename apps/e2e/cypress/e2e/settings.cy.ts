@@ -154,7 +154,7 @@ context('Settings tests', () => {
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+        proposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 2,
         prevProposalStatusId:
@@ -169,29 +169,29 @@ context('Settings tests', () => {
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: initialDBData.proposalStatuses.sepReview.id,
+        proposalStatusId: initialDBData.proposalStatuses.fapReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 3,
-        prevProposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+        prevProposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_SEP_SELECTED'],
+            statusChangingEvents: ['PROPOSAL_Fap_SELECTED'],
           });
         }
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: initialDBData.proposalStatuses.sepMeeting.id,
+        proposalStatusId: initialDBData.proposalStatuses.fapMeeting.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 4,
-        prevProposalStatusId: initialDBData.proposalStatuses.sepReview.id,
+        prevProposalStatusId: initialDBData.proposalStatuses.fapReview.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED'],
+            statusChangingEvents: ['PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED'],
           });
         }
       });
@@ -216,7 +216,7 @@ context('Settings tests', () => {
         });
         cy.addProposalWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_1',
-          proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+          proposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 0,
           prevProposalStatusId:
@@ -275,7 +275,7 @@ context('Settings tests', () => {
                 ...updatedCall,
                 proposalWorkflowId: workflow.id,
                 esiTemplateId: createdEsiTemplateId,
-                seps: [initialDBData.sep.id],
+                faps: [initialDBData.fap.id],
               });
             }
           });
@@ -756,10 +756,10 @@ context('Settings tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.contains('SEP_SELECTION');
+      cy.contains('Fap_SELECTION');
     });
 
-    it('Proposal status should update immediately after assigning it to a SEP', () => {
+    it('Proposal status should update immediately after assigning it to a Fap', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
@@ -788,27 +788,27 @@ context('Settings tests', () => {
 
       cy.get('[type="checkbox"]').first().check();
 
-      cy.get("[aria-label='Assign proposals to SEP']").first().click();
+      cy.get("[aria-label='Assign proposals to Fap']").first().click();
 
-      cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
+      cy.get('#selectedFapId-input').should('not.have.class', 'Mui-disabled');
 
-      cy.get('#selectedSEPId-input').first().click();
+      cy.get('#selectedFapId-input').first().click();
 
-      cy.get('[data-cy="sep-selection-options"] li').first().click();
+      cy.get('[data-cy="fap-selection-options"] li').first().click();
 
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s assigned to the selected SEP successfully',
+        text: 'Proposal/s assigned to the selected Fap successfully',
       });
 
-      cy.should('not.contain', 'SEP_SELECTION');
-      cy.contains('SEP_REVIEW');
+      cy.should('not.contain', 'Fap_SELECTION');
+      cy.contains('FAP_REVIEW');
     });
 
-    it('Proposal status should update immediately after all SEP reviews submitted', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+    it('Proposal status should update immediately after all Fap reviews submitted', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
@@ -831,12 +831,12 @@ context('Settings tests', () => {
             reviewerId: 0,
           });
 
-          cy.assignProposalsToSep({
+          cy.assignProposalsToFap({
             proposals: {
               callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            sepId: initialDBData.sep.id,
+            fapId: initialDBData.fap.id,
           });
         }
       });
@@ -845,13 +845,13 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('SEPs').click();
+      cy.contains('Faps').click();
 
       cy.get("[aria-label='Edit']").first().click();
 
       cy.contains('Members').click();
 
-      cy.get('[aria-label="Set SEP Chair"]').click();
+      cy.get('[aria-label="Set Fap Chair"]').click();
 
       cy.finishedLoading();
 
@@ -859,14 +859,14 @@ context('Settings tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'SEP chair assigned successfully!',
+        text: 'Fap chair assigned successfully!',
       });
 
       cy.contains('Proposals and Assignments').click();
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="assign-sep-member"]').first().click();
+      cy.get('[data-cy="assign-fap-member"]').first().click();
 
       cy.finishedLoading();
 
@@ -906,7 +906,7 @@ context('Settings tests', () => {
       cy.closeModal();
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.contains('SEP Meeting');
+      cy.contains('Fap Meeting');
     });
 
     it('User Officer should be able to filter proposals based on statuses', () => {
@@ -931,12 +931,12 @@ context('Settings tests', () => {
             reviewerId: 0,
           });
 
-          cy.assignProposalsToSep({
+          cy.assignProposalsToFap({
             proposals: {
               callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            sepId: initialDBData.sep.id,
+            fapId: initialDBData.fap.id,
           });
         }
       });
@@ -951,7 +951,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="5"]').click();
@@ -960,7 +960,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
@@ -1032,7 +1032,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="droppable-group"]').should('have.length', 3);
 
-      cy.get('[data-cy^="status_SEP_SELECTION"]').dragElement([
+      cy.get('[data-cy^="status_Fap_SELECTION"]').dragElement([
         { direction: 'left', length: 2 },
       ]);
 
@@ -1169,7 +1169,7 @@ context('Settings tests', () => {
 
       cy.closeModal();
 
-      cy.contains(firstProposalTitle).parent().contains('SEP_SELECTION');
+      cy.contains(firstProposalTitle).parent().contains('Fap_SELECTION');
       cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
     });
   });

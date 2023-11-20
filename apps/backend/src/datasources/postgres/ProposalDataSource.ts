@@ -43,7 +43,7 @@ import {
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
   technicalStatus: 'technical_review_status',
-  sepCode: 'sep_code',
+  fapCode: 'fap_code',
   rankOrder: 'rank_order',
   reviewAverage: 'average',
   reviewDeviation: 'deviation',

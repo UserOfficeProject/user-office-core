@@ -46,8 +46,8 @@ context('Proposal tests', () => {
     endCall: faker.date.future().toISOString(),
     startReview: currentDayStart,
     endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
+    startFapReview: currentDayStart,
+    endFapReview: currentDayStart,
     startNotify: currentDayStart,
     endNotify: currentDayStart,
     startCycle: currentDayStart,
@@ -93,7 +93,7 @@ context('Proposal tests', () => {
 
   describe('Proposal basic tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -245,7 +245,7 @@ context('Proposal tests', () => {
     });
 
     it('User officer should be able to save proposal column selection', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
       cy.login('officer');
@@ -255,7 +255,7 @@ context('Proposal tests', () => {
 
       cy.get("[aria-label='Show Columns']").first().click();
       cy.get('.MuiPopover-paper').contains('Call').click();
-      cy.get('.MuiPopover-paper').contains('SEP').click();
+      cy.get('.MuiPopover-paper').contains('Fap').click();
 
       cy.get('body').click();
 
@@ -266,7 +266,7 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
 
       cy.contains('Call');
-      cy.contains('SEP');
+      cy.contains('Fap');
     });
 
     it('User officer should be able to select all prefetched proposals in the table', function () {
@@ -484,7 +484,7 @@ context('Proposal tests', () => {
 
       cy.get('@dialog').find('#selectedStatusId-input').click();
 
-      cy.get('[role="listbox"]').contains('SEP Meeting').click();
+      cy.get('[role="listbox"]').contains('Fap Meeting').click();
 
       cy.get('[data-cy="submit-proposal-status-change"]').click();
 
@@ -495,10 +495,10 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .should('contain.text', 'SEP Meeting');
+        .should('contain.text', 'Fap Meeting');
       cy.contains(clonedProposalTitle)
         .parent()
-        .should('contain.text', 'SEP Meeting');
+        .should('contain.text', 'Fap Meeting');
     });
 
     it('User officer should be able to see proposal status when opening change status modal', () => {
@@ -507,7 +507,7 @@ context('Proposal tests', () => {
         proposalsToClonePk: [createdProposalPk],
       });
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.sepMeeting.id,
+        statusId: initialDBData.proposalStatuses.fapMeeting.id,
         proposals: [
           { primaryKey: createdProposalPk, callId: initialDBData.call.id },
         ],
@@ -537,21 +537,21 @@ context('Proposal tests', () => {
         .find('[type="checkbox"]')
         .uncheck();
 
-      cy.contains('SEP Meeting').parent().find('[type="checkbox"]').check();
+      cy.contains('Fap Meeting').parent().find('[type="checkbox"]').check();
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.finishedLoading();
 
       cy.get('[data-cy="status-selection"] input').should(
         'have.value',
-        `${initialDBData.proposalStatuses.sepMeeting.name}`
+        `${initialDBData.proposalStatuses.fapMeeting.name}`
       );
 
       // Close the modal
       cy.get('body').trigger('keydown', { keyCode: 27 });
 
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.sepReview.id,
+        statusId: initialDBData.proposalStatuses.fapReview.id,
         proposals: [
           { primaryKey: createdProposalPk, callId: initialDBData.call.id },
         ],
@@ -740,7 +740,7 @@ context('Proposal tests', () => {
 
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -801,7 +801,7 @@ context('Proposal tests', () => {
 
   describe('Proposal internal and external basic tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -1204,7 +1204,7 @@ context('Proposal tests', () => {
       managerUserId: initialDBData.users.user1.id,
     };
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -1226,7 +1226,7 @@ context('Proposal tests', () => {
       cy.createInstrument(instrument).then((result) => {
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentSepIds: [{ instrumentId: result.createInstrument.id }],
+          instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
         });
       });
       cy.createTopic({
