@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { createSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
+import { createFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
@@ -47,7 +47,7 @@ const AddFap = ({ close }: AddFapProps) => {
           close(null);
         }
       }}
-      validationSchema={createSEPValidationSchema}
+      validationSchema={createFapValidationSchema}
     >
       {(): JSX.Element => (
         <Form>

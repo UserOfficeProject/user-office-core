@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import {
+  Event,
   FeatureId,
   TechnicalReviewStatus,
   TemplateGroupId,
@@ -148,7 +149,7 @@ context('Settings tests', () => {
         if (connection) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: connection.id,
-            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
       });
@@ -163,7 +164,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_FEASIBLE'],
+            statusChangingEvents: [Event.PROPOSAL_FEASIBLE],
           });
         }
       });
@@ -177,7 +178,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_Fap_SELECTED'],
+            statusChangingEvents: [Event.PROPOSAL_FAP_SELECTED],
           });
         }
       });
@@ -191,7 +192,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED'],
+            statusChangingEvents: [Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED],
           });
         }
       });
@@ -210,7 +211,7 @@ context('Settings tests', () => {
           if (connection) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: connection.id,
-              statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+              statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
             });
           }
         });
@@ -226,7 +227,7 @@ context('Settings tests', () => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-              statusChangingEvents: ['PROPOSAL_FEASIBLE'],
+              statusChangingEvents: [Event.PROPOSAL_FEASIBLE],
             });
           }
         });
@@ -242,7 +243,7 @@ context('Settings tests', () => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-              statusChangingEvents: ['PROPOSAL_UNFEASIBLE'],
+              statusChangingEvents: [Event.PROPOSAL_UNFEASIBLE],
             });
           }
         });
@@ -756,7 +757,7 @@ context('Settings tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.contains('Fap_SELECTION');
+      cy.contains('FAP_SELECTION');
     });
 
     it('Proposal status should update immediately after assigning it to a Fap', () => {
@@ -803,7 +804,7 @@ context('Settings tests', () => {
         text: 'Proposal/s assigned to the selected Fap successfully',
       });
 
-      cy.should('not.contain', 'Fap_SELECTION');
+      cy.should('not.contain', 'FAP_SELECTION');
       cy.contains('FAP_REVIEW');
     });
 
@@ -845,7 +846,7 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.get("[aria-label='Edit']").first().click();
 
@@ -906,7 +907,7 @@ context('Settings tests', () => {
       cy.closeModal();
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.contains('Fap Meeting');
+      cy.contains('FAP Meeting');
     });
 
     it('User Officer should be able to filter proposals based on statuses', () => {
@@ -1032,7 +1033,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="droppable-group"]').should('have.length', 3);
 
-      cy.get('[data-cy^="status_Fap_SELECTION"]').dragElement([
+      cy.get('[data-cy^="status_FAP_SELECTION"]').dragElement([
         { direction: 'left', length: 2 },
       ]);
 
@@ -1169,7 +1170,7 @@ context('Settings tests', () => {
 
       cy.closeModal();
 
-      cy.contains(firstProposalTitle).parent().contains('Fap_SELECTION');
+      cy.contains(firstProposalTitle).parent().contains('FAP_SELECTION');
       cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
     });
   });

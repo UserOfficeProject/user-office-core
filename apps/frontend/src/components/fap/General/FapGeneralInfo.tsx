@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { updateSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
+import { updateFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -66,7 +66,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
       onSubmit={async (values): Promise<void> => {
         await sendFapUpdate(values);
       }}
-      validationSchema={updateSEPValidationSchema}
+      validationSchema={updateFapValidationSchema}
     >
       {({
         values,

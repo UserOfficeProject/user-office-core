@@ -151,7 +151,7 @@ context('User administration tests', () => {
 
     cy.get('[data-cy="user-roles-table"] table tbody tr')
       .first()
-      .contains('Fap Reviewer');
+      .contains('FAP Reviewer');
   });
 
   it('Should be able to delete user information', () => {

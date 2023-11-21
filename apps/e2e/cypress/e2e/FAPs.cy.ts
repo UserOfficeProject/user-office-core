@@ -8,6 +8,7 @@ import {
   TemplateGroupId,
   FeatureId,
   UserJwt,
+  Event,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -352,7 +353,7 @@ context('Fap reviews tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Fap_MEMBER_ASSIGNED_TO_PROPOSAL');
+      cy.contains(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL);
     });
 
     it('Officer should be able to read/write reviews', () => {
@@ -877,7 +878,7 @@ context('Fap reviews tests', () => {
     });
 
     it('Fap Reviewer should be able to see Faps he is part of', () => {
-      cy.get('[data-cy="FapRoles-menu-items"]').contains('Faps').click();
+      cy.get('[data-cy="FapRoles-menu-items"]').contains('FAPs').click();
 
       cy.finishedLoading();
 
@@ -1686,7 +1687,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Fap_MEMBER_REMOVED_FROM_PROPOSAL');
+      cy.contains(Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL);
     });
 
     it('Officer should be able to remove assigned proposal from existing Fap', () => {

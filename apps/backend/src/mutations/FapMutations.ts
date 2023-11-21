@@ -1,12 +1,12 @@
 import {
-  updateSEPValidationSchema,
-  assignSEPMembersValidationSchema,
-  removeSEPMemberValidationSchema,
-  assignSEPChairOrSecretaryValidationSchema,
-  assignSEPMemberToProposalValidationSchema,
+  updateFapValidationSchema,
+  assignFapMembersValidationSchema,
+  removeFapMemberValidationSchema,
+  assignFapChairOrSecretaryValidationSchema,
+  assignFapMemberToProposalValidationSchema,
   updateTimeAllocationValidationSchema,
-  saveSepMeetingDecisionValidationSchema,
-  createSEPValidationSchema,
+  saveFapMeetingDecisionValidationSchema,
+  createFapValidationSchema,
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
@@ -60,7 +60,7 @@ export default class FapMutations {
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  @ValidateArgs(createSEPValidationSchema)
+  @ValidateArgs(createFapValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.FAP_CREATED)
   async create(
@@ -85,7 +85,7 @@ export default class FapMutations {
       });
   }
 
-  @ValidateArgs(updateSEPValidationSchema)
+  @ValidateArgs(updateFapValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.FAP_UPDATED)
   async update(
@@ -111,7 +111,7 @@ export default class FapMutations {
       });
   }
 
-  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema(UserRole))
+  @ValidateArgs(assignFapChairOrSecretaryValidationSchema(UserRole))
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.FAP_MEMBERS_ASSIGNED)
   async assignChairOrSecretaryToFap(
@@ -144,7 +144,7 @@ export default class FapMutations {
       });
   }
 
-  @ValidateArgs(assignSEPMembersValidationSchema)
+  @ValidateArgs(assignFapMembersValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBERS_ASSIGNED)
   async assignReviewersToFap(
@@ -170,7 +170,7 @@ export default class FapMutations {
     });
   }
 
-  @ValidateArgs(removeSEPMemberValidationSchema)
+  @ValidateArgs(removeFapMemberValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_REMOVED)
   async removeMemberFromFap(
@@ -380,7 +380,7 @@ export default class FapMutations {
       });
   }
 
-  @ValidateArgs(assignSEPMemberToProposalValidationSchema)
+  @ValidateArgs(assignFapMemberToProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL)
   async removeMemberFromFapProposal(
@@ -446,7 +446,7 @@ export default class FapMutations {
       });
   }
 
-  @ValidateArgs(saveSepMeetingDecisionValidationSchema, [
+  @ValidateArgs(saveFapMeetingDecisionValidationSchema, [
     'commentForUser',
     'commentForManagement',
   ])
