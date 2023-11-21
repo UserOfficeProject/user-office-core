@@ -245,22 +245,24 @@ context('Proposal tests', () => {
     });
 
     it('User should be able to have a preferred name', () => {
-      cy.updateUserDetails({
-        id: 4,
-        firstname: 'Benjamin',
-        user_title: 'Mr.',
-        lastname: 'Beckley',
-        gender: 'male',
-        preferredname: 'Ben',
-        nationality: 1,
-        birthdate: new Date('2000/04/02'),
-        organisation: 1,
-        department: 'IT department',
-        position: 'Management',
-        email: faker.internet.email(),
-        telephone: '(288) 221-4533',
-        organizationCountry: 1,
-      });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        cy.updateUserDetails({
+          id: 4,
+          user_title: 'Mr.',
+          firstname: 'Benjamin',
+          lastname: 'Beckley',
+          preferredname: 'Ben',
+          gender: 'male',
+          nationality: 1,
+          birthdate: new Date('2000/04/02'),
+          organisation: 1,
+          department: 'IT deparment',
+          position: 'Management',
+          email: 'ben@inbox.com',
+          telephone: '(288) 221-4533',
+          organizationCountry: 1,
+        });
+      }
       cy.login('user2');
       cy.visit('/');
       cy.contains('New Proposal').click();
@@ -295,22 +297,25 @@ context('Proposal tests', () => {
     });
 
     it('User should be able to not have a preferred name', () => {
-      cy.updateUserDetails({
-        id: 1,
-        firstname: 'Carl',
-        user_title: 'Mr.',
-        lastname: 'Carlsson',
-        gender: 'male',
-        preferredname: '',
-        nationality: 1,
-        birthdate: new Date('2000/04/02'),
-        organisation: 1,
-        department: 'IT department',
-        position: 'Strategist',
-        email: faker.internet.email(),
-        telephone: '(288) 431-1443',
-        organizationCountry: 1,
-      });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+        cy.updateUserDetails({
+          id: 1,
+          user_title: 'Mr.',
+          firstname: 'Carl',
+          lastname: 'Carlsson',
+          preferredname: '',
+          gender: 'male',
+          nationality: 1,
+          birthdate: new Date('2000/04/02'),
+          organisation: 1,
+          department: 'IT deparment',
+          position: 'Strategist',
+          email: 'Javon4@hotmail.com',
+          telephone: '(288) 431-1443',
+          organizationCountry: 1,
+        });
+      }
+
       cy.login('user1');
       cy.visit('/');
 
@@ -319,7 +324,7 @@ context('Proposal tests', () => {
 
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
-        'Carl'
+        'Carl '
       );
     });
 

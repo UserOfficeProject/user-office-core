@@ -60,7 +60,7 @@ export function toEssBasicUserDetails(
     Number(stfcUser.userNumber),
     stfcUser.givenName ?? '',
     stfcUser.familyName ?? '',
-    stfcUser.firstNameKnownAs ?? stfcUser.givenName,
+    stfcUser.firstNameKnownAs ?? '',
     stfcUser.orgName ?? '',
     stfcUser.orgId ?? 1,
     '',
