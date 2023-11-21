@@ -254,8 +254,16 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
 
       cy.get("[aria-label='Show Columns']").first().click();
-      cy.get('.MuiPopover-paper').contains('Call').click();
-      cy.get('.MuiPopover-paper').contains('Fap').click();
+      cy.get('.MuiPopover-paper')
+        .contains('Call')
+        .parent()
+        .find('input')
+        .uncheck();
+      cy.get('.MuiPopover-paper')
+        .contains('Fap')
+        .parent()
+        .find('input')
+        .uncheck();
 
       cy.get('body').click();
 
@@ -265,8 +273,37 @@ context('Proposal tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.contains('Call');
-      cy.contains('Fap');
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'not.contain',
+        'Call'
+      );
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'not.contain',
+        'Fap'
+      );
+
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper')
+        .contains('Call')
+        .parent()
+        .find('input')
+        .check();
+      cy.get('.MuiPopover-paper')
+        .contains('Fap')
+        .parent()
+        .find('input')
+        .check();
+
+      cy.reload();
+
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'contain',
+        'Call'
+      );
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'contain',
+        'Fap'
+      );
     });
 
     it('User officer should be able to select all prefetched proposals in the table', function () {

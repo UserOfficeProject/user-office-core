@@ -52,7 +52,7 @@ context('General scientific evaluation panel tests', () => {
 
     cy.get('[data-cy="user-menu-items"]').as('userMenuItems');
 
-    cy.get('@userMenuItems').should('not.contain', 'Faps');
+    cy.get('@userMenuItems').should('not.contain', 'FAPs');
   });
 
   describe('Fap basic tests as user officer role', () => {
@@ -98,7 +98,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('Officer should be able to delete Fap', () => {
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
       cy.get('[aria-label="Delete"]').last().click();
 
       cy.get('[aria-label="Save"]').click();
@@ -109,7 +109,7 @@ context('General scientific evaluation panel tests', () => {
     it('Officer should be able to create Fap', () => {
       const { code, description } = fap1;
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
       cy.contains('Create').click();
       cy.get('#code').type(code);
       cy.get('#description').type(description);
@@ -139,7 +139,7 @@ context('General scientific evaluation panel tests', () => {
       const newCode = faker.random.words(3);
       const newDescription = faker.random.words(8);
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -150,7 +150,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.notification({ variant: 'success', text: 'Fap updated successfully' });
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.get('[data-cy="Faps-table"]').as('FapsTable');
 
@@ -159,7 +159,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('Should be able to download Fap as Excel file', () => {
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       const token = window.localStorage.getItem('token');
 
@@ -211,7 +211,7 @@ context('General scientific evaluation panel tests', () => {
       let selectedSecretaryUserFirstName = '';
       let selectedSecretaryUserLastName = '';
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -323,7 +323,7 @@ context('General scientific evaluation panel tests', () => {
           roleId: UserRole.FAP_SECRETARY,
         },
       });
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -353,7 +353,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('Officer should be able to assign Fap Reviewers to existing Fap', () => {
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -388,7 +388,7 @@ context('General scientific evaluation panel tests', () => {
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer.id],
       });
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -463,7 +463,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.contains(fap1.code)
         .closest('tr')
@@ -486,7 +486,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.visit('/');
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.contains(fap1.code)
         .closest('tr')
@@ -541,7 +541,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.contains(fap1.code);
       cy.contains(fap2.code).should('not.exist');
@@ -583,7 +583,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.contains(fap1.code)
         .closest('tr')
@@ -606,7 +606,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.visit('/');
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.contains(fap1.code)
         .closest('tr')
@@ -653,7 +653,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Faps').click();
+      cy.contains('FAPs').click();
 
       cy.contains(fap1.code);
       cy.contains(fap2.code).should('not.exist');
