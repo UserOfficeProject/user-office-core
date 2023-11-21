@@ -108,7 +108,7 @@ describe('Test if predefined async jobs are running correctly', () => {
     expect(mockedFunction).toHaveBeenCalledTimes(1);
   });
 
-  it('Should run callFAPReviewEnded job once in 24 hours', (done) => {
+  it('Should run callFapReviewEnded job once in 24 hours', (done) => {
     const functionWithMockedDataSource = async () => {
       const callsWithEndedFAPReview =
         await checkCallsFAPReviewEndedJob.functionToRun(callDataSourceMock);
@@ -117,7 +117,7 @@ describe('Test if predefined async jobs are running correctly', () => {
 
       for (const callWithEndedFAPReview of callsWithEndedFAPReview) {
         expect(callWithEndedFAPReview).toHaveProperty(
-          'callFAPReviewEnded',
+          'callFapReviewEnded',
           true
         );
       }

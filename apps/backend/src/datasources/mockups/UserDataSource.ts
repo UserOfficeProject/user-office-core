@@ -319,7 +319,7 @@ export class UserDataSourceMock implements UserDataSource {
         },
       ];
     } else if (id === 1001) {
-      return [{ id: 2, shortCode: 'FAP_REVIEWER', title: 'User' }];
+      return [{ id: 2, shortCode: 'fap_reviewer', title: 'Fap Reviewer' }];
     } else if (id === dummyFapChairWithRole.id) {
       return [{ id: 4, shortCode: 'fap_chair', title: 'Fap Chair' }];
     } else {
