@@ -380,6 +380,35 @@ context('Proposal administration tests', () => {
       );
     });
 
+    it('Downloaded proposal filename format is RB_SURNAME_YYYY', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        //temporarily skipping, until issue is fixed on github actions
+        this.skip();
+      }
+      cy.contains('Proposals').click();
+
+      cy.contains(proposalName1)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="download-proposals"]').click();
+
+      cy.contains('Proposal(s)').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        proposalName1
+      );
+
+      const currentYear = new Date().getFullYear();
+      const downloadedFileName = `${createdProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
+      const downloadsFolder = Cypress.config('downloadsFolder');
+      const downloadFilePath = `${downloadsFolder}/${downloadedFileName}`;
+
+      cy.readFile(downloadFilePath).should('exist');
+    });
+
     it('Should be able to verify pdf download and compare with a fixture', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until issue is fixed on github actions

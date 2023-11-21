@@ -235,9 +235,9 @@ export const collectProposalPDFData = async (
   });
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   const genericTemplateAttachments: Attachment[] = [];
@@ -262,9 +262,9 @@ export const collectProposalPDFData = async (
   );
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   const out: ProposalPDFData = {
@@ -461,9 +461,9 @@ export const collectProposalPDFDataTokenAccess = async (
   });
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   const genericTemplateAttachments: Attachment[] = [];
@@ -499,9 +499,9 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   // Add information from each topic in proposal
