@@ -253,7 +253,7 @@ export default {
     },
     fapMeeting: {
       id: 12,
-      name: 'Fap Meeting',
+      name: 'FAP Meeting',
     },
     editableSubmitted: {
       id: 14,

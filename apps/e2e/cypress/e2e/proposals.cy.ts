@@ -484,7 +484,9 @@ context('Proposal tests', () => {
 
       cy.get('@dialog').find('#selectedStatusId-input').click();
 
-      cy.get('[role="listbox"]').contains('Fap Meeting').click();
+      cy.get('[role="listbox"]')
+        .contains(initialDBData.proposalStatuses.fapMeeting.name)
+        .click();
 
       cy.get('[data-cy="submit-proposal-status-change"]').click();
 
@@ -495,10 +497,10 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .should('contain.text', 'Fap Meeting');
+        .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
       cy.contains(clonedProposalTitle)
         .parent()
-        .should('contain.text', 'Fap Meeting');
+        .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
     });
 
     it('User officer should be able to see proposal status when opening change status modal', () => {
@@ -537,7 +539,10 @@ context('Proposal tests', () => {
         .find('[type="checkbox"]')
         .uncheck();
 
-      cy.contains('Fap Meeting').parent().find('[type="checkbox"]').check();
+      cy.contains(initialDBData.proposalStatuses.fapMeeting.name)
+        .parent()
+        .find('[type="checkbox"]')
+        .check();
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.finishedLoading();

@@ -122,7 +122,7 @@ context('Personal information tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="role-modal"]')
-        .contains('Fap Chair')
+        .contains('FAP Chair')
         .parent()
         .find('input[type="checkbox"]')
         .click();

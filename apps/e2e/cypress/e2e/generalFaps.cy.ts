@@ -1,5 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { UserRole, FeatureId } from '@user-office-software-libs/shared-types';
+import {
+  UserRole,
+  FeatureId,
+  Event,
+} from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -159,8 +163,9 @@ context('General scientific evaluation panel tests', () => {
 
       const token = window.localStorage.getItem('token');
 
+      // TODO: The url should be updated on the factory side.
       cy.request({
-        url: '/download/xlsx/fap/1/call/1',
+        url: '/download/xlsx/sep/1/call/1',
         method: 'GET',
         headers: {
           authorization: `Bearer ${token}`,
@@ -284,7 +289,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('Logs').click();
 
-      cy.contains('Fap_MEMBERS_ASSIGNED');
+      cy.contains(Event.FAP_MEMBERS_ASSIGNED);
 
       cy.contains('Members').click();
 
@@ -375,7 +380,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('Logs').click();
 
-      cy.contains('Fap_MEMBERS_ASSIGNED');
+      cy.contains(Event.FAP_MEMBERS_ASSIGNED);
     });
 
     it('Officer should be able to remove Fap Reviewers from existing Fap', () => {
@@ -404,7 +409,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Fap_MEMBER_REMOVED');
+      cy.contains(Event.FAP_MEMBER_REMOVED);
 
       cy.contains('Members').click();
 

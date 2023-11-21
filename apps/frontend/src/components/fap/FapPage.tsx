@@ -94,7 +94,7 @@ const FapPage = () => {
   if (isUserOfficer) {
     tabs.push({
       name: 'Logs',
-      element: <EventLogList changedObjectId={fap.id} eventType="Fap" />,
+      element: <EventLogList changedObjectId={fap.id} eventType="FAP" />,
     });
   }
 

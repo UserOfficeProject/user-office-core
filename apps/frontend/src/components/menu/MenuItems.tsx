@@ -291,7 +291,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
             <ListItemIcon>
               <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary={i18n.format(t('Fap'), 'plural')} />
+            <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
           </ListItem>
         </Tooltip>
       )}
@@ -340,7 +340,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           <GroupWorkIcon />
         </ListItemIcon>
         <Tooltip title={`${i18n.format(t('Facility access panel'), 'plural')}`}>
-          <ListItemText primary={i18n.format(t('Fap'), 'plural')} />
+          <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
         </Tooltip>
       </ListItem>
     </div>
