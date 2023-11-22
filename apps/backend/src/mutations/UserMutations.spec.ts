@@ -12,7 +12,7 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { isRejection } from '../models/Rejection';
-import { AuthJwtPayload, BasicUserDetails, UserRole } from '../models/User';
+import { AuthJwtPayload, UserRole } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import UserMutations from './UserMutations';
 
@@ -215,45 +215,6 @@ test('A user gets an error if providing a email not attached to a account', () =
   return expect(
     userMutations.resetPasswordEmail(null, { email: 'dummyemail@ess.se' })
   ).resolves.toHaveProperty('reason', 'Could not find user by email');
-});
-
-test('A user can update its password', () => {
-  return expect(
-    userMutations.updatePassword(dummyUserWithRole, {
-      id: dummyUser.id,
-      password: 'Test1234!',
-    })
-  ).resolves.toBeInstanceOf(BasicUserDetails);
-});
-
-test('A user can not update another users password', () => {
-  return expect(
-    userMutations.updatePassword(dummyUserNotOnProposalWithRole, {
-      id: dummyUser.id,
-      password: 'Test1234!',
-    })
-  ).resolves.toHaveProperty(
-    'reason',
-    'Can not update password because of insufficient permissions'
-  );
-});
-
-test('A not logged in users can not update passwords', () => {
-  return expect(
-    userMutations.updatePassword(null, {
-      id: dummyUser.id,
-      password: 'Test1234!',
-    })
-  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
-});
-
-test('A user officer can update any password', () => {
-  return expect(
-    userMutations.updatePassword(dummyUserOfficerWithRole, {
-      id: dummyUser.id,
-      password: 'Test1234!',
-    })
-  ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test('A user must not be able to obtain token for another user', async () => {

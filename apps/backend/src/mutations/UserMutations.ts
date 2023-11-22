@@ -4,10 +4,8 @@ import {
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   resetPasswordByEmailValidationSchema,
-  updatePasswordValidationSchema,
   updateUserRolesValidationSchema,
   updateUserValidationSchema,
-  userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
@@ -23,7 +21,6 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import {
   AuthJwtPayload,
-  BasicUserDetails,
   EmailVerificationJwtPayload,
   PasswordResetJwtPayload,
   User,
@@ -509,48 +506,6 @@ export default class UserMutations {
       .catch((err) =>
         rejection('Could not add user role', { agent, args }, err)
       );
-  }
-
-  @ValidateArgs(updatePasswordValidationSchema)
-  @Authorized()
-  async updatePassword(
-    agent: UserWithRole | null,
-    { id, password }: { id: number; password: string }
-  ): Promise<BasicUserDetails | Rejection> {
-    const isUpdatingOwnUser = agent?.id === id;
-    if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
-      return rejection(
-        'Can not update password because of insufficient permissions',
-        {
-          id,
-          agent,
-          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
-        }
-      );
-    }
-
-    try {
-      const hash = this.createHash(password);
-      const user = await this.dataSource.getUser(id);
-      if (user) {
-        return this.dataSource.setUserPassword(user.id, hash);
-      } else {
-        return rejection('Could not update password. Used does not exist', {
-          agent,
-          id,
-          code: ApolloServerErrorCodeExtended.NOT_FOUND,
-        });
-      }
-    } catch (error) {
-      return rejection(
-        'Could not update password',
-        {
-          agent,
-          id,
-        },
-        error
-      );
-    }
   }
 
   @Authorized([Roles.USER_OFFICER])
