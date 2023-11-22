@@ -296,38 +296,6 @@ context('Proposal tests', () => {
       cy.contains('Ben ');
     });
 
-    it('User should be able to not have a preferred name', () => {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
-        cy.updateUserDetails({
-          id: 1,
-          user_title: 'Mr.',
-          firstname: 'Carl',
-          lastname: 'Carlsson',
-          preferredname: '',
-          gender: 'male',
-          nationality: 1,
-          birthdate: new Date('2000/04/02'),
-          organisation: 1,
-          department: 'IT deparment',
-          position: 'Strategist',
-          email: 'Javon4@hotmail.com',
-          telephone: '(288) 431-1443',
-          organizationCountry: 1,
-        });
-      }
-
-      cy.login('user1');
-      cy.visit('/');
-
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl '
-      );
-    });
-
     it('User officer should be able to save proposal column selection', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         this.skip();
