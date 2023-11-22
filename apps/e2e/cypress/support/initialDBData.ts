@@ -244,6 +244,7 @@ export default {
     },
     feasibilityReview: {
       id: 2,
+      name: 'FEASIBILITY_REVIEW',
     },
     notFeasible: { id: 3 },
     sepSelection: { id: 4 },

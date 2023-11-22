@@ -402,6 +402,7 @@ export interface EventLogRecord {
   readonly row_data: string;
   readonly event_tstamp: Date;
   readonly changed_object_id: string;
+  readonly description: string;
 }
 
 export interface SEPRecord {

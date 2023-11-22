@@ -17,7 +17,8 @@ const EventBusDecorator = (eventType: Event) => {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args) {
-      let [loggedInUser] = args;
+      // eslint-disable-next-line prefer-const
+      let [loggedInUser, ...restArgs] = args;
 
       const result = await originalMethod?.apply(this, args);
 
@@ -35,6 +36,7 @@ const EventBusDecorator = (eventType: Event) => {
         key: resultKey,
         loggedInUserId: loggedInUser ? loggedInUser.id : null,
         isRejection: isRejection(result),
+        inputArgs: JSON.stringify(restArgs),
       } as ApplicationEvent;
 
       // NOTE: Do not log the event in testing environment.

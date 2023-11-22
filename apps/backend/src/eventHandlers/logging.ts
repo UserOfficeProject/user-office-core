@@ -3,6 +3,9 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { SEPDataSource } from '../datasources/SEPDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
@@ -10,6 +13,14 @@ export default function createHandler() {
   const eventLogsDataSource = container.resolve<EventLogsDataSource>(
     Tokens.EventLogsDataSource
   );
+  const proposalSettingsDataSource =
+    container.resolve<ProposalSettingsDataSource>(
+      Tokens.ProposalSettingsDataSource
+    );
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+  const sepDataSource = container.resolve<SEPDataSource>(Tokens.SEPDataSource);
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
@@ -47,40 +58,62 @@ export default function createHandler() {
             event.emailinviteresponse.userId.toString()
           );
           break;
-        case Event.PROPOSAL_INSTRUMENT_SELECTED:
+        case Event.PROPOSAL_INSTRUMENT_SELECTED: {
           await Promise.all(
-            event.instrumenthasproposals.proposalPks.map((proposalPk) =>
-              eventLogsDataSource.set(
+            event.instrumenthasproposals.proposalPks.map(async (proposalPk) => {
+              const instrument =
+                await instrumentDataSource.getInstrumentByProposalPk(
+                  proposalPk
+                );
+
+              const description = `Selected instrument: ${instrument?.name}`;
+
+              return eventLogsDataSource.set(
                 event.loggedInUserId,
                 event.type,
                 json,
-                proposalPk.toString()
-              )
-            )
+                proposalPk.toString(),
+                description
+              );
+            })
           );
           break;
+        }
         case Event.PROPOSAL_SEP_SELECTED:
           await Promise.all(
-            event.proposalpks.proposalPks.map((proposalPk) =>
-              eventLogsDataSource.set(
+            event.proposalpks.proposalPks.map(async (proposalPk) => {
+              const sep = await sepDataSource.getSEPByProposalPk(proposalPk);
+
+              const description = `Selected SEP: ${sep?.code}`;
+
+              return eventLogsDataSource.set(
                 event.loggedInUserId,
                 event.type,
                 json,
-                proposalPk.toString()
-              )
-            )
+                proposalPk.toString(),
+                description
+              );
+            })
           );
           break;
         case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
           await Promise.all(
-            event.proposals.proposals.map((proposal) =>
-              eventLogsDataSource.set(
+            event.proposals.proposals.map(async (proposal) => {
+              const proposalStatus =
+                await proposalSettingsDataSource.getProposalStatus(
+                  proposal.statusId
+                );
+
+              const description = `Status changed to: ${proposalStatus?.name}`;
+
+              return eventLogsDataSource.set(
                 event.loggedInUserId,
                 event.type,
                 json,
-                proposal.primaryKey.toString()
-              )
-            )
+                proposal.primaryKey.toString(),
+                description
+              );
+            })
           );
           break;
         case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
@@ -109,18 +142,22 @@ export default function createHandler() {
             event.questionarystep.questionaryId.toString()
           );
           break;
-        default:
+        default: {
           const changedObjectId =
             typeof (event as any)[event.key].id === 'number'
               ? (event as any)[event.key].id
               : (event as any)[event.key].primaryKey;
+          const description = event.description || '';
+
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
-            changedObjectId.toString()
+            changedObjectId.toString(),
+            description
           );
           break;
+        }
       }
     } catch (error) {
       logger.logException(`Error handling logs for event ${event.type}`, error);
