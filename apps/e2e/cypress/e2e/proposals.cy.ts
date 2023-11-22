@@ -244,7 +244,7 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it('User should be able to have and a preferred name', () => {
+    it.only('User should be able to have and a preferred name', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         cy.updateUserDetails({
           id: 4,
@@ -253,14 +253,6 @@ context('Proposal tests', () => {
           lastname: 'Beckley',
           preferredname: 'Ben',
           gender: 'male',
-          nationality: 1,
-          birthdate: new Date('2000/04/02'),
-          organisation: 1,
-          department: 'IT deparment',
-          position: 'Management',
-          email: 'ben@inbox.com',
-          telephone: '(288) 221-4533',
-          organizationCountry: 1,
         });
         cy.updateUserDetails({
           id: 1,
@@ -269,16 +261,20 @@ context('Proposal tests', () => {
           lastname: 'Carlsson',
           preferredname: '',
           gender: 'male',
-          nationality: 1,
-          birthdate: new Date('2000/04/02'),
-          organisation: 1,
-          department: 'IT deparment',
-          position: 'Strategist',
-          email: 'Javon4@hotmail.com',
-          telephone: '(288) 431-1443',
-          organizationCountry: 1,
         });
       }
+
+      cy.login('user1');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl '
+      );
+
       cy.login('user2');
       cy.visit('/');
       cy.contains('New Proposal').click();
@@ -310,17 +306,6 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('Ben ');
-
-      cy.login('user1');
-      cy.visit('/');
-
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl '
-      );
     });
 
     it('User officer should be able to save proposal column selection', function () {
