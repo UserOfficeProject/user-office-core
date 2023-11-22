@@ -74,7 +74,8 @@
     "lint:fix:bash": "eslint --fix $(git diff --name-only --diff-filter=ACMRTUXB develop | grep  -E \"(.js$|.ts$|.tsx$)\")",
     "start": "npm run dev",
     "generate:local": "node scripts/generate-graphql-sdk.js",
-    "generate:local:windows": "powershell \"node scripts/generate-graphql-sdk.js\""
+    "generate:local:windows": "powershell \"node scripts/generate-graphql-sdk.js\"",
+    "analyze": "npx vite-bundle-visualizer"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -109,7 +110,6 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.6.1",
     "react-test-renderer": "^17.0.0",
-    "source-map-explorer": "^2.5.2",
     "vite": "^5.0.0"
   },
   "engines": {
