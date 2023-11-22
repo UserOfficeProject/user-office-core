@@ -75,7 +75,7 @@ services:
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
       UO_FEATURE_DISABLE_EAM: 1
-      USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500
+      USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500/generate
       RABBITMQ_HOSTNAME: rabbitmq
       AUTH_DISCOVERY_URL: http://host.docker.internal:5001/.well-known/openid-configuration
       AUTH_CLIENT_ID: useroffice
