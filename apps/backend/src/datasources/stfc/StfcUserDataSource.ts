@@ -255,10 +255,6 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getStfcBasicPersonByEmail(email).then((user) => !!user);
   }
 
-  async getPasswordByEmail(email: string): Promise<string> {
-    throw new Error('Method not implemented.');
-  }
-
   setUserEmailVerified(id: number): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
