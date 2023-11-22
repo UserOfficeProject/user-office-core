@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [splitVendorChunkPlugin(), react()],
   server: {
     open: true,
+    host: true,
     port: 3000,
     proxy: {
       ...[
