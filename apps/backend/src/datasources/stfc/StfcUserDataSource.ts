@@ -274,10 +274,6 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getUser(parseInt(username));
   }
 
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    throw new Error('Method not implemented.');
-  }
-
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     throw new Error('Method not implemented.');
   }

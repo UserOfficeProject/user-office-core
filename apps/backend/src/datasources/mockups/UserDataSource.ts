@@ -281,9 +281,6 @@ export class UserDataSourceMock implements UserDataSource {
   async getByUsername(username: string): Promise<User | null> {
     return dummyUser;
   }
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
-  }
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     // Do something here or remove the function.
   }

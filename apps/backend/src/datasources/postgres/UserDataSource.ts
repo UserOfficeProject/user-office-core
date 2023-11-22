@@ -69,15 +69,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    return database
-      .select('password')
-      .from('users')
-      .where('username', username)
-      .first()
-      .then((user: UserRecord) => (user ? user.password : null));
-  }
-
   async update(user: User): Promise<User> {
     const {
       firstname,
