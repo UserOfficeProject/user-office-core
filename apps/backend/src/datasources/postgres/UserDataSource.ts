@@ -206,20 +206,6 @@ export default class PostgresUserDataSource implements UserDataSource {
     });
   }
 
-  async setUserPassword(
-    id: number,
-    password: string
-  ): Promise<BasicUserDetails> {
-    return database
-      .update({
-        password,
-      })
-      .from('users')
-      .returning('*')
-      .where('user_id', id)
-      .then((record: UserRecord[]) => createBasicUserObject(record[0]));
-  }
-
   async me(id: number): Promise<User | null> {
     return database
       .select()

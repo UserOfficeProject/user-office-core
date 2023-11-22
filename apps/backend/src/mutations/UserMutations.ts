@@ -553,39 +553,6 @@ export default class UserMutations {
     }
   }
 
-  @ValidateArgs(userPasswordFieldBEValidationSchema)
-  async resetPassword(
-    agent: UserWithRole | null,
-    { token, password }: { token: string; password: string }
-  ): Promise<BasicUserDetails | Rejection> {
-    // Check that token is valid
-    try {
-      const hash = this.createHash(password);
-      const decoded = verifyToken<PasswordResetJwtPayload>(token);
-      const user = await this.dataSource.getUser(decoded.id);
-
-      //Check that user exist and that it has not been updated since token creation
-      if (
-        user &&
-        user.updated === decoded.updated &&
-        decoded.type === 'passwordReset'
-      ) {
-        return this.dataSource
-          .setUserPassword(user.id, hash)
-          .then((user) => user)
-          .catch((err) => rejection('Could not reset password', { user }, err));
-      }
-
-      return rejection('Could not reset password incomplete data', {
-        user,
-        decoded,
-        code: ApolloServerErrorCodeExtended.BAD_USER_INPUT,
-      });
-    } catch (error) {
-      return rejection('Could not reset password', {}, error);
-    }
-  }
-
   @Authorized([Roles.USER_OFFICER])
   setUserEmailVerified(
     _: UserWithRole | null,

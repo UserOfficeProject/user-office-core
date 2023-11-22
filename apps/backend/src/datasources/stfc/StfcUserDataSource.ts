@@ -267,13 +267,6 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.setUserNotPlaceholder(id);
   }
 
-  async setUserPassword(
-    id: number,
-    password: string
-  ): Promise<BasicUserDetails> {
-    throw new Error('Method not implemented.');
-  }
-
   async getByEmail(email: string): Promise<User | null> {
     return this.getStfcBasicPersonByEmail(email).then((stfcUser) =>
       stfcUser ? toEssUser(stfcUser) : null

@@ -217,24 +217,6 @@ test('A user gets an error if providing a email not attached to a account', () =
   ).resolves.toHaveProperty('reason', 'Could not find user by email');
 });
 
-test('A user can update its password if it has a valid token', () => {
-  return expect(
-    userMutations.resetPassword(null, {
-      token: goodToken,
-      password: 'Test1234!',
-    })
-  ).resolves.toBeInstanceOf(BasicUserDetails);
-});
-
-test('A user can not update its password if it has a bad token', () => {
-  return expect(
-    userMutations.resetPassword(null, {
-      token: badToken,
-      password: 'Test1234!',
-    })
-  ).resolves.toHaveProperty('reason');
-});
-
 test('A user can update its password', () => {
   return expect(
     userMutations.updatePassword(dummyUserWithRole, {
