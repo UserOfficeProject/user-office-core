@@ -177,14 +177,6 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
   questionarystep: QuestionaryStep;
 }
 
-interface UserResetPasswordEmailEvent extends GeneralEvent {
-  type: Event.USER_PASSWORD_RESET_EMAIL;
-  userlinkresponse: {
-    user: User;
-    link: string;
-  };
-}
-
 interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
   user: User;
@@ -312,7 +304,6 @@ export type ApplicationEvent =
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
   | EmailInvite
-  | UserResetPasswordEmailEvent
   | UserUpdateEvent
   | UserRoleUpdateEvent
   | SEPCreatedEvent

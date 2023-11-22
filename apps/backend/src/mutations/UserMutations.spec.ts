@@ -205,18 +205,6 @@ test('A user should be able to update a token if valid', () => {
   ).resolves.toBe('string');
 });
 
-test('A user can reset its password by providing a valid email', () => {
-  return expect(
-    userMutations.resetPasswordEmail(null, { email: dummyUser.email })
-  ).resolves.toHaveProperty('user');
-});
-
-test('A user gets an error if providing a email not attached to a account', () => {
-  return expect(
-    userMutations.resetPasswordEmail(null, { email: 'dummyemail@ess.se' })
-  ).resolves.toHaveProperty('reason', 'Could not find user by email');
-});
-
 test('A user must not be able to obtain token for another user', async () => {
   return expect(
     isRejection(

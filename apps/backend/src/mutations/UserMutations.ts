@@ -3,7 +3,6 @@ import {
   createUserByEmailInviteValidationSchema,
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
-  resetPasswordByEmailValidationSchema,
   updateUserRolesValidationSchema,
   updateUserValidationSchema,
 } from '@user-office-software/duo-validation';
@@ -22,13 +21,11 @@ import { Role, Roles } from '../models/Role';
 import {
   AuthJwtPayload,
   EmailVerificationJwtPayload,
-  PasswordResetJwtPayload,
   User,
   UserRole,
   UserRoleShortCodeMap,
   UserWithRole,
 } from '../models/User';
-import { UserLinkResponse } from '../models/UserLinkResponse';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
@@ -441,38 +438,6 @@ export default class UserMutations {
         error
       );
     }
-  }
-
-  @ValidateArgs(resetPasswordByEmailValidationSchema)
-  @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
-  async resetPasswordEmail(
-    agent: UserWithRole | null,
-    args: { email: string }
-  ): Promise<UserLinkResponse | Rejection> {
-    const user = await this.dataSource.getByEmail(args.email);
-
-    if (!user) {
-      return rejection('Could not find user by email', {
-        args,
-        code: ApolloServerErrorCodeExtended.NOT_FOUND,
-      });
-    }
-
-    const token = signToken<PasswordResetJwtPayload>(
-      {
-        id: user.id,
-        type: 'passwordReset',
-        updated: user.updated,
-      },
-      { expiresIn: '24h' }
-    );
-
-    const link = process.env.baseURL + '/resetPassword/' + token;
-
-    const userLinkResponse = new UserLinkResponse(user, link);
-
-    // Send reset email with link
-    return userLinkResponse;
   }
 
   async emailVerification(token: string) {
