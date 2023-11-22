@@ -244,7 +244,7 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it.only('User should be able to have and a preferred name', () => {
+    it('User should be able to have and a preferred name', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         cy.updateUserDetails({
           id: 4,
