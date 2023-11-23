@@ -262,27 +262,10 @@ context('Proposal tests', () => {
           telephone: '(288) 221-4533',
           organizationCountry: 1,
         });
-        cy.updateUserDetails({
-          id: 1,
-          user_title: 'Mr.',
-          firstname: 'Carl',
-          lastname: 'Carlsson',
-          preferredname: '',
-          gender: 'male',
-          nationality: 1,
-          birthdate: new Date('2000/04/02'),
-          organisation: 1,
-          department: 'IT deparment',
-          position: 'Strategist',
-          email: 'Javon4@hotmail.com',
-          telephone: '(288) 431-1443',
-          organizationCountry: 1,
-        });
       }
 
       cy.login('user1');
       cy.visit('/');
-
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
