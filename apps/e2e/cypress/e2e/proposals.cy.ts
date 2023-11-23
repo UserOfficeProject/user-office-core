@@ -244,7 +244,7 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it('User should be able to have and a preferred name', () => {
+    it('User should be able to have a preferred name', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
         cy.updateUserDetails({
           id: 4,
@@ -283,13 +283,9 @@ context('Proposal tests', () => {
       cy.login('user1');
       cy.visit('/');
 
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl '
-      );
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().find('[aria-label="Edit proposal"]').click();
+      cy.contains('Carl ');
 
       cy.login('user2');
       cy.visit('/');
