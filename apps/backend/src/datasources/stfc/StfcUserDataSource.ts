@@ -498,7 +498,6 @@ export class StfcUserDataSource implements UserDataSource {
     middlename: string | undefined,
     lastname: string,
     username: string,
-    password: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_access_token: string,

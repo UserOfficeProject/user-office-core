@@ -152,7 +152,6 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         undefined,
         userInfo.family_name,
         userInfo.email,
-        '',
         userInfo.given_name,
         userInfo.sub,
         tokenSet.access_token,
