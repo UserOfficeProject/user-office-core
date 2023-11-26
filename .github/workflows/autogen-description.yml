@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  pull_request:
+
+jobs:
+    openai-pr-description:
+        runs-on: ubuntu-22.04
+    
+        steps:
+          - name: Extract branch name
+            id: extract_branch
+            shell: bash
+            run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+    
+          - name: Extract Jira Issue Key
+            id: extract-issue-key
+            shell: bash
+            run: |
+              BRANCH_NAME=$(echo "${{ steps.extract_branch.outputs.branch }}" | sed 's|.*/||')
+              JIRA_ISSUE_KEY=$(echo "$BRANCH_NAME" | grep -oE 'CON-[0-9]+' | head -n1 || true)
+    
+              if [ -n "$JIRA_ISSUE_KEY" ]; then
+                echo "::set-output name=issue_key::$JIRA_ISSUE_KEY"  # Set the output variable
+              else
+                echo "No Jira issue key found in branch name."
+              fi
+    
+          - name: Add PR description
+            uses: swapActions/pr-description-autogen@main
+            with:
+              github_token: ${{ secrets.GITHUB_TOKEN }}
+              openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+              jira_base_url: 'https://jira.esss.lu.se'
+              jira_username: ${{ secrets.JIRA_USERNAME }}
+              jira_api_token: ${{ secrets.JIRA_API_TOKEN }}
+              jira_issue_key: ${{ steps.extract-issue-key.outputs.issue_key }}
+              openai_model: gpt-4
