@@ -21,6 +21,7 @@ type SEPMeetingInstrumentsTableProps = {
   sepId: number;
   selectedCall?: Call;
   confirm: WithConfirmType;
+  code: string;
 };
 
 const instrumentTableColumns = [
@@ -43,6 +44,7 @@ const SEPMeetingInstrumentsTable = ({
   sepId,
   selectedCall,
   confirm,
+  code,
 }: SEPMeetingInstrumentsTableProps) => {
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsBySEPData(sepId, selectedCall?.id);
@@ -168,7 +170,10 @@ const SEPMeetingInstrumentsTable = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {`${i18n.format(t('instrument'), 'plural')} with proposals`}
+            {`${code} - ${i18n.format(
+              t('instrument'),
+              'plural'
+            )} with proposals`}
           </Typography>
         }
         columns={columns}

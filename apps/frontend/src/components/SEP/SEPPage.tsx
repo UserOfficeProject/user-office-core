@@ -86,7 +86,7 @@ const SEPPage = () => {
       },
       {
         name: 'Meeting Components',
-        element: <SEPMeetingComponentsView sepId={sep.id} />,
+        element: <SEPMeetingComponentsView sepId={sep.id} code={sep.code} />,
       },
     ];
   }

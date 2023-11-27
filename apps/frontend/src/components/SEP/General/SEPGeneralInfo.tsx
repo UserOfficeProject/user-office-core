@@ -79,7 +79,7 @@ const SEPGeneralInfo = ({ data, onSEPUpdate }: SEPPageProps) => {
       }): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
-            {`${t('Scientific evaluation panel')}`}
+            {`${sep.code} - ${t('Scientific evaluation panel')}`}
           </Typography>
           <Grid container spacing={3}>
             <Grid item sm={6} xs={12}>

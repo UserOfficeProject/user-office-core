@@ -236,7 +236,7 @@ const SEPMembers = ({
         userRole={UserRole.SEP_REVIEWER}
       />
       <Typography variant="h6" component="h2" gutterBottom>
-        {`${t('SEP')} Members`}
+        {`${sepData.code} - ${t('SEP')} Members`}
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>

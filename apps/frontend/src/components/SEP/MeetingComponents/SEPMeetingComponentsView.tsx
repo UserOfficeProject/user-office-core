@@ -10,9 +10,13 @@ import SEPMeetingInstrumentsTable from './SEPMeetingInstrumentsTable';
 
 type SEPMeetingComponentsViewProps = {
   sepId: number;
+  code: string;
 };
 
-const SEPMeetingComponentsView = ({ sepId }: SEPMeetingComponentsViewProps) => {
+const SEPMeetingComponentsView = ({
+  sepId,
+  code,
+}: SEPMeetingComponentsViewProps) => {
   const { loadingCalls, calls } = useCallsData({ sepIds: [sepId] });
   const [query, setQuery] = useQueryParams({
     call: withDefault(NumberParam, null),
@@ -42,6 +46,7 @@ const SEPMeetingComponentsView = ({ sepId }: SEPMeetingComponentsViewProps) => {
       <SEPMeetingInstrumentsTable
         sepId={sepId}
         selectedCall={getSelectedCall()}
+        code={code}
       />
     </>
   );

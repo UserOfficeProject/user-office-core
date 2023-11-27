@@ -556,7 +556,7 @@ const SEPProposalsAndAssignmentsTable = ({
           columns={SEPProposalColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${t('SEP')} Proposals`}
+              {`${data.code} - ${t('SEP')} Proposals`}
             </Typography>
           }
           data={SEPProposalsWitIdAndFormattedDate}
