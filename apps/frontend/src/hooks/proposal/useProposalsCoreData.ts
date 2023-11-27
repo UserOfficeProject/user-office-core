@@ -40,7 +40,7 @@ export function useProposalsCoreData(
         currentRole === UserRole.INTERNAL_REVIEWER
       ) {
         api()
-          .getInstrumentScientistProposals({
+          .getInstrumentScientistProposalsBatched({
             filter: {
               reviewer,
               callId,
@@ -60,28 +60,32 @@ export function useProposalsCoreData(
             if (componentController?.unmounted) {
               return;
             }
-            if (data.instrumentScientistProposals) {
+            if (data.instrumentScientistProposalsBatched) {
               setProposalsData(
-                data.instrumentScientistProposals.proposals.map((proposal) => {
-                  return {
-                    ...proposal,
-                    status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatus: getTranslation(
-                      proposal.technicalStatus as ResourceId
-                    ),
-                    finalStatus: getTranslation(
-                      proposal.finalStatus as ResourceId
-                    ),
-                  } as ProposalViewData;
-                })
+                data.instrumentScientistProposalsBatched.proposals.map(
+                  (proposal) => {
+                    return {
+                      ...proposal,
+                      status: proposal.submitted ? 'Submitted' : 'Open',
+                      technicalStatus: getTranslation(
+                        proposal.technicalStatus as ResourceId
+                      ),
+                      finalStatus: getTranslation(
+                        proposal.finalStatus as ResourceId
+                      ),
+                    } as ProposalViewData;
+                  }
+                )
               );
-              setTotalCount(data.instrumentScientistProposals.totalCount);
+              setTotalCount(
+                data.instrumentScientistProposalsBatched.totalCount
+              );
             }
             setLoading(false);
           });
       } else {
         api()
-          .getProposalsCore({
+          .getProposalsCoreBatched({
             filter: {
               callId,
               instrumentId,
@@ -100,9 +104,9 @@ export function useProposalsCoreData(
             if (componentController?.unmounted) {
               return;
             }
-            if (data.proposalsView) {
+            if (data.proposalsViewBatched) {
               setProposalsData(
-                data.proposalsView.proposalViews.map((proposal) => {
+                data.proposalsViewBatched.proposalViews.map((proposal) => {
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
@@ -115,7 +119,7 @@ export function useProposalsCoreData(
                   } as ProposalViewData;
                 })
               );
-              setTotalCount(data.proposalsView.totalCount);
+              setTotalCount(data.proposalsViewBatched.totalCount);
             }
             setLoading(false);
           });

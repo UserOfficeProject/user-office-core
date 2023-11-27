@@ -9,6 +9,7 @@ import {
   createResolversMap,
 } from 'type-graphql';
 
+import { buildStitchedSchema } from '../utils/buildStitchedSchema';
 import { customAuthChecker } from './custom-auth-checker';
 
 export async function buildFederatedSchema(
@@ -30,6 +31,7 @@ export async function buildFederatedSchema(
       referenceResolvers
     ),
   });
+  const sticthedSchema = await buildStitchedSchema(federatedSchema);
 
-  return federatedSchema;
+  return sticthedSchema;
 }

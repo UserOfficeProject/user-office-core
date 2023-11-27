@@ -148,6 +148,11 @@ export default class UserQueries {
     return this.dataSource.getUser(id);
   }
 
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async getUsers(agent: UserWithRole | null, id: readonly number[]) {
+    return this.dataSource.getUsersByUserNumbers(id);
+  }
+
   @Authorized()
   async getProposers(agent: UserWithRole | null, proposalPk: number) {
     return this.dataSource.getProposalUsers(proposalPk);

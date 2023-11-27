@@ -1,0 +1,40 @@
+query getInstrumentScientistProposalsBatched(
+  $filter: ProposalsFilter
+  $offset: Int
+  $first: Int
+) {
+  instrumentScientistProposalsBatched(
+    filter: $filter
+    offset: $offset
+    first: $first
+  ) {
+    proposals {
+      primaryKey
+      proposalId
+      title
+      submitted
+      finalStatus
+      technicalReviewAssigneeId
+      technicalReviewAssigneeFirstName
+      technicalReviewAssigneeLastName
+      technicalStatus
+      technicalTimeAllocation
+      statusName
+      technicalReviewSubmitted
+      instrumentId
+      instrumentName
+      allocationTimeUnit
+      callShortCode
+      statusName
+      sepCode
+      principalInvestigator {
+        firstname
+        lastname
+        preferredname
+        organisation
+        email
+      }
+    }
+    totalCount
+  }
+}
