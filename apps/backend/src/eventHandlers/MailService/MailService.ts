@@ -1,6 +1,5 @@
-import { ResultsPromise } from 'sparkpost';
-
 import EmailSettings from './EmailSettings';
+import { ResultsPromise } from './SparkPost';
 
 export abstract class MailService {
   abstract sendMail(options: EmailSettings): ResultsPromise<SendMailResults>;
