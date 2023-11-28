@@ -52,6 +52,8 @@ const fieldMap: { [key: string]: string } = {
   statusName: 'proposal_table_view.proposal_status_id',
   proposalId: 'proposal_table_view.proposal_id',
   title: 'title',
+  submitted: 'proposal_table_view.submitted',
+  notified: 'proposal_table_view.notified',
 };
 
 export async function calculateReferenceNumber(
