@@ -27,12 +27,11 @@ jobs:
               fi
     
           - name: Add PR description
-            uses: swapActions/pr-description-autogen@main
+            uses: swapActions/pr-description-autogen@master
             with:
               github_token: ${{ secrets.GITHUB_TOKEN }}
               openai_api_key: ${{ secrets.OPENAI_API_KEY }}
               jira_base_url: 'https://jira.esss.lu.se'
-              jira_username: ${{ secrets.JIRA_USERNAME }}
               jira_api_token: ${{ secrets.JIRA_API_TOKEN }}
               jira_issue_key: ${{ steps.extract-issue-key.outputs.issue_key }}
               openai_model: gpt-4
