@@ -72,7 +72,6 @@
     "lint": "tsc --noEmit && eslint . --ext .js,.jsx,.ts,.tsx --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "lint:fix:bash": "eslint --fix $(git diff --name-only --diff-filter=ACMRTUXB develop | grep  -E \"(.js$|.ts$|.tsx$)\")",
-    "start": "npm run dev",
     "generate:local": "node scripts/generate-graphql-sdk.js",
     "generate:local:windows": "powershell \"node scripts/generate-graphql-sdk.js\"",
     "analyze": "npx vite-bundle-visualizer"
