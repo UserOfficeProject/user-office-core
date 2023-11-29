@@ -118,6 +118,7 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'Principal Investigator',
     field: 'principalInvestigator',
+    sorting: false,
     emptyValue: '-',
     render: (proposalView) => {
       if (
@@ -133,6 +134,7 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'PI Email',
     field: 'principalInvestigator.email',
+    sorting: false,
     emptyValue: '-',
   },
   {
