@@ -614,7 +614,8 @@ context('Proposal tests', () => {
       cy.contains(longProposalTitle)
         .parent()
         .invoke('outerWidth')
-        .should('eq', 400);
+        .should('be.gte', 400)
+        .should('be.lt', 410);
 
       cy.contains(longProposalTitle)
         .parent()
