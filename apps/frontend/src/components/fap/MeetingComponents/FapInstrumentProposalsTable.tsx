@@ -12,7 +12,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import clsx from 'clsx';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -125,7 +124,6 @@ const FapInstrumentProposalsTable = ({
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
-  const { t } = useTranslation();
 
   const assignmentColumns = [
     {
@@ -190,7 +188,7 @@ const FapInstrumentProposalsTable = ({
       },
     },
     {
-      title: t('Fap') + ' meeting submitted',
+      title: 'Fap meeting submitted',
       field: 'proposal.fapMeetingDecision.submitted',
       lookup: { true: 'Yes', false: 'No', undefined: 'No' },
     },

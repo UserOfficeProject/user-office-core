@@ -4,9 +4,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
 import { DatePicker } from 'formik-mui-lab';
-import i18n from 'i18n';
 import React, { useContext } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -34,7 +32,6 @@ const CallReviewAndNotification = () => {
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
   const { startReview, startFapReview } = formik.values;
-  const { t } = useTranslation();
 
   const fapOptions =
     allActiveFaps?.map((fap) => ({
@@ -83,7 +80,7 @@ const CallReviewAndNotification = () => {
         />
         <Field
           name="startFapReview"
-          label={'Start of ' + t('Fap') + ' review'}
+          label="Start of Fap review"
           id="start-fap-review-input"
           inputFormat={dateFormat}
           mask={mask}
@@ -98,7 +95,7 @@ const CallReviewAndNotification = () => {
         />
         <Field
           name="endFapReview"
-          label={'End of ' + t('Fap') + ' review'}
+          label="End of Fap review"
           id="end-fap-review-input"
           inputFormat={dateFormat}
           mask={mask}
@@ -115,7 +112,7 @@ const CallReviewAndNotification = () => {
       </LocalizationProvider>
       <FormikUIAutocomplete
         name="faps"
-        label={'Call ' + i18n.format(t('Fap'), 'plural')}
+        label="Call Faps"
         multiple
         loading={loadingFaps}
         noOptionsText="No Faps"

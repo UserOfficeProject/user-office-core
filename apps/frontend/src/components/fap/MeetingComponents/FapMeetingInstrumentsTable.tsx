@@ -113,13 +113,10 @@ const FapMeetingInstrumentsTable = ({
           setInstrumentsData(newInstrumentsData);
         }
       } else {
-        enqueueSnackbar(
-          'All proposal ' + t('Fap') + ' meetings should be submitted',
-          {
-            variant: 'error',
-            className: 'snackbar-error',
-          }
-        );
+        enqueueSnackbar('All proposal Fap meetings should be submitted', {
+          variant: 'error',
+          className: 'snackbar-error',
+        });
       }
     }
   };
@@ -149,9 +146,7 @@ const FapMeetingInstrumentsTable = ({
             },
             {
               title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `No further changes to ${t(
-                'Fap'
-              )} meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
+              description: `No further changes to Fap meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
                 'instrument'
               )}?`,
             }

@@ -6,7 +6,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -147,7 +146,6 @@ const FapProposalsAndAssignmentsTable = ({
   const { api } = useDataApiWithFeedback();
   const [proposalPk, setProposalPk] = useState<null | number>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
-  const { t } = useTranslation();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -177,7 +175,7 @@ const FapProposalsAndAssignmentsTable = ({
           <Visibility />
         </IconButton>
       </Tooltip>
-      <Tooltip title={`Assign ${t('Fap')} Member`}>
+      <Tooltip title="Assign Fap Member">
         <IconButton
           data-cy="assign-fap-member"
           onClick={() => setProposalPk(rowData.proposalPk)}
@@ -232,10 +230,9 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
     confirm(() => removeProposalsFromFap(proposalsToRemove), {
-      title: 'Remove ' + t('Fap') + ' assignment/s',
-      description: `Are you sure you want to remove the selected proposal/s from this ${t(
-        'Fap'
-      )}?`,
+      title: 'Remove Fap assignment/s',
+      description:
+        'Are you sure you want to remove the selected proposal/s from this Fap?',
     })();
   };
 
@@ -345,7 +342,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     if (shouldShowWarning) {
       confirm(() => assignMemberToFapProposal(memberUsers), {
-        title: t('Fap') + ' reviewers assignment',
+        title: 'Fap reviewers assignment',
         description: ' ',
         shouldEnableOKWithAlert: true,
         alertText: (
@@ -383,10 +380,7 @@ const FapProposalsAndAssignmentsTable = ({
                 )}
               </ul>
             </strong>
-            {`. Are you sure you want to assign all selected users to the ${t(
-              'Fap'
-            )}
-            proposal?`}
+            {`. Are you sure you want to assign all selected users to the Fap proposal?`}
           </>
         ),
       })();
@@ -526,7 +520,7 @@ const FapProposalsAndAssignmentsTable = ({
   return (
     <>
       <ProposalReviewModal
-        title={`${t('Fap')} - Proposal View`}
+        title="Fap - Proposal View"
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={() => {
           setUrlQueryParams({ reviewModal: undefined });
@@ -555,7 +549,7 @@ const FapProposalsAndAssignmentsTable = ({
           columns={FapProposalColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${t('Fap')} Proposals`}
+              Fap Proposals
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}

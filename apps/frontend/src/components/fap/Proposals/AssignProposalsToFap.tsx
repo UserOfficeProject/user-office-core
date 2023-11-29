@@ -5,9 +5,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
-import i18n from 'i18n';
 import React, { useContext } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { UserContext } from 'context/UserContextProvider';
@@ -39,7 +37,6 @@ const AssignProposalsToFap = ({
   fapIds,
 }: AssignProposalToFapProps) => {
   const classes = useStyles();
-  const { t } = useTranslation();
   const { currentRole } = useContext(UserContext);
   const { Faps, loadingFaps } = useFapsData({
     filter: '',
@@ -79,34 +76,30 @@ const AssignProposalsToFap = ({
               component="h1"
               className={classes.cardHeader}
             >
-              {`Assign proposal/s to ${t('Fap')}`}
+              Assign proposal/s to Fap
             </Typography>
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormikUIAutocomplete
                   name="selectedFapId"
-                  label={`Select ${t('Fap')}`}
+                  label="Select Fap"
                   loading={loadingFaps}
                   items={Faps.map((fap) => ({
                     value: fap.id,
                     text: fap.code,
                   }))}
                   disabled={isSubmitting}
-                  noOptionsText={`No ${i18n.format(t('Fap'), 'plural')}`}
+                  noOptionsText="No Faps"
                   data-cy="fap-selection"
                 />
               </Grid>
             </Grid>
             {!values.selectedFapId && (
               <Alert severity="warning" data-cy="remove-fap-alert">
-                {`Be aware that leaving ${t(
-                  'Fap'
-                )} selection empty will remove assigned
-                ${t('Fap')} from proposal/s and delete all ${t(
-                  'Fap'
-                )} reviews on that
-                assignment.`}
+                Be aware that leaving Fap selection empty will remove assigned
+                Fap from proposal/s and delete all Fap reviews on that
+                assignment.
               </Alert>
             )}
             <Button

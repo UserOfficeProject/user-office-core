@@ -8,7 +8,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import { updateFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
@@ -36,7 +35,6 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
-  const { t } = useTranslation();
 
   const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
     fap.customGradeGuide
@@ -49,7 +47,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
 
   const sendFapUpdate = async (values: Fap): Promise<void> => {
     await api({
-      toastSuccessMessage: t('Fap') + ' updated successfully!',
+      toastSuccessMessage: 'Fap updated successfully!',
     }).updateFap(values);
     onFapUpdate(values);
   };
@@ -78,7 +76,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
       }): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
-            {`${t('Facility access panel')}`}
+            Facility access panel
           </Typography>
           <Grid container spacing={3}>
             <Grid item sm={6} xs={12}>
@@ -200,7 +198,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 data-cy="submit"
               >
                 {isExecutingCall && <UOLoader size={14} />}
-                {`Update ${t('Fap')}`}
+                Update Fap
               </Button>
             </StyledButtonContainer>
           )}

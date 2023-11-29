@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -19,7 +18,6 @@ const FapPage = () => {
   const { id } = useParams<{ id: string }>();
   const { loading, fap, setFap } = useFapData(parseInt(id));
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const { t } = useTranslation();
   const isFapChairOrSecretary = useCheckAccess([
     UserRole.FAP_CHAIR,
     UserRole.FAP_SECRETARY,
@@ -38,7 +36,7 @@ const FapPage = () => {
   if (!fap) {
     return (
       <StyledContainer>
-        <StyledPaper>{`${t('Fap')} not found`}</StyledPaper>
+        <StyledPaper>Fap not found</StyledPaper>
       </StyledContainer>
     );
   }

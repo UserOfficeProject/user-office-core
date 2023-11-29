@@ -356,7 +356,7 @@ const Dashboard = () => {
           {isFapEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title={t('Fap')}
+              title="Fap"
               path="/FapPage/:id"
               component={FapPage}
             />
@@ -364,7 +364,7 @@ const Dashboard = () => {
           {isFapEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title={i18n.format(t('Fap'), 'plural')}
+              title="Faps"
               path="/Faps"
               component={FapsPage}
             />

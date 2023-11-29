@@ -7,7 +7,6 @@ import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import UOLoader from 'components/common/UOLoader';
 import { Fap } from 'generated/sdk';
@@ -26,7 +25,6 @@ type AddFapProps = {
 const AddFap = ({ close }: AddFapProps) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { t } = useTranslation();
 
   return (
     <Formik
@@ -39,7 +37,7 @@ const AddFap = ({ close }: AddFapProps) => {
       onSubmit={async (values): Promise<void> => {
         try {
           const { createFap } = await api({
-            toastSuccessMessage: t('Fap ') + 'created successfully!',
+            toastSuccessMessage: 'Fap created successfully!',
           }).createFap(values);
 
           close(createFap);
@@ -52,7 +50,7 @@ const AddFap = ({ close }: AddFapProps) => {
       {(): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h1">
-            Create new {t('Fap')}
+            Create new Fap
           </Typography>
 
           <Field

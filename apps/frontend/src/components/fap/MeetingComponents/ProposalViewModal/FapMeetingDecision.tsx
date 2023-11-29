@@ -5,7 +5,6 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import {
   Maybe,
@@ -33,7 +32,6 @@ const FapMeetingDecision = ({
   fap,
 }: FapMeetingDecisionProps) => {
   const classes = useStyles();
-  const { t } = useTranslation();
 
   return (
     <div data-cy="Fap-meeting-components-decision">
@@ -44,7 +42,7 @@ const FapMeetingDecision = ({
           className={classes.heading}
           gutterBottom
         >
-          {fap?.code} - {`${t('Fap')} Meeting decision`}
+          {fap?.code} - Fap Meeting decision
         </Typography>
         <Table>
           <TableBody>
@@ -56,7 +54,7 @@ const FapMeetingDecision = ({
                 {fapMeetingDecision?.rankOrder || '-'}
               </TableCell>
               <TableCell width="25%" className={classes.textBold}>
-                {`${t('Fap')} meeting recommendation`}
+                Fap meeting recommendation
               </TableCell>
               <TableCell width="25%">
                 {fapMeetingDecision?.recommendation || '-'}

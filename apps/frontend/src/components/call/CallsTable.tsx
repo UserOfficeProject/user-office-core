@@ -122,7 +122,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       field: 'proposalCount',
     },
     {
-      title: '#' + i18n.format(i18n.format(t('Fap'), 'plural'), 'lowercase'),
+      title: '#faps',
       field: 'faps.length',
       emptyValue: '-',
     },

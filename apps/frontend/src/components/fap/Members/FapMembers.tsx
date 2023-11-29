@@ -10,7 +10,6 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import React, { useState, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { useCheckAccess } from 'components/common/Can';
@@ -58,7 +57,6 @@ const FapMembers = ({
   const [fapChairModalOpen, setFapChairModalOpen] = useState(false);
   const [fapSecretaryModalOpen, setFapSecretaryModalOpen] = useState(false);
   const { user } = useContext(UserContext);
-  const { t } = useTranslation();
   const { setRenewTokenValue } = useRenewToken();
   const { loadingMembers, FapReviewersData, setFapReviewersData } =
     useFapReviewersData(
@@ -79,7 +77,7 @@ const FapMembers = ({
     const [fapChair] = value;
 
     await api({
-      toastSuccessMessage: t('Fap') + ' chair assigned successfully!',
+      toastSuccessMessage: 'Fap chair assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToFapInput: {
         fapId: fapData.id,
@@ -107,7 +105,7 @@ const FapMembers = ({
     const [fapSecretary] = value;
 
     await api({
-      toastSuccessMessage: t('Fap') + ' secretary assigned successfully!',
+      toastSuccessMessage: 'Fap secretary assigned successfully!',
     }).assignChairOrSecretary({
       assignChairOrSecretaryToFapInput: {
         fapId: fapData.id,
@@ -131,7 +129,7 @@ const FapMembers = ({
 
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     await api({
-      toastSuccessMessage: t('Fap') + ' member assigned successfully!',
+      toastSuccessMessage: 'Fap member assigned successfully!',
     }).assignReviewersToFap({
       memberIds: users.map((user) => user.id),
       fapId: fapData.id,
@@ -149,7 +147,7 @@ const FapMembers = ({
     user: BasicUserDetailsWithRole
   ): Promise<void> => {
     await api({
-      toastSuccessMessage: t('Fap') + ' member removed successfully!',
+      toastSuccessMessage: 'Fap member removed successfully!',
     }).removeMemberFromFap({
       memberId: user.id,
       fapId: fapData.id,
@@ -182,10 +180,10 @@ const FapMembers = ({
         });
       },
       {
-        title: 'Remove ' + t('Fap') + ' member',
+        title: 'Remove Fap member',
         description: `Are you sure you want to remove ${getFullUserName(
           memberToRemove
-        )} from this ${t('Fap')}?`,
+        )} from this Fap?`,
       }
     )();
   };
@@ -222,7 +220,7 @@ const FapMembers = ({
         close={(): void => setFapChairModalOpen(false)}
         addParticipants={sendFapChairUpdate}
         selectedUsers={alreadySelectedMembers}
-        title={`${t('Fap')} Chair`}
+        title="Fap Chair"
         invitationUserRole={UserRole.FAP_CHAIR}
         userRole={UserRole.FAP_REVIEWER}
       />
@@ -231,19 +229,19 @@ const FapMembers = ({
         close={(): void => setFapSecretaryModalOpen(false)}
         addParticipants={sendFapSecretaryUpdate}
         selectedUsers={alreadySelectedMembers}
-        title={`${t('Fap')} Secretary`}
+        title="Fap Secretary"
         invitationUserRole={UserRole.FAP_SECRETARY}
         userRole={UserRole.FAP_REVIEWER}
       />
       <Typography variant="h6" component="h2" gutterBottom>
-        {`${t('Fap')} Members`}
+        Fap Members
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>
           <TextField
             name="FapChair"
             id="FapChair"
-            label={`${t('Fap')} Chair`}
+            label="Fap Chair"
             type="text"
             value={getFullUserName(fapData.fapChair)}
             margin="none"
@@ -255,7 +253,7 @@ const FapMembers = ({
               endAdornment: isUserOfficer && (
                 <>
                   {fapData.fapChair && (
-                    <Tooltip title={'Remove ' + t('Fap') + ' Chair'}>
+                    <Tooltip title="Remove Fap Chair">
                       <IconButton
                         aria-label="Remove Fap chair"
                         onClick={() =>
@@ -266,7 +264,7 @@ const FapMembers = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title={'Set ' + t('Fap') + ' Chair'}>
+                  <Tooltip title="Set Fap Chair">
                     <IconButton
                       edge="start"
                       onClick={() => setFapChairModalOpen(true)}
@@ -296,7 +294,7 @@ const FapMembers = ({
           <TextField
             name="FapSecretary"
             id="FapSecretary"
-            label={`${t('Fap')} Secretary`}
+            label="Fap Secretary"
             type="text"
             value={getFullUserName(fapData.fapSecretary)}
             margin="none"
@@ -308,7 +306,7 @@ const FapMembers = ({
               endAdornment: isUserOfficer && (
                 <>
                   {fapData.fapSecretary && (
-                    <Tooltip title={'Remove ' + t('Fap') + ' Secretary'}>
+                    <Tooltip title="Remove Fap Secretary">
                       <IconButton
                         aria-label="Remove Fap secretary"
                         onClick={() =>
@@ -319,7 +317,7 @@ const FapMembers = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title={'Set ' + t('Fap') + ' Secretary'}>
+                  <Tooltip title="Set Fap Secretary">
                     <IconButton
                       edge="start"
                       onClick={() => setFapSecretaryModalOpen(true)}

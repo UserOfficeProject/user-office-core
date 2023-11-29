@@ -2,9 +2,7 @@ import { Column } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import i18n from 'i18n';
 import React, { useContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory } from 'react-router';
 import { useQueryParams } from 'use-query-params';
 
@@ -60,7 +58,6 @@ const FapsTable = () => {
     true
   );
   const history = useHistory();
-  const { t } = useTranslation();
   const {
     loadingFaps,
     Faps,
@@ -98,7 +95,7 @@ const FapsTable = () => {
   const deleteFap = async (id: number | string) => {
     try {
       await api({
-        toastSuccessMessage: t('Fap') + ' deleted successfully',
+        toastSuccessMessage: 'Fap deleted successfully',
       }).deleteFap({
         id: id as number,
       });
@@ -155,7 +152,7 @@ const FapsTable = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {`${i18n.format(t('Facility access panel'), 'plural')}`}
+            Facility access panels
           </Typography>
         }
         columns={columns}

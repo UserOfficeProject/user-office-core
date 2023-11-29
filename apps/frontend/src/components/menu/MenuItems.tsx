@@ -286,12 +286,12 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         </Tooltip>
       )}
       {isFapEnabled && (
-        <Tooltip title={`${i18n.format(t('Facility access panel'), 'plural')}`}>
+        <Tooltip title="Facility access panels">
           <ListItem component={NavLink} to="/Faps" button>
             <ListItemIcon>
               <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
+            <ListItemText primary="FAPs" />
           </ListItem>
         </Tooltip>
       )}
@@ -339,8 +339,8 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <Tooltip title={`${i18n.format(t('Facility access panel'), 'plural')}`}>
-          <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
+        <Tooltip title="Facility access panels">
+          <ListItemText primary="FAPs" />
         </Tooltip>
       </ListItem>
     </div>

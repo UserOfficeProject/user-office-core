@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
@@ -90,7 +89,6 @@ const FapMeetingProposalViewModal = ({
   };
 
   const fapTimeAllocation = FapProposalData?.fapTimeAllocation ?? null;
-  const { t } = useTranslation();
 
   return (
     <>
@@ -113,8 +111,8 @@ const FapMeetingProposalViewModal = ({
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              {t('Fap')} Meeting Components - Proposal View:{' '}
-              {proposalData?.title} ({proposalData?.proposalId})
+              Fap Meeting Components - Proposal View: {proposalData?.title} (
+              {proposalData?.proposalId})
             </Typography>
           </Toolbar>
         </AppBar>

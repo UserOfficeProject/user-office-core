@@ -174,9 +174,7 @@ const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
 ) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const FapReviewColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
-) => [
+const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
@@ -192,7 +190,7 @@ const FapReviewColumns = (
     hidden: true,
   },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
-  { title: t('Fap'), field: 'fapCode', emptyValue: '-' },
+  { title: 'Fap', field: 'fapCode', emptyValue: '-' },
 ];
 
 const PREFETCH_SIZE = 200;
@@ -443,9 +441,9 @@ const ProposalTableOfficer = ({
   }
 
   if (isFapEnabled) {
-    addColumns(columns, FapReviewColumns(t));
+    addColumns(columns, FapReviewColumns);
   } else {
-    removeColumns(columns, FapReviewColumns(t));
+    removeColumns(columns, FapReviewColumns);
   }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
@@ -498,7 +496,7 @@ const ProposalTableOfficer = ({
     if (fap) {
       await api({
         toastSuccessMessage:
-          'Proposal/s assigned to the selected ' + t('Fap') + ' successfully!',
+          'Proposal/s assigned to the selected Fap successfully!',
       }).assignProposalsToFap({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
@@ -511,8 +509,7 @@ const ProposalTableOfficer = ({
       setTimeout(fetchProposalsData, 500);
     } else {
       await api({
-        toastSuccessMessage:
-          'Proposal/s removed from the ' + t('Fap') + ' successfully!',
+        toastSuccessMessage: 'Proposal/s removed from the Fap successfully!',
       }).removeProposalsFromFap({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
@@ -925,7 +922,7 @@ const ProposalTableOfficer = ({
           },
           {
             icon: GroupWorkIcon,
-            tooltip: 'Assign proposals to ' + t('Fap'),
+            tooltip: 'Assign proposals to Fap',
             onClick: () => {
               setOpenAssignment(true);
             },
