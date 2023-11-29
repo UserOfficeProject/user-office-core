@@ -18,6 +18,41 @@ import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+const SepSelectionComponent = ({
+  onChange,
+  id,
+}: Instrument & {
+  onChange: (id: number, newValue: number | null) => void;
+}) => {
+  const { currentRole } = useContext(UserContext);
+  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+  });
+
+  const sepOptions =
+    allActiveSeps?.map((sep) => ({
+      label: sep.code,
+      value: sep.id,
+    })) || [];
+
+  return (
+    <Autocomplete
+      loading={loadingSEPs}
+      id="sepSelection"
+      options={sepOptions}
+      isOptionEqualToValue={(option, value) => option.value === value.value}
+      renderInput={(params) => (
+        <TextField {...params} label="SEPs" margin="none" />
+      )}
+      onChange={(_event, newValue) => {
+        onChange(id, newValue?.value || null);
+      }}
+    />
+  );
+};
+
 type AssignInstrumentsToCallProps = {
   assignInstrumentsToCall: (
     instruments: InstrumentWithAvailabilityTime[]
@@ -32,12 +67,6 @@ const AssignInstrumentsToCall = ({
   assignedInstruments,
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
-  const { currentRole } = useContext(UserContext);
-  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
-    filter: '',
-    active: true,
-    role: currentRole as UserRole,
-  });
 
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]
@@ -49,11 +78,12 @@ const AssignInstrumentsToCall = ({
     [instrumentId: number]: number | null;
   }>({});
 
-  const sepOptions =
-    allActiveSeps?.map((sep) => ({
-      label: sep.code,
-      value: sep.id,
-    })) || [];
+  const onChange = (id: number, newValue: number | null) => {
+    setInstrumentSepMapping({
+      ...instrumentSepMapping,
+      [id]: newValue,
+    });
+  };
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -62,30 +92,9 @@ const AssignInstrumentsToCall = ({
     {
       title: 'SEP',
       field: 'sep',
-      render: (rowData: Instrument) => {
-        return (
-          <Autocomplete
-            loading={loadingSEPs}
-            id="sepSelection"
-            options={sepOptions}
-            renderInput={(params) => <TextField {...params} label="SEPs" />}
-            onChange={(_event, newValue) => {
-              if (newValue) {
-                setInstrumentSepMapping({
-                  ...instrumentSepMapping,
-                  [rowData.id]: newValue.value,
-                });
-              } else {
-                // remove from mapping and set to state
-                setInstrumentSepMapping({
-                  ...instrumentSepMapping,
-                  [rowData.id]: null,
-                });
-              }
-            }}
-          />
-        );
-      },
+      render: (rowData: Instrument) => (
+        <SepSelectionComponent {...rowData} onChange={onChange} />
+      ),
     },
   ];
 

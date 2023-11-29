@@ -75,7 +75,9 @@ const SepSelectionEditComponent = (
       loading={loadingSEPs}
       id="sepSelection"
       options={sepOptions}
-      renderInput={(params) => <TextField {...params} placeholder="Sep" />}
+      renderInput={(params) => (
+        <TextField {...params} placeholder="Sep" margin="none" />
+      )}
       onChange={(_event, newValue) => {
         props.onChange(newValue?.value ?? null);
       }}
@@ -102,6 +104,7 @@ const AvailabilityTimeEditComponent = (
     fullWidth
     error={props.error}
     helperText={props.helperText}
+    margin="none"
   />
 );
 
@@ -299,7 +302,6 @@ const AssignedInstrumentsTable = ({
                 instrumentUpdatePromise,
                 sepUpdatePromise,
               ]).then((values) => {
-                console.log(values[1].updateSepToCallInstrument.instruments);
                 assignInstrumentsToCall(
                   values[1].updateSepToCallInstrument
                     .instruments as InstrumentWithAvailabilityTime[]
