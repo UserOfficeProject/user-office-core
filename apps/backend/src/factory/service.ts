@@ -17,7 +17,7 @@ export enum DownloadType {
 export enum XLSXType {
   PROPOSAL = 'proposal',
   // TODO: Change this when factory is ready.
-  Fap = 'sep',
+  Fap = 'fap',
 }
 
 export enum PDFType {
@@ -100,9 +100,13 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
         ? properties.meta.collectionFilename
         : properties.meta.singleFilename;
 
+    const contentTypeHeaders = factoryResp.headers.get('content-type');
+
     res.setHeader('Content-Disposition', contentDisposition(filename));
     res.setHeader('x-download-filename', querystring.escape(filename));
-    res.setHeader('Content-Type', 'application/pdf');
+    if (contentTypeHeaders) {
+      res.setHeader('content-type', contentTypeHeaders);
+    }
 
     readableStream.pipe(res);
   } catch (error) {
