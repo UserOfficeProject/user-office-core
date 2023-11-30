@@ -143,7 +143,8 @@ context('Proposal tests', () => {
     });
 
     it('Should be able create proposal', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
+
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -392,8 +393,10 @@ context('Proposal tests', () => {
       cy.get('[data-cy="allocation-time-unit"]').click();
       cy.contains('Hour').click();
 
-      cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="listbox"] li').first().click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
+        cy.get('[data-cy="call-esi-template"]').click();
+        cy.get('[role="listbox"] li').first().click();
+      }
 
       cy.get('[data-cy="next-step"]').click();
       cy.get('[data-cy="next-step"]').click();
@@ -412,7 +415,7 @@ context('Proposal tests', () => {
       });
       cy.submitProposal({ proposalPk: createdProposalPk });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(newProposalTitle);
@@ -574,7 +577,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able to delete proposal', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -624,7 +627,7 @@ context('Proposal tests', () => {
 
     it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -667,7 +670,7 @@ context('Proposal tests', () => {
       let createdCallId: number;
       const createdCallTitle = 'Created call';
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.createCall({
@@ -698,7 +701,7 @@ context('Proposal tests', () => {
     });
 
     it('During Proposal creation, User should not lose data when refreshing the page', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New Proposal').click();

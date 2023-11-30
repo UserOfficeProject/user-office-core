@@ -28,7 +28,7 @@ context('Instrument tests', () => {
   const scientist2 = initialDBData.users.user2;
 
   const instrument1 = {
-    name: faker.random.words(2),
+    name: 'ISIS',
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(5),
     managerUserId: scientist1.id,
@@ -48,7 +48,7 @@ context('Instrument tests', () => {
 
   // TODO: Maybe this should be moved to permission testing.
   it('User should not be able to see Instruments page', () => {
-    cy.login('user1');
+    cy.login('user1', 1);
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -316,7 +316,7 @@ context('Instrument tests', () => {
         timeAllocation: 1,
       });
 
-      cy.login('officer');
+      cy.login('officer', 2);
       cy.visit('/');
 
       cy.contains('Proposals');
