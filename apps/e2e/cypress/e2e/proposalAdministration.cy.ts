@@ -656,7 +656,7 @@ context('Proposal administration tests', () => {
       cy.get('[role="dialog"]').contains('Reviews').click();
 
       cy.get('[role="dialog"]').contains('External reviews');
-      cy.get('[role="dialog"]').contains('SEP Meeting decision');
+      cy.get('[role="dialog"]').contains('Fap Meeting decision');
     });
   });
 

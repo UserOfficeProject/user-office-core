@@ -34,7 +34,7 @@ export class Review implements Partial<ReviewOrigin> {
   public proposalPk: number;
 
   @Field(() => Int)
-  public sepID: number;
+  public fapID: number;
 }
 
 @Resolver(() => Review)

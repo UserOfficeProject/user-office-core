@@ -33,10 +33,10 @@ export class CreateCallInput {
   public endReview: Date;
 
   @Field(() => Date, { nullable: true })
-  public startSEPReview?: Date;
+  public startFapReview?: Date;
 
   @Field(() => Date, { nullable: true })
-  public endSEPReview?: Date;
+  public endFapReview?: Date;
 
   @Field()
   public startNotify: Date;
@@ -84,7 +84,7 @@ export class CreateCallInput {
   public description: string;
 
   @Field(() => [Int], { nullable: true })
-  public seps?: number[];
+  public faps?: number[];
 
   @Field(() => Int, { nullable: true })
   public pdfTemplateId?: number;

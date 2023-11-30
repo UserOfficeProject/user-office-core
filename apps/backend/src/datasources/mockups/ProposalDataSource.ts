@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
+import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import {
   TechnicalReview,
   TechnicalReviewStatus,
@@ -60,7 +60,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
   );
 };
 
-export const dummySepMeetingDecision = new SepMeetingDecision(
+export const dummyFapMeetingDecision = new FapMeetingDecision(
   1,
   1,
   ProposalEndStatus.ACCEPTED,
@@ -103,19 +103,19 @@ const dummyProposalEvents = {
   call_ended: false,
   call_ended_internal: false,
   call_review_ended: false,
-  proposal_sep_selected: false,
+  proposal_fap_selected: false,
   proposal_instrument_selected: false,
   proposal_feasibility_review_submitted: false,
   proposal_sample_review_submitted: false,
-  proposal_all_sep_reviews_submitted: false,
+  proposal_all_fap_reviews_submitted: false,
   proposal_feasibility_review_updated: false,
   proposal_management_decision_submitted: false,
   proposal_management_decision_updated: false,
   proposal_sample_safe: false,
-  proposal_sep_review_updated: false,
-  proposal_all_sep_reviewers_selected: false,
-  proposal_sep_review_submitted: false,
-  proposal_sep_meeting_submitted: false,
+  proposal_fap_review_updated: false,
+  proposal_all_fap_reviewers_selected: false,
+  proposal_fap_review_submitted: false,
+  proposal_fap_meeting_submitted: false,
   proposal_instrument_submitted: false,
   proposal_accepted: false,
   proposal_reserved: false,
@@ -189,7 +189,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       false,
       'instrument',
       'call short code',
-      'sep code',
+      'fap code',
       1,
       1,
       1,

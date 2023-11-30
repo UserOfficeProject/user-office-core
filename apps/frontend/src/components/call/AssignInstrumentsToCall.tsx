@@ -13,8 +13,8 @@ import {
   InstrumentWithAvailabilityTime,
   UserRole,
 } from 'generated/sdk';
+import { useFapsData } from 'hooks/fap/useFapsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
-import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -33,7 +33,7 @@ const AssignInstrumentsToCall = ({
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
   const { currentRole } = useContext(UserContext);
-  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
+  const { Faps: allActiveFaps, loadingFaps } = useFapsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
@@ -45,14 +45,14 @@ const AssignInstrumentsToCall = ({
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
-  const [instrumentSepMapping, setInstrumentSepMapping] = useState<{
+  const [instrumentFapMapping, setInstrumentFapMapping] = useState<{
     [instrumentId: number]: number | null;
   }>({});
 
-  const sepOptions =
-    allActiveSeps?.map((sep) => ({
-      label: sep.code,
-      value: sep.id,
+  const fapOptions =
+    allActiveFaps?.map((fap) => ({
+      label: fap.code,
+      value: fap.id,
     })) || [];
 
   const columns = [
@@ -60,25 +60,25 @@ const AssignInstrumentsToCall = ({
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
     {
-      title: 'SEP',
-      field: 'sep',
+      title: 'Fap',
+      field: 'fap',
       render: (rowData: Instrument) => {
         return (
           <Autocomplete
-            loading={loadingSEPs}
-            id="sepSelection"
-            options={sepOptions}
-            renderInput={(params) => <TextField {...params} label="SEPs" />}
+            loading={loadingFaps}
+            id="fapSelection"
+            options={fapOptions}
+            renderInput={(params) => <TextField {...params} label="Faps" />}
             onChange={(_event, newValue) => {
               if (newValue) {
-                setInstrumentSepMapping({
-                  ...instrumentSepMapping,
+                setInstrumentFapMapping({
+                  ...instrumentFapMapping,
                   [rowData.id]: newValue.value,
                 });
               } else {
                 // remove from mapping and set to state
-                setInstrumentSepMapping({
-                  ...instrumentSepMapping,
+                setInstrumentFapMapping({
+                  ...instrumentFapMapping,
                   [rowData.id]: null,
                 });
               }
@@ -106,9 +106,9 @@ const AssignInstrumentsToCall = ({
       toastSuccessMessage: t('instrument') + '/s assigned successfully!',
     }).assignInstrumentsToCall({
       callId,
-      instrumentSepIds: selectedInstruments.map((instrumentToAssign) => ({
+      instrumentFapIds: selectedInstruments.map((instrumentToAssign) => ({
         instrumentId: instrumentToAssign.id,
-        sepId: instrumentSepMapping[instrumentToAssign.id],
+        fapId: instrumentFapMapping[instrumentToAssign.id],
       })),
     });
 

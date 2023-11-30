@@ -6,12 +6,12 @@ import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
+import ExternalReviews from 'components/fap/MeetingComponents/ProposalViewModal/ExternalReviews';
+import FapMeetingDecision from 'components/fap/MeetingComponents/ProposalViewModal/FapMeetingDecision';
 import GeneralInformation from 'components/proposal/GeneralInformation';
 import ProposalAdmin, {
   AdministrationFormData,
 } from 'components/proposal/ProposalAdmin';
-import ExternalReviews from 'components/SEP/MeetingComponents/ProposalViewModal/ExternalReviews';
-import SEPMeetingDecision from 'components/SEP/MeetingComponents/ProposalViewModal/SEPMeetingDecision';
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
@@ -43,7 +43,7 @@ type ProposalReviewContentProps = {
   tabNames: PROPOSAL_MODAL_TAB_NAMES[];
   proposalPk?: number | null;
   reviewId?: number | null;
-  sepId?: number | null;
+  fapId?: number | null;
   isInsideModal?: boolean;
 };
 
@@ -51,14 +51,14 @@ const ProposalReviewContent = ({
   proposalPk,
   tabNames,
   reviewId,
-  sepId,
+  fapId,
   isInsideModal,
 }: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
+  const { reviewData, setReviewData } = useReviewData(reviewId, fapId);
   const { proposalData, setProposalData, loading } = useProposalData(
     proposalPk || reviewData?.proposal?.primaryKey
   );
@@ -134,16 +134,16 @@ const ProposalReviewContent = ({
       onChange={() => {}}
       review={reviewData}
       setReview={setReviewData}
-      sepId={sepId as number} //grade is only used within SEP
+      fapId={fapId as number} //grade is only used within Fap
     />
   );
 
   const AllProposalReviewsTab = isUserOfficer && (
     <>
       <ExternalReviews reviews={proposalData.reviews as Review[]} />
-      <SEPMeetingDecision
-        sepMeetingDecision={proposalData.sepMeetingDecision}
-        sep={proposalData.sep}
+      <FapMeetingDecision
+        fapMeetingDecision={proposalData.fapMeetingDecision}
+        fap={proposalData.fap}
       />
     </>
   );

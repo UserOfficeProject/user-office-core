@@ -40,7 +40,7 @@ export type ProposalPDFData = {
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
   technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
-  sepReviews?: Review[];
+  fapReviews?: Review[];
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
   genericTemplates: Array<
     Pick<
@@ -352,7 +352,7 @@ export const collectProposalPDFData = async (
     proposal.primaryKey
   );
 
-  if (reviews) out.sepReviews = reviews;
+  if (reviews) out.fapReviews = reviews;
 
   return out;
 };

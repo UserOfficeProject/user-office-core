@@ -20,6 +20,8 @@ import { isRejection } from '../../models/Rejection';
 import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { Fap } from './Fap';
+import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { Instrument } from './Instrument';
 import { ProposalBookingCore, ProposalBookingFilter } from './ProposalBooking';
@@ -27,8 +29,6 @@ import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { Sample } from './Sample';
-import { SEP } from './SEP';
-import { SepMeetingDecision } from './SepMeetingDecision';
 import { TechnicalReview } from './TechnicalReview';
 import { Visit } from './Visit';
 
@@ -170,12 +170,12 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => SEP, { nullable: true })
-  async sep(
+  @FieldResolver(() => Fap, { nullable: true })
+  async fap(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<SEP | null> {
-    return await context.queries.sep.dataSource.getSEPByProposalPk(
+  ): Promise<Fap | null> {
+    return await context.queries.fap.dataSource.getFapByProposalPk(
       proposal.primaryKey
     );
   }
@@ -200,12 +200,12 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => SepMeetingDecision, { nullable: true })
-  async sepMeetingDecision(
+  @FieldResolver(() => FapMeetingDecision, { nullable: true })
+  async fapMeetingDecision(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<SepMeetingDecision | null> {
-    return await context.queries.sep.getProposalSepMeetingDecision(
+  ): Promise<FapMeetingDecision | null> {
+    return await context.queries.fap.getProposalFapMeetingDecision(
       context.user,
       proposal.primaryKey
     );

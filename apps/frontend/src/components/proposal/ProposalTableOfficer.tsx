@@ -25,12 +25,12 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import AssignProposalsToFap from 'components/fap/Proposals/AssignProposalsToFap';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
@@ -38,7 +38,7 @@ import {
   ProposalsFilter,
   ProposalStatus,
   ProposalSelectionInput,
-  Sep,
+  Fap,
   InstrumentFragment,
   FeatureId,
 } from 'generated/sdk';
@@ -77,7 +77,7 @@ export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
   instrumentId: number | null;
-  sepId: number | null;
+  fapId: number | null;
   statusId: number;
 };
 
@@ -176,9 +176,7 @@ const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
 ) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const SEPReviewColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
-) => [
+const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
@@ -194,7 +192,7 @@ const SEPReviewColumns = (
     hidden: true,
   },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
-  { title: t('SEP'), field: 'sepCode', emptyValue: '-' },
+  { title: 'Fap', field: 'fapCode', emptyValue: '-' },
 ];
 
 const PREFETCH_SIZE = 200;
@@ -359,7 +357,7 @@ const ProposalTableOfficer = ({
               primaryKey: proposal.primaryKey,
               callId: proposal.callId,
               instrumentId: proposal.instrumentId,
-              sepId: proposal.sepId,
+              fapId: proposal.fapId,
               statusId: proposal.statusId,
               workflowId: proposal.workflowId,
               title: proposal.title,
@@ -411,8 +409,8 @@ const ProposalTableOfficer = ({
   const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-  const isSEPEnabled = featureContext.featuresMap.get(
-    FeatureId.SEP_REVIEW
+  const isFapEnabled = featureContext.featuresMap.get(
+    FeatureId.FAP_REVIEW
   )?.isEnabled;
 
   /**
@@ -444,10 +442,10 @@ const ProposalTableOfficer = ({
     removeColumns(columns, instrumentManagementColumns(t));
   }
 
-  if (isSEPEnabled) {
-    addColumns(columns, SEPReviewColumns(t));
+  if (isFapEnabled) {
+    addColumns(columns, FapReviewColumns);
   } else {
-    removeColumns(columns, SEPReviewColumns(t));
+    removeColumns(columns, FapReviewColumns);
   }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
@@ -496,30 +494,29 @@ const ProposalTableOfficer = ({
     });
   };
 
-  const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
-    if (sep) {
+  const assignProposalsToFap = async (fap: Fap | null): Promise<void> => {
+    if (fap) {
       await api({
         toastSuccessMessage:
-          'Proposal/s assigned to the selected ' + t('SEP') + ' successfully!',
-      }).assignProposalsToSep({
+          'Proposal/s assigned to the selected Fap successfully!',
+      }).assignProposalsToFap({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
         })),
-        sepId: sep.id,
+        fapId: fap.id,
       });
 
       // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
       setTimeout(fetchProposalsData, 500);
     } else {
       await api({
-        toastSuccessMessage:
-          'Proposal/s removed from the ' + t('SEP') + ' successfully!',
-      }).removeProposalsFromSep({
+        toastSuccessMessage: 'Proposal/s removed from the Fap successfully!',
+      }).removeProposalsFromFap({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
-        sepId: selectedProposals[0].sepId as number,
+        fapId: selectedProposals[0].fapId as number,
       });
 
       setProposalsData((proposalsData) =>
@@ -530,8 +527,8 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.sepCode = null;
-            prop.sepId = null;
+            prop.fapCode = null;
+            prop.fapId = null;
           }
 
           return prop;
@@ -669,7 +666,7 @@ const ProposalTableOfficer = ({
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
+    ...(isFapEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
     PROPOSAL_MODAL_TAB_NAMES.ADMIN,
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
@@ -708,11 +705,11 @@ const ProposalTableOfficer = ({
         onClose={(): void => setOpenAssignment(false)}
       >
         <DialogContent>
-          <AssignProposalsToSEP
-            assignProposalsToSEP={assignProposalsToSEP}
+          <AssignProposalsToFap
+            assignProposalsToFap={assignProposalsToFap}
             close={(): void => setOpenAssignment(false)}
-            sepIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.sepId
+            fapIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.fapId
             )}
           />
         </DialogContent>
@@ -927,7 +924,7 @@ const ProposalTableOfficer = ({
           },
           {
             icon: GroupWorkIcon,
-            tooltip: 'Assign proposals to ' + t('SEP'),
+            tooltip: 'Assign proposals to Fap',
             onClick: () => {
               setOpenAssignment(true);
             },
