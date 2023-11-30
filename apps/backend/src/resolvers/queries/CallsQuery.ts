@@ -12,7 +12,7 @@ export class CallsFilter {
   public pdfTemplateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
-  public sepIds?: number[];
+  public fapIds?: number[];
 
   @Field(() => [Int], { nullable: true })
   public instrumentIds?: number[];
@@ -33,7 +33,7 @@ export class CallsFilter {
   public isReviewEnded?: boolean;
 
   @Field(() => Boolean, { nullable: true })
-  public isSEPReviewEnded?: boolean;
+  public isFapReviewEnded?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   public isCallEndedByEvent?: boolean;

@@ -179,16 +179,16 @@ export default {
   instrument2: {
     id: 2,
   },
-  sep: {
+  fap: {
     id: 1,
     code: 'DEMAX',
   },
   roles: {
     user: 1,
     userOfficer: 2,
-    sepChair: 4,
-    sepSecretary: 5,
-    sepReviewer: 6,
+    fapChair: 4,
+    fapSecretary: 5,
+    fapReviewer: 6,
     instrumentScientist: 7,
     sampleSafetyReviewer: 8,
     internalReviewer: 9,
@@ -247,13 +247,13 @@ export default {
       name: 'FEASIBILITY_REVIEW',
     },
     notFeasible: { id: 3 },
-    sepSelection: { id: 4 },
-    sepReview: {
+    fapSelection: { id: 4 },
+    fapReview: {
       id: 5,
     },
-    sepMeeting: {
+    fapMeeting: {
       id: 12,
-      name: 'SEP Meeting',
+      name: 'FAP Meeting',
     },
     editableSubmitted: {
       id: 14,

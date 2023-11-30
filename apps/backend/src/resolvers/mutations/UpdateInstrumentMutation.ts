@@ -51,7 +51,7 @@ export class InstrumentSubmitArgs {
   public callId: number;
 
   @Field(() => Int)
-  public sepId: number;
+  public fapId: number;
 }
 
 @Resolver()

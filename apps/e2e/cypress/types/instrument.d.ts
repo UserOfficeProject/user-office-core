@@ -125,7 +125,7 @@ declare global {
       ) => Cypress.Chainable<SetInstrumentAvailabilityTimeMutation>;
 
       /**
-       * Submit instrument in SEP meeting components
+       * Submit instrument in Fap meeting components
        *
        * @returns {typeof submitInstrument}
        * @memberof Chainable
