@@ -79,10 +79,10 @@ const AssignInstrumentsToCall = ({
   }>({});
 
   const onChange = (id: number, newValue: number | null) => {
-    setInstrumentFapMapping({
-      ...instrumentFapMapping,
+    setInstrumentFapMapping((oldState) => ({
+      ...oldState,
       [id]: newValue,
-    });
+    }));
   };
 
   const columns = [
