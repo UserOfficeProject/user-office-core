@@ -2,8 +2,8 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -139,24 +139,24 @@ export const getCoProposersAndFormatOutputForEmailSending = async (
   return PIs;
 };
 
-export const getSEPReviewersAndFormatOutputForEmailSending = async (
+export const getFapReviewersAndFormatOutputForEmailSending = async (
   proposals: WorkflowEngineProposalType[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
-  const sepDataSource: SEPDataSource = container.resolve(Tokens.SEPDataSource);
+  const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
   const SRs: EmailReadyType[] = [];
   await Promise.all(
     proposals.map(async (proposal) => {
-      const allSepReviewers =
-        await sepDataSource.getSEPUsersByProposalPkAndCallId(
+      const allFapReviewers =
+        await fapDataSource.getFapUsersByProposalPkAndCallId(
           proposal.primaryKey,
           proposal.callId
         );
 
       getEmailReadyArrayOfUsersAndProposals(
         SRs,
-        allSepReviewers,
+        allFapReviewers,
         proposal,
         recipientWithTemplate
       );

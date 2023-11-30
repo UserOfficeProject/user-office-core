@@ -9,6 +9,8 @@ import {
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Country } from '../../models/Country';
+import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
+import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
@@ -33,8 +35,6 @@ import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { SEP, SEPAssignment, SEPProposal, SEPReviewer } from '../../models/SEP';
-import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { TechnicalReview } from '../../models/TechnicalReview';
@@ -147,8 +147,8 @@ export interface ProposalViewRecord {
   readonly technical_review_assignee_lastname: string;
   readonly instrument_name: string;
   readonly call_short_code: string;
-  readonly sep_id: number;
-  readonly sep_code: string;
+  readonly fap_id: number;
+  readonly fap_code: string;
   readonly average: number;
   readonly deviation: number;
   readonly instrument_id: number;
@@ -288,7 +288,7 @@ export interface ReviewRecord {
   readonly comment: string;
   readonly grade: number;
   readonly status: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
 }
 
 export interface TechnicalReviewRecord {
@@ -323,8 +323,8 @@ export interface CallRecord {
   readonly end_call_internal: Date;
   readonly start_review: Date;
   readonly end_review: Date;
-  readonly start_sep_review: Date;
-  readonly end_sep_review: Date;
+  readonly start_fap_review: Date;
+  readonly end_fap_review: Date;
   readonly start_notify: Date;
   readonly end_notify: Date;
   readonly start_cycle: Date;
@@ -338,7 +338,7 @@ export interface CallRecord {
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
-  readonly call_sep_review_ended: boolean;
+  readonly call_fap_review_ended: boolean;
   readonly template_id: number;
   readonly esi_template_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
@@ -405,8 +405,8 @@ export interface EventLogRecord {
   readonly description: string;
 }
 
-export interface SEPRecord {
-  readonly sep_id: number;
+export interface FapRecord {
+  readonly fap_id: number;
   readonly code: string;
   readonly description: string;
   readonly number_ratings_required: number;
@@ -414,31 +414,31 @@ export interface SEPRecord {
   readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
-  readonly sep_chair_user_id: number | null;
-  readonly sep_secretary_user_id: number | null;
+  readonly fap_chair_user_id: number | null;
+  readonly fap_secretary_user_id: number | null;
 }
 
-export interface SEPProposalRecord {
+export interface FapProposalRecord {
   readonly proposal_pk: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
   readonly date_assigned: Date;
-  readonly sep_time_allocation: number | null;
+  readonly fap_time_allocation: number | null;
   readonly instrument_submitted?: boolean;
 }
 
-export interface SEPAssignmentRecord {
+export interface FapAssignmentRecord {
   readonly proposal_pk: number;
-  readonly sep_member_user_id: number;
-  readonly sep_id: number;
+  readonly fap_member_user_id: number;
+  readonly fap_id: number;
   readonly date_assigned: Date;
   readonly reassigned: boolean;
   readonly date_reassigned: Date;
   readonly email_sent: boolean;
 }
 
-export interface SEPReviewerRecord {
+export interface FapReviewerRecord {
   readonly user_id: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
 }
 
 export interface RoleUserRecord {
@@ -467,7 +467,7 @@ export interface CallHasInstrumentRecord {
   readonly instrument_id: number;
   availability_time: number;
   submitted: boolean;
-  sep_id: number;
+  fap_id: number;
 }
 export interface InstrumentWithAvailabilityTimeRecord {
   readonly instrument_id: number;
@@ -479,7 +479,7 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
 }
 
 export interface TemplateCategoryRecord {
@@ -546,7 +546,7 @@ export interface StatusChangingEventRecord {
   readonly status_changing_event: string;
 }
 
-export interface SepMeetingDecisionRecord {
+export interface FapMeetingDecisionRecord {
   readonly proposal_pk: number;
   readonly comment_for_management: string;
   readonly comment_for_user: string;
@@ -556,7 +556,7 @@ export interface SepMeetingDecisionRecord {
   readonly submitted_by: number | null;
 }
 
-export interface SepProposalWithReviewGradesAndRankingRecord {
+export interface FapProposalWithReviewGradesAndRankingRecord {
   readonly proposal_pk: number;
   readonly rank_order: number | null;
   readonly review_grades: number[];
@@ -571,19 +571,19 @@ export interface ProposalEventsRecord {
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
-  readonly proposal_sep_selected: boolean;
+  readonly proposal_fap_selected: boolean;
   readonly proposal_instrument_selected: boolean;
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;
-  readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_all_fap_reviewers_selected: boolean;
   readonly proposal_management_decision_updated: boolean;
   readonly proposal_management_decision_submitted: boolean;
-  readonly proposal_all_sep_reviews_submitted: boolean;
-  readonly proposal_sep_review_updated: boolean;
+  readonly proposal_all_fap_reviews_submitted: boolean;
+  readonly proposal_fap_review_updated: boolean;
   readonly proposal_feasibility_review_updated: boolean;
   readonly proposal_sample_safe: boolean;
-  readonly proposal_sep_review_submitted: boolean;
-  readonly proposal_sep_meeting_submitted: boolean;
+  readonly proposal_fap_review_submitted: boolean;
+  readonly proposal_fap_meeting_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
   readonly proposal_accepted: boolean;
   readonly proposal_reserved: boolean;
@@ -768,7 +768,7 @@ export const createReviewObject = (review: ReviewRecord) => {
     review.comment,
     review.grade,
     review.status,
-    review.sep_id
+    review.fap_id
   );
 };
 
@@ -820,8 +820,8 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_review_submitted,
     proposal.instrument_name,
     proposal.call_short_code,
-    proposal.sep_code,
-    proposal.sep_id,
+    proposal.fap_code,
+    proposal.fap_id,
     proposal.average,
     proposal.deviation,
     proposal.instrument_id,
@@ -960,8 +960,8 @@ export const createCallObject = (call: CallRecord) => {
     call.end_call_internal,
     call.start_review,
     call.end_review,
-    call.start_sep_review,
-    call.end_sep_review,
+    call.start_fap_review,
+    call.end_fap_review,
     call.start_notify,
     call.end_notify,
     call.start_cycle,
@@ -975,7 +975,7 @@ export const createCallObject = (call: CallRecord) => {
     call.call_ended,
     call.call_ended_internal,
     call.call_review_ended,
-    call.call_sep_review_ended,
+    call.call_fap_review_ended,
     call.template_id,
     call.esi_template_id,
     call.allocation_time_unit,
@@ -994,7 +994,7 @@ export const createCallHasInstrumentObject = (
     callHasInstrument.instrument_id,
     callHasInstrument.availability_time,
     callHasInstrument.submitted,
-    callHasInstrument.sep_id
+    callHasInstrument.fap_id
   );
 };
 
@@ -1072,59 +1072,59 @@ export const createSettingsObject = (record: SettingsRecord) => {
   );
 };
 
-export const createSEPObject = (sep: SEPRecord) => {
-  return new SEP(
-    sep.sep_id,
-    sep.code,
-    sep.description,
-    sep.number_ratings_required,
-    sep.grade_guide,
-    sep.custom_grade_guide,
-    sep.active,
-    sep.sep_chair_user_id,
-    sep.sep_secretary_user_id
+export const createFapObject = (fap: FapRecord) => {
+  return new Fap(
+    fap.fap_id,
+    fap.code,
+    fap.description,
+    fap.number_ratings_required,
+    fap.grade_guide,
+    fap.custom_grade_guide,
+    fap.active,
+    fap.fap_chair_user_id,
+    fap.fap_secretary_user_id
   );
 };
 
-export const createSepMeetingDecisionObject = (
-  sepMeetingDecisionRecord: SepMeetingDecisionRecord
+export const createFapMeetingDecisionObject = (
+  fapMeetingDecisionRecord: FapMeetingDecisionRecord
 ) => {
-  return new SepMeetingDecision(
-    sepMeetingDecisionRecord.proposal_pk,
-    sepMeetingDecisionRecord.rank_order,
-    sepMeetingDecisionRecord.recommendation,
-    sepMeetingDecisionRecord.comment_for_user,
-    sepMeetingDecisionRecord.comment_for_management,
-    sepMeetingDecisionRecord.submitted,
-    sepMeetingDecisionRecord.submitted_by
+  return new FapMeetingDecision(
+    fapMeetingDecisionRecord.proposal_pk,
+    fapMeetingDecisionRecord.rank_order,
+    fapMeetingDecisionRecord.recommendation,
+    fapMeetingDecisionRecord.comment_for_user,
+    fapMeetingDecisionRecord.comment_for_management,
+    fapMeetingDecisionRecord.submitted,
+    fapMeetingDecisionRecord.submitted_by
   );
 };
 
-export const createSEPProposalObject = (sepAssignment: SEPProposalRecord) => {
-  return new SEPProposal(
-    sepAssignment.proposal_pk,
-    sepAssignment.sep_id,
-    sepAssignment.date_assigned,
-    sepAssignment.sep_time_allocation,
-    sepAssignment.instrument_submitted
+export const createFapProposalObject = (fapAssignment: FapProposalRecord) => {
+  return new FapProposal(
+    fapAssignment.proposal_pk,
+    fapAssignment.fap_id,
+    fapAssignment.date_assigned,
+    fapAssignment.fap_time_allocation,
+    fapAssignment.instrument_submitted
   );
 };
-export const createSEPAssignmentObject = (
-  sepAssignment: SEPAssignmentRecord
+export const createFapAssignmentObject = (
+  fapAssignment: FapAssignmentRecord
 ) => {
-  return new SEPAssignment(
-    sepAssignment.proposal_pk,
-    sepAssignment.sep_member_user_id,
-    sepAssignment.sep_id,
-    sepAssignment.date_assigned,
-    sepAssignment.reassigned,
-    sepAssignment.date_reassigned,
-    sepAssignment.email_sent
+  return new FapAssignment(
+    fapAssignment.proposal_pk,
+    fapAssignment.fap_member_user_id,
+    fapAssignment.fap_id,
+    fapAssignment.date_assigned,
+    fapAssignment.reassigned,
+    fapAssignment.date_reassigned,
+    fapAssignment.email_sent
   );
 };
 
-export const createSEPReviewerObject = (sepMember: SEPReviewerRecord) => {
-  return new SEPReviewer(sepMember.user_id, sepMember.sep_id);
+export const createFapReviewerObject = (fapMember: FapReviewerRecord) => {
+  return new FapReviewer(fapMember.user_id, fapMember.fap_id);
 };
 
 export const createRoleObject = (role: RoleRecord) => {

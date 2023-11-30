@@ -101,7 +101,7 @@ test('A user officer can invite a reviewer by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
     dummyPlaceHolderUser.id,
     dummyUserOfficer.id,
-    UserRole.SEP_REVIEWER
+    UserRole.FAP_REVIEWER
   );
 
   return expect(
@@ -109,7 +109,7 @@ test('A user officer can invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyPlaceHolderUser.email,
-      userRole: UserRole.SEP_REVIEWER,
+      userRole: UserRole.FAP_REVIEWER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
 });
@@ -120,7 +120,7 @@ test('A user cannot invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'email@google.com',
-      userRole: UserRole.SEP_REVIEWER,
+      userRole: UserRole.FAP_REVIEWER,
     })
   ).rejects.toThrow('Can not create user for this role');
 });

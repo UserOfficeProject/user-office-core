@@ -37,9 +37,9 @@ export function useInstrumentsData(callIds?: number[]): {
       currentRole &&
       [
         UserRole.USER_OFFICER,
-        UserRole.SEP_REVIEWER,
-        UserRole.SEP_CHAIR,
-        UserRole.SEP_SECRETARY,
+        UserRole.FAP_REVIEWER,
+        UserRole.FAP_CHAIR,
+        UserRole.FAP_SECRETARY,
         UserRole.USER,
       ].includes(currentRole)
     ) {
