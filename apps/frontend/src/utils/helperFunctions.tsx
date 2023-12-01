@@ -73,7 +73,7 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
-    rankOrder: proposal.sepMeetingDecision?.rankOrder,
+    rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
     technicalTimeAllocation: proposal.technicalReview?.timeAllocation || null,
     technicalReviewAssigneeId:
@@ -92,7 +92,7 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
       average(getGradesFromReviews(proposal.reviews ?? [])) || null,
     reviewDeviation:
       standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    sepCode: proposal.sep?.code,
+    fapCode: proposal.fap?.code,
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
