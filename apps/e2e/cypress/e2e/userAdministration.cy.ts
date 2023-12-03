@@ -78,7 +78,7 @@ context('User administration tests', () => {
     cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
   });
 
-  it('Should be able to invite user or sep reviewer by email', () => {
+  it('Should be able to invite user or fap reviewer by email', () => {
     const userFirstName = faker.name.firstName();
     const userLastName = faker.name.lastName();
     const userEmail = faker.internet.email();
@@ -151,7 +151,7 @@ context('User administration tests', () => {
 
     cy.get('[data-cy="user-roles-table"] table tbody tr')
       .first()
-      .contains('SEP Reviewer');
+      .contains('FAP Reviewer');
   });
 
   it('Should be able to delete user information', () => {

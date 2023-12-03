@@ -109,7 +109,7 @@ export default class UserMutations {
     }
 
     if (
-      args.userRole === UserRole.SEP_REVIEWER &&
+      args.userRole === UserRole.FAP_REVIEWER &&
       this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
@@ -119,7 +119,7 @@ export default class UserMutations {
       );
 
       await this.dataSource.setUserRoles(userId, [newUserRole.id]);
-      role = UserRole.SEP_REVIEWER;
+      role = UserRole.FAP_REVIEWER;
     } else if (args.userRole === UserRole.USER) {
       userId = await this.dataSource.createInviteUser(args);
 
@@ -130,18 +130,18 @@ export default class UserMutations {
       await this.dataSource.setUserRoles(userId, [newUserRole.id]);
       role = UserRole.USER;
     } else if (
-      args.userRole === UserRole.SEP_CHAIR &&
+      args.userRole === UserRole.FAP_CHAIR &&
       this.userAuth.isUserOfficer(agent)
     ) {
-      // NOTE: For inviting SEP_CHAIR and SEP_SECRETARY we do not setUserRoles because they are set right after in separate call.
+      // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in faparate call.
       userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.SEP_CHAIR;
+      role = UserRole.FAP_CHAIR;
     } else if (
-      args.userRole === UserRole.SEP_SECRETARY &&
+      args.userRole === UserRole.FAP_SECRETARY &&
       this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.SEP_SECRETARY;
+      role = UserRole.FAP_SECRETARY;
     } else if (
       args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
       this.userAuth.isUserOfficer(agent)

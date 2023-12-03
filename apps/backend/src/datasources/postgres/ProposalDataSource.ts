@@ -43,7 +43,7 @@ import {
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
   technicalStatus: 'technical_review_status',
-  sepCode: 'sep_code',
+  fapCode: 'fap_code',
   rankOrder: 'rank_order',
   reviewAverage: 'average',
   reviewDeviation: 'deviation',
@@ -52,6 +52,8 @@ const fieldMap: { [key: string]: string } = {
   statusName: 'proposal_table_view.proposal_status_id',
   proposalId: 'proposal_table_view.proposal_id',
   title: 'title',
+  submitted: 'proposal_table_view.submitted',
+  notified: 'proposal_table_view.notified',
 };
 
 export async function calculateReferenceNumber(

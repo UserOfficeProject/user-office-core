@@ -36,10 +36,10 @@ export class UpdateCallInput {
   public endReview?: Date;
 
   @Field(() => Date, { nullable: true })
-  public startSEPReview?: Date;
+  public startFapReview?: Date;
 
   @Field(() => Date, { nullable: true })
-  public endSEPReview?: Date;
+  public endFapReview?: Date;
 
   @Field(() => Date, { nullable: true })
   public startNotify?: Date;
@@ -84,7 +84,7 @@ export class UpdateCallInput {
   public callReviewEnded?: boolean;
 
   @Field(() => Int, { nullable: true })
-  public callSEPReviewEnded?: boolean;
+  public callFapReviewEnded?: boolean;
 
   @Field(() => Int, { nullable: true })
   public templateId?: number;
@@ -102,32 +102,32 @@ export class UpdateCallInput {
   public description?: string;
 
   @Field(() => [Int!], { nullable: true })
-  public seps?: number[];
+  public faps?: number[];
 
   @Field(() => Boolean, { nullable: true })
   public isActive?: boolean;
 }
 
 @InputType()
-export class InstrumentSepMappingInput {
+export class InstrumentFapMappingInput {
   @Field(() => Int)
   instrumentId: number;
 
   @Field(() => Int, { nullable: true })
-  sepId?: number;
+  fapId?: number;
 }
 
 @InputType()
 export class AssignInstrumentsToCallInput {
-  @Field(() => [InstrumentSepMappingInput])
-  instrumentSepIds: InstrumentSepMappingInput[];
+  @Field(() => [InstrumentFapMappingInput])
+  instrumentFapIds: InstrumentFapMappingInput[];
 
   @Field(() => Int)
   callId: number;
 }
 
 @InputType()
-export class UpdateSepToCallInstrumentInput {
+export class UpdateFapToCallInstrumentInput {
   @Field(() => Int)
   instrumentId: number;
 
@@ -135,11 +135,11 @@ export class UpdateSepToCallInstrumentInput {
   callId: number;
 
   @Field(() => Int, { nullable: true })
-  sepId?: number;
+  fapId?: number;
 }
 
 @InputType()
-export class RemoveSepFromCallInstrumentsInput {
+export class RemoveFapFromCallInstrumentsInput {
   @Field(() => [Int])
   instrumentIds: number[];
 
@@ -181,14 +181,14 @@ export class UpdateCallMutation {
   }
 
   @Mutation(() => Call)
-  updateSepToCallInstrument(
-    @Arg('updateSepToCallInstrumentInput')
-    updateSepToCallInstrumentInput: UpdateSepToCallInstrumentInput,
+  updateFapToCallInstrument(
+    @Arg('updateFapToCallInstrumentInput')
+    updateFapToCallInstrumentInput: UpdateFapToCallInstrumentInput,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.call.updateSepToCallInstrument(
+    return context.mutations.call.updateFapToCallInstrument(
       context.user,
-      updateSepToCallInstrumentInput
+      updateFapToCallInstrumentInput
     );
   }
 

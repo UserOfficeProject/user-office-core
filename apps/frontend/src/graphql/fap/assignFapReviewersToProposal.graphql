@@ -1,0 +1,13 @@
+mutation assignFapReviewersToProposal(
+  $memberIds: [Int!]!
+  $fapId: Int!
+  $proposalPk: Int!
+) {
+  assignFapReviewersToProposal(
+    memberIds: $memberIds
+    fapId: $fapId
+    proposalPk: $proposalPk
+  ) {
+    id
+  }
+}

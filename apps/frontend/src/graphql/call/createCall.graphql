@@ -5,8 +5,8 @@ mutation createCall(
   $endCallInternal: DateTime
   $startReview: DateTime!
   $endReview: DateTime!
-  $startSEPReview: DateTime
-  $endSEPReview: DateTime
+  $startFapReview: DateTime
+  $endFapReview: DateTime
   $startNotify: DateTime!
   $endNotify: DateTime!
   $startCycle: DateTime!
@@ -22,7 +22,7 @@ mutation createCall(
   $pdfTemplateId: Int
   $title: String
   $description: String
-  $seps: [Int!]
+  $faps: [Int!]
 ) {
   createCall(
     createCallInput: {
@@ -32,8 +32,8 @@ mutation createCall(
       endCallInternal: $endCallInternal
       startReview: $startReview
       endReview: $endReview
-      startSEPReview: $startSEPReview
-      endSEPReview: $endSEPReview
+      startFapReview: $startFapReview
+      endFapReview: $endFapReview
       startNotify: $startNotify
       endNotify: $endNotify
       startCycle: $startCycle
@@ -49,7 +49,7 @@ mutation createCall(
       pdfTemplateId: $pdfTemplateId
       title: $title
       description: $description
-      seps: $seps
+      faps: $faps
     }
   ) {
     ...call
