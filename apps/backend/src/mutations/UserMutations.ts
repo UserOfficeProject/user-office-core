@@ -24,7 +24,6 @@ import { Role, Roles } from '../models/Role';
 import {
   AuthJwtPayload,
   BasicUserDetails,
-  EmailVerificationJwtPayload,
   PasswordResetJwtPayload,
   User,
   UserRole,
@@ -478,28 +477,6 @@ export default class UserMutations {
     return userLinkResponse;
   }
 
-  async emailVerification(token: string) {
-    // Check that token is valid
-    try {
-      const decoded = verifyToken<EmailVerificationJwtPayload>(token);
-      const user = await this.dataSource.getUser(decoded.id);
-      //Check that user exist
-      if (user && decoded.type === 'emailVerification') {
-        await this.dataSource.setUserEmailVerified(user.id);
-
-        return true;
-      } else {
-        return rejection('Can not verify user', { user, decoded });
-      }
-    } catch (error) {
-      return rejection(
-        'Can not verify email, please contact user office for help',
-        {},
-        error
-      );
-    }
-  }
-
   @ValidateArgs(addUserRoleValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: UserWithRole | null, args: AddUserRoleArgs) {
@@ -584,14 +561,6 @@ export default class UserMutations {
     } catch (error) {
       return rejection('Could not reset password', {}, error);
     }
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  setUserEmailVerified(
-    _: UserWithRole | null,
-    id: number
-  ): Promise<User | null> {
-    return this.dataSource.setUserEmailVerified(id);
   }
 
   @Authorized([Roles.USER_OFFICER])

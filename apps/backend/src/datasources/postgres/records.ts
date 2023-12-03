@@ -248,7 +248,6 @@ export interface UserRecord {
   readonly organisation_address: string;
   readonly position: string;
   readonly email: string;
-  readonly email_verified: boolean;
   readonly password: string;
   readonly telephone: string;
   readonly telephone_alt: string;
@@ -913,7 +912,6 @@ export const createUserObject = (user: UserRecord) => {
     user.department,
     user.position,
     user.email,
-    user.email_verified,
     user.telephone,
     user.telephone_alt,
     user.placeholder,

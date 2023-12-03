@@ -92,9 +92,6 @@ export class User implements Partial<UserOrigin> {
   public email: string;
 
   @Field()
-  public emailVerified: boolean;
-
-  @Field()
   public telephone: string;
 
   @Field(() => String, { nullable: true })

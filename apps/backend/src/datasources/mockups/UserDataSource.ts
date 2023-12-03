@@ -259,10 +259,6 @@ export class UserDataSourceMock implements UserDataSource {
   async getPasswordByEmail(email: string): Promise<string> {
     return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
   }
-  async setUserEmailVerified(id: number): Promise<User | null> {
-    return null;
-    // Do something here or remove the function.
-  }
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     return null;
   }

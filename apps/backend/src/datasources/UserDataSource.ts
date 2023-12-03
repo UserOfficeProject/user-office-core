@@ -84,7 +84,6 @@ export interface UserDataSource {
   setUserRoles(id: number, roles: number[]): Promise<void>;
   setUserPassword(id: number, password: string): Promise<BasicUserDetails>;
   getPasswordByUsername(username: string): Promise<string | null>;
-  setUserEmailVerified(id: number): Promise<User | null>;
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
     userId: number,
