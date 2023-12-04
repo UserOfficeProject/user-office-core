@@ -219,7 +219,7 @@ context('Proposal administration tests', () => {
         cy.logout();
       }
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(proposalName1)

@@ -1,13 +1,16 @@
 import { faker } from '@faker-js/faker';
 import {
   FeatureId,
+  SettingsId,
   TechnicalReviewStatus,
   TemplateGroupId,
+  UserRole,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
@@ -22,7 +25,7 @@ context('Settings tests', () => {
     const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
     it('User should not be able to see Settings page', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -311,7 +314,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -397,7 +400,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -486,12 +489,12 @@ context('Settings tests', () => {
             proposalPk: result.createProposal.primaryKey,
             title: proposalTitle,
             abstract: proposalTitle,
-            proposerId: initialDBData.users.user2.id,
+            proposerId: initialDBData.users.placeholderUser.id,
           });
         }
       });
 
-      cy.login('user2');
+      cy.login('placeholderUser', 1);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -681,7 +684,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.finishedLoading();
@@ -777,7 +780,7 @@ context('Settings tests', () => {
             status: TechnicalReviewStatus.FEASIBLE,
             timeAllocation: 1,
             submitted: true,
-            reviewerId: 0,
+            reviewerId: 4,
           });
         }
       });
@@ -828,7 +831,7 @@ context('Settings tests', () => {
             status: TechnicalReviewStatus.FEASIBLE,
             timeAllocation: 1,
             submitted: true,
-            reviewerId: 0,
+            reviewerId: 4,
           });
 
           cy.assignProposalsToSep({
@@ -837,6 +840,22 @@ context('Settings tests', () => {
               primaryKey: proposal.primaryKey,
             },
             sepId: initialDBData.sep.id,
+          });
+          cy.assignChairOrSecretary({
+            assignChairOrSecretaryToSEPInput: {
+              sepId: 1,
+              userId: initialDBData.users.user1.id,
+              roleId: UserRole.SEP_CHAIR,
+            },
+          });
+          cy.assignReviewersToSep({
+            sepId: 1,
+            memberIds: [initialDBData.users.reviewer.id],
+          });
+          cy.assignSepReviewersToProposal({
+            sepId: 1,
+            memberIds: [initialDBData.users.reviewer.id],
+            proposalPk: proposal.primaryKey,
           });
         }
       });
@@ -849,41 +868,9 @@ context('Settings tests', () => {
 
       cy.get("[aria-label='Edit']").first().click();
 
-      cy.contains('Members').click();
-
-      cy.get('[aria-label="Set SEP Chair"]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[aria-label="Select user"]').first().click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP chair assigned successfully!',
-      });
-
       cy.contains('Proposals and Assignments').click();
 
       cy.finishedLoading();
-
-      cy.get('[data-cy="assign-sep-member"]').first().click();
-
-      cy.finishedLoading();
-
-      cy.get('[role="dialog"]')
-        .contains('Nilsson')
-        .parent()
-        .find('input[type="checkbox"]')
-        .click();
-      cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Members assigned',
-      });
 
       cy.get('[role="dialog"]').should('not.exist');
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
@@ -896,7 +883,15 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="grade-proposal"]').click();
 
-      cy.get('[role="listbox"] > [role="option"]').first().click();
+      if (
+        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
+      ) {
+        cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
+
+        cy.get('[role="listbox"] > [role="option"]').first().click();
+      } else {
+        cy.get('[data-cy="grade-proposal"]').click().type('1');
+      }
 
       cy.get('[data-cy="is-grade-submitted"]').click();
       cy.get('[type="submit"]').contains('Save').click();
@@ -928,7 +923,7 @@ context('Settings tests', () => {
             status: TechnicalReviewStatus.FEASIBLE,
             timeAllocation: 1,
             submitted: true,
-            reviewerId: 0,
+            reviewerId: 4,
           });
 
           cy.assignProposalsToSep({
@@ -1095,7 +1090,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(firstProposalTitle).parent().contains('submitted');

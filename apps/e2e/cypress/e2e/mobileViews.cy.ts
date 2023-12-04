@@ -24,7 +24,7 @@ context('Mobile views tests', () => {
 
   it('Action buttons on a modal should be visible on smaller screens', () => {
     cy.viewport('macbook-11');
-    cy.login('user1');
+    cy.login('user1', 1);
     cy.visit('/');
 
     cy.contains('New Proposal').click();

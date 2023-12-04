@@ -41,7 +41,7 @@ context('General scientific evaluation panel tests', () => {
   });
 
   it('User should not be able to see SEPs page', () => {
-    cy.login('user1');
+    cy.login('user1', 1);
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -199,17 +199,16 @@ context('General scientific evaluation panel tests', () => {
       });
     });
     it('Officer should be able to assign SEP Chair and SEP Secretary to existing SEP', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        this.skip();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: sepMembers.chair.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
+        });
+        cy.updateUserRoles({
+          id: sepMembers.secretary.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
+        });
       }
-      cy.updateUserRoles({
-        id: sepMembers.chair.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
-      });
-      cy.updateUserRoles({
-        id: sepMembers.secretary.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
-      });
       let selectedChairUserFirstName = '';
       let selectedChairUserLastName = '';
       let selectedSecretaryUserFirstName = '';
@@ -305,17 +304,16 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('Officer should be able to remove assigned SEP Chair and SEP Secretary from existing SEP', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        this.skip();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: sepMembers.chair.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
+        });
+        cy.updateUserRoles({
+          id: sepMembers.secretary.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
+        });
       }
-      cy.updateUserRoles({
-        id: sepMembers.chair.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
-      });
-      cy.updateUserRoles({
-        id: sepMembers.secretary.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
-      });
       cy.assignChairOrSecretary({
         assignChairOrSecretaryToSEPInput: {
           sepId: createdSepId,
@@ -437,13 +435,12 @@ context('General scientific evaluation panel tests', () => {
     let createdSepId: number;
 
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        this.skip();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: sepMembers.chair.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
+        });
       }
-      cy.updateUserRoles({
-        id: sepMembers.chair.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
-      });
       cy.createSep({
         code: sep1.code,
         description: sep1.description,
@@ -560,13 +557,13 @@ context('General scientific evaluation panel tests', () => {
 
   describe('SEP tests as SEP Secretary', () => {
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        this.skip();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: sepMembers.secretary.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
+        });
       }
-      cy.updateUserRoles({
-        id: sepMembers.secretary.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
-      });
+
       cy.createSep({
         code: sep1.code,
         description: sep1.description,

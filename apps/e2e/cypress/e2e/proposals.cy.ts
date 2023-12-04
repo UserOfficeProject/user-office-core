@@ -775,7 +775,7 @@ context('Proposal tests', () => {
     });
 
     it('User officer should reopen proposal', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
       cy.get('[aria-label="View proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -790,7 +790,7 @@ context('Proposal tests', () => {
       cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
       cy.get('[aria-label="Edit proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -838,7 +838,7 @@ context('Proposal tests', () => {
         endCallInternal: faker.date.future(),
         proposalWorkflowId: createdWorkflowId,
       });
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -938,7 +938,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1012,7 +1012,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1055,7 +1055,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
       cy.contains('Dashboard').click();
 
@@ -1076,7 +1076,7 @@ context('Proposal tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
       let createdCallId: number;
       const createdCallTitle = faker.random.alphaNumeric(15);
@@ -1126,7 +1126,7 @@ context('Proposal tests', () => {
         if (response.createCall) {
           createdCallId = response.createCall.id;
         }
-        cy.login('user2');
+        cy.login('placeholderUser', 1);
         cy.visit('/');
 
         cy.contains('New Proposal').click();
@@ -1146,8 +1146,10 @@ context('Proposal tests', () => {
         cy.reload();
 
         cy.finishedLoading();
-
-        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
+        cy.get('[data-cy=call-list]').should(
+          'not.contain',
+          updatedCall.shortCode
+        );
       });
     });
 
@@ -1179,7 +1181,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user2');
+      cy.login('placeholderUser', 1);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1260,7 +1262,7 @@ context('Proposal tests', () => {
       });
     });
     it('Instrument should be automatically assigned to the proposal', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();

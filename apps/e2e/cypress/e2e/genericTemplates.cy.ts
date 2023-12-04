@@ -406,7 +406,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -438,7 +438,7 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -581,7 +581,7 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
       cy.createProposal({ callId: initialDBData.call.id });
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -697,7 +697,7 @@ context('GenericTemplates tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -798,7 +798,7 @@ context('GenericTemplates tests', () => {
       });
     });
     it('User should be able to modify and submit cloned proposal with generic templates', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.finishedLoading();
@@ -890,7 +890,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('User should be able to revert deleting a template', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -962,7 +962,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('User should be able to revert deleting multiple templates', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1059,7 +1059,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('User should be able to revert cloning a template', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1131,7 +1131,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('User should be able to revert cloning multiple templates', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1209,7 +1209,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('User should be able to revert adding a template', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1252,7 +1252,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('User should be able to revert adding multiple templates', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1318,7 +1318,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('User should be able to revert deleting, cloning and adding templates', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1371,7 +1371,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('Reverted changes should not be restored after saving', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1449,7 +1449,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('State is updated after user edits a template', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();
@@ -1509,7 +1509,7 @@ context('GenericTemplates tests', () => {
     });
 
     it('State is unchanged after user closes edit template prompt', () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New proposal', { matchCase: false }).click();

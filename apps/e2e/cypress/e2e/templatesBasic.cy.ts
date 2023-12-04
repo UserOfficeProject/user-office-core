@@ -881,7 +881,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -1011,7 +1011,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -1101,7 +1101,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains(proposal.title)
@@ -1387,7 +1387,7 @@ context('Template tests', () => {
 
   describe('Dynamic multiple choice external api call tests', () => {
     const createProposalAndClickDropdownBehavior = () => {
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -1519,7 +1519,7 @@ context('Template tests', () => {
 
       cy.createFileUploadQuestion(fileQuestion, ['.pdf', '.docx', 'image/*']);
 
-      cy.login('user1');
+      cy.login('user1', 1);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
