@@ -366,6 +366,9 @@ export class UserDataSourceMock implements UserDataSource {
       users: [basicDummyUser, basicDummyUserNotOnProposal],
     };
   }
+  async getUsersByUserNumbers(id: readonly number[]): Promise<User[] | null> {
+    return [dummyUser, dummyUserOfficer];
+  }
 
   async getPreviousCollaborators(
     user_id: number,

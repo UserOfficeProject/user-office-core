@@ -53,3 +53,11 @@ test('A user that is not logged in is not allowed to fetch all accounts', () => 
 test('A user is not allowed to fetch roles', () => {
   return expect(userQueries.getRoles(dummyUserWithRole)).resolves.toBe(null);
 });
+test('A user officer is allowed to fetch other users account in bulk', () => {
+  return expect(
+    userQueries.getUsers(dummyUserOfficerWithRole, [
+      dummyUser.id,
+      dummyUserOfficer.id,
+    ])
+  ).resolves.toStrictEqual([dummyUser, dummyUserOfficer]);
+});

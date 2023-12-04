@@ -783,4 +783,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         .where({ [row.columnName]: userFrom });
     }
   }
+  async getUsersByUserNumbers(id: readonly number[]): Promise<User[] | null> {
+    throw new Error('Method not implemented.');
+  }
 }
