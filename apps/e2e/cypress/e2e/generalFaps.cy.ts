@@ -163,9 +163,8 @@ context('General scientific evaluation panel tests', () => {
 
       const token = window.localStorage.getItem('token');
 
-      // TODO: The url should be updated on the factory side.
       cy.request({
-        url: '/download/xlsx/sep/1/call/1',
+        url: '/download/xlsx/fap/1/call/1',
         method: 'GET',
         headers: {
           authorization: `Bearer ${token}`,
