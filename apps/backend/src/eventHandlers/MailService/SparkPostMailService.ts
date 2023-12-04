@@ -21,7 +21,7 @@ export class SparkPostMailService extends MailService {
       endpoint: 'https://api.eu.sparkpost.com:443',
     });
 
-    this.sinkEmail = 'martin.trajanovski@ess.eu';
+    this.sinkEmail = process.env.SINK_EMAIL;
   }
 
   private getEnvOptions(options: EmailSettings) {

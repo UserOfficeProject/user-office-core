@@ -1,21 +1,3 @@
-export default interface EmailSettings extends CreateTransmission {
-  content: {
-    template_id: string;
-  };
-  recipients: (
-    | {
-        address: string;
-      }
-    | {
-        address: {
-          email: string;
-          header_to: string;
-        };
-      }
-  )[];
-  // eslint-disable-next-line semi
-}
-
 interface BaseRecipient {
   /** SparkPost Enterprise API only. Email to use for envelope FROM. */
   return_path?: string | undefined;
@@ -168,4 +150,22 @@ export interface CreateTransmission {
     | InlineContent
     | { template_id: string; use_draft_template?: boolean | undefined }
     | { email_rfc822: string };
+}
+
+export default interface EmailSettings extends CreateTransmission {
+  content: {
+    template_id: string;
+  };
+  recipients: (
+    | {
+        address: string;
+      }
+    | {
+        address: {
+          email: string;
+          header_to: string;
+        };
+      }
+  )[];
+  // eslint-disable-next-line semi
 }
