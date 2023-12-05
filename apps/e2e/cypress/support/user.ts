@@ -29,11 +29,12 @@ type DecodedTokenData = {
 
 const extTokenStoreStfc = new Map<TestUserId, string>([
   ['user1', 'user'],
-  ['user2', 'externalUser'],
-  ['user3', 'user'],
+  ['user2', 'internalUser'],
+  ['user3', 'secretary'],
   ['officer', 'officer'],
   ['placeholderUser', 'user'],
-  ['reviewer', 'user'],
+  ['reviewer', 'reviewer'],
+  ['placeholderUser', 'externalUser'],
 ]);
 
 const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
@@ -69,10 +70,11 @@ function changeActiveRole(selectedRoleId: number) {
     ) as DecodedTokenData;
 
     window.localStorage.setItem('token', resp.selectRole);
-    window.localStorage.setItem(
-      'currentRole',
-      currentRole.shortCode.toUpperCase()
-    );
+    currentRole.shortCode &&
+      window.localStorage.setItem(
+        'currentRole',
+        currentRole.shortCode.toUpperCase()
+      );
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
     window.localStorage.isInternalUser = isInternalUser;
@@ -187,10 +189,11 @@ const login = (
         }
         const { user, exp, currentRole } = jwtDecode(token) as DecodedTokenData;
         window.localStorage.setItem('token', token);
-        window.localStorage.setItem(
-          'currentRole',
-          currentRole.shortCode.toUpperCase()
-        );
+        currentRole.shortCode &&
+          window.localStorage.setItem(
+            'currentRole',
+            currentRole.shortCode.toUpperCase()
+          );
         window.localStorage.setItem('expToken', `${exp}`);
         window.localStorage.setItem('user', JSON.stringify(user));
 
