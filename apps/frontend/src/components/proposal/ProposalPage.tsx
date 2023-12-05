@@ -28,6 +28,7 @@ export type ProposalUrlQueryParamsType = {
   reviewModal: QueryParamConfig<number | null | undefined>;
   compareOperator: QueryParamConfig<string | null | undefined>;
   questionId: QueryParamConfig<string | null | undefined>;
+  proposalId: QueryParamConfig<string | null | undefined>;
   value: QueryParamConfig<string | null | undefined>;
   dataType: QueryParamConfig<string | null | undefined>;
 } & UrlQueryParamsType;
@@ -41,6 +42,7 @@ export default function ProposalPage() {
       proposalStatus: NumberParam,
       reviewModal: NumberParam,
       questionId: StringParam,
+      proposalId: StringParam,
       compareOperator: StringParam,
       value: StringParam,
       dataType: StringParam,
@@ -49,6 +51,9 @@ export default function ProposalPage() {
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus,
+    referenceNumbers: urlQueryParams.proposalId
+      ? [urlQueryParams.proposalId]
+      : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });
   const { calls, loadingCalls } = useCallsData();
@@ -74,6 +79,7 @@ export default function ProposalPage() {
         />
         <ProposalTableOfficer
           proposalFilter={proposalFilter}
+          setProposalFilter={setProposalFilter}
           urlQueryParams={urlQueryParams}
           setUrlQueryParams={setUrlQueryParams}
         />
