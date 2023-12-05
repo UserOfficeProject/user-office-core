@@ -19,10 +19,18 @@ const ExternalAuthQueryParams = {
   error_description: StringParam,
 };
 
-const getCurrentUrlWithoutQueryParams = () => {
-  const { protocol, host, pathname } = window.location;
+export const getCurrentUrlValues = () => {
+  const { protocol, host, pathname, search } = window.location;
+  const currentUrlWithoutParams = [protocol, '//', host, pathname].join('');
+  const queryParams = new URLSearchParams(search);
+  Object.keys(ExternalAuthQueryParams).map((value) => {
+    queryParams.delete(value);
+  });
 
-  return [protocol, '//', host, pathname].join('');
+  return {
+    currentUrlWithoutParams,
+    queryParams,
+  };
 };
 
 function ExternalAuth() {
@@ -45,7 +53,7 @@ function ExternalAuth() {
 
     isFirstRun.current = false;
 
-    const ErrorMessage = (props: { message?: string }) => (
+    const ErrorMessage = (props: { message?: string; redirectURL: string }) => (
       <CenteredAlert
         severity="error"
         action={
@@ -55,7 +63,7 @@ function ExternalAuth() {
             variant="outlined"
             onClick={() => {
               localStorage.clear();
-              window.location.assign('/');
+              window.location.assign(props.redirectURL);
             }}
           >
             Return to frontpage
@@ -106,8 +114,10 @@ function ExternalAuth() {
     );
 
     const handleAuthorizationCode = (authorizationCode: string) => {
-      const currentUrlWithoutParams = getCurrentUrlWithoutQueryParams();
-
+      const { currentUrlWithoutParams, queryParams } = getCurrentUrlValues();
+      const redirectURL = queryParams.size
+        ? `/?${queryParams.toString()}`
+        : '/';
       setView(<ContactingAuthorizationServerMessage />);
 
       unauthorizedApi()
@@ -117,10 +127,12 @@ function ExternalAuth() {
         })
         .then(({ externalTokenLogin }) => {
           handleLogin(externalTokenLogin);
-          window.location.href = '/';
+          window.location.href = redirectURL;
         })
         .catch((error) => {
-          setView(<ErrorMessage message={error.message} />);
+          setView(
+            <ErrorMessage message={error.message} redirectURL={redirectURL} />
+          );
         });
     };
 
@@ -129,18 +141,26 @@ function ExternalAuth() {
         SettingsId.EXTERNAL_AUTH_LOGIN_URL
       )?.settingsValue;
       if (!externalAuthLoginUrl) {
-        setView(<ErrorMessage message="System configuration error" />);
+        setView(
+          <ErrorMessage
+            message="System configuration error"
+            redirectURL={'/'}
+          />
+        );
 
         return;
       }
+      const { currentUrlWithoutParams, queryParams } = getCurrentUrlValues();
       const url = new URL(externalAuthLoginUrl);
-      const currentUrlWithoutParams = getCurrentUrlWithoutQueryParams();
       url.searchParams.set('redirect_uri', currentUrlWithoutParams);
+      queryParams.forEach((value, key) => {
+        url.searchParams.set(key, value);
+      });
       window.location.href = url.toString();
     };
 
     const handleError = (error: string) => {
-      setView(<ErrorMessage message={error} />);
+      setView(<ErrorMessage message={error} redirectURL={'/'} />);
     };
 
     setView(<LoadingMessage />);

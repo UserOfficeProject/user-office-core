@@ -23,7 +23,7 @@ import clearSession from 'utils/clearSession';
 import DashBoard from './DashBoard';
 import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
-import ExternalAuth from './user/ExternalAuth';
+import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
 
 const PrivateRoute = ({ component, ...rest }: RouteProps) => {
   if (!component) {
@@ -38,8 +38,13 @@ const PrivateRoute = ({ component, ...rest }: RouteProps) => {
         <Route
           {...rest}
           render={(props): JSX.Element => {
+            const { queryParams } = getCurrentUrlValues();
+            const redirectURL =
+              queryParams.size > 0
+                ? `/external-auth?${queryParams.toString()}`
+                : '/external-auth';
             if (!token) {
-              return <Redirect to="/external-auth" />;
+              return <Redirect to={redirectURL} />;
             }
 
             if (!currentRole) {
