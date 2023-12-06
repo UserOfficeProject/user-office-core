@@ -1166,7 +1166,7 @@ context('Proposal tests', () => {
               proposalPk: result.createProposal.primaryKey,
               title: title,
               abstract: abstract,
-              proposerId: initialDBData.users.user2.id,
+              proposerId: initialDBData.users.placeholderUser.id,
             });
           }
         })
