@@ -796,6 +796,23 @@ context('Template tests', () => {
       cy.contains('Yes').click();
     });
 
+    it('User officer can view proposals on template', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find('[data-cy=proposals-count]')
+        .contains('1')
+        .click();
+
+      cy.get('[data-cy=proposals-modal]').contains(
+        initialDBData.proposal.title
+      );
+    });
+
     it('should render the Date field with default value and min max values when set', () => {
       let dateFieldId: string;
       const minDate = DateTime.fromJSDate(faker.date.past()).toFormat(

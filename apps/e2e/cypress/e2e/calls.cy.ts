@@ -26,8 +26,8 @@ context('Calls tests', () => {
     endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
     endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
+    startFapReview: currentDayStart,
+    endFapReview: currentDayStart,
     startNotify: currentDayStart,
     endNotify: currentDayStart,
     startCycle: currentDayStart,
@@ -46,8 +46,8 @@ context('Calls tests', () => {
     endCall: yesterday.toISO(),
     startReview: currentDayStart,
     endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
+    startFapReview: currentDayStart,
+    endFapReview: currentDayStart,
     startNotify: currentDayStart,
     endNotify: currentDayStart,
     startCycle: currentDayStart,
@@ -484,7 +484,7 @@ context('Calls tests', () => {
         .should('include.text', '0');
     });
 
-    it('A user-officer should be able to add SEPs to a call', () => {
+    it('A user-officer should be able to add Faps to a call', () => {
       cy.createCall({
         ...newCall,
         esiTemplateId: esiTemplateId,
@@ -505,11 +505,11 @@ context('Calls tests', () => {
       );
       cy.get('.MuiStep-root').contains('Reviews').click();
 
-      cy.get('[data-cy="call-seps"]').click();
+      cy.get('[data-cy="call-faps"]').click();
 
-      cy.get('[data-cy="call-seps-options"]').click();
+      cy.get('[data-cy="call-faps-options"]').click();
 
-      cy.contains(initialDBData.sep.code).click();
+      cy.contains(initialDBData.fap.code).click();
 
       cy.get('[data-cy="next-step"]').click();
       cy.get('[data-cy="submit"]').click();
@@ -781,7 +781,7 @@ context('Calls tests', () => {
       const MAX_32_BIT_INTEGER = Math.pow(2, 31);
       cy.assignInstrumentToCall({
         callId: createdCallId,
-        instrumentSepIds: [{ instrumentId: createdInstrumentId }],
+        instrumentFapIds: [{ instrumentId: createdInstrumentId }],
       });
 
       cy.contains('Calls').click();
@@ -822,7 +822,7 @@ context('Calls tests', () => {
     it('A user-officer should be able to set availability time on instrument per call', () => {
       cy.assignInstrumentToCall({
         callId: createdCallId,
-        instrumentSepIds: [{ instrumentId: createdInstrumentId }],
+        instrumentFapIds: [{ instrumentId: createdInstrumentId }],
       });
 
       cy.contains('Calls').click();
@@ -862,7 +862,7 @@ context('Calls tests', () => {
     it('A user-officer should be able to remove instrument from a call', () => {
       cy.assignInstrumentToCall({
         callId: createdCallId,
-        instrumentSepIds: [{ instrumentId: createdInstrumentId }],
+        instrumentFapIds: [{ instrumentId: createdInstrumentId }],
       });
       cy.contains('Calls').click();
 

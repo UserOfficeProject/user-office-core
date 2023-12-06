@@ -374,7 +374,7 @@ export default class ProposalMutations {
     'commentForUser',
     'commentForManagement',
   ])
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
     args: AdministrationProposalArgs

@@ -16,7 +16,7 @@ export enum DownloadType {
 
 export enum XLSXType {
   PROPOSAL = 'proposal',
-  SEP = 'sep',
+  Fap = 'fap',
 }
 
 export enum PDFType {

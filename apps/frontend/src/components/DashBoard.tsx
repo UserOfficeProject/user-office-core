@@ -27,6 +27,8 @@ import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
 import ChangeRole from './common/ChangeRole';
 import ExperimentPage from './experiment/ExperimentPage';
+import FapPage from './fap/FapPage';
+import FapsPage from './fap/FapsPage';
 import CreateFeedbackPage from './feedback/CreateFeedbackPage';
 import UpdateFeedbackPage from './feedback/UpdateFeedbackPage';
 import InstitutionPage from './institution/InstitutionPage';
@@ -46,8 +48,6 @@ import UserExperimentTimesTable from './proposalBooking/UserExperimentsTable';
 import CreateProposalEsiPage from './proposalEsi/CreateProposalEsiPage';
 import UpdateProposalEsiPage from './proposalEsi/UpdateProposalEsiPage';
 import SampleSafetyPage from './sample/SampleSafetyPage';
-import SEPPage from './SEP/SEPPage';
-import SEPsPage from './SEP/SEPsPage';
 import ApiAccessTokensPage from './settings/apiAccessTokens/ApiAccessTokensPage';
 import AppSettingsPage from './settings/appSettings/AppSettingsPage';
 import FeaturesPage from './settings/features/FeaturesPage';
@@ -183,8 +183,8 @@ const Dashboard = () => {
   const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-  const isSEPEnabled = featureContext.featuresMap.get(
-    FeatureId.SEP_REVIEW
+  const isFapEnabled = featureContext.featuresMap.get(
+    FeatureId.FAP_REVIEW
   )?.isEnabled;
   const isUserManagementEnabled = featureContext.featuresMap.get(
     FeatureId.USER_MANAGEMENT
@@ -353,20 +353,20 @@ const Dashboard = () => {
             path="/changeRole"
             component={ChangeRole}
           />
-          {isSEPEnabled && (
+          {isFapEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title={t('SEP')}
-              path="/SEPPage/:id"
-              component={SEPPage}
+              title="Fap"
+              path="/FapPage/:id"
+              component={FapPage}
             />
           )}
-          {isSEPEnabled && (
+          {isFapEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title={i18n.format(t('SEP'), 'plural')}
-              path="/SEPs"
-              component={SEPsPage}
+              title="Faps"
+              path="/Faps"
+              component={FapsPage}
             />
           )}
           {isInstrumentManagementEnabled && (
@@ -608,9 +608,9 @@ const Dashboard = () => {
                 no={() => (
                   <Can
                     allowedRoles={[
-                      UserRole.SEP_REVIEWER,
-                      UserRole.SEP_CHAIR,
-                      UserRole.SEP_SECRETARY,
+                      UserRole.FAP_REVIEWER,
+                      UserRole.FAP_CHAIR,
+                      UserRole.FAP_SECRETARY,
                       UserRole.INSTRUMENT_SCIENTIST,
                       UserRole.INTERNAL_REVIEWER,
                     ]}

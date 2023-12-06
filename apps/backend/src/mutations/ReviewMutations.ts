@@ -38,7 +38,7 @@ export default class ReviewMutations {
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  @EventBus(Event.PROPOSAL_SEP_REVIEW_UPDATED)
+  @EventBus(Event.PROPOSAL_FAP_REVIEW_UPDATED)
   @ValidateArgs(proposalGradeValidationSchema, ['comment'])
   @Authorized()
   async updateReview(
@@ -72,7 +72,7 @@ export default class ReviewMutations {
     });
   }
 
-  @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)
+  @EventBus(Event.PROPOSAL_FAP_REVIEW_SUBMITTED)
   @ValidateArgs(submitProposalReviewValidationSchema)
   @Authorized()
   async submitProposalReview(
@@ -232,18 +232,18 @@ export default class ReviewMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   async removeUserForReview(
     agent: UserWithRole | null,
-    { reviewId, sepId }: { reviewId: number; sepId: number }
+    { reviewId, fapId }: { reviewId: number; fapId: number }
   ): Promise<Review | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId))
     ) {
       return rejection(
         'Can not remove user for review because of insufficient permissions',
-        { agent, reviewId, sepId }
+        { agent, reviewId, fapId }
       );
     }
 
@@ -253,7 +253,7 @@ export default class ReviewMutations {
       .catch((error) => {
         return rejection(
           'Can not remove user for review because error occurred',
-          { agent, reviewId, sepId },
+          { agent, reviewId, fapId },
           error
         );
       });
@@ -291,15 +291,15 @@ export default class ReviewMutations {
   }
 
   @ValidateArgs(addUserForReviewValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   async addUserForReview(
     agent: UserWithRole | null,
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
-    const { proposalPk, userID, sepID } = args;
+    const { proposalPk, userID, fapID } = args;
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepID))
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapID))
     ) {
       return rejection(
         'Can not add user for review because of insufficient permissions',

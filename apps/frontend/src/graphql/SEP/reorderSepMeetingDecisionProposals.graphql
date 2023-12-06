@@ -1,9 +1,0 @@
-mutation reorderSepMeetingDecisionProposals(
-  $reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput!
-) {
-  reorderSepMeetingDecisionProposals(
-    reorderSepMeetingDecisionProposalsInput: $reorderSepMeetingDecisionProposalsInput
-  ) {
-    proposalPk
-  }
-}

@@ -12,9 +12,9 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
@@ -43,7 +43,7 @@ export default class InstrumentMutations {
   constructor(
     @inject(Tokens.InstrumentDataSource)
     private dataSource: InstrumentDataSource,
-    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
 
@@ -278,14 +278,14 @@ export default class InstrumentMutations {
 
   @EventBus(Event.PROPOSAL_INSTRUMENT_SUBMITTED)
   @ValidateArgs(submitInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async submitInstrument(
     agent: UserWithRole | null,
     args: InstrumentSubmitArgs
   ): Promise<InstrumentHasProposals | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, args.sepId))
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
       return rejection('Submitting instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
@@ -295,44 +295,44 @@ export default class InstrumentMutations {
     }
 
     const allInstrumentProposals =
-      await this.sepDataSource.getSEPProposalsByInstrument(
-        args.sepId,
+      await this.fapDataSource.getFapProposalsByInstrument(
+        args.fapId,
         args.instrumentId,
         args.callId
       );
 
     const submittedInstrumentProposalPks = allInstrumentProposals.map(
-      (sepInstrumentProposal) => sepInstrumentProposal.proposalPk
+      (fapInstrumentProposal) => fapInstrumentProposal.proposalPk
     );
 
-    const sepProposalsWithReviewsAndRanking =
-      await this.sepDataSource.getSepProposalsWithReviewGradesAndRanking(
+    const fapProposalsWithReviewsAndRanking =
+      await this.fapDataSource.getFapProposalsWithReviewGradesAndRanking(
         submittedInstrumentProposalPks
       );
 
-    const allSepMeetingsHasRankings = sepProposalsWithReviewsAndRanking.every(
-      (sepProposalWithReviewsAndRanking) =>
-        !!sepProposalWithReviewsAndRanking.rankOrder
+    const allFapMeetingsHasRankings = fapProposalsWithReviewsAndRanking.every(
+      (fapProposalWithReviewsAndRanking) =>
+        !!fapProposalWithReviewsAndRanking.rankOrder
     );
 
-    if (!allSepMeetingsHasRankings) {
-      const sortedSepProposals = sortByRankOrAverageScore(
-        sepProposalsWithReviewsAndRanking
+    if (!allFapMeetingsHasRankings) {
+      const sortedFapProposals = sortByRankOrAverageScore(
+        fapProposalsWithReviewsAndRanking
       );
 
-      const allProposalsWithRankings = sortedSepProposals.map(
-        (sortedSepProposal, index) => {
-          if (!sortedSepProposal.rankOrder) {
-            sortedSepProposal.rankOrder = index + 1;
+      const allProposalsWithRankings = sortedFapProposals.map(
+        (sortedFapProposal, index) => {
+          if (!sortedFapProposal.rankOrder) {
+            sortedFapProposal.rankOrder = index + 1;
           }
 
-          return sortedSepProposal;
+          return sortedFapProposal;
         }
       );
 
       await Promise.all(
         allProposalsWithRankings.map((proposalWithRanking) => {
-          return this.sepDataSource.saveSepMeetingDecision({
+          return this.fapDataSource.saveFapMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
             rankOrder: proposalWithRanking.rankOrder,
           });

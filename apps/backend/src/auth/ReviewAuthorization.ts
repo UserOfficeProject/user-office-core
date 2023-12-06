@@ -58,11 +58,11 @@ export class ReviewAuthorization {
       return true;
     }
 
-    const isChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+    const isChairOrSecretaryOfFap = await this.userAuth.isChairOrSecretaryOfFap(
       agent,
-      review.sepID
+      review.fapID
     );
-    if (isChairOrSecretaryOfSEP) {
+    if (isChairOrSecretaryOfFap) {
       return true;
     }
 
@@ -96,11 +96,11 @@ export class ReviewAuthorization {
       return false;
     }
 
-    const isChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+    const isChairOrSecretaryOfFap = await this.userAuth.isChairOrSecretaryOfFap(
       agent,
-      review.sepID
+      review.fapID
     );
-    if (isChairOrSecretaryOfSEP) {
+    if (isChairOrSecretaryOfFap) {
       return true;
     }
 
