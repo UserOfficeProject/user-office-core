@@ -82,7 +82,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.INSTRUMENT_MANAGEMENT,
       FeatureId.STFC_IDLE_TIMER,
       FeatureId.TECHNICAL_REVIEW,
-      FeatureId.SEP_REVIEW,
+      FeatureId.FAP_REVIEW,
     ],
     true
   );
