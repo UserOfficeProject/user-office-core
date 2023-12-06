@@ -661,7 +661,7 @@ const ProposalTableOfficer = ({
   const proposalToReview = proposalsData.find((proposal) => {
     return (
       urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalId
+      proposal.proposalId === urlQueryParams.proposalid
     );
   });
 
@@ -810,9 +810,9 @@ const ProposalTableOfficer = ({
               }
             })
           );
-          if (urlQueryParams.proposalId) {
+          if (urlQueryParams.proposalid) {
             setUrlQueryParams({
-              proposalId: undefined,
+              proposalid: undefined,
             });
             setProposalFilter({
               ...proposalFilter,

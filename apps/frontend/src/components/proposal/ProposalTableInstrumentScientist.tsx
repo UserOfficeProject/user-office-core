@@ -269,7 +269,7 @@ const ProposalTableInstrumentScientist = ({
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    proposalId: StringParam,
+    proposalid: StringParam,
     reviewer: withDefault(StringParam, reviewerFilter),
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
@@ -277,8 +277,8 @@ const ProposalTableInstrumentScientist = ({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus,
-    referenceNumbers: urlQueryParams.proposalId
-      ? [urlQueryParams.proposalId]
+    referenceNumbers: urlQueryParams.proposalid
+      ? [urlQueryParams.proposalid]
       : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
@@ -609,7 +609,7 @@ const ProposalTableInstrumentScientist = ({
   const proposalToReview = preselectedProposalsData.find(
     (proposal) =>
       proposal.primaryKey === urlQueryParams.reviewModal ||
-      urlQueryParams.proposalId
+      urlQueryParams.proposalid
   );
 
   /** NOTE:
@@ -712,13 +712,13 @@ const ProposalTableInstrumentScientist = ({
               }
             })
           );
-          if (urlQueryParams.proposalId) {
+          if (urlQueryParams.proposalid) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
             setUrlQueryParams({
-              proposalId: undefined,
+              proposalid: undefined,
             });
           }
           setUrlQueryParams({
