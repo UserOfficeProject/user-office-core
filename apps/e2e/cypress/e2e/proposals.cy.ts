@@ -245,7 +245,7 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it.only('Officer should be able to navigate to proposal using proposal ID', () => {
+    it('Officer should be able to navigate to proposal using proposal ID', () => {
       cy.login('officer');
 
       cy.visit('/', {
