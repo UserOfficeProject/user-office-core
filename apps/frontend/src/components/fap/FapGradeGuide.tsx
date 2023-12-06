@@ -1,8 +1,8 @@
 import Grid from '@mui/material/Grid';
-import { Editor } from '@tinymce/tinymce-react';
 import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import Editor from 'components/common/TinyEditor';
 import { Fap, UserRole } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 

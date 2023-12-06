@@ -6,7 +6,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { Editor } from '@tinymce/tinymce-react';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import { Select, TextField, CheckboxWithLabel } from 'formik-mui';
@@ -16,6 +15,7 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 
 import { useCheckAccess } from 'components/common/Can';
 import ErrorMessage from 'components/common/ErrorMessage';
+import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import NavigationFragment from 'components/questionary/NavigationFragment';
