@@ -843,18 +843,18 @@ context('Settings tests', () => {
             fapId: initialDBData.fap.id,
           });
           cy.assignChairOrSecretary({
-            assignChairOrSecretaryToSEPInput: {
-              sepId: 1,
+            assignChairOrSecretaryToFapInput: {
+              fapId: 1,
               userId: initialDBData.users.user1.id,
-              roleId: UserRole.SEP_CHAIR,
+              roleId: UserRole.FAP_CHAIR,
             },
           });
-          cy.assignReviewersToSep({
-            sepId: 1,
+          cy.assignReviewersToFap({
+            fapId: 1,
             memberIds: [initialDBData.users.reviewer.id],
           });
-          cy.assignSepReviewersToProposal({
-            sepId: 1,
+          cy.assignFapReviewersToProposal({
+            fapId: 1,
             memberIds: [initialDBData.users.reviewer.id],
             proposalPk: proposal.primaryKey,
           });
