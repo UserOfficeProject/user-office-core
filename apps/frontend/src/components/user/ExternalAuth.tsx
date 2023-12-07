@@ -11,6 +11,7 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import clearSession from 'utils/clearSession';
 
 const ExternalAuthQueryParams = {
   sessionid: StringParam,
@@ -20,8 +21,8 @@ const ExternalAuthQueryParams = {
 };
 
 export const getCurrentUrlValues = () => {
-  const { protocol, host, pathname, search } = window.location;
-  const currentUrlWithoutParams = [protocol, '//', host, pathname].join('');
+  const { protocol, host, pathname: pathName, search } = window.location;
+  const currentUrlWithoutParams = [protocol, '//', host, pathName].join('');
   const queryParams = new URLSearchParams(search);
   Object.keys(ExternalAuthQueryParams).map((value) => {
     queryParams.delete(value);
@@ -30,6 +31,7 @@ export const getCurrentUrlValues = () => {
   return {
     currentUrlWithoutParams,
     queryParams,
+    pathName,
   };
 };
 
@@ -53,7 +55,7 @@ function ExternalAuth() {
 
     isFirstRun.current = false;
 
-    const ErrorMessage = (props: { message?: string; redirectURL: string }) => (
+    const ErrorMessage = (props: { message?: string }) => (
       <CenteredAlert
         severity="error"
         action={
@@ -62,8 +64,8 @@ function ExternalAuth() {
             size="small"
             variant="outlined"
             onClick={() => {
-              localStorage.clear();
-              window.location.assign(props.redirectURL);
+              clearSession();
+              window.location.assign('/');
             }}
           >
             Return to frontpage
@@ -127,12 +129,12 @@ function ExternalAuth() {
         })
         .then(({ externalTokenLogin }) => {
           handleLogin(externalTokenLogin);
-          window.location.href = redirectURL;
+          const previousPath = localStorage.getItem('redirectPath');
+          clearSession('redirectPath');
+          window.location.href = previousPath ?? redirectURL;
         })
         .catch((error) => {
-          setView(
-            <ErrorMessage message={error.message} redirectURL={redirectURL} />
-          );
+          setView(<ErrorMessage message={error.message} />);
         });
     };
 
@@ -141,26 +143,18 @@ function ExternalAuth() {
         SettingsId.EXTERNAL_AUTH_LOGIN_URL
       )?.settingsValue;
       if (!externalAuthLoginUrl) {
-        setView(
-          <ErrorMessage
-            message="System configuration error"
-            redirectURL={'/'}
-          />
-        );
+        setView(<ErrorMessage message="System configuration error" />);
 
         return;
       }
-      const { currentUrlWithoutParams, queryParams } = getCurrentUrlValues();
+      const { currentUrlWithoutParams } = getCurrentUrlValues();
       const url = new URL(externalAuthLoginUrl);
       url.searchParams.set('redirect_uri', currentUrlWithoutParams);
-      queryParams.forEach((value, key) => {
-        url.searchParams.set(key, value);
-      });
       window.location.href = url.toString();
     };
 
     const handleError = (error: string) => {
-      setView(<ErrorMessage message={error} redirectURL={'/'} />);
+      setView(<ErrorMessage message={error} />);
     };
 
     setView(<LoadingMessage />);

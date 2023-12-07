@@ -38,13 +38,14 @@ const PrivateRoute = ({ component, ...rest }: RouteProps) => {
         <Route
           {...rest}
           render={(props): JSX.Element => {
-            const { queryParams } = getCurrentUrlValues();
-            const redirectURL =
-              queryParams.size > 0
-                ? `/external-auth?${queryParams.toString()}`
-                : '/external-auth';
             if (!token) {
-              return <Redirect to={redirectURL} />;
+              const { queryParams, pathName } = getCurrentUrlValues();
+              const redirectPath = queryParams.size
+                ? `${pathName}?${queryParams.toString()}`
+                : pathName;
+              localStorage.redirectPath = redirectPath;
+
+              return <Redirect to="/external-auth" />;
             }
 
             if (!currentRole) {
