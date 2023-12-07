@@ -40,11 +40,7 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
   )?.settingsValue;
 
   useEffect(() => {
-    async function fetchData() {
-      const importedLogo = await import('images/' + logoFilename);
-      setLogo(importedLogo.default);
-    }
-    fetchData();
+    setLogo('/images/' + logoFilename);
   }, [logoFilename]);
 
   const useStyles = makeStyles((theme) => ({
