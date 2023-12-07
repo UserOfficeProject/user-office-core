@@ -25,7 +25,7 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
       comment
       status
       userID
-      sepID
+      fapID
       reviewer {
         firstname
         lastname

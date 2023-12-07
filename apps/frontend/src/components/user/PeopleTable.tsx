@@ -105,10 +105,10 @@ const getTitle = ({
   switch (invitationUserRole) {
     case UserRole.USER_OFFICER:
       return 'Invite User';
-    case UserRole.SEP_CHAIR:
-      return 'Invite ' + t('SEP') + ' Chair';
-    case UserRole.SEP_SECRETARY:
-      return 'Invite ' + t('SEP') + ' Secretary';
+    case UserRole.FAP_CHAIR:
+      return 'Invite Fap Chair';
+    case UserRole.FAP_SECRETARY:
+      return 'Invite Fap Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
       return 'Invite ' + t('instrumentSci');
     default:
@@ -324,7 +324,7 @@ const PeopleTable = ({
           setInviteUserModal({
             show: true,
             title: 'Invite Reviewer',
-            userRole: UserRole.SEP_REVIEWER,
+            userRole: UserRole.FAP_REVIEWER,
           }),
         'data-cy': 'invite-reviewer-button',
       }

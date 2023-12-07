@@ -39,19 +39,19 @@ export class AssignProposalsToInstrumentMutation {
       args
     );
 
-    const proposalsSeps = await context.queries.sep.getProposalsSeps(
+    const proposalsFaps = await context.queries.fap.getProposalsFaps(
       context.user,
       args.proposals.map((proposal) => proposal.primaryKey)
     );
 
-    await context.mutations.sep.assignProposalsToSEPUsingCallInstrument(
+    await context.mutations.fap.assignProposalsToFapUsingCallInstrument(
       context.user,
       {
         instrumentId: args.instrumentId,
         proposalPks: args.proposals
           .filter(
             (proposal) =>
-              !proposalsSeps.find((ps) => ps.proposalPk === proposal.primaryKey)
+              !proposalsFaps.find((ps) => ps.proposalPk === proposal.primaryKey)
           )
           .map((proposal) => proposal.primaryKey),
       }

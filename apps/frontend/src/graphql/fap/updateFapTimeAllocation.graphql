@@ -1,0 +1,13 @@
+mutation updateFapTimeAllocation(
+  $fapId: Int!
+  $proposalPk: Int!
+  $fapTimeAllocation: Int
+) {
+  updateFapTimeAllocation(
+    fapId: $fapId
+    proposalPk: $proposalPk
+    fapTimeAllocation: $fapTimeAllocation
+  ) {
+    fapId
+  }
+}
