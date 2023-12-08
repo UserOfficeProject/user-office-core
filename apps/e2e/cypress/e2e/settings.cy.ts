@@ -781,7 +781,7 @@ context('Settings tests', () => {
             status: TechnicalReviewStatus.FEASIBLE,
             timeAllocation: 1,
             submitted: true,
-            reviewerId: 4,
+            reviewerId: 0,
           });
         }
       });
@@ -832,7 +832,7 @@ context('Settings tests', () => {
             status: TechnicalReviewStatus.FEASIBLE,
             timeAllocation: 1,
             submitted: true,
-            reviewerId: 4,
+            reviewerId: 0,
           });
 
           cy.assignProposalsToFap({
@@ -924,7 +924,7 @@ context('Settings tests', () => {
             status: TechnicalReviewStatus.FEASIBLE,
             timeAllocation: 1,
             submitted: true,
-            reviewerId: 4,
+            reviewerId: 0,
           });
 
           cy.assignProposalsToFap({

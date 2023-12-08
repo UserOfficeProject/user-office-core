@@ -90,30 +90,6 @@ context('Internal Review tests', () => {
           technicalReviewId = result.updateTechnicalReviewAssignee[0].id;
         });
       });
-      numberOfScientistsAndManagerAssignedToCreatedInstrument = 2;
-
-      cy.assignScientistsToInstrument({
-        instrumentId: createdInstrumentId,
-        scientistIds: [scientist1.id],
-      });
-      cy.assignScientistsToInstrument({
-        instrumentId: createdInstrumentId,
-        scientistIds: [scientist2.id],
-      });
-      cy.assignProposalsToInstrument({
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
-        instrumentId: createdInstrumentId,
-      }).then(() => {
-        // NOTE: Get the technical review id for later usage.
-        cy.updateTechnicalReviewAssignee({
-          proposalPks: [createdProposalPk],
-          userId: scientist1.id,
-        }).then((result) => {
-          technicalReviewId = result.updateTechnicalReviewAssignee[0].id;
-        });
-      });
     });
   });
 

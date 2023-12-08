@@ -28,7 +28,7 @@ context('Instrument tests', () => {
   const scientist2 = initialDBData.users.user2;
 
   const instrument1 = {
-    name: 'ISIS',
+    name: faker.random.words(2),
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(5),
     managerUserId: scientist1.id,
