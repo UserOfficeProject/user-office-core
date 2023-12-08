@@ -114,7 +114,8 @@ export class StfcUserAuthorization extends UserAuthorization {
   async autoAssignRemoveInstruments(
     userId: number,
     requiredInstrumentNames: string[],
-    currentInstruments: Instrument[]
+    currentInstruments: Instrument[],
+    removeInstruments: boolean
   ) {
     // Assign any instruments which aren't currently assigned
     const instrumentsToAdd = await this.getInstrumentsToAdd(
@@ -136,24 +137,26 @@ export class StfcUserAuthorization extends UserAuthorization {
       );
     }
 
-    // Remove any instruments which are currently assigned, but not required
-    const instrumentsToRemove = await this.getInstrumentsToRemove(
-      requiredInstrumentNames,
-      currentInstruments
-    );
-
-    if (instrumentsToRemove.length > 0) {
-      logger.logInfo(
-        'Auto-removing STFC instrument scientist from instruments',
-        {
-          instruments: instrumentsToRemove,
-        }
+    if (removeInstruments) {
+      // Remove any instruments which are currently assigned, but not required
+      const instrumentsToRemove = await this.getInstrumentsToRemove(
+        requiredInstrumentNames,
+        currentInstruments
       );
 
-      this.instrumentDataSource.removeScientistFromInstruments(
-        userId,
-        instrumentsToRemove
-      );
+      if (instrumentsToRemove.length > 0) {
+        logger.logInfo(
+          'Auto-removing STFC instrument scientist from instruments',
+          {
+            instruments: instrumentsToRemove,
+          }
+        );
+
+        this.instrumentDataSource.removeScientistFromInstruments(
+          userId,
+          instrumentsToRemove
+        );
+      }
     }
   }
 
@@ -211,14 +214,23 @@ export class StfcUserAuthorization extends UserAuthorization {
         (role, index) =>
           stfcRoles.findIndex((r) => r.name == role.name) === index
       );
+
       const requiredInstruments =
         this.getRequiredInstrumentForRole(uniqueRoles);
+
       const currentUserInstruments =
         await this.instrumentDataSource.getUserInstruments(userNumber);
+
+      // Don't remove instruments from ISIS Staff and User officers as these will be manually assigned
       this.autoAssignRemoveInstruments(
         userNumber,
         requiredInstruments,
-        currentUserInstruments
+        currentUserInstruments,
+        !uniqueRoles.find(
+          (role) =>
+            role.name === 'ISIS Instrument Scientist' ||
+            role.name === 'User Officer'
+        )
       );
     }
 
