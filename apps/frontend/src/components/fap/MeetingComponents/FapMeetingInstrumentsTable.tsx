@@ -20,6 +20,7 @@ type FapMeetingInstrumentsTableProps = {
   fapId: number;
   selectedCall?: Call;
   confirm: WithConfirmType;
+  code: string;
 };
 
 const instrumentTableColumns = [
@@ -42,6 +43,7 @@ const FapMeetingInstrumentsTable = ({
   fapId,
   selectedCall,
   confirm,
+  code,
 }: FapMeetingInstrumentsTableProps) => {
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsByFapData(fapId, selectedCall?.id);
@@ -162,7 +164,10 @@ const FapMeetingInstrumentsTable = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {`${i18n.format(t('instrument'), 'plural')} with proposals`}
+            {`${code} - ${i18n.format(
+              t('instrument'),
+              'plural'
+            )} with proposals`}
           </Typography>
         }
         columns={columns}

@@ -234,7 +234,7 @@ const FapMembers = ({
         userRole={UserRole.FAP_REVIEWER}
       />
       <Typography variant="h6" component="h2" gutterBottom>
-        Fap Members
+        {`${fapData.code} - Fap Members`}
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>
