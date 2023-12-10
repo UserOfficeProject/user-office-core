@@ -42,14 +42,6 @@ export default function createHandler() {
     // NOTE: We need to have custom checks for events where response is not standard one.
     try {
       switch (event.type) {
-        case Event.USER_PASSWORD_RESET_EMAIL:
-          await eventLogsDataSource.set(
-            event.loggedInUserId,
-            event.type,
-            json,
-            event.userlinkresponse.user.id.toString()
-          );
-          break;
         case Event.EMAIL_INVITE:
           await eventLogsDataSource.set(
             event.loggedInUserId,
