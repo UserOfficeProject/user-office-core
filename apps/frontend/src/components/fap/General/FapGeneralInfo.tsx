@@ -76,7 +76,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
       }): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
-            Facility access panel
+            {`${fap.code} Facility access panel`}
           </Typography>
           <Grid container spacing={3}>
             <Grid item sm={6} xs={12}>
