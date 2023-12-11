@@ -303,7 +303,8 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
       });
 
-      cy.login(scientist2);
+      cy.login('user2');
+
       cy.updateTechnicalReviewAssignee({
         proposalPks: createdProposalPk,
         userId: scientist2.id,
@@ -356,7 +357,8 @@ context('Instrument tests', () => {
         userId: scientist2.id,
       });
 
-      cy.login(scientist2);
+      cy.login('user2');
+      cy.visit('/');
 
       cy.addProposalTechnicalReview({
         proposalPk: createdProposalPk,

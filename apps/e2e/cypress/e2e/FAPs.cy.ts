@@ -211,6 +211,7 @@ context('Fap reviews tests', () => {
       updateUsersRoles();
     });
     initializationBeforeTests();
+    cy.getAndStoreAppSettings();
   });
 
   describe('User officer role', () => {

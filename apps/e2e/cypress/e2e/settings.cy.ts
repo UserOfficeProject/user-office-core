@@ -812,6 +812,8 @@ context('Settings tests', () => {
     });
 
     it('Proposal status should update immediately after all Fap reviews submitted', function () {
+      cy.getAndStoreAppSettings();
+
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
