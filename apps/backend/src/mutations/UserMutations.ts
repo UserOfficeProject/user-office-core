@@ -3,11 +3,8 @@ import {
   createUserByEmailInviteValidationSchema,
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
-  resetPasswordByEmailValidationSchema,
-  updatePasswordValidationSchema,
   updateUserRolesValidationSchema,
   updateUserValidationSchema,
-  userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
@@ -23,15 +20,12 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import {
   AuthJwtPayload,
-  BasicUserDetails,
   EmailVerificationJwtPayload,
-  PasswordResetJwtPayload,
   User,
   UserRole,
   UserRoleShortCodeMap,
   UserWithRole,
 } from '../models/User';
-import { UserLinkResponse } from '../models/UserLinkResponse';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
@@ -446,38 +440,6 @@ export default class UserMutations {
     }
   }
 
-  @ValidateArgs(resetPasswordByEmailValidationSchema)
-  @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
-  async resetPasswordEmail(
-    agent: UserWithRole | null,
-    args: { email: string }
-  ): Promise<UserLinkResponse | Rejection> {
-    const user = await this.dataSource.getByEmail(args.email);
-
-    if (!user) {
-      return rejection('Could not find user by email', {
-        args,
-        code: ApolloServerErrorCodeExtended.NOT_FOUND,
-      });
-    }
-
-    const token = signToken<PasswordResetJwtPayload>(
-      {
-        id: user.id,
-        type: 'passwordReset',
-        updated: user.updated,
-      },
-      { expiresIn: '24h' }
-    );
-
-    const link = process.env.baseURL + '/resetPassword/' + token;
-
-    const userLinkResponse = new UserLinkResponse(user, link);
-
-    // Send reset email with link
-    return userLinkResponse;
-  }
-
   async emailVerification(token: string) {
     // Check that token is valid
     try {
@@ -509,81 +471,6 @@ export default class UserMutations {
       .catch((err) =>
         rejection('Could not add user role', { agent, args }, err)
       );
-  }
-
-  @ValidateArgs(updatePasswordValidationSchema)
-  @Authorized()
-  async updatePassword(
-    agent: UserWithRole | null,
-    { id, password }: { id: number; password: string }
-  ): Promise<BasicUserDetails | Rejection> {
-    const isUpdatingOwnUser = agent?.id === id;
-    if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
-      return rejection(
-        'Can not update password because of insufficient permissions',
-        {
-          id,
-          agent,
-          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
-        }
-      );
-    }
-
-    try {
-      const hash = this.createHash(password);
-      const user = await this.dataSource.getUser(id);
-      if (user) {
-        return this.dataSource.setUserPassword(user.id, hash);
-      } else {
-        return rejection('Could not update password. Used does not exist', {
-          agent,
-          id,
-          code: ApolloServerErrorCodeExtended.NOT_FOUND,
-        });
-      }
-    } catch (error) {
-      return rejection(
-        'Could not update password',
-        {
-          agent,
-          id,
-        },
-        error
-      );
-    }
-  }
-
-  @ValidateArgs(userPasswordFieldBEValidationSchema)
-  async resetPassword(
-    agent: UserWithRole | null,
-    { token, password }: { token: string; password: string }
-  ): Promise<BasicUserDetails | Rejection> {
-    // Check that token is valid
-    try {
-      const hash = this.createHash(password);
-      const decoded = verifyToken<PasswordResetJwtPayload>(token);
-      const user = await this.dataSource.getUser(decoded.id);
-
-      //Check that user exist and that it has not been updated since token creation
-      if (
-        user &&
-        user.updated === decoded.updated &&
-        decoded.type === 'passwordReset'
-      ) {
-        return this.dataSource
-          .setUserPassword(user.id, hash)
-          .then((user) => user)
-          .catch((err) => rejection('Could not reset password', { user }, err));
-      }
-
-      return rejection('Could not reset password incomplete data', {
-        user,
-        decoded,
-        code: ApolloServerErrorCodeExtended.BAD_USER_INPUT,
-      });
-    } catch (error) {
-      return rejection('Could not reset password', {}, error);
-    }
   }
 
   @Authorized([Roles.USER_OFFICER])

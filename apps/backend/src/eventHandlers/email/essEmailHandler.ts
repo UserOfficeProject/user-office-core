@@ -31,35 +31,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.USER_PASSWORD_RESET_EMAIL: {
-      mailService
-        .sendMail({
-          content: {
-            template_id: 'user-office-account-reset-password',
-          },
-          substitution_data: {
-            title: 'ESS User reset account password',
-            buttonText: 'Click to reset',
-            link: event.userlinkresponse.link,
-          },
-          recipients: [{ address: event.userlinkresponse.user.email }],
-        })
-        .then((res) => {
-          logger.logInfo('Email send on for password reset:', {
-            result: res,
-            event,
-          });
-        })
-        .catch((err: string) => {
-          logger.logError('Could not send email for password reset', {
-            error: err,
-            event,
-          });
-        });
-
-      return;
-    }
-
     case Event.EMAIL_INVITE: {
       const user = await userDataSource.getUser(
         event.emailinviteresponse.userId
