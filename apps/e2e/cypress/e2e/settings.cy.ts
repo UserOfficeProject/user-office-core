@@ -883,12 +883,10 @@ context('Settings tests', () => {
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
-      cy.get('[data-cy="grade-proposal"]').click();
-
       if (
         settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
       ) {
-        cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
+        cy.get('[data-cy="grade-proposal"]').click();
 
         cy.get('[role="listbox"] > [role="option"]').first().click();
       } else {
