@@ -255,23 +255,12 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getStfcBasicPersonByEmail(email).then((user) => !!user);
   }
 
-  async getPasswordByEmail(email: string): Promise<string> {
-    throw new Error('Method not implemented.');
-  }
-
   setUserEmailVerified(id: number): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
 
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     return await postgresUserDataSource.setUserNotPlaceholder(id);
-  }
-
-  async setUserPassword(
-    id: number,
-    password: string
-  ): Promise<BasicUserDetails> {
-    throw new Error('Method not implemented.');
   }
 
   async getByEmail(email: string): Promise<User | null> {
@@ -283,10 +272,6 @@ export class StfcUserDataSource implements UserDataSource {
   async getByUsername(username: string): Promise<User | null> {
     // We use user numbers as usernames
     return this.getUser(parseInt(username));
-  }
-
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    throw new Error('Method not implemented.');
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
@@ -513,7 +498,6 @@ export class StfcUserDataSource implements UserDataSource {
     middlename: string | undefined,
     lastname: string,
     username: string,
-    password: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_access_token: string,
