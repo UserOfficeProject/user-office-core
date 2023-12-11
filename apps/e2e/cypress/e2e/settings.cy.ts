@@ -285,6 +285,7 @@ context('Settings tests', () => {
           });
         }
       });
+      cy.getAndStoreAppSettings();
     });
 
     it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED status', () => {
@@ -812,8 +813,6 @@ context('Settings tests', () => {
     });
 
     it('Proposal status should update immediately after all Fap reviews submitted', function () {
-      cy.getAndStoreAppSettings();
-
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
@@ -847,7 +846,7 @@ context('Settings tests', () => {
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToFapInput: {
               fapId: 1,
-              userId: initialDBData.users.user1.id,
+              userId: initialDBData.users.reviewer.id,
               roleId: UserRole.FAP_CHAIR,
             },
           });
