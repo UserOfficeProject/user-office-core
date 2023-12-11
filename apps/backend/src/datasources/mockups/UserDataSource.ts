@@ -256,32 +256,12 @@ export class UserDataSourceMock implements UserDataSource {
   async checkEmailExist(email: string): Promise<boolean> {
     return false;
   }
-  async getPasswordByEmail(email: string): Promise<string> {
-    return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
-  }
   async setUserEmailVerified(id: number): Promise<User | null> {
     return null;
     // Do something here or remove the function.
   }
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     return null;
-  }
-  async setUserPassword(
-    id: number,
-    password: string
-  ): Promise<BasicUserDetails> {
-    return new BasicUserDetails(
-      id,
-      'John',
-      'Smith',
-      'John',
-      'ESS',
-      2,
-      'Manager',
-      new Date('2019-07-17 08:25:12.23043+00'),
-      false,
-      'test@email.com'
-    );
   }
   async getByEmail(email: string): Promise<User | null> {
     if (dummyUser.email === email) {
@@ -300,9 +280,6 @@ export class UserDataSourceMock implements UserDataSource {
   }
   async getByUsername(username: string): Promise<User | null> {
     return dummyUser;
-  }
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
   }
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     // Do something here or remove the function.
