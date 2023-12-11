@@ -84,7 +84,7 @@ const FapPage = () => {
       },
       {
         name: 'Meeting Components',
-        element: <FapMeetingComponentsView fapId={fap.id} />,
+        element: <FapMeetingComponentsView fapId={fap.id} code={fap.code} />,
       },
     ];
   }

@@ -249,7 +249,6 @@ export interface UserRecord {
   readonly position: string;
   readonly email: string;
   readonly email_verified: boolean;
-  readonly password: string;
   readonly telephone: string;
   readonly telephone_alt: string;
   readonly created_at: Date;

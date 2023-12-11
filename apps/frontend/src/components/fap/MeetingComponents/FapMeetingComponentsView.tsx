@@ -10,9 +10,13 @@ import FapMeetingInstrumentsTable from './FapMeetingInstrumentsTable';
 
 type FapMeetingComponentsViewProps = {
   fapId: number;
+  code: string;
 };
 
-const FapMeetingComponentsView = ({ fapId }: FapMeetingComponentsViewProps) => {
+const FapMeetingComponentsView = ({
+  fapId,
+  code,
+}: FapMeetingComponentsViewProps) => {
   const { loadingCalls, calls } = useCallsData({ fapIds: [fapId] });
   const [query, setQuery] = useQueryParams({
     call: withDefault(NumberParam, null),
@@ -42,6 +46,7 @@ const FapMeetingComponentsView = ({ fapId }: FapMeetingComponentsViewProps) => {
       <FapMeetingInstrumentsTable
         fapId={fapId}
         selectedCall={getSelectedCall()}
+        code={code}
       />
     </>
   );

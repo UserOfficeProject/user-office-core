@@ -549,7 +549,7 @@ const FapProposalsAndAssignmentsTable = ({
           columns={FapProposalColumns}
           title={
             <Typography variant="h6" component="h2">
-              Fap Proposals
+              {`${data.code} - Fap Proposals`}
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}
