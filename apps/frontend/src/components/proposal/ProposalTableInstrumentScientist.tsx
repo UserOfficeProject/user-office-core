@@ -609,7 +609,7 @@ const ProposalTableInstrumentScientist = ({
   const proposalToReview = preselectedProposalsData.find(
     (proposal) =>
       proposal.primaryKey === urlQueryParams.reviewModal ||
-      urlQueryParams.proposalid
+      proposal.proposalId === urlQueryParams.proposalid
   );
 
   /** NOTE:

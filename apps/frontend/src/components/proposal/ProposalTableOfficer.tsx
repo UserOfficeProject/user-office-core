@@ -658,12 +658,11 @@ const ProposalTableOfficer = ({
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
-  const proposalToReview = proposalsData.find((proposal) => {
-    return (
-      urlQueryParams.reviewModal ||
+  const proposalToReview = preselectedProposalsData.find(
+    (proposal) =>
+      proposal.primaryKey === urlQueryParams.reviewModal ||
       proposal.proposalId === urlQueryParams.proposalid
-    );
-  });
+  );
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
