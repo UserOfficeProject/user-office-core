@@ -66,7 +66,7 @@
   "proxy": "http://localhost:4000",
   "scripts": {
     "dev": "vite",
-    "dev:docker": "npm install && vite",
+    "dev:docker": "npm install && vite --no-open",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit && eslint . --ext .js,.jsx,.ts,.tsx --quiet",
