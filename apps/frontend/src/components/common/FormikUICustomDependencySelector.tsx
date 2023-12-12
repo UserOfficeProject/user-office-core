@@ -15,6 +15,7 @@ import {
   SelectionFromOptionsConfig,
   Template,
 } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import {
   getAllFields,
   getFieldById,
@@ -61,6 +62,7 @@ const FormikUICustomDependencySelector = ({
   const [availableValues, setAvailableValues] = useState<Option[]>([]);
 
   const classes = useStyles();
+  const api = useDataApi();
 
   useEffect(() => {
     setDependencyId(dependency.dependencyId);
@@ -86,6 +88,8 @@ const FormikUICustomDependencySelector = ({
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     if (dependencyId) {
       const depField = getFieldById(template.steps, dependencyId);
       if (!depField) {
@@ -106,9 +110,30 @@ const FormikUICustomDependencySelector = ({
             }
           )
         ); // use options
+      } else if (depField.question.dataType === DataType.INSTRUMENT_PICKER) {
+        api()
+          .getInstruments()
+          .then((data) => {
+            if (unmounted) {
+              return;
+            }
+
+            if (data.instruments) {
+              setAvailableValues(
+                data.instruments.instruments.map((instrument) => ({
+                  label: instrument.name,
+                  value: instrument.id,
+                }))
+              );
+            }
+          });
       }
     }
-  }, [dependencyId, template]);
+
+    return () => {
+      unmounted = true;
+    };
+  }, [dependencyId, template, api]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateFormikMemoized = useCallback(updateFormik, [
@@ -149,9 +174,12 @@ const FormikUICustomDependencySelector = ({
     return allFields
       .filter(
         (option) =>
-          [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
-            option.question.dataType
-          ) && currentQuestionId !== option.question.id
+          [
+            DataType.BOOLEAN,
+            DataType.SELECTION_FROM_OPTIONS,
+            DataType.INSTRUMENT_PICKER,
+          ].includes(option.question.dataType) &&
+          currentQuestionId !== option.question.id
       )
       .filter((option) => !hasCircularDependency(currentQuestionId, option));
   }, [steps, currentQuestionId]);
@@ -168,7 +196,12 @@ const FormikUICustomDependencySelector = ({
             value={dependencyId}
             onChange={(event: SelectChangeEvent<string>) => {
               const depFieldId = event.target.value;
+
               setDependencyId(depFieldId);
+
+              if (depFieldId !== dependencyId) {
+                setDependencyValue('');
+              }
             }}
             required
           >
@@ -216,7 +249,7 @@ const FormikUICustomDependencySelector = ({
           <Select
             fullWidth
             id="dependencyValue"
-            value={dependencyValue}
+            value={availableValues.length ? dependencyValue : ''}
             onChange={(event: SelectChangeEvent<unknown>): void => {
               setDependencyValue(event.target.value);
             }}
@@ -239,6 +272,6 @@ const FormikUICustomDependencySelector = ({
 export default FormikUICustomDependencySelector;
 
 interface Option {
-  value: string | boolean;
+  value: string | boolean | number;
   label: string;
 }
