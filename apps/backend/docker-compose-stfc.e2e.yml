@@ -48,7 +48,7 @@ services:
       - 1080:1080
   
   mockserver-client:
-    image: "ghcr.io/userofficeproject/stfc-mockserver-client:878-fix-seps-test-stfc"
+    image: "ghcr.io/userofficeproject/stfc-mockserver-client:master"
     command: sh -c "sleep 5 && node src/mockserver.js"
     depends_on:
       - mockServer
