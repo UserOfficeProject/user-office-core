@@ -1,5 +1,4 @@
-export const body = `
-<html lang="en">
+export const body = `<html lang="en">
 <head>
   <meta charset="utf-8" />
 
@@ -386,8 +385,7 @@ export const body = `
 </html>
 `;
 
-export const footer = `
-<html>
+export const footer = `<html>
   <head>
     <style type='text/css'>
       .content-footer { width: 100%; font-family: SegoeUI; color: black;
@@ -408,8 +406,7 @@ export const footer = `
 </html>
 `;
 
-export const header = `
-<style>
+export const header = `<style>
   .logo { max-height: 54px; max-width: 150px; padding: 0; }
   .proposal-header-title{ font-size: 13px; float: right; color: rgb(0, 163,
   218); } .flex{ display: flex; padding-left: 10px; padding-right: 10px;
@@ -426,8 +423,7 @@ export const header = `
   </div>
 </div>`;
 
-export const sampleDeclaration = `
-<html lang='en'>
+export const sampleDeclaration = `<html lang='en'>
   <head>
     <meta charset='utf-8' />
 
