@@ -4,7 +4,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
-import { FormikHelpers, FormikValues } from 'formik';
+import { FormikProps, FormikValues } from 'formik';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
 import {
@@ -45,34 +45,26 @@ const FormikUICustomDependencySelector = ({
     onChange: FunctionType;
     value: string;
   };
-  form: FormikHelpers<FormikValues>;
+  form: FormikProps<FormikValues>;
   template: Template;
   templateField: QuestionTemplateRelation;
   dependency: FieldDependency;
   currentQuestionId: string;
 }) => {
-  const [dependencyId, setDependencyId] = useState<string>('');
+  const [dependencyId, setDependencyId] = useState<string>(
+    dependency.dependencyId || ''
+  );
   const [operator, setOperator] = useState<EvaluatorOperator>(
-    EvaluatorOperator.EQ
+    dependency.condition.condition || EvaluatorOperator.EQ
   );
   const [dependencyValue, setDependencyValue] = useState<
     string | boolean | number | Date | unknown
-  >('');
+  >(dependency.condition.params || '');
 
   const [availableValues, setAvailableValues] = useState<Option[]>([]);
 
   const classes = useStyles();
   const api = useDataApi();
-
-  useEffect(() => {
-    setDependencyId(dependency.dependencyId);
-    setOperator(dependency.condition.condition);
-    setDependencyValue(dependency.condition.params);
-  }, [
-    dependency.dependencyId,
-    dependency.condition.condition,
-    dependency.condition.params,
-  ]);
 
   const updateFormik = (): void => {
     if (dependencyId && dependencyValue && operator) {
@@ -88,8 +80,6 @@ const FormikUICustomDependencySelector = ({
   };
 
   useEffect(() => {
-    let unmounted = false;
-
     if (dependencyId) {
       const depField = getFieldById(template.steps, dependencyId);
       if (!depField) {
@@ -111,13 +101,13 @@ const FormikUICustomDependencySelector = ({
           )
         ); // use options
       } else if (depField.question.dataType === DataType.INSTRUMENT_PICKER) {
+        if (form.submitCount) {
+          return;
+        }
+
         api()
           .getInstruments()
           .then((data) => {
-            if (unmounted) {
-              return;
-            }
-
             if (data.instruments) {
               setAvailableValues(
                 data.instruments.instruments.map((instrument) => ({
@@ -129,11 +119,7 @@ const FormikUICustomDependencySelector = ({
           });
       }
     }
-
-    return () => {
-      unmounted = true;
-    };
-  }, [dependencyId, template, api]);
+  }, [dependencyId, template, api, form.submitCount]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateFormikMemoized = useCallback(updateFormik, [
