@@ -1,5 +1,4 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -186,14 +185,6 @@ export default function UpdateUserInformation(
           <Typography variant="h6" component="h2" gutterBottom>
             User Information
             <Box className={classes.chipSpace}>
-              {!userData.emailVerified && (
-                <Chip
-                  color="primary"
-                  icon={<AlternateEmailIcon />}
-                  size="small"
-                  label="Email not verified"
-                />
-              )}
               {userData.placeholder && (
                 <Chip
                   color="primary"

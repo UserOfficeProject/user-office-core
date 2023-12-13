@@ -20,7 +20,6 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import {
   AuthJwtPayload,
-  EmailVerificationJwtPayload,
   User,
   UserRole,
   UserRoleShortCodeMap,
@@ -440,28 +439,6 @@ export default class UserMutations {
     }
   }
 
-  async emailVerification(token: string) {
-    // Check that token is valid
-    try {
-      const decoded = verifyToken<EmailVerificationJwtPayload>(token);
-      const user = await this.dataSource.getUser(decoded.id);
-      //Check that user exist
-      if (user && decoded.type === 'emailVerification') {
-        await this.dataSource.setUserEmailVerified(user.id);
-
-        return true;
-      } else {
-        return rejection('Can not verify user', { user, decoded });
-      }
-    } catch (error) {
-      return rejection(
-        'Can not verify email, please contact user office for help',
-        {},
-        error
-      );
-    }
-  }
-
   @ValidateArgs(addUserRoleValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: UserWithRole | null, args: AddUserRoleArgs) {
@@ -471,14 +448,6 @@ export default class UserMutations {
       .catch((err) =>
         rejection('Could not add user role', { agent, args }, err)
       );
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  setUserEmailVerified(
-    _: UserWithRole | null,
-    id: number
-  ): Promise<User | null> {
-    return this.dataSource.setUserEmailVerified(id);
   }
 
   @Authorized([Roles.USER_OFFICER])
