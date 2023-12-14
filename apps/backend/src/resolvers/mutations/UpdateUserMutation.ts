@@ -73,6 +73,11 @@ export class UpdateUserArgs {
 
   @Field(() => Int, { nullable: true })
   public organizationCountry?: number;
+
+  public oauthAccessToken?: string | null;
+  public oauthIssuer?: string | null;
+  public oauthRefreshToken?: string | null;
+  public oidcSub?: string | null;
 }
 
 @ArgsType()

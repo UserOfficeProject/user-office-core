@@ -133,11 +133,11 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         ...user,
         birthdate: userInfo.birthdate
           ? new Date(userInfo.birthdate)
-          : user.birthdate,
+          : undefined,
         department: userInfo.department as string,
         email: userInfo.email,
         firstname: userInfo.given_name,
-        gender: userInfo.gender as string,
+        gender: userInfo.gender,
         lastname: userInfo.family_name,
         oauthAccessToken: tokenSet.access_token,
         oauthIssuer: client.issuer.metadata.issuer,
@@ -146,7 +146,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         organisation: institutionId ?? user.organisation,
         position: userInfo.position as string,
         preferredname: userInfo.name,
-        telephone: userInfo.phone_number as string,
+        telephone: userInfo.phone_number,
         user_title: userInfo.title as string,
       });
 
