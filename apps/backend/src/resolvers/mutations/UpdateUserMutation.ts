@@ -100,14 +100,6 @@ export class UpdateUserMutation {
   }
 
   @Mutation(() => User)
-  setUserEmailVerified(
-    @Arg('id', () => Int) id: number,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.user.setUserEmailVerified(context.user, id);
-  }
-
-  @Mutation(() => User)
   setUserNotPlaceholder(
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext

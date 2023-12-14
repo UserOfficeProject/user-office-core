@@ -4,19 +4,19 @@ BEGIN
 
   INSERT INTO users(
     user_id, user_title, middlename, firstname, lastname, username, preferredname, oidc_sub, oauth_access_token, oauth_refresh_token, gender, birthdate, department, "position", email, 
-    email_verified, telephone, telephone_alt, created_at, updated_at, organisation, nationality, placeholder)
-    VALUES (100, '', '1', 'Instrument', 'Scientist', 'instr.sci1', '-', 'instr.sci1.oauthsub', 'dummy-access-token', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'instr.sci1@local.host', true, '', '', NOW(), NOW(), 1, 169, false);
+    telephone, telephone_alt, created_at, updated_at, organisation, nationality, placeholder)
+    VALUES (100, '', '1', 'Instrument', 'Scientist', 'instr.sci1', '-', 'instr.sci1.oauthsub', 'dummy-access-token', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'instr.sci1@local.host', '', '', NOW(), NOW(), 1, 169, false);
 
   INSERT INTO users(
     user_id, user_title, middlename, firstname, lastname, username, preferredname, oidc_sub, oauth_access_token, oauth_refresh_token, gender, birthdate, department, "position", email, 
-    email_verified, telephone, telephone_alt, created_at, updated_at, organisation, nationality, placeholder)
-    VALUES (101, '', '2', 'Instrument', 'Scientist', 'instr.sci2', '-', 'instr.sci2.oauthsub', 'dummy-access-token', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'instr.sci2@local.host', true, '', '', NOW(), NOW(), 1, 169, false);
+    telephone, telephone_alt, created_at, updated_at, organisation, nationality, placeholder)
+    VALUES (101, '', '2', 'Instrument', 'Scientist', 'instr.sci2',  '-', 'instr.sci2.oauthsub', 'dummy-access-token', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'instr.sci2@local.host', '', '', NOW(), NOW(), 1, 169, false);
 
   -- user account with every roles except instrument scientist and user officer
   INSERT INTO users(
     user_id, user_title, middlename, firstname, lastname, username, preferredname, oidc_sub, oauth_access_token, oauth_refresh_token, gender, birthdate, department, "position", email, 
-    email_verified, telephone, telephone_alt, created_at, updated_at, organisation, nationality, placeholder)
-    VALUES (102, '', 'Instrument', 'Not', 'Scientist', 'not.instr.sci', '-', 'not.instr.sci.oauthsub', 'dummy-access-token', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'not.instr.sci@local.host', true, '', '', NOW(), NOW(), 1, 169, false);
+    telephone, telephone_alt, created_at, updated_at, organisation, nationality, placeholder)
+    VALUES (102, '', 'Instrument', 'Not', 'Scientist', 'not.instr.sci', '-', 'not.instr.sci.oauthsub', 'dummy-access-token', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'not.instr.sci@local.host', '', '', NOW(), NOW(), 1, 169, false);
 
   INSERT INTO role_user(
     role_id, user_id)

@@ -94,7 +94,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     stfcUser.deptName ?? '',
     '',
     stfcUser.email ?? '',
-    true,
     stfcUser.workPhone ?? '',
     undefined,
     false,
@@ -253,10 +252,6 @@ export class StfcUserDataSource implements UserDataSource {
 
   async checkEmailExist(email: string): Promise<boolean> {
     return this.getStfcBasicPersonByEmail(email).then((user) => !!user);
-  }
-
-  setUserEmailVerified(id: number): Promise<User | null> {
-    throw new Error('Method not implemented.');
   }
 
   async setUserNotPlaceholder(id: number): Promise<User | null> {
