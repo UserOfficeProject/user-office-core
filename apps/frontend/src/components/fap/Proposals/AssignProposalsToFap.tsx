@@ -38,7 +38,7 @@ const AssignProposalsToFap = ({
 }: AssignProposalToFapProps) => {
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
-  const { Faps, loadingFaps } = useFapsData({
+  const { faps, loadingFaps } = useFapsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
@@ -61,7 +61,7 @@ const AssignProposalsToFap = ({
           selectedFapId: selectedProposalsFap,
         }}
         onSubmit={async (values): Promise<void> => {
-          const selectedFap = Faps.find(
+          const selectedFap = faps.find(
             (fap) => fap.id === values.selectedFapId
           );
 
@@ -85,7 +85,7 @@ const AssignProposalsToFap = ({
                   name="selectedFapId"
                   label="Select Fap"
                   loading={loadingFaps}
-                  items={Faps.map((fap) => ({
+                  items={faps.map((fap) => ({
                     value: fap.id,
                     text: fap.code,
                   }))}

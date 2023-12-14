@@ -33,7 +33,7 @@ const AssignInstrumentsToCall = ({
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
   const { currentRole } = useContext(UserContext);
-  const { Faps: allActiveFaps, loadingFaps } = useFapsData({
+  const { faps: allActiveFaps, loadingFaps } = useFapsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
