@@ -1,10 +1,10 @@
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
-import { Role } from '../../models/Role';
-import { Roles } from '../../models/Role';
+import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { LRUCache } from '../../utils/LRUCache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
@@ -94,7 +94,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     stfcUser.deptName ?? '',
     '',
     stfcUser.email ?? '',
-    true,
     stfcUser.workPhone ?? '',
     undefined,
     false,
@@ -255,10 +254,6 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getStfcBasicPersonByEmail(email).then((user) => !!user);
   }
 
-  setUserEmailVerified(id: number): Promise<User | null> {
-    throw new Error('Method not implemented.');
-  }
-
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     return await postgresUserDataSource.setUserNotPlaceholder(id);
   }
@@ -339,7 +334,7 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.getRoles();
   }
 
-  async update(user: User): Promise<User> {
+  async update(user: UpdateUserArgs): Promise<User> {
     throw new Error('Method not implemented.');
   }
 

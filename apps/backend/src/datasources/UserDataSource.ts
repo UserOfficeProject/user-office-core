@@ -1,9 +1,10 @@
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
 import { Role, Roles } from '../models/Role';
-import { User, BasicUserDetails, UserRole } from '../models/User';
+import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 
 export interface UserDataSource {
@@ -78,9 +79,8 @@ export interface UserDataSource {
     verified: boolean,
     countryId?: number
   ): Promise<number>;
-  update(user: User): Promise<User>;
+  update(user: UpdateUserArgs): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
-  setUserEmailVerified(id: number): Promise<User | null>;
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
     userId: number,
