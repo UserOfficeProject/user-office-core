@@ -101,7 +101,7 @@ export default {
     },
     instrumentPicker: {
       id: 'instrument_picker_question',
-      text: 'Instrument picker question from seeds',
+      text: 'Instrument Picker question from seeds',
       type: DataType.INSTRUMENT_PICKER,
     },
     addSamples: {
@@ -175,9 +175,14 @@ export default {
   },
   instrument1: {
     id: 1,
+    name: 'Instrument 1',
   },
   instrument2: {
     id: 2,
+  },
+  instrument3: {
+    id: 3,
+    name: 'Instrument 3',
   },
   fap: {
     id: 1,
