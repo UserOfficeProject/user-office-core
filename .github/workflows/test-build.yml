@@ -121,19 +121,6 @@ jobs:
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
         run: npm run install:frontend
 
-      - name: Cache frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-
-      - name: Generate frontend SDK
-        if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
-        run: |
-          cp apps/frontend/example.development.env apps/frontend/.env
-          npm run generate:sdk
-
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -169,15 +156,7 @@ jobs:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-          restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
-            sdk-frontend-
+      - run: npm run generate:sdk
 
       - run: npm ci
 
@@ -273,15 +252,8 @@ jobs:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-          restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
-            sdk-frontend-
+      - run: ls
+      - run: ls -a
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
