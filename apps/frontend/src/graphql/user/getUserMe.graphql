@@ -16,7 +16,6 @@ query getUserMe {
     telephone
     telephone_alt
     oidcSub
-    emailVerified
     placeholder
   }
 }

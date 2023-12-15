@@ -16,7 +16,6 @@ query getUser($userId: Int!) {
     telephone
     telephone_alt
     oidcSub
-    emailVerified
     placeholder
   }
 }
