@@ -121,6 +121,18 @@ jobs:
         if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
         run: npm run install:frontend
 
+      - name: Cache frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/frontend/src/generated
+          key: sdk-frontend-${{ steps.extract_branch.outputs.branch }}
+
+      - name: Generate frontend SDK
+        run: |
+          cp apps/frontend/example.development.env apps/frontend/.env
+          npm run generate:sdk
+
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -156,7 +168,15 @@ jobs:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
-      - run: npm run generate:sdk
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/frontend/src/generated
+          key: sdk-frontend-${{ steps.extract_branch.outputs.branch }}
+          restore-keys: |
+            sdk-frontend-${{ steps.extract_branch.outputs.branch }}
+            sdk-frontend-
 
       - run: npm ci
 
@@ -252,8 +272,15 @@ jobs:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
-      - run: ls
-      - run: ls -a
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v3
+        with:
+          path: apps/frontend/src/generated
+          key: sdk-frontend-${{ steps.extract_branch.outputs.branch }}
+          restore-keys: |
+            sdk-frontend-${{ steps.extract_branch.outputs.branch }}
+            sdk-frontend-
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
