@@ -13,6 +13,9 @@ import { QuestionFormShell } from '../QuestionFormShell';
 export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
+  document.addEventListener('focusin', function (e) {
+    e.stopImmediatePropagation();
+  });
 
   return (
     <QuestionFormShell
