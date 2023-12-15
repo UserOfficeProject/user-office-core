@@ -7,26 +7,27 @@ import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
 import {
-  User,
   BasicUserDetails,
+  User,
   UserRole,
   UserRoleShortCodeMap,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
-  UserRecord,
-  createUserObject,
-  createBasicUserObject,
+  CountryRecord,
+  InstitutionRecord,
   RoleRecord,
   RoleUserRecord,
-  InstitutionRecord,
-  createInstitutionObject,
+  UserRecord,
+  createBasicUserObject,
   createCountryObject,
-  CountryRecord,
+  createInstitutionObject,
+  createUserObject,
 } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -69,7 +70,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  async update(user: User): Promise<User> {
+  async update(user: UpdateUserArgs): Promise<User> {
     const {
       firstname,
       user_title,

@@ -54,7 +54,7 @@ export function QuestionaryComponentInstrumentPicker(
   );
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
-    onComplete(+event.target.value);
+    onComplete(+event.target.value || '');
   };
   switch (config.variant) {
     case 'dropdown':
@@ -68,7 +68,7 @@ export function QuestionaryComponentInstrumentPicker(
           <InputLabel id={`questionary-${id}`}>{label}</InputLabel>
           <Select
             id={id}
-            value={answer.value ?? null}
+            value={answer.value ?? ''}
             onChange={handleOnChange}
             labelId={`questionary-${id}`}
             required={config.required}
