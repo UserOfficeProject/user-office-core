@@ -21,10 +21,6 @@ export type PasswordResetJwtPayload = SpecialActionJwtPayload & {
   type: 'passwordReset';
 };
 
-export type EmailVerificationJwtPayload = SpecialActionJwtPayload & {
-  type: 'emailVerification';
-};
-
 export class User {
   constructor(
     public id: number,
@@ -45,7 +41,6 @@ export class User {
     public department: string,
     public position: string,
     public email: string,
-    public emailVerified: boolean,
     public telephone: string,
     public telephone_alt: string | undefined,
     public placeholder: boolean,
