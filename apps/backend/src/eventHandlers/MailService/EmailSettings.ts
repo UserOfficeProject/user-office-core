@@ -1,8 +1,8 @@
 interface BaseRecipient {
   /** SparkPost Enterprise API only. Email to use for envelope FROM. */
-  return_path?: string | undefined;
+  return_path?: string;
   /** Array of text labels associated with a recipient. */
-  tags?: string[] | undefined;
+  tags?: string[];
   /** Key/value pairs associated with a recipient. */
   metadata?: unknown;
   /** Key/value pairs associated with a recipient that are provided to the substitution engine. */
@@ -28,9 +28,9 @@ interface Address {
   /** Valid email address */
   email: string;
   /** User-friendly name for the email address */
-  name?: string | undefined;
+  name?: string;
   /** Email address to display in the “To” header instead of address.email (for CC and BCC) */
-  header_to?: string | undefined;
+  header_to?: string;
 }
 
 interface RecipientWithAddress {
@@ -43,7 +43,7 @@ interface RecipientWithMultichannelAddresses {
    * If both address and multichannel_addresses are specified only multichannel_addresses will be used.
    *
    */
-  address?: Address | string | undefined;
+  address?: Address | string;
   /**
    * Array of Multichannel Address objects for a recipient. At a minimum, address or multichannel_addresses is required.
    * If both address and multichannel_addresses are specified only multichannel_addresses will be used.
@@ -56,21 +56,21 @@ type Recipient = (RecipientWithAddress | RecipientWithMultichannelAddresses) &
 
 interface TransmissionOptions {
   /** Delay generation of messages until this datetime. */
-  start_time?: string | undefined;
+  start_time?: string;
   /** Whether open tracking is enabled for this transmission */
-  open_tracking?: boolean | undefined;
+  open_tracking?: boolean;
   /** Whether click tracking is enabled for this transmission */
-  click_tracking?: boolean | undefined;
+  click_tracking?: boolean;
   /** Whether message is transactional or non-transactional for unsubscribe and suppression purposes */
-  transactional?: boolean | undefined;
+  transactional?: boolean;
   /** Whether or not to use the sandbox sending domain */
-  sandbox?: boolean | undefined;
+  sandbox?: boolean;
   /** SparkPost Enterprise API only: Whether or not to ignore customer suppression rules, for this transmission only. Only applicable if your configuration supports this parameter. */
-  skip_suppression?: boolean | undefined;
+  skip_suppression?: boolean;
   /** The ID of a dedicated IP pool associated with your account ( Note: SparkPost only ). */
-  ip_pool?: string | undefined;
+  ip_pool?: string;
   /** Whether or not to perform CSS inlining in HTML content */
-  inline_css?: boolean | undefined;
+  inline_css?: boolean;
 }
 
 interface PushData {
@@ -101,54 +101,54 @@ interface Attachment {
 
 interface InlineContent {
   /** HTML content for the email’s text/html MIME part  At a minimum, html, text, or push is required. */
-  html?: string | undefined;
+  html?: string;
   /** Text content for the email’s text/plain MIME part  At a minimum, html, text, or push is required. */
-  text?: string | undefined;
+  text?: string;
   /**  Content of push notifications  At a minimum, html, text, or push is required.  SparkPost Enterprise API only. */
-  push?: PushData | undefined;
+  push?: PushData;
   /** Email subject line  required for email transmissions  Expected in the UTF-8 charset without RFC2047 encoding. Substitution syntax is supported. */
-  subject?: string | undefined;
+  subject?: string;
   /** "deals@company.com" or JSON object composed of the “name” and “email” fields “from” : { “name” : “My Company”, “email” : "deals@company.com" } used to compose the email’s “From” header */
-  from?: string | { email: string; name: string } | undefined;
+  from?: string | { email: string; name: string };
   /** Email address used to compose the email’s “Reply-To” header */
-  reply_to?: string | undefined;
+  reply_to?: string;
   /** JSON dictionary containing headers other than “Subject”, “From”, “To”, and “Reply-To” */
   headers?: unknown;
   /** JSON array of attachments. */
-  attachments?: Attachment[] | undefined;
+  attachments?: Attachment[];
   /** JSON array of inline images. */
-  inline_images?: Attachment[] | undefined;
+  inline_images?: Attachment[];
 }
 
 export interface CreateTransmission {
   /** JSON object in which transmission options are defined */
-  options?: TransmissionOptions | undefined;
+  options?: TransmissionOptions;
   /**
    * Recipients to receive a carbon copy of the transmission
    *
    */
-  cc?: Recipient[] | undefined;
+  cc?: Recipient[];
   /**
    * Recipients to discreetly receive a carbon copy of the transmission
    *
    */
-  bcc?: Recipient[] | undefined;
+  bcc?: Recipient[];
   /** Inline recipient objects or object containing stored recipient list ID */
-  recipients?: Recipient[] | { list_id: string } | undefined;
+  recipients?: Recipient[] | { list_id: string };
   /** Name of the campaign */
-  campaign_id?: string | undefined;
+  campaign_id?: string;
   /** Description of the transmission */
-  description?: string | undefined;
+  description?: string;
   /** Transmission level metadata containing key/value pairs */
   metadata?: unknown;
   /** Key/value pairs that are provided to the substitution engine */
   substitution_data?: unknown;
   /** SparkPost Enterprise API only: email to use for envelope FROM */
-  return_path?: string | undefined;
+  return_path?: string;
   /** Content that will be used to construct a message */
   content:
     | InlineContent
-    | { template_id: string; use_draft_template?: boolean | undefined }
+    | { template_id: string; use_draft_template?: boolean }
     | { email_rfc822: string };
 }
 
