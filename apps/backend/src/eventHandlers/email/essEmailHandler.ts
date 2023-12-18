@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
@@ -24,6 +25,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
   );
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
     Tokens.RedeemCodesDataSource
+  );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
   );
 
   if (event.isRejection) {
@@ -92,12 +96,16 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
-      const participants = await userDataSource.getProposalUsersFull(
-        event.proposal.primaryKey
-      );
+
       if (!principalInvestigator) {
         return;
       }
+
+      const participants = await userDataSource.getProposalUsersFull(
+        event.proposal.primaryKey
+      );
+
+      const call = await callDataSource.getCall(event.proposal.callId);
 
       const options: EmailSettings = {
         content: {
@@ -111,7 +119,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           coProposers: participants.map(
             (partipant) => `${partipant.preferredname} ${partipant.lastname} `
           ),
-          call: '',
+          callShortCode: call?.shortCode,
         },
         recipients: [
           { address: principalInvestigator.email },
@@ -148,6 +156,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
+      const call = await callDataSource.getCall(event.proposal.callId);
       if (!principalInvestigator) {
         return;
       }
@@ -176,6 +185,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             proposalNumber: event.proposal.proposalId,
             proposalTitle: event.proposal.title,
             commentForUser: event.proposal.commentForUser,
+            callShortCode: call?.shortCode,
           },
           recipients: [
             { address: principalInvestigator.email },
@@ -211,6 +221,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
         return;
       }
 
+      const call = await callDataSource.getCall(proposal?.callId);
+
       mailService
         .sendMail({
           content: {
@@ -222,6 +234,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             proposalNumber: proposal.proposalId,
             proposalTitle: proposal.title,
             commentForUser: proposal.commentForUser,
+            callShortCode: call?.shortCode,
           },
           recipients: [
             { address: fapReviewer.email },
