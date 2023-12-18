@@ -9,6 +9,7 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 
@@ -57,7 +58,6 @@ export const dummyUserOfficer = new User(
   'IT department',
   'Producer',
   'Dorris83@gmail.com',
-  true,
   '+46700568256',
   '',
   false,
@@ -89,7 +89,6 @@ export const dummyUser = new User(
   'IT department',
   'Architect',
   'Cleve30@yahoo.com',
-  true,
   '+38978414058',
   '+46700568256',
   false,
@@ -165,7 +164,6 @@ export const dummyPlaceHolderUser = new User(
   'IT department',
   'Architect',
   'placeholder@ess.se',
-  true,
   '+46700568256',
   '',
   true,
@@ -192,7 +190,6 @@ export const dummyUserNotOnProposal = new User(
   'IT department',
   'Facilitator',
   'Tyrique41@hotmail.com',
-  true,
   '+46700568256',
   '',
   false,
@@ -256,10 +253,6 @@ export class UserDataSourceMock implements UserDataSource {
   async checkEmailExist(email: string): Promise<boolean> {
     return false;
   }
-  async setUserEmailVerified(id: number): Promise<User | null> {
-    return null;
-    // Do something here or remove the function.
-  }
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     return null;
   }
@@ -311,7 +304,7 @@ export class UserDataSourceMock implements UserDataSource {
     ];
   }
 
-  async update(user: User): Promise<User> {
+  async update(user: UpdateUserArgs): Promise<User> {
     return dummyUser;
   }
 
