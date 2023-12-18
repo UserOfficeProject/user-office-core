@@ -48,7 +48,7 @@ context('Instrument tests', () => {
 
   // TODO: Maybe this should be moved to permission testing.
   it('User should not be able to see Instruments page', () => {
-    cy.login('user1', 1);
+    cy.login('user1', initialDBData.roles.user);
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -317,7 +317,7 @@ context('Instrument tests', () => {
         timeAllocation: 1,
       });
 
-      cy.login('officer', 2);
+      cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
 
       cy.contains('Proposals');

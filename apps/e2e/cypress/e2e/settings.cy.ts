@@ -26,7 +26,7 @@ context('Settings tests', () => {
     const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
     it('User should not be able to see Settings page', () => {
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -316,7 +316,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -402,7 +402,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -496,7 +496,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('placeholderUser', 1);
+      cy.login('placeholderUser', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -686,7 +686,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.finishedLoading();
@@ -1090,7 +1090,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(firstProposalTitle).parent().contains('submitted');

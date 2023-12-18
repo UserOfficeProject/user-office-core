@@ -528,7 +528,7 @@ context('Fap reviews tests', () => {
       const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
+        // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
           organisation: 2,
@@ -665,7 +665,7 @@ context('Fap reviews tests', () => {
       const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        // NOTE: Change organization before assigning to avoid warning in the SEP reviewers assignment
+        // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
           organisation: 2,

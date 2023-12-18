@@ -143,7 +143,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able create proposal', () => {
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
 
       cy.visit('/');
 
@@ -452,7 +452,7 @@ context('Proposal tests', () => {
       });
       cy.submitProposal({ proposalPk: createdProposalPk });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle);
@@ -619,7 +619,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able to delete proposal', () => {
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -670,7 +670,7 @@ context('Proposal tests', () => {
 
     it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -713,7 +713,7 @@ context('Proposal tests', () => {
       let createdCallId: number;
       const createdCallTitle = 'Created call';
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.createCall({
@@ -744,7 +744,7 @@ context('Proposal tests', () => {
     });
 
     it('During Proposal creation, User should not lose data when refreshing the page', () => {
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -818,7 +818,7 @@ context('Proposal tests', () => {
     });
 
     it('User officer should reopen proposal', () => {
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.get('[aria-label="View proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -833,7 +833,7 @@ context('Proposal tests', () => {
       cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.get('[aria-label="Edit proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -881,7 +881,7 @@ context('Proposal tests', () => {
         endCallInternal: faker.date.future(),
         proposalWorkflowId: createdWorkflowId,
       });
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -981,7 +981,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1055,7 +1055,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1098,7 +1098,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('Dashboard').click();
 
@@ -1119,7 +1119,7 @@ context('Proposal tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       let createdCallId: number;
       const createdCallTitle = faker.random.alphaNumeric(15);
@@ -1169,7 +1169,7 @@ context('Proposal tests', () => {
         if (response.createCall) {
           createdCallId = response.createCall.id;
         }
-        cy.login('placeholderUser', 1);
+        cy.login('placeholderUser', initialDBData.roles.user);
         cy.visit('/');
 
         cy.contains('New Proposal').click();
@@ -1224,7 +1224,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('placeholderUser', 1);
+      cy.login('placeholderUser', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1305,7 +1305,7 @@ context('Proposal tests', () => {
       });
     });
     it('Instrument should be automatically assigned to the proposal', () => {
-      cy.login('user1', 1);
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();

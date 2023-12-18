@@ -45,7 +45,7 @@ context('General scientific evaluation panel tests', () => {
   });
 
   it('User should not be able to see Faps page', () => {
-    cy.login('user1', 1);
+    cy.login('user1', initialDBData.roles.user);
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -199,7 +199,7 @@ context('General scientific evaluation panel tests', () => {
         }
       });
     });
-    it('Officer should be able to assign SEP Chair and SEP Secretary to existing SEP', function () {
+    it('Officer should be able to assign FAP Chair and FAP Secretary to existing FAP', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: fapMembers.chair.id,
