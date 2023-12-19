@@ -174,7 +174,7 @@ const ProposalGrade = ({
             disabled={isDisabled(isSubmitting)}
           />
           <FormHelperText>
-            Characters: {numberOfChars} / {2000}
+            Characters: {numberOfChars} / {6000}
           </FormHelperText>
           <ErrorMessage name="comment" />
           <Box marginTop={1} width={150}>
