@@ -6,7 +6,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { Editor } from '@tinymce/tinymce-react';
 import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select } from 'formik-mui';
@@ -15,6 +14,7 @@ import React, { useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
+import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import {
   Proposal,
