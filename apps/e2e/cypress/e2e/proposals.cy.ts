@@ -285,9 +285,12 @@ context('Proposal tests', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
-      cy.contains('Dashboard').click();
-      cy.contains(title).parent().find('[aria-label="Edit proposal"]').click();
-      cy.contains('Carl ');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl '
+      );
 
       cy.login('user2');
       cy.visit('/');
