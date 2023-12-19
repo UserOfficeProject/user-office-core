@@ -752,7 +752,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
             {
               category_id,
               question_id,
-              natural_key: natural_key.concat('_key'),
+              natural_key: natural_key.concat('_copy'),
               data_type,
               question,
               default_config,
