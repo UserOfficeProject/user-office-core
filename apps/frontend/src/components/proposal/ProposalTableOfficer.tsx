@@ -68,6 +68,7 @@ import TableActionsDropdownMenu from './TableActionsDropdownMenu';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
+  setProposalFilter: (filter: ProposalsFilter) => void;
   urlQueryParams: DecodedValueMap<ProposalUrlQueryParamsType>;
   setUrlQueryParams: SetQuery<ProposalUrlQueryParamsType>;
   confirm: WithConfirmType;
@@ -266,6 +267,7 @@ const ToolbarWithSelectAllPrefetched = (props: {
 
 const ProposalTableOfficer = ({
   proposalFilter,
+  setProposalFilter,
   urlQueryParams,
   setUrlQueryParams,
   confirm,
@@ -661,9 +663,10 @@ const ProposalTableOfficer = ({
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
-
-  const proposalToReview = proposalsData.find(
-    (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
+  const proposalToReview = preselectedProposalsData.find(
+    (proposal) =>
+      proposal.primaryKey === urlQueryParams.reviewModal ||
+      proposal.proposalId === urlQueryParams.proposalid
   );
 
   const userOfficerProposalReviewTabs = [
@@ -800,7 +803,7 @@ const ProposalTableOfficer = ({
       />
       <ProposalReviewModal
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
-        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        proposalReviewModalOpen={!!proposalToReview}
         setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
           setProposalsData(
             proposalsData.map((proposal) => {
@@ -811,6 +814,15 @@ const ProposalTableOfficer = ({
               }
             })
           );
+          if (urlQueryParams.proposalid) {
+            setUrlQueryParams({
+              proposalid: undefined,
+            });
+            setProposalFilter({
+              ...proposalFilter,
+              referenceNumbers: undefined,
+            });
+          }
           setUrlQueryParams({ reviewModal: undefined });
         }}
         reviewItemId={proposalToReview?.primaryKey}

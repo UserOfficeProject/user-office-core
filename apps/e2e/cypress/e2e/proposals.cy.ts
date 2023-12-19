@@ -33,6 +33,7 @@ context('Proposal tests', () => {
 
   let createdWorkflowId: number;
   let createdProposalPk: number;
+  let createdProposalId: string;
   const textQuestion = faker.random.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
@@ -116,7 +117,7 @@ context('Proposal tests', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           createdProposalPk = result.createProposal.primaryKey;
-
+          createdProposalId = result.createProposal.proposalId;
           cy.updateProposal({
             proposalPk: result.createProposal.primaryKey,
             title: newProposalTitle,
@@ -319,6 +320,24 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('Ben ');
+     });
+
+    it('Officer should be able to navigate to proposal using proposal ID', () => {
+      cy.login('officer');
+
+      cy.visit('/', {
+        qs: {
+          proposalid: createdProposalId,
+        },
+      });
+      cy.url().should('contain', `proposalid=${createdProposalId}`);
+
+      cy.contains(newProposalTitle);
+
+      cy.closeModal();
+
+      cy.url().should('not.contain', `proposalid=${createdProposalId}`);
+
     });
 
     it('User officer should be able to save proposal column selection', function () {
