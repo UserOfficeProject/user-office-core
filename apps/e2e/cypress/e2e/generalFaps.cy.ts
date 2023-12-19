@@ -45,7 +45,7 @@ context('General scientific evaluation panel tests', () => {
   });
 
   it('User should not be able to see Faps page', () => {
-    cy.login('user1');
+    cy.login('user1', initialDBData.roles.user);
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -61,7 +61,10 @@ context('General scientific evaluation panel tests', () => {
       cy.visit('/');
     });
 
-    it('Officer should be able to assign Fap Reviewer role', () => {
+    it('Officer should be able to assign Fap Reviewer role', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
       cy.contains('People').click();
       searchMuiTableAsync(fapMembers.chair.lastName);
       cy.get('[aria-label="Edit user"]').click();
@@ -196,15 +199,17 @@ context('General scientific evaluation panel tests', () => {
         }
       });
     });
-    it('Officer should be able to assign Fap Chair and Fap Secretary to existing Fap', () => {
-      cy.updateUserRoles({
-        id: fapMembers.chair.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
-      });
-      cy.updateUserRoles({
-        id: fapMembers.secretary.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
-      });
+    it('Officer should be able to assign FAP Chair and FAP Secretary to existing FAP', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: fapMembers.chair.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+        cy.updateUserRoles({
+          id: fapMembers.secretary.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+      }
       let selectedChairUserFirstName = '';
       let selectedChairUserLastName = '';
       let selectedSecretaryUserFirstName = '';
@@ -299,15 +304,17 @@ context('General scientific evaluation panel tests', () => {
       });
     });
 
-    it('Officer should be able to remove assigned Fap Chair and Fap Secretary from existing Fap', () => {
-      cy.updateUserRoles({
-        id: fapMembers.chair.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
-      });
-      cy.updateUserRoles({
-        id: fapMembers.secretary.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
-      });
+    it('Officer should be able to remove assigned Fap Chair and Fap Secretary from existing Fap', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: fapMembers.chair.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+        cy.updateUserRoles({
+          id: fapMembers.secretary.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+      }
       cy.assignChairOrSecretary({
         assignChairOrSecretaryToFapInput: {
           fapId: createdFapId,
@@ -429,10 +436,12 @@ context('General scientific evaluation panel tests', () => {
     let createdFapId: number;
 
     beforeEach(function () {
-      cy.updateUserRoles({
-        id: fapMembers.chair.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
-      });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: fapMembers.chair.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+      }
       cy.createFap({
         code: fap1.code,
         description: fap1.description,
@@ -549,10 +558,13 @@ context('General scientific evaluation panel tests', () => {
 
   describe('Fap tests as Fap Secretary', () => {
     beforeEach(function () {
-      cy.updateUserRoles({
-        id: fapMembers.secretary.id,
-        roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
-      });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: fapMembers.secretary.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+      }
+
       cy.createFap({
         code: fap1.code,
         description: fap1.description,

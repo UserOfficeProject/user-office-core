@@ -2,13 +2,16 @@ import { faker } from '@faker-js/faker';
 import {
   Event,
   FeatureId,
+  SettingsId,
   TechnicalReviewStatus,
   TemplateGroupId,
+  UserRole,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
@@ -23,7 +26,7 @@ context('Settings tests', () => {
     const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
     it('User should not be able to see Settings page', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -282,6 +285,7 @@ context('Settings tests', () => {
           });
         }
       });
+      cy.getAndStoreAppSettings();
     });
 
     it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED status', () => {
@@ -312,7 +316,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -398,7 +402,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -487,12 +491,12 @@ context('Settings tests', () => {
             proposalPk: result.createProposal.primaryKey,
             title: proposalTitle,
             abstract: proposalTitle,
-            proposerId: initialDBData.users.user2.id,
+            proposerId: initialDBData.users.placeholderUser.id,
           });
         }
       });
 
-      cy.login('user2');
+      cy.login('placeholderUser', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -682,7 +686,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.finishedLoading();
@@ -839,6 +843,22 @@ context('Settings tests', () => {
             },
             fapId: initialDBData.fap.id,
           });
+          cy.assignChairOrSecretary({
+            assignChairOrSecretaryToFapInput: {
+              fapId: 1,
+              userId: initialDBData.users.reviewer.id,
+              roleId: UserRole.FAP_CHAIR,
+            },
+          });
+          cy.assignReviewersToFap({
+            fapId: 1,
+            memberIds: [initialDBData.users.reviewer.id],
+          });
+          cy.assignFapReviewersToProposal({
+            fapId: 1,
+            memberIds: [initialDBData.users.reviewer.id],
+            proposalPk: proposal.primaryKey,
+          });
         }
       });
       cy.login('officer');
@@ -850,41 +870,9 @@ context('Settings tests', () => {
 
       cy.get("[aria-label='Edit']").first().click();
 
-      cy.contains('Members').click();
-
-      cy.get('[aria-label="Set Fap Chair"]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[aria-label="Select user"]').first().click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Fap chair assigned successfully!',
-      });
-
       cy.contains('Proposals and Assignments').click();
 
       cy.finishedLoading();
-
-      cy.get('[data-cy="assign-fap-member"]').first().click();
-
-      cy.finishedLoading();
-
-      cy.get('[role="dialog"]')
-        .contains('Nilsson')
-        .parent()
-        .find('input[type="checkbox"]')
-        .click();
-      cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Members assigned',
-      });
 
       cy.get('[role="dialog"]').should('not.exist');
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
@@ -895,9 +883,15 @@ context('Settings tests', () => {
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
-      cy.get('[data-cy="grade-proposal"]').click();
+      if (
+        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
+      ) {
+        cy.get('[data-cy="grade-proposal"]').click();
 
-      cy.get('[role="listbox"] > [role="option"]').first().click();
+        cy.get('[role="listbox"] > [role="option"]').first().click();
+      } else {
+        cy.get('[data-cy="grade-proposal"]').click().type('1');
+      }
 
       cy.get('[data-cy="is-grade-submitted"]').click();
       cy.get('[type="submit"]').contains('Save').click();
@@ -1096,7 +1090,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(firstProposalTitle).parent().contains('submitted');
