@@ -320,7 +320,7 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('Ben ');
-     });
+    });
 
     it('Officer should be able to navigate to proposal using proposal ID', () => {
       cy.login('officer');
@@ -337,7 +337,6 @@ context('Proposal tests', () => {
       cy.closeModal();
 
       cy.url().should('not.contain', `proposalid=${createdProposalId}`);
-
     });
 
     it('User officer should be able to save proposal column selection', function () {
