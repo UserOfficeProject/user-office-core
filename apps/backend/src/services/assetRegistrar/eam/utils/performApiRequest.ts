@@ -7,7 +7,7 @@ export async function performApiRequest(requestData: string) {
     const accessToken = await getToken();
 
     const response = await fetch(getEnvOrThrow('EAM_API_URL'), {
-      method: 'post',
+      method: 'POST',
       body: requestData,
       headers: {
         'Content-Type': 'text/xml',
