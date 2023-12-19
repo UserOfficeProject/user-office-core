@@ -246,7 +246,7 @@ context('Proposal tests', () => {
     });
 
     it('User should be able to have a preferred name', () => {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         cy.updateUserDetails({
           id: 4,
           user_title: 'Mr.',
@@ -281,7 +281,7 @@ context('Proposal tests', () => {
         });
       }
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
