@@ -216,7 +216,8 @@ test('When a user requires an instrument but does not have it, the instrument is
   await userAuthorization.autoAssignRemoveInstruments(
     0,
     [isisInstrument.name],
-    []
+    [],
+    true
   );
 
   expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
@@ -226,7 +227,12 @@ test('When a user requires an instrument but does not have it, the instrument is
 });
 
 test('When a user does not require an instrument but has it, no instrument is assigned and the instrument is removed', async () => {
-  await userAuthorization.autoAssignRemoveInstruments(0, [], [isisInstrument]);
+  await userAuthorization.autoAssignRemoveInstruments(
+    0,
+    [],
+    [isisInstrument],
+    true
+  );
 
   expect(mockAssignScientistToInstruments).toHaveBeenCalledTimes(0);
   expect(mockRemoveScientistFromInstruments).toHaveBeenCalledWith(0, [
@@ -238,7 +244,8 @@ test('When a user requires an instrument but has a different one, the requested 
   await userAuthorization.autoAssignRemoveInstruments(
     0,
     [isisInstrument.name],
-    [lsfInstrument]
+    [lsfInstrument],
+    true
   );
 
   expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
