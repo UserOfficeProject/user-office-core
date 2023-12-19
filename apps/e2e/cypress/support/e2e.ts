@@ -26,3 +26,4 @@ import './visits';
 import './workflow';
 import './fap';
 import './predefinedMessages';
+import './settings';
