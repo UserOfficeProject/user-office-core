@@ -247,7 +247,7 @@ context('Proposal tests', () => {
     });
 
     it('User should be able to have a preferred name', () => {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserDetails({
           id: 4,
           user_title: 'Mr.',
