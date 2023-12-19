@@ -2,11 +2,11 @@ import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
 import makeStyles from '@mui/styles/makeStyles';
-import { Editor } from '@tinymce/tinymce-react';
 import { getIn } from 'formik';
 import React, { useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
+import Editor from 'components/common/TinyEditor';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { RichTextInputConfig } from 'generated/sdk';
 
