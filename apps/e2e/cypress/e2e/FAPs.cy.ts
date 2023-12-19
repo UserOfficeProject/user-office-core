@@ -8,11 +8,13 @@ import {
   TemplateGroupId,
   FeatureId,
   UserJwt,
+  SettingsId,
   Event,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 const fapMembers = {
@@ -35,9 +37,13 @@ function readWriteReview(
 
   cy.setTinyMceContent('comment', faker.lorem.words(3));
 
-  cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
+  if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
+    cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
 
-  cy.get('[role="listbox"] > [role="option"]').first().click();
+    cy.get('[role="listbox"] > [role="option"]').first().click();
+  } else {
+    cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
+  }
 
   if (shouldSubmit) {
     if (isReviewer) {
@@ -205,6 +211,7 @@ context('Fap reviews tests', () => {
       updateUsersRoles();
     });
     initializationBeforeTests();
+    cy.getAndStoreAppSettings();
   });
 
   describe('User officer role', () => {
@@ -520,19 +527,20 @@ context('Fap reviews tests', () => {
 
       const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
-      // NOTE: Change organization before assigning to avoid warning in the Fap reviewers assignment
-      cy.updateUserDetails({
-        ...loggedInUserParsed,
-        organisation: 2,
-        telephone: faker.phone.number('+4670#######'),
-        user_title: 'Dr.',
-        gender: 'male',
-        nationality: 1,
-        birthdate: new Date('2000/01/01'),
-        department: 'IT',
-        position: 'Dirrector',
-      } as UpdateUserMutationVariables);
-
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
+        cy.updateUserDetails({
+          ...loggedInUserParsed,
+          organisation: 2,
+          telephone: faker.phone.number('+4670#######'),
+          user_title: 'Dr.',
+          gender: 'male',
+          nationality: 1,
+          birthdate: new Date('2000/01/01'),
+          department: 'IT',
+          position: 'Dirrector',
+        } as UpdateUserMutationVariables);
+      }
       cy.visit(`/FapPage/${createdFapId}?tab=2`);
 
       cy.finishedLoading();
@@ -656,19 +664,21 @@ context('Fap reviews tests', () => {
 
       const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
-      // NOTE: Change organization before assigning to avoid warning in the Fap reviewers assignment
-      cy.updateUserDetails({
-        ...loggedInUserParsed,
-        organisation: 2,
-        telephone: faker.phone.number('+4670#######'),
-        telephone_alt: faker.phone.number('+4670#######'),
-        user_title: 'Dr.',
-        gender: 'male',
-        nationality: 1,
-        birthdate: new Date('2000/01/01'),
-        department: 'IT',
-        position: 'Dirrector',
-      } as UpdateUserMutationVariables);
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
+        cy.updateUserDetails({
+          ...loggedInUserParsed,
+          organisation: 2,
+          telephone: faker.phone.number('+4670#######'),
+          telephone_alt: faker.phone.number('+4670#######'),
+          user_title: 'Dr.',
+          gender: 'male',
+          nationality: 1,
+          birthdate: new Date('2000/01/01'),
+          department: 'IT',
+          position: 'Dirrector',
+        } as UpdateUserMutationVariables);
+      }
 
       cy.visit(`/FapPage/${createdFapId}?tab=2`);
 
@@ -808,6 +818,8 @@ context('Fap reviews tests', () => {
         }
       });
       cy.login(fapMembers.reviewer);
+
+      cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
     });
 
@@ -856,10 +868,18 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
       cy.setTinyMceContent('comment', faker.lorem.words(3));
-      cy.get('[data-cy="grade-proposal"]').click();
-      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
-        .first()
-        .click();
+
+      if (
+        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
+      ) {
+        cy.get('[data-cy="grade-proposal"]').click();
+        cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+          .first()
+          .click();
+      } else {
+        cy.get('[data-cy="grade-proposal"]').click().click().type('1');
+      }
+
       cy.get('[data-cy=submit-grade]').click();
       cy.get('[data-cy=confirm-ok]').click();
       cy.finishedLoading();
@@ -935,6 +955,9 @@ context('Fap meeting components tests', () => {
   let createdInstrumentId: number;
 
   beforeEach(function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
