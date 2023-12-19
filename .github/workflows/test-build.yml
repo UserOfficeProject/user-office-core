@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: 18.x
+  FRONTEND_SDK_KEY: sdk-frontend-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -126,10 +127,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          key: ${{ env.FRONTEND_SDK_KEY }}
 
       - name: Generate frontend SDK
-        if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
         run: |
           cp apps/frontend/example.development.env apps/frontend/.env
           npm run generate:sdk
@@ -174,9 +174,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            ${{ env.FRONTEND_SDK_KEY }}
             sdk-frontend-
 
       - run: npm ci
@@ -278,9 +278,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            ${{ env.FRONTEND_SDK_KEY }}
             sdk-frontend-
 
       # TODO: See how to proceed with e2e caching because there is some error:

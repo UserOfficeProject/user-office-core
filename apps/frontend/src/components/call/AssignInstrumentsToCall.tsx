@@ -18,6 +18,41 @@ import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+const FapSelectionComponent = ({
+  onChange,
+  id,
+}: Instrument & {
+  onChange: (id: number, newValue: number | null) => void;
+}) => {
+  const { currentRole } = useContext(UserContext);
+  const { faps: allActiveFaps, loadingFaps } = useFapsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+  });
+
+  const fapOptions =
+    allActiveFaps?.map((fap) => ({
+      label: fap.code,
+      value: fap.id,
+    })) || [];
+
+  return (
+    <Autocomplete
+      loading={loadingFaps}
+      id="fapSelection"
+      options={fapOptions}
+      isOptionEqualToValue={(option, value) => option.value === value.value}
+      renderInput={(params) => (
+        <TextField {...params} label="Fap" margin="none" />
+      )}
+      onChange={(_event, newValue) => {
+        onChange(id, newValue?.value || null);
+      }}
+    />
+  );
+};
+
 type AssignInstrumentsToCallProps = {
   assignInstrumentsToCall: (
     instruments: InstrumentWithAvailabilityTime[]
@@ -32,13 +67,6 @@ const AssignInstrumentsToCall = ({
   assignedInstruments,
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
-  const { currentRole } = useContext(UserContext);
-  const { faps: allActiveFaps, loadingFaps } = useFapsData({
-    filter: '',
-    active: true,
-    role: currentRole as UserRole,
-  });
-
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]
   >([]);
@@ -49,11 +77,12 @@ const AssignInstrumentsToCall = ({
     [instrumentId: number]: number | null;
   }>({});
 
-  const fapOptions =
-    allActiveFaps?.map((fap) => ({
-      label: fap.code,
-      value: fap.id,
-    })) || [];
+  const onChange = (id: number, newValue: number | null) => {
+    setInstrumentFapMapping((oldState) => ({
+      ...oldState,
+      [id]: newValue,
+    }));
+  };
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -62,30 +91,9 @@ const AssignInstrumentsToCall = ({
     {
       title: 'Fap',
       field: 'fap',
-      render: (rowData: Instrument) => {
-        return (
-          <Autocomplete
-            loading={loadingFaps}
-            id="fapSelection"
-            options={fapOptions}
-            renderInput={(params) => <TextField {...params} label="Faps" />}
-            onChange={(_event, newValue) => {
-              if (newValue) {
-                setInstrumentFapMapping({
-                  ...instrumentFapMapping,
-                  [rowData.id]: newValue.value,
-                });
-              } else {
-                // remove from mapping and set to state
-                setInstrumentFapMapping({
-                  ...instrumentFapMapping,
-                  [rowData.id]: null,
-                });
-              }
-            }}
-          />
-        );
-      },
+      render: (rowData: Instrument) => (
+        <FapSelectionComponent {...rowData} onChange={onChange} />
+      ),
     },
   ];
 
