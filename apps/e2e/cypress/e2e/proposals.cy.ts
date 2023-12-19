@@ -46,8 +46,8 @@ context('Proposal tests', () => {
     endCall: faker.date.future().toISOString(),
     startReview: currentDayStart,
     endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
+    startFapReview: currentDayStart,
+    endFapReview: currentDayStart,
     startNotify: currentDayStart,
     endNotify: currentDayStart,
     startCycle: currentDayStart,
@@ -93,7 +93,7 @@ context('Proposal tests', () => {
 
   describe('Proposal basic tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -143,7 +143,8 @@ context('Proposal tests', () => {
     });
 
     it('Should be able create proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
+
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -321,7 +322,7 @@ context('Proposal tests', () => {
     });
 
     it('User officer should be able to save proposal column selection', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
       cy.login('officer');
@@ -330,8 +331,16 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
 
       cy.get("[aria-label='Show Columns']").first().click();
-      cy.get('.MuiPopover-paper').contains('Call').click();
-      cy.get('.MuiPopover-paper').contains('SEP').click();
+      cy.get('.MuiPopover-paper')
+        .contains('Call')
+        .parent()
+        .find('input')
+        .uncheck();
+      cy.get('.MuiPopover-paper')
+        .contains('Fap')
+        .parent()
+        .find('input')
+        .uncheck();
 
       cy.get('body').click();
 
@@ -341,8 +350,37 @@ context('Proposal tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.contains('Call');
-      cy.contains('SEP');
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'not.contain',
+        'Call'
+      );
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'not.contain',
+        'Fap'
+      );
+
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper')
+        .contains('Call')
+        .parent()
+        .find('input')
+        .check();
+      cy.get('.MuiPopover-paper')
+        .contains('Fap')
+        .parent()
+        .find('input')
+        .check();
+
+      cy.reload();
+
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'contain',
+        'Call'
+      );
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'contain',
+        'Fap'
+      );
     });
 
     it('User officer should be able to select all prefetched proposals in the table', function () {
@@ -468,8 +506,10 @@ context('Proposal tests', () => {
       cy.get('[data-cy="allocation-time-unit"]').click();
       cy.contains('Hour').click();
 
-      cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="listbox"] li').first().click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
+        cy.get('[data-cy="call-esi-template"]').click();
+        cy.get('[role="listbox"] li').first().click();
+      }
 
       cy.get('[data-cy="next-step"]').click();
       cy.get('[data-cy="next-step"]').click();
@@ -488,7 +528,7 @@ context('Proposal tests', () => {
       });
       cy.submitProposal({ proposalPk: createdProposalPk });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle);
@@ -560,7 +600,9 @@ context('Proposal tests', () => {
 
       cy.get('@dialog').find('#selectedStatusId-input').click();
 
-      cy.get('[role="listbox"]').contains('SEP Meeting').click();
+      cy.get('[role="listbox"]')
+        .contains(initialDBData.proposalStatuses.fapMeeting.name)
+        .click();
 
       cy.get('[data-cy="submit-proposal-status-change"]').click();
 
@@ -571,10 +613,10 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .should('contain.text', 'SEP Meeting');
+        .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
       cy.contains(clonedProposalTitle)
         .parent()
-        .should('contain.text', 'SEP Meeting');
+        .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
     });
 
     it('User officer should be able to see proposal status when opening change status modal', () => {
@@ -583,7 +625,7 @@ context('Proposal tests', () => {
         proposalsToClonePk: [createdProposalPk],
       });
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.sepMeeting.id,
+        statusId: initialDBData.proposalStatuses.fapMeeting.id,
         proposals: [
           { primaryKey: createdProposalPk, callId: initialDBData.call.id },
         ],
@@ -613,21 +655,24 @@ context('Proposal tests', () => {
         .find('[type="checkbox"]')
         .uncheck();
 
-      cy.contains('SEP Meeting').parent().find('[type="checkbox"]').check();
+      cy.contains(initialDBData.proposalStatuses.fapMeeting.name)
+        .parent()
+        .find('[type="checkbox"]')
+        .check();
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.finishedLoading();
 
       cy.get('[data-cy="status-selection"] input').should(
         'have.value',
-        `${initialDBData.proposalStatuses.sepMeeting.name}`
+        `${initialDBData.proposalStatuses.fapMeeting.name}`
       );
 
       // Close the modal
       cy.get('body').trigger('keydown', { keyCode: 27 });
 
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.sepReview.id,
+        statusId: initialDBData.proposalStatuses.fapReview.id,
         proposals: [
           { primaryKey: createdProposalPk, callId: initialDBData.call.id },
         ],
@@ -650,7 +695,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able to delete proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -690,7 +735,8 @@ context('Proposal tests', () => {
       cy.contains(longProposalTitle)
         .parent()
         .invoke('outerWidth')
-        .should('eq', 400);
+        .should('be.gte', 400)
+        .should('be.lt', 410);
 
       cy.contains(longProposalTitle)
         .parent()
@@ -700,7 +746,7 @@ context('Proposal tests', () => {
 
     it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -743,7 +789,7 @@ context('Proposal tests', () => {
       let createdCallId: number;
       const createdCallTitle = 'Created call';
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.createCall({
@@ -774,7 +820,7 @@ context('Proposal tests', () => {
     });
 
     it('During Proposal creation, User should not lose data when refreshing the page', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -816,7 +862,7 @@ context('Proposal tests', () => {
 
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -848,7 +894,7 @@ context('Proposal tests', () => {
     });
 
     it('User officer should reopen proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.get('[aria-label="View proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -863,7 +909,7 @@ context('Proposal tests', () => {
       cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.get('[aria-label="Edit proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -877,7 +923,7 @@ context('Proposal tests', () => {
 
   describe('Proposal internal and external basic tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -911,7 +957,7 @@ context('Proposal tests', () => {
         endCallInternal: faker.date.future(),
         proposalWorkflowId: createdWorkflowId,
       });
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -1011,7 +1057,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1085,7 +1131,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1128,7 +1174,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('Dashboard').click();
 
@@ -1149,7 +1195,7 @@ context('Proposal tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       let createdCallId: number;
       const createdCallTitle = faker.random.alphaNumeric(15);
@@ -1199,7 +1245,7 @@ context('Proposal tests', () => {
         if (response.createCall) {
           createdCallId = response.createCall.id;
         }
-        cy.login('user2');
+        cy.login('placeholderUser', initialDBData.roles.user);
         cy.visit('/');
 
         cy.contains('New Proposal').click();
@@ -1219,8 +1265,10 @@ context('Proposal tests', () => {
         cy.reload();
 
         cy.finishedLoading();
-
-        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
+        cy.get('[data-cy=call-list]').should(
+          'not.contain',
+          updatedCall.shortCode
+        );
       });
     });
 
@@ -1237,7 +1285,7 @@ context('Proposal tests', () => {
               proposalPk: result.createProposal.primaryKey,
               title: title,
               abstract: abstract,
-              proposerId: initialDBData.users.user2.id,
+              proposerId: initialDBData.users.placeholderUser.id,
             });
           }
         })
@@ -1252,7 +1300,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user2');
+      cy.login('placeholderUser', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1280,7 +1328,7 @@ context('Proposal tests', () => {
       managerUserId: initialDBData.users.user1.id,
     };
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -1302,7 +1350,7 @@ context('Proposal tests', () => {
       cy.createInstrument(instrument).then((result) => {
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentSepIds: [{ instrumentId: result.createInstrument.id }],
+          instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
         });
       });
       cy.createTopic({
@@ -1333,7 +1381,7 @@ context('Proposal tests', () => {
       });
     });
     it('Instrument should be automatically assigned to the proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();

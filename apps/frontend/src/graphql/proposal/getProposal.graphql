@@ -23,7 +23,7 @@ query getProposal($primaryKey: Int!) {
       comment
       status
       userID
-      sepID
+      fapID
       reviewer {
         firstname
         lastname
@@ -59,7 +59,7 @@ query getProposal($primaryKey: Int!) {
       endCallInternal
       proposalWorkflowId
     }
-    sep {
+    fap {
       id
       code
     }

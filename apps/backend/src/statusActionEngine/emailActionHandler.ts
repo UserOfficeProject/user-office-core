@@ -14,7 +14,7 @@ import {
   getCoProposersAndFormatOutputForEmailSending,
   getInstrumentScientistsAndFormatOutputForEmailSending,
   getPIAndFormatOutputForEmailSending,
-  getSEPReviewersAndFormatOutputForEmailSending,
+  getFapReviewersAndFormatOutputForEmailSending,
   publishMessageToTheEventBus,
 } from './statusActionUtils';
 
@@ -64,8 +64,8 @@ export const emailActionHandler = async (
           break;
         }
 
-        case EmailStatusActionRecipients.SEP_REVIEWERS: {
-          const SRs = await getSEPReviewersAndFormatOutputForEmailSending(
+        case EmailStatusActionRecipients.FAP_REVIEWERS: {
+          const SRs = await getFapReviewersAndFormatOutputForEmailSending(
             proposals,
             recipientWithTemplate
           );

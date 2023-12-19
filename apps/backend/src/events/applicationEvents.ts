@@ -1,12 +1,12 @@
 import { Call } from '../models/Call';
+import { Fap } from '../models/Fap';
+import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
-import { SEP } from '../models/SEP';
-import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
@@ -102,18 +102,18 @@ interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   technicalreview: TechnicalReview;
 }
 
-interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED;
+interface ProposalFapReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_REVIEW_SUBMITTED;
   review: Review;
 }
 
-interface ProposalSEPReviewUpdatedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_SEP_REVIEW_UPDATED;
+interface ProposalFapReviewUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_REVIEW_UPDATED;
   review: Review;
 }
 
-interface ProposalAllSEPReviewsSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED;
+interface ProposalAllFapReviewsSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED;
   proposal: Proposal;
 }
 
@@ -127,8 +127,8 @@ interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   instrumenthasproposals: InstrumentHasProposals;
 }
 
-interface ProposalSEPSelectedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_SEP_SELECTED;
+interface ProposalFapSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_SELECTED;
   proposalpks: ProposalPks;
 }
 
@@ -137,8 +137,8 @@ interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   instrumenthasproposals: InstrumentHasProposals;
 }
 
-interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_SEP_MEETING_SUBMITTED;
+interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_MEETING_SUBMITTED;
   proposal: Proposal;
 }
 
@@ -157,32 +157,24 @@ interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   proposals: Proposals;
 }
 
-interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_SEP_MEETING_SAVED;
-  sepmeetingdecision: SepMeetingDecision;
+interface ProposalFapMeetingSavedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_MEETING_SAVED;
+  fapmeetingdecision: FapMeetingDecision;
 }
 
-interface ProposalSEPMeetingRankingOverwrittenEvent extends GeneralEvent {
-  type: Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN;
-  sepmeetingdecision: SepMeetingDecision;
+interface ProposalFapMeetingRankingOverwrittenEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN;
+  fapmeetingdecision: FapMeetingDecision;
 }
 
-interface ProposalSEPMeetingReorderEvent extends GeneralEvent {
-  type: Event.PROPOSAL_SEP_MEETING_REORDER;
-  sepmeetingdecision: SepMeetingDecision;
+interface ProposalFapMeetingReorderEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_MEETING_REORDER;
+  fapmeetingdecision: FapMeetingDecision;
 }
 
 interface ProposalTopicAnsweredEvent extends GeneralEvent {
   type: Event.TOPIC_ANSWERED;
   questionarystep: QuestionaryStep;
-}
-
-interface UserResetPasswordEmailEvent extends GeneralEvent {
-  type: Event.USER_PASSWORD_RESET_EMAIL;
-  userlinkresponse: {
-    user: User;
-    link: string;
-  };
 }
 
 interface UserUpdateEvent extends GeneralEvent {
@@ -209,39 +201,39 @@ interface EmailInvite extends GeneralEvent {
   };
 }
 
-interface SEPCreatedEvent extends GeneralEvent {
-  type: Event.SEP_CREATED;
-  sep: SEP;
+interface FapCreatedEvent extends GeneralEvent {
+  type: Event.FAP_CREATED;
+  fap: Fap;
 }
 
-interface SEPUpdatedEvent extends GeneralEvent {
-  type: Event.SEP_UPDATED;
-  sep: SEP;
+interface FapUpdatedEvent extends GeneralEvent {
+  type: Event.FAP_UPDATED;
+  fap: Fap;
 }
 
-interface SEPMembersAssignedEvent extends GeneralEvent {
-  type: Event.SEP_MEMBERS_ASSIGNED;
-  sep: SEP;
+interface FapMembersAssignedEvent extends GeneralEvent {
+  type: Event.FAP_MEMBERS_ASSIGNED;
+  fap: Fap;
 }
 
-interface SEPMemberAssignedToProposalEvent extends GeneralEvent {
-  type: Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL;
-  sep: SEP;
+interface FapMemberAssignedToProposalEvent extends GeneralEvent {
+  type: Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL;
+  fap: Fap;
 }
 
-interface SEPMemberRemovedFromProposalEvent extends GeneralEvent {
-  type: Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL;
-  sep: SEP;
+interface FapMemberRemovedFromProposalEvent extends GeneralEvent {
+  type: Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL;
+  fap: Fap;
 }
 
-interface SEPProposalRemovedEvent extends GeneralEvent {
-  type: Event.SEP_PROPOSAL_REMOVED;
-  sep: SEP;
+interface FapProposalRemovedEvent extends GeneralEvent {
+  type: Event.FAP_PROPOSAL_REMOVED;
+  fap: Fap;
 }
 
-interface SEPMemberRemovedEvent extends GeneralEvent {
-  type: Event.SEP_MEMBER_REMOVED;
-  sep: SEP;
+interface FapMemberRemovedEvent extends GeneralEvent {
+  type: Event.FAP_MEMBER_REMOVED;
+  fap: Fap;
 }
 
 interface CallCreatedEvent extends GeneralEvent {
@@ -263,8 +255,8 @@ interface CallReviewEndedEvent extends GeneralEvent {
   call: Call;
 }
 
-interface CallSEPReviewEndedEvent extends GeneralEvent {
-  type: Event.CALL_SEP_REVIEW_ENDED;
+interface CallFapReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_FAP_REVIEW_ENDED;
   call: Call;
 }
 
@@ -292,9 +284,9 @@ interface InstrumentDeletedEvent extends GeneralEvent {
   instrument: Instrument;
 }
 
-interface SEPReviewerNotified extends GeneralEvent {
-  type: Event.SEP_REVIEWER_NOTIFIED;
-  sepReview: Review;
+interface FapReviewerNotified extends GeneralEvent {
+  type: Event.FAP_REVIEWER_NOTIFIED;
+  fapReview: Review;
 }
 
 export type ApplicationEvent =
@@ -312,43 +304,42 @@ export type ApplicationEvent =
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
   | EmailInvite
-  | UserResetPasswordEmailEvent
   | UserUpdateEvent
   | UserRoleUpdateEvent
-  | SEPCreatedEvent
-  | SEPUpdatedEvent
-  | SEPMembersAssignedEvent
-  | SEPProposalRemovedEvent
-  | SEPMemberRemovedEvent
-  | SEPMemberAssignedToProposalEvent
-  | SEPMemberRemovedFromProposalEvent
+  | FapCreatedEvent
+  | FapUpdatedEvent
+  | FapMembersAssignedEvent
+  | FapProposalRemovedEvent
+  | FapMemberRemovedEvent
+  | FapMemberAssignedToProposalEvent
+  | FapMemberRemovedFromProposalEvent
   | UserDeletedEvent
   | ProposalNotifiedEvent
   | CallCreatedEvent
   | CallEndedEvent
   | CallEndedInternalEvent
   | CallReviewEndedEvent
-  | CallSEPReviewEndedEvent
+  | CallFapReviewEndedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
-  | ProposalSEPReviewUpdatedEvent
-  | ProposalSEPReviewSubmittedEvent
-  | ProposalAllSEPReviewsSubmittedEvent
+  | ProposalFapReviewUpdatedEvent
+  | ProposalFapReviewSubmittedEvent
+  | ProposalAllFapReviewsSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
-  | ProposalSEPSelectedEvent
+  | ProposalFapSelectedEvent
   | ProposalInstrumentSubmittedEvent
-  | ProposalSEPMeetingSubmittedEvent
+  | ProposalFapMeetingSubmittedEvent
   | ProposalStatusChangedByWorkflowEvent
   | ProposalStatusChangedByUserEvent
-  | ProposalSEPMeetingSavedEvent
-  | ProposalSEPMeetingRankingOverwrittenEvent
-  | ProposalSEPMeetingReorderEvent
+  | ProposalFapMeetingSavedEvent
+  | ProposalFapMeetingRankingOverwrittenEvent
+  | ProposalFapMeetingReorderEvent
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
   | ProposalBookingTimeSlotsRemovedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
-  | SEPReviewerNotified
+  | FapReviewerNotified
   | ProposalStatusActionExecutedEvent;

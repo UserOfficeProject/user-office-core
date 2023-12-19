@@ -157,11 +157,9 @@ const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
 ) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const SEPReviewColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
-) => [
+const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
-  { title: t('SEP'), field: 'sepCode', emptyValue: '-', hidden: true },
+  { title: 'Fap', field: 'fapCode', emptyValue: '-', hidden: true },
 ];
 
 const proposalStatusFilter: Record<string, number> = {
@@ -382,8 +380,8 @@ const ProposalTableInstrumentScientist = ({
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
 
-  const isSEPEnabled = featureContext.featuresMap.get(
-    FeatureId.SEP_REVIEW
+  const isFapEnabled = featureContext.featuresMap.get(
+    FeatureId.FAP_REVIEW
   )?.isEnabled;
 
   const instrumentScientistProposalReviewTabs = [
@@ -391,7 +389,7 @@ const ProposalTableInstrumentScientist = ({
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isSEPEnabled && isInstrumentScientist
+    ...(isFapEnabled && isInstrumentScientist
       ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN]
       : []),
   ];
@@ -589,10 +587,10 @@ const ProposalTableInstrumentScientist = ({
     removeColumns(columns, instrumentManagementColumns(t));
   }
 
-  if (isSEPEnabled) {
-    addColumns(columns, SEPReviewColumns(t));
+  if (isFapEnabled) {
+    addColumns(columns, FapReviewColumns);
   } else {
-    removeColumns(columns, SEPReviewColumns(t));
+    removeColumns(columns, FapReviewColumns);
   }
 
   columns = setSortDirectionOnSortColumn(

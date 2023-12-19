@@ -1,0 +1,5 @@
+mutation deleteFap($id: Int!) {
+  deleteFap(id: $id) {
+    id
+  }
+}

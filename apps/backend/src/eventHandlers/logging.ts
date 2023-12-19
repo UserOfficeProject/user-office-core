@@ -3,9 +3,9 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
@@ -20,7 +20,7 @@ export default function createHandler() {
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
-  const sepDataSource = container.resolve<SEPDataSource>(Tokens.SEPDataSource);
+  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
@@ -42,14 +42,6 @@ export default function createHandler() {
     // NOTE: We need to have custom checks for events where response is not standard one.
     try {
       switch (event.type) {
-        case Event.USER_PASSWORD_RESET_EMAIL:
-          await eventLogsDataSource.set(
-            event.loggedInUserId,
-            event.type,
-            json,
-            event.userlinkresponse.user.id.toString()
-          );
-          break;
         case Event.EMAIL_INVITE:
           await eventLogsDataSource.set(
             event.loggedInUserId,
@@ -79,12 +71,12 @@ export default function createHandler() {
           );
           break;
         }
-        case Event.PROPOSAL_SEP_SELECTED:
+        case Event.PROPOSAL_FAP_SELECTED:
           await Promise.all(
             event.proposalpks.proposalPks.map(async (proposalPk) => {
-              const sep = await sepDataSource.getSEPByProposalPk(proposalPk);
+              const fap = await fapDataSource.getFapByProposalPk(proposalPk);
 
-              const description = `Selected SEP: ${sep?.code}`;
+              const description = `Selected Fap: ${fap?.code}`;
 
               return eventLogsDataSource.set(
                 event.loggedInUserId,
@@ -124,14 +116,14 @@ export default function createHandler() {
             event.instrumenthasproposals.instrumentId.toString()
           );
           break;
-        case Event.PROPOSAL_SEP_MEETING_SAVED:
-        case Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN:
-        case Event.PROPOSAL_SEP_MEETING_REORDER:
+        case Event.PROPOSAL_FAP_MEETING_SAVED:
+        case Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN:
+        case Event.PROPOSAL_FAP_MEETING_REORDER:
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
-            event.sepmeetingdecision.proposalPk.toString()
+            event.fapmeetingdecision.proposalPk.toString()
           );
           break;
         case Event.TOPIC_ANSWERED:
