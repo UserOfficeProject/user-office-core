@@ -56,31 +56,33 @@ export default class ReviewQueries {
   async technicalReviewForProposal(
     agent: UserWithRole | null,
     proposalPk: number
-  ): Promise<TechnicalReview | null> {
-    const technicalreview = await this.dataSource.getTechnicalReview(
+  ): Promise<TechnicalReview[] | null> {
+    const technicalReviews = await this.dataSource.getTechnicalReviews(
       proposalPk
     );
 
-    if (!technicalreview) {
+    if (!technicalReviews) {
       return null;
     }
 
-    const hasReadRights = await this.technicalReviewAuth.hasReadRights(
-      agent,
-      technicalreview
-    );
-    if (hasReadRights === false) {
-      return null;
-    }
+    // const hasReadRights = await this.technicalReviewAuth.hasReadRights(
+    //   agent,
+    //   technicalreview
+    // );
+    // if (hasReadRights === false) {
+    //   return null;
+    // }
 
     const isReviewerOfProposal = await this.proposalAuth.isReviewerOfProposal(
       agent,
       proposalPk
     );
     if (isReviewerOfProposal) {
-      technicalreview.comment = '';
+      technicalReviews.forEach((technicalReview) => {
+        technicalReview.comment = '';
+      });
     }
 
-    return technicalreview;
+    return technicalReviews;
   }
 }

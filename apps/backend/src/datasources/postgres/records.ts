@@ -300,6 +300,7 @@ export interface TechnicalReviewRecord {
   readonly reviewer_id: number;
   readonly files: string;
   readonly technical_review_assignee_id: number | null;
+  readonly instrument_id: number | null;
 }
 
 export interface InternalReviewRecord {
@@ -793,7 +794,8 @@ export const createTechnicalReviewObject = (
     technicalReview.submitted,
     technicalReview.reviewer_id,
     technicalReview.files ? JSON.stringify(technicalReview.files) : null,
-    technicalReview.technical_review_assignee_id
+    technicalReview.technical_review_assignee_id,
+    technicalReview.instrument_id
   );
 };
 

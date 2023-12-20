@@ -26,7 +26,7 @@ export interface ReviewDataSource {
     args: AddTechnicalReviewInput,
     shouldUpdateReview: boolean
   ): Promise<TechnicalReview>;
-  getTechnicalReview(proposalPk: number): Promise<TechnicalReview | null>;
+  getTechnicalReviews(proposalPk: number): Promise<TechnicalReview[] | null>;
   getTechnicalReviewById(
     technicalReviewId: number
   ): Promise<TechnicalReview | null>;

@@ -149,11 +149,11 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => TechnicalReview, { nullable: true })
-  async technicalReview(
+  @FieldResolver(() => [TechnicalReview], { nullable: true })
+  async technicalReviews(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<TechnicalReview | null> {
+  ): Promise<TechnicalReview[] | null> {
     return await context.queries.review.technicalReviewForProposal(
       context.user,
       proposal.primaryKey

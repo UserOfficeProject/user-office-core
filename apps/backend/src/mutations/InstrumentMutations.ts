@@ -160,7 +160,7 @@ export default class InstrumentMutations {
     const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
 
     for await (const proposalPk of proposalPks) {
-      const technicalReview = await this.reviewDataSource.getTechnicalReview(
+      const technicalReview = await this.reviewDataSource.getTechnicalReviews(
         proposalPk
       );
 
@@ -180,6 +180,7 @@ export default class InstrumentMutations {
             status: null,
             files: null,
             submitted: false,
+            instrumentId: instrument.id,
           },
           false
         );

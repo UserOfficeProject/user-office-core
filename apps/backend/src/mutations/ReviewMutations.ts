@@ -144,9 +144,9 @@ export default class ReviewMutations {
       );
     }
 
-    const technicalReview = await this.dataSource.getTechnicalReview(
-      args.proposalPk
-    );
+    const technicalReview = (
+      await this.dataSource.getTechnicalReviews(args.proposalPk)
+    )?.[0];
 
     if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
       return rejection('Request is impersonating another user', {
@@ -208,9 +208,9 @@ export default class ReviewMutations {
       );
     }
 
-    const technicalReview = await this.dataSource.getTechnicalReview(
-      args.proposalPk
-    );
+    const technicalReview = (
+      await this.dataSource.getTechnicalReviews(args.proposalPk)
+    )?.[0];
     const shouldUpdateReview = technicalReview !== null;
 
     if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
@@ -265,8 +265,8 @@ export default class ReviewMutations {
   ) {
     for await (const proposalPk of proposalPks) {
       const technicalReviewAssignee = (
-        await this.dataSource.getTechnicalReview(proposalPk)
-      )?.technicalReviewAssigneeId;
+        await this.dataSource.getTechnicalReviews(proposalPk)
+      )?.[0].technicalReviewAssigneeId;
       if (technicalReviewAssignee !== assigneeUserId) {
         return false;
       }

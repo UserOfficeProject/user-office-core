@@ -188,9 +188,9 @@ export class ProposalAuthorization {
       return false;
     }
 
-    const technicalReview = await this.reviewDataSource.getTechnicalReview(
-      proposal?.primaryKey
-    );
+    const technicalReview = (
+      await this.reviewDataSource.getTechnicalReviews(proposal?.primaryKey)
+    )?.[0];
 
     return (
       this.userAuth.isUserOfficer(agent) ||

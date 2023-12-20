@@ -49,9 +49,9 @@ export class TechnicalReviewAuthorization {
 
     if (typeof technicalreviewOrProposalPk === 'number') {
       const proposalPk = technicalreviewOrProposalPk;
-      technicalreview = await this.reviewDataSource.getTechnicalReview(
-        proposalPk
-      );
+      technicalreview =
+        (await this.reviewDataSource.getTechnicalReviews(proposalPk))?.[0] ||
+        null;
     } else {
       technicalreview = technicalreviewOrProposalPk;
     }

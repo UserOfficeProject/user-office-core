@@ -61,7 +61,7 @@ query getProposals($filter: ProposalsFilter) {
       users {
         ...basicUserDetails
       }
-      technicalReview {
+      technicalReviews {
         ...coreTechnicalReview
         reviewer {
           ...basicUserDetails

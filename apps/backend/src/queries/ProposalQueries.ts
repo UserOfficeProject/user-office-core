@@ -30,8 +30,9 @@ export default class ProposalQueries {
   @Authorized()
   async get(agent: UserWithRole | null, primaryKey: number) {
     let proposal = await this.dataSource.get(primaryKey);
-    const proposalTechnicalReview =
-      await this.reviewDataSource.getTechnicalReview(primaryKey);
+    const proposalTechnicalReview = (
+      await this.reviewDataSource.getTechnicalReviews(primaryKey)
+    )?.[0];
 
     if (!proposal) {
       return null;

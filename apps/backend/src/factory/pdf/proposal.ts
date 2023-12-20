@@ -334,11 +334,12 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
-  const technicalReview =
+  const technicalReview = (
     await baseContext.queries.review.technicalReviewForProposal(
       user,
       proposal.primaryKey
-    );
+    )
+  )?.[0];
   if (technicalReview) {
     out.technicalReview = {
       ...technicalReview,
@@ -526,9 +527,9 @@ export const collectProposalPDFDataTokenAccess = async (
   const reviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
-  const technicalReview = await reviewDataSource.getTechnicalReview(
-    proposal.primaryKey
-  );
+  const technicalReview = (
+    await reviewDataSource.getTechnicalReviews(proposal.primaryKey)
+  )?.[0];
   if (technicalReview) {
     proposalPDFData.technicalReview = {
       ...technicalReview,

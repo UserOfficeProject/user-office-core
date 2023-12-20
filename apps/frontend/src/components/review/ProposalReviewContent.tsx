@@ -91,43 +91,46 @@ const ProposalReviewContent = ({
     />
   );
 
-  const TechnicalReviewTab =
-    isUserOfficer ||
-    (isInstrumentScientist &&
-      proposalData.technicalReview?.technicalReviewAssigneeId === user.id) ||
-    isInternalReviewer ? (
-      <>
-        {!!proposalData.technicalReview && (
-          <InternalReviews
-            technicalReviewId={proposalData.technicalReview.id}
-            technicalReviewSubmitted={proposalData.technicalReview.submitted}
+  const TechnicalReviewTab = proposalData.technicalReviews?.map(
+    (technicalReview) => {
+      return isUserOfficer ||
+        (isInstrumentScientist &&
+          technicalReview?.technicalReviewAssigneeId === user.id) ||
+        isInternalReviewer ? (
+        <>
+          {!!technicalReview && (
+            <InternalReviews
+              technicalReviewId={technicalReview.id}
+              technicalReviewSubmitted={technicalReview.submitted}
+            />
+          )}
+          {!!proposalData.instrument && (
+            <ProposalTechnicalReviewerAssignment
+              proposalData={proposalData}
+              setProposalData={setProposalData}
+            />
+          )}
+          <ProposalTechnicalReview
+            proposal={proposalData as Proposal}
+            data={technicalReview}
+            setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+              setProposalData({
+                ...proposalData,
+                technicalReviews: [
+                  {
+                    ...technicalReview,
+                    ...data,
+                  },
+                ],
+              })
+            }
           />
-        )}
-        {!!proposalData.instrument && (
-          <ProposalTechnicalReviewerAssignment
-            proposalData={proposalData}
-            setProposalData={setProposalData}
-          />
-        )}
-        <ProposalTechnicalReview
-          proposal={proposalData as Proposal}
-          data={proposalData.technicalReview}
-          setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
-            setProposalData({
-              ...proposalData,
-              technicalReview: {
-                ...proposalData.technicalReview,
-                ...data,
-              } as TechnicalReview,
-            })
-          }
-        />
-      </>
-    ) : (
-      <TechnicalReviewInformation
-        data={proposalData.technicalReview as TechnicalReview}
-      />
-    );
+        </>
+      ) : (
+        <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
+      );
+    }
+  );
 
   const GradeTab = (
     <ProposalGrade

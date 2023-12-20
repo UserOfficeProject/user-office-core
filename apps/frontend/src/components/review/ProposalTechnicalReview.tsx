@@ -134,6 +134,7 @@ const ProposalTechnicalReview = ({
             submitted: shouldSubmit,
             reviewerId: user.id,
             files: fileList ? JSON.stringify(fileList) : null,
+            instrumentId: data?.instrumentId,
           },
         ],
       });
@@ -147,6 +148,7 @@ const ProposalTechnicalReview = ({
         submitted: shouldSubmit,
         reviewerId: user.id,
         files: fileList ? JSON.stringify(fileList) : null,
+        instrumentId: data?.instrumentId,
       });
     }
 
@@ -167,6 +169,7 @@ const ProposalTechnicalReview = ({
         publicComment: values.publicComment,
         status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
         submitted: shouldSubmit,
+        instrumentId: data?.instrumentId,
       } as CoreTechnicalReviewFragment);
     }
   };
@@ -179,11 +182,9 @@ const ProposalTechnicalReview = ({
       <Typography variant="h6" component="h2" gutterBottom>
         Technical Review
       </Typography>
-      {proposal.technicalReview?.technicalReviewAssignee && (
+      {data?.technicalReviewAssignee && (
         <Typography variant="subtitle2" data-cy="reviewed-by-info">
-          {`Reviewed by ${getFullUserName(
-            proposal.technicalReview.technicalReviewAssignee
-          )}`}
+          {`Reviewed by ${getFullUserName(data?.technicalReviewAssignee)}`}
         </Typography>
       )}
       <Formik
