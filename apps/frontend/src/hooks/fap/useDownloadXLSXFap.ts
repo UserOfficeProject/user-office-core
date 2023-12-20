@@ -8,7 +8,7 @@ export function useDownloadXLSXFap() {
   const { prepareDownload } = useContext(DownloadContext);
   const downloadFapXLSX = useCallback(
     (fapId: number, callId: number, name: string) => {
-      prepareDownload(PREPARE_DOWNLOAD_TYPE.XLSX_Fap, [[fapId, callId]], name);
+      prepareDownload(PREPARE_DOWNLOAD_TYPE.XLSX_FAP, [[fapId, callId]], name);
     },
     [prepareDownload]
   );
