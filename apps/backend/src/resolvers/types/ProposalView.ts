@@ -54,28 +54,28 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public submitted: boolean;
 
   @Field(() => Int, { nullable: true })
-  public technicalTimeAllocation: number;
-
-  @Field(() => Int, { nullable: true })
   public managementTimeAllocation: number;
 
-  @Field(() => Int, { nullable: true })
-  public technicalReviewAssigneeId: number;
+  @Field(() => [Int], { nullable: true })
+  public technicalTimeAllocations: number[];
 
-  @Field(() => String, { nullable: true })
-  public technicalReviewAssigneeFirstName: string;
+  @Field(() => [Int], { nullable: true })
+  public technicalReviewAssigneeIds: number[];
 
-  @Field(() => String, { nullable: true })
-  public technicalReviewAssigneeLastName: string;
+  @Field(() => [String], { nullable: true })
+  public technicalReviewAssigneeNames: string[];
 
-  @Field(() => TechnicalReviewStatus, { nullable: true })
-  public technicalStatus: TechnicalReviewStatus;
+  @Field(() => [TechnicalReviewStatus], { nullable: true })
+  public technicalStatuses: TechnicalReviewStatus[];
 
-  @Field(() => Int, { nullable: true })
-  public technicalReviewSubmitted: boolean;
+  @Field(() => [Int], { nullable: true })
+  public technicalReviewsSubmitted: boolean[];
 
-  @Field(() => String, { nullable: true })
-  public instrumentName: string;
+  @Field(() => [String], { nullable: true })
+  public instrumentNames: string[];
+
+  @Field(() => [Int], { nullable: true })
+  public instrumentIds: number[];
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;
@@ -92,9 +92,6 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Float, { nullable: true })
   public reviewDeviation: number;
 
-  @Field(() => Int, { nullable: true })
-  public instrumentId: number;
-
   @Field(() => Int)
   public callId: number;
 
@@ -105,6 +102,7 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public allocationTimeUnit: AllocationTimeUnits;
 }
 
+// TODO: Investigate if this could be removed and instead we keep all the information in the view. Like we do with the technical assignee name.
 @Resolver(() => ProposalView)
 export class ProposalResolver {
   @FieldResolver(() => User, { nullable: true })

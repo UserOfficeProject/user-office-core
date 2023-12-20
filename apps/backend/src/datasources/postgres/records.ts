@@ -137,24 +137,24 @@ export interface ProposalViewRecord {
   readonly proposal_id: string;
   readonly rank_order: number;
   readonly final_status: number;
-  readonly technical_time_allocation: number;
   readonly management_time_allocation: number;
   readonly notified: boolean;
-  readonly technical_review_status: number;
-  readonly technical_review_submitted: boolean;
-  readonly technical_review_assignee_id: number;
-  readonly technical_review_assignee_firstname: string;
-  readonly technical_review_assignee_lastname: string;
-  readonly instrument_name: string;
+  readonly submitted: boolean;
+  readonly technical_review_ids: number[];
+  readonly technical_time_allocations: number[];
+  readonly technical_review_statuses: number[];
+  readonly technical_reviews_submitted: boolean[];
+  readonly technical_review_assignee_ids: number[];
+  readonly technical_review_assignee_names: string[];
+  readonly instrument_ids: number[];
+  readonly instrument_names: string[];
   readonly call_short_code: string;
   readonly fap_id: number;
   readonly fap_code: string;
   readonly average: number;
   readonly deviation: number;
-  readonly instrument_id: number;
   readonly call_id: number;
   readonly proposal_workflow_id: number;
-  readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
 }
@@ -811,24 +811,24 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.rank_order,
     proposal.final_status,
     proposal.notified,
-    proposal.technical_time_allocation,
+    proposal.submitted,
     proposal.management_time_allocation,
-    proposal.technical_review_assignee_id,
-    proposal.technical_review_assignee_firstname,
-    proposal.technical_review_assignee_lastname,
-    proposal.technical_review_status,
-    proposal.technical_review_submitted,
-    proposal.instrument_name,
+    proposal.technical_review_ids,
+    proposal.technical_review_assignee_ids,
+    proposal.technical_time_allocations,
+    proposal.technical_review_assignee_names,
+    proposal.technical_review_statuses,
+    proposal.technical_reviews_submitted,
+    proposal.instrument_names,
+    proposal.instrument_ids,
     proposal.call_short_code,
     proposal.fap_code,
     proposal.fap_id,
     proposal.average,
     proposal.deviation,
-    proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.proposal_workflow_id,
-    proposal.submitted
+    proposal.proposal_workflow_id
   );
 };
 

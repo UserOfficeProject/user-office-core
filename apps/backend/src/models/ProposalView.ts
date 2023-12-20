@@ -12,23 +12,23 @@ export class ProposalView {
     public rankOrder: number,
     public finalStatus: number, // Should use ProposalEndStatus enum here
     public notified: boolean,
-    public technicalTimeAllocation: number,
+    public submitted: boolean,
     public managementTimeAllocation: number,
-    public technicalReviewAssigneeId: number,
-    public technicalReviewAssigneeFirstName: string,
-    public technicalReviewAssigneeLastName: string,
-    public technicalStatus: TechnicalReviewStatus,
-    public technicalReviewSubmitted: boolean,
-    public instrumentName: string,
+    public technicalReviewIds: number[],
+    public technicalReviewAssigneeIds: number[],
+    public technicalTimeAllocations: number[],
+    public technicalReviewAssigneeNames: string[],
+    public technicalStatuses: TechnicalReviewStatus[],
+    public technicalReviewsSubmitted: boolean[],
+    public instrumentNames: string[],
+    public instrumentIds: number[],
     public callShortCode: string,
     public fapCode: string,
     public fapId: number,
     public reviewAverage: number,
     public reviewDeviation: number,
-    public instrumentId: number,
     public allocationTimeUnit: AllocationTimeUnits,
     public callId: number,
-    public workflowId: number,
-    public submitted: boolean
+    public workflowId: number
   ) {}
 }

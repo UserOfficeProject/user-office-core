@@ -369,10 +369,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.where('proposal_table_view.call_id', filter?.callId);
         }
         if (filter?.instrumentId) {
-          query.where(
-            'proposal_table_view.instrument_id',
-            filter?.instrumentId
-          );
+          // query.where(
+          //   'proposal_table_view.instrument_id',
+          //   filter?.instrumentId
+          // );
+          query.whereRaw('? = ANY(instrument_ids)', filter?.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
@@ -432,6 +433,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
       })
       .then((proposals: ProposalViewRecord[]) => {
+        console.log(proposals);
         const props = proposals.map((proposal) =>
           createProposalViewObject(proposal)
         );

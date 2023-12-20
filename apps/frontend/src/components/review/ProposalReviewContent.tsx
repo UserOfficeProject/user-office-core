@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import React, { Fragment, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -98,6 +99,9 @@ const ProposalReviewContent = ({
           technicalReview?.technicalReviewAssigneeId === user.id) ||
         isInternalReviewer ? (
         <>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Review for instrument: {technicalReview.instrumentId}
+          </Typography>
           {!!technicalReview && (
             <InternalReviews
               technicalReviewId={technicalReview.id}
