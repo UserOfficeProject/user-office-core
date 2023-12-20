@@ -418,6 +418,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.orderBy(sortField, sortDirection);
         }
 
+        if (filter?.referenceNumbers) {
+          query.whereIn(
+            'proposal_table_view.proposal_id',
+            filter.referenceNumbers
+          );
+        }
         if (first) {
           query.limit(first);
         }
@@ -596,6 +602,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           const questionFilter = filter.questionFilter;
 
           this.addQuestionFilter(query, questionFilter);
+        }
+
+        if (filter?.referenceNumbers) {
+          query.whereIn(
+            'proposal_table_view.proposal_id',
+            filter.referenceNumbers
+          );
         }
 
         if (first) {
