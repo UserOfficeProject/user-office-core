@@ -54,28 +54,28 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public submitted: boolean;
 
   @Field(() => Int, { nullable: true })
-  public managementTimeAllocation: number;
+  public managementTimeAllocation?: number;
 
-  @Field(() => [Int], { nullable: true })
-  public technicalTimeAllocations: number[];
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public technicalTimeAllocations?: number[];
 
-  @Field(() => [Int], { nullable: true })
-  public technicalReviewAssigneeIds: number[];
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public technicalReviewAssigneeIds?: number[];
 
-  @Field(() => [String], { nullable: true })
-  public technicalReviewAssigneeNames: string[];
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  public technicalReviewAssigneeNames?: string[];
 
-  @Field(() => [TechnicalReviewStatus], { nullable: true })
-  public technicalStatuses: TechnicalReviewStatus[];
+  @Field(() => [TechnicalReviewStatus], { nullable: 'itemsAndList' })
+  public technicalStatuses?: TechnicalReviewStatus[];
 
-  @Field(() => [Int], { nullable: true })
-  public technicalReviewsSubmitted: boolean[];
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public technicalReviewsSubmitted?: boolean[];
 
-  @Field(() => [String], { nullable: true })
-  public instrumentNames: string[];
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  public instrumentNames?: string[];
 
-  @Field(() => [Int], { nullable: true })
-  public instrumentIds: number[];
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public instrumentIds?: number[];
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;

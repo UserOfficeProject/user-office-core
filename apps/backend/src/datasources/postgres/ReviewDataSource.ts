@@ -61,6 +61,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         submitted,
         reviewer_id: reviewerId,
         files,
+        instrument_id: instrumentId,
       })
       .returning('*')
       .into('technical_review')
@@ -80,6 +81,25 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         // }
 
         return reviews.map((review) => createTechnicalReviewObject(review));
+      });
+  }
+
+  async getProposalInstrumentTechnicalReview(
+    proposalId: number,
+    instrumentId: number
+  ): Promise<TechnicalReview | null> {
+    return database
+      .select()
+      .from('technical_review')
+      .where('proposal_pk', proposalId)
+      .andWhere('instrument_id', instrumentId)
+      .first()
+      .then((review: TechnicalReviewRecord) => {
+        if (review === undefined) {
+          return null;
+        }
+
+        return createTechnicalReviewObject(review);
       });
   }
 

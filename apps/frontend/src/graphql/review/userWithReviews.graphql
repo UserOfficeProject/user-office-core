@@ -27,7 +27,7 @@ query userWithReviews(
         call {
           shortCode
         }
-        instrument {
+        instruments {
           shortCode
         }
       }

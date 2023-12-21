@@ -3,7 +3,6 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import i18n from 'i18n';
 import React from 'react';
@@ -13,23 +12,10 @@ import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  form: {
-    width: '240px',
-  },
-}));
-
 type AssignProposalsToInstrumentProps = {
   close: () => void;
   assignProposalsToInstrument: (
-    instrument: InstrumentFragment | null
+    instrument: InstrumentFragment[] | null
   ) => Promise<void>;
   callIds: number[];
   instrumentIds: (number | null)[];
@@ -41,19 +27,18 @@ const AssignProposalsToInstrument = ({
   callIds,
   instrumentIds,
 }: AssignProposalsToInstrumentProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const { instruments, loadingInstruments } = useInstrumentsData(callIds);
 
-  const allSelectedProposalsHaveSameInstrument = instrumentIds.every(
-    (item) => item === instrumentIds[0]
-  );
+  // const allSelectedProposalsHaveSameInstrument = instrumentIds.every(
+  //   (item) => item === instrumentIds[0]
+  // );
 
-  const selectedProposalsInstrument =
-    allSelectedProposalsHaveSameInstrument && instrumentIds[0]
-      ? instrumentIds[0]
-      : null;
+  // const selectedProposalsInstrument =
+  //   allSelectedProposalsHaveSameInstrument && instrumentIds[0]
+  //     ? instrumentIds[0]
+  //     : null;
 
   return (
     <Container
@@ -63,24 +48,22 @@ const AssignProposalsToInstrument = ({
     >
       <Formik
         initialValues={{
-          selectedInstrumentId: selectedProposalsInstrument,
+          selectedInstrumentIds: instrumentIds || null,
         }}
         onSubmit={async (values): Promise<void> => {
-          const selectedInstrument = instruments.find(
-            (instrument) => instrument.id === values.selectedInstrumentId
+          const selectedInstruments = instruments.filter((instrument) =>
+            values.selectedInstrumentIds.find(
+              (selectedInstrumentId) => selectedInstrumentId === instrument.id
+            )
           );
 
-          await assignProposalsToInstrument(selectedInstrument || null);
+          await assignProposalsToInstrument(selectedInstruments || null);
           close();
         }}
       >
         {({ isSubmitting, values }): JSX.Element => (
-          <Form className={classes.form}>
-            <Typography
-              className={classes.cardHeader}
-              variant="h6"
-              component="h1"
-            >
+          <Form>
+            <Typography variant="h6" component="h1">
               {`Assign proposal/s to ${i18n.format(
                 t('instrument'),
                 'lowercase'
@@ -90,9 +73,11 @@ const AssignProposalsToInstrument = ({
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormikUIAutocomplete
-                  name="selectedInstrumentId"
-                  label="Select instrument"
+                  name="selectedInstrumentIds"
+                  label="Select instruments"
                   loading={loadingInstruments}
+                  disableCloseOnSelect={true}
+                  multiple={true}
                   items={instruments.map((instrument) => ({
                     value: instrument.id,
                     text: instrument.name,
@@ -109,7 +94,7 @@ const AssignProposalsToInstrument = ({
                 />
               </Grid>
             </Grid>
-            {!values.selectedInstrumentId && (
+            {!values.selectedInstrumentIds.length && (
               <Alert severity="warning" data-cy="remove-instrument-alert">
                 {`Be aware that leaving ${i18n.format(
                   t('instrument'),
@@ -121,7 +106,9 @@ const AssignProposalsToInstrument = ({
             <Button
               type="submit"
               fullWidth
-              className={classes.submit}
+              sx={{
+                marginTop: (theme) => theme.spacing(3),
+              }}
               disabled={isSubmitting || loadingInstruments}
               data-cy="submit-assign-remove-instrument"
             >

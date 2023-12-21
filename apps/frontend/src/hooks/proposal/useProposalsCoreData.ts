@@ -68,8 +68,9 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatus: getTranslation(
-                      proposal.technicalStatus as ResourceId
+                    technicalStatuses: proposal.technicalStatuses?.map(
+                      (technicalStatus) =>
+                        getTranslation(technicalStatus as ResourceId)
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId
@@ -109,8 +110,9 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatus: getTranslation(
-                      proposal.technicalStatus as ResourceId
+                    technicalStatuses: proposal.technicalStatuses?.map(
+                      (technicalStatus) =>
+                        getTranslation(technicalStatus as ResourceId)
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId

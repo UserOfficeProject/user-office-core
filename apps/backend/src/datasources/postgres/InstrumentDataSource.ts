@@ -253,6 +253,7 @@ export default class PostgresInstrumentDataSource
         await database('instrument_has_proposals')
           .del()
           .whereIn('proposal_pk', proposalPks)
+          .andWhere('instrument_id', instrumentId)
           .transacting(trx);
 
         const result = await database('instrument_has_proposals')
@@ -301,9 +302,9 @@ export default class PostgresInstrumentDataSource
     }
   }
 
-  async getInstrumentByProposalPk(
+  async getInstrumentsByProposalPk(
     proposalPk: number
-  ): Promise<Instrument | null> {
+  ): Promise<Instrument[] | null> {
     return database
       .select([
         'i.instrument_id',
@@ -317,13 +318,14 @@ export default class PostgresInstrumentDataSource
         'i.instrument_id': 'ihp.instrument_id',
       })
       .where('ihp.proposal_pk', proposalPk)
-      .first()
-      .then((instrument: InstrumentRecord) => {
-        if (!instrument) {
-          return null;
-        }
+      .then((instruments: InstrumentRecord[]) => {
+        // if (!instrument) {
+        //   return null;
+        // }
 
-        const result = this.createInstrumentObject(instrument);
+        const result = instruments.map((instrument) =>
+          this.createInstrumentObject(instrument)
+        );
 
         return result;
       });

@@ -75,24 +75,32 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     proposalId: proposal.proposalId,
     rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-    technicalTimeAllocation: proposal.technicalReview?.timeAllocation || null,
-    technicalReviewAssigneeId:
-      proposal.technicalReview?.technicalReviewAssigneeId || null,
-    technicalReviewAssigneeFirstName:
-      proposal.technicalReview?.technicalReviewAssignee?.firstname || null,
-    technicalReviewAssigneeLastName:
-      proposal.technicalReview?.technicalReviewAssignee?.lastname || null,
-    managementTimeAllocation: proposal.managementTimeAllocation || null,
-    technicalStatus: getTranslation(
-      proposal.technicalReview?.status as ResourceId
+    technicalTimeAllocations:
+      proposal.technicalReviews?.map(
+        (technicalReview) => technicalReview?.timeAllocation
+      ) || null,
+    technicalReviewAssigneeIds:
+      proposal.technicalReviews?.map(
+        (technicalReview) => technicalReview.technicalReviewAssigneeId
+      ) || null,
+    technicalReviewAssigneeNames: proposal.technicalReviews?.map(
+      (technicalReview) =>
+        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
     ),
-    instrumentName: proposal.instrument?.name || null,
-    instrumentId: proposal.instrument?.id || null,
+    managementTimeAllocation: proposal.managementTimeAllocation || null,
+    technicalStatuses: proposal.technicalReviews?.map((technicalReview) =>
+      getTranslation(technicalReview?.status as ResourceId)
+    ),
+    instrumentNames:
+      proposal.instruments?.map((instrument) => instrument?.name) || null,
+    instrumentIds:
+      proposal.instruments?.map((instrument) => instrument?.id) || null,
     reviewAverage:
       average(getGradesFromReviews(proposal.reviews ?? [])) || null,
     reviewDeviation:
       standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
     fapCode: proposal.fap?.code,
+    fapId: proposal.fap?.id,
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,

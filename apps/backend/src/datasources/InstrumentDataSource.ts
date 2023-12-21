@@ -46,7 +46,7 @@ export interface InstrumentDataSource {
     instrumentIds: number[]
   ): Promise<boolean>;
   getInstrumentScientists(instrumentId: number): Promise<BasicUserDetails[]>;
-  getInstrumentByProposalPk(proposalPk: number): Promise<Instrument | null>;
+  getInstrumentsByProposalPk(proposalPk: number): Promise<Instrument[] | null>;
   getInstrumentsByFapId(
     fapId: number,
     callId: number

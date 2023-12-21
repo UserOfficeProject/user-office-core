@@ -433,7 +433,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
       })
       .then((proposals: ProposalViewRecord[]) => {
-        console.log(proposals);
         const props = proposals.map((proposal) =>
           createProposalViewObject(proposal)
         );

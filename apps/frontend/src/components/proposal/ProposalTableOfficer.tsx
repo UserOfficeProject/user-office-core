@@ -77,7 +77,7 @@ type ProposalTableOfficerProps = {
 export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
-  instrumentId: number | null;
+  instrumentIds: (number | null)[] | null;
   fapId: number | null;
   statusId: number;
 };
@@ -159,23 +159,41 @@ let columns: Column<ProposalViewData>[] = [
 ];
 
 const technicalReviewColumns = [
-  { title: 'Technical status', field: 'technicalStatus', emptyValue: '-' },
+  {
+    title: 'Technical status',
+    field: 'technicalStatuses',
+    render: (rowData: ProposalViewData) =>
+      rowData.technicalStatuses?.join(', ') || '-',
+  },
   {
     title: 'Assigned technical reviewer',
-    field: 'assignedTechnicalReviewer',
-    emptyValue: '-',
+    field: 'technicalReviewAssigneeNames',
+    render: (rowData: ProposalViewData) =>
+      rowData.technicalReviewAssigneeNames?.join(', ') || '-',
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocationRendered',
-    emptyValue: '-',
+    field: 'technicalTimeAllocations',
+    render: (rowData: ProposalViewData) =>
+      rowData.technicalTimeAllocations && rowData.technicalTimeAllocations[0]
+        ? `${rowData.technicalTimeAllocations?.join(', ')} (${
+            rowData.allocationTimeUnit
+          })`
+        : '-',
     hidden: true,
   },
 ];
 
 const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
-) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
+) => [
+  {
+    title: 'Instruments',
+    field: 'instrumentNames',
+    render: (rowData: ProposalViewData) =>
+      rowData.instrumentNames?.join(', ') || '-',
+  },
+];
 
 const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
@@ -358,7 +376,7 @@ const ProposalTableOfficer = ({
             selected.push({
               primaryKey: proposal.primaryKey,
               callId: proposal.callId,
-              instrumentId: proposal.instrumentId,
+              instrumentIds: proposal.instrumentIds || [],
               fapId: proposal.fapId,
               statusId: proposal.statusId,
               workflowId: proposal.workflowId,
@@ -540,9 +558,9 @@ const ProposalTableOfficer = ({
   };
 
   const assignProposalsToInstrument = async (
-    instrument: InstrumentFragment | null
+    instruments: InstrumentFragment[] | null
   ): Promise<void> => {
-    if (instrument) {
+    if (instruments?.length) {
       await api({
         toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
           t('instrument'),
@@ -553,7 +571,7 @@ const ProposalTableOfficer = ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
         })),
-        instrumentId: instrument.id,
+        instrumentIds: instruments.map((instrument) => instrument.id),
       });
 
       // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
@@ -578,8 +596,8 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.instrumentName = null;
-            prop.instrumentId = null;
+            prop.instrumentNames = null;
+            prop.instrumentIds = null;
           }
 
           return prop;
@@ -682,12 +700,12 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
-        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
-        : '-',
-      technicalTimeAllocationRendered: proposal.technicalTimeAllocation
-        ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
-        : '-',
+      // assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+      //   ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+      //   : '-',
+      // technicalTimeAllocationRendered: proposal.technicalTimeAllocation
+      //   ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
+      //   : '-',
       finalTimeAllocationRendered: proposal.managementTimeAllocation
         ? `${proposal.managementTimeAllocation}(${proposal.allocationTimeUnit}s)`
         : '-',
@@ -706,6 +724,8 @@ const ProposalTableOfficer = ({
         aria-describedby="simple-modal-description"
         open={openAssignment}
         onClose={(): void => setOpenAssignment(false)}
+        maxWidth="xs"
+        fullWidth
       >
         <DialogContent>
           <AssignProposalsToFap
@@ -722,6 +742,8 @@ const ProposalTableOfficer = ({
         aria-describedby="simple-modal-description"
         open={openInstrumentAssignment}
         onClose={(): void => setOpenInstrumentAssignment(false)}
+        maxWidth="xs"
+        fullWidth
       >
         <DialogContent>
           <AssignProposalsToInstrument
@@ -730,9 +752,9 @@ const ProposalTableOfficer = ({
             callIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.callId
             )}
-            instrumentIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.instrumentId
-            )}
+            instrumentIds={selectedProposals
+              .map((selectedProposal) => selectedProposal.instrumentIds)
+              .flat()}
           />
         </DialogContent>
       </Dialog>
@@ -750,7 +772,7 @@ const ProposalTableOfficer = ({
               (selectedProposal) => selectedProposal.statusId
             )}
             allSelectedProposalsHaveInstrument={selectedProposals.every(
-              (selectedProposal) => selectedProposal.instrumentId
+              (selectedProposal) => selectedProposal.instrumentIds
             )}
           />
         </DialogContent>

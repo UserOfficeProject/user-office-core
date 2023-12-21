@@ -17,8 +17,8 @@ export class AssignProposalsToInstrumentArgs {
   @Field(() => [ProposalSelectionInput])
   public proposals: ProposalSelectionInput[];
 
-  @Field(() => Int)
-  public instrumentId: number;
+  @Field(() => [Int])
+  public instrumentIds: number[];
 }
 
 @ArgsType()
@@ -39,23 +39,23 @@ export class AssignProposalsToInstrumentMutation {
       args
     );
 
-    const proposalsFaps = await context.queries.fap.getProposalsFaps(
-      context.user,
-      args.proposals.map((proposal) => proposal.primaryKey)
-    );
+    // const proposalsFaps = await context.queries.fap.getProposalsFaps(
+    //   context.user,
+    //   args.proposals.map((proposal) => proposal.primaryKey)
+    // );
 
-    await context.mutations.fap.assignProposalsToFapUsingCallInstrument(
-      context.user,
-      {
-        instrumentId: args.instrumentId,
-        proposalPks: args.proposals
-          .filter(
-            (proposal) =>
-              !proposalsFaps.find((ps) => ps.proposalPk === proposal.primaryKey)
-          )
-          .map((proposal) => proposal.primaryKey),
-      }
-    );
+    // await context.mutations.fap.assignProposalsToFapUsingCallInstrument(
+    //   context.user,
+    //   {
+    //     instrumentId: args.instrumentId,
+    //     proposalPks: args.proposals
+    //       .filter(
+    //         (proposal) =>
+    //           !proposalsFaps.find((ps) => ps.proposalPk === proposal.primaryKey)
+    //       )
+    //       .map((proposal) => proposal.primaryKey),
+    //   }
+    // );
 
     return isRejection(res) ? res : true;
   }

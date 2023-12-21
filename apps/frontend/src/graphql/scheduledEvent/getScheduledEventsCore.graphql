@@ -10,7 +10,7 @@ query getScheduledEventsCore(
       proposer {
         ...basicUserDetails
       }
-      instrument {
+      instruments {
         ...instrument
       }
     }

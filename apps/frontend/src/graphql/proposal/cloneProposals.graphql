@@ -32,7 +32,7 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
         id
       }
     }
-    instrument {
+    instruments {
       id
       name
       shortCode

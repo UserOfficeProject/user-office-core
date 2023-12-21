@@ -67,7 +67,7 @@ query getProposals($filter: ProposalsFilter) {
           ...basicUserDetails
         }
       }
-      instrument {
+      instruments {
         id
         name
       }

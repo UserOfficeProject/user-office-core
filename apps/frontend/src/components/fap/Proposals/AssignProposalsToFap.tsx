@@ -3,7 +3,6 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React, { useContext } from 'react';
 
@@ -11,19 +10,6 @@ import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { UserContext } from 'context/UserContextProvider';
 import { UserRole, Fap } from 'generated/sdk';
 import { useFapsData } from 'hooks/fap/useFapsData';
-
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  form: {
-    width: '240px',
-  },
-}));
 
 type AssignProposalToFapProps = {
   close: () => void;
@@ -36,7 +22,6 @@ const AssignProposalsToFap = ({
   assignProposalsToFap,
   fapIds,
 }: AssignProposalToFapProps) => {
-  const classes = useStyles();
   const { currentRole } = useContext(UserContext);
   const { Faps, loadingFaps } = useFapsData({
     filter: '',
@@ -70,12 +55,8 @@ const AssignProposalsToFap = ({
         }}
       >
         {({ isSubmitting, values }): JSX.Element => (
-          <Form className={classes.form}>
-            <Typography
-              variant="h6"
-              component="h1"
-              className={classes.cardHeader}
-            >
+          <Form>
+            <Typography variant="h6" component="h1">
               Assign proposal/s to Fap
             </Typography>
 
@@ -105,7 +86,7 @@ const AssignProposalsToFap = ({
             <Button
               type="submit"
               fullWidth
-              className={classes.submit}
+              sx={{ marginTop: (theme) => theme.spacing(3) }}
               disabled={isSubmitting || loadingFaps}
               data-cy="submit"
             >

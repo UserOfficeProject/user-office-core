@@ -76,7 +76,8 @@ const ProposalTechnicalReview = ({
 
   const initialValues: TechnicalReviewFormType = {
     status: data?.status || '',
-    timeAllocation: data?.timeAllocation || '',
+    timeAllocation:
+      typeof data?.timeAllocation === 'number' ? data.timeAllocation : '',
     comment: data?.comment || '',
     publicComment: data?.publicComment || '',
     submitted: data?.submitted || false,

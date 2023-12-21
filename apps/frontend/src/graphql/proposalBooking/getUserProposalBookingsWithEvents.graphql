@@ -52,7 +52,7 @@ query getUserProposalBookingsWithEvents(
       visits {
         ...visit
       }
-      instrument {
+      instruments {
         id
         name
       }

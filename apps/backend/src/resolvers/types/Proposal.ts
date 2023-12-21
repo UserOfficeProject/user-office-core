@@ -160,12 +160,12 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => Instrument, { nullable: true })
-  async instrument(
+  @FieldResolver(() => [Instrument], { nullable: 'itemsAndList' })
+  async instruments(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Instrument | null> {
-    return await context.queries.instrument.dataSource.getInstrumentByProposalPk(
+  ): Promise<Instrument[] | null> {
+    return await context.queries.instrument.dataSource.getInstrumentsByProposalPk(
       proposal.primaryKey
     );
   }

@@ -34,7 +34,7 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
           id
         }
       }
-      instrument {
+      instruments {
         id
         name
         shortCode

@@ -30,7 +30,7 @@ query getProposal($primaryKey: Int!) {
         id
       }
     }
-    instrument {
+    instruments {
       id
       name
       shortCode

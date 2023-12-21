@@ -25,7 +25,7 @@ mutation updateVisit(
 
     proposal {
       ...proposal
-      instrument {
+      instruments {
         name
       }
     }

@@ -2,7 +2,7 @@ import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
   deleteInstrumentValidationSchema,
-  assignProposalsToInstrumentValidationSchema,
+  // assignProposalsToInstrumentValidationSchema,
   assignScientistsToInstrumentValidationSchema,
   removeScientistFromInstrumentValidationSchema,
   setAvailabilityTimeOnInstrumentValidationSchema,
@@ -101,14 +101,15 @@ export default class InstrumentMutations {
   }
 
   async checkIfProposalsAreOnSameCallAsInstrument(
-    inputArguments: AssignProposalsToInstrumentArgs
+    inputArguments: AssignProposalsToInstrumentArgs,
+    instrumentId: number
   ) {
     const proposalCallIds = inputArguments.proposals.map(
       (proposal) => proposal.callId
     );
     const proposalCallsWithInstrument =
       await this.dataSource.getCallsByInstrumentId(
-        inputArguments.instrumentId,
+        instrumentId,
         proposalCallIds
       );
 
@@ -133,74 +134,90 @@ export default class InstrumentMutations {
   }
 
   @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
-  @ValidateArgs(assignProposalsToInstrumentValidationSchema)
+  // @ValidateArgs(assignProposalsToInstrumentValidationSchema)
   async assignProposalsToInstrumentInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
   ): Promise<InstrumentHasProposals | Rejection> {
-    const allProposalsAreOnSameCallAsInstrument =
-      await this.checkIfProposalsAreOnSameCallAsInstrument(args);
-
-    if (!allProposalsAreOnSameCallAsInstrument) {
-      return rejection(
-        'One or more proposals can not be assigned to instrument, because instrument is not in the call',
-        { args }
-      );
-    }
-
-    const instrument = await this.dataSource.getInstrument(args.instrumentId);
-
-    if (!instrument) {
-      return rejection(
-        'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
-        { agent, args }
-      );
-    }
-
-    const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
-
-    for await (const proposalPk of proposalPks) {
-      const technicalReview = await this.reviewDataSource.getTechnicalReviews(
-        proposalPk
-      );
-
-      if (technicalReview) {
-        await this.proposalDataSource.updateProposalTechnicalReviewer({
-          userId: instrument.managerUserId,
-          proposalPks: [proposalPk],
-        });
-      } else {
-        await this.reviewDataSource.setTechnicalReview(
-          {
-            proposalPk: proposalPk,
-            comment: null,
-            publicComment: null,
-            reviewerId: instrument.managerUserId,
-            timeAllocation: null,
-            status: null,
-            files: null,
-            submitted: false,
-            instrumentId: instrument.id,
-          },
-          false
-        );
-        await this.proposalDataSource.updateProposalTechnicalReviewer({
-          userId: instrument.managerUserId,
-          proposalPks: [proposalPk],
-        });
-      }
-    }
-
-    const result = await this.dataSource.assignProposalsToInstrument(
-      proposalPks,
-      args.instrumentId
-    );
-
-    if (result.proposalPks.length !== proposalPks.length) {
-      return rejection('Could not assign proposal/s to instrument', {
+    let result: InstrumentHasProposals | Rejection = rejection(
+      'Could not assign proposal/s to instrument',
+      {
         agent,
         args,
-      });
+      }
+    );
+    for await (const instrumentId of args.instrumentIds) {
+      const allProposalsAreOnSameCallAsInstrument =
+        await this.checkIfProposalsAreOnSameCallAsInstrument(
+          args,
+          instrumentId
+        );
+
+      if (!allProposalsAreOnSameCallAsInstrument) {
+        return rejection(
+          'One or more proposals can not be assigned to instrument, because instrument is not in the call',
+          { args }
+        );
+      }
+
+      const instrument = await this.dataSource.getInstrument(instrumentId);
+
+      if (!instrument) {
+        return rejection(
+          'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
+          { agent, args }
+        );
+      }
+
+      const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
+
+      for await (const proposalPk of proposalPks) {
+        const technicalReview =
+          await this.reviewDataSource.getProposalInstrumentTechnicalReview(
+            proposalPk,
+            instrumentId
+          );
+
+        console.log(technicalReview, instrument);
+
+        if (technicalReview) {
+          await this.proposalDataSource.updateProposalTechnicalReviewer({
+            userId: instrument.managerUserId,
+            proposalPks: [proposalPk],
+          });
+        } else {
+          await this.reviewDataSource.setTechnicalReview(
+            {
+              proposalPk: proposalPk,
+              comment: null,
+              publicComment: null,
+              reviewerId: instrument.managerUserId,
+              timeAllocation: null,
+              status: null,
+              files: null,
+              submitted: false,
+              instrumentId: instrument.id,
+            },
+            false
+          );
+          await this.proposalDataSource.updateProposalTechnicalReviewer({
+            userId: instrument.managerUserId,
+            proposalPks: [proposalPk],
+          });
+        }
+      }
+
+      result = await this.dataSource.assignProposalsToInstrument(
+        proposalPks,
+        instrumentId
+      );
+
+      if (result.proposalPks.length !== proposalPks.length) {
+        return rejection('Could not assign proposal/s to instrument', {
+          agent,
+          args,
+        });
+      }
     }
 
     return result;

@@ -20,6 +20,7 @@ type FormikUIAutocompleteProps = {
   TextFieldProps?: MUITextFieldProps;
   InputProps?: Partial<InputProps> & { 'data-cy': string };
   multiple?: boolean;
+  disableCloseOnSelect?: boolean;
   'data-cy'?: string;
   AdornmentIcon?: MUITextFieldProps;
 };
@@ -35,6 +36,7 @@ const FormikUIAutocomplete = ({
   InputProps,
   TextFieldProps,
   multiple = false,
+  disableCloseOnSelect = false,
   AdornmentIcon,
   ...props
 }: FormikUIAutocompleteProps) => {
@@ -49,6 +51,7 @@ const FormikUIAutocomplete = ({
       loading={loading}
       multiple={multiple}
       options={options}
+      disableCloseOnSelect={disableCloseOnSelect}
       noOptionsText={noOptionsText}
       getOptionLabel={(option: number | string) => {
         const foundOption = items.find((item) => item.value === option);
