@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import CallDataSource from '../datasources/postgres/CallDataSource';
 import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
@@ -12,6 +13,7 @@ const proposalSettingsDataSource = container.resolve(
   ProposalSettingsDataSource
 );
 const proposalDataSource = container.resolve(ProposalDataSource);
+const callDataSource = container.resolve(CallDataSource);
 
 const getProposalWorkflowByCallId = (callId: number) => {
   return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
@@ -57,6 +59,7 @@ const updateProposalStatus = (
 export type WorkflowEngineProposalType = Proposal & {
   workflowId: number;
   prevProposalStatusId: number;
+  callShortCode: string;
 };
 
 export const workflowEngine = async (
@@ -94,6 +97,12 @@ export const workflowEngine = async (
           );
 
         if (!currentWorkflowConnections.length) {
+          return;
+        }
+
+        const call = await callDataSource.getCall(proposal.callId);
+
+        if (!call) {
           return;
         }
 
@@ -163,6 +172,7 @@ export const workflowEngine = async (
                   workflowId: proposalWorkflow.id,
                   prevProposalStatusId:
                     currentWorkflowConnection.proposalStatusId,
+                  callShortCode: call.shortCode,
                 };
               }
             }
