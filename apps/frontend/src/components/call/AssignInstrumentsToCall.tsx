@@ -25,7 +25,7 @@ const FapSelectionComponent = ({
   onChange: (id: number, newValue: number | null) => void;
 }) => {
   const { currentRole } = useContext(UserContext);
-  const { Faps: allActiveFaps, loadingFaps } = useFapsData({
+  const { faps: allActiveFaps, loadingFaps } = useFapsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
@@ -67,7 +67,6 @@ const AssignInstrumentsToCall = ({
   assignedInstruments,
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
-
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]
   >([]);
