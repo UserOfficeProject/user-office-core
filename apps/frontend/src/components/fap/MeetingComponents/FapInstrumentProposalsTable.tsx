@@ -23,6 +23,7 @@ import {
   FapMeetingDecision,
   Call,
   Proposal,
+  TechnicalReview,
 } from 'generated/sdk';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
@@ -125,6 +126,13 @@ const FapInstrumentProposalsTable = ({
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
 
+  const getInstrumentTechnicalReview = (
+    technicalReviews: TechnicalReview[] | null
+  ) =>
+    technicalReviews?.find(
+      (technicalReview) => technicalReview.instrumentId === fapInstrument.id
+    );
+
   const assignmentColumns = [
     {
       title: 'Actions',
@@ -174,14 +182,15 @@ const FapInstrumentProposalsTable = ({
           return a.fapTimeAllocation - b.fapTimeAllocation;
         }
 
-        if (
-          a.proposal.technicalReview?.timeAllocation &&
-          b.proposal.technicalReview?.timeAllocation
-        ) {
-          return (
-            a.proposal.technicalReview.timeAllocation -
-            b.proposal.technicalReview.timeAllocation
-          );
+        const aReview = getInstrumentTechnicalReview(
+          a.proposal.technicalReviews
+        );
+        const bReview = getInstrumentTechnicalReview(
+          b.proposal.technicalReviews
+        );
+
+        if (aReview?.timeAllocation && bReview?.timeAllocation) {
+          return aReview.timeAllocation - bReview.timeAllocation;
         } else {
           return -1;
         }
@@ -292,7 +301,10 @@ const FapInstrumentProposalsTable = ({
           const proposalAllocationTime =
             proposalData.fapTimeAllocation !== null
               ? proposalData.fapTimeAllocation
-              : proposalData.proposal.technicalReview?.timeAllocation || 0;
+              : proposalData.proposal.technicalReviews?.find(
+                  (technicalReview) =>
+                    technicalReview.instrumentId === fapInstrument.id
+                )?.timeAllocation || 0;
 
           if (
             allocationTimeSum + proposalAllocationTime >
@@ -322,11 +334,12 @@ const FapInstrumentProposalsTable = ({
   const ProposalTimeAllocationColumn = (
     rowData: FapProposalWithAverageScoreAndAvailabilityZone
   ) => {
-    const timeAllocation =
-      rowData.proposal.technicalReview &&
-      rowData.proposal.technicalReview.timeAllocation
-        ? rowData.proposal.technicalReview.timeAllocation
-        : '-';
+    const instrumentTechnicalReview = rowData.proposal.technicalReviews?.find(
+      (technicalReview) => technicalReview.instrumentId === fapInstrument.id
+    );
+    const timeAllocation = instrumentTechnicalReview
+      ? instrumentTechnicalReview.timeAllocation
+      : '-';
 
     const fapTimeAllocation = rowData.fapTimeAllocation;
 
@@ -592,7 +605,10 @@ const FapInstrumentProposalsTable = ({
       const proposalTimeAllocation =
         typeof element.fapTimeAllocation === 'number'
           ? element.fapTimeAllocation
-          : element.proposal.technicalReview?.timeAllocation || 0;
+          : element.proposal.technicalReviews?.find(
+              (technicalReview) =>
+                technicalReview.instrumentId === fapInstrument.id
+            )?.timeAllocation || 0;
 
       allocatedTimeSum = allocatedTimeSum + proposalTimeAllocation;
     }

@@ -21,7 +21,10 @@ import {
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
-import { useProposalData } from 'hooks/proposal/useProposalData';
+import {
+  ProposalDataTechnicalReview,
+  useProposalData,
+} from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
 import { StyledPaper } from 'styles/StyledComponents';
 
@@ -94,6 +97,10 @@ const ProposalReviewContent = ({
 
   const TechnicalReviewTab = proposalData.technicalReviews?.map(
     (technicalReview) => {
+      const technicalReviewInstrument = proposalData.instruments?.find(
+        (instrument) => instrument?.id === technicalReview.instrumentId
+      );
+
       return isUserOfficer ||
         (isInstrumentScientist &&
           technicalReview?.technicalReviewAssigneeId === user.id) ||
@@ -108,10 +115,23 @@ const ProposalReviewContent = ({
               technicalReviewSubmitted={technicalReview.submitted}
             />
           )}
-          {!!proposalData.instrument && (
+          {!!technicalReviewInstrument && (
             <ProposalTechnicalReviewerAssignment
-              proposalData={proposalData}
-              setProposalData={setProposalData}
+              technicalReview={technicalReview}
+              instrument={technicalReviewInstrument}
+              onTechnicalReviewUpdated={(
+                updatedTechnicalReview: ProposalDataTechnicalReview
+              ) => {
+                setProposalData({
+                  ...proposalData,
+                  technicalReviews:
+                    proposalData.technicalReviews?.map((tReview) =>
+                      updatedTechnicalReview.id === tReview.id
+                        ? updatedTechnicalReview
+                        : tReview
+                    ) || [],
+                });
+              }}
             />
           )}
           <ProposalTechnicalReview

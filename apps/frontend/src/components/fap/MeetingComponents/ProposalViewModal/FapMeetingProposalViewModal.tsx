@@ -14,13 +14,7 @@ import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
-import {
-  TechnicalReview,
-  Review,
-  UserRole,
-  FapMeetingDecision,
-  Proposal,
-} from 'generated/sdk';
+import { Review, UserRole, FapMeetingDecision, Proposal } from 'generated/sdk';
 import { useFapProposalData } from 'hooks/fap/useFapProposalData';
 
 import ExternalReviews from './ExternalReviews';
@@ -142,21 +136,23 @@ const FapMeetingProposalViewModal = ({
                     <ExternalReviews
                       reviews={proposalData.reviews as Review[]}
                     />
-                    <TechnicalReviewInfo
-                      hasWriteAccess={finalHasWriteAccess}
-                      technicalReview={
-                        proposalData.technicalReview as TechnicalReview
-                      }
-                      fapTimeAllocation={fapTimeAllocation}
-                      onFapTimeAllocationEdit={(fapTimeAllocation) =>
-                        setFapProposalData({
-                          ...FapProposalData,
-                          fapTimeAllocation,
-                        })
-                      }
-                      proposal={proposalData}
-                      fapId={fapId}
-                    />
+                    {proposalData.technicalReviews?.map((technicalReview) => (
+                      <TechnicalReviewInfo
+                        key={technicalReview.id}
+                        hasWriteAccess={finalHasWriteAccess}
+                        technicalReview={technicalReview}
+                        fapTimeAllocation={fapTimeAllocation}
+                        onFapTimeAllocationEdit={(fapTimeAllocation) =>
+                          setFapProposalData({
+                            ...FapProposalData,
+                            fapTimeAllocation,
+                          })
+                        }
+                        proposal={proposalData}
+                        fapId={fapId}
+                      />
+                    ))}
+
                     <ProposalDetails proposal={proposalData} />
                   </>
                 )}

@@ -59,7 +59,7 @@ export const collectProposalXLSXData = async (
     );
   }
 
-  const technicalReview =
+  const technicalReviews =
     await baseContext.queries.review.technicalReviewForProposal(
       user,
       proposal.primaryKey
@@ -76,17 +76,29 @@ export const collectProposalXLSXData = async (
       proposal.primaryKey
     );
 
+  // TODO: Review the technical review details
   return [
     proposal.proposalId,
     proposal.title,
     `${proposer.firstname} ${proposer.lastname}`,
-    technicalReview?.status !== undefined && technicalReview?.status !== null
-      ? getTranslation(
-          TechnicalReviewStatus[technicalReview?.status] as ResourceId
-        )
+    technicalReviews?.length
+      ? technicalReviews
+          .map((technicalReview) =>
+            technicalReview?.status !== undefined &&
+            technicalReview?.status !== null
+              ? getTranslation(
+                  TechnicalReviewStatus[technicalReview?.status] as ResourceId
+                )
+              : '<missing>'
+          )
+          .join(', ')
       : '<missing>',
-    technicalReview?.publicComment ?? '<missing>',
-    technicalReview?.timeAllocation ?? '<missing>',
+    technicalReviews
+      ?.map((technicalReview) => technicalReview?.publicComment ?? '<missing>')
+      .join(', ') ?? '<missing>',
+    technicalReviews
+      ?.map((technicalReview) => technicalReview?.timeAllocation ?? '<missing>')
+      .join(', ') ?? '<missing>',
     absoluteDifference(getGrades(reviews)) || 'NA',
     average(getGrades(reviews)) || 'NA',
     proposal.commentForManagement ?? '<missing>',

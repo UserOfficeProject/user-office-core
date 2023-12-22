@@ -80,7 +80,7 @@ describe('Test Instrument Mutations', () => {
             { primaryKey: 1, callId: 1 },
             { primaryKey: 2, callId: 1 },
           ],
-          instrumentId: 1,
+          instrumentIds: [1],
         }
       )
     ).resolves.toEqual({

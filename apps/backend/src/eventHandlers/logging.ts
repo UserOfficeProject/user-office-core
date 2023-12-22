@@ -53,12 +53,14 @@ export default function createHandler() {
         case Event.PROPOSAL_INSTRUMENT_SELECTED: {
           await Promise.all(
             event.instrumenthasproposals.proposalPks.map(async (proposalPk) => {
-              const instrument =
-                await instrumentDataSource.getInstrumentByProposalPk(
+              const instruments =
+                await instrumentDataSource.getInstrumentsByProposalPk(
                   proposalPk
                 );
 
-              const description = `Selected instrument: ${instrument?.name}`;
+              const description = `Selected instruments: ${instruments
+                ?.map((instrument) => instrument.name)
+                .join(', ')}`;
 
               return eventLogsDataSource.set(
                 event.loggedInUserId,

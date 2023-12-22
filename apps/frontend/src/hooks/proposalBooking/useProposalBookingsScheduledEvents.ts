@@ -33,7 +33,7 @@ export type ProposalScheduledEvent = Pick<
   } & {
     users: BasicUserDetailsFragment[];
   };
-  instrument: Pick<Instrument, 'id' | 'name'> | null;
+  instruments: (Pick<Instrument, 'id' | 'name'> | null)[] | null;
 } & {
   visit:
     | (VisitFragment & {
@@ -105,7 +105,7 @@ export function useProposalBookingsScheduledEvents({
                     managementDecisionSubmitted:
                       proposal.managementDecisionSubmitted,
                   },
-                  instrument: proposal.instrument,
+                  instruments: proposal.instruments,
                   visit: scheduledEvent.visit,
                   esi: scheduledEvent.esi,
                   feedback: scheduledEvent.feedback,

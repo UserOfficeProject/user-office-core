@@ -92,12 +92,13 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         throw new GraphQLError('Proposal not found');
       }
 
+      // TODO: Check the value here. Should be array of instrumentIds
       const { value } = JSON.parse(answer.value);
-      const instrumentId = value;
+      const instrumentIds = value;
 
       // Assign the Proposals to Instrument
       await instrumentMutations.assignProposalsToInstrumentInternal(null, {
-        instrumentId,
+        instrumentIds,
         proposals: [
           { primaryKey: proposal.primaryKey, callId: proposal.callId },
         ],
@@ -105,7 +106,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
 
       // Assign the Proposals to Fap using Call Instrument
       await fapMutation.assignProposalsToFapUsingCallInstrumentInternal(null, {
-        instrumentId: instrumentId,
+        instrumentId: instrumentIds,
         proposalPks: [proposal.primaryKey],
       });
     },

@@ -138,13 +138,19 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocationRendered',
-    emptyValue: '-',
+    field: 'technicalTimeAllocations',
+    render: (rowData: ProposalViewData) =>
+      rowData.technicalTimeAllocations && rowData.technicalTimeAllocations[0]
+        ? `${rowData.technicalTimeAllocations?.join(', ')} (${
+            rowData.allocationTimeUnit
+          })`
+        : '-',
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'assignedTechnicalReviewer',
-    emptyValue: '-',
+    field: 'technicalReviewAssigneeNames',
+    render: (rowData: ProposalViewData) =>
+      rowData.technicalReviewAssigneeNames?.join(', ') || '-',
   },
 ];
 
@@ -401,10 +407,12 @@ const ProposalTableInstrumentScientist = ({
   const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
-      isInstrumentScientist && rowData.technicalReviewAssigneeId === user.id;
+      isInstrumentScientist &&
+      rowData.technicalReviewAssigneeIds?.includes(user.id);
 
+    // TODO: Review this logic here after testing the functionality
     const showView =
-      rowData.technicalReviewSubmitted ||
+      rowData.technicalReviewsSubmitted?.every((submitted) => submitted) ||
       (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
     return (
@@ -451,7 +459,8 @@ const ProposalTableInstrumentScientist = ({
       const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
         selectedProposals.map((proposal) => ({
           proposalPk: proposal.primaryKey,
-          reviewerId: proposal.technicalReviewAssigneeId || user.id,
+          // TODO: Check this reviewerId here. Because we are sending the first reviewer but there might be multiple.
+          reviewerId: proposal.technicalReviewAssigneeIds?.[0] || user.id,
           submitted: true,
         }));
 
@@ -463,12 +472,12 @@ const ProposalTableInstrumentScientist = ({
 
       const newProposalsData = proposalsData.map((proposalData) => ({
         ...proposalData,
-        technicalReviewSubmitted: selectedProposals.find(
+        technicalReviewsSubmitted: selectedProposals.find(
           (selectedProposal) =>
             selectedProposal.primaryKey === proposalData.primaryKey
         )
-          ? 1
-          : proposalData.technicalReviewSubmitted,
+          ? [1]
+          : proposalData.technicalReviewsSubmitted,
       }));
       setProposalsData(newProposalsData);
     }
@@ -540,7 +549,7 @@ const ProposalTableInstrumentScientist = ({
       const isValidSchema =
         await proposalTechnicalReviewValidationSchema.isValid({
           status: proposal.status,
-          timeAllocation: proposal.technicalTimeAllocation,
+          timeAllocations: proposal.technicalTimeAllocations,
         });
       if (!isValidSchema) {
         invalid.push(proposal);
@@ -620,12 +629,12 @@ const ProposalTableInstrumentScientist = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
-        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
-        : '-',
-      technicalTimeAllocationRendered: proposal.technicalTimeAllocation
-        ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
-        : '-',
+      // assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+      //   ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+      //   : '-',
+      // technicalTimeAllocationRendered: proposal.technicalTimeAllocation
+      //   ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
+      //   : '-',
     })
   );
 
@@ -689,23 +698,28 @@ const ProposalTableInstrumentScientist = ({
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...proposal,
-                  technicalReviewAssigneeId:
-                    updatedProposal.technicalReview
-                      ?.technicalReviewAssigneeId || null,
-                  technicalReviewAssigneeFirstName:
-                    updatedProposal.technicalReview?.technicalReviewAssignee
-                      ?.firstname || null,
-                  technicalReviewAssigneeLastName:
-                    updatedProposal.technicalReview?.technicalReviewAssignee
-                      ?.lastname || null,
-                  technicalReviewSubmitted: updatedProposal.technicalReview
-                    ?.submitted
-                    ? 1
-                    : 0,
-                  technicalStatus:
-                    updatedProposal.technicalReview?.status || '',
-                  technicalTimeAllocation:
-                    updatedProposal.technicalReview?.timeAllocation || null,
+                  technicalReviewAssigneeIds:
+                    updatedProposal.technicalReviews?.map(
+                      (technicalReview) =>
+                        technicalReview.technicalReviewAssigneeId
+                    ) || null,
+                  technicalReviewAssigneeNames:
+                    updatedProposal.technicalReviews?.map(
+                      (technicalReview) =>
+                        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
+                    ) || null,
+                  technicalReviewsSubmitted:
+                    updatedProposal.technicalReviews?.map((technicalReview) =>
+                      technicalReview.submitted ? 1 : 0
+                    ) || null,
+                  technicalStatuses:
+                    updatedProposal.technicalReviews?.map(
+                      (technicalReview) => technicalReview.status
+                    ) || null,
+                  technicalTimeAllocations:
+                    updatedProposal.technicalReviews?.map(
+                      (technicalReview) => technicalReview.timeAllocation
+                    ) || null,
                 };
               } else {
                 return proposal;

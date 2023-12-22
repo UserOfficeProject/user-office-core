@@ -146,6 +146,7 @@ export default class InstrumentMutations {
         args,
       }
     );
+    // TODO: Cleanup this part becaues it is quite ugly
     for await (const instrumentId of args.instrumentIds) {
       const allProposalsAreOnSameCallAsInstrument =
         await this.checkIfProposalsAreOnSameCallAsInstrument(
@@ -177,8 +178,6 @@ export default class InstrumentMutations {
             proposalPk,
             instrumentId
           );
-
-        console.log(technicalReview, instrument);
 
         if (technicalReview) {
           await this.proposalDataSource.updateProposalTechnicalReviewer({

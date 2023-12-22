@@ -194,7 +194,10 @@ export const collectFaplXLSXData = async (
     const rows = proposals.map((proposal, pIndx) => {
       const { firstname = '<missing>', lastname = '<missing>' } =
         proposalPrincipalInvestigators[pIndx] ?? {};
-      const technicalReview = technicalReviews[pIndx];
+      const technicalReview =
+        technicalReviews[pIndx]?.find(
+          (technicalReview) => technicalReview.instrumentId === instrument.id
+        ) || null;
       const reviews = proposalReviews[pIndx];
       const fapProposal = fapProposals?.[pIndx];
       const fapMeetingDecision = fapMeetingDecisions[pIndx];

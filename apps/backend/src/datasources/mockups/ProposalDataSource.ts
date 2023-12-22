@@ -91,6 +91,7 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   false,
   1,
   '',
+  1,
   1
 );
 
@@ -180,24 +181,24 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       false,
-      1,
-      1,
-      1,
-      'Carl',
-      'Carlsson',
-      1,
       false,
-      'instrument',
+      1,
+      [1],
+      [1],
+      [1],
+      ['Carl Carlsson'],
+      [1],
+      [false],
+      ['instrument'],
+      [1],
       'call short code',
       'fap code',
       1,
       1,
       1,
-      1,
       AllocationTimeUnits.Day,
       1,
-      1,
-      false
+      1
     );
 
     allProposals = [

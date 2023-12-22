@@ -40,14 +40,14 @@ type ProposalMessageData = {
   abstract: string;
   allocatedTime: number;
   callId: number;
-  instrument?: Pick<Instrument, 'id' | 'shortCode'>;
+  instruments?: Pick<Instrument, 'id' | 'shortCode'>[];
   members: Member[];
   newStatus?: string;
   proposalPk: number;
   proposer?: Member;
   shortCode: string;
   title: string;
-  instrumentId?: number; // instrumentId is here for backwards compatibility.
+  instrumentIds?: number[]; // instrumentId is here for backwards compatibility. TODO: Review this comment!!!
   submitted: boolean;
 };
 
@@ -115,9 +115,8 @@ export const getProposalMessageData = async (proposal: Proposal) => {
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
-  const maybeInstrument = await instrumentDataSource.getInstrumentByProposalPk(
-    proposal.primaryKey
-  );
+  const maybeInstruments =
+    await instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey);
 
   const call = await callDataSource.getCall(proposal.callId);
   if (!call) {
@@ -129,21 +128,21 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     call.allocationTimeUnit
   );
 
-  const instrument = maybeInstrument
-    ? {
-        id: maybeInstrument.id,
-        shortCode: maybeInstrument.shortCode,
-      }
+  const instruments = maybeInstruments?.length
+    ? maybeInstruments.map((instr) => ({
+        id: instr.id,
+        shortCode: instr.shortCode,
+      }))
     : undefined;
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
-    instrument: instrument,
+    instruments: instruments,
     title: proposal.title,
     abstract: proposal.abstract,
     callId: call.id,
     allocatedTime: proposalAllocatedTime,
-    instrumentId: instrument?.id,
+    instrumentIds: instruments?.map((instrument) => instrument?.id),
     members: proposalUsersWithInstitution.map(
       (proposalUserWithInstitution) => ({
         firstName: proposalUserWithInstitution.user.firstname,

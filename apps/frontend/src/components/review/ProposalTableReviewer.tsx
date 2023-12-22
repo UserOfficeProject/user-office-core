@@ -129,7 +129,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         comment: review.comment,
         status: review.status,
         callShortCode: review.proposal!.call?.shortCode,
-        instrumentShortCode: review.proposal!.instrument?.shortCode,
+        instrumentShortCodes: review.proposal!.instruments?.map(
+          (instrument) => instrument?.shortCode
+        ),
         tableData: {
           checked:
             selection?.has(review.proposal!.primaryKey.toString() || null) ||

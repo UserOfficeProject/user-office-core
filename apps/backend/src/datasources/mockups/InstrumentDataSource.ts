@@ -148,6 +148,12 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return [basicDummyUser];
   }
 
+  async getInstrumentsByProposalPk(
+    proposalPk: number
+  ): Promise<Instrument[] | null> {
+    return [dummyInstrument];
+  }
+
   async setAvailabilityTimeOnInstrument(
     callId: number,
     instrumentId: number,

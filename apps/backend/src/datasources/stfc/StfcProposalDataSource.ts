@@ -130,8 +130,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         ) => {
           const props = proposals.map((proposal) => {
             const prop = createProposalViewObject(proposal);
-            prop.instrumentId = proposal.call_instrument_id;
-            prop.instrumentName = proposal.call_instrument_name;
+            prop.instrumentIds = [proposal.call_instrument_id];
+            prop.instrumentNames = [proposal.call_instrument_name];
 
             return prop;
           });

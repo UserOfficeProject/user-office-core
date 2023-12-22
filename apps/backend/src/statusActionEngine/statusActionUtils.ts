@@ -180,36 +180,45 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
   const ISs: EmailReadyType[] = [];
   await Promise.all(
     proposals.map(async (proposal) => {
-      const proposalInstrument =
-        await instrumentDataSource.getInstrumentByProposalPk(
+      const proposalInstruments =
+        await instrumentDataSource.getInstrumentsByProposalPk(
           proposal.primaryKey
         );
 
-      if (!proposalInstrument) {
+      if (!proposalInstruments?.length) {
         return;
       }
 
-      const beamLineManager = await usersDataSource.getBasicUserInfo(
-        proposalInstrument.managerUserId
+      // TODO: Test this logic if the correct users are included
+      const instrumentsPeople = await Promise.all(
+        proposalInstruments.map(async (proposalInstrument) => {
+          const beamLineManager = await usersDataSource.getBasicUserInfo(
+            proposalInstrument.managerUserId
+          );
+
+          if (!beamLineManager) {
+            return;
+          }
+
+          const instrumentScientists =
+            await instrumentDataSource.getInstrumentScientists(
+              proposalInstrument.id
+            );
+
+          return [beamLineManager, ...instrumentScientists];
+        })
       );
 
-      if (!beamLineManager) {
-        return;
-      }
-
-      const instrumentScientists =
-        await instrumentDataSource.getInstrumentScientists(
-          proposalInstrument.id
+      const filteredInstrumentPeople = instrumentsPeople
+        .flat()
+        .filter(
+          (user, i, array): user is BasicUserDetails =>
+            !!user && array.findIndex((v2) => v2?.id === user?.id) === i
         );
-
-      const instrumentScientistsWithManager = [
-        beamLineManager,
-        ...instrumentScientists,
-      ];
 
       getEmailReadyArrayOfUsersAndProposals(
         ISs,
-        instrumentScientistsWithManager,
+        filteredInstrumentPeople,
         proposal,
         recipientWithTemplate
       );

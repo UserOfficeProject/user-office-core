@@ -27,7 +27,7 @@ export type ShipmentPDFData = {
   shipment: Shipment & {
     proposalId: string;
     callShortCode: string;
-    instrumentShortCode: string;
+    instrumentShortCodes: string;
     weight: number;
     width: number;
     height: number;
@@ -136,13 +136,16 @@ const getInstrumentData = async (proposalPk: number) => {
     Tokens.InstrumentDataSource
   );
 
-  const instrument = await dataSource.getInstrumentByProposalPk(proposalPk);
-  if (!instrument) {
-    throw new Error(`Instrument not found for proposalPk: ${proposalPk}`);
+  const instruments = await dataSource.getInstrumentsByProposalPk(proposalPk);
+  if (!instruments?.length) {
+    throw new Error(`Instruments not found for proposalPk: ${proposalPk}`);
   }
 
+  // TODO: Review the instrument shortcode information here.
   return {
-    instrumentShortCode: instrument.shortCode,
+    instrumentShortCodes: instruments
+      .map((instrument) => instrument.shortCode)
+      .join(', '),
   };
 };
 
