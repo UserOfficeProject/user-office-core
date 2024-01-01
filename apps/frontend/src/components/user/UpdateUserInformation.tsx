@@ -101,7 +101,7 @@ export default function UpdateUserInformation(
     othergender: userData.gender,
     nationality: userData.nationality,
     birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
-    institution: userData.institutionId,
+    institutionId: userData.institutionId,
     organizationCountry: 0,
     department: userData.department,
     position: userData.position,
@@ -166,9 +166,9 @@ export default function UpdateUserInformation(
           id: props.id,
           ...values,
           nationality: +(values.nationality as number),
-          institution: +values.institution,
+          institutionId: +values.institutionId,
           organizationCountry:
-            +values.institution === 1 ? +values.organizationCountry : null,
+            +values.institutionId === 1 ? +values.organizationCountry : null,
           gender:
             values.gender === 'other' ? values.othergender : values.gender,
         } as UpdateUserMutationVariables;
@@ -350,14 +350,14 @@ export default function UpdateUserInformation(
                 disabled={true}
               />
               <FormikUIAutocomplete
-                name="institution"
+                name="institutionId"
                 label="Organization"
                 items={institutionsList}
                 data-cy="institution"
                 loading={loadingInstitutions}
                 noOptionsText="No organizations"
               />
-              {+values.institution === 1 && (
+              {+values.institutionId === 1 && (
                 <>
                   <Field
                     name="otherInstitution"
