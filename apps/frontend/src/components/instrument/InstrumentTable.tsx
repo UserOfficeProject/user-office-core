@@ -86,14 +86,6 @@ const InstrumentTable = () => {
       scientistIds: scientists.map((scientist) => scientist.id),
     });
 
-    scientists = scientists.map((scientist) => {
-      if (!scientist.organisation) {
-        scientist.organisation = 'Other';
-      }
-
-      return scientist;
-    });
-
     setInstruments((instruments) =>
       instruments.map((instrumentItem) => {
         if (instrumentItem.id === assigningInstrumentId) {

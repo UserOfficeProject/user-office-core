@@ -215,8 +215,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return database
       .select()
       .from('users')
-      .where('organisation', id)
-      .then((users: UserRecord[]) =>
+      .where('institution', id)
+      .then((users: Array<UserRecord & InstitutionRecord>) =>
         users.map((user) => createBasicUserObject(user))
       );
   }
@@ -553,8 +553,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return await database
       .transaction(async (trx) => {
         await trx('users')
-          .update({ organisation: args.institutionIdInto })
-          .where('organisation', args.institutionIdFrom);
+          .update({ institution: args.institutionIdInto })
+          .where('institution', args.institutionIdFrom);
 
         await trx('institutions')
           .del()

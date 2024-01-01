@@ -100,9 +100,9 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
 
   private async getUserInstitutionId(userInfo: UserinfoResponse) {
-    if (userInfo.organisation) {
+    if (userInfo.institution_name) {
       const institutions = await this.adminDataSource.getInstitutions({
-        name: userInfo.organisation as string,
+        name: userInfo.institution_name as string,
       });
 
       if (institutions.length === 1) {
@@ -143,7 +143,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
-        organisation: institutionId ?? user.organisation,
+        institutionId: institutionId ?? user.institutionId,
         position: userInfo.position as string,
         preferredname: userInfo.name,
         telephone: userInfo.phone_number,

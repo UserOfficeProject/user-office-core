@@ -101,7 +101,7 @@ export default function UpdateUserInformation(
     othergender: userData.gender,
     nationality: userData.nationality,
     birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
-    organisation: userData.organisation,
+    institution: userData.institutionId,
     organizationCountry: 0,
     department: userData.department,
     position: userData.position,
@@ -166,9 +166,9 @@ export default function UpdateUserInformation(
           id: props.id,
           ...values,
           nationality: +(values.nationality as number),
-          organisation: +values.organisation,
+          institution: +values.institution,
           organizationCountry:
-            +values.organisation === 1 ? +values.organizationCountry : null,
+            +values.institution === 1 ? +values.organizationCountry : null,
           gender:
             values.gender === 'other' ? values.othergender : values.gender,
         } as UpdateUserMutationVariables;
@@ -350,24 +350,24 @@ export default function UpdateUserInformation(
                 disabled={true}
               />
               <FormikUIAutocomplete
-                name="organisation"
+                name="institution"
                 label="Organization"
                 items={institutionsList}
-                data-cy="organisation"
+                data-cy="institution"
                 loading={loadingInstitutions}
                 noOptionsText="No organizations"
               />
-              {+values.organisation === 1 && (
+              {+values.institution === 1 && (
                 <>
                   <Field
-                    name="otherOrganisation"
+                    name="otherInstitution"
                     label="Please specify organization"
-                    id="organisation-input"
+                    id="institution-input"
                     type="text"
                     component={TextField}
                     margin="normal"
                     fullWidth
-                    data-cy="otherOrganisation"
+                    data-cy="otherInstitution"
                     required
                   />
                   <FormikUIAutocomplete

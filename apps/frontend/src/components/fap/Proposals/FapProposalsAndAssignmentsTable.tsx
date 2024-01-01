@@ -323,14 +323,14 @@ const FapProposalsAndAssignmentsTable = ({
 
     const selectedReviewerWithSameOrganizationAsPI = memberUsers.find(
       (member) =>
-        member.organizationId ===
-        selectedProposal.proposal.proposer?.organizationId
+        member.institutionId ===
+        selectedProposal.proposal.proposer?.institutionId
     );
 
     const selectedReviewerWithSameOrganizationAsCoProposers =
       memberUsers.filter((member) =>
         selectedProposal.proposal.users.find(
-          (user) => user.organizationId === member.organizationId
+          (user) => user.institutionId === member.institutionId
         )
       );
 

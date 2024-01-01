@@ -41,8 +41,8 @@ const assignmentColumns = [
     field: 'lastname',
   },
   {
-    title: 'Organisation',
-    field: 'organisation',
+    title: 'Institution',
+    field: 'institution',
   },
 ];
 

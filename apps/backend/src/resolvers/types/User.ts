@@ -1,15 +1,15 @@
 import {
+  Arg,
+  ArgsType,
   Ctx,
   Directive,
   Field,
   FieldResolver,
+  InputType,
   Int,
   ObjectType,
   Resolver,
   Root,
-  Arg,
-  ArgsType,
-  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -80,7 +80,7 @@ export class User implements Partial<UserOrigin> {
   public birthdate: Date;
 
   @Field(() => Int)
-  public organisation: number;
+  public institutionId: number;
 
   @Field()
   public department: string;

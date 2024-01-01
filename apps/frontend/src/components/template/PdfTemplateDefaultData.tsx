@@ -87,7 +87,7 @@ export const body = `<html lang="en">
                   >{{ principalInvestigator.firstname }} {{
                   principalInvestigator.lastname }}, {{
                   principalInvestigator.position }}, {{
-                  principalInvestigator.organisation }}</span
+                  principalInvestigator.institution }}</span
                 >
               </div>
             </div>
@@ -100,7 +100,7 @@ export const body = `<html lang="en">
                 {{#each coProposers}}
                 <span
                   >{{ this.firstname }} {{ this.lastname }}, {{
-                  this.organisation }}</span
+                  this.institution }}</span
                 >
                 {{/each}}
               </div>
@@ -590,7 +590,7 @@ export const dummyData = `{
       "firstname": "Carl",
       "lastname": "Carlsson",
       "preferredname": "Carl",
-      "organisation": "Other",
+      "institution": "Other",
       "organizationId": 1,
       "position": "Strategist",
       "created": "2023-10-10T13:32:18.172Z",
@@ -603,7 +603,7 @@ export const dummyData = `{
         "firstname": "Benjamin",
         "lastname": "Beckley",
         "preferredname": "Benjamin",
-        "organisation": "Other",
+        "institution": "Other",
         "organizationId": 1,
         "position": "Management",
         "created": "2023-10-18T11:38:15.429Z",
