@@ -27,6 +27,9 @@ export class UpdatePdfTemplateArgs {
 
   @Field(() => String, { nullable: true })
   templateSampleDeclaration?: string;
+
+  @Field(() => String, { nullable: true })
+  dummyData?: string;
 }
 
 @Resolver()

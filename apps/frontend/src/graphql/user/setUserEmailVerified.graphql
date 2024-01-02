@@ -1,5 +1,0 @@
-mutation setUserEmailVerified($id: Int!) {
-  setUserEmailVerified(id: $id) {
-    id
-  }
-}

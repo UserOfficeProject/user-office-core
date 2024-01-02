@@ -32,6 +32,9 @@ class PdfTemplatesFilter {
   @Field(() => String, { nullable: true })
   public pdfTemplateSampleDeclaration?: string;
 
+  @Field(() => String, { nullable: true })
+  public dummyData?: string;
+
   @Field(() => Int, { nullable: true })
   public creatorId?: number;
 }

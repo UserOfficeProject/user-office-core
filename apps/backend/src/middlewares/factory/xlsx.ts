@@ -9,13 +9,13 @@ import callFactoryService, {
   XLSXMetaBase,
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
+import { collectFaplXLSXData } from '../../factory/xlsx/fap';
 import {
   collectProposalXLSXData,
   defaultProposalDataColumns,
 } from '../../factory/xlsx/proposal';
-import { collectSEPlXLSXData } from '../../factory/xlsx/sep';
 
-const sepDataColumns = container.resolve<string[]>(Tokens.SEPDataColumns);
+const fapDataColumns = container.resolve<string[]>(Tokens.FapDataColumns);
 
 const router = express.Router();
 
@@ -74,7 +74,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   }
 });
 
-router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
+router.get(`/${XLSXType.Fap}/:fap_id/call/:call_id`, async (req, res, next) => {
   try {
     if (!req.user) {
       throw new Error('Not authorized');
@@ -85,17 +85,17 @@ router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
       currentRole: req.user.currentRole,
     };
 
-    const sepId = parseInt(req.params.sep_id);
+    const fapId = parseInt(req.params.fap_id);
     const callId = parseInt(req.params.call_id);
 
-    if (isNaN(+sepId) || isNaN(+callId)) {
+    if (isNaN(+fapId) || isNaN(+callId)) {
       throw new Error(
-        `Invalid SEP or call ID: SEP ${req.params.sep_id}, Call ${req.params.call_id}`
+        `Invalid Fap or call ID: Fap ${req.params.fap_id}, Call ${req.params.call_id}`
       );
     }
 
-    const { data, filename } = await collectSEPlXLSXData(
-      sepId,
+    const { data, filename } = await collectFaplXLSXData(
+      fapId,
       callId,
       userWithRole
     );
@@ -103,13 +103,13 @@ router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
     const meta: XLSXMetaBase = {
       singleFilename: filename,
       collectionFilename: filename,
-      columns: sepDataColumns,
+      columns: fapDataColumns,
     };
 
     const userRole = req.user.currentRole;
     callFactoryService(
       DownloadType.XLSX,
-      XLSXType.SEP,
+      XLSXType.Fap,
       { data, meta, userRole },
       req,
       res,

@@ -58,9 +58,12 @@ const QuestionDependencyList = ({
     field.dependencies.length >=
     getAllFields(template.steps).filter(
       (option) =>
-        [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
-          option.question.dataType
-        ) && currentQuestionId !== option.question.id
+        [
+          DataType.BOOLEAN,
+          DataType.SELECTION_FROM_OPTIONS,
+          DataType.INSTRUMENT_PICKER,
+        ].includes(option.question.dataType) &&
+        currentQuestionId !== option.question.id
     ).length;
 
   return (

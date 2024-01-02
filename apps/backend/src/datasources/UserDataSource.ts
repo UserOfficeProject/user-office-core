@@ -1,9 +1,10 @@
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
 import { Role, Roles } from '../models/Role';
-import { User, BasicUserDetails, UserRole } from '../models/User';
+import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 
 export interface UserDataSource {
@@ -28,7 +29,6 @@ export interface UserDataSource {
   getByUsername(username: string): Promise<User | null>;
   getByEmail(email: string): Promise<User | null>;
   getByOIDCSub(sub: string): Promise<User | null>;
-  getPasswordByEmail(email: string): Promise<string | null>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
     args: UsersArgs
@@ -58,7 +58,6 @@ export interface UserDataSource {
     middlename: string | undefined,
     lastname: string,
     username: string,
-    password: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_accesstoken: string,
@@ -81,11 +80,8 @@ export interface UserDataSource {
     verified: boolean,
     countryId?: number
   ): Promise<number>;
-  update(user: User): Promise<User>;
+  update(user: UpdateUserArgs): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
-  setUserPassword(id: number, password: string): Promise<BasicUserDetails>;
-  getPasswordByUsername(username: string): Promise<string | null>;
-  setUserEmailVerified(id: number): Promise<User | null>;
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
     userId: number,

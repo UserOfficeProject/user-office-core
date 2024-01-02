@@ -1,8 +1,0 @@
-query getSEPs($filter: SEPsFilter) {
-  seps(filter: $filter) {
-    seps {
-      ...sep
-    }
-    totalCount
-  }
-}

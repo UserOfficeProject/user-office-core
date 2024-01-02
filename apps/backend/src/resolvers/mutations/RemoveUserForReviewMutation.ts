@@ -8,12 +8,12 @@ export class RemoveUserForReviewMutation {
   @Mutation(() => Review)
   removeUserForReview(
     @Arg('reviewId', () => Int) reviewId: number,
-    @Arg('sepId', () => Int) sepId: number,
+    @Arg('fapId', () => Int) fapId: number,
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.review.removeUserForReview(context.user, {
       reviewId,
-      sepId,
+      fapId,
     });
   }
 }

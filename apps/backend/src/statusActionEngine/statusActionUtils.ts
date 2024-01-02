@@ -1,9 +1,13 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { resolveApplicationEventBus } from '../events';
+import { ApplicationEvent } from '../events/applicationEvents';
+import { Event } from '../events/event.enum';
 import { BasicUserDetails } from '../models/User';
 import {
   EmailStatusActionRecipients,
@@ -44,9 +48,12 @@ export const groupProposalsByProperties = (
 
 export type EmailReadyType = {
   id: EmailStatusActionRecipients;
-  proposals: { proposalId: string; proposalTitle: string }[];
+  proposals: WorkflowEngineProposalType[];
   template: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
+  preferredName?: string;
 };
 
 export const getEmailReadyArrayOfUsersAndProposals = (
@@ -62,22 +69,16 @@ export const getEmailReadyArrayOfUsersAndProposals = (
     );
 
     if (foundIndex !== -1) {
-      emailReadyUsersWithProposals[foundIndex].proposals.push({
-        proposalId: proposal.proposalId,
-        proposalTitle: proposal.title,
-      });
+      emailReadyUsersWithProposals[foundIndex].proposals.push(proposal);
     } else {
       emailReadyUsersWithProposals.push({
         id: recipientsWithEmailTemplate.recipient.name,
-        proposals: [
-          {
-            proposalId: proposal.proposalId,
-            proposalTitle: proposal.title,
-          },
-        ],
-
+        proposals: [proposal],
         template: recipientsWithEmailTemplate.emailTemplate.id,
         email: user.email,
+        firstName: user.firstname,
+        lastName: user.lastname,
+        preferredName: user.preferredname,
       });
     }
   });
@@ -138,24 +139,24 @@ export const getCoProposersAndFormatOutputForEmailSending = async (
   return PIs;
 };
 
-export const getSEPReviewersAndFormatOutputForEmailSending = async (
+export const getFapReviewersAndFormatOutputForEmailSending = async (
   proposals: WorkflowEngineProposalType[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
-  const sepDataSource: SEPDataSource = container.resolve(Tokens.SEPDataSource);
+  const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
   const SRs: EmailReadyType[] = [];
   await Promise.all(
     proposals.map(async (proposal) => {
-      const allSepReviewers =
-        await sepDataSource.getSEPUsersByProposalPkAndCallId(
+      const allFapReviewers =
+        await fapDataSource.getFapUsersByProposalPkAndCallId(
           proposal.primaryKey,
           proposal.callId
         );
 
       getEmailReadyArrayOfUsersAndProposals(
         SRs,
-        allSepReviewers,
+        allFapReviewers,
         proposal,
         recipientWithTemplate
       );
@@ -216,4 +217,32 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
   );
 
   return ISs;
+};
+
+export const publishMessageToTheEventBus = async (
+  proposals: WorkflowEngineProposalType[],
+  messageDescription: string,
+  exchange?: string
+) => {
+  const eventBus = resolveApplicationEventBus();
+
+  await Promise.all(
+    proposals.map(async (proposal) => {
+      const event = {
+        type: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
+        proposal: proposal,
+        key: 'proposal',
+        loggedInUserId: null,
+        isRejection: false,
+        description: messageDescription,
+        exchange: exchange,
+      } as ApplicationEvent;
+
+      return eventBus
+        .publish(event)
+        .catch((e) =>
+          logger.logError(`EventBus publish failed ${event.type}`, e)
+        );
+    })
+  );
 };

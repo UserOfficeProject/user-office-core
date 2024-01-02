@@ -52,6 +52,7 @@ test('A userofficer can create a PDF template', async () => {
   const templateHeader = '...';
   const templateFooter = '...';
   const templateSampleDeclaration = '...';
+  const dummyData = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -67,6 +68,7 @@ test('A userofficer can create a PDF template', async () => {
       templateHeader,
       templateFooter,
       templateSampleDeclaration,
+      dummyData,
     }
   );
 
@@ -84,6 +86,7 @@ test('A user cannot create a PDF template', async () => {
   const templateHeader = '...';
   const templateFooter = '...';
   const templateSampleDeclaration = '...';
+  const dummyData = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -99,6 +102,7 @@ test('A user cannot create a PDF template', async () => {
       templateHeader,
       templateFooter,
       templateSampleDeclaration,
+      dummyData,
     }
   );
 
@@ -111,6 +115,7 @@ test('Template must be correct type for PDF template to be created', async () =>
   const templateHeader = '...';
   const templateFooter = '...';
   const templateSampleDeclaration = '...';
+  const dummyData = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -126,6 +131,7 @@ test('Template must be correct type for PDF template to be created', async () =>
       templateHeader,
       templateFooter,
       templateSampleDeclaration,
+      dummyData,
     }
   );
 
@@ -138,6 +144,7 @@ test('Create PDF template database error gives friendly error', async () => {
   const templateHeader = '...';
   const templateFooter = '...';
   const templateSampleDeclaration = '...';
+  const dummyData = '...';
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
@@ -155,6 +162,7 @@ test('Create PDF template database error gives friendly error', async () => {
       templateHeader,
       templateFooter,
       templateSampleDeclaration,
+      dummyData,
     }
   );
 
@@ -167,6 +175,7 @@ test('A userofficer can update a PDF template', async () => {
   const newTemplateHeader = 'new header';
   const newTemplateFooter = 'new footer';
   const newTemplateSampleDeclaration = 'new sample declaration';
+  const newDummyData = 'new dummy data';
 
   let template = await pdfTemplateMutations.updatePdfTemplate(
     dummyUserOfficerWithRole,
@@ -176,6 +185,7 @@ test('A userofficer can update a PDF template', async () => {
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
       templateSampleDeclaration: newTemplateSampleDeclaration,
+      dummyData: newDummyData,
     }
   );
 
@@ -188,6 +198,7 @@ test('A userofficer can update a PDF template', async () => {
   expect(template.templateSampleDeclaration).toEqual(
     newTemplateSampleDeclaration
   );
+  expect(template.dummyData).toEqual(newDummyData);
 });
 
 test('A user cannot update a PDF template', async () => {
@@ -196,6 +207,7 @@ test('A user cannot update a PDF template', async () => {
   const newTemplateHeader = 'new header';
   const newTemplateFooter = 'new footer';
   const newTemplateSampleDeclaration = 'new sample declaration';
+  const newDummyData = 'new dummy data';
 
   const template = await pdfTemplateMutations.updatePdfTemplate(
     dummyUserWithRole,
@@ -205,6 +217,7 @@ test('A user cannot update a PDF template', async () => {
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
       templateSampleDeclaration: newTemplateSampleDeclaration,
+      dummyData: newDummyData,
     }
   );
 
@@ -217,6 +230,7 @@ test('Update PDF template database error gives friendly error', async () => {
   const newTemplateHeader = 'new header';
   const newTemplateFooter = 'new footer';
   const newTemplateSampleDeclaration = 'new sample declaration';
+  const newDummyData = 'new dummy data';
 
   mockUpdatePdfTemplate.mockRejectedValue(new Error('Database error'));
 
@@ -228,6 +242,7 @@ test('Update PDF template database error gives friendly error', async () => {
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
       templateSampleDeclaration: newTemplateSampleDeclaration,
+      dummyData: newDummyData,
     }
   );
 

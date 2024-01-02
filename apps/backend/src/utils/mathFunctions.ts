@@ -1,5 +1,5 @@
+import { FapProposalWithReviewGradesAndRanking } from '../models/Fap';
 import { Review, ReviewStatus } from '../models/Review';
-import { SEPProposalWithReviewGradesAndRanking } from '../models/SEP';
 
 export const average = (numbers: number[]) => {
   const sum = numbers.reduce(function (sum, value) {
@@ -46,8 +46,8 @@ export const getGrades = (reviews: Review[] | null | undefined) =>
     .map((review) => review.grade as number) ?? [];
 
 export const sortByRankOrder = (
-  a: SEPProposalWithReviewGradesAndRanking,
-  b: SEPProposalWithReviewGradesAndRanking
+  a: FapProposalWithReviewGradesAndRanking,
+  b: FapProposalWithReviewGradesAndRanking
 ) => {
   if (a.rankOrder === b.rankOrder || (!a.rankOrder && !b.rankOrder)) {
     return -1;
@@ -61,7 +61,7 @@ export const sortByRankOrder = (
 };
 
 export const sortByRankOrAverageScore = (
-  data: SEPProposalWithReviewGradesAndRanking[]
+  data: FapProposalWithReviewGradesAndRanking[]
 ) => {
   return data
     .map((proposalData) => {

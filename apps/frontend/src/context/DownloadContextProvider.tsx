@@ -117,7 +117,7 @@ export enum PREPARE_DOWNLOAD_TYPE {
   PDF_GENERIC_TEMPLATE,
   ZIP_ATTACHMENT,
   XLSX_PROPOSAL,
-  XLSX_SEP,
+  XLSX_FAP,
 }
 
 export type DownloadOptions = {
@@ -156,16 +156,16 @@ function generateLink(
       return '/download/pdf/generic-template/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_PROPOSAL:
       return '/download/xlsx/proposal/' + ids;
-    case PREPARE_DOWNLOAD_TYPE.XLSX_SEP:
+    case PREPARE_DOWNLOAD_TYPE.XLSX_FAP:
       const [params] = ids;
 
       if (!Array.isArray(params)) {
         throw new Error('Invalid params: ' + params);
       }
 
-      const [sepId, callId] = params;
+      const [fapId, callId] = params;
 
-      return `/download/xlsx/sep/${sepId}/call/${callId}`;
+      return `/download/xlsx/fap/${fapId}/call/${callId}`;
     case PREPARE_DOWNLOAD_TYPE.ZIP_ATTACHMENT:
       if (!options?.questionIds) {
         throw new Error('Question ids are require');

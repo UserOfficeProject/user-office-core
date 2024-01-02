@@ -151,12 +151,12 @@ describe('Test Instrument Mutations', () => {
     ).resolves.toBe(true);
   });
 
-  test('A logged in user officer can submit instrument attached to a call from a SEP', () => {
+  test('A logged in user officer can submit instrument attached to a call from a Fap', () => {
     return expect(
       instrumentMutations.submitInstrument(dummyUserOfficerWithRole, {
         instrumentId: 1,
         callId: 1,
-        sepId: 1,
+        fapId: 1,
       })
     ).resolves.toBe(dummyInstrumentHasProposals);
   });

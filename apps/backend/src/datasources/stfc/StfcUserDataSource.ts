@@ -1,10 +1,10 @@
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
-import { Role } from '../../models/Role';
-import { Roles } from '../../models/Role';
+import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { LRUCache } from '../../utils/LRUCache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
@@ -29,6 +29,10 @@ const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
   'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
   'CLF LSF FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'FAP Member': [Roles.FAP_REVIEWER],
+  'FAP Secretary': [Roles.FAP_SECRETARY],
+  'FAP Chair': [Roles.FAP_CHAIR],
+  'Internal Reviewer': [Roles.INTERNAL_REVIEWER],
 };
 
 export type stfcRole = {
@@ -90,7 +94,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     stfcUser.deptName ?? '',
     '',
     stfcUser.email ?? '',
-    true,
     stfcUser.workPhone ?? '',
     undefined,
     false,
@@ -251,23 +254,8 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getStfcBasicPersonByEmail(email).then((user) => !!user);
   }
 
-  async getPasswordByEmail(email: string): Promise<string> {
-    throw new Error('Method not implemented.');
-  }
-
-  setUserEmailVerified(id: number): Promise<User | null> {
-    throw new Error('Method not implemented.');
-  }
-
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     return await postgresUserDataSource.setUserNotPlaceholder(id);
-  }
-
-  async setUserPassword(
-    id: number,
-    password: string
-  ): Promise<BasicUserDetails> {
-    throw new Error('Method not implemented.');
   }
 
   async getByEmail(email: string): Promise<User | null> {
@@ -279,10 +267,6 @@ export class StfcUserDataSource implements UserDataSource {
   async getByUsername(username: string): Promise<User | null> {
     // We use user numbers as usernames
     return this.getUser(parseInt(username));
-  }
-
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    throw new Error('Method not implemented.');
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
@@ -350,7 +334,7 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.getRoles();
   }
 
-  async update(user: User): Promise<User> {
+  async update(user: UpdateUserArgs): Promise<User> {
     throw new Error('Method not implemented.');
   }
 
@@ -520,7 +504,6 @@ export class StfcUserDataSource implements UserDataSource {
     middlename: string | undefined,
     lastname: string,
     username: string,
-    password: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_access_token: string,

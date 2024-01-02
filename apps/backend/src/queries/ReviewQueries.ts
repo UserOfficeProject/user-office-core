@@ -38,7 +38,7 @@ export default class ReviewQueries {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async reviewsForProposal(
     agent: UserWithRole | null,
     proposalPk: number

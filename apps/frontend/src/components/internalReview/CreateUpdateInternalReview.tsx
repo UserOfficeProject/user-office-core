@@ -2,13 +2,13 @@ import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { Editor } from '@tinymce/tinymce-react';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import React, { useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { InternalReview, UserRole } from 'generated/sdk';

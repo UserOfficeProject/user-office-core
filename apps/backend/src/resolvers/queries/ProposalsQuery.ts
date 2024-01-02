@@ -59,6 +59,9 @@ export class ProposalsFilter {
 
   @Field(() => [String], { nullable: true })
   public referenceNumbers?: string[];
+
+  @Field(() => [Int], { nullable: true })
+  public templateIds?: number[];
 }
 
 @ArgsType()

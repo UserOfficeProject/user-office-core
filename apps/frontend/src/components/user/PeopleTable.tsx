@@ -1,8 +1,4 @@
-import MaterialTable, {
-  Options,
-  Column,
-  MTableToolbar,
-} from '@material-table/core';
+import { Options, Column, MTableToolbar } from '@material-table/core';
 import Email from '@mui/icons-material/Email';
 import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -15,6 +11,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import EmailSearchBar from 'components/common/EmailSearchBar';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
@@ -108,10 +105,10 @@ const getTitle = ({
   switch (invitationUserRole) {
     case UserRole.USER_OFFICER:
       return 'Invite User';
-    case UserRole.SEP_CHAIR:
-      return 'Invite ' + t('SEP') + ' Chair';
-    case UserRole.SEP_SECRETARY:
-      return 'Invite ' + t('SEP') + ' Secretary';
+    case UserRole.FAP_CHAIR:
+      return 'Invite Fap Chair';
+    case UserRole.FAP_SECRETARY:
+      return 'Invite Fap Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
       return 'Invite ' + t('instrumentSci');
     default:
@@ -327,7 +324,7 @@ const PeopleTable = ({
           setInviteUserModal({
             show: true,
             title: 'Invite Reviewer',
-            userRole: UserRole.SEP_REVIEWER,
+            userRole: UserRole.FAP_REVIEWER,
           }),
         'data-cy': 'invite-reviewer-button',
       }
@@ -524,7 +521,6 @@ const PeopleTable = ({
             search: search,
             debounceInterval: 400,
             pageSize: query.first as number,
-            emptyRowsWhenPaging: false,
             selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
