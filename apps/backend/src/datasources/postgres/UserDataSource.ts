@@ -785,6 +785,8 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async getUsersByUserNumbers(id: readonly number[]): Promise<User[] | null> {
-    throw new Error('Method not implemented.');
+    logger.logDebug('Method not implemented.', {});
+
+    return null;
   }
 }
