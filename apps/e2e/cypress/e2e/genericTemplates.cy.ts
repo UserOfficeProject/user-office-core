@@ -20,9 +20,8 @@ context('GenericTemplates tests', () => {
   const genericTemplateQuestion = twoFakes(4);
   const proposalTitle = twoFakes(3);
   const addButtonLabel = twoFakes(2);
-  const copyButtonLabel = faker.lorem.words(3);
-  const deleteButtonLabel = faker.lorem.words(3);
-  const genericTemplateTitle = faker.lorem.words(3);
+  const copyButtonLabel = faker.lorem.words(2);
+  const genericTemplateTitle = faker.lorem.words(2);
   const genericTemplateQuestionaryQuestion = twoFakes(3);
   const genericTemplateTitleAnswers = [
     faker.lorem.words(3),
