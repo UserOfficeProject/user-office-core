@@ -5,7 +5,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
-  UpdateSepToCallInstrumentInput,
+  UpdateFapToCallInstrumentInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -19,8 +19,8 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.endCallInternal || new Date(),
     values?.startReview || new Date(),
     values?.endReview || new Date(),
-    values?.startSEPReview || new Date(),
-    values?.endSEPReview || new Date(),
+    values?.startFapReview || new Date(),
+    values?.endFapReview || new Date(),
     values?.startNotify || new Date(),
     values?.endNotify || new Date(),
     values?.startCycle || new Date(),
@@ -34,7 +34,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.callEnded || false,
     values?.callEndedInternal || false,
     values?.callReviewEnded || false,
-    values?.callSEPReviewEnded || false,
+    values?.callFapReviewEnded || false,
     values?.templateId || 1,
     values?.esiTemplateId || 2,
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
@@ -163,7 +163,7 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCall;
   }
 
-  async updateSepToCallInstrument(args: UpdateSepToCallInstrumentInput) {
+  async updateFapToCallInstrument(args: UpdateFapToCallInstrumentInput) {
     return dummyCall;
   }
 

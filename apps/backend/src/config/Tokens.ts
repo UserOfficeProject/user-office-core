@@ -23,7 +23,7 @@ export const Tokens = {
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
   RedeemCodesDataSource: Symbol('RedeemCodesDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),
-  SEPDataSource: Symbol('SEPDataSource'),
+  FapDataSource: Symbol('FapDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),
   SampleEsiDataSource: Symbol('SampleEsiDataSource'),
   ScheduledEventDataSource: Symbol('ScheduledEventDataSource'),
@@ -36,7 +36,7 @@ export const Tokens = {
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
-  SEPDataColumns: Symbol('SEPDataColumns'),
-  SEPDataRow: Symbol('SEPDataRow'),
+  FapDataColumns: Symbol('FapDataColumns'),
+  FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),
 };

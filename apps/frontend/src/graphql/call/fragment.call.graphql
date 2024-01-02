@@ -6,8 +6,8 @@ fragment call on Call {
   endCallInternal
   startReview
   endReview
-  startSEPReview
-  endSEPReview
+  startFapReview
+  endFapReview
   startNotify
   endNotify
   startCycle
@@ -27,8 +27,8 @@ fragment call on Call {
     description
     availabilityTime
     submitted
-    sepId
-    sep {
+    fapId
+    fap {
       id
       code
     }
@@ -36,7 +36,7 @@ fragment call on Call {
       ...basicUserDetails
     }
   }
-  seps {
+  faps {
     id
     code
   }

@@ -5,6 +5,6 @@ query getProposalReviews($proposalPk: Int!) {
     comment
     grade
     status
-    sepID
+    fapID
   }
 }

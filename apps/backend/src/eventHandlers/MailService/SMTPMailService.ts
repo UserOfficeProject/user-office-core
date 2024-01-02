@@ -3,11 +3,11 @@ import path from 'path';
 import { logger } from '@user-office-software/duo-logger';
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
-import { ResultsPromise } from 'sparkpost';
 
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
 import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
+import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
   private _email: EmailTemplates<any>;

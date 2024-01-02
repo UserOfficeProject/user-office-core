@@ -14,7 +14,13 @@ export function DenseMaterialTable<RowData extends object>(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const columns = useMemo(() => denseTableColumns(props.columns), []);
 
-  return <MaterialTable {...props} columns={columns} />;
+  return (
+    <MaterialTable
+      {...props}
+      options={{ ...props.options, pageSize: props.options?.pageSize || 10 }}
+      columns={columns}
+    />
+  );
 }
 
 export default DenseMaterialTable;

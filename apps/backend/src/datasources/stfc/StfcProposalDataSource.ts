@@ -107,6 +107,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           this.addQuestionFilter(query, questionFilter);
         }
 
+        if (filter?.referenceNumbers) {
+          query.whereIn(
+            'proposal_table_view.proposal_id',
+            filter.referenceNumbers
+          );
+        }
+
         if (first) {
           query.limit(first);
         }

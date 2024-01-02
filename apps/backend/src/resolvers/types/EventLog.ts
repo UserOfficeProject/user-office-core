@@ -28,15 +28,22 @@ export class EventLog {
 
   @Field(() => String)
   public changedObjectId: string;
+
+  @Field(() => String)
+  public description: string;
 }
 
-@Resolver((of) => EventLog)
+@Resolver(() => EventLog)
 export class EventLogResolver {
-  @FieldResolver(() => User)
+  @FieldResolver(() => User, { nullable: true })
   async changedBy(
     @Root() eventLog: EventLogOrigin,
     @Ctx() context: ResolverContext
   ): Promise<User | null> {
+    if (!eventLog.changedBy) {
+      return null;
+    }
+
     return await context.queries.user.getUser(context.user, eventLog.changedBy);
   }
 }

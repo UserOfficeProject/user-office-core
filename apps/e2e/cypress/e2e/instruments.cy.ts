@@ -48,7 +48,7 @@ context('Instrument tests', () => {
 
   // TODO: Maybe this should be moved to permission testing.
   it('User should not be able to see Instruments page', () => {
-    cy.login('user1');
+    cy.login('user1', initialDBData.roles.user);
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -180,7 +180,7 @@ context('Instrument tests', () => {
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentSepIds: [{ instrumentId: createdInstrumentId }],
+            instrumentFapIds: [{ instrumentId: createdInstrumentId }],
           });
         }
       });
@@ -303,7 +303,8 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
       });
 
-      cy.login(scientist2);
+      cy.login('user2');
+
       cy.updateTechnicalReviewAssignee({
         proposalPks: createdProposalPk,
         userId: scientist2.id,
@@ -316,7 +317,7 @@ context('Instrument tests', () => {
         timeAllocation: 1,
       });
 
-      cy.login('officer');
+      cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
 
       cy.contains('Proposals');
@@ -356,7 +357,8 @@ context('Instrument tests', () => {
         userId: scientist2.id,
       });
 
-      cy.login(scientist2);
+      cy.login('user2');
+      cy.visit('/');
 
       cy.addProposalTechnicalReview({
         proposalPk: createdProposalPk,
@@ -555,7 +557,7 @@ context('Instrument tests', () => {
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentSepIds: [{ instrumentId: createdInstrumentId }],
+            instrumentFapIds: [{ instrumentId: createdInstrumentId }],
           });
 
           cy.assignScientistsToInstrument({
@@ -570,7 +572,7 @@ context('Instrument tests', () => {
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
-            instrumentSepIds: [{ instrumentId: createdInstrument2Id }],
+            instrumentFapIds: [{ instrumentId: createdInstrument2Id }],
           });
 
           cy.assignScientistsToInstrument({

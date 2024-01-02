@@ -73,7 +73,7 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
-    rankOrder: proposal.sepMeetingDecision?.rankOrder,
+    rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
     technicalTimeAllocation: proposal.technicalReview?.timeAllocation || null,
     technicalReviewAssigneeId:
@@ -92,7 +92,8 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
       average(getGradesFromReviews(proposal.reviews ?? [])) || null,
     reviewDeviation:
       standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    sepCode: proposal.sep?.code,
+    fapId: proposal.fap?.id,
+    fapCode: proposal.fap?.code,
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
@@ -176,7 +177,7 @@ export const denseTableColumn = <T extends object>(
       const columnData = getValueFromKey(rowData, column.field?.toString());
 
       // NOTE: If it is more than 50 chars then show the title tooltip
-      if (typeof columnData === 'string' && columnData.length > 50) {
+      if (typeof columnData === 'string' && columnData.length > 45) {
         return (
           <span title={columnData}>
             {column.render ? column.render(rowData, 'row') : columnData}

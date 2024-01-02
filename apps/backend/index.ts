@@ -14,14 +14,17 @@ import factory from './src/middlewares/factory';
 import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
 import healthCheck from './src/middlewares/healthCheck';
+import jwtErrorHandler from './src/middlewares/jwtErrorHandler';
 import readinessCheck from './src/middlewares/readinessCheck';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 4000;
   const app = express();
-
+  app.use(express.json({ limit: '5mb' }));
+  app.use(express.urlencoded({ extended: false }));
   app
     .use(authorization())
+    .use(jwtErrorHandler)
     .use(files())
     .use(factory())
     .use(healthCheck())

@@ -137,7 +137,7 @@ context('Samples tests', () => {
   };
 
   beforeEach(() => {
-    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+    // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
     // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
     cy.window().then((win) => {
       win.location.href = 'about:blank';
@@ -235,7 +235,7 @@ context('Samples tests', () => {
     });
     it('Should be able to create proposal with sample', () => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
@@ -308,7 +308,7 @@ context('Samples tests', () => {
 
     it('Should be able to modify sample declaration question and all other questions without loosing information', () => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('new proposal', { matchCase: false }).click();
@@ -504,7 +504,7 @@ context('Samples tests', () => {
     });
 
     it('User should not be able to submit proposal with unfinished sample', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)

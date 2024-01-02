@@ -1,6 +1,7 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import React, { useContext } from 'react';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { Settings } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';

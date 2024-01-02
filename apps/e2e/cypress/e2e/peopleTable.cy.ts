@@ -196,7 +196,7 @@ context('PageTable component tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('10 rows').click();
+      cy.get('@modal').contains('10 rows').click();
       cy.get('[data-value=5]').click();
 
       for (const email of emails) {
@@ -351,7 +351,9 @@ context('PageTable component tests', () => {
 
       cy.get('[role="presentation"] [role="dialog"]').as('modal');
 
-      cy.contains('10 rows').click();
+      cy.finishedLoading();
+
+      cy.get('@modal').contains('10 rows').click();
       cy.get('[data-value=5]').click();
 
       cy.get('@modal').contains('0 user(s) selected');

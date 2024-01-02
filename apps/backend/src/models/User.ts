@@ -21,10 +21,6 @@ export type PasswordResetJwtPayload = SpecialActionJwtPayload & {
   type: 'passwordReset';
 };
 
-export type EmailVerificationJwtPayload = SpecialActionJwtPayload & {
-  type: 'emailVerification';
-};
-
 export class User {
   constructor(
     public id: number,
@@ -45,7 +41,6 @@ export class User {
     public department: string,
     public position: string,
     public email: string,
-    public emailVerified: boolean,
     public telephone: string,
     public telephone_alt: string | undefined,
     public placeholder: boolean,
@@ -67,9 +62,9 @@ export interface UserWithRole extends UserJWT {
 export enum UserRole {
   USER = 1,
   USER_OFFICER,
-  SEP_CHAIR,
-  SEP_SECRETARY,
-  SEP_REVIEWER,
+  FAP_CHAIR,
+  FAP_SECRETARY,
+  FAP_REVIEWER,
   INSTRUMENT_SCIENTIST,
   SAMPLE_SAFETY_REVIEWER,
   INTERNAL_REVIEWER,
@@ -78,9 +73,9 @@ export enum UserRole {
 export const UserRoleShortCodeMap = {
   [UserRole.USER]: Roles.USER,
   [UserRole.USER_OFFICER]: Roles.USER_OFFICER,
-  [UserRole.SEP_CHAIR]: Roles.SEP_CHAIR,
-  [UserRole.SEP_SECRETARY]: Roles.SEP_SECRETARY,
-  [UserRole.SEP_REVIEWER]: Roles.SEP_REVIEWER,
+  [UserRole.FAP_CHAIR]: Roles.FAP_CHAIR,
+  [UserRole.FAP_SECRETARY]: Roles.FAP_SECRETARY,
+  [UserRole.FAP_REVIEWER]: Roles.FAP_REVIEWER,
   [UserRole.INSTRUMENT_SCIENTIST]: Roles.INSTRUMENT_SCIENTIST,
   [UserRole.SAMPLE_SAFETY_REVIEWER]: Roles.SAMPLE_SAFETY_REVIEWER,
   [UserRole.INTERNAL_REVIEWER]: Roles.INTERNAL_REVIEWER,

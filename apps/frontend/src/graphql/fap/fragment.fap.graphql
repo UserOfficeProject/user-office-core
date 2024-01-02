@@ -1,0 +1,18 @@
+fragment fap on Fap {
+  id
+  code
+  description
+  numberRatingsRequired
+  gradeGuide
+  customGradeGuide
+  active
+  fapChair {
+    ...basicUserDetails
+  }
+  fapChairProposalCount
+  fapSecretary {
+    ...basicUserDetails
+  }
+  fapSecretaryProposalCount
+  proposalCount
+}

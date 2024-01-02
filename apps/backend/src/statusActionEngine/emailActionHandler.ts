@@ -2,7 +2,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import {
@@ -15,7 +14,8 @@ import {
   getCoProposersAndFormatOutputForEmailSending,
   getInstrumentScientistsAndFormatOutputForEmailSending,
   getPIAndFormatOutputForEmailSending,
-  getSEPReviewersAndFormatOutputForEmailSending,
+  getFapReviewersAndFormatOutputForEmailSending,
+  publishMessageToTheEventBus,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -36,7 +36,7 @@ export const emailActionHandler = async (
             recipientWithTemplate
           );
 
-          sendMail(PIs);
+          await sendMail(PIs);
 
           break;
         }
@@ -47,7 +47,7 @@ export const emailActionHandler = async (
             recipientWithTemplate
           );
 
-          sendMail(CPs);
+          await sendMail(CPs);
 
           break;
         }
@@ -59,13 +59,13 @@ export const emailActionHandler = async (
               recipientWithTemplate
             );
 
-          sendMail(ISs);
+          await sendMail(ISs);
 
           break;
         }
 
-        case EmailStatusActionRecipients.SEP_REVIEWERS: {
-          const SRs = await getSEPReviewersAndFormatOutputForEmailSending(
+        case EmailStatusActionRecipients.FAP_REVIEWERS: {
+          const SRs = await getFapReviewersAndFormatOutputForEmailSending(
             proposals,
             recipientWithTemplate
           );
@@ -84,14 +84,11 @@ export const emailActionHandler = async (
             recipientWithTemplate.otherRecipientEmails.map((email) => ({
               id: recipientWithTemplate.recipient.name,
               email: email,
-              proposals: proposals.map((proposal) => ({
-                proposalId: proposal.proposalId,
-                proposalTitle: proposal.title,
-              })),
+              proposals: proposals,
               template: recipientWithTemplate.emailTemplate.id,
             }));
 
-          sendMail(otherRecipients);
+          await sendMail(otherRecipients);
 
           break;
         }
@@ -101,27 +98,12 @@ export const emailActionHandler = async (
       }
     })
   );
-
-  await markStatusActionAsExecuted(proposalStatusAction);
 };
 
-const markStatusActionAsExecuted = async (
-  proposalStatusAction: ConnectionHasStatusAction
-) => {
-  const statusActionsDataSource: StatusActionsDataSource = container.resolve(
-    Tokens.StatusActionsDataSource
-  );
-
-  await statusActionsDataSource.updateConnectionStatusAction({
-    ...proposalStatusAction,
-    executed: true,
-  });
-};
-
-const sendMail = (recipientsWithData: EmailReadyType[]) => {
+const sendMail = async (recipientsWithData: EmailReadyType[]) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
 
-  Promise.all(
+  await Promise.all(
     recipientsWithData.map(async (recipientWithData) => {
       return mailService
         .sendMail({
@@ -130,13 +112,22 @@ const sendMail = (recipientsWithData: EmailReadyType[]) => {
           },
           substitution_data: {
             proposals: recipientWithData.proposals,
+            firstName: recipientWithData.firstName,
+            lastName: recipientWithData.lastName,
+            preferredName: recipientWithData.preferredName,
           },
           recipients: [{ address: recipientWithData.email }],
         })
-        .then((res) => {
+        .then(async (res) => {
           logger.logInfo('Email sent:', {
             result: res,
           });
+
+          const messageDescription = `Email successfully sent to: ${recipientWithData.email}`;
+          await publishMessageToTheEventBus(
+            recipientWithData.proposals,
+            messageDescription
+          );
         })
         .catch((err) => {
           logger.logError('Could not send email', {
