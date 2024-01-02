@@ -266,7 +266,7 @@ context('Proposal tests', () => {
         });
       }
 
-      cy.login('user2');
+      cy.login('user2', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -304,29 +304,29 @@ context('Proposal tests', () => {
         cy.updateUserDetails({
           id: 1,
           user_title: 'Mr.',
-          firstname: 'Carl',
-          lastname: 'Carlsson',
+          firstname: 'David',
+          lastname: 'Dawson',
           preferredname: '',
           gender: 'male',
           nationality: 1,
-          birthdate: new Date('2000/04/02'),
+          birthdate: new Date('1995/04/01'),
           organisation: 1,
-          department: 'IT deparment',
-          position: 'Strategist',
-          email: 'Javon4@hotmail.com',
-          telephone: '(288) 431-1443',
+          department: 'Maxillofacial surgeon',
+          position: 'Management',
+          email: 'david@teleworm.us',
+          telephone: '0676 472 14 66',
           organizationCountry: 1,
         });
       }
 
-      cy.login('user1', initialDBData.roles.user);
+      cy.login('user3', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
       cy.get('[data-cy=principal-investigator] input').should(
         'contain.value',
-        'Carl '
+        'David '
       );
     });
 
