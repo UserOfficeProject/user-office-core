@@ -302,7 +302,7 @@ context('Proposal tests', () => {
     it('User should be able to not have a preferred name', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserDetails({
-          id: 1,
+          id: 6,
           user_title: 'Mr.',
           firstname: 'David',
           lastname: 'Dawson',
@@ -321,7 +321,6 @@ context('Proposal tests', () => {
 
       cy.login('user3', initialDBData.roles.user);
       cy.visit('/');
-
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
       cy.get('[data-cy=principal-investigator] input').should(
