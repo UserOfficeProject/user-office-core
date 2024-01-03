@@ -15,11 +15,11 @@ export function useFapsData({
   callIds?: number[];
 }): {
   loadingFaps: boolean;
-  Faps: Fap[];
+  faps: Fap[];
   setFapsWithLoading: Dispatch<SetStateAction<Fap[]>>;
 } {
   const api = useDataApi();
-  const [Faps, setFaps] = useState<Fap[]>([]);
+  const [faps, setFaps] = useState<Fap[]>([]);
   const [loadingFaps, setLoadingFaps] = useState(true);
 
   const setFapsWithLoading = (data: SetStateAction<Fap[]>) => {
@@ -84,5 +84,5 @@ export function useFapsData({
     };
   }, [filter, active, api, role, callIds]);
 
-  return { loadingFaps, Faps, setFapsWithLoading };
+  return { loadingFaps, faps, setFapsWithLoading };
 }
