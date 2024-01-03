@@ -71,7 +71,7 @@ context('Personal information tests', () => {
 
       cy.get("[name='telephone']").clear().type(newTelephone);
 
-      cy.get("[name='otherOrganisation']").clear().type(otherOrg);
+      cy.get("[name='otherInstitution']").clear().type(otherOrg);
 
       cy.get('[data-cy="organizationCountry"] input').click();
       cy.get('[data-cy="organizationCountry-options"]').first().click();

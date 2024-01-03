@@ -139,7 +139,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         gender: '',
         nationality: null,
         birthdate: '2000-01-01',
-        institutionId: 1,
+        institution_id: 1,
         department: '',
         position: '',
         email,

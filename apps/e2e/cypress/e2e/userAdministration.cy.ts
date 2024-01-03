@@ -50,7 +50,7 @@ context('User administration tests', () => {
 
     cy.get("[name='telephone_alt']").clear().type(newTelephoneAlt);
 
-    cy.get("[name='otherOrganisation']").clear().type(newOrganisation);
+    cy.get("[name='otherInstitution']").clear().type(newOrganisation);
 
     cy.get('[data-cy="organizationCountry"] input').click();
     cy.get('[data-cy="organizationCountry-options"]').first().click();
