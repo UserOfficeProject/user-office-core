@@ -308,7 +308,6 @@ jobs:
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
      
       - name: Run e2e tests stfc
-        timeout-minutes: 25
         env:
           USER_OFFICE_BACKEND_DIR: apps/backend
           USER_OFFICE_FRONTEND_DIR: apps/frontend
