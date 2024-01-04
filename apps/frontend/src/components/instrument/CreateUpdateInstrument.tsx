@@ -14,10 +14,14 @@ import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
-import { InstrumentFragment, UserRole } from 'generated/sdk';
+import {
+  BasicUserDetailsFragment,
+  InstrumentFragment,
+  UserRole,
+} from 'generated/sdk';
 import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName } from 'utils/user';
+import { getFullUserNameWithEmail } from 'utils/user';
 
 const useStyles = makeStyles((theme) => ({
   submit: {
@@ -139,10 +143,15 @@ const CreateUpdateInstrument = ({
             name="managerUserId"
             label="Beamline manager"
             noOptionsText="No one"
-            items={usersData.users.map((user) => ({
-              text: getFullUserName(user),
-              value: user.id,
-            }))}
+            items={usersData.users
+              .sort(
+                (a: BasicUserDetailsFragment, b: BasicUserDetailsFragment) =>
+                  a.firstname > b.firstname ? 1 : -1
+              )
+              .map((user) => ({
+                text: getFullUserNameWithEmail(user),
+                value: user.id,
+              }))}
             InputProps={{
               'data-cy': 'beamline-manager',
             }}
