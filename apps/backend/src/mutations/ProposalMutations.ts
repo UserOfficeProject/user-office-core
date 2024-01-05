@@ -661,6 +661,7 @@ export default class ProposalMutations {
       proposerId,
       referenceNumber,
       users: coiIds,
+      created,
     } = args;
 
     const submitter = await this.userDataSource.getUser(submitterId);
@@ -723,6 +724,7 @@ export default class ProposalMutations {
       proposal: proposal as Proposal,
       args: {
         proposalPk: proposal.primaryKey,
+        created: created,
         ...args,
       },
     });
