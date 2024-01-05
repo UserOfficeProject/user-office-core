@@ -143,7 +143,7 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     { proposal, args }: { proposal: Proposal; args: UpdateProposalArgs }
   ): Promise<Proposal | Rejection> {
-    const { proposalPk, title, abstract, users, proposerId } = args;
+    const { proposalPk, title, abstract, users, proposerId, created } = args;
 
     if (title !== undefined) {
       proposal.title = title;
@@ -151,6 +151,10 @@ export default class ProposalMutations {
 
     if (abstract !== undefined) {
       proposal.abstract = abstract;
+    }
+
+    if (created !== undefined) {
+      proposal.created = created;
     }
 
     if (users !== undefined) {
@@ -724,7 +728,6 @@ export default class ProposalMutations {
       proposal: proposal as Proposal,
       args: {
         proposalPk: proposal.primaryKey,
-        created: created,
         ...args,
       },
     });
