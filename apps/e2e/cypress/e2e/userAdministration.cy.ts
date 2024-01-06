@@ -13,7 +13,7 @@ context('User administration tests', () => {
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.number('0##########');
   const newTelephoneAlt = faker.phone.number('0##########');
-  const newOrganisation = faker.company.name();
+  const newInstitution = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
 
   beforeEach(function () {
@@ -50,7 +50,7 @@ context('User administration tests', () => {
 
     cy.get("[name='telephone_alt']").clear().type(newTelephoneAlt);
 
-    cy.get("[name='otherInstitution']").clear().type(newOrganisation);
+    cy.get("[name='otherInstitution']").clear().type(newInstitution);
 
     cy.get('[data-cy="organizationCountry"] input').click();
     cy.get('[data-cy="organizationCountry-options"]').first().click();
