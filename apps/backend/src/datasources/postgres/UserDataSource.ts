@@ -405,7 +405,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       gender: '',
       nationality: 1,
       birthdate: '2000-01-01',
-      institution: 1,
+      institution_id: 1,
       department: '',
       position: '',
       email: userId.toString(),
