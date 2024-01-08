@@ -240,7 +240,7 @@ context('User administration tests', () => {
         department: 'Maxillofacial surgeon',
         position: 'Management',
         email: 'david@teleworm.us',
-        telephone: '0676 472 14 66',
+        telephone: '(288) 221-4533',
         organizationCountry: 1,
       });
     }
