@@ -56,7 +56,7 @@ const FapSelectionEditComponent = (
   }
 ) => {
   const { currentRole } = useContext(UserContext);
-  const { Faps: allActiveFaps, loadingFaps } = useFapsData({
+  const { faps: allActiveFaps, loadingFaps } = useFapsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
@@ -75,7 +75,9 @@ const FapSelectionEditComponent = (
       loading={loadingFaps}
       id="fapSelection"
       options={fapOptions}
-      renderInput={(params) => <TextField {...params} placeholder="Fap" />}
+      renderInput={(params) => (
+        <TextField {...params} placeholder="Fap" margin="none" />
+      )}
       onChange={(_event, newValue) => {
         props.onChange(newValue?.value ?? null);
       }}
@@ -102,6 +104,7 @@ const AvailabilityTimeEditComponent = (
     fullWidth
     error={props.error}
     helperText={props.helperText}
+    margin="none"
   />
 );
 
@@ -299,7 +302,6 @@ const AssignedInstrumentsTable = ({
                 instrumentUpdatePromise,
                 fapUpdatePromise,
               ]).then((values) => {
-                console.log(values[1].updateFapToCallInstrument.instruments);
                 assignInstrumentsToCall(
                   values[1].updateFapToCallInstrument
                     .instruments as InstrumentWithAvailabilityTime[]

@@ -60,7 +60,7 @@ const FapsTable = () => {
   const history = useHistory();
   const {
     loadingFaps,
-    Faps,
+    faps,
     setFapsWithLoading: setFaps,
   } = useFapsData({
     filter: '',
@@ -100,7 +100,7 @@ const FapsTable = () => {
         id: id as number,
       });
 
-      const newObjectsArray = Faps.filter((objectItem) => objectItem.id !== id);
+      const newObjectsArray = faps.filter((objectItem) => objectItem.id !== id);
       setFaps(newObjectsArray);
 
       return true;
@@ -156,7 +156,7 @@ const FapsTable = () => {
           </Typography>
         }
         columns={columns}
-        data={Faps}
+        data={faps}
         delete={deleteFap}
         isLoading={loadingFaps}
         options={{

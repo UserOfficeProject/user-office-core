@@ -20,7 +20,7 @@ import { useFapsData } from 'hooks/fap/useFapsData';
 const CallReviewAndNotification = () => {
   const theme = useTheme();
   const { currentRole } = useContext(UserContext);
-  const { Faps: allActiveFaps, loadingFaps } = useFapsData({
+  const { faps: allActiveFaps, loadingFaps } = useFapsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
