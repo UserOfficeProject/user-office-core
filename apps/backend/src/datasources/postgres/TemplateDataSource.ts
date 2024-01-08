@@ -720,58 +720,36 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     question: string,
     default_config: string
   ): Promise<Question> {
-    try {
-      const resultSet: QuestionRecord[] = await database
-        .insert(
-          {
-            category_id,
-            question_id,
-            natural_key,
-            data_type,
-            question,
-            default_config,
-          },
-          ['*']
-        )
-        .from('questions')
-        .onConflict('question_id')
-        .merge();
+    const naturalKeyExistAlready = await database
+      .select('natural_key')
+      .from('questions')
+      .where('natural_key', natural_key);
 
-      if (!resultSet || resultSet.length != 1) {
-        throw new GraphQLError('Failure to upsert question');
-      }
-
-      return createQuestionObject(resultSet[0]);
-    } catch (error) {
-      if (
-        (error as { constraint: string }).constraint ===
-        'questions_natural_key_key'
-      ) {
-        const resultSet: QuestionRecord[] = await database
-          .insert(
-            {
-              category_id,
-              question_id,
-              natural_key: natural_key.concat('_copy'),
-              data_type,
-              question,
-              default_config,
-            },
-            ['*']
-          )
-          .from('questions')
-          .onConflict('question_id')
-          .merge();
-
-        if (!resultSet || resultSet.length != 1) {
-          throw new GraphQLError('Failure to upsert question');
-        }
-
-        return createQuestionObject(resultSet[0]);
-      } else {
-        throw new GraphQLError('Failure to upsert question');
-      }
+    if (naturalKeyExistAlready !== undefined) {
+      natural_key = natural_key.concat('_copy');
     }
+
+    const resultSet: QuestionRecord[] = await database
+      .insert(
+        {
+          category_id,
+          question_id,
+          natural_key,
+          data_type,
+          question,
+          default_config,
+        },
+        ['*']
+      )
+      .from('questions')
+      .onConflict('question_id')
+      .merge();
+
+    if (!resultSet || resultSet.length != 1) {
+      throw new GraphQLError('Failure to upsert question');
+    }
+
+    return createQuestionObject(resultSet[0]);
   }
 
   async getQuestion(questionId: string): Promise<Question | null> {
