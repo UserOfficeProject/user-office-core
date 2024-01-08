@@ -432,7 +432,7 @@
       "response": []
     },
     {
-      "name": "createSep [Mutations]",
+      "name": "createFap [Mutations]",
       "event": [
         {
           "listen": "test",
@@ -441,9 +441,9 @@
             "exec": [
               "pm.test(\"Can create proposal template\", function () {",
               "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData.data.createSEP.rejection).to.be.eql(null)",
-              "    pm.expect(jsonData.data.createSEP.sep.id).to.be.above(0)",
-              "    pm.environment.set(\"NEW_SEP_ID\", jsonData.data.createSEP.sep.id);",
+              "    pm.expect(jsonData.data.createFap.rejection).to.be.eql(null)",
+              "    pm.expect(jsonData.data.createFap.fap.id).to.be.above(0)",
+              "    pm.environment.set(\"NEW_FAP_ID\", jsonData.data.createFap.fap.id);",
               "});",
               ""
             ],
@@ -486,7 +486,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation($code: String!, $active: Boolean!, $description: String!) {\n  createSEP(code:$code, active:$active, description:$description) {\n    sep {\n      id\n    }\n    rejection { reason }\n  }\n}",
+            "query": "mutation($code: String!, $active: Boolean!, $description: String!) {\n  createFap(code:$code, active:$active, description:$description) {\n    fap {\n      id\n    }\n    rejection { reason }\n  }\n}",
             "variables": "{\n        \"code\": \"{{$randomWord}}\",\n        \"active\": true,\n        \"description\": \"{{$randomWord}}\"\n    }"
           },
           "options": {
@@ -2950,8 +2950,8 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation($newUserId:Int!, $newProposalPk:Int!, $newSepId:Int!) {\n  addUserForReview(userID: $newUserId, sepID: $newSepId, proposalPk: $newProposalPk) {\n    review {\n      id\n\t}\n    rejection { reason }\n  }\n}\n",
-            "variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalPk\":{{NEW_PROPOSAL_PK}},\n\t\"newSepId\":{{NEW_SEP_ID}}\n}"
+            "query": "mutation($newUserId:Int!, $newProposalPk:Int!, $newFapId:Int!) {\n  addUserForReview(userID: $newUserId, fapID: $newFapId, proposalPk: $newProposalPk) {\n    review {\n      id\n\t}\n    rejection { reason }\n  }\n}\n",
+            "variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalPk\":{{NEW_PROPOSAL_PK}},\n\t\"newFapId\":{{NEW_FAP_ID}}\n}"
           },
           "options": {
             "graphql": {}
@@ -3040,8 +3040,8 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation($reviewID: Int!, $sepID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9, status:DRAFT, sepID: $sepID) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    rejection { reason }\n  }\n}\n",
-            "variables": "{\n\t\"reviewID\":{{NEW_REVIEW_ID}},\n\t\"sepID\": {{NEW_SEP_ID}}\n}"
+            "query": "mutation($reviewID: Int!, $fapID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9, status:DRAFT, fapID: $fapID) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    rejection { reason }\n  }\n}\n",
+            "variables": "{\n\t\"reviewID\":{{NEW_REVIEW_ID}},\n\t\"fapID\": {{NEW_FAP_ID}}\n}"
           },
           "options": {
             "graphql": {}
@@ -3196,8 +3196,8 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation($newReviewID:Int!, $sepId:Int!) {\n  removeUserForReview(reviewId: $newReviewID, sepId: $sepId) {\n      review {\n          id\n      }\n      rejection { reason }\n  }\n}\n",
-            "variables": "{\n\t\"newReviewID\":{{NEW_REVIEW_ID}},\n\t\"sepId\":{{NEW_SEP_ID}}\n}"
+            "query": "mutation($newReviewID:Int!, $fapId:Int!) {\n  removeUserForReview(reviewId: $newReviewID, fapId: $fapId) {\n      review {\n          id\n      }\n      rejection { reason }\n  }\n}\n",
+            "variables": "{\n\t\"newReviewID\":{{NEW_REVIEW_ID}},\n\t\"fapId\":{{NEW_FAP_ID}}\n}"
           }
         },
         "url": "http://localhost:4000/graphql"

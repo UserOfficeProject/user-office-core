@@ -1,0 +1,15 @@
+mutation updateFapToCallInstrument(
+  $instrumentId: Int!
+  $fapId: Int
+  $callId: Int!
+) {
+  updateFapToCallInstrument(
+    updateFapToCallInstrumentInput: {
+      instrumentId: $instrumentId
+      fapId: $fapId
+      callId: $callId
+    }
+  ) {
+    ...call
+  }
+}

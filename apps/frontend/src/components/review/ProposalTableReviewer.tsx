@@ -425,12 +425,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         <ProposalReviewContent
           reviewId={urlQueryParams.reviewModal}
           tabNames={reviewerProposalReviewTabs}
-          sepId={
+          fapId={
             userData?.reviews.find((review) => {
               return (
                 review.proposal?.proposalId === proposalToReview?.proposalId
               );
-            })?.sepID
+            })?.fapID
           }
         />
       </ProposalReviewModal>

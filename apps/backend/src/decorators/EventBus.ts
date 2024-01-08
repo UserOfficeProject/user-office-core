@@ -22,10 +22,10 @@ const EventBusDecorator = (eventType: Event) => {
 
       const result = await originalMethod?.apply(this, args);
 
-      // NOTE: Get the name of the object or class like: 'SEP', 'USER', 'Proposal' and lowercase it.
+      // NOTE: Get the name of the object or class like: 'Fap', 'USER', 'Proposal' and lowercase it.
       const resultKey = (result.constructor.name as string).toLowerCase();
 
-      // NOTE: This needs to be checked because there are mutations where we don't have loggedIn user. Example: ResetPasswordEmailMutation.
+      // NOTE: This needs to be checked because there are mutations where we don't have loggedIn user
       if (!loggedInUser) {
         loggedInUser = result.user;
       }

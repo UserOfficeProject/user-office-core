@@ -1,13 +1,17 @@
 import { faker } from '@faker-js/faker';
 import {
+  Event,
   FeatureId,
+  SettingsId,
   TechnicalReviewStatus,
   TemplateGroupId,
+  UserRole,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 context('Settings tests', () => {
@@ -22,7 +26,7 @@ context('Settings tests', () => {
     const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
     it('User should not be able to see Settings page', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -148,13 +152,13 @@ context('Settings tests', () => {
         if (connection) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: connection.id,
-            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+        proposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 2,
         prevProposalStatusId:
@@ -163,35 +167,35 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_FEASIBLE'],
+            statusChangingEvents: [Event.PROPOSAL_FEASIBLE],
           });
         }
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: initialDBData.proposalStatuses.sepReview.id,
+        proposalStatusId: initialDBData.proposalStatuses.fapReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 3,
-        prevProposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+        prevProposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_SEP_SELECTED'],
+            statusChangingEvents: [Event.PROPOSAL_FAP_SELECTED],
           });
         }
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: initialDBData.proposalStatuses.sepMeeting.id,
+        proposalStatusId: initialDBData.proposalStatuses.fapMeeting.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 4,
-        prevProposalStatusId: initialDBData.proposalStatuses.sepReview.id,
+        prevProposalStatusId: initialDBData.proposalStatuses.fapReview.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED'],
+            statusChangingEvents: [Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED],
           });
         }
       });
@@ -210,13 +214,13 @@ context('Settings tests', () => {
           if (connection) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: connection.id,
-              statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+              statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
             });
           }
         });
         cy.addProposalWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_1',
-          proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+          proposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 0,
           prevProposalStatusId:
@@ -226,7 +230,7 @@ context('Settings tests', () => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-              statusChangingEvents: ['PROPOSAL_FEASIBLE'],
+              statusChangingEvents: [Event.PROPOSAL_FEASIBLE],
             });
           }
         });
@@ -242,7 +246,7 @@ context('Settings tests', () => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-              statusChangingEvents: ['PROPOSAL_UNFEASIBLE'],
+              statusChangingEvents: [Event.PROPOSAL_UNFEASIBLE],
             });
           }
         });
@@ -275,12 +279,13 @@ context('Settings tests', () => {
                 ...updatedCall,
                 proposalWorkflowId: workflow.id,
                 esiTemplateId: createdEsiTemplateId,
-                seps: [initialDBData.sep.id],
+                faps: [initialDBData.fap.id],
               });
             }
           });
         }
       });
+      cy.getAndStoreAppSettings();
     });
 
     it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED status', () => {
@@ -311,7 +316,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -397,7 +402,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -486,12 +491,12 @@ context('Settings tests', () => {
             proposalPk: result.createProposal.primaryKey,
             title: proposalTitle,
             abstract: proposalTitle,
-            proposerId: initialDBData.users.user2.id,
+            proposerId: initialDBData.users.placeholderUser.id,
           });
         }
       });
 
-      cy.login('user2');
+      cy.login('placeholderUser', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(proposalTitle)
@@ -681,7 +686,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.finishedLoading();
@@ -756,10 +761,10 @@ context('Settings tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.contains('SEP_SELECTION');
+      cy.contains('FAP_SELECTION');
     });
 
-    it('Proposal status should update immediately after assigning it to a SEP', () => {
+    it('Proposal status should update immediately after assigning it to a Fap', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
@@ -788,27 +793,27 @@ context('Settings tests', () => {
 
       cy.get('[type="checkbox"]').first().check();
 
-      cy.get("[aria-label='Assign proposals to SEP']").first().click();
+      cy.get("[aria-label='Assign proposals to Fap']").first().click();
 
-      cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
+      cy.get('#selectedFapId-input').should('not.have.class', 'Mui-disabled');
 
-      cy.get('#selectedSEPId-input').first().click();
+      cy.get('#selectedFapId-input').first().click();
 
-      cy.get('[data-cy="sep-selection-options"] li').first().click();
+      cy.get('[data-cy="fap-selection-options"] li').first().click();
 
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s assigned to the selected SEP successfully',
+        text: 'Proposal/s assigned to the selected Fap successfully',
       });
 
-      cy.should('not.contain', 'SEP_SELECTION');
-      cy.contains('SEP_REVIEW');
+      cy.should('not.contain', 'FAP_SELECTION');
+      cy.contains('FAP_REVIEW');
     });
 
-    it('Proposal status should update immediately after all SEP reviews submitted', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+    it('Proposal status should update immediately after all Fap reviews submitted', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
@@ -831,12 +836,28 @@ context('Settings tests', () => {
             reviewerId: 0,
           });
 
-          cy.assignProposalsToSep({
+          cy.assignProposalsToFap({
             proposals: {
               callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            sepId: initialDBData.sep.id,
+            fapId: initialDBData.fap.id,
+          });
+          cy.assignChairOrSecretary({
+            assignChairOrSecretaryToFapInput: {
+              fapId: 1,
+              userId: initialDBData.users.reviewer.id,
+              roleId: UserRole.FAP_CHAIR,
+            },
+          });
+          cy.assignReviewersToFap({
+            fapId: 1,
+            memberIds: [initialDBData.users.reviewer.id],
+          });
+          cy.assignFapReviewersToProposal({
+            fapId: 1,
+            memberIds: [initialDBData.users.reviewer.id],
+            proposalPk: proposal.primaryKey,
           });
         }
       });
@@ -845,45 +866,13 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('SEPs').click();
+      cy.contains('FAPs').click();
 
       cy.get("[aria-label='Edit']").first().click();
-
-      cy.contains('Members').click();
-
-      cy.get('[aria-label="Set SEP Chair"]').click();
-
-      cy.finishedLoading();
-
-      cy.get('[aria-label="Select user"]').first().click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP chair assigned successfully!',
-      });
 
       cy.contains('Proposals and Assignments').click();
 
       cy.finishedLoading();
-
-      cy.get('[data-cy="assign-sep-member"]').first().click();
-
-      cy.finishedLoading();
-
-      cy.get('[role="dialog"]')
-        .contains('Nilsson')
-        .parent()
-        .find('input[type="checkbox"]')
-        .click();
-      cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Members assigned',
-      });
 
       cy.get('[role="dialog"]').should('not.exist');
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
@@ -894,9 +883,15 @@ context('Settings tests', () => {
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
-      cy.get('[data-cy="grade-proposal"]').click();
+      if (
+        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
+      ) {
+        cy.get('[data-cy="grade-proposal"]').click();
 
-      cy.get('[role="listbox"] > [role="option"]').first().click();
+        cy.get('[role="listbox"] > [role="option"]').first().click();
+      } else {
+        cy.get('[data-cy="grade-proposal"]').click().type('1');
+      }
 
       cy.get('[data-cy="is-grade-submitted"]').click();
       cy.get('[type="submit"]').contains('Save').click();
@@ -906,7 +901,7 @@ context('Settings tests', () => {
       cy.closeModal();
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.contains('SEP Meeting');
+      cy.contains('FAP Meeting');
     });
 
     it('User Officer should be able to filter proposals based on statuses', () => {
@@ -931,12 +926,12 @@ context('Settings tests', () => {
             reviewerId: 0,
           });
 
-          cy.assignProposalsToSep({
+          cy.assignProposalsToFap({
             proposals: {
               callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            sepId: initialDBData.sep.id,
+            fapId: initialDBData.fap.id,
           });
         }
       });
@@ -951,7 +946,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="5"]').click();
@@ -960,7 +955,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
@@ -1032,7 +1027,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="droppable-group"]').should('have.length', 3);
 
-      cy.get('[data-cy^="status_SEP_SELECTION"]').dragElement([
+      cy.get('[data-cy^="status_FAP_SELECTION"]').dragElement([
         { direction: 'left', length: 2 },
       ]);
 
@@ -1095,7 +1090,7 @@ context('Settings tests', () => {
         }
       });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(firstProposalTitle).parent().contains('submitted');
@@ -1169,7 +1164,7 @@ context('Settings tests', () => {
 
       cy.closeModal();
 
-      cy.contains(firstProposalTitle).parent().contains('SEP_SELECTION');
+      cy.contains(firstProposalTitle).parent().contains('FAP_SELECTION');
       cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
     });
   });
