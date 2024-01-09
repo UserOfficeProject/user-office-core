@@ -725,7 +725,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .from('questions')
       .where('natural_key', natural_key);
 
-    if (naturalKeyExistAlready !== undefined) {
+    if (naturalKeyExistAlready.length != 0) {
       natural_key = natural_key.concat('_copy');
     }
 
