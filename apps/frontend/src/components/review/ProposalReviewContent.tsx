@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import React, { Fragment, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -95,7 +94,7 @@ const ProposalReviewContent = ({
     />
   );
 
-  const TechnicalReviewTab = proposalData.technicalReviews?.map(
+  const technicalReviewsContent = proposalData.technicalReviews?.map(
     (technicalReview) => {
       const technicalReviewInstrument = proposalData.instruments?.find(
         (instrument) => instrument?.id === technicalReview.instrumentId
@@ -105,10 +104,7 @@ const ProposalReviewContent = ({
         (isInstrumentScientist &&
           technicalReview?.technicalReviewAssigneeId === user.id) ||
         isInternalReviewer ? (
-        <>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Review for instrument: {technicalReview.instrumentId}
-          </Typography>
+        <Fragment key={technicalReview.id}>
           {!!technicalReview && (
             <InternalReviews
               technicalReviewId={technicalReview.id}
@@ -140,21 +136,42 @@ const ProposalReviewContent = ({
             setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
               setProposalData({
                 ...proposalData,
-                technicalReviews: [
-                  {
-                    ...technicalReview,
-                    ...data,
-                  },
-                ],
+                technicalReviews:
+                  proposalData.technicalReviews?.map((technicalReview) => {
+                    if (technicalReview.id === data?.id) {
+                      return { ...technicalReview, ...data };
+                    } else {
+                      return {
+                        ...technicalReview,
+                      };
+                    }
+                  }) || null,
               })
             }
           />
-        </>
+        </Fragment>
       ) : (
         <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
       );
     }
   );
+
+  const TechnicalReviewTab =
+    proposalData.technicalReviews?.length &&
+    proposalData.technicalReviews.length > 1 ? (
+      <SimpleTabs
+        tabNames={
+          proposalData.technicalReviews?.map(
+            (technicalReview) =>
+              `Review for instrument ${technicalReview.instrumentId}`
+          ) || []
+        }
+      >
+        {technicalReviewsContent as JSX.Element[]}
+      </SimpleTabs>
+    ) : (
+      technicalReviewsContent
+    );
 
   const GradeTab = (
     <ProposalGrade

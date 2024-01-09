@@ -101,7 +101,6 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
       standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
     fapId: proposal.fap?.id,
     fapCode: proposal.fap?.code,
-    fapId: proposal.fap?.id,
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,

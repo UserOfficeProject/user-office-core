@@ -3,18 +3,7 @@ $$
 BEGIN
 	IF register_patch('MultiInstrumentPerProposal.sql', 'martintrajanovski', 'Mutliple instrument per proposal', '2023-12-18') THEN
 	BEGIN
-
-      -- ALTER TABLE technical_review 
-			-- ADD COLUMN instrument_id INT REFERENCES instruments (instrument_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-			-- ALTER TABLE technical_review DROP CONSTRAINT technical_review_proposal_id_key;
-
-			-- drop view to allow recreating it
-    -- DROP VIEW proposal_table_view;
-
-    -- re-create view with PI ID
-		--   CREATE VIEW proposal_table_view
-		--   AS
+		-- newest view query with order by
 		-- 	SELECT  p.proposal_pk AS proposal_pk,
 		--           p.title,
 		--           p.proposer_id AS principal_investigator,
@@ -56,13 +45,13 @@ BEGIN
 		--   LEFT JOIN "fap_meeting_decisions" smd ON smd.proposal_pk = p.proposal_pk
 		-- LEFT JOIN (
 		-- 	SELECT proposal_pk,
-		-- 		array_agg(t.time_allocation) AS technical_time_allocations,
-		-- 		array_agg(t.technical_review_id) AS technical_review_ids,
-		-- 		array_agg(t.technical_review_assignee_id) AS technical_review_assignee_ids,
-		-- 		array_agg(t.status) AS technical_review_statuses,
-		-- 		array_agg(t.submitted) AS technical_reviews_submitted,
-		-- 		array_agg(u.firstname || ' ' || u.lastname) AS technical_review_assignee_names
-		-- 	FROM technical_review t 
+		-- 		array_agg(t.time_allocation ORDER BY t.technical_review_id ASC) AS technical_time_allocations,
+		-- 		array_agg(t.technical_review_id ORDER BY t.technical_review_id ASC) AS technical_review_ids,
+		-- 		array_agg(t.technical_review_assignee_id ORDER BY t.technical_review_id ASC) AS technical_review_assignee_ids,
+		-- 		array_agg(t.status ORDER BY t.technical_review_id ASC) AS technical_review_statuses,
+		-- 		array_agg(t.submitted ORDER BY t.technical_review_id ASC) AS technical_reviews_submitted,
+		-- 		array_agg(u.firstname || ' ' || u.lastname ORDER BY t.technical_review_id ASC) AS technical_review_assignee_names
+		-- 	FROM technical_review t
 		-- 	LEFT JOIN users u ON u.user_id = t.technical_review_assignee_id
 		-- 	GROUP BY t.proposal_pk
 		-- ) t ON t.proposal_pk = p.proposal_pk
