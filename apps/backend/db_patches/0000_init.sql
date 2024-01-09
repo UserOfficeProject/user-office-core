@@ -434,7 +434,7 @@ INSERT INTO users (
                       'Beckley', 
                       'testuser2', 
                       '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
-                      'Ben',
+                      'Benjamin',
                       '123123123',
                       '581459604',
                       'male',
