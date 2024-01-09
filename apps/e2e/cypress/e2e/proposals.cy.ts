@@ -246,7 +246,7 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it('User should be able to have a preferred name', function () {
+    it('User should be able to have and a preferred name', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserDetails({
           id: 4,
