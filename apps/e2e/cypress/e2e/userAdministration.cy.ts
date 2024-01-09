@@ -172,7 +172,7 @@ context('User administration tests', () => {
     cy.notification({ variant: 'success', text: 'User removed successfully' });
   });
 
-  it('User should be able to have a preferred name', () => {
+  it('User should be able to have a preferred name', function () {
     if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
       cy.updateUserDetails({
         id: 4,
@@ -225,7 +225,7 @@ context('User administration tests', () => {
     cy.contains('Ben ');
   });
 
-  it('User should be able to not have a preferred name', () => {
+  it('User should be able to not have a preferred name', function () {
     if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
       cy.updateUserDetails({
         id: 6,
