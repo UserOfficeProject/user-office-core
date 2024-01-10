@@ -5,7 +5,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -19,6 +19,7 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import { UserContext } from 'context/UserContextProvider';
 import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import {
@@ -149,6 +150,7 @@ const FapProposalsAndAssignmentsTable = ({
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
+  const { currentRole } = useContext(UserContext);
 
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -175,14 +177,16 @@ const FapProposalsAndAssignmentsTable = ({
           <Visibility />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Assign Fap Member">
-        <IconButton
-          data-cy="assign-fap-member"
-          onClick={() => setProposalPk(rowData.proposalPk)}
-        >
-          <AssignmentInd />
-        </IconButton>
-      </Tooltip>
+      {currentRole !== UserRole.FAP_REVIEWER && (
+        <Tooltip title="Assign Fap Member">
+          <IconButton
+            data-cy="assign-fap-member"
+            onClick={() => setProposalPk(rowData.proposalPk)}
+          >
+            <AssignmentInd />
+          </IconButton>
+        </Tooltip>
+      )}
     </>
   );
 
