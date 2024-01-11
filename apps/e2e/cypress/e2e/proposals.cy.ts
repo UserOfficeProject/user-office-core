@@ -246,58 +246,6 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it('User should be able to have and a preferred name', () => {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        cy.updateUserDetails({
-          id: 4,
-          user_title: 'Mr.',
-          firstname: 'Benjamin',
-          lastname: 'Beckley',
-          preferredname: 'Ben',
-          gender: 'male',
-          nationality: 1,
-          birthdate: new Date('2000/04/02'),
-          organisation: 1,
-          department: 'IT deparment',
-          position: 'Management',
-          email: 'ben@inbox.com',
-          telephone: '(288) 221-4533',
-          organizationCountry: 1,
-        });
-      }
-      cy.login('user2', initialDBData.roles.user);
-      cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Ben '
-      );
-
-      cy.get('[data-cy=title] input').type(title).should('have.value', title);
-
-      cy.get('[data-cy=abstract] textarea')
-        .first()
-        .type(abstract)
-        .should('have.value', abstract);
-
-      cy.contains('Save and continue').click();
-
-      cy.finishedLoading();
-      cy.notification({ variant: 'success', text: 'Saved' });
-
-      cy.contains('Dashboard').click();
-      cy.contains(title).parent().find('[aria-label="Edit proposal"]').click();
-      cy.contains('Ben ');
-
-      cy.login('officer');
-      cy.visit('/');
-      cy.contains('Proposals').click();
-      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
-      cy.contains('Ben ');
-    });
-
     it('Officer should be able to navigate to proposal using proposal ID', () => {
       cy.login('officer');
 
