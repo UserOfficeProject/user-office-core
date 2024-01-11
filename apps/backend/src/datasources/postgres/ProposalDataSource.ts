@@ -94,10 +94,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async updateProposalTechnicalReviewer({
     userId,
     proposalPks,
+    instrumentId,
   }: UpdateTechnicalReviewAssigneeInput): Promise<TechnicalReview[]> {
     const response = await database('technical_review')
       .update('technical_review_assignee_id', userId)
       .whereIn('proposal_pk', proposalPks)
+      .andWhere('instrument_id', instrumentId)
       .returning('*')
       .then((technicalReviews: TechnicalReviewRecord[]) => {
         return technicalReviews.map((technicalReview) =>

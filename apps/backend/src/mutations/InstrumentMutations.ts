@@ -183,6 +183,7 @@ export default class InstrumentMutations {
           await this.proposalDataSource.updateProposalTechnicalReviewer({
             userId: instrument.managerUserId,
             proposalPks: [proposalPk],
+            instrumentId: instrument.id,
           });
         } else {
           await this.reviewDataSource.setTechnicalReview(
@@ -202,6 +203,7 @@ export default class InstrumentMutations {
           await this.proposalDataSource.updateProposalTechnicalReviewer({
             userId: instrument.managerUserId,
             proposalPks: [proposalPk],
+            instrumentId: instrument.id,
           });
         }
       }

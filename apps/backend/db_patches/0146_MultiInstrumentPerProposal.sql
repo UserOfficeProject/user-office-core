@@ -3,7 +3,20 @@ $$
 BEGIN
 	IF register_patch('MultiInstrumentPerProposal.sql', 'martintrajanovski', 'Mutliple instrument per proposal', '2023-12-18') THEN
 	BEGIN
-		-- newest view query with order by
+
+      -- ALTER TABLE technical_review 
+			-- ADD COLUMN instrument_id INT REFERENCES instruments (instrument_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			-- UPDATE technical_review
+			-- SET instrument_id = (SELECT instrument_id FROM instrument_has_proposals WHERE technical_review.proposal_pk = instrument_has_proposals.proposal_pk);
+
+			-- ALTER TABLE technical_review DROP CONSTRAINT technical_review_proposal_id_key;
+
+			-- drop view to allow recreating it
+    -- DROP VIEW proposal_table_view;
+
+    -- re-create newest view query with order by
+		--   CREATE VIEW proposal_table_view
+		--   AS
 		-- 	SELECT  p.proposal_pk AS proposal_pk,
 		--           p.title,
 		--           p.proposer_id AS principal_investigator,
@@ -63,6 +76,18 @@ BEGIN
 		-- 	JOIN instruments i ON i.instrument_id = ihp.instrument_id
 		-- 	GROUP BY ihp.proposal_pk
 		-- ) ihp ON ihp.proposal_pk = p.proposal_pk;
+
+		-- Add new events in the proposal events table.
+		-- ALTER TABLE proposal_events ADD COLUMN proposal_all_feasibility_reviews_submitted BOOLEAN DEFAULT FALSE;
+		-- ALTER TABLE proposal_events ADD COLUMN proposal_all_feasibility_reviews_feasible BOOLEAN DEFAULT FALSE;
+		-- ALTER TABLE proposal_events RENAME COLUMN proposal_feasible TO proposal_feasibility_review_feasible;
+		-- ALTER TABLE proposal_events RENAME COLUMN proposal_unfeasible TO proposal_feasibility_review_unfeasible;
+		-- UPDATE status_changing_events
+		-- SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE'
+		-- WHERE status_changing_event = 'PROPOSAL_FEASIBLE';
+		-- UPDATE status_changing_events
+		-- SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE'
+		-- WHERE status_changing_event = 'PROPOSAL_UNFEASIBLE';
 
     END;
 	END IF;

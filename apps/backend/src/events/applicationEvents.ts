@@ -32,12 +32,12 @@ interface ProposalSubmittedEvent extends GeneralEvent {
 }
 
 interface ProposalFeasibleEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FEASIBLE;
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE;
   proposal: Proposal;
 }
 
 interface ProposalUnfeasibleEvent extends GeneralEvent {
-  type: Event.PROPOSAL_UNFEASIBLE;
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE;
   proposal: Proposal;
 }
 
@@ -100,6 +100,16 @@ interface ProposalFeasibilityReviewUpdatedEvent extends GeneralEvent {
 interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
   technicalreview: TechnicalReview;
+}
+
+interface ProposalALLFeasibilityReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalALLFeasibilityReviewFeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE;
+  proposal: Proposal;
 }
 
 interface ProposalFapReviewSubmittedEvent extends GeneralEvent {
@@ -322,6 +332,8 @@ export type ApplicationEvent =
   | CallFapReviewEndedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
+  | ProposalALLFeasibilityReviewSubmittedEvent
+  | ProposalALLFeasibilityReviewFeasibleEvent
   | ProposalFapReviewUpdatedEvent
   | ProposalFapReviewSubmittedEvent
   | ProposalAllFapReviewsSubmittedEvent

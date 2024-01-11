@@ -565,8 +565,8 @@ export interface ProposalEventsRecord {
   readonly proposal_pk: number;
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
-  readonly proposal_feasible: boolean;
-  readonly proposal_unfeasible: boolean;
+  readonly proposal_feasibility_review_feasible: boolean;
+  readonly proposal_feasibility_review_unfeasible: boolean;
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
