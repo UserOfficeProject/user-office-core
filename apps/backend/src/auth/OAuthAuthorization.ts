@@ -41,7 +41,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     try {
       const { userProfile, tokenSet } = await OpenIdClient.login(
         code,
-        'http://localhost:3000/external-auth'
+        redirectUri
       );
       const user = await this.upsertUser(userProfile, tokenSet);
 
