@@ -133,6 +133,7 @@ export default class InstrumentMutations {
     return this.assignProposalsToInstrumentInternal(agent, args);
   }
 
+  // TODO: Check validation here
   @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
   // @ValidateArgs(assignProposalsToInstrumentValidationSchema)
   async assignProposalsToInstrumentInternal(

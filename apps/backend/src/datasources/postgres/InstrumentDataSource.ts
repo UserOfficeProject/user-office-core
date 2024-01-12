@@ -93,6 +93,16 @@ export default class PostgresInstrumentDataSource
       );
   }
 
+  async getInstrumentsByIds(instrumentIds: number[]): Promise<Instrument[]> {
+    return database
+      .select()
+      .from('instruments')
+      .whereIn('instrument_id', instrumentIds)
+      .then((results: InstrumentRecord[]) =>
+        results.map(this.createInstrumentObject)
+      );
+  }
+
   async getInstruments(
     first?: number,
     offset?: number

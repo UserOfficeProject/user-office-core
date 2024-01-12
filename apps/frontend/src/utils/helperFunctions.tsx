@@ -218,3 +218,11 @@ export const denseTableColumns = <T extends object>(columns: Column<T>[]) =>
   columns.map((column) => {
     return denseTableColumn(column);
   });
+
+export const toArray = (input: string | string[]): string[] => {
+  if (typeof input === 'string' || typeof input === 'number') {
+    return [input];
+  }
+
+  return input;
+};

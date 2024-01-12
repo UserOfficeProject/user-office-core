@@ -34,10 +34,11 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       config.tooltip = '';
       config.variant = 'dropdown';
       config.instruments = [];
+      config.isMultipleSelect = false;
 
       return config;
     },
-    getDefaultAnswer: () => null,
+    getDefaultAnswer: () => [],
     filterQuery: (queryBuilder, filter) => {
       const value = JSON.parse(filter.value).value;
       switch (filter.compareOperator) {
@@ -92,7 +93,6 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         throw new GraphQLError('Proposal not found');
       }
 
-      // TODO: Check the value here. Should be array of instrumentIds
       const { value } = JSON.parse(answer.value);
       const instrumentIds = value;
 
@@ -104,9 +104,10 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         ],
       });
 
+      // TODO: Check this when starting with FAP part for multi instrument. For now only the first instrument FAP is assigned just to be backwards compatible.
       // Assign the Proposals to Fap using Call Instrument
       await fapMutation.assignProposalsToFapUsingCallInstrumentInternal(null, {
-        instrumentId: instrumentIds,
+        instrumentId: instrumentIds[0],
         proposalPks: [proposal.primaryKey],
       });
     },

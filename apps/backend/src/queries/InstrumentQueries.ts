@@ -32,6 +32,14 @@ export default class InstrumentQueries {
     return instrument;
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async getInstrumentsByIds(
+    agent: UserWithRole | null,
+    instrumentIds: number[]
+  ) {
+    return await this.dataSource.getInstrumentsByIds(instrumentIds);
+  }
+
   @Authorized([
     Roles.USER_OFFICER,
     Roles.FAP_REVIEWER,

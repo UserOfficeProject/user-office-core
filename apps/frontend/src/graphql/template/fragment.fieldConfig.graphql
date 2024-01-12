@@ -22,7 +22,6 @@ fragment fieldConfig on FieldConfig {
     file_type
     max_files
     pdf_page_limit
-
     small_label
     required
     tooltip
@@ -32,7 +31,6 @@ fragment fieldConfig on FieldConfig {
     units {
       ...unit
     }
-
     small_label
     required
     tooltip
@@ -43,7 +41,6 @@ fragment fieldConfig on FieldConfig {
       ...unit
     }
     numberValueConstraint
-
     small_label
     required
     tooltip
@@ -94,7 +91,6 @@ fragment fieldConfig on FieldConfig {
     variant
     options
     isMultipleSelect
-
     small_label
     required
     tooltip
@@ -104,7 +100,6 @@ fragment fieldConfig on FieldConfig {
     max
     multiline
     placeholder
-
     small_label
     required
     tooltip
@@ -162,6 +157,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    isMultipleSelect
     instruments {
       id
       name

@@ -160,6 +160,9 @@ export class InstrumentPickerConfig extends ConfigBase {
 
   @Field(() => [InstrumentOption])
   instruments: InstrumentOption[];
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
 }
 
 @ObjectType()
