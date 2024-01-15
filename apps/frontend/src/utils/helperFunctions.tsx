@@ -219,10 +219,10 @@ export const denseTableColumns = <T extends object>(columns: Column<T>[]) =>
     return denseTableColumn(column);
   });
 
-export const toArray = (input: string | string[]): string[] => {
-  if (typeof input === 'string' || typeof input === 'number') {
-    return [input];
+export function toArray<T>(input: T | T[]): T[] {
+  if (Array.isArray(input)) {
+    return input;
   }
 
-  return input;
-};
+  return [input];
+}

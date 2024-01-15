@@ -32,7 +32,7 @@ export default class InstrumentQueries {
     return instrument;
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async getInstrumentsByIds(
     agent: UserWithRole | null,
     instrumentIds: number[]

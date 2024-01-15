@@ -40,7 +40,7 @@ export function QuestionaryComponentInstrumentPicker(
     question: { id, question, naturalKey },
     value,
   } = answer;
-  const [stateValue, setStateValue] = useState<Array<string>>(value);
+  const [stateValue, setStateValue] = useState<Array<string> | string>(value);
   const config = answer.config as InstrumentPickerConfig;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
@@ -62,7 +62,7 @@ export function QuestionaryComponentInstrumentPicker(
   );
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
-    const newValue = event.target.value ? toArray(event.target.value) : null;
+    const newValue = event.target.value || null;
 
     onComplete(newValue);
   };
@@ -82,11 +82,7 @@ export function QuestionaryComponentInstrumentPicker(
           <Select
             id={id}
             value={
-              config.isMultipleSelect
-                ? stateValue
-                : stateValue?.length > 0
-                ? stateValue[0]
-                : '0'
+              config.isMultipleSelect ? toArray(stateValue) : stateValue || '0'
             }
             onChange={handleOnChange}
             multiple={config.isMultipleSelect}

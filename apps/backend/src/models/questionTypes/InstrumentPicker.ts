@@ -94,7 +94,15 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       }
 
       const { value } = JSON.parse(answer.value);
-      const instrumentIds = value;
+      const instrumentIds = value
+        ? Array.isArray(value)
+          ? value
+          : [value]
+        : null;
+
+      if (!instrumentIds?.length) {
+        return;
+      }
 
       // Assign the Proposals to Instrument
       await instrumentMutations.assignProposalsToInstrumentInternal(null, {

@@ -20,7 +20,7 @@ export function useInstrumentsByIdsData(instrumentIds: number[] | null): {
   useEffect(() => {
     let unmounted = false;
 
-    if (!instrumentIds) {
+    if (!instrumentIds?.length) {
       return;
     }
 
