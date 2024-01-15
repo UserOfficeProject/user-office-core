@@ -53,7 +53,7 @@ export default class ReviewQueries {
   }
 
   @Authorized()
-  async technicalReviewForProposal(
+  async technicalReviewsForProposal(
     agent: UserWithRole | null,
     proposalPk: number
   ): Promise<TechnicalReview[] | null> {
@@ -65,6 +65,7 @@ export default class ReviewQueries {
       return null;
     }
 
+    // TODO: Review this
     // const hasReadRights = await this.technicalReviewAuth.hasReadRights(
     //   agent,
     //   technicalreview

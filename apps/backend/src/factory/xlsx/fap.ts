@@ -143,7 +143,7 @@ export const collectFaplXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.review.technicalReviewForProposal(
+            ? baseContext.queries.review.technicalReviewsForProposal(
                 user,
                 proposal.primaryKey
               )

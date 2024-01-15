@@ -76,23 +76,23 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .from('technical_review')
       .where('proposal_pk', id)
       .then((reviews: TechnicalReviewRecord[]) => {
-        // if (reviews === undefined) {
-        //   return null;
-        // }
-
         return reviews.map((review) => createTechnicalReviewObject(review));
       });
   }
 
   async getProposalInstrumentTechnicalReview(
     proposalId: number,
-    instrumentId: number
+    instrumentId?: number
   ): Promise<TechnicalReview | null> {
     return database
       .select()
       .from('technical_review')
       .where('proposal_pk', proposalId)
-      .andWhere('instrument_id', instrumentId)
+      .modify((query) => {
+        if (instrumentId) {
+          query.andWhere('instrument_id', instrumentId);
+        }
+      })
       .first()
       .then((review: TechnicalReviewRecord) => {
         if (review === undefined) {

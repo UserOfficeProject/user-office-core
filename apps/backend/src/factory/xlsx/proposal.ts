@@ -60,7 +60,7 @@ export const collectProposalXLSXData = async (
   }
 
   const technicalReviews =
-    await baseContext.queries.review.technicalReviewForProposal(
+    await baseContext.queries.review.technicalReviewsForProposal(
       user,
       proposal.primaryKey
     );

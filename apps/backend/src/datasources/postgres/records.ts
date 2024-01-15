@@ -300,7 +300,7 @@ export interface TechnicalReviewRecord {
   readonly reviewer_id: number;
   readonly files: string;
   readonly technical_review_assignee_id: number | null;
-  readonly instrument_id: number | null;
+  readonly instrument_id: number;
 }
 
 export interface InternalReviewRecord {

@@ -334,8 +334,9 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
+  // TODO: Review this and get all technical reviews to the pdf
   const technicalReview = (
-    await baseContext.queries.review.technicalReviewForProposal(
+    await baseContext.queries.review.technicalReviewsForProposal(
       user,
       proposal.primaryKey
     )

@@ -156,8 +156,7 @@ const ProposalReviewContent = ({
     }
   );
 
-  const TechnicalReviewTab =
-    proposalData.technicalReviews?.length &&
+  const TechnicalReviewTab = proposalData.technicalReviews?.length ? (
     proposalData.technicalReviews.length > 1 ? (
       <SimpleTabs
         tabNames={
@@ -171,7 +170,10 @@ const ProposalReviewContent = ({
       </SimpleTabs>
     ) : (
       technicalReviewsContent
-    );
+    )
+  ) : (
+    <div>No technical reviews found for the selected proposal</div>
+  );
 
   const GradeTab = (
     <ProposalGrade

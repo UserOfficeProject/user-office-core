@@ -295,6 +295,7 @@ const createReviews = async () => {
         timeAllocation: dummy.positiveNumber(10),
         submitted: faker.datatype.boolean(),
         reviewerId: 1,
+        instrumentId: 1,
         files: '[]',
       },
       false

@@ -28,7 +28,7 @@ export interface ReviewDataSource {
   ): Promise<TechnicalReview>;
   getProposalInstrumentTechnicalReview(
     proposalPk: number,
-    instrumentId: number
+    instrumentId?: number
   ): Promise<TechnicalReview | null>;
   // TODO: Maybe this should be called getAllProposalTechnicalReviews
   getTechnicalReviews(proposalPk: number): Promise<TechnicalReview[] | null>;
