@@ -36,7 +36,7 @@ context('Scheduler tests', () => {
       instrumentFapIds: [{ instrumentId: initialDBData.instrument2.id }],
     });
     cy.assignProposalsToInstrument({
-      instrumentId: initialDBData.instrument2.id,
+      instrumentIds: [initialDBData.instrument2.id],
       proposals: [
         {
           callId: initialDBData.call.id,

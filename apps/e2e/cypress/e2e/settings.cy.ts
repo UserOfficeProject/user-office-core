@@ -167,7 +167,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_FEASIBLE],
+            statusChangingEvents: [Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE],
           });
         }
       });
@@ -230,7 +230,9 @@ context('Settings tests', () => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-              statusChangingEvents: [Event.PROPOSAL_FEASIBLE],
+              statusChangingEvents: [
+                Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
+              ],
             });
           }
         });
@@ -246,7 +248,9 @@ context('Settings tests', () => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
               proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-              statusChangingEvents: [Event.PROPOSAL_UNFEASIBLE],
+              statusChangingEvents: [
+                Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
+              ],
             });
           }
         });

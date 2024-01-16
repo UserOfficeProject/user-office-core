@@ -300,7 +300,7 @@ context('Instrument tests', () => {
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
-        instrumentId: createdInstrumentId,
+        instrumentIds: [createdInstrumentId],
       });
 
       cy.login('user2');
@@ -308,6 +308,7 @@ context('Instrument tests', () => {
       cy.updateTechnicalReviewAssignee({
         proposalPks: createdProposalPk,
         userId: scientist2.id,
+        instrumentId: createdInstrumentId,
       });
       cy.addProposalTechnicalReview({
         proposalPk: createdProposalPk,
@@ -349,12 +350,13 @@ context('Instrument tests', () => {
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
-        instrumentId: createdInstrumentId,
+        instrumentIds: [createdInstrumentId],
       });
 
       cy.updateTechnicalReviewAssignee({
         proposalPks: [createdProposalPk],
         userId: scientist2.id,
+        instrumentId: createdInstrumentId,
       });
 
       cy.login('user2');
@@ -439,7 +441,7 @@ context('Instrument tests', () => {
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
-        instrumentId: createdInstrumentId,
+        instrumentIds: [createdInstrumentId],
       });
 
       cy.login('officer');
@@ -596,12 +598,13 @@ context('Instrument tests', () => {
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
-            instrumentId: createdInstrumentId,
+            instrumentIds: [createdInstrumentId],
           });
 
           cy.updateTechnicalReviewAssignee({
             proposalPks: [createdProposalPk],
             userId: scientist2.id,
+            instrumentId: createdInstrumentId,
           });
         }
       });
@@ -682,7 +685,7 @@ context('Instrument tests', () => {
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
-            instrumentId: createdInstrumentId,
+            instrumentIds: [createdInstrumentId],
           });
         }
       });
@@ -729,7 +732,7 @@ context('Instrument tests', () => {
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
-            instrumentId: createdInstrumentId,
+            instrumentIds: [createdInstrumentId],
           });
         }
       });
@@ -926,12 +929,13 @@ context('Instrument tests', () => {
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposal2Id },
             ],
-            instrumentId: createdInstrumentId,
+            instrumentIds: [createdInstrumentId],
           });
 
           cy.updateTechnicalReviewAssignee({
             proposalPks: [createdProposal2Id],
             userId: scientist2.id,
+            instrumentId: createdInstrumentId,
           });
 
           cy.addProposalTechnicalReview({

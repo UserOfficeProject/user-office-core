@@ -1002,7 +1002,7 @@ context('Fap meeting components tests', () => {
           instrumentFapIds: [{ instrumentId: createdInstrumentId }],
         });
         cy.assignProposalsToInstrument({
-          instrumentId: createdInstrumentId,
+          instrumentIds: [createdInstrumentId],
           proposals: [
             {
               callId: initialDBData.call.id,
@@ -1105,7 +1105,7 @@ context('Fap meeting components tests', () => {
                 });
 
                 cy.assignProposalsToInstrument({
-                  instrumentId: createdInstrument2Id,
+                  instrumentIds: [createdInstrument2Id],
                   proposals: [
                     {
                       callId: initialDBData.call.id,
@@ -1179,7 +1179,7 @@ context('Fap meeting components tests', () => {
           });
 
           cy.assignProposalsToInstrument({
-            instrumentId: createdInstrumentId,
+            instrumentIds: [createdInstrumentId],
             proposals: [
               {
                 callId: initialDBData.call.id,
@@ -1283,7 +1283,7 @@ context('Fap meeting components tests', () => {
           });
 
           cy.assignProposalsToInstrument({
-            instrumentId: createdInstrumentId,
+            instrumentIds: [createdInstrumentId],
             proposals: [
               {
                 callId: initialDBData.call.id,
@@ -1450,7 +1450,7 @@ context('Fap meeting components tests', () => {
             });
 
             cy.assignProposalsToInstrument({
-              instrumentId: createdInstrumentId,
+              instrumentIds: [createdInstrumentId],
               proposals: [
                 {
                   callId: initialDBData.call.id,
@@ -2167,7 +2167,7 @@ context('Automatic Fap assignment to Proposal', () => {
           proposals: [
             { callId: initialDBData.call.id, primaryKey: createdProposalPk },
           ],
-          instrumentId: result.createInstrument.id,
+          instrumentIds: [result.createInstrument.id],
         });
 
         cy.login('officer');
