@@ -7,7 +7,6 @@
 !cypress
 !tsconfig.json
 !iis.conf
-!nginx.conf
 !default.conf
 !.env
 !index.html
