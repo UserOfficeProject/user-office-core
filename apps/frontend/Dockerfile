@@ -19,7 +19,7 @@ COPY ./ ./
 RUN npm run build
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.22.0-alpine
+FROM nginxinc/nginx-unprivileged:1.25-alpine
 
 COPY --from=build-stage /app/build/ /usr/share/nginx/html
 
@@ -28,6 +28,5 @@ RUN echo $BUILD_VERSION > /usr/share/nginx/html/build-version.txt
 
 # Copy the default nginx.conf provided by tiangolo/node-frontend
 COPY default.conf /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 8080
