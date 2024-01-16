@@ -257,7 +257,7 @@ const ProposalGrade = ({
               >
                 {review.status === ReviewStatus.SUBMITTED
                   ? 'Submitted'
-                  : 'Submit'}
+                  : 'Save and Submit'}
               </Button>
             )}
           </NavigationFragment>
