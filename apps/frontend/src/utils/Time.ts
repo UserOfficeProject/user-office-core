@@ -25,7 +25,7 @@ function getFormattedDate(
     'June',
     'July',
     'August',
-    'September',
+    'Faptember',
     'October',
     'November',
     'December',

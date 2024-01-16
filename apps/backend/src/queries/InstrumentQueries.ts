@@ -34,9 +34,9 @@ export default class InstrumentQueries {
 
   @Authorized([
     Roles.USER_OFFICER,
-    Roles.SEP_REVIEWER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
+    Roles.FAP_REVIEWER,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
   ])
   async getAll(agent: UserWithRole | null, callIds: number[]) {
     if (!callIds || callIds.length === 0) {
@@ -66,17 +66,17 @@ export default class InstrumentQueries {
     return { totalCount: instruments.length, instruments };
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
-  async getInstrumentsBySepId(
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async getInstrumentsByFapId(
     agent: UserWithRole | null,
-    { sepId, callId }: { sepId: number; callId: number }
+    { fapId, callId }: { fapId: number; callId: number }
   ) {
     if (
       this.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfSEP(agent, sepId))
+      (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
-      const instruments = await this.dataSource.getInstrumentsBySepId(
-        sepId,
+      const instruments = await this.dataSource.getInstrumentsByFapId(
+        fapId,
         callId
       );
 

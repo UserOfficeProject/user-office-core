@@ -10,3 +10,6 @@
 !nginx.conf
 !default.conf
 !.env
+!index.html
+!vite.config.mts
+!tsconfig.node.json

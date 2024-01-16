@@ -70,8 +70,8 @@ export const collectProposalXLSXData = async (
     proposalPk
   );
 
-  const sepMeetingDecision =
-    await baseContext.queries.sep.getProposalSepMeetingDecision(
+  const fapMeetingDecision =
+    await baseContext.queries.fap.getProposalFapMeetingDecision(
       user,
       proposal.primaryKey
     );
@@ -91,6 +91,6 @@ export const collectProposalXLSXData = async (
     average(getGrades(reviews)) || 'NA',
     proposal.commentForManagement ?? '<missing>',
     ProposalEndStatus[proposal.finalStatus] ?? '<missing>',
-    sepMeetingDecision?.rankOrder ?? '<missing>',
+    fapMeetingDecision?.rankOrder ?? '<missing>',
   ];
 };

@@ -152,11 +152,9 @@ const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
 ) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const SEPReviewColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
-) => [
+const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
-  { title: t('SEP'), field: 'sepCode', emptyValue: '-', hidden: true },
+  { title: 'Fap', field: 'fapCode', emptyValue: '-', hidden: true },
 ];
 
 const proposalStatusFilter: Record<string, number> = {
@@ -271,6 +269,7 @@ const ProposalTableInstrumentScientist = ({
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
+    proposalid: StringParam,
     reviewer: withDefault(StringParam, reviewerFilter),
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
@@ -278,6 +277,9 @@ const ProposalTableInstrumentScientist = ({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus,
+    referenceNumbers: urlQueryParams.proposalid
+      ? [urlQueryParams.proposalid]
+      : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
@@ -301,6 +303,7 @@ const ProposalTableInstrumentScientist = ({
         callId: proposalFilter.callId,
         questionFilter: proposalFilter.questionFilter,
         reviewer: proposalFilter.reviewer,
+        referenceNumbers: proposalFilter.referenceNumbers,
         text: queryParameters.searchText,
       },
       queryParameters.query
@@ -377,8 +380,8 @@ const ProposalTableInstrumentScientist = ({
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
 
-  const isSEPEnabled = featureContext.featuresMap.get(
-    FeatureId.SEP_REVIEW
+  const isFapEnabled = featureContext.featuresMap.get(
+    FeatureId.FAP_REVIEW
   )?.isEnabled;
 
   const instrumentScientistProposalReviewTabs = [
@@ -386,7 +389,7 @@ const ProposalTableInstrumentScientist = ({
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isSEPEnabled && isInstrumentScientist
+    ...(isFapEnabled && isInstrumentScientist
       ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN]
       : []),
   ];
@@ -584,10 +587,10 @@ const ProposalTableInstrumentScientist = ({
     removeColumns(columns, instrumentManagementColumns(t));
   }
 
-  if (isSEPEnabled) {
-    addColumns(columns, SEPReviewColumns(t));
+  if (isFapEnabled) {
+    addColumns(columns, FapReviewColumns);
   } else {
-    removeColumns(columns, SEPReviewColumns(t));
+    removeColumns(columns, FapReviewColumns);
   }
 
   columns = setSortDirectionOnSortColumn(
@@ -604,7 +607,9 @@ const ProposalTableInstrumentScientist = ({
   );
 
   const proposalToReview = preselectedProposalsData.find(
-    (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
+    (proposal) =>
+      proposal.primaryKey === urlQueryParams.reviewModal ||
+      proposal.proposalId === urlQueryParams.proposalid
   );
 
   /** NOTE:
@@ -677,7 +682,7 @@ const ProposalTableInstrumentScientist = ({
     <>
       <ProposalReviewModal
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
-        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        proposalReviewModalOpen={!!proposalToReview}
         setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
           setProposalsData(
             proposalsData.map((proposal) => {
@@ -707,12 +712,24 @@ const ProposalTableInstrumentScientist = ({
               }
             })
           );
-          setUrlQueryParams({ reviewModal: undefined, modalTab: undefined });
+          if (urlQueryParams.proposalid) {
+            setProposalFilter({
+              ...proposalFilter,
+              referenceNumbers: undefined,
+            });
+            setUrlQueryParams({
+              proposalid: undefined,
+            });
+          }
+          setUrlQueryParams({
+            reviewModal: undefined,
+            modalTab: undefined,
+          });
         }}
-        reviewItemId={urlQueryParams.reviewModal}
+        reviewItemId={proposalToReview?.primaryKey}
       >
         <ProposalReviewContent
-          proposalPk={urlQueryParams.reviewModal as number}
+          proposalPk={proposalToReview?.primaryKey as number}
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>

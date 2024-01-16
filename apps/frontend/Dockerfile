@@ -6,7 +6,6 @@ ARG ORCID_REDIRECT=
 WORKDIR /app
 
 RUN echo "REACT_APP_ORCID_REDIRECT=$ORCID_REDIRECT" > .env
-RUN echo "GENERATE_SOURCEMAP=false" >> .env
 
 COPY package*.json /app/
 

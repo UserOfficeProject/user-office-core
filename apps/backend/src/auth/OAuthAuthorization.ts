@@ -131,17 +131,23 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     if (user) {
       const updatedUser = await this.userDataSource.update({
         ...user,
-        firstname: userInfo.given_name,
-        lastname: userInfo.family_name,
+        birthdate: userInfo.birthdate
+          ? new Date(userInfo.birthdate)
+          : undefined,
+        department: userInfo.department as string,
         email: userInfo.email,
+        firstname: userInfo.given_name,
+        gender: userInfo.gender,
+        lastname: userInfo.family_name,
         oauthAccessToken: tokenSet.access_token,
+        oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
-        oauthIssuer: client.issuer.metadata.issuer,
-        department: userInfo.department as string,
-        gender: userInfo.gender as string,
-        user_title: userInfo.title as string,
         organisation: institutionId ?? user.organisation,
+        position: userInfo.position as string,
+        preferredname: userInfo.name,
+        telephone: userInfo.phone_number,
+        user_title: userInfo.title as string,
       });
 
       return updatedUser;
@@ -152,7 +158,6 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         undefined,
         userInfo.family_name,
         userInfo.email,
-        '',
         userInfo.given_name,
         userInfo.sub,
         tokenSet.access_token,

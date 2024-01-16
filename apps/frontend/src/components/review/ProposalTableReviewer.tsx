@@ -1,4 +1,4 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import RateReviewIcon from '@mui/icons-material/RateReview';
@@ -12,6 +12,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
@@ -26,7 +27,6 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import {
   capitalize,
-  denseTableColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -62,25 +62,24 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
 
 const columns: (
   t: TFunction<'translation', undefined, 'translation'>
-) => Column<UserWithReview>[] = (t) =>
-  denseTableColumns([
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      field: 'rowActions',
-    },
-    { title: 'Proposal ID', field: 'proposalId' },
-    { title: 'Title', field: 'title' },
-    { title: 'Grade', field: 'grade' },
-    {
-      title: 'Review status',
-      render: (user) => capitalize(user.status),
-      customSort: (a, b) => a.status.localeCompare(b.status),
-    },
-    { title: 'Call', field: 'callShortCode' },
-    { title: t('instrument') as string, field: 'instrumentShortCode' },
-  ]);
+) => Column<UserWithReview>[] = (t) => [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 120 },
+    sorting: false,
+    field: 'rowActions',
+  },
+  { title: 'Proposal ID', field: 'proposalId' },
+  { title: 'Title', field: 'title' },
+  { title: 'Grade', field: 'grade' },
+  {
+    title: 'Review status',
+    render: (user) => capitalize(user.status),
+    customSort: (a, b) => a.status.localeCompare(b.status),
+  },
+  { title: 'Call', field: 'callShortCode' },
+  { title: t('instrument') as string, field: 'instrumentShortCode' },
+];
 
 const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -425,12 +424,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         <ProposalReviewContent
           reviewId={urlQueryParams.reviewModal}
           tabNames={reviewerProposalReviewTabs}
-          sepId={
+          fapId={
             userData?.reviews.find((review) => {
               return (
                 review.proposal?.proposalId === proposalToReview?.proposalId
               );
-            })?.sepID
+            })?.fapID
           }
         />
       </ProposalReviewModal>

@@ -3,20 +3,20 @@ mutation updateReview(
   $grade: Float!
   $comment: String!
   $status: ReviewStatus!
-  $sepID: Int!
+  $fapID: Int!
 ) {
   updateReview(
     reviewID: $reviewID
     grade: $grade
     comment: $comment
     status: $status
-    sepID: $sepID
+    fapID: $fapID
   ) {
     id
     userID
     status
     comment
     grade
-    sepID
+    fapID
   }
 }
