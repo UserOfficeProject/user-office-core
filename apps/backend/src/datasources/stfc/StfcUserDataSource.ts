@@ -379,6 +379,7 @@ export class StfcUserDataSource implements UserDataSource {
       const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] = (
         await client.getBasicPeopleDetailsFromSurname(token, filter, true)
       )?.return;
+      if (!stfcBasicPeopleByLastName) return { totalCount: 0, users: [] };
 
       userDetails = stfcBasicPeopleByLastName.map((person) =>
         toEssBasicUserDetails(person)

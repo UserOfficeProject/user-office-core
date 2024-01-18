@@ -14,18 +14,23 @@ import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
-import {
-  BasicUserDetailsFragment,
-  InstrumentFragment,
-  UserRole,
-} from 'generated/sdk';
-import { useUsersData } from 'hooks/user/useUsersData';
+import { BasicUserDetailsFragment, InstrumentFragment } from 'generated/sdk';
+import { useUsersDataByFilter } from 'hooks/user/useUsersDataByFilter';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserNameWithEmail } from 'utils/user';
 
 const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
+  },
+  findButton: {
+    marginLeft: '10px',
+    whiteSpace: 'nowrap',
+  },
+  findBySurnameForm: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'baseline',
   },
 }));
 
@@ -41,13 +46,13 @@ const CreateUpdateInstrument = ({
   const classes = useStyles();
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { usersData } = useUsersData({
-    userRole: UserRole.INSTRUMENT_SCIENTIST,
-  });
+  const { usersData, setUsersData } = useUsersDataByFilter(instrument);
+  const surnameInitialValue = { surname: '' };
 
   if (!usersData) {
     return <UOLoader />;
   }
+
   const initialValues = instrument
     ? instrument
     : {
@@ -138,7 +143,52 @@ const CreateUpdateInstrument = ({
             disabled={isExecutingCall}
             required
           />
-
+          <Formik
+            initialValues={surnameInitialValue}
+            onSubmit={async (values, { setFieldError }): Promise<void> => {
+              try {
+                await api()
+                  .getUsers({ filter: values.surname })
+                  .then((data) => {
+                    if (data.users?.totalCount == 0)
+                      setFieldError(
+                        'surname',
+                        'No users found with that surname'
+                      );
+                    else
+                      setUsersData(data.users || { totalCount: 0, users: [] });
+                  });
+              } catch (error) {
+                close(null);
+              }
+            }}
+          >
+            {(inner) => {
+              return (
+                <Form className={classes.findBySurnameForm}>
+                  <Field
+                    id="surname"
+                    name="surname"
+                    label="Surname"
+                    type="text"
+                    component={TextField}
+                    fullWidth
+                    flex="1"
+                    data-cy="surname"
+                  />
+                  <Button
+                    data-cy="findUser"
+                    type="button"
+                    disabled={!inner.values.surname}
+                    className={classes.findButton}
+                    onClick={inner.submitForm}
+                  >
+                    Find User
+                  </Button>
+                </Form>
+              );
+            }}
+          </Formik>
           <FormikUIAutocomplete
             name="managerUserId"
             label="Beamline manager"
