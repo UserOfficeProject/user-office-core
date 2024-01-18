@@ -396,7 +396,7 @@ const ProposalTechnicalReview = ({
                       onClick={() => setShouldSubmit(true)}
                       data-cy="submit-technical-review"
                     >
-                      {data?.submitted ? 'Submitted' : 'Submit'}
+                      {data?.submitted ? 'Submitted' : 'Save and Submit'}
                     </Button>
                   )}
                 </StyledButtonContainer>
