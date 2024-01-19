@@ -726,7 +726,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .where('natural_key', natural_key);
 
     if (naturalKeyExistAlready.length != 0) {
-      natural_key = natural_key.concat('_' + Math.floor(Math.random() * 1000));
+      natural_key = natural_key + '_' + Date.now();
     }
 
     const resultSet: QuestionRecord[] = await database
