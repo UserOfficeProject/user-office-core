@@ -43,6 +43,7 @@ import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDe
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
 import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
+
 @injectable()
 export default class FapMutations {
   private proposalAuth = container.resolve(ProposalAuthorization);
@@ -137,7 +138,7 @@ export default class FapMutations {
       .assignChairOrSecretaryToFap(args.assignChairOrSecretaryToFapInput)
       .catch((error) => {
         return rejection(
-          'Could not assign chair and secretary to Fap',
+          'Could not assign chair or secretary to Fap please ensure they have the correct roles',
           { agent },
           error
         );
@@ -163,7 +164,7 @@ export default class FapMutations {
 
     return this.dataSource.assignReviewersToFap(args).catch((err) => {
       return rejection(
-        'Could not assign member to Fap because of an error',
+        'Could not assign member to Fap because of an error, please ensure all selected users have the correct role',
         { agent },
         err
       );

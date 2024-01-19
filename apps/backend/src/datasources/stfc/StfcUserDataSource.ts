@@ -525,4 +525,23 @@ export class StfcUserDataSource implements UserDataSource {
       true
     ));
   }
+
+  async getUsersRoles(
+    userIds: number[]
+  ): Promise<{ userId: number; roles: Role[] }[]> {
+    const usersRolesPromises = [];
+    for (const userId of userIds) {
+      usersRolesPromises.push(this.getUserRoles(userId));
+    }
+
+    const usersRoles = await Promise.all(usersRolesPromises);
+
+    const usersWithRoles: { userId: number; roles: Role[] }[] = [];
+
+    usersRoles.forEach((roles, index) =>
+      usersWithRoles.push({ userId: userIds[index], roles })
+    );
+
+    return usersWithRoles;
+  }
 }
