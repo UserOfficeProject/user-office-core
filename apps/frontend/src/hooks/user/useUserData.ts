@@ -115,4 +115,5 @@ export interface BasicUserData {
   lastname: string;
   organisation: string;
   id: number;
+  preferredname?: string | null;
 }

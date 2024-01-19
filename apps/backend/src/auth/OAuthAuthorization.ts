@@ -145,7 +145,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         oidcSub: userInfo.sub,
         organisation: institutionId ?? user.organisation,
         position: userInfo.position as string,
-        preferredname: userInfo.name,
+        preferredname: userInfo.preferred_username,
         telephone: userInfo.phone_number,
         user_title: userInfo.title as string,
       });
@@ -158,7 +158,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         undefined,
         userInfo.family_name,
         userInfo.email,
-        userInfo.given_name,
+        userInfo.preferred_username,
         userInfo.sub,
         tokenSet.access_token,
         tokenSet.refresh_token ?? '',

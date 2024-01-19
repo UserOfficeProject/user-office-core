@@ -15,21 +15,21 @@ context('User administration tests', () => {
   const newTelephoneAlt = faker.phone.number('0##########');
   const newOrganisation = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
+  const title = faker.lorem.words(2);
+  const abstract = faker.lorem.words(3);
 
-  beforeEach(function () {
+  beforeEach(() => {
     cy.resetDB();
-    cy.getAndStoreFeaturesEnabled().then(() => {
-      // NOTE: We can check features after they are stored to the local storage
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        this.skip();
-      }
-    });
+    cy.getAndStoreFeaturesEnabled();
 
     cy.login('officer');
     cy.visit('/');
   });
 
-  it('Should be able administer user information', () => {
+  it('Should be able administer user information', function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
     cy.contains('People').click();
 
     cy.get("[aria-label='Edit user']").first().click();
@@ -78,7 +78,10 @@ context('User administration tests', () => {
     cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
   });
 
-  it('Should be able to invite user or fap reviewer by email', () => {
+  it('Should be able to invite user or fap reviewer by email', function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
     const userFirstName = faker.name.firstName();
     const userLastName = faker.name.lastName();
     const userEmail = faker.internet.email();
@@ -154,7 +157,10 @@ context('User administration tests', () => {
       .contains('FAP Reviewer');
   });
 
-  it('Should be able to delete user information', () => {
+  it('Should be able to delete user information', function () {
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
     cy.contains('People').click();
     cy.contains(placeholderUser.firstName)
       .parent()
@@ -164,5 +170,86 @@ context('User administration tests', () => {
     cy.get("[data-cy=co-proposers] [aria-label='Save']").click();
 
     cy.notification({ variant: 'success', text: 'User removed successfully' });
+  });
+  it('User should be able to have and a preferred name', function () {
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      cy.updateUserDetails({
+        id: 4,
+        user_title: 'Mr.',
+        firstname: 'Benjamin',
+        lastname: 'Beckley',
+        preferredname: 'Ben',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('2000/04/02'),
+        organisation: 1,
+        department: 'IT deparment',
+        position: 'Management',
+        email: 'ben@inbox.com',
+        telephone: '(288) 221-4533',
+        organizationCountry: 1,
+      });
+    }
+    cy.login('user2', initialDBData.roles.user);
+    cy.visit('/');
+    cy.contains('New Proposal').click();
+    cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+    cy.get('[data-cy=principal-investigator] input').should(
+      'contain.value',
+      'Ben '
+    );
+
+    cy.get('[data-cy=title] input').type(title).should('have.value', title);
+
+    cy.get('[data-cy=abstract] textarea')
+      .first()
+      .type(abstract)
+      .should('have.value', abstract);
+
+    cy.contains('Save and continue').click();
+
+    cy.finishedLoading();
+    cy.notification({ variant: 'success', text: 'Saved' });
+
+    cy.contains('Dashboard').click();
+    cy.contains(title).parent().find('[aria-label="Edit proposal"]').click();
+    cy.contains('Ben ');
+
+    cy.login('officer');
+    cy.visit('/');
+    cy.contains('Proposals').click();
+    cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+    cy.contains('Ben ');
+  });
+
+  it('User should be able to not have a preferred name', function () {
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      cy.updateUserDetails({
+        id: 6,
+        user_title: 'Mr.',
+        firstname: 'David',
+        lastname: 'Dawson',
+        preferredname: '',
+        gender: 'male',
+        nationality: 1,
+        birthdate: new Date('1995/04/01'),
+        organisation: 1,
+        department: 'Maxillofacial surgeon',
+        position: 'Management',
+        email: 'david@teleworm.us',
+        telephone: '(288) 221-4533',
+        organizationCountry: 1,
+      });
+    }
+
+    cy.login('user3', initialDBData.roles.user);
+    cy.visit('/');
+    cy.contains('New Proposal').click();
+    cy.get('[data-cy=call-list]').find('li:first-child').click();
+    cy.get('[data-cy=principal-investigator] input').should(
+      'contain.value',
+      'David '
+    );
   });
 });

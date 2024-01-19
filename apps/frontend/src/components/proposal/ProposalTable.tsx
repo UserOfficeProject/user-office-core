@@ -1,3 +1,4 @@
+import { Column } from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -20,7 +21,7 @@ import { Call, FeatureId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
-import { denseTableColumns, isCallEnded } from 'utils/helperFunctions';
+import { isCallEnded } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -47,7 +48,7 @@ type ProposalTableProps = {
   confirm: WithConfirmType;
 };
 
-const columns = denseTableColumns<PartialProposalsDataType>([
+const columns: Column<PartialProposalsDataType>[] = [
   {
     title: 'Proposal ID',
     field: 'proposalId',
@@ -70,7 +71,7 @@ const columns = denseTableColumns<PartialProposalsDataType>([
     emptyValue: '-',
   },
   { title: 'Created', field: 'created' },
-]);
+];
 
 const ProposalTable = ({
   title,
