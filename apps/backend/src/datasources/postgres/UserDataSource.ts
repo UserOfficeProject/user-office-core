@@ -737,9 +737,10 @@ export default class PostgresUserDataSource implements UserDataSource {
     }
   }
 
-  async getUsersByUserNumbers(id: readonly number[]): Promise<User[] | null> {
+  async getUsersByUserNumbers(id: readonly number[]): Promise<User[]> {
     logger.logDebug('Method not implemented.', {});
+    const user: User[] = [];
 
-    return null;
+    return user;
   }
 }

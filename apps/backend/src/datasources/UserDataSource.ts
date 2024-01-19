@@ -20,7 +20,7 @@ export interface UserDataSource {
   // Read
   me(id: number): Promise<User | null>;
   getUser(id: number): Promise<User | null>;
-  getUsersByUserNumbers(id: readonly number[]): Promise<User[] | null>;
+  getUsersByUserNumbers(id: readonly number[]): Promise<User[]>;
   getUserWithInstitution(id: number): Promise<{
     user: User;
     institution: Institution;

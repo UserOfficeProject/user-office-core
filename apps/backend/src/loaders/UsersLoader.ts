@@ -21,6 +21,6 @@ export default class UsersLoader {
       return usersList?.find((user) => user.id === id);
     });
 
-    return Promise.resolve(result);
+    return result;
   });
 }
