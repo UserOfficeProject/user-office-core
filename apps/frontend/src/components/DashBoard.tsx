@@ -245,13 +245,6 @@ const Dashboard = () => {
         };
   }
   const { calls } = useCallsData(getDashBoardCallFilter());
-  useEffect(() => {
-    if (isTabletOrMobile) {
-      setOpen(false);
-    } else if (localStorage.getItem('drawerOpen') === '1') {
-      setOpen(true);
-    }
-  }, [isTabletOrMobile]);
 
   const handleDrawerOpen = () => {
     localStorage.setItem('drawerOpen', '1');
@@ -261,6 +254,17 @@ const Dashboard = () => {
     localStorage.setItem('drawerOpen', '0');
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (isTabletOrMobile) {
+      // NOTE: Closing drawer in the next event cycle fixes the bug where drawer cannot be re-opened when switching from desktop to mobile view.
+      setTimeout(() => {
+        handleDrawerClose();
+      });
+    } else if (localStorage.getItem('drawerOpen') === '1') {
+      handleDrawerOpen();
+    }
+  }, [isTabletOrMobile]);
 
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
