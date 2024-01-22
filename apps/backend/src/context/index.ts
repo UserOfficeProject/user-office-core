@@ -1,3 +1,4 @@
+import UsersLoader from '../loaders/UsersLoader';
 import PDFServices from '../middlewares/factory/factoryServices';
 import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
@@ -106,6 +107,9 @@ interface ResolverContextMutations {
 interface ResolverContextServices {
   pdfServices: PDFServices;
 }
+interface ResolverContextLoader {
+  user: UsersLoader;
+}
 
 export interface BasicResolverContext {
   mutations: ResolverContextMutations;
@@ -114,6 +118,7 @@ export interface BasicResolverContext {
     scheduler: () => Promise<Sdk | undefined>;
   };
   services: ResolverContextServices;
+  loaders: ResolverContextLoader;
 }
 
 export interface ResolverContext extends BasicResolverContext {

@@ -347,7 +347,15 @@ export class StfcUserDataSource implements UserDataSource {
       (stfcBasicPerson) => (stfcBasicPerson ? toEssUser(stfcBasicPerson) : null)
     );
   }
+  async getUsersByUserNumbers(ids: number[]) {
+    const stfcBasicPersonDetails = await this.getStfcBasicPeopleByUserNumbers(
+      ids.map((id) => id.toString())
+    );
 
+    return stfcBasicPersonDetails?.map((stfcbasicPerson) =>
+      toEssUser(stfcbasicPerson)
+    );
+  }
   async getUserWithInstitution(id: number): Promise<{
     user: User;
     institution: Institution;

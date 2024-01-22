@@ -112,9 +112,10 @@ export class ProposalResolver {
     @Root() proposal: ProposalView,
     @Ctx() context: ResolverContext
   ): Promise<User | null> {
-    return await context.queries.user.get(
-      context.user,
+    const user = await context.loaders.user.batchLoader.load(
       proposal.principalInvestigatorId
     );
+
+    return user ? user : null;
   }
 }
