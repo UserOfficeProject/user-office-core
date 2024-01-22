@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 
 import { Fap } from '../../models/Fap';
+import { UserRoleShortCodeMap } from '../../models/User';
 import {
   AssignChairOrSecretaryToFapInput,
   AssignReviewersToFapArgs,
@@ -19,9 +20,13 @@ export default class StfcFapDataSource
     args: AssignChairOrSecretaryToFapInput
   ): Promise<Fap> {
     const roles = await stfcUserDataSource.getUserRoles(args.userId);
+
     if (
       roles.find((role) => {
-        return role.id === args.roleId;
+        return (
+          role.shortCode === UserRoleShortCodeMap[args.roleId] ||
+          role.shortCode === 'user_officer'
+        );
       })
     ) {
       return super.assignChairOrSecretaryToFap(args);
@@ -40,8 +45,10 @@ export default class StfcFapDataSource
     );
 
     usersWithRoles.forEach((user) => {
-      !!user.roles.find((role) => role.shortCode === 'fap_reviewer') &&
-        members.push(user.userId);
+      !!user.roles.find(
+        (role) =>
+          role.shortCode === 'fap_reviewer' || role.shortCode === 'user_officer'
+      ) && members.push(user.userId);
     });
 
     if (members.length === args.memberIds.length) {
