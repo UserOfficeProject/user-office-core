@@ -369,7 +369,6 @@ export class StfcUserDataSource implements UserDataSource {
     first,
     offset,
     subtractUsers,
-    userRole,
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     let userDetails: BasicUserDetails[] = [];
 
@@ -389,7 +388,7 @@ export class StfcUserDataSource implements UserDataSource {
         filter: undefined,
         first: first,
         offset: offset,
-        userRole: userRole,
+        userRole: undefined,
         subtractUsers: subtractUsers,
         orderDirection: 'asc',
       });
