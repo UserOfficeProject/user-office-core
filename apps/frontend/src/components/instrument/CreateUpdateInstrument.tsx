@@ -174,7 +174,7 @@ const CreateUpdateInstrument = ({
                     component={TextField}
                     fullWidth
                     flex="1"
-                    data-cy="surname"
+                    data-cy="beamline-manager"
                   />
                   <Button
                     data-cy="findUser"
