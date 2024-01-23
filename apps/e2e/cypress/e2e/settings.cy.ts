@@ -846,7 +846,7 @@ context('Settings tests', () => {
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToFapInput: {
               fapId: 1,
-              userId: initialDBData.users.reviewer.id,
+              userId: initialDBData.users.user2.id,
               roleId: UserRole.FAP_CHAIR,
             },
           });
