@@ -843,6 +843,14 @@ context('Settings tests', () => {
             },
             fapId: initialDBData.fap.id,
           });
+          if (
+            featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)
+          ) {
+            cy.updateUserRoles({
+              id: initialDBData.users.user2.id,
+              roles: [initialDBData.roles.fapReviewer],
+            });
+          }
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToFapInput: {
               fapId: 1,
