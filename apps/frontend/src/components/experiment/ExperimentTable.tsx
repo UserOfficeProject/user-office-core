@@ -46,7 +46,10 @@ const columns = (t: TFunction<'translation', undefined, 'translation'>) => [
   },
   {
     title: t('instrument'),
-    field: 'proposal.instrument.name',
+    render: (rowData: RowType) =>
+      rowData.proposal.instruments
+        ?.map((instrument) => instrument?.name)
+        .join(', ') || '-',
   },
 ];
 

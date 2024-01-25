@@ -35,7 +35,8 @@ context('Experiments tests', () => {
       cy.login('officer');
       cy.visit('/');
       cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
-      cy.get('[value=NONE]').click();
+      cy.finishedLoading();
+      cy.get('button[value=NONE]').click();
 
       cy.get('[data-cy=call-filter]').click();
       cy.get('[role=presentation]').contains('call 1').click();
