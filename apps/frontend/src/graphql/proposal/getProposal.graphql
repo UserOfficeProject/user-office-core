@@ -38,11 +38,13 @@ query getProposal($primaryKey: Int!) {
         id
         firstname
         lastname
+        preferredname
       }
       scientists {
         id
         firstname
         lastname
+        preferredname
       }
     }
     call {

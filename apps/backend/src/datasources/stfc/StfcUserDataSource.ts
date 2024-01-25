@@ -64,7 +64,7 @@ export function toEssBasicUserDetails(
     Number(stfcUser.userNumber),
     stfcUser.givenName ?? '',
     stfcUser.familyName ?? '',
-    stfcUser.displayName ?? '',
+    stfcUser.firstNameKnownAs ?? stfcUser.givenName,
     stfcUser.orgName ?? '',
     stfcUser.orgId ?? 1,
     '',
@@ -82,7 +82,7 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     undefined,
     stfcUser.familyName ?? '',
     stfcUser.email ?? '',
-    stfcUser.firstNameKnownAs ?? '',
+    stfcUser.firstNameKnownAs ?? stfcUser.givenName,
     '',
     '',
     '',
@@ -347,7 +347,15 @@ export class StfcUserDataSource implements UserDataSource {
       (stfcBasicPerson) => (stfcBasicPerson ? toEssUser(stfcBasicPerson) : null)
     );
   }
+  async getUsersByUserNumbers(ids: number[]) {
+    const stfcBasicPersonDetails = await this.getStfcBasicPeopleByUserNumbers(
+      ids.map((id) => id.toString())
+    );
 
+    return stfcBasicPersonDetails?.map((stfcbasicPerson) =>
+      toEssUser(stfcbasicPerson)
+    );
+  }
   async getUserWithInstitution(id: number): Promise<{
     user: User;
     institution: Institution;
