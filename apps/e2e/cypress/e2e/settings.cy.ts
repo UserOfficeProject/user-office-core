@@ -135,10 +135,30 @@ context('Settings tests', () => {
     const proposalAbstract = faker.lorem.words(5);
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
+    const instrument1 = {
+      name: faker.random.words(2),
+      shortCode: faker.random.alphaNumeric(15),
+      description: faker.random.words(5),
+      managerUserId: initialDBData.users.user1.id,
+    };
     let workflowDroppableGroupId: string;
     let createdWorkflowId: number;
     let prevProposalStatusId: number;
     let createdEsiTemplateId: number;
+    let createdInstrumentId: number;
+
+    const createInstrumentAndAssignItToCall = () => {
+      cy.createInstrument(instrument1).then((result) => {
+        if (result.createInstrument) {
+          createdInstrumentId = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+          });
+        }
+      });
+    };
 
     const addMultipleStatusesToProposalWorkflowWithChangingEvents = () => {
       cy.addProposalWorkflowStatus({
@@ -167,7 +187,10 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE],
+            statusChangingEvents: [
+              Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
+              Event.PROPOSAL_INSTRUMENT_SELECTED,
+            ],
           });
         }
       });
@@ -305,7 +328,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
       });
@@ -391,7 +414,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
       });
@@ -485,7 +508,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
       });
@@ -644,7 +667,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
 
-      cy.contains('PROPOSAL_SUBMITTED').click();
+      cy.contains(Event.PROPOSAL_SUBMITTED).click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -659,7 +682,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
 
-      cy.contains('PROPOSAL_FEASIBLE').click();
+      cy.contains(Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE).click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -668,7 +691,9 @@ context('Settings tests', () => {
         text: 'Status changing events added successfully!',
       });
 
-      cy.contains('PROPOSAL_SUBMITTED & PROPOSAL_FEASIBLE');
+      cy.contains(
+        `${Event.PROPOSAL_SUBMITTED} & ${Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE}`
+      );
     });
 
     it('Proposal should follow the selected workflow', function () {
@@ -677,6 +702,7 @@ context('Settings tests', () => {
       }
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
+      createInstrumentAndAssignItToCall();
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
@@ -728,8 +754,33 @@ context('Settings tests', () => {
       cy.get('.MuiTable-root tbody tr')
         .first()
         .then((element) =>
-          expect(element.text()).to.contain('FEASIBILITY_REVIEW')
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.feasibilityReview.name
+          )
         );
+
+      cy.contains(proposalTitle)
+        .closest('tr')
+        .find('[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]')
+        .contains('Loading...')
+        .should('not.exist');
+
+      cy.get('#selectedInstrumentIds-input').first().click();
+
+      cy.get('[data-cy="instrument-selection-options"] li')
+        .contains(instrument1.name)
+        .click();
+
+      cy.get('body').type('{esc}');
+
+      cy.get('[data-cy="submit-assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
 
       cy.get('[data-cy="view-proposal"]').first().click();
       cy.get('[role="dialog"]').contains('Technical review').click();
@@ -770,6 +821,7 @@ context('Settings tests', () => {
 
     it('Proposal status should update immediately after assigning it to a Fap', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      createInstrumentAndAssignItToCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
@@ -781,6 +833,16 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.assignProposalsToInstrument({
+            instrumentIds: [createdInstrumentId],
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: proposal.primaryKey,
+                workflowId: createdWorkflowId,
+              },
+            ],
+          });
           cy.addProposalTechnicalReview({
             proposalPk: proposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
@@ -822,6 +884,7 @@ context('Settings tests', () => {
         this.skip();
       }
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      createInstrumentAndAssignItToCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
@@ -833,6 +896,16 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.assignProposalsToInstrument({
+            instrumentIds: [createdInstrumentId],
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: proposal.primaryKey,
+                workflowId: createdWorkflowId,
+              },
+            ],
+          });
           cy.addProposalTechnicalReview({
             proposalPk: proposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
@@ -912,6 +985,7 @@ context('Settings tests', () => {
 
     it('User Officer should be able to filter proposals based on statuses', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      createInstrumentAndAssignItToCall();
       cy.createProposal({ callId: initialDBData.call.id });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
@@ -924,6 +998,16 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.assignProposalsToInstrument({
+            instrumentIds: [createdInstrumentId],
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: proposal.primaryKey,
+                workflowId: createdWorkflowId,
+              },
+            ],
+          });
           cy.addProposalTechnicalReview({
             proposalPk: proposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
@@ -949,7 +1033,11 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('DRAFT'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.draft.name
+          )
+        );
 
       cy.get('.MuiTable-root tbody')
         .first()
@@ -971,7 +1059,11 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('DRAFT'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.draft.name
+          )
+        );
     });
 
     it('User Officer should be able to remove statuses from proposal workflow using trash icon', () => {
@@ -988,12 +1080,12 @@ context('Settings tests', () => {
 
       cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should(
         'contain.text',
-        'FEASIBILITY_REVIEW'
+        initialDBData.proposalStatuses.feasibilityReview.name
       );
 
       cy.get('[data-cy="confirmation-dialog"] .MuiDialogContent-root').should(
         'contain.text',
-        'FEASIBILITY_REVIEW'
+        initialDBData.proposalStatuses.feasibilityReview.name
       );
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -1072,6 +1164,7 @@ context('Settings tests', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents();
+      createInstrumentAndAssignItToCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
@@ -1082,6 +1175,16 @@ context('Settings tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.assignProposalsToInstrument({
+            instrumentIds: [createdInstrumentId],
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: proposal.primaryKey,
+                workflowId: createdWorkflowId,
+              },
+            ],
+          });
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
@@ -1094,6 +1197,16 @@ context('Settings tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.assignProposalsToInstrument({
+            instrumentIds: [createdInstrumentId],
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: proposal.primaryKey,
+                workflowId: createdWorkflowId,
+              },
+            ],
+          });
         }
       });
 
