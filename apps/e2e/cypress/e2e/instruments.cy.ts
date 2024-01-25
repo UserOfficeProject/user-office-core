@@ -79,6 +79,8 @@ context('Instrument tests', () => {
       cy.get('#shortCode').type(instrument1.shortCode);
       cy.get('#description').type(instrument1.description);
 
+      cy.get('[data-cy=beamline-manager-surname]').type(scientist1.lastName);
+      cy.get('[data-cy=findUser]').click();
       cy.get('[data-cy=beamline-manager]').click();
       cy.get('[role=presentation]').contains(scientist1.lastName).click();
 
@@ -530,6 +532,10 @@ context('Instrument tests', () => {
         .parent()
         .find('[aria-label="Edit"]')
         .click();
+
+      cy.get('[data-cy=beamline-manager-surname]').type(scientist2.lastName);
+
+      cy.get('[data-cy=findUser]').click();
 
       cy.get('[data-cy=beamline-manager]').click();
 
