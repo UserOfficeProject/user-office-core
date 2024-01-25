@@ -5,7 +5,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useUsersDataByFilter(instrument: InstrumentFragment | null) {
   const api = useDataApi();
-  const [surName, setSurName] = useState<string>();
+
   const [usersData, setUsersData] = useState<{
     totalCount: number;
     users: Array<BasicUserDetailsFragment>;
@@ -19,15 +19,14 @@ export function useUsersDataByFilter(instrument: InstrumentFragment | null) {
       api()
         .getUser({ userId: instrument.managerUserId })
         .then((data) => {
-          setSurName(data.user?.lastname);
           api()
-            .getUsers({ filter: surName })
+            .getUsers({ filter: data.user?.lastname })
             .then((data) => {
               setUsersData(data.users || { totalCount: 0, users: [] });
             });
         });
     }
-  }, [api, surName, instrument]);
+  }, [api, instrument]);
 
   return { usersData, setUsersData };
 }
