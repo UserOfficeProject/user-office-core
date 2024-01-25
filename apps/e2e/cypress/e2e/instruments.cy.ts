@@ -218,11 +218,13 @@ context('Instrument tests', () => {
         .contains('Loading...')
         .should('not.exist');
 
-      cy.get('#selectedInstrumentId-input').first().click();
+      cy.get('#selectedInstrumentIds-input').first().click();
 
       cy.get('[data-cy="instrument-selection-options"] li')
         .contains(instrument1.name)
         .click();
+
+      cy.get('body').type('{esc}');
 
       cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
@@ -243,8 +245,8 @@ context('Instrument tests', () => {
 
       cy.contains('Loading...').should('not.exist');
 
-      cy.get('[data-cy="instrument-selection"] input').should(
-        'have.value',
+      cy.get('[data-cy="instrument-selection"]').should(
+        'contain',
         instrument1.name
       );
 
@@ -316,6 +318,7 @@ context('Instrument tests', () => {
         submitted: true,
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
+        instrumentId: createdInstrumentId,
       });
 
       cy.login('officer', initialDBData.roles.userOfficer);
@@ -368,6 +371,7 @@ context('Instrument tests', () => {
         submitted: true,
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
+        instrumentId: createdInstrumentId,
       });
 
       cy.login('officer');
@@ -944,6 +948,7 @@ context('Instrument tests', () => {
             timeAllocation: 1,
             reviewerId: scientist2.id,
             submitted: false,
+            instrumentId: createdInstrumentId,
           });
         }
       });

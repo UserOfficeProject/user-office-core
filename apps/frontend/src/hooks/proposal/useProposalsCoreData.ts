@@ -160,7 +160,7 @@ export function useProposalsCoreData(
 }
 
 export interface ProposalViewData
-  extends Omit<ProposalView, 'technicalStatus'> {
+  extends Omit<ProposalView, 'technicalStatuses'> {
   status: string;
-  technicalStatus: string;
+  technicalStatuses: string[] | null;
 }

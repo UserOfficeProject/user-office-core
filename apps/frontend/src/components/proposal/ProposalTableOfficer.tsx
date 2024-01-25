@@ -193,7 +193,7 @@ const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
 ) => [
   {
-    title: 'Instruments',
+    title: t('instrument'),
     field: 'instrumentNames',
     render: (rowData: ProposalViewData) =>
       rowData.instrumentNames?.join(', ') || '-',

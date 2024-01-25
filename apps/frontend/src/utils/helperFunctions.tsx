@@ -62,8 +62,8 @@ export const getProposalStatus = (
   }
 };
 
-export const fromProposalToProposalView = (proposal: Proposal) => {
-  return {
+export const fromProposalToProposalView = (proposal: Proposal) =>
+  ({
     primaryKey: proposal.primaryKey,
     principalInvestigator: proposal.proposer || null,
     title: proposal.title,
@@ -106,8 +106,7 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     callId: proposal.callId,
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
-  } as ProposalViewData;
-};
+  } as ProposalViewData);
 
 export const capitalize = (s: string) =>
   s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();

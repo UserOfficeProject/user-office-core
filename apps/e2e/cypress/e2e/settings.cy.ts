@@ -787,6 +787,7 @@ context('Settings tests', () => {
             timeAllocation: 1,
             submitted: true,
             reviewerId: 0,
+            instrumentId: initialDBData.instrument1.id,
           });
         }
       });
@@ -838,6 +839,7 @@ context('Settings tests', () => {
             timeAllocation: 1,
             submitted: true,
             reviewerId: 0,
+            instrumentId: initialDBData.instrument1.id,
           });
 
           cy.assignProposalsToFap({
@@ -928,6 +930,7 @@ context('Settings tests', () => {
             timeAllocation: 1,
             submitted: true,
             reviewerId: 0,
+            instrumentId: initialDBData.instrument1.id,
           });
 
           cy.assignProposalsToFap({

@@ -28,18 +28,21 @@ BEGIN
 		          p.notified,
 		          p.questionary_id,
 		          p.management_time_allocation,
-				p.submitted,
+							p.submitted,
 		          t.technical_review_ids,
-				t.technical_review_assignee_ids,
-				t.technical_time_allocations,
+							t.technical_review_assignee_ids,
+							t.technical_time_allocations,
 		          t.technical_review_assignee_names,
 		          t.technical_review_statuses,
 		          t.technical_reviews_submitted,
-				ihp.instrument_ids,
+							t.internal_technical_reviewer_ids,
+							ihp.instrument_ids,
 		          ihp.instrument_names,
+							ihp.instrument_manager_ids,
+							ihp.instrument_scientist_ids,
 		          s.code AS sep_code,
 		          s.fap_id AS sep_id,
-				c.call_short_code,
+							c.call_short_code,
 		          c.allocation_time_unit,
 		          c.call_id,
 		          c.proposal_workflow_id,
@@ -56,26 +59,31 @@ BEGIN
 		  LEFT JOIN "fap_proposals" sp ON sp.proposal_pk = p.proposal_pk
 		  LEFT JOIN "faps" s ON s.fap_id = sp.fap_id
 		  LEFT JOIN "fap_meeting_decisions" smd ON smd.proposal_pk = p.proposal_pk
-		LEFT JOIN (
-			SELECT proposal_pk,
-				array_agg(t.time_allocation ORDER BY t.technical_review_id ASC) AS technical_time_allocations,
-				array_agg(t.technical_review_id ORDER BY t.technical_review_id ASC) AS technical_review_ids,
-				array_agg(t.technical_review_assignee_id ORDER BY t.technical_review_id ASC) AS technical_review_assignee_ids,
-				array_agg(t.status ORDER BY t.technical_review_id ASC) AS technical_review_statuses,
-				array_agg(t.submitted ORDER BY t.technical_review_id ASC) AS technical_reviews_submitted,
-				array_agg(u.firstname || ' ' || u.lastname ORDER BY t.technical_review_id ASC) AS technical_review_assignee_names
-			FROM technical_review t
-			LEFT JOIN users u ON u.user_id = t.technical_review_assignee_id
-			GROUP BY t.proposal_pk
-		) t ON t.proposal_pk = p.proposal_pk
-		LEFT JOIN (
-			SELECT proposal_pk,
-				array_agg(ihp.instrument_id) AS instrument_ids,
-				array_agg(i.name) AS instrument_names
-			FROM instrument_has_proposals ihp 
-			JOIN instruments i ON i.instrument_id = ihp.instrument_id
-			GROUP BY ihp.proposal_pk
-		) ihp ON ihp.proposal_pk = p.proposal_pk;
+			LEFT JOIN (
+				SELECT proposal_pk,
+					array_agg(t.time_allocation ORDER BY t.technical_review_id ASC) AS technical_time_allocations,
+					array_agg(t.technical_review_id ORDER BY t.technical_review_id ASC) AS technical_review_ids,
+					array_agg(t.technical_review_assignee_id ORDER BY t.technical_review_id ASC) AS technical_review_assignee_ids,
+					array_agg(t.status ORDER BY t.technical_review_id ASC) AS technical_review_statuses,
+					array_agg(t.submitted ORDER BY t.technical_review_id ASC) AS technical_reviews_submitted,
+					array_agg(u.firstname || ' ' || u.lastname ORDER BY t.technical_review_id ASC) AS technical_review_assignee_names,
+					array_agg(ir.reviewer_id ORDER BY t.technical_review_id) AS internal_technical_reviewer_ids
+				FROM technical_review t
+				LEFT JOIN users u ON u.user_id = t.technical_review_assignee_id
+				LEFT JOIN internal_reviews ir ON ir.technical_review_id = t.technical_review_id
+				GROUP BY t.proposal_pk
+			) t ON t.proposal_pk = p.proposal_pk
+			LEFT JOIN (
+				SELECT proposal_pk,
+					array_agg(ihp.instrument_id) AS instrument_ids,
+					array_agg(i.name) AS instrument_names,
+					array_agg(i.manager_user_id) AS instrument_manager_ids,
+					array_agg(ihs.user_id) AS instrument_scientist_ids
+				FROM instrument_has_proposals ihp 
+				JOIN instruments i ON i.instrument_id = ihp.instrument_id
+				LEFT JOIN instrument_has_scientists ihs ON i.instrument_id = ihs.instrument_id
+				GROUP BY ihp.proposal_pk
+			) ihp ON ihp.proposal_pk = p.proposal_pk;
 
 		-- Add new events in the proposal events table.
 		ALTER TABLE proposal_events ADD COLUMN proposal_all_feasibility_reviews_submitted BOOLEAN DEFAULT FALSE;

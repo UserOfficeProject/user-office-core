@@ -539,24 +539,18 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         database.raw('count(*) OVER() AS full_count'),
       ])
       .from('proposal_table_view')
-      .join('instruments', {
-        'instruments.instrument_id': 'proposal_table_view.instrument_id',
-      })
-      .leftJoin('instrument_has_scientists', {
-        'instrument_has_scientists.instrument_id':
-          'proposal_table_view.instrument_id',
-      })
-      .leftJoin(
-        'internal_reviews',
-        'proposal_table_view.technical_review_id',
-        'internal_reviews.technical_review_id'
-      )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
-          this.where('internal_reviews.reviewer_id', user.id);
+          this.whereRaw(
+            '? = ANY(proposal_table_view.internal_technical_reviewer_ids)',
+            user.id
+          );
         } else {
-          this.where('instrument_has_scientists.user_id', user.id).orWhere(
-            'instruments.manager_user_id',
+          this.whereRaw(
+            '? = ANY(proposal_table_view.instrument_scientist_ids)',
+            user.id
+          ).orWhereRaw(
+            '? = ANY(proposal_table_view.instrument_manager_ids)',
             user.id
           );
         }
@@ -575,13 +569,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.where('proposal_table_view.call_id', filter.callId);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
-          query.where(
-            'proposal_table_view.technical_review_assignee_id',
+          query.whereRaw(
+            '? = ANY(proposal_table_view.technical_review_assignee_ids)',
             user.id
           );
         }
         if (filter?.instrumentId) {
-          query.where('instruments.instrument_id', filter.instrumentId);
+          query.whereRaw(
+            '? = ANY(proposal_table_view.instrument_ids)',
+            filter.instrumentId
+          );
         }
 
         if (filter?.proposalStatusId) {

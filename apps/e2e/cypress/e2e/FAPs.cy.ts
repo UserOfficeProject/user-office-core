@@ -991,6 +991,7 @@ context('Fap meeting components tests', () => {
       timeAllocation: firstProposalTimeAllocation,
       submitted: true,
       reviewerId: 0,
+      instrumentId: createdInstrumentId,
     });
     cy.createInstrument(instrument).then((result) => {
       const createdInstrument = result.createInstrument;
@@ -1176,6 +1177,7 @@ context('Fap meeting components tests', () => {
             timeAllocation: secondProposalTimeAllocation,
             submitted: true,
             reviewerId: 0,
+            instrumentId: createdInstrumentId,
           });
 
           cy.assignProposalsToInstrument({
@@ -1280,6 +1282,7 @@ context('Fap meeting components tests', () => {
             timeAllocation: 5,
             submitted: true,
             reviewerId: 0,
+            instrumentId: createdInstrumentId,
           });
 
           cy.assignProposalsToInstrument({

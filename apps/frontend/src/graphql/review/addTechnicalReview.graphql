@@ -7,7 +7,7 @@ mutation addTechnicalReview(
   $submitted: Boolean!
   $reviewerId: Int!
   $files: String
-  $instrumentId: Int
+  $instrumentId: Int!
 ) {
   addTechnicalReview(
     addTechnicalReviewInput: {

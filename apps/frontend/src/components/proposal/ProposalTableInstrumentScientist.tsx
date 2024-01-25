@@ -3,9 +3,13 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
-import { Box, Button, Dialog, DialogContent } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import {
+  ResourceId,
+  getTranslation,
+} from '@user-office-software/duo-localisation';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
 import React, { useContext, useState, useEffect } from 'react';
@@ -138,14 +142,15 @@ let columns: Column<ProposalViewData>[] = [
 const technicalReviewColumns: Column<ProposalViewData>[] = [
   {
     title: 'Technical status',
-    field: 'technicalStatus',
-    emptyValue: '-',
+    field: 'technicalStatuses',
+    render: (rowData: ProposalViewData) =>
+      rowData.technicalStatuses?.join(', ') || '-',
   },
   {
     title: 'Technical time allocation',
     field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalTimeAllocations && rowData.technicalTimeAllocations[0]
+      rowData.technicalTimeAllocations
         ? `${rowData.technicalTimeAllocations?.join(', ')} (${
             rowData.allocationTimeUnit
           })`
@@ -161,7 +166,14 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
 
 const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
-) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
+) => [
+  {
+    title: t('instrument'),
+    field: 'instrumentNames',
+    render: (rowData: ProposalViewData) =>
+      rowData.instrumentNames?.join(', ') || '-',
+  },
+];
 
 const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
@@ -461,13 +473,21 @@ const ProposalTableInstrumentScientist = ({
   ) => {
     if (selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
-      const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
-        selectedProposals.map((proposal) => ({
-          proposalPk: proposal.primaryKey,
-          // TODO: Check this reviewerId here. Because we are sending the first reviewer but there might be multiple.
-          reviewerId: proposal.technicalReviewAssigneeIds?.[0] || user.id,
-          submitted: true,
-        }));
+      const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] = [];
+      selectedProposals.forEach((proposal) => {
+        if (proposal.instrumentIds) {
+          proposal.instrumentIds.forEach((instrumentId) => {
+            if (instrumentId) {
+              submittedTechnicalReviewsInput.push({
+                proposalPk: proposal.primaryKey,
+                reviewerId: user.id,
+                submitted: true,
+                instrumentId: instrumentId,
+              });
+            }
+          });
+        }
+      });
 
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} technical review submitted successfully!`,
@@ -551,13 +571,27 @@ const ProposalTableInstrumentScientist = ({
     const invalid = [];
 
     for await (const proposal of selectedProposals) {
-      const isValidSchema =
-        await proposalTechnicalReviewValidationSchema.isValid({
-          status: proposal.status,
-          timeAllocations: proposal.technicalTimeAllocations,
-        });
-      if (!isValidSchema) {
-        invalid.push(proposal);
+      if (
+        proposal.technicalStatuses?.length &&
+        proposal.technicalTimeAllocations?.length &&
+        proposal.technicalStatuses?.length ===
+          proposal.technicalTimeAllocations?.length
+      ) {
+        const isValidSchema = (
+          await Promise.all(
+            proposal.technicalStatuses.map(
+              async (technicalStatus, index) =>
+                await proposalTechnicalReviewValidationSchema.isValid({
+                  status: technicalStatus,
+                  timeAllocation: proposal.technicalTimeAllocations?.[index],
+                })
+            )
+          )
+        ).every(Boolean);
+
+        if (!isValidSchema) {
+          invalid.push(proposal);
+        }
       }
     }
 
@@ -634,12 +668,6 @@ const ProposalTableInstrumentScientist = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      // assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
-      //   ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
-      //   : '-',
-      // technicalTimeAllocationRendered: proposal.technicalTimeAllocation
-      //   ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
-      //   : '-',
     })
   );
 
@@ -718,8 +746,8 @@ const ProposalTableInstrumentScientist = ({
                       technicalReview.submitted ? 1 : 0
                     ) || null,
                   technicalStatuses:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) => technicalReview.status
+                    updatedProposal.technicalReviews?.map((technicalReview) =>
+                      getTranslation(technicalReview?.status as ResourceId)
                     ) || null,
                   technicalTimeAllocations:
                     updatedProposal.technicalReviews?.map(
@@ -781,24 +809,28 @@ const ProposalTableInstrumentScientist = ({
         options={Object.values(DownloadMenuOption)}
       />
       {isInstrumentScientist && (
-        <>
-          <ReviewerFilterComponent
-            reviewer={urlQueryParams.reviewer}
-            onChange={(reviewer) =>
-              setProposalFilter({ ...proposalFilter, reviewer })
-            }
-          />
-          <ProposalFilterBar
-            calls={{ data: calls, isLoading: loadingCalls }}
-            instruments={{ data: instruments, isLoading: loadingInstruments }}
-            proposalStatuses={{
-              data: proposalStatuses,
-              isLoading: loadingProposalStatuses,
-            }}
-            setProposalFilter={setProposalFilter}
-            filter={proposalFilter}
-          />
-        </>
+        <Grid container spacing={2}>
+          <Grid item sm={2} xs={12}>
+            <ReviewerFilterComponent
+              reviewer={urlQueryParams.reviewer}
+              onChange={(reviewer) =>
+                setProposalFilter({ ...proposalFilter, reviewer })
+              }
+            />
+          </Grid>
+          <Grid item sm={10} xs={12}>
+            <ProposalFilterBar
+              calls={{ data: calls, isLoading: loadingCalls }}
+              instruments={{ data: instruments, isLoading: loadingInstruments }}
+              proposalStatuses={{
+                data: proposalStatuses,
+                isLoading: loadingProposalStatuses,
+              }}
+              setProposalFilter={setProposalFilter}
+              filter={proposalFilter}
+            />
+          </Grid>
+        </Grid>
       )}
       <MaterialTable
         icons={tableIcons}
