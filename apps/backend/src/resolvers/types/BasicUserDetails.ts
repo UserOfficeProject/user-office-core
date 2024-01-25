@@ -28,7 +28,11 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field()
   public position: string;
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.INTERNAL_REVIEWER,
+  ])
   @Field({ nullable: true })
   public email: string;
 
