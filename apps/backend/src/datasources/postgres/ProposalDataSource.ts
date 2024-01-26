@@ -371,10 +371,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.where('proposal_table_view.call_id', filter?.callId);
         }
         if (filter?.instrumentId) {
-          // query.where(
-          //   'proposal_table_view.instrument_id',
-          //   filter?.instrumentId
-          // );
           query.whereRaw('? = ANY(instrument_ids)', filter?.instrumentId);
         }
 

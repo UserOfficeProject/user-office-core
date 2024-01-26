@@ -30,9 +30,6 @@ export default class ProposalQueries {
   @Authorized()
   async get(agent: UserWithRole | null, primaryKey: number) {
     let proposal = await this.dataSource.get(primaryKey);
-    const proposalTechnicalReview = (
-      await this.reviewDataSource.getTechnicalReviews(primaryKey)
-    )?.[0];
 
     if (!proposal) {
       return null;
@@ -51,13 +48,7 @@ export default class ProposalQueries {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
 
-    if (
-      (await this.hasReadRights(agent, proposal)) === true ||
-      (await this.userAuth.isInternalReviewerOnTechnicalReview(
-        agent,
-        proposalTechnicalReview?.id
-      ))
-    ) {
+    if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
     } else {
       return null;

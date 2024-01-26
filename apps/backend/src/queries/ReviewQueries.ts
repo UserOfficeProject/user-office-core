@@ -65,14 +65,19 @@ export default class ReviewQueries {
       return null;
     }
 
-    // TODO: Review this
-    // const hasReadRights = await this.technicalReviewAuth.hasReadRights(
-    //   agent,
-    //   technicalreview
-    // );
-    // if (hasReadRights === false) {
-    //   return null;
-    // }
+    // NOTE: We only return the tehcnical reviews that the user has rights to see.
+    await Promise.all(
+      technicalReviews.map(async (tehcnicalReview, index) => {
+        const hasReadRights = await this.technicalReviewAuth.hasReadRights(
+          agent,
+          tehcnicalReview
+        );
+
+        if (!hasReadRights) {
+          technicalReviews.splice(index, 1);
+        }
+      })
+    );
 
     const isReviewerOfProposal = await this.proposalAuth.isReviewerOfProposal(
       agent,

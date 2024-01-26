@@ -135,7 +135,8 @@ export default class ReviewMutations {
   ): Promise<TechnicalReview | Rejection> {
     const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
       agent,
-      args.proposalPk
+      args.proposalPk,
+      args.instrumentId
     );
     if (!hasWriteRights) {
       return rejection(
@@ -201,7 +202,8 @@ export default class ReviewMutations {
   ): Promise<TechnicalReview | Rejection> {
     const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
       agent,
-      args.proposalPk
+      args.proposalPk,
+      args.instrumentId
     );
     if (!hasWriteRights) {
       return rejection(
@@ -265,13 +267,17 @@ export default class ReviewMutations {
 
   async isTechnicalReviewAssignee(
     proposalPks: number[],
-    assigneeUserId?: number
+    instrumentId: number,
+    loggedInUserId?: number
   ) {
     for await (const proposalPk of proposalPks) {
       const technicalReviewAssignee = (
-        await this.dataSource.getTechnicalReviews(proposalPk)
-      )?.[0].technicalReviewAssigneeId;
-      if (technicalReviewAssignee !== assigneeUserId) {
+        await this.dataSource.getProposalInstrumentTechnicalReview(
+          proposalPk,
+          instrumentId
+        )
+      )?.technicalReviewAssigneeId;
+      if (technicalReviewAssignee !== loggedInUserId) {
         return false;
       }
     }
@@ -286,7 +292,11 @@ export default class ReviewMutations {
   ): Promise<TechnicalReview[] | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !this.isTechnicalReviewAssignee(args.proposalPks, agent?.id)
+      !this.isTechnicalReviewAssignee(
+        args.proposalPks,
+        args.instrumentId,
+        agent?.id
+      )
     ) {
       return rejection('NOT_ALLOWED');
     }
