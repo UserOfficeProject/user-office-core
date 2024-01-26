@@ -25,6 +25,12 @@ context('Proposal tests', () => {
     name: faker.random.words(2),
     description: faker.random.words(5),
   };
+  const instrument1 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: initialDBData.users.user1.id,
+  };
 
   const proposalInternalWorkflow = {
     name: faker.random.words(2),
@@ -405,6 +411,27 @@ context('Proposal tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
+
+      const allocationTime = '10';
+      cy.createInstrument(instrument1).then((result) => {
+        if (result.createInstrument) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+          });
+
+          cy.assignProposalsToInstrument({
+            instrumentIds: [result.createInstrument.id],
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: createdProposalPk,
+                workflowId: createdWorkflowId,
+              },
+            ],
+          });
+        }
+      });
       cy.login('officer');
       cy.visit('/');
 
@@ -423,7 +450,7 @@ context('Proposal tests', () => {
 
       cy.contains('Technical review').click();
 
-      cy.get('[data-cy="timeAllocation"] input').clear().type('10');
+      cy.get('[data-cy="timeAllocation"] input').clear().type(allocationTime);
 
       cy.get('[data-cy="technical-review-status"]').click();
       cy.get('[data-cy="technical-review-status-options"]')
@@ -434,7 +461,9 @@ context('Proposal tests', () => {
 
       cy.closeModal();
 
-      cy.contains(newProposalTitle).parent().contains('10(Days)');
+      cy.contains(newProposalTitle)
+        .parent()
+        .contains(`${allocationTime} (${AllocationTimeUnits.DAY}s)`);
 
       cy.contains('Calls').click();
 
@@ -446,7 +475,7 @@ context('Proposal tests', () => {
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="allocation-time-unit"]').click();
-      cy.contains('Hour').click();
+      cy.contains(AllocationTimeUnits.HOUR).click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
@@ -460,7 +489,9 @@ context('Proposal tests', () => {
       cy.notification({ variant: 'success', text: 'successfully' });
 
       cy.contains('Proposals').click();
-      cy.contains(newProposalTitle).parent().contains('10(Hours)');
+      cy.contains(newProposalTitle)
+        .parent()
+        .contains(`${allocationTime} (${AllocationTimeUnits.HOUR}s)`);
     });
 
     it('Should be able clone proposal to another call', () => {

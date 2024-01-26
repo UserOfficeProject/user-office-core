@@ -252,7 +252,9 @@ context('Proposal administration tests', () => {
 
       cy.reload();
 
-      cy.get('[data-cy="timeAllocation"]').should('exist');
+      cy.get('button[role="tab"]')
+        .contains('Technical review')
+        .should('have.attr', 'aria-selected', 'true');
     });
 
     it('Download proposal is working with dialog window showing up', () => {

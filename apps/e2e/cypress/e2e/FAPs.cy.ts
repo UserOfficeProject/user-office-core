@@ -2125,61 +2125,62 @@ context('Fap meeting components tests', () => {
   });
 });
 
-context('Automatic Fap assignment to Proposal', () => {
-  const scientist1 = initialDBData.users.user1;
-  const instrument1 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
-    managerUserId: scientist1.id,
-  };
+// TODO: Enable this test when the automatic FAP assignment to proposal is in place again after changes with multi-instrument proposals.
+// context('Automatic Fap assignment to Proposal', () => {
+//   const scientist1 = initialDBData.users.user1;
+//   const instrument1 = {
+//     name: faker.random.words(2),
+//     shortCode: faker.random.alphaNumeric(15),
+//     description: faker.random.words(5),
+//     managerUserId: scientist1.id,
+//   };
 
-  beforeEach(function () {
-    cy.resetDB();
-    cy.getAndStoreFeaturesEnabled().then(() => {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
-        this.skip();
-      }
-      updateUsersRoles();
-    });
-    initializationBeforeTests();
-  });
+//   beforeEach(function () {
+//     cy.resetDB();
+//     cy.getAndStoreFeaturesEnabled().then(() => {
+//       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
+//         this.skip();
+//       }
+//       updateUsersRoles();
+//     });
+//     initializationBeforeTests();
+//   });
 
-  it('Automatic Fap assignment to Proposal, when an Instrument is assigned to a Proposal', () => {
-    cy.createInstrument(instrument1).then((result) => {
-      if (result.createInstrument) {
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [
-            {
-              instrumentId: result.createInstrument.id,
-              fapId: initialDBData.fap.id,
-            },
-          ],
-        });
+//   it('Automatic Fap assignment to Proposal, when an Instrument is assigned to a Proposal', () => {
+//     cy.createInstrument(instrument1).then((result) => {
+//       if (result.createInstrument) {
+//         cy.assignInstrumentToCall({
+//           callId: initialDBData.call.id,
+//           instrumentFapIds: [
+//             {
+//               instrumentId: result.createInstrument.id,
+//               fapId: initialDBData.fap.id,
+//             },
+//           ],
+//         });
 
-        cy.createProposal({ callId: initialDBData.call.id }).then(
-          (response) => {
-            if (response.createProposal) {
-              createdProposalPk = response.createProposal.primaryKey;
-            }
-          }
-        );
+//         cy.createProposal({ callId: initialDBData.call.id }).then(
+//           (response) => {
+//             if (response.createProposal) {
+//               createdProposalPk = response.createProposal.primaryKey;
+//             }
+//           }
+//         );
 
-        cy.assignProposalsToInstrument({
-          proposals: [
-            { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-          ],
-          instrumentIds: [result.createInstrument.id],
-        });
+//         cy.assignProposalsToInstrument({
+//           proposals: [
+//             { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+//           ],
+//           instrumentIds: [result.createInstrument.id],
+//         });
 
-        cy.login('officer');
-        cy.visit('/Proposals');
+//         cy.login('officer');
+//         cy.visit('/Proposals');
 
-        cy.contains('td', createdProposalId)
-          .siblings()
-          .should('contain.text', initialDBData.fap.code);
-      }
-    });
-  });
-});
+//         cy.contains('td', createdProposalId)
+//           .siblings()
+//           .should('contain.text', initialDBData.fap.code);
+//       }
+//     });
+//   });
+// });

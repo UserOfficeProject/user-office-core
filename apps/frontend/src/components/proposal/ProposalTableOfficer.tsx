@@ -183,7 +183,7 @@ const technicalReviewColumns = [
       rowData.technicalTimeAllocations && rowData.technicalTimeAllocations[0]
         ? `${rowData.technicalTimeAllocations?.join(', ')} (${
             rowData.allocationTimeUnit
-          })`
+          }s)`
         : '-',
     hidden: true,
   },
@@ -777,7 +777,7 @@ const ProposalTableOfficer = ({
               (selectedProposal) => selectedProposal.statusId
             )}
             allSelectedProposalsHaveInstrument={selectedProposals.every(
-              (selectedProposal) => selectedProposal.instrumentIds
+              (selectedProposal) => selectedProposal.instrumentIds?.length
             )}
           />
         </DialogContent>

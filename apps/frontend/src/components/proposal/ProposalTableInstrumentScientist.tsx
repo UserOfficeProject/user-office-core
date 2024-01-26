@@ -153,7 +153,7 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
       rowData.technicalTimeAllocations
         ? `${rowData.technicalTimeAllocations?.join(', ')} (${
             rowData.allocationTimeUnit
-          })`
+          }s)`
         : '-',
   },
   {
