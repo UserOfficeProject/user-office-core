@@ -262,7 +262,7 @@ context('General scientific evaluation panel tests', () => {
         );
       });
 
-      cy.get('[aria-label="Set Fap Secretary"]').click();
+      cy.get('[data-cy="add-secretary-button"]').click();
 
       cy.finishedLoading();
 
@@ -297,11 +297,13 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('Members').click();
 
-      cy.get('input[id="FapSecretary"]').should((element) => {
-        expect(element.val()).to.contain(
-          `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
-        );
-      });
+      cy.get('input[id="FapSecretary-' + fapMembers.secretary.id + '"]').should(
+        (element) => {
+          expect(element.val()).to.contain(
+            `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
+          );
+        }
+      );
     });
 
     it('Officer should be able to remove assigned Fap Chair and Fap Secretary from existing Fap', function () {

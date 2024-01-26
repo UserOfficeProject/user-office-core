@@ -955,9 +955,11 @@ context('Fap meeting components tests', () => {
   let createdInstrumentId: number;
 
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-      this.skip();
-    }
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
@@ -2044,7 +2046,7 @@ context('Fap meeting components tests', () => {
       // NOTE: Testing native html required validation message.
       cy.get('[data-cy="grade-proposal"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Please fill out this field.'
+          'Please fill in this field.'
         );
       });
       cy.get('[data-cy="grade-proposal"]').click();
