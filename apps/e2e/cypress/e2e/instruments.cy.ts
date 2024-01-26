@@ -226,8 +226,6 @@ context('Instrument tests', () => {
         .contains(instrument1.name)
         .click();
 
-      cy.get('body').type('{esc}');
-
       cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
       cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');

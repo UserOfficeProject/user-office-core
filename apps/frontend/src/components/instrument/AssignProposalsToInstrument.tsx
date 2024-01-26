@@ -31,14 +31,9 @@ const AssignProposalsToInstrument = ({
 
   const { instruments, loadingInstruments } = useInstrumentsData(callIds);
 
-  // const allSelectedProposalsHaveSameInstrument = instrumentIds.every(
-  //   (item) => item === instrumentIds[0]
-  // );
-
-  // const selectedProposalsInstrument =
-  //   allSelectedProposalsHaveSameInstrument && instrumentIds[0]
-  //     ? instrumentIds[0]
-  //     : null;
+  const uniqueInstrumentIds = instrumentIds.filter((value, index, self) => {
+    return self.indexOf(value) === index;
+  });
 
   return (
     <Container
@@ -48,7 +43,7 @@ const AssignProposalsToInstrument = ({
     >
       <Formik
         initialValues={{
-          selectedInstrumentIds: instrumentIds || null,
+          selectedInstrumentIds: uniqueInstrumentIds || null,
         }}
         onSubmit={async (values): Promise<void> => {
           const selectedInstruments = instruments.filter((instrument) =>
@@ -76,7 +71,6 @@ const AssignProposalsToInstrument = ({
                   name="selectedInstrumentIds"
                   label="Select instruments"
                   loading={loadingInstruments}
-                  disableCloseOnSelect={true}
                   multiple={true}
                   items={instruments.map((instrument) => ({
                     value: instrument.id,

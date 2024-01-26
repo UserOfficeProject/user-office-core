@@ -705,12 +705,6 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      // assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
-      //   ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
-      //   : '-',
-      // technicalTimeAllocationRendered: proposal.technicalTimeAllocation
-      //   ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
-      //   : '-',
       finalTimeAllocationRendered: proposal.managementTimeAllocation
         ? `${proposal.managementTimeAllocation}(${proposal.allocationTimeUnit}s)`
         : '-',
