@@ -228,7 +228,7 @@ export default class FapMutations {
     }
 
     return this.dataSource
-      .removeMemberFromFap(args, isMemberToRemoveChairOrSecretaryOfFap)
+      .removeMemberFromFap(args, args.roleId === UserRole.FAP_CHAIR)
       .catch((error) => {
         return rejection(
           'Could not remove member from scientific evaluation panel',

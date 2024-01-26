@@ -119,10 +119,14 @@ const FapMembers = ({
     setFapSecretaryModalOpen(false);
     onFapUpdate({
       ...fapData,
-      fapSecretary,
+      fapSecretary:
+        fapData.fapSecretary?.concat([fapSecretary]) ?? fapData.fapSecretary,
     });
 
-    if (fapSecretary.id === user.id || fapData.fapSecretary?.id === user.id) {
+    if (
+      fapSecretary.id === user.id ||
+      fapData.fapSecretary?.find((sec) => sec.id === user.id)
+    ) {
       setRenewTokenValue();
     }
   };
@@ -154,29 +158,37 @@ const FapMembers = ({
       roleId: user.roleId,
     });
 
-    if (user.roleId === UserRole.FAP_REVIEWER) {
-      setFapReviewersData((fapReviewers) =>
-        fapReviewers.filter(({ userId }) => userId !== user.id)
-      );
-    } else {
-      const key =
-        user.roleId === UserRole.FAP_CHAIR ? 'fapChair' : 'fapSecretary';
-      onFapUpdate({
-        ...fapData,
-        [key]: null,
-      });
+    switch (user.roleId) {
+      case UserRole.FAP_REVIEWER:
+        setFapReviewersData((fapReviewers) =>
+          fapReviewers.filter(({ userId }) => userId !== user.id)
+        );
+        break;
+      case UserRole.FAP_SECRETARY:
+        onFapUpdate({
+          ...fapData,
+          fapSecretary: fapData.fapSecretary.filter(
+            (sec) => sec.id !== user.id
+          ),
+        });
+        break;
+      case UserRole.FAP_CHAIR:
+        onFapUpdate({
+          ...fapData,
+          fapChair: null,
+        });
     }
   };
 
-  const removeChairOrSecretary = (roleId: UserRole) => {
-    const memberToRemove =
-      roleId === UserRole.FAP_CHAIR ? fapData.fapChair : fapData.fapSecretary;
-
+  const removeChairOrSecretary = (
+    memberToRemove: BasicUserDetails,
+    roleId: UserRole
+  ) => {
     confirm(
       () => {
         removeMember({
-          ...(memberToRemove as BasicUserDetails),
-          roleId,
+          ...memberToRemove,
+          roleId: roleId,
         });
       },
       {
@@ -194,10 +206,11 @@ const FapMembers = ({
 
   const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
 
-  const alreadySelectedMembers = FapReviewersData.map(({ userId }) => userId);
+  const alreadySelectedMembers = FapReviewersData.map(
+    ({ userId }) => userId
+  ).concat(fapData.fapSecretary.map((sec) => sec.id));
 
   fapData.fapChair && alreadySelectedMembers.push(fapData.fapChair.id);
-  fapData.fapSecretary && alreadySelectedMembers.push(fapData.fapSecretary.id);
 
   const FapReviewersDataWithId = FapReviewersData.map((fapReviewer) =>
     Object.assign(fapReviewer, { id: fapReviewer.userId })
@@ -244,7 +257,7 @@ const FapMembers = ({
             label="Fap Chair"
             type="text"
             value={getFullUserName(fapData.fapChair)}
-            margin="none"
+            margin="normal"
             fullWidth
             data-cy="FapChair"
             required
@@ -257,7 +270,10 @@ const FapMembers = ({
                       <IconButton
                         aria-label="Remove Fap chair"
                         onClick={() =>
-                          removeChairOrSecretary(UserRole.FAP_CHAIR)
+                          removeChairOrSecretary(
+                            fapData.fapChair as BasicUserDetails,
+                            UserRole.FAP_CHAIR
+                          )
                         }
                       >
                         <Clear />
@@ -291,59 +307,73 @@ const FapMembers = ({
           />
         </Grid>
         <Grid item sm={6} xs={12}>
-          <TextField
-            name="FapSecretary"
-            id="FapSecretary"
-            label="Fap Secretary"
-            type="text"
-            value={getFullUserName(fapData.fapSecretary)}
-            margin="none"
-            fullWidth
-            data-cy="FapSecretary"
-            required
-            InputProps={{
-              readOnly: true,
-              endAdornment: isUserOfficer && (
-                <>
-                  {fapData.fapSecretary && (
+          {fapData.fapSecretary.map((sec, index) => (
+            <TextField
+              key={sec.id}
+              name="FapSecretary"
+              id={'FapSecretary-' + sec.id}
+              label="Fap Secretary"
+              type="text"
+              value={getFullUserName(sec)}
+              margin="normal"
+              fullWidth
+              data-cy="FapSecretary"
+              required
+              InputProps={{
+                readOnly: true,
+                endAdornment: isUserOfficer && (
+                  <>
                     <Tooltip title="Remove Fap Secretary">
                       <IconButton
                         aria-label="Remove Fap secretary"
                         onClick={() =>
-                          removeChairOrSecretary(UserRole.FAP_SECRETARY)
+                          removeChairOrSecretary(sec, UserRole.FAP_SECRETARY)
                         }
                       >
                         <Clear />
                       </IconButton>
                     </Tooltip>
-                  )}
-                  <Tooltip title="Set Fap Secretary">
-                    <IconButton
-                      edge="start"
-                      onClick={() => setFapSecretaryModalOpen(true)}
-                    >
-                      <Person />
-                    </IconButton>
+                    <Tooltip title="Set Fap Secretary">
+                      <IconButton
+                        edge="start"
+                        onClick={() => setFapSecretaryModalOpen(true)}
+                      >
+                        <Person />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ),
+                startAdornment: fapData.fapSecretary && (
+                  <Tooltip
+                    title={`Number of proposals to review: ${
+                      fapData.fapSecretaryProposalCount[index] || 0
+                    }`}
+                    sx={{ padding: '2px', marginRight: '4px' }}
+                  >
+                    <InfoOutlined
+                      fontSize="small"
+                      data-cy="fap-secretary-reviews-info"
+                    />
                   </Tooltip>
-                </>
-              ),
-              startAdornment: fapData.fapSecretary && (
-                <Tooltip
-                  title={`Number of proposals to review: ${
-                    fapData.fapSecretaryProposalCount || 0
-                  }`}
-                  sx={{ padding: '2px', marginRight: '4px' }}
-                >
-                  <InfoOutlined
-                    fontSize="small"
-                    data-cy="fap-secretary-reviews-info"
-                  />
-                </Tooltip>
-              ),
-            }}
-          />
+                ),
+              }}
+            />
+          ))}
         </Grid>
       </Grid>
+      {isUserOfficer && (
+        <Grid>
+          <div style={{ textAlign: 'right' }}>
+            <Button
+              onClick={() => setFapSecretaryModalOpen(true)}
+              aria-label="Add New FAP Secretary Button"
+              data-cy="add-secretary-button"
+            >
+              Add Secretary
+            </Button>
+          </div>
+        </Grid>
+      )}
       <Grid container spacing={3}>
         <Grid data-cy="fap-reviewers-table" item xs={12}>
           <MaterialTable

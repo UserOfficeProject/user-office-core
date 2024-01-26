@@ -8,7 +8,7 @@ export class Fap {
     public customGradeGuide: boolean | null,
     public active: boolean,
     public fapChairUserId: number | null,
-    public fapSecretaryUserId: number | null
+    public fapSecretaryUserIds: number[] | null
   ) {}
 }
 
