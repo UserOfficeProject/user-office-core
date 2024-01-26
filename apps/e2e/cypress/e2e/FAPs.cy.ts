@@ -2046,7 +2046,7 @@ context('Fap meeting components tests', () => {
       // NOTE: Testing native html required validation message.
       cy.get('[data-cy="grade-proposal"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Please fill in this field.'
+          'Please fill out this field.'
         );
       });
       cy.get('[data-cy="grade-proposal"]').click();

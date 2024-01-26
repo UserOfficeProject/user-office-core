@@ -65,7 +65,7 @@ export class LRUCache<T> implements ILRUCache<T> {
 
   public constructor(maxEntries: number, secondsToLive?: number) {
     this.maxEntries = maxEntries;
-    this.millisecondsToLive = 5000;
+    this.millisecondsToLive = secondsToLive ? secondsToLive * 1000 : 10000;
   }
 
   /**
