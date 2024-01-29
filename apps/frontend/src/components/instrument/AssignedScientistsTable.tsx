@@ -1,4 +1,11 @@
 import MaterialTable from '@material-table/core';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
@@ -81,12 +88,22 @@ const AssignedScientistsTable = ({
       className={classes.root}
       data-cy="instrument-scientist-assignments-table"
     >
-      <div>
-        Beam Line Manager :{' '}
-        {(instrument.beamlineManager?.firstname || '') +
-          ' ' +
-          instrument.beamlineManager?.lastname}
-      </div>
+      <TableContainer>
+        <Table className={classes.root}>
+          <TableBody>
+            <TableRow key="BeamlinemanagerName">
+              <TableCell align="center">
+                BeamLine Manager of {instrument.name} :{' '}
+                {instrument.beamlineManager?.firstname +
+                  ' ' +
+                  instrument.beamlineManager?.lastname}
+                . Below are the instrument scientists assigned to{' '}
+                {instrument.name}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
