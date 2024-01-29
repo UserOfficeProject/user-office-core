@@ -71,8 +71,12 @@ const ProposalReviewModal = ({
      * TODO: This needs to be refactored a bit and instead of loading proposal before close we could use the proposal used in the modal content tabs.
      * For now this is the easiest solution to get all changes that are done on the proposal inside the modal.
      */
-    const freshProposal = await loadProposal();
-    setProposalReviewModalOpen(freshProposal);
+    try {
+      const freshProposal = await loadProposal();
+      setProposalReviewModalOpen(freshProposal);
+    } catch {
+      setProposalReviewModalOpen();
+    }
   };
 
   return (

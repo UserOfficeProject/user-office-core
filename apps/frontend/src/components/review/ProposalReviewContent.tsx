@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
-import SimpleTabs from 'components/common/TabPanel';
+import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import ExternalReviews from 'components/fap/MeetingComponents/ProposalViewModal/ExternalReviews';
@@ -25,7 +25,6 @@ import {
   useProposalData,
 } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
-import { StyledPaper } from 'styles/StyledComponents';
 
 import InternalReviews from '../internalReview/InternalReviews';
 import ProposalGrade from './ProposalGrade';
@@ -94,10 +93,15 @@ const ProposalReviewContent = ({
     />
   );
 
+  const getTechnicalReviewInstrument = (instrumentId: number) =>
+    proposalData.instruments?.find(
+      (instrument) => instrument?.id === instrumentId
+    );
+
   const technicalReviewsContent = proposalData.technicalReviews?.map(
     (technicalReview) => {
-      const technicalReviewInstrument = proposalData.instruments?.find(
-        (instrument) => instrument?.id === technicalReview.instrumentId
+      const technicalReviewInstrument = getTechnicalReviewInstrument(
+        technicalReview.instrumentId
       );
 
       return isUserOfficer ||
@@ -159,10 +163,12 @@ const ProposalReviewContent = ({
   const TechnicalReviewTab = proposalData.technicalReviews?.length ? (
     proposalData.technicalReviews.length > 1 ? (
       <SimpleTabs
+        orientation="vertical"
         tabNames={
           proposalData.technicalReviews?.map(
             (technicalReview) =>
-              `Review for instrument ${technicalReview.instrumentId}`
+              getTechnicalReviewInstrument(technicalReview.instrumentId)
+                ?.name || 'None'
           ) || []
         }
       >
@@ -230,7 +236,7 @@ const ProposalReviewContent = ({
   });
 
   return (
-    <StyledPaper>
+    <>
       {tabNames.length > 1 ? (
         <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
           {tabsContent}
@@ -238,7 +244,7 @@ const ProposalReviewContent = ({
       ) : (
         <>{tabsContent}</>
       )}
-    </StyledPaper>
+    </>
   );
 };
 
