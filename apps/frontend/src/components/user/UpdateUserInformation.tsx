@@ -102,7 +102,6 @@ export default function UpdateUserInformation(
     nationality: userData.nationality,
     birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
     institutionId: userData.institutionId,
-    organizationCountry: 0,
     department: userData.department,
     position: userData.position,
     oldEmail: userData.email,
@@ -167,8 +166,6 @@ export default function UpdateUserInformation(
           ...values,
           nationality: +(values.nationality as number),
           institutionId: +values.institutionId,
-          organizationCountry:
-            +values.institutionId === 1 ? +values.organizationCountry : null,
           gender:
             values.gender === 'other' ? values.othergender : values.gender,
         } as UpdateUserMutationVariables;
@@ -351,11 +348,11 @@ export default function UpdateUserInformation(
               />
               <FormikUIAutocomplete
                 name="institutionId"
-                label="Organization"
+                label="Institution"
                 items={institutionsList}
                 data-cy="institution"
                 loading={loadingInstitutions}
-                noOptionsText="No organizations"
+                noOptionsText="No institutions"
               />
               {+values.institutionId === 1 && (
                 <>
@@ -369,15 +366,6 @@ export default function UpdateUserInformation(
                     fullWidth
                     data-cy="otherInstitution"
                     required
-                  />
-                  <FormikUIAutocomplete
-                    name="organizationCountry"
-                    label="Please specify organization country"
-                    items={countriesList}
-                    data-cy="organizationCountry"
-                    required
-                    loading={!countries}
-                    noOptionsText="No countries"
                   />
                 </>
               )}
