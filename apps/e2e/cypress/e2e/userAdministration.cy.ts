@@ -52,9 +52,6 @@ context('User administration tests', () => {
 
     cy.get("[name='otherInstitution']").clear().type(newInstitution);
 
-    cy.get('[data-cy="organizationCountry"] input').click();
-    cy.get('[data-cy="organizationCountry-options"]').first().click();
-
     cy.contains('Update Profile').click();
 
     cy.notification({ variant: 'success', text: 'Updated Information' });
