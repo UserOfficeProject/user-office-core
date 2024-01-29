@@ -214,8 +214,9 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   async getInstitutionUsers(id: number): Promise<BasicUserDetails[]> {
     return database
       .select()
-      .from('users')
-      .where('institution_id', id)
+      .from('users as u')
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .where('u.institution_id', id)
       .then((users: Array<UserRecord & InstitutionRecord>) =>
         users.map((user) => createBasicUserObject(user))
       );

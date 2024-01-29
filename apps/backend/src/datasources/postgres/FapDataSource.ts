@@ -291,7 +291,7 @@ export default class PostgresFapDataSource implements FapDataSource {
   ): Promise<BasicUserDetails[]> {
     const fapProposalReviewers: Array<UserRecord & InstitutionRecord> =
       await database
-        .select(['users.*, institutions.*'])
+        .select(['users.*', 'institutions.*']) // Adjusted here
         .from('fap_reviews as sr')
         .join('fap_proposals as sp', {
           'sr.proposal_pk': 'sp.proposal_pk',
@@ -300,7 +300,9 @@ export default class PostgresFapDataSource implements FapDataSource {
         .join('users', {
           'users.user_id': 'sr.user_id',
         })
-        .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+        .join('institutions', {
+          'users.institution_id': 'institutions.institution_id',
+        })
         .where('sp.proposal_pk', proposalPk)
         .andWhere('sp.call_id', callId);
 

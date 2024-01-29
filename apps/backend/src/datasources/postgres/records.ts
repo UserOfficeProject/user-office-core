@@ -255,12 +255,6 @@ export interface UserRecord {
   readonly placeholder: boolean;
 }
 
-export interface UserRecordWithInstitution {
-  user: UserRecord;
-  institution: InstitutionRecord;
-  country: CountryRecord;
-}
-
 export interface VisitRegistrationRecord {
   user_id: number;
   visit_id: number;
