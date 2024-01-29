@@ -182,12 +182,10 @@ context('User administration tests', () => {
         gender: 'male',
         nationality: 1,
         birthdate: new Date('2000/04/02'),
-        organisation: 1,
         department: 'IT deparment',
         position: 'Management',
         email: 'ben@inbox.com',
         telephone: '(288) 221-4533',
-        organizationCountry: 1,
       });
     }
     cy.login('user2', initialDBData.roles.user);
@@ -234,12 +232,10 @@ context('User administration tests', () => {
         gender: 'male',
         nationality: 1,
         birthdate: new Date('1995/04/01'),
-        organisation: 1,
         department: 'Maxillofacial surgeon',
         position: 'Management',
         email: 'david@teleworm.us',
         telephone: '(288) 221-4533',
-        organizationCountry: 1,
       });
     }
 

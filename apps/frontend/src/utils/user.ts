@@ -27,9 +27,9 @@ export const getFullUserNameWithOrganisation = (
   user
     ? `${user.preferredname}`
       ? `${user.preferredname} ${user.lastname}; ${
-          user.organisation ? `${user.organisation}` : ''
+          user.institution ? `${user.institution}` : ''
         }`
       : `${user.firstname} ${user.lastname}; ${
-          user.organisation ? `${user.organisation}` : ''
+          user.institution ? `${user.institution}` : ''
         }`
     : 'None';
