@@ -98,7 +98,7 @@ const ProposalReviewContent = ({
       (instrument) => instrument?.id === instrumentId
     );
 
-  const technicalReviewsContent = proposalData.technicalReviews?.map(
+  const technicalReviewsContent = proposalData.technicalReviews.map(
     (technicalReview) => {
       const technicalReviewInstrument = getTechnicalReviewInstrument(
         technicalReview.instrumentId
@@ -125,7 +125,7 @@ const ProposalReviewContent = ({
                 setProposalData({
                   ...proposalData,
                   technicalReviews:
-                    proposalData.technicalReviews?.map((tReview) =>
+                    proposalData.technicalReviews.map((tReview) =>
                       updatedTechnicalReview.id === tReview.id
                         ? updatedTechnicalReview
                         : tReview
@@ -141,7 +141,7 @@ const ProposalReviewContent = ({
               setProposalData({
                 ...proposalData,
                 technicalReviews:
-                  proposalData.technicalReviews?.map((technicalReview) => {
+                  proposalData.technicalReviews.map((technicalReview) => {
                     if (technicalReview.id === data?.id) {
                       return { ...technicalReview, ...data };
                     } else {
@@ -160,7 +160,7 @@ const ProposalReviewContent = ({
     }
   );
 
-  const TechnicalReviewTab = proposalData.technicalReviews?.length ? (
+  const TechnicalReviewTab = proposalData.technicalReviews.length ? (
     proposalData.technicalReviews.length > 1 ? (
       <SimpleTabs
         orientation="vertical"

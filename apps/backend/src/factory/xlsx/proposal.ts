@@ -81,7 +81,7 @@ export const collectProposalXLSXData = async (
     proposal.proposalId,
     proposal.title,
     `${proposer.firstname} ${proposer.lastname}`,
-    technicalReviews?.length
+    technicalReviews.length
       ? technicalReviews
           .map((technicalReview) =>
             technicalReview?.status !== undefined &&

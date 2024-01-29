@@ -56,13 +56,13 @@ export default class ReviewQueries {
   async technicalReviewsForProposal(
     agent: UserWithRole | null,
     proposalPk: number
-  ): Promise<TechnicalReview[] | null> {
+  ): Promise<TechnicalReview[]> {
     const technicalReviews = await this.dataSource.getTechnicalReviews(
       proposalPk
     );
 
     if (!technicalReviews) {
-      return null;
+      return [];
     }
 
     // NOTE: We only return the tehcnical reviews that the user has rights to see.
