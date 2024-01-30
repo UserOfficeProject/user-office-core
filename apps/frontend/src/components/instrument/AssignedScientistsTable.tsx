@@ -42,7 +42,7 @@ const assignmentColumns = [
   },
   {
     title: 'Institution',
-    field: 'institution',
+    field: 'institutions',
   },
 ];
 
