@@ -1,11 +1,4 @@
 import MaterialTable from '@material-table/core';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
@@ -52,7 +45,24 @@ const assignmentColumns = [
     field: 'organisation',
   },
 ];
-
+const beamLineManagerColumns = [
+  {
+    title: 'Name',
+    field: 'firstname',
+  },
+  {
+    title: 'Surname',
+    field: 'lastname',
+  },
+  {
+    title: 'Email',
+    field: 'email',
+  },
+  {
+    title: 'Organisation',
+    field: 'organisation',
+  },
+];
 const AssignedScientistsTable = ({
   instrument,
   removeAssignedScientistFromInstrument,
@@ -88,26 +98,27 @@ const AssignedScientistsTable = ({
       className={classes.root}
       data-cy="instrument-scientist-assignments-table"
     >
-      <TableContainer>
-        <Table className={classes.root}>
-          <TableBody>
-            <TableRow key="BeamlinemanagerName">
-              <TableCell align="center">
-                BeamLine Manager of {instrument.name} :{' '}
-                {instrument.beamlineManager?.firstname +
-                  ' ' +
-                  instrument.beamlineManager?.lastname}
-                . Below are the instrument scientists assigned to{' '}
-                {instrument.name}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <MaterialTable
+        columns={beamLineManagerColumns}
+        title={`Beamline Manager`}
+        data={[
+          {
+            firstname: instrument.beamlineManager?.firstname,
+            lastname: instrument.beamlineManager?.lastname,
+            email: instrument.beamlineManager?.email,
+            organisation: instrument.beamlineManager?.organisation,
+          },
+        ]}
+        options={{
+          search: false,
+          paging: false,
+          headerStyle: { backgroundColor: '#fafafa' },
+        }}
+      ></MaterialTable>
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={`Assigned ${i18n.format(t('instrument'), 'plural')}`}
+        title={`Assigned ${i18n.format(t('Scientist'), 'plural')}`}
         data={instrument.scientists}
         editable={
           isUserOfficer
@@ -122,7 +133,6 @@ const AssignedScientistsTable = ({
         options={{
           search: false,
           paging: false,
-          toolbar: false,
           headerStyle: { backgroundColor: '#fafafa' },
         }}
       />
