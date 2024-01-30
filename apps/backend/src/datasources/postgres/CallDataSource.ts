@@ -310,14 +310,24 @@ export default class PostgresCallDataSource implements CallDataSource {
               submission_message: args.submissionMessage,
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
-              call_ended:
-                preUpdateCall.call_ended &&
-                args.endCall &&
-                args.endCall.getTime() < currentDate.getTime(),
-              call_ended_internal: args.endCallInternal
-                ? preUpdateCall.call_ended_internal &&
-                  args.endCallInternal.getTime() < currentDate.getTime()
-                : args.callEndedInternal,
+              /*
+               If the call is updated with future end dates, set the ended flags as
+               false. If updated with past dates, leave the flags unchanged from the
+               existing values (if the existing values are false, the call end events
+               will fire for this call and update the flags, and if true it indicates
+               an old call being updated).
+              */
+              call_ended: args.callEnded
+                ? args.callEnded
+                : args.endCall && args.endCall.getTime() > currentDate.getTime()
+                ? false
+                : preUpdateCall.call_ended,
+              call_ended_internal: args.callEndedInternal
+                ? args.callEndedInternal
+                : args.endCallInternal &&
+                  args.endCallInternal.getTime() > currentDate.getTime()
+                ? false
+                : preUpdateCall.call_ended_internal,
               call_review_ended: args.callReviewEnded,
               call_fap_review_ended: args.callFapReviewEnded,
               template_id: args.templateId,
