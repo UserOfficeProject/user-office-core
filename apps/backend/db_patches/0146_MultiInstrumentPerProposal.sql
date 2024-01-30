@@ -39,7 +39,7 @@ BEGIN
 							ihp.instrument_ids,
 		          ihp.instrument_names,
 							ihp.instrument_manager_ids,
-							ihp.instrument_scientist_ids,
+							ihp_2.instrument_scientist_ids,
 		          s.code AS fap_code,
 		          s.fap_id AS fap_id,
 							c.call_short_code,
@@ -52,7 +52,7 @@ BEGIN
 		          ( SELECT round(stddev_pop("fap_reviews".grade)::numeric, 2) AS round
 		                  FROM "fap_reviews"
 		                  WHERE "fap_reviews".proposal_pk = p.proposal_pk) AS deviation,
-				smd.rank_order as rank_order
+							smd.rank_order as rank_order
 		  FROM proposals p
 		  LEFT JOIN proposal_statuses ps ON ps.proposal_status_id = p.status_id
 		  LEFT JOIN call c ON c.call_id = p.call_id
@@ -77,13 +77,18 @@ BEGIN
 				SELECT proposal_pk,
 					array_agg(ihp.instrument_id) AS instrument_ids,
 					array_agg(i.name) AS instrument_names,
-					array_agg(i.manager_user_id) AS instrument_manager_ids,
-					array_agg(ihs.user_id) AS instrument_scientist_ids
+					array_agg(i.manager_user_id) AS instrument_manager_ids
 				FROM instrument_has_proposals ihp 
 				JOIN instruments i ON i.instrument_id = ihp.instrument_id
-				LEFT JOIN instrument_has_scientists ihs ON i.instrument_id = ihs.instrument_id
 				GROUP BY ihp.proposal_pk
-			) ihp ON ihp.proposal_pk = p.proposal_pk;
+			) ihp ON ihp.proposal_pk = p.proposal_pk
+			LEFT JOIN (
+				SELECT proposal_pk,
+					array_agg(ihs.user_id) AS instrument_scientist_ids
+				FROM instrument_has_proposals ihp_2
+				LEFT JOIN instrument_has_scientists ihs ON ihp_2.instrument_id = ihs.instrument_id
+				GROUP BY ihp_2.proposal_pk
+			) ihp_2 ON ihp_2.proposal_pk = p.proposal_pk;
 
 		-- Add new events in the proposal events table.
 		ALTER TABLE proposal_events ADD COLUMN proposal_all_feasibility_reviews_submitted BOOLEAN DEFAULT FALSE;

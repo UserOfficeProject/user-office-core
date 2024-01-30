@@ -52,6 +52,8 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[1],
   },
   tabs: {
+    width: 'auto',
+    flexShrink: 0,
     backgroundColor: theme.palette.grey['100'],
     boxShadow: theme.shadows[1],
   },

@@ -48,7 +48,7 @@ const fieldMap: { [key: string]: string } = {
   reviewAverage: 'average',
   reviewDeviation: 'deviation',
   callShortCode: 'proposal_table_view.call_short_code',
-  instrumentName: 'instrument_name',
+  instrumentNames: 'instrument_names',
   statusName: 'proposal_table_view.proposal_status_id',
   proposalId: 'proposal_table_view.proposal_id',
   title: 'title',
@@ -405,8 +405,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query
             .whereRaw('proposal_table_view.proposal_id ILIKE ?', searchText)
             .orWhereRaw('proposal_table_view.title ILIKE ?', searchText)
-            .orWhereRaw('proposal_status_name ILIKE ?', searchText)
-            .orWhereRaw('instrument_name ILIKE ?', searchText);
+            .orWhereRaw('proposal_status_name ILIKE ?', searchText);
+          // TODO: Check what is the best way to do text search on array field in postgresql.
+          // .orWhereRaw('instrument_names ILIKE ?', searchText);
         }
 
         if (sortField && sortDirection) {
@@ -558,8 +559,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query
             .where('proposal_table_view.title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
-            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
+            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`);
+          // TODO: Check what is the best way to do text search on array field in postgresql.
+          // .orWhere('instrument_names', 'ilike', `%${filter.text}%`);
         }
         if (filter?.callId) {
           query.where('proposal_table_view.call_id', filter.callId);

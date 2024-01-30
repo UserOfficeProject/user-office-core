@@ -49,8 +49,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query
             .where('proposal_table_view.title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
-            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
+            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`);
+          // TODO: Check what is the best way to do text search on array field in postgresql.
+          // .orWhere('instrument_names', 'ilike', `%${filter.text}%`);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           query.whereRaw(
