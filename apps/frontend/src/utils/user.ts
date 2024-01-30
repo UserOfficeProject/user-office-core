@@ -21,7 +21,7 @@ export const getFullUserNameWithEmail = (
         }`
     : 'None';
 
-export const getFullUserNameWithOrganisation = (
+export const getFullUserNameWithInstitution = (
   user?: BasicUserData | null
 ): string =>
   user

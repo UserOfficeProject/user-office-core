@@ -352,7 +352,7 @@ const FapProposalsAndAssignmentsTable = ({
         alertText: (
           <>
             Some of the selected reviewers are already part of the proposal as a
-            PI/Co-proposer or belong to the same organization{' '}
+            PI/Co-proposer or belong to the same institution{' '}
             <strong>
               <ul>
                 {!!selectedPI && <li>PI: {getFullUserName(selectedPI)}</li>}
@@ -368,13 +368,13 @@ const FapProposalsAndAssignmentsTable = ({
                 )}
                 {!!selectedReviewerWithSameInstitutionAsPI && (
                   <li>
-                    Same organization as PI:{' '}
+                    Same institution as PI:{' '}
                     {getFullUserName(selectedReviewerWithSameInstitutionAsPI)}
                   </li>
                 )}
                 {!!selectedReviewerWithSameInstitutionAsCoProposers.length && (
                   <li>
-                    Same organization as co-proposers:{' '}
+                    Same institution as co-proposers:{' '}
                     {selectedReviewerWithSameInstitutionAsCoProposers
                       .map((selectedCoProposer) =>
                         getFullUserName(selectedCoProposer)

@@ -358,7 +358,7 @@ export default function UpdateUserInformation(
                 <>
                   <Field
                     name="otherInstitution"
-                    label="Please specify organization"
+                    label="Please specify institution"
                     id="institution-input"
                     type="text"
                     component={TextField}
