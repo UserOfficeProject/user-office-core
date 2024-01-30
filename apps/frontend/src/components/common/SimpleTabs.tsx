@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -50,10 +49,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
+    boxShadow: theme.shadows[1],
   },
   tabs: {
-    // width: 'auto',
-    // flexShrink: 0,
     backgroundColor: theme.palette.grey['100'],
     boxShadow: theme.shadows[1],
   },
@@ -132,7 +130,7 @@ const SimpleTabs = ({
   } ${noItems && classes.tabsNoItems}`;
 
   return (
-    <Paper elevation={3} className={isVerticalOrientation ? classes.root : ''}>
+    <Box className={isVerticalOrientation ? classes.root : ''}>
       <Tabs
         value={isInsideModal ? query.modalTab : query.tab}
         onChange={handleChange}
@@ -175,7 +173,7 @@ const SimpleTabs = ({
           </TabPanel>
         ))
       )}
-    </Paper>
+    </Box>
   );
 };
 
