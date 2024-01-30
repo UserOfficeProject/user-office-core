@@ -39,7 +39,10 @@ export type ProposalPDFData = {
   coProposers: BasicUserDetails[];
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
-  technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
+  technicalReviews: (Omit<TechnicalReview, 'status'> & {
+    status: string;
+    instrumentName?: string;
+  })[];
   fapReviews?: Review[];
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
   genericTemplates: Array<
@@ -273,6 +276,7 @@ export const collectProposalPDFData = async (
     coProposers,
     questionarySteps: [],
     attachments: [],
+    technicalReviews: [],
     samples: samplePDFData,
     genericTemplates: genericTemplatePDFData,
     pdfTemplate,
@@ -334,18 +338,26 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
-  // TODO: Review this and get all technical reviews to the pdf
-  const technicalReview = (
+  const technicalReviews =
     await baseContext.queries.review.technicalReviewsForProposal(
       user,
       proposal.primaryKey
-    )
-  )?.[0];
-  if (technicalReview) {
-    out.technicalReview = {
+    );
+
+  if (technicalReviews.length) {
+    const instruments =
+      await baseContext.queries.instrument.getInstrumentsByIds(
+        user,
+        technicalReviews.map((technicalReview) => technicalReview.instrumentId)
+      );
+
+    out.technicalReviews = technicalReviews.map((technicalReview) => ({
       ...technicalReview,
       status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-    };
+      instrumentName: instruments.find(
+        (instrument) => instrument.id === technicalReview.instrumentId
+      )?.name,
+    }));
   }
 
   // Get Reviews
@@ -365,7 +377,6 @@ export const collectProposalPDFDataTokenAccess = async (
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
-  const proposalAuth = container.resolve(ProposalAuthorization);
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
@@ -514,6 +525,7 @@ export const collectProposalPDFDataTokenAccess = async (
       coProposers,
       questionarySteps: [],
       attachments: [],
+      technicalReviews: [],
       samples: samplePDFData,
       genericTemplates: genericTemplatePDFData,
       pdfTemplate,
@@ -528,14 +540,25 @@ export const collectProposalPDFDataTokenAccess = async (
   const reviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
-  const technicalReview = (
-    await reviewDataSource.getTechnicalReviews(proposal.primaryKey)
-  )?.[0];
-  if (technicalReview) {
-    proposalPDFData.technicalReview = {
-      ...technicalReview,
-      status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-    };
+  const technicalReviews = await reviewDataSource.getTechnicalReviews(
+    proposal.primaryKey
+  );
+
+  if (technicalReviews?.length) {
+    const instruments =
+      await baseContext.queries.instrument.getInstrumentsByIds(
+        user,
+        technicalReviews.map((technicalReview) => technicalReview.instrumentId)
+      );
+    proposalPDFData.technicalReviews = technicalReviews.map(
+      (technicalReview) => ({
+        ...technicalReview,
+        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+        instrumentName: instruments.find(
+          (instrument) => instrument.id === technicalReview.instrumentId
+        )?.name,
+      })
+    );
   }
 
   return proposalPDFData;
