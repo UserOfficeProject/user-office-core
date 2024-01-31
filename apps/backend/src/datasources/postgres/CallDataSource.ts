@@ -290,6 +290,34 @@ export default class PostgresCallDataSource implements CallDataSource {
           }
         }
 
+        /*
+         Work out whether the call_ended and call_ended_internal flags need updating.
+        */
+        const determineCallEndedFlag = (
+          newFlagValue: boolean | undefined,
+          previousFlagValue: boolean | undefined,
+          endCall: Date | undefined
+        ) => {
+          // Use the new value if explicitly passed in.
+          if (newFlagValue) {
+            return newFlagValue;
+          }
+
+          /*
+           If the call end date has been changed to the future, set to false.
+          */
+          if (endCall && endCall.getTime() > currentDate.getTime()) {
+            return false;
+          }
+
+          /*
+           Where the date has been changed to the past, leave the flag unchanged from
+           its previous value. If it's false, the call end event will fire for this
+           call and update the flags, and if true it indicates an old call being updated).
+          */
+          return previousFlagValue;
+        };
+
         const callUpdate = await database
           .update(
             {
@@ -310,24 +338,16 @@ export default class PostgresCallDataSource implements CallDataSource {
               submission_message: args.submissionMessage,
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
-              /*
-               If the call is updated with future end dates, set the ended flags as
-               false. If updated with past dates, leave the flags unchanged from the
-               existing values (if the existing values are false, the call end events
-               will fire for this call and update the flags, and if true it indicates
-               an old call being updated).
-              */
-              call_ended: args.callEnded
-                ? args.callEnded
-                : args.endCall && args.endCall.getTime() > currentDate.getTime()
-                ? false
-                : preUpdateCall.call_ended,
-              call_ended_internal: args.callEndedInternal
-                ? args.callEndedInternal
-                : args.endCallInternal &&
-                  args.endCallInternal.getTime() > currentDate.getTime()
-                ? false
-                : preUpdateCall.call_ended_internal,
+              call_ended: determineCallEndedFlag(
+                args.callEnded,
+                preUpdateCall.call_ended,
+                args.endCall
+              ),
+              call_ended_internal: determineCallEndedFlag(
+                args.callEndedInternal,
+                preUpdateCall.call_ended_internal,
+                args.endCallInternal
+              ),
               call_review_ended: args.callReviewEnded,
               call_fap_review_ended: args.callFapReviewEnded,
               template_id: args.templateId,
