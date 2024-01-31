@@ -13,8 +13,13 @@ import { CallRecord, createCallObject, createProposalObject } from './records';
 
 const callDataSource = new CallDataSource();
 
-const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
-const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+const today = new Date();
+
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+
+const yesterday = new Date(today);
+yesterday.setDate(yesterday.getDate() - 1);
 
 async function getProposalsInCall(callId: number): Promise<Proposal[]> {
   const proposals = await database
