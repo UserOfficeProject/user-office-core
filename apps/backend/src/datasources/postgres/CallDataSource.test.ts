@@ -25,13 +25,15 @@ async function getProposalsInCall(callId: number): Promise<Proposal[]> {
   return proposals.map((p) => createProposalObject(p));
 }
 
-async function createCall(args: {
-  format?: string;
-  callEnded?: boolean;
-  callEndedInternal?: boolean;
-  endCall?: Date;
-  endCallInternal?: Date;
-}): Promise<Call> {
+async function createCall(
+  args: {
+    format?: string;
+    callEnded?: boolean;
+    callEndedInternal?: boolean;
+    endCall?: Date;
+    endCallInternal?: Date;
+  } = {}
+): Promise<Call> {
   const call: CallRecord[] = await database('call')
     .insert({
       call_id: -999,
@@ -143,7 +145,7 @@ afterAll(async () => {
 
 describe('Call update with reference numbers', () => {
   test('When updated with a reference number format after one did not exist, all proposals in the call are updated to use the new format', async () => {
-    const call = await createCall({});
+    const call = await createCall();
     const expectedRefNums: string[] = [];
     for (let i = 0; i < 1000; i++) {
       await createSubmittedProposal(call.id, i, i);
