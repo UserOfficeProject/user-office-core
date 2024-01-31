@@ -11,6 +11,7 @@ import InternalReviewsTable from './InternalReviewsTable';
 type InternalReviewsProps = {
   technicalReviewId: number;
   technicalReviewSubmitted: boolean;
+  proposalPk: number;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -22,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
 const InternalReviews = ({
   technicalReviewId,
   technicalReviewSubmitted,
+  proposalPk,
 }: InternalReviewsProps) => {
   const classes = useStyles();
 
@@ -46,6 +48,7 @@ const InternalReviews = ({
         <InternalReviewsTable
           technicalReviewId={technicalReviewId}
           technicalReviewSubmitted={technicalReviewSubmitted}
+          proposalPk={proposalPk}
         />
       </AccordionDetails>
     </Accordion>

@@ -1,9 +1,11 @@
+import { Button } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { InternalReview, UserRole } from 'generated/sdk';
+import SafetyNotificationModal from 'components/review/SafetyNotificationModal';
+import { BasicUserDetails, InternalReview, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInternalReviewsData } from 'hooks/review/useInternalReviewData';
 import { tableIcons } from 'utils/materialIcons';
@@ -30,11 +32,13 @@ const columns = [
 type InternalReviewsTableProps = {
   technicalReviewId: number;
   technicalReviewSubmitted: boolean;
+  proposalPk: number;
 };
 
 const InternalReviewsTable = ({
   technicalReviewId,
   technicalReviewSubmitted,
+  proposalPk,
 }: InternalReviewsTableProps) => {
   const { api } = useDataApiWithFeedback();
   const {
@@ -46,6 +50,8 @@ const InternalReviewsTable = ({
     shouldUseTimeZone: true,
   });
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
+  const [safetyNotificationModalOpen, setSafetyNotificationModalOpen] =
+    useState(false);
 
   const createModal = (
     onUpdate: FunctionType<void, [InternalReview | null]>,
@@ -86,8 +92,32 @@ const InternalReviewsTable = ({
     formattedCreatedAt: toFormattedDateTime(review.createdAt),
   }));
 
+  const distinctReviewers: BasicUserDetails[] = internalReviews.reduce(
+    (accumulator, review) => {
+      const reviewer = review.reviewer;
+
+      if (
+        reviewer &&
+        !accumulator.some(
+          (existingReviewer) => existingReviewer.id === reviewer.id
+        )
+      ) {
+        accumulator.push(reviewer);
+      }
+
+      return accumulator;
+    },
+    [] as BasicUserDetails[]
+  );
+
   return (
     <div data-cy="internal-reviews-table">
+      <SafetyNotificationModal
+        proposalPk={proposalPk}
+        userListToNotify={distinctReviewers}
+        show={safetyNotificationModalOpen}
+        close={() => setSafetyNotificationModalOpen(false)}
+      />
       <SuperMaterialTable
         hasAccess={{
           create: !isInternalReviewer,
@@ -111,6 +141,16 @@ const InternalReviewsTable = ({
           search: false,
           padding: 'dense',
         }}
+        extraActionButtons={
+          <Button
+            type="button"
+            onClick={() => setSafetyNotificationModalOpen(true)}
+            color="primary"
+            data-cy="notify-safety-reviewers-button"
+          >
+            Notify Safety reviewers
+          </Button>
+        }
       />
     </div>
   );

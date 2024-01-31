@@ -77,6 +77,15 @@ interface ProposalNotifiedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalSafetyNotifiedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SAFETY_NOTIFIED;
+  safetynotificationresponse: {
+    proposal: Proposal;
+    safetyManagerEmails: string[];
+    templateId: string;
+  };
+}
+
 interface ProposalClonedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CLONED;
   proposal: Proposal;
@@ -315,6 +324,7 @@ export type ApplicationEvent =
   | FapMemberRemovedFromProposalEvent
   | UserDeletedEvent
   | ProposalNotifiedEvent
+  | ProposalSafetyNotifiedEvent
   | CallCreatedEvent
   | CallEndedEvent
   | CallEndedInternalEvent

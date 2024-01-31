@@ -19,11 +19,13 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { MailService } from '../eventHandlers/MailService/MailService';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
+import { SafetyNotificationResponse } from '../models/SafetyNotificationResponse';
 import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
@@ -57,7 +59,9 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.MailService)
+    public emailService: MailService
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -371,6 +375,54 @@ export default class ProposalMutations {
     const result = await this.proposalDataSource.update(proposal);
 
     return result || rejection('Can not notify proposal', { result });
+  }
+
+  @EventBus(Event.PROPOSAL_SAFETY_NOTIFIED)
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async notifySafety(
+    user: UserWithRole | null,
+    {
+      proposalPk,
+      safetyManagerEmails,
+      templateId,
+    }: {
+      proposalPk: number;
+      safetyManagerEmails: string[];
+      templateId: string;
+    }
+  ): Promise<SafetyNotificationResponse | Rejection> {
+    const proposal = await this.proposalDataSource.get(proposalPk);
+
+    if (!proposal) {
+      return rejection('Can not notify Safety because proposal not found', {
+        proposalPk,
+      });
+    }
+
+    const emailTemplates = (await this.emailService.getEmailTemplates())
+      .results;
+
+    const emailTemplate = emailTemplates.find(
+      (template) => template.id === templateId
+    );
+
+    if (!emailTemplate) {
+      return rejection(
+        'Can not notify Safety because email template not found',
+        { templateId }
+      );
+    }
+
+    return (
+      new SafetyNotificationResponse(
+        proposal,
+        safetyManagerEmails,
+        templateId
+      ) ||
+      rejection('Can not notify Safety', {
+        proposal,
+      })
+    );
   }
 
   @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED)

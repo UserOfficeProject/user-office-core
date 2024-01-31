@@ -1,0 +1,13 @@
+mutation notifySafety(
+  $proposalPk: Int!
+  $safetyManagerEmails: [String!]!
+  $templateId: String!
+) {
+  notifySafety(
+    proposalPk: $proposalPk
+    safetyManagerEmails: $safetyManagerEmails
+    templateId: $templateId
+  ) {
+    primaryKey
+  }
+}

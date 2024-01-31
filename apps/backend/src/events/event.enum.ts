@@ -45,6 +45,7 @@ export enum Event {
   FAP_MEMBER_REMOVED_FROM_PROPOSAL = 'FAP_MEMBER_REMOVED_FROM_PROPOSAL',
   FAP_REVIEWER_NOTIFIED = 'FAP_REVIEWER_NOTIFIED',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
+  PROPOSAL_SAFETY_NOTIFIED = 'PROPOSAL_SAFETY_NOTIFIED',
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_ACTION_EXECUTED = 'PROPOSAL_STATUS_ACTION_EXECUTED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
@@ -204,6 +205,7 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when FAP member is removed from proposal for review',
   ],
   [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
+  [Event.PROPOSAL_SAFETY_NOTIFIED, 'Event occurs when Safety is notified'],
   [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
   [
     Event.PROPOSAL_STATUS_ACTION_EXECUTED,

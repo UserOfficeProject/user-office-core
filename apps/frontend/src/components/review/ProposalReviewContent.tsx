@@ -101,6 +101,7 @@ const ProposalReviewContent = ({
           <InternalReviews
             technicalReviewId={proposalData.technicalReview.id}
             technicalReviewSubmitted={proposalData.technicalReview.submitted}
+            proposalPk={proposalData.primaryKey}
           />
         )}
         {!!proposalData.instrument && (

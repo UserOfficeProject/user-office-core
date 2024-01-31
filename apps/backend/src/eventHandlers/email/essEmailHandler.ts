@@ -212,6 +212,39 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       return;
     }
+    case Event.PROPOSAL_SAFETY_NOTIFIED: {
+      const proposal = event.safetynotificationresponse.proposal;
+      const safetyManagerEmails =
+        event.safetynotificationresponse.safetyManagerEmails;
+      const call = await callDataSource.getCall(proposal.callId);
+
+      const templateId = event.safetynotificationresponse.templateId;
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+          },
+          substitution_data: {},
+          recipients: safetyManagerEmails.map((email) => ({
+            address: email,
+          })),
+        })
+        .then((res) => {
+          logger.logInfo('Email sent on proposal safety notify:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on proposal safety notify:', {
+            error: err,
+            event,
+          });
+        });
+
+      return;
+    }
     case Event.FAP_REVIEWER_NOTIFIED: {
       const { id: reviewId, userID, proposalPk } = event.fapReview;
       const fapReviewer = await userDataSource.getUser(userID);

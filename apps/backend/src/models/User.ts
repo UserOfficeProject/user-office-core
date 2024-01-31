@@ -68,6 +68,7 @@ export enum UserRole {
   INSTRUMENT_SCIENTIST,
   SAMPLE_SAFETY_REVIEWER,
   INTERNAL_REVIEWER,
+  SAFETY_MANAGER,
 }
 
 export const UserRoleShortCodeMap = {
@@ -79,6 +80,7 @@ export const UserRoleShortCodeMap = {
   [UserRole.INSTRUMENT_SCIENTIST]: Roles.INSTRUMENT_SCIENTIST,
   [UserRole.SAMPLE_SAFETY_REVIEWER]: Roles.SAMPLE_SAFETY_REVIEWER,
   [UserRole.INTERNAL_REVIEWER]: Roles.INTERNAL_REVIEWER,
+  [UserRole.SAFETY_MANAGER]: Roles.SAFETY_MANAGER,
 } as const;
 
 export class BasicUserDetails {
