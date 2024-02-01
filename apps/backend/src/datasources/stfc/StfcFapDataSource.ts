@@ -38,18 +38,17 @@ export default class StfcFapDataSource
   }
 
   async assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap> {
-    const members: number[] = [];
-
     const usersWithRoles = await stfcUserDataSource.getUsersRoles(
       args.memberIds
     );
 
-    usersWithRoles.forEach((user) => {
-      !!user.roles.find(
-        (role) =>
-          role.shortCode === 'fap_reviewer' || role.shortCode === 'user_officer'
-      ) && members.push(user.userId);
-    });
+    const members = usersWithRoles
+      .filter((user) =>
+        user.roles.some((role) =>
+          ['fap_reviewer', 'user_officer'].includes(role.shortCode)
+        )
+      )
+      .map((user) => user.userId);
 
     if (members.length === args.memberIds.length) {
       return super.assignReviewersToFap(args);
