@@ -92,29 +92,15 @@ const InternalReviewsTable = ({
     formattedCreatedAt: toFormattedDateTime(review.createdAt),
   }));
 
-  const distinctReviewers: BasicUserDetails[] = internalReviews.reduce(
-    (accumulator, review) => {
-      const reviewer = review.reviewer;
-
-      if (
-        reviewer &&
-        !accumulator.some(
-          (existingReviewer) => existingReviewer.id === reviewer.id
-        )
-      ) {
-        accumulator.push(reviewer);
-      }
-
-      return accumulator;
-    },
-    [] as BasicUserDetails[]
-  );
-
   return (
     <div data-cy="internal-reviews-table">
       <SafetyNotificationModal
         proposalPk={proposalPk}
-        userListToNotify={distinctReviewers}
+        users={
+          (internalReviews.map(
+            (review) => review.reviewer
+          ) as BasicUserDetails[]) || []
+        }
         show={safetyNotificationModalOpen}
         close={() => setSafetyNotificationModalOpen(false)}
       />

@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   Typography,
+  Tooltip,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -23,14 +24,14 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type SafetyNotificationModalProps = {
   proposalPk: number;
-  userListToNotify: BasicUserDetails[];
+  users: BasicUserDetails[];
   show: boolean;
   close: () => void;
 };
 
 const SafetyNotificationModal = ({
   proposalPk,
-  userListToNotify,
+  users,
   show,
   close,
 }: SafetyNotificationModalProps) => {
@@ -42,6 +43,37 @@ const SafetyNotificationModal = ({
   const safetyManagers = useUsersData({ userRole: UserRole.SAFETY_MANAGER })
     .usersData.users;
 
+  const emailActionDefaultConfig = statusActions.find(
+    (action) => action.type === ProposalStatusActionType.EMAIL
+  )?.defaultConfig as EmailActionDefaultConfig;
+
+  const distinctReviewers: BasicUserDetails[] = users.reduce(
+    (accumulator, reviewer) => {
+      if (
+        reviewer &&
+        !accumulator.some(
+          (existingReviewer) => existingReviewer.id === reviewer.id
+        )
+      ) {
+        accumulator.push(reviewer);
+      }
+
+      return accumulator;
+    },
+    [] as BasicUserDetails[]
+  );
+
+  const safetyManagerEmails = distinctReviewers
+    .filter(
+      (user) =>
+        user.email &&
+        safetyManagers.some((manager) => manager.email === user.email)
+    )
+    .map((user) => user.email!);
+
+  const sendButtonDisabled =
+    !selectedTemplate || safetyManagerEmails.length === 0;
+
   const handleTemplateChange = (
     value: EmailStatusActionEmailTemplate | null
   ) => {
@@ -49,14 +81,6 @@ const SafetyNotificationModal = ({
   };
 
   const emailSafety = async () => {
-    const safetyManagerEmails = userListToNotify
-      .filter(
-        (user) =>
-          user.email &&
-          safetyManagers.some((manager) => manager.email === user.email)
-      )
-      .map((user) => user.email!);
-
     await api({
       toastSuccessMessage: 'Notification to Safety Managers sent successfully',
     }).notifySafety({
@@ -67,10 +91,6 @@ const SafetyNotificationModal = ({
 
     close();
   };
-
-  const emailActionDefaultConfig = statusActions.find(
-    (action) => action.type === ProposalStatusActionType.EMAIL
-  )?.defaultConfig as EmailActionDefaultConfig;
 
   return (
     <Dialog
@@ -110,15 +130,23 @@ const SafetyNotificationModal = ({
           </Grid>
         </Grid>
         <ActionButtonContainer>
-          <Button
-            type="button"
-            color="primary"
-            onClick={emailSafety}
-            disabled={!selectedTemplate}
-            data-cy="safety-notification-modal-send-button"
+          <Tooltip
+            title="Template is not selected or there are no safety managers in the reviews"
+            disableHoverListener={!sendButtonDisabled}
           >
-            Send notification
-          </Button>
+            <span>
+              {/* Span needed because Tooltip children can't be disabled */}
+              <Button
+                type="button"
+                color="primary"
+                onClick={emailSafety}
+                disabled={sendButtonDisabled}
+                data-cy="safety-notification-modal-send-button"
+              >
+                Send notification
+              </Button>
+            </span>
+          </Tooltip>
         </ActionButtonContainer>
       </DialogContent>
     </Dialog>

@@ -399,6 +399,12 @@ export default class ProposalMutations {
       });
     }
 
+    if (safetyManagerEmails.length === 0) {
+      return rejection('Can not notify Safety because recipients empty', {
+        proposal,
+      });
+    }
+
     const emailTemplates = (await this.emailService.getEmailTemplates())
       .results;
 
