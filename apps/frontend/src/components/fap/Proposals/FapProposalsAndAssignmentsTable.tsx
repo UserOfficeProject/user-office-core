@@ -93,6 +93,19 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     emptyValue: '-',
   },
   {
+    title: 'Reviews',
+    render: (rowData) => {
+      const totalReviews = rowData.assignments?.length;
+      const gradedReviews = rowData.assignments?.filter(
+        (assignment) =>
+          assignment.review !== null && assignment.review.grade !== null
+      );
+      const countReviews = gradedReviews?.length || 0;
+
+      return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
+    },
+  },
+  {
     title: 'Average grade',
     render: (rowData) => {
       const avgGrade = average(
