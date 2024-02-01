@@ -164,7 +164,8 @@ export default class FapMutations {
 
     return this.dataSource.assignReviewersToFap(args).catch((err) => {
       return rejection(
-        'Could not assign member to Fap because of an error, please ensure all selected users have the correct role',
+        'Could not assign member to Fap because of an error, please ensure all selected users have the correct role. ' +
+          err.message,
         { agent },
         err
       );

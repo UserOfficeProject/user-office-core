@@ -44,16 +44,24 @@ export default class StfcFapDataSource
 
     const members = usersWithRoles
       .filter((user) =>
-        user.roles.some((role) =>
-          ['fap_reviewer', 'user_officer'].includes(role.shortCode)
+        user.roles.every(
+          (role) => !['fap_reviewer', 'user_officer'].includes(role.shortCode)
         )
       )
       .map((user) => user.userId);
 
-    if (members.length === args.memberIds.length) {
+    if (members.length === 0) {
       return super.assignReviewersToFap(args);
     }
 
-    throw new GraphQLError('Some members did not have the correct Roles');
+    const usersWithoutRole = await Promise.resolve(
+      stfcUserDataSource.getUsersByUserNumbers(members)
+    );
+
+    const userEmails = usersWithoutRole.map((user) => user.email);
+
+    throw new GraphQLError(
+      `Some members: ${userEmails} did not have the correct Roles`
+    );
   }
 }
