@@ -38,7 +38,7 @@
     "e2e:after:dev:stfc": "concurrently -k -s first \"wait-on --verbose --interval 5000 --timeout 300000 http://127.0.0.1:4000/readiness && wait-on --verbose --interval 5000 --timeout 300000 tcp:3000 && cd apps/e2e && npm run cy:run:action\" \"npm run dev:e2e:stfc\"",
     "generate:sdk": "concurrently -k -s first \"npm run dev:backend\" \"wait-on --timeout 300000 http://127.0.0.1:4000/health && npm run generate:shared:types\"",
     "start": "npm run dev",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "keywords": [
     "duo",
