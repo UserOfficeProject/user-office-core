@@ -25,13 +25,8 @@ export async function getStfcDataRow(
   reviews: Review[] | null
 ) {
   const daysRequested = proposalAnswers
-    ?.find((step) =>
-      step.fields.find(
-        (answer) => answer.question.naturalKey === 'days_requested'
-      )
-    )
-    ?.fields.find((answer) => answer.question.naturalKey === 'days_requested')
-    ?.value.value;
+    ?.flatMap((step) => step.fields)
+    .find((answer) => answer.question.naturalKey === 'days_requested');
 
   const piDetails = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers([
     proposal?.proposerId.toString() ?? '',
