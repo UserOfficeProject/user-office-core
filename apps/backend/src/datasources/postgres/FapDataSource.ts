@@ -238,7 +238,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         }
       })
       .then((allFaps: FapRecord[]) => {
-        const faps = Promise.all(
+        return Promise.all(
           allFaps.map(createFapObject).map(this.getSecretaries)
         ).then((faps) => {
           return {
@@ -246,8 +246,6 @@ export default class PostgresFapDataSource implements FapDataSource {
             faps: faps,
           };
         });
-
-        return faps;
       });
   }
 
