@@ -89,7 +89,7 @@ jobs:
 
       - name: Cache node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -102,7 +102,7 @@ jobs:
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -113,7 +113,7 @@ jobs:
 
       - name: Cache frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -124,7 +124,7 @@ jobs:
 
       - name: Cache frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
@@ -150,28 +150,28 @@ jobs:
 
       - name: Restore node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
@@ -202,7 +202,7 @@ jobs:
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -254,28 +254,28 @@ jobs:
 
       - name: Restore node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
@@ -291,7 +291,7 @@ jobs:
       #   env:
       #     CYPRESS_CACHE_FOLDER: cache/Cypress
       #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v3
+      #   uses: actions/cache@v4
       #   with:
       #     path: apps/e2e/node_modules
       #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
