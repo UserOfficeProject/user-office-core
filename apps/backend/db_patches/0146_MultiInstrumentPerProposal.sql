@@ -88,7 +88,8 @@ BEGIN
 				FROM instrument_has_proposals ihp_2
 				LEFT JOIN instrument_has_scientists ihs ON ihp_2.instrument_id = ihs.instrument_id
 				GROUP BY ihp_2.proposal_pk
-			) ihp_2 ON ihp_2.proposal_pk = p.proposal_pk;
+			) ihp_2 ON ihp_2.proposal_pk = p.proposal_pk
+			ORDER BY proposal_pk;
 
 		-- Add new events in the proposal events table.
 		ALTER TABLE proposal_events ADD COLUMN proposal_all_feasibility_reviews_submitted BOOLEAN DEFAULT FALSE;
