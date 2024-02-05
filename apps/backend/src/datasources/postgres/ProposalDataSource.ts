@@ -47,13 +47,13 @@ const fieldMap: { [key: string]: string } = {
   rankOrder: 'rank_order',
   reviewAverage: 'average',
   reviewDeviation: 'deviation',
-  callShortCode: 'proposal_table_view.call_short_code',
+  callShortCode: 'call_short_code',
   instrumentNames: 'instrument_names',
-  statusName: 'proposal_table_view.proposal_status_id',
-  proposalId: 'proposal_table_view.proposal_id',
+  statusName: 'proposal_status_id',
+  proposalId: 'proposal_id',
   title: 'title',
-  submitted: 'proposal_table_view.submitted',
-  notified: 'proposal_table_view.notified',
+  submitted: 'submitted',
+  notified: 'notified',
 };
 
 export async function calculateReferenceNumber(
@@ -344,11 +344,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     query
-      .leftJoin(
-        'answers',
-        'answers.questionary_id',
-        'proposal_table_view.questionary_id'
-      )
+      .leftJoin('answers', 'answers.questionary_id', 'ptw.questionary_id')
       .andWhere('answers.question_id', questionFilter.questionId)
       .modify(questionFilterQuery, questionFilter);
 
@@ -364,21 +360,30 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     return database
+      .with(
+        'ptw',
+        database
+          .select([
+            '*',
+            database.raw(
+              // eslint-disable-next-line quotes
+              "array_to_string(instrument_names, ',') all_instrument_names"
+            ),
+          ])
+          .from('proposal_table_view')
+      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('proposal_table_view')
+      .from('ptw')
       .modify((query) => {
         if (filter?.callId) {
-          query.where('proposal_table_view.call_id', filter?.callId);
+          query.where('call_id', filter?.callId);
         }
         if (filter?.instrumentId) {
           query.whereRaw('? = ANY(instrument_ids)', filter?.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
-          query.where(
-            'proposal_table_view.proposal_status_id',
-            filter?.proposalStatusId
-          );
+          query.where('proposal_status_id', filter?.proposalStatusId);
         }
 
         if (filter?.shortCodes) {
@@ -387,7 +392,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
         if (filter?.questionFilter) {
@@ -403,11 +408,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText = `%${searchText}%`;
 
           query
-            .whereRaw('proposal_table_view.proposal_id ILIKE ?', searchText)
-            .orWhereRaw('proposal_table_view.title ILIKE ?', searchText)
-            .orWhereRaw('proposal_status_name ILIKE ?', searchText);
-          // TODO: Check what is the best way to do text search on array field in postgresql.
-          // .orWhereRaw('instrument_names ILIKE ?', searchText);
+            .whereRaw('proposal_id ILIKE ?', searchText)
+            .orWhereRaw('title ILIKE ?', searchText)
+            .orWhereRaw('proposal_status_name ILIKE ?', searchText)
+            .orWhereRaw('all_instrument_names ILIKE ?', searchText);
         }
 
         if (sortField && sortDirection) {
@@ -419,10 +423,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.referenceNumbers) {
-          query.whereIn(
-            'proposal_table_view.proposal_id',
-            filter.referenceNumbers
-          );
+          query.whereIn('proposal_id', filter.referenceNumbers);
         }
         if (first) {
           query.limit(first);
@@ -531,59 +532,52 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return database
-      .select([
-        'proposal_table_view.*',
-        database.raw('count(*) OVER() AS full_count'),
-      ])
-      .from('proposal_table_view')
+      .with(
+        'ptw',
+        database
+          .select([
+            '*',
+            database.raw(
+              // eslint-disable-next-line quotes
+              "array_to_string(instrument_names, ',') all_instrument_names"
+            ),
+          ])
+          .from('proposal_table_view')
+      )
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('ptw')
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
-          this.whereRaw(
-            '? = ANY(proposal_table_view.internal_technical_reviewer_ids)',
-            user.id
-          );
+          this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
         } else {
           this.whereRaw(
-            '? = ANY(proposal_table_view.instrument_scientist_ids)',
+            '? = ANY(instrument_scientist_ids)',
             user.id
-          ).orWhereRaw(
-            '? = ANY(proposal_table_view.instrument_manager_ids)',
-            user.id
-          );
+          ).orWhereRaw('? = ANY(instrument_manager_ids)', user.id);
         }
       })
-      .distinct('proposal_table_view.proposal_pk')
-      .orderBy('proposal_table_view.proposal_pk', 'desc')
+      .distinct('proposal_pk')
+      .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
           query
-            .where('proposal_table_view.title', 'ilike', `%${filter.text}%`)
+            .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
-            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`);
-          // TODO: Check what is the best way to do text search on array field in postgresql.
-          // .orWhere('instrument_names', 'ilike', `%${filter.text}%`);
+            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
+            .orWhere('all_instrument_names', 'ilike', `%${filter.text}%`);
         }
         if (filter?.callId) {
-          query.where('proposal_table_view.call_id', filter.callId);
+          query.where('call_id', filter.callId);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
-          query.whereRaw(
-            '? = ANY(proposal_table_view.technical_review_assignee_ids)',
-            user.id
-          );
+          query.whereRaw('? = ANY(technical_review_assignee_ids)', user.id);
         }
         if (filter?.instrumentId) {
-          query.whereRaw(
-            '? = ANY(proposal_table_view.instrument_ids)',
-            filter.instrumentId
-          );
+          query.whereRaw('? = ANY(instrument_ids)', filter.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
-          query.where(
-            'proposal_table_view.proposal_status_id',
-            filter?.proposalStatusId
-          );
+          query.where('proposal_status_id', filter?.proposalStatusId);
         }
 
         if (filter?.shortCodes) {
@@ -592,7 +586,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
@@ -603,10 +597,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.referenceNumbers) {
-          query.whereIn(
-            'proposal_table_view.proposal_id',
-            filter.referenceNumbers
-          );
+          query.whereIn('proposal_id', filter.referenceNumbers);
         }
 
         if (first) {
