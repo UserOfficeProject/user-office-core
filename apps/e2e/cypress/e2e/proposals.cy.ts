@@ -149,6 +149,21 @@ context('Proposal tests', () => {
       });
     });
 
+    it('Principal investigator in the proposal table should not be empty', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains('td', newProposalTitle)
+        .parents('tbody tr')
+        .first()
+        .find('td')
+        .eq(4)
+        .should('not.contain.text', '-')
+        .should('contain.text', 'Carl');
+    });
+
     it('Should be able create proposal', () => {
       cy.login('user1', initialDBData.roles.user);
 
