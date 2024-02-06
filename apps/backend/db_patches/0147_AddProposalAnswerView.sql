@@ -12,7 +12,7 @@ BEGIN
                     gt.title as generic_template_title,
                     a.answer_id,
                     q.natural_key as question_natural_key,
-                    a.answer #> '{value}' AS json_value,
+                    a.answer #> '{value}' AS full_value,
                     COALESCE(
                         a.answer #>> '{value,0}',
                         a.answer #>> '{value,value}',
@@ -37,7 +37,7 @@ BEGIN
                     null,
                     a.answer_id,
                     q.natural_key,
-                    a.answer #> '{value}' AS json_value,
+                    a.answer #> '{value}' AS full_value,
                     COALESCE(
                         a.answer #>> '{value,0}',
                         a.answer #>> '{value,value}',
