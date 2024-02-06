@@ -437,13 +437,7 @@ context('Proposal tests', () => {
 
           cy.assignProposalsToInstruments({
             instrumentIds: [result.createInstrument.id],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: createdProposalPk,
-                workflowId: createdWorkflowId,
-              },
-            ],
+            proposalPks: [createdProposalPk],
           });
         }
       });

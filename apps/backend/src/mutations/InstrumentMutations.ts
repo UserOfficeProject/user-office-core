@@ -2,7 +2,6 @@ import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
   deleteInstrumentValidationSchema,
-  // assignProposalsToInstrumentValidationSchema,
   assignScientistsToInstrumentValidationSchema,
   removeScientistFromInstrumentValidationSchema,
   setAvailabilityTimeOnInstrumentValidationSchema,
@@ -46,7 +45,6 @@ export default class InstrumentMutations {
     @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource
@@ -104,24 +102,29 @@ export default class InstrumentMutations {
     inputArguments: AssignProposalsToInstrumentsArgs,
     instrumentId: number
   ) {
-    const proposalCallIds = inputArguments.proposals.map(
-      (proposal) => proposal.callId
+    const fullProposals = await this.proposalDataSource.getProposalsByIds(
+      inputArguments.proposalPks
     );
+
+    const allProposalsCallIds = fullProposals.map(
+      (fullProposal) => fullProposal.callId
+    );
+
     const proposalCallsWithInstrument =
       await this.dataSource.getCallsByInstrumentId(
         instrumentId,
-        proposalCallIds
+        allProposalsCallIds
       );
 
-    const proposalsOnSameCallAsInstrument = inputArguments.proposals.filter(
-      (proposal) =>
-        proposalCallsWithInstrument.some(
-          (call) => call.callId === proposal.callId
-        )
+    const proposalsOnSameCallAsInstrument = fullProposals.filter((proposal) =>
+      proposalCallsWithInstrument.some(
+        (call) => call.callId === proposal.callId
+      )
     );
 
     return (
-      proposalsOnSameCallAsInstrument.length === inputArguments.proposals.length
+      proposalsOnSameCallAsInstrument.length ===
+      inputArguments.proposalPks.length
     );
   }
 
@@ -133,9 +136,7 @@ export default class InstrumentMutations {
     return this.assignProposalsToInstrumentsInternal(agent, args);
   }
 
-  // TODO: Check validation here
   @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
-  // @ValidateArgs(assignProposalsToInstrumentValidationSchema)
   async assignProposalsToInstrumentsInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentsArgs
@@ -171,9 +172,7 @@ export default class InstrumentMutations {
         );
       }
 
-      const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
-
-      for await (const proposalPk of proposalPks) {
+      for await (const proposalPk of args.proposalPks) {
         const technicalReview =
           await this.reviewDataSource.getProposalInstrumentTechnicalReview(
             proposalPk,
@@ -210,11 +209,11 @@ export default class InstrumentMutations {
       }
 
       result = await this.dataSource.assignProposalsToInstrument(
-        proposalPks,
+        args.proposalPks,
         instrumentId
       );
 
-      if (result.proposalPks.length !== proposalPks.length) {
+      if (result.proposalPks.length !== args.proposalPks.length) {
         return rejection('Could not assign proposal/s to instrument', {
           agent,
           args,

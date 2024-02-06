@@ -452,6 +452,7 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
+    // TODO: It is better to collect the data here on the backend then sending callId and workflowId as arguments.
     const { statusId, proposals } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(

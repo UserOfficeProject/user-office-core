@@ -833,13 +833,7 @@ context('Settings tests', () => {
           cy.submitProposal({ proposalPk: proposal.primaryKey });
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: proposal.primaryKey,
-                workflowId: createdWorkflowId,
-              },
-            ],
+            proposalPks: [proposal.primaryKey],
           });
           cy.addProposalTechnicalReview({
             proposalPk: proposal.primaryKey,
@@ -896,13 +890,7 @@ context('Settings tests', () => {
           cy.submitProposal({ proposalPk: proposal.primaryKey });
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: proposal.primaryKey,
-                workflowId: createdWorkflowId,
-              },
-            ],
+            proposalPks: [proposal.primaryKey],
           });
           cy.addProposalTechnicalReview({
             proposalPk: proposal.primaryKey,
@@ -998,13 +986,7 @@ context('Settings tests', () => {
           cy.submitProposal({ proposalPk: proposal.primaryKey });
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: proposal.primaryKey,
-                workflowId: createdWorkflowId,
-              },
-            ],
+            proposalPks: [proposal.primaryKey],
           });
           cy.addProposalTechnicalReview({
             proposalPk: proposal.primaryKey,
@@ -1175,13 +1157,7 @@ context('Settings tests', () => {
           cy.submitProposal({ proposalPk: proposal.primaryKey });
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: proposal.primaryKey,
-                workflowId: createdWorkflowId,
-              },
-            ],
+            proposalPks: [proposal.primaryKey],
           });
         }
       });
@@ -1197,13 +1173,7 @@ context('Settings tests', () => {
           cy.submitProposal({ proposalPk: proposal.primaryKey });
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: proposal.primaryKey,
-                workflowId: createdWorkflowId,
-              },
-            ],
+            proposalPks: [proposal.primaryKey],
           });
         }
       });

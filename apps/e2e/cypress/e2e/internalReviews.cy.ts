@@ -77,9 +77,7 @@ context('Internal Review tests', () => {
         scientistIds: [scientist2.id],
       });
       cy.assignProposalsToInstruments({
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
+        proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
       }).then(() => {
         // NOTE: Get the technical review id for later usage.

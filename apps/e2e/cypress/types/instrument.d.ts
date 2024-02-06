@@ -54,16 +54,13 @@ declare global {
       ) => Cypress.Chainable<AssignScientistsToInstrumentMutation>;
 
       /**
-       * Assigns selected proposal/s to instruments
+       * Assigns selected proposal/s to instrument/s
        *
        * @returns {typeof assignProposalsToInstruments}
        * @memberof Chainable
        * @example
        *    cy.assignProposalsToInstruments({
-       *      proposals: [{
-       *        callId: 1,
-       *        primaryKey: 1
-       *      }],
+       *      proposalPks: [1],
        *      instrumentId: [1]
        *    });
        */

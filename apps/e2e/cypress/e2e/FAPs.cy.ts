@@ -1010,12 +1010,7 @@ context('Fap meeting components tests', () => {
         });
         cy.assignProposalsToInstruments({
           instrumentIds: [createdInstrumentId],
-          proposals: [
-            {
-              callId: initialDBData.call.id,
-              primaryKey: createdProposalPk,
-            },
-          ],
+          proposalPks: [createdProposalPk],
         });
 
         cy.setInstrumentAvailabilityTime({
@@ -1113,12 +1108,7 @@ context('Fap meeting components tests', () => {
 
                 cy.assignProposalsToInstruments({
                   instrumentIds: [createdInstrument2Id],
-                  proposals: [
-                    {
-                      callId: initialDBData.call.id,
-                      primaryKey: createdProposal.primaryKey,
-                    },
-                  ],
+                  proposalPks: [createdProposal.primaryKey],
                 });
 
                 cy.assignProposalsToFap({
@@ -1188,12 +1178,7 @@ context('Fap meeting components tests', () => {
 
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: createdProposal.primaryKey,
-              },
-            ],
+            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFap({
@@ -1293,12 +1278,7 @@ context('Fap meeting components tests', () => {
 
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
-            proposals: [
-              {
-                callId: initialDBData.call.id,
-                primaryKey: createdProposal.primaryKey,
-              },
-            ],
+            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFap({
@@ -1460,12 +1440,7 @@ context('Fap meeting components tests', () => {
 
             cy.assignProposalsToInstruments({
               instrumentIds: [createdInstrumentId],
-              proposals: [
-                {
-                  callId: initialDBData.call.id,
-                  primaryKey: createdProposal.primaryKey,
-                },
-              ],
+              proposalPks: [createdProposal.primaryKey],
             });
           }
         }
@@ -2174,9 +2149,7 @@ context('Automatic Fap assignment to Proposal', () => {
         );
 
         cy.assignProposalsToInstruments({
-          proposals: [
-            { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-          ],
+          proposalPks: [createdProposalPk],
           instrumentIds: [result.createInstrument.id],
         });
 

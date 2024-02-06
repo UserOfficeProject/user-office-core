@@ -572,10 +572,9 @@ const ProposalTableOfficer = ({
           'lowercase'
         )} successfully!`,
       }).assignProposalsToInstruments({
-        proposals: selectedProposals.map((selectedProposal) => ({
-          primaryKey: selectedProposal.primaryKey,
-          callId: selectedProposal.callId,
-        })),
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
+        ),
         instrumentIds: instruments.map((instrument) => instrument.id),
       });
 

@@ -1,9 +1,9 @@
 mutation assignProposalsToInstruments(
-  $proposals: [ProposalSelectionInput!]!
+  $proposalPks: [Int!]!
   $instrumentIds: [Int!]!
 ) {
   assignProposalsToInstruments(
-    proposals: $proposals
+    proposalPks: $proposalPks
     instrumentIds: $instrumentIds
   )
 }

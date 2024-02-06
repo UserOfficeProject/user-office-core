@@ -76,10 +76,7 @@ describe('Test Instrument Mutations', () => {
       instrumentMutations.assignProposalsToInstruments(
         dummyUserOfficerWithRole,
         {
-          proposals: [
-            { primaryKey: 1, callId: 1 },
-            { primaryKey: 2, callId: 1 },
-          ],
+          proposalPks: [1, 2],
           instrumentIds: [1],
         }
       )

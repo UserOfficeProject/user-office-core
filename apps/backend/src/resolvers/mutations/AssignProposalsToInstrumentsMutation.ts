@@ -10,12 +10,11 @@ import {
 
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
-import { ProposalSelectionInput } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
 export class AssignProposalsToInstrumentsArgs {
-  @Field(() => [ProposalSelectionInput])
-  public proposals: ProposalSelectionInput[];
+  @Field(() => [Int])
+  public proposalPks: number[];
 
   @Field(() => [Int])
   public instrumentIds: number[];
@@ -42,19 +41,17 @@ export class AssignProposalsToInstrumentsMutation {
     // TODO: Review this when starting with FAP part for multi instrument. For now only the first instrument FAP is assigned just to be backwards compatible.
     const proposalsFaps = await context.queries.fap.getProposalsFaps(
       context.user,
-      args.proposals.map((proposal) => proposal.primaryKey)
+      args.proposalPks
     );
 
     await context.mutations.fap.assignProposalsToFapUsingCallInstrument(
       context.user,
       {
         instrumentId: args.instrumentIds[0],
-        proposalPks: args.proposals
-          .filter(
-            (proposal) =>
-              !proposalsFaps.find((ps) => ps.proposalPk === proposal.primaryKey)
-          )
-          .map((proposal) => proposal.primaryKey),
+        proposalPks: args.proposalPks.filter(
+          (proposalPk) =>
+            !proposalsFaps.find((ps) => ps.proposalPk === proposalPk)
+        ),
       }
     );
     // ----------------------

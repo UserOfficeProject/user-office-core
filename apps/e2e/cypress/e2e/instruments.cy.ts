@@ -299,9 +299,7 @@ context('Instrument tests', () => {
         scientistIds: [scientist2.id],
       });
       cy.assignProposalsToInstruments({
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
+        proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
       });
 
@@ -350,9 +348,7 @@ context('Instrument tests', () => {
         scientistIds: [scientist2.id],
       });
       cy.assignProposalsToInstruments({
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
+        proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
       });
 
@@ -442,9 +438,7 @@ context('Instrument tests', () => {
         scientistIds: [scientist2.id],
       });
       cy.assignProposalsToInstruments({
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
+        proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
       });
 
@@ -603,9 +597,7 @@ context('Instrument tests', () => {
           });
 
           cy.assignProposalsToInstruments({
-            proposals: [
-              { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-            ],
+            proposalPks: [createdProposalPk],
             instrumentIds: [createdInstrumentId],
           });
 
@@ -690,9 +682,7 @@ context('Instrument tests', () => {
           });
 
           cy.assignProposalsToInstruments({
-            proposals: [
-              { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-            ],
+            proposalPks: [createdProposalPk],
             instrumentIds: [createdInstrumentId],
           });
         }
@@ -737,9 +727,7 @@ context('Instrument tests', () => {
           });
 
           cy.assignProposalsToInstruments({
-            proposals: [
-              { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-            ],
+            proposalPks: [createdProposalPk],
             instrumentIds: [createdInstrumentId],
           });
         }
@@ -934,9 +922,7 @@ context('Instrument tests', () => {
           });
 
           cy.assignProposalsToInstruments({
-            proposals: [
-              { callId: initialDBData.call.id, primaryKey: createdProposal2Id },
-            ],
+            proposalPks: [createdProposal2Id],
             instrumentIds: [createdInstrumentId],
           });
 

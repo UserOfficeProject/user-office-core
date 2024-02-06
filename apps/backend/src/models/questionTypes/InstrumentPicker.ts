@@ -107,9 +107,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       // Assign the Proposals to Instruments
       await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
         instrumentIds,
-        proposals: [
-          { primaryKey: proposal.primaryKey, callId: proposal.callId },
-        ],
+        proposalPks: [proposal.primaryKey],
       });
 
       // TODO: Check this when starting with FAP part for multi instrument. For now only the first instrument FAP is assigned just to be backwards compatible.
