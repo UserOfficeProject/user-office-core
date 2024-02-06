@@ -902,7 +902,7 @@ const ProposalTableOfficer = ({
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },
-          debounceInterval: 400,
+          debounceInterval: 600,
           columnsButton: true,
           selectionProps: (rowdata: ProposalViewData) => ({
             inputProps: {
