@@ -26,7 +26,8 @@ export async function getStfcDataRow(
 ) {
   const daysRequested = proposalAnswers
     ?.flatMap((step) => step.fields)
-    .find((answer) => answer.question.naturalKey === 'days_requested')?.value;
+    .find((answer) => answer.question.naturalKey === 'days_requested')
+    ?.value.value;
 
   const piDetails = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers([
     proposal?.proposerId.toString() ?? '',
