@@ -608,6 +608,8 @@ context('Fap reviews tests', () => {
 
       cy.finishedLoading();
 
+      cy.contains('0 / 1').should('be.visible');
+
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(fapMembers.reviewer.lastName)
@@ -629,6 +631,10 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="save-grade"]').should('be.disabled');
       cy.get('[data-cy="submit-grade"]').should('be.disabled');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.finishedLoading();
+      cy.contains('1 / 1').should('be.visible');
     });
   });
 
