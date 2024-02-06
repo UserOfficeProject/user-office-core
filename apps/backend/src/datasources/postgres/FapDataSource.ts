@@ -1,5 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import { inject, injectable } from 'tsyringe';
 
 import {
   Fap,
@@ -43,8 +44,17 @@ import {
   UserRecord,
   createBasicUserObject,
 } from './records';
+import { Tokens } from '../../config/Tokens';
+import { CallDataSource } from '../CallDataSource';
+import { CallsFilter } from '../../resolvers/queries/CallsQuery';
 
+@injectable()
 export default class PostgresFapDataSource implements FapDataSource {
+
+  constructor(
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
+  ) {}
+
   async delete(id: number): Promise<Fap> {
     return database
       .where('faps.fap_id', id)
@@ -324,6 +334,18 @@ export default class PostgresFapDataSource implements FapDataSource {
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
       });
+  }
+
+  async getFapReviewerProposalCountCurrentRound(reviewerId: number, fapId: number): Promise<number> {
+    const callFilter = {
+      isEnded: true,
+      fapIds: [fapId],
+      isFapReviewEnded: false
+    };
+
+    const call = await this.callDataSource.getCalls(callFilter);
+
+    
   }
 
   async getFapReviewsByCallAndStatus(
