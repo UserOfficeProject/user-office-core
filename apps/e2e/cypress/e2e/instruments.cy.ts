@@ -298,7 +298,7 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
-      cy.assignProposalsToInstrument({
+      cy.assignProposalsToInstruments({
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -349,7 +349,7 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
-      cy.assignProposalsToInstrument({
+      cy.assignProposalsToInstruments({
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -441,7 +441,7 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
-      cy.assignProposalsToInstrument({
+      cy.assignProposalsToInstruments({
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -602,7 +602,7 @@ context('Instrument tests', () => {
             abstract: proposal1.abstract,
           });
 
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
@@ -689,7 +689,7 @@ context('Instrument tests', () => {
             abstract: proposal2.abstract,
           });
 
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
@@ -736,7 +736,7 @@ context('Instrument tests', () => {
             abstract: proposal2.abstract,
           });
 
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposalPk },
             ],
@@ -933,7 +933,7 @@ context('Instrument tests', () => {
             abstract: proposal2.abstract,
           });
 
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposal2Id },
             ],

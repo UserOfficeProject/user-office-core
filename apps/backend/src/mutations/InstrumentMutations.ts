@@ -22,9 +22,9 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
-  AssignProposalsToInstrumentArgs,
+  AssignProposalsToInstrumentsArgs,
   RemoveProposalsFromInstrumentArgs,
-} from '../resolvers/mutations/AssignProposalsToInstrumentMutation';
+} from '../resolvers/mutations/AssignProposalsToInstrumentsMutation';
 import {
   RemoveScientistFromInstrumentArgs,
   AssignScientistsToInstrumentArgs,
@@ -101,7 +101,7 @@ export default class InstrumentMutations {
   }
 
   async checkIfProposalsAreOnSameCallAsInstrument(
-    inputArguments: AssignProposalsToInstrumentArgs,
+    inputArguments: AssignProposalsToInstrumentsArgs,
     instrumentId: number
   ) {
     const proposalCallIds = inputArguments.proposals.map(
@@ -126,19 +126,19 @@ export default class InstrumentMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async assignProposalsToInstrument(
+  async assignProposalsToInstruments(
     agent: UserWithRole | null,
-    args: AssignProposalsToInstrumentArgs
+    args: AssignProposalsToInstrumentsArgs
   ): Promise<InstrumentHasProposals | Rejection> {
-    return this.assignProposalsToInstrumentInternal(agent, args);
+    return this.assignProposalsToInstrumentsInternal(agent, args);
   }
 
   // TODO: Check validation here
   @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
   // @ValidateArgs(assignProposalsToInstrumentValidationSchema)
-  async assignProposalsToInstrumentInternal(
+  async assignProposalsToInstrumentsInternal(
     agent: UserWithRole | null,
-    args: AssignProposalsToInstrumentArgs
+    args: AssignProposalsToInstrumentsArgs
   ): Promise<InstrumentHasProposals | Rejection> {
     let result: InstrumentHasProposals | Rejection = rejection(
       'Could not assign proposal/s to instrument',
@@ -147,7 +147,7 @@ export default class InstrumentMutations {
         args,
       }
     );
-    // TODO: Cleanup this part becaues it is quite ugly
+    // TODO: Cleanup this part because it is quite ugly
     for await (const instrumentId of args.instrumentIds) {
       const allProposalsAreOnSameCallAsInstrument =
         await this.checkIfProposalsAreOnSameCallAsInstrument(

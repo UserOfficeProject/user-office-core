@@ -1008,7 +1008,7 @@ context('Fap meeting components tests', () => {
           callId: initialDBData.call.id,
           instrumentFapIds: [{ instrumentId: createdInstrumentId }],
         });
-        cy.assignProposalsToInstrument({
+        cy.assignProposalsToInstruments({
           instrumentIds: [createdInstrumentId],
           proposals: [
             {
@@ -1111,7 +1111,7 @@ context('Fap meeting components tests', () => {
                   proposerId: initialDBData.users.user1.id,
                 });
 
-                cy.assignProposalsToInstrument({
+                cy.assignProposalsToInstruments({
                   instrumentIds: [createdInstrument2Id],
                   proposals: [
                     {
@@ -1186,7 +1186,7 @@ context('Fap meeting components tests', () => {
             instrumentId: createdInstrumentId,
           });
 
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposals: [
               {
@@ -1291,7 +1291,7 @@ context('Fap meeting components tests', () => {
             instrumentId: createdInstrumentId,
           });
 
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposals: [
               {
@@ -1458,7 +1458,7 @@ context('Fap meeting components tests', () => {
               }
             });
 
-            cy.assignProposalsToInstrument({
+            cy.assignProposalsToInstruments({
               instrumentIds: [createdInstrumentId],
               proposals: [
                 {
@@ -2173,7 +2173,7 @@ context('Automatic Fap assignment to Proposal', () => {
           }
         );
 
-        cy.assignProposalsToInstrument({
+        cy.assignProposalsToInstruments({
           proposals: [
             { callId: initialDBData.call.id, primaryKey: createdProposalPk },
           ],

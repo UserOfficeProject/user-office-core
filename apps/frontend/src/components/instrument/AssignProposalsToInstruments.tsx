@@ -12,21 +12,21 @@ import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
-type AssignProposalsToInstrumentProps = {
+type AssignProposalsToInstrumentsProps = {
   close: () => void;
-  assignProposalsToInstrument: (
+  assignProposalsToInstruments: (
     instrument: InstrumentFragment[] | null
   ) => Promise<void>;
   callIds: number[];
   instrumentIds: (number | null)[];
 };
 
-const AssignProposalsToInstrument = ({
+const AssignProposalsToInstruments = ({
   close,
-  assignProposalsToInstrument,
+  assignProposalsToInstruments,
   callIds,
   instrumentIds,
-}: AssignProposalsToInstrumentProps) => {
+}: AssignProposalsToInstrumentsProps) => {
   const { t } = useTranslation();
 
   const { instruments, loadingInstruments } = useInstrumentsData(callIds);
@@ -52,7 +52,7 @@ const AssignProposalsToInstrument = ({
             )
           );
 
-          await assignProposalsToInstrument(selectedInstruments || null);
+          await assignProposalsToInstruments(selectedInstruments || null);
           close();
         }}
       >
@@ -117,7 +117,7 @@ const AssignProposalsToInstrument = ({
 
 // NOTE: This comparison is done to prevent component re-rendering on modal close
 export default React.memo(
-  AssignProposalsToInstrument,
+  AssignProposalsToInstruments,
   (prevProps, nextProps) =>
     JSON.stringify(prevProps.callIds) === JSON.stringify(nextProps.callIds)
 );

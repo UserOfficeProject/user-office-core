@@ -104,8 +104,8 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         return;
       }
 
-      // Assign the Proposals to Instrument
-      await instrumentMutations.assignProposalsToInstrumentInternal(null, {
+      // Assign the Proposals to Instruments
+      await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
         instrumentIds,
         proposals: [
           { primaryKey: proposal.primaryKey, callId: proposal.callId },

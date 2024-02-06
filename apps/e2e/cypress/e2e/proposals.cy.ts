@@ -435,7 +435,7 @@ context('Proposal tests', () => {
             instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
           });
 
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [result.createInstrument.id],
             proposals: [
               {

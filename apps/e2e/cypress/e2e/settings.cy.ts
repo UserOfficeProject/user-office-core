@@ -831,7 +831,7 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposals: [
               {
@@ -894,7 +894,7 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposals: [
               {
@@ -996,7 +996,7 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposals: [
               {
@@ -1173,7 +1173,7 @@ context('Settings tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
           cy.submitProposal({ proposalPk: proposal.primaryKey });
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposals: [
               {
@@ -1195,7 +1195,7 @@ context('Settings tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
           cy.submitProposal({ proposalPk: proposal.primaryKey });
-          cy.assignProposalsToInstrument({
+          cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposals: [
               {

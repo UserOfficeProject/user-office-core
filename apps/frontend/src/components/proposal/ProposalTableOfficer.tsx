@@ -26,7 +26,7 @@ import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import AssignProposalsToFap from 'components/fap/Proposals/AssignProposalsToFap';
-import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
+import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
@@ -562,7 +562,7 @@ const ProposalTableOfficer = ({
     }
   };
 
-  const assignProposalsToInstrument = async (
+  const assignProposalsToInstruments = async (
     instruments: InstrumentFragment[] | null
   ): Promise<void> => {
     if (instruments?.length) {
@@ -571,7 +571,7 @@ const ProposalTableOfficer = ({
           t('instrument'),
           'lowercase'
         )} successfully!`,
-      }).assignProposalsToInstrument({
+      }).assignProposalsToInstruments({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
@@ -745,8 +745,8 @@ const ProposalTableOfficer = ({
         fullWidth
       >
         <DialogContent>
-          <AssignProposalsToInstrument
-            assignProposalsToInstrument={assignProposalsToInstrument}
+          <AssignProposalsToInstruments
+            assignProposalsToInstruments={assignProposalsToInstruments}
             close={(): void => setOpenInstrumentAssignment(false)}
             callIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.callId

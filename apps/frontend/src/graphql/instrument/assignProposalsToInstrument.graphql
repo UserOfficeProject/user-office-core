@@ -1,8 +1,8 @@
-mutation assignProposalsToInstrument(
+mutation assignProposalsToInstruments(
   $proposals: [ProposalSelectionInput!]!
   $instrumentIds: [Int!]!
 ) {
-  assignProposalsToInstrument(
+  assignProposalsToInstruments(
     proposals: $proposals
     instrumentIds: $instrumentIds
   )

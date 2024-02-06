@@ -73,7 +73,7 @@ describe('Test Instrument Mutations', () => {
 
   test('A logged in user officer can assign proposal/s to instrument', () => {
     return expect(
-      instrumentMutations.assignProposalsToInstrument(
+      instrumentMutations.assignProposalsToInstruments(
         dummyUserOfficerWithRole,
         {
           proposals: [
