@@ -44,7 +44,7 @@ const columns = [
   },
   {
     title: '# proposals',
-    field: 'proposalsCount',
+    field: 'proposalsCountByCall',
   },
 ];
 

@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import {
   Fap,
   FapAssignment,
@@ -22,6 +23,7 @@ import {
 import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
 import database from './database';
 import {
@@ -44,13 +46,9 @@ import {
   UserRecord,
   createBasicUserObject,
 } from './records';
-import { Tokens } from '../../config/Tokens';
-import { CallDataSource } from '../CallDataSource';
-import { CallsFilter } from '../../resolvers/queries/CallsQuery';
 
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
-
   constructor(
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
   ) {}
@@ -336,16 +334,29 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getFapReviewerProposalCountCurrentRound(reviewerId: number, fapId: number): Promise<number> {
+  async getFapReviewerProposalCountCurrentRound(
+    reviewerId: number,
+    fapId: number
+  ): Promise<number> {
     const callFilter = {
       isEnded: true,
       fapIds: [fapId],
-      isFapReviewEnded: false
+      isFapReviewEnded: false,
     };
 
-    const call = await this.callDataSource.getCalls(callFilter);
+    const call = (await this.callDataSource.getCalls(callFilter))[0];
+    const proposalPks = (await this.getFapProposals(fapId, call.id)).map(
+      (p) => p.proposalPk
+    );
 
-    
+    return database('fap_reviews')
+      .count('user_id')
+      .whereIn('proposal_pk', proposalPks)
+      .andWhere('user_id', reviewerId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
   }
 
   async getFapReviewsByCallAndStatus(
