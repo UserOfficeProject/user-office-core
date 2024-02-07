@@ -121,6 +121,7 @@ const dummyProposalEvents = {
   proposal_reserved: false,
   proposal_rejected: false,
   proposal_notified: false,
+  proposal_safety_notified: false,
   proposal_booking_time_activated: false,
   proposal_booking_time_updated: false,
   proposal_booking_time_slot_added: false,
