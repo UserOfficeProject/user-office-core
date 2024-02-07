@@ -534,4 +534,18 @@ export class StfcUserDataSource implements UserDataSource {
       true
     ));
   }
+
+  async getUsersRoles(
+    userIds: number[]
+  ): Promise<{ userId: number; roles: Role[] }[]> {
+    const usersWithRoles: { userId: number; roles: Role[] }[] =
+      await Promise.all(
+        userIds.map(async (userId) => ({
+          userId,
+          roles: await this.getUserRoles(userId),
+        }))
+      );
+
+    return usersWithRoles;
+  }
 }

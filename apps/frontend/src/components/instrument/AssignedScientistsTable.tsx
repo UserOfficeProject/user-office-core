@@ -86,9 +86,11 @@ const AssignedScientistsTable = ({
   useEffect(() => {
     if (instrument.managerUserId) {
       api()
-        .getUser({ userId: instrument.managerUserId })
+        .getBasicUserDetails({ userId: instrument.managerUserId })
         .then((data) => {
-          return (instrument.beamlineManager = Object.create(data.user));
+          return (instrument.beamlineManager = Object.create(
+            data.basicUserDetails
+          ));
         });
     }
   });
