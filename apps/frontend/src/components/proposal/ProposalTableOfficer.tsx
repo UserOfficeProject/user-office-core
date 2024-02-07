@@ -124,6 +124,11 @@ let columns: Column<ProposalViewData>[] = [
     render: (proposalView) => {
       if (
         proposalView.principalInvestigator?.lastname &&
+        proposalView.principalInvestigator?.preferredname
+      ) {
+        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
+      } else if (
+        proposalView.principalInvestigator?.lastname &&
         proposalView.principalInvestigator?.firstname
       ) {
         return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
@@ -881,7 +886,7 @@ const ProposalTableOfficer = ({
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },
-          debounceInterval: 400,
+          debounceInterval: 600,
           columnsButton: true,
           selectionProps: (rowdata: ProposalViewData) => ({
             inputProps: {

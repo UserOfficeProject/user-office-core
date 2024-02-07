@@ -736,4 +736,16 @@ export default class PostgresUserDataSource implements UserDataSource {
         .where({ [row.columnName]: userFrom });
     }
   }
+
+  async getUsersByUserNumbers(ids: readonly number[]): Promise<User[]> {
+    return database
+      .select()
+      .from('users')
+      .whereIn('user_id', ids)
+      .then((userRecords: UserRecord[]) => {
+        return userRecords.map((user) => {
+          return createUserObject(user);
+        });
+      });
+  }
 }

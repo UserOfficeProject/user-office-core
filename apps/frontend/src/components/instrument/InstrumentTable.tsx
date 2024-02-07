@@ -199,7 +199,7 @@ const InstrumentTable = () => {
           createModal={createModal}
           detailPanel={[
             {
-              tooltip: 'Show Scientists',
+              tooltip: 'Show Manager and Scientists',
               render: AssignedScientists,
             },
           ]}

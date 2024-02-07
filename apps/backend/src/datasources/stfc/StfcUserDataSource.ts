@@ -64,7 +64,7 @@ export function toEssBasicUserDetails(
     Number(stfcUser.userNumber),
     stfcUser.givenName ?? '',
     stfcUser.familyName ?? '',
-    stfcUser.displayName ?? '',
+    stfcUser.firstNameKnownAs ?? stfcUser.givenName,
     stfcUser.orgName ?? '',
     stfcUser.orgId ?? 1,
     '',
@@ -82,7 +82,7 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     undefined,
     stfcUser.familyName ?? '',
     stfcUser.email ?? '',
-    stfcUser.firstNameKnownAs ?? '',
+    stfcUser.firstNameKnownAs ?? stfcUser.givenName,
     '',
     '',
     '',
@@ -347,7 +347,15 @@ export class StfcUserDataSource implements UserDataSource {
       (stfcBasicPerson) => (stfcBasicPerson ? toEssUser(stfcBasicPerson) : null)
     );
   }
+  async getUsersByUserNumbers(ids: number[]) {
+    const stfcBasicPersonDetails = await this.getStfcBasicPeopleByUserNumbers(
+      ids.map((id) => id.toString())
+    );
 
+    return stfcBasicPersonDetails?.map((stfcbasicPerson) =>
+      toEssUser(stfcbasicPerson)
+    );
+  }
   async getUserWithInstitution(id: number): Promise<{
     user: User;
     institution: Institution;
@@ -378,6 +386,7 @@ export class StfcUserDataSource implements UserDataSource {
       const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] = (
         await client.getBasicPeopleDetailsFromSurname(token, filter, true)
       )?.return;
+      if (!stfcBasicPeopleByLastName) return { totalCount: 0, users: [] };
 
       userDetails = stfcBasicPeopleByLastName.map((person) =>
         toEssBasicUserDetails(person)
@@ -524,5 +533,19 @@ export class StfcUserDataSource implements UserDataSource {
       userId.toString(),
       true
     ));
+  }
+
+  async getUsersRoles(
+    userIds: number[]
+  ): Promise<{ userId: number; roles: Role[] }[]> {
+    const usersWithRoles: { userId: number; roles: Role[] }[] =
+      await Promise.all(
+        userIds.map(async (userId) => ({
+          userId,
+          roles: await this.getUserRoles(userId),
+        }))
+      );
+
+    return usersWithRoles;
   }
 }
