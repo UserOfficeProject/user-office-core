@@ -321,11 +321,17 @@ export const collectProposalPDFData = async (
           )
           .map((genericTemplate) => genericTemplate);
       } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
-        const instrument = await baseContext.queries.instrument.get(
-          user,
-          answer.value as number
-        );
-        answer.value = instrument?.name ?? '';
+        const instrumentIds = Array.isArray(answer.value)
+          ? answer.value
+          : [answer.value];
+        const instruments =
+          await baseContext.queries.instrument.getInstrumentsByIds(
+            user,
+            instrumentIds
+          );
+        answer.value = instruments?.length
+          ? instruments.map((instrument) => instrument.name).join(', ')
+          : '';
       }
     }
 
