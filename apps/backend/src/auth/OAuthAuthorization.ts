@@ -36,12 +36,14 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
   public async externalTokenLogin(
     code: string,
-    redirectUri: string
+    redirectUri: string,
+    iss: string | null
   ): Promise<User | null> {
     try {
       const { userProfile, tokenSet } = await OpenIdClient.login(
         code,
-        redirectUri
+        redirectUri,
+        iss
       );
       const user = await this.upsertUser(userProfile, tokenSet);
 
@@ -52,7 +54,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         stack: (error as Error)?.stack,
       });
 
-      return null;
+      throw new Error(error as string);
     }
   }
 
