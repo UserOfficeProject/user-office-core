@@ -40,7 +40,7 @@ export type ProposalPDFData = {
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
   technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
-  sepReviews?: Review[];
+  fapReviews?: Review[];
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
   genericTemplates: Array<
     Pick<
@@ -235,9 +235,9 @@ export const collectProposalPDFData = async (
   });
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   const genericTemplateAttachments: Attachment[] = [];
@@ -262,9 +262,9 @@ export const collectProposalPDFData = async (
   );
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   const out: ProposalPDFData = {
@@ -334,18 +334,16 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
-  if (await proposalAuth.isReviewerOfProposal(user, proposal.primaryKey)) {
-    const technicalReview =
-      await baseContext.queries.review.technicalReviewForProposal(
-        user,
-        proposal.primaryKey
-      );
-    if (technicalReview) {
-      out.technicalReview = {
-        ...technicalReview,
-        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-      };
-    }
+  const technicalReview =
+    await baseContext.queries.review.technicalReviewForProposal(
+      user,
+      proposal.primaryKey
+    );
+  if (technicalReview) {
+    out.technicalReview = {
+      ...technicalReview,
+      status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+    };
   }
 
   // Get Reviews
@@ -354,7 +352,7 @@ export const collectProposalPDFData = async (
     proposal.primaryKey
   );
 
-  if (reviews) out.sepReviews = reviews;
+  if (reviews) out.fapReviews = reviews;
 
   return out;
 };
@@ -463,9 +461,9 @@ export const collectProposalPDFDataTokenAccess = async (
   });
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   const genericTemplateAttachments: Attachment[] = [];
@@ -501,9 +499,9 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   notify?.(
-    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.proposalId
-    }.pdf`
+    `${proposal.proposalId}_${
+      principalInvestigator.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
   );
 
   // Add information from each topic in proposal
@@ -528,16 +526,14 @@ export const collectProposalPDFDataTokenAccess = async (
   const reviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
-  if (await proposalAuth.isReviewerOfProposal(user, proposal.primaryKey)) {
-    const technicalReview = await reviewDataSource.getTechnicalReview(
-      proposal.primaryKey
-    );
-    if (technicalReview) {
-      proposalPDFData.technicalReview = {
-        ...technicalReview,
-        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-      };
-    }
+  const technicalReview = await reviewDataSource.getTechnicalReview(
+    proposal.primaryKey
+  );
+  if (technicalReview) {
+    proposalPDFData.technicalReview = {
+      ...technicalReview,
+      status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+    };
   }
 
   return proposalPDFData;

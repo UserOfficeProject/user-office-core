@@ -20,7 +20,6 @@ export class ConnectionHasStatusAction {
     public workflowId: number,
     public name: string,
     public type: ProposalStatusActionType,
-    public executed: boolean,
     public config: typeof ProposalStatusActionConfig | null
   ) {}
 }

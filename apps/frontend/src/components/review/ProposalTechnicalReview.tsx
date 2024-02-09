@@ -5,7 +5,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { Editor } from '@tinymce/tinymce-react';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
@@ -17,6 +16,7 @@ import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
+import Editor from 'components/common/TinyEditor';
 import { UserContext } from 'context/UserContextProvider';
 import {
   TechnicalReviewStatus,
@@ -394,7 +394,7 @@ const ProposalTechnicalReview = ({
                       onClick={() => setShouldSubmit(true)}
                       data-cy="submit-technical-review"
                     >
-                      {data?.submitted ? 'Submitted' : 'Submit'}
+                      {data?.submitted ? 'Submitted' : 'Save and Submit'}
                     </Button>
                   )}
                 </StyledButtonContainer>

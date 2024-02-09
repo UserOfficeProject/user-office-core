@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import { Autocomplete, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import i18n from 'i18n';
@@ -7,16 +6,52 @@ import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
   Instrument,
   InstrumentWithAvailabilityTime,
   UserRole,
 } from 'generated/sdk';
+import { useFapsData } from 'hooks/fap/useFapsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
-import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+const FapSelectionComponent = ({
+  onChange,
+  id,
+}: Instrument & {
+  onChange: (id: number, newValue: number | null) => void;
+}) => {
+  const { currentRole } = useContext(UserContext);
+  const { faps: allActiveFaps, loadingFaps } = useFapsData({
+    filter: '',
+    active: true,
+    role: currentRole as UserRole,
+  });
+
+  const fapOptions =
+    allActiveFaps?.map((fap) => ({
+      label: fap.code,
+      value: fap.id,
+    })) || [];
+
+  return (
+    <Autocomplete
+      loading={loadingFaps}
+      id="fapSelection"
+      options={fapOptions}
+      isOptionEqualToValue={(option, value) => option.value === value.value}
+      renderInput={(params) => (
+        <TextField {...params} label="Fap" margin="none" />
+      )}
+      onChange={(_event, newValue) => {
+        onChange(id, newValue?.value || null);
+      }}
+    />
+  );
+};
 
 type AssignInstrumentsToCallProps = {
   assignInstrumentsToCall: (
@@ -32,60 +67,33 @@ const AssignInstrumentsToCall = ({
   assignedInstruments,
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
-  const { currentRole } = useContext(UserContext);
-  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
-    filter: '',
-    active: true,
-    role: currentRole as UserRole,
-  });
-
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]
   >([]);
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
-  const [instrumentSepMapping, setInstrumentSepMapping] = useState<{
+  const [instrumentFapMapping, setInstrumentFapMapping] = useState<{
     [instrumentId: number]: number | null;
   }>({});
 
-  const sepOptions =
-    allActiveSeps?.map((sep) => ({
-      label: sep.code,
-      value: sep.id,
-    })) || [];
+  const onChange = (id: number, newValue: number | null) => {
+    setInstrumentFapMapping((oldState) => ({
+      ...oldState,
+      [id]: newValue,
+    }));
+  };
 
   const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
     {
-      title: 'SEP',
-      field: 'sep',
-      render: (rowData: Instrument) => {
-        return (
-          <Autocomplete
-            loading={loadingSEPs}
-            id="sepSelection"
-            options={sepOptions}
-            renderInput={(params) => <TextField {...params} label="SEPs" />}
-            onChange={(_event, newValue) => {
-              if (newValue) {
-                setInstrumentSepMapping({
-                  ...instrumentSepMapping,
-                  [rowData.id]: newValue.value,
-                });
-              } else {
-                // remove from mapping and set to state
-                setInstrumentSepMapping({
-                  ...instrumentSepMapping,
-                  [rowData.id]: null,
-                });
-              }
-            }}
-          />
-        );
-      },
+      title: 'Fap',
+      field: 'fap',
+      render: (rowData: Instrument) => (
+        <FapSelectionComponent {...rowData} onChange={onChange} />
+      ),
     },
   ];
 
@@ -106,9 +114,9 @@ const AssignInstrumentsToCall = ({
       toastSuccessMessage: t('instrument') + '/s assigned successfully!',
     }).assignInstrumentsToCall({
       callId,
-      instrumentSepIds: selectedInstruments.map((instrumentToAssign) => ({
+      instrumentFapIds: selectedInstruments.map((instrumentToAssign) => ({
         instrumentId: instrumentToAssign.id,
-        sepId: instrumentSepMapping[instrumentToAssign.id],
+        fapId: instrumentFapMapping[instrumentToAssign.id],
       })),
     });
 

@@ -13,7 +13,8 @@ export default class PostgresEventLogsDataSource
       eventLog.event_type,
       eventLog.row_data,
       eventLog.event_tstamp,
-      eventLog.changed_object_id
+      eventLog.changed_object_id,
+      eventLog.description
     );
   }
 
@@ -21,7 +22,8 @@ export default class PostgresEventLogsDataSource
     changedBy: number,
     eventType: string,
     rowData: string,
-    changedObjectId: string
+    changedObjectId: string,
+    description?: string
   ) {
     return database
       .insert({
@@ -29,6 +31,7 @@ export default class PostgresEventLogsDataSource
         event_type: eventType,
         row_data: rowData,
         changed_object_id: changedObjectId,
+        description: description,
       })
       .returning('*')
       .into('event_logs')

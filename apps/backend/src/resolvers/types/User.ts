@@ -16,11 +16,11 @@ import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
 import { User as UserOrigin } from '../../models/User';
+import { Fap } from './Fap';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
-import { SEP } from './SEP';
 
 @InputType()
 export class UserProposalsFilter {
@@ -92,9 +92,6 @@ export class User implements Partial<UserOrigin> {
   public email: string;
 
   @Field()
-  public emailVerified: boolean;
-
-  @Field()
   public telephone: string;
 
   @Field(() => String, { nullable: true })
@@ -131,8 +128,8 @@ export class UserResolver {
       return [];
     }
 
-    const sepsUserIsMemberOf =
-      await context.queries.sep.dataSource.getUserSepsByRoleAndSepId(
+    const fapsUserIsMemberOf =
+      await context.queries.fap.dataSource.getUserFapsByRoleAndFapId(
         user.id,
         context.user.currentRole
       );
@@ -140,7 +137,7 @@ export class UserResolver {
     const shouldGetOnlyUserReviews = !reviewer;
 
     return context.queries.review.dataSource.getUserReviews(
-      sepsUserIsMemberOf.map((seps) => seps.id),
+      fapsUserIsMemberOf.map((faps) => faps.id),
       shouldGetOnlyUserReviews ? user.id : undefined,
       callId,
       instrumentId,
@@ -161,13 +158,13 @@ export class UserResolver {
     );
   }
 
-  @FieldResolver(() => [SEP])
-  async seps(@Root() user: User, @Ctx() context: ResolverContext) {
+  @FieldResolver(() => [Fap])
+  async faps(@Root() user: User, @Ctx() context: ResolverContext) {
     if (!context.user || !context.user.currentRole) {
       return [];
     }
 
-    return context.queries.sep.dataSource.getUserSeps(
+    return context.queries.fap.dataSource.getUserFaps(
       user.id,
       context.user.currentRole
     );

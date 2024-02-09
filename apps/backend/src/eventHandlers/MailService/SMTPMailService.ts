@@ -3,11 +3,11 @@ import path from 'path';
 import { logger } from '@user-office-software/duo-logger';
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
-import { ResultsPromise } from 'sparkpost';
 
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
 import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
+import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
   private _email: EmailTemplates<any>;
@@ -115,7 +115,7 @@ export class SMTPMailService extends MailService {
     return Promise.allSettled(emailPromises).then((results) => {
       results.forEach((result) => {
         if (result.status === 'rejected') {
-          logger.logWarn('Unable to send email to user', {
+          logger.logError('Unable to send email to user', {
             error: result.reason,
           });
           sendMailResults.total_rejected_recipients++;

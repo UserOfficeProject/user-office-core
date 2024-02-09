@@ -42,6 +42,13 @@ export default function ProposalContainer(props: ProposalContainerProps) {
   const customEventHandlers = createCustomEventHandlers(
     (state: ProposalSubmissionState, action: Event) => {
       switch (action.type) {
+        case 'ITEM_WITH_QUESTIONARY_CREATED':
+          window.history.replaceState(
+            null,
+            '',
+            `/ProposalEdit/${state.proposal.primaryKey}`
+          );
+          break;
         case 'ITEM_WITH_QUESTIONARY_MODIFIED':
           proposalUpdated?.({
             ...state.proposal,

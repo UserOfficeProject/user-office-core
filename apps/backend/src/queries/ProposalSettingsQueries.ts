@@ -3,8 +3,10 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
+import { EXCHANGE_NAME } from '../eventHandlers/messageBroker';
 import { Event, EventLabel } from '../events/event.enum';
 import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
@@ -23,6 +25,8 @@ export default class ProposalSettingsQueries {
   constructor(
     @inject(Tokens.ProposalSettingsDataSource)
     public dataSource: ProposalSettingsDataSource,
+    @inject(Tokens.StatusActionsDataSource)
+    public statusActionsDataSource: StatusActionsDataSource,
     @inject(Tokens.MailService)
     public emailService: MailService
   ) {}
@@ -142,14 +146,16 @@ export default class ProposalSettingsQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async getStatusAction(agent: UserWithRole | null, actionId: number) {
-    const statusAction = await this.dataSource.getStatusAction(actionId);
+    const statusAction = await this.statusActionsDataSource.getStatusAction(
+      actionId
+    );
 
     return statusAction;
   }
 
   @Authorized([Roles.USER_OFFICER])
   async getStatusActions(agent: UserWithRole | null) {
-    const statusActions = await this.dataSource.getStatusActions();
+    const statusActions = await this.statusActionsDataSource.getStatusActions();
 
     return statusActions;
   }
@@ -159,7 +165,10 @@ export default class ProposalSettingsQueries {
     agent: UserWithRole | null,
     { connectionId, workflowId }: { connectionId: number; workflowId: number }
   ) {
-    return this.dataSource.getConnectionStatusActions(connectionId, workflowId);
+    return this.statusActionsDataSource.getConnectionStatusActions(
+      connectionId,
+      workflowId
+    );
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -186,7 +195,10 @@ export default class ProposalSettingsQueries {
         return new EmailActionDefaultConfig(allEmailRecipients, emailTemplates);
 
       case ProposalStatusActionType.RABBITMQ:
-        return new RabbitMQActionDefaultConfig([]);
+        // NOTE: For now we return just the default exchange.
+        const rabbitMQDefaultExchange = EXCHANGE_NAME;
+
+        return new RabbitMQActionDefaultConfig([rabbitMQDefaultExchange]);
 
       default:
         return null;

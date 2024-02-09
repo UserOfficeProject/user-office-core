@@ -73,6 +73,11 @@ export class UpdateUserArgs {
 
   @Field(() => Int, { nullable: true })
   public organizationCountry?: number;
+
+  public oauthAccessToken?: string | null;
+  public oauthIssuer?: string | null;
+  public oauthRefreshToken?: string | null;
+  public oidcSub?: string | null;
 }
 
 @ArgsType()
@@ -97,14 +102,6 @@ export class UpdateUserMutation {
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.user.updateRoles(context.user, args);
-  }
-
-  @Mutation(() => User)
-  setUserEmailVerified(
-    @Arg('id', () => Int) id: number,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.user.setUserEmailVerified(context.user, id);
   }
 
   @Mutation(() => User)

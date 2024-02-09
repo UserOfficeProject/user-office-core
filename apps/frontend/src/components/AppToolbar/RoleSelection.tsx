@@ -1,4 +1,4 @@
-import MaterialTable from '@material-table/core';
+import MaterialTable, { Column } from '@material-table/core';
 import Button from '@mui/material/Button';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
@@ -10,12 +10,15 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-const columns = [
+const columns: Column<Role>[] = [
   {
     title: 'Action',
     field: 'roleAction',
   },
-  { title: 'Role', field: 'title' },
+  {
+    title: 'Role',
+    field: 'title',
+  },
 ];
 
 const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
@@ -36,8 +39,8 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
       }
 
       if (data?.me) {
-        /** NOTE: We have roles that are duplicated in role_id and user_id but different only in sep_id
-         *  which is used to determine if the user with that role is member of a SEP.
+        /** NOTE: We have roles that are duplicated in role_id and user_id but different only in fap_id
+         *  which is used to determine if the user with that role is member of a Fap.
          */
         setRoles(getUniqueArrayBy(data.me?.roles, 'id'));
         setLoading(false);
@@ -71,7 +74,11 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
   const RoleAction = (rowData: Role) => (
     <>
       {rowData.shortCode.toUpperCase() === currentRole?.valueOf() ? (
-        <Button variant="text" disabled>
+        <Button
+          variant="text"
+          disabled
+          data-cy={`selected-role-${rowData.shortCode}`}
+        >
           In Use
         </Button>
       ) : (
@@ -79,6 +86,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
           variant="text"
           disabled={loading}
           onClick={() => selectUserRole(rowData)}
+          data-cy={`select-role-${rowData.shortCode}`}
         >
           Use
         </Button>

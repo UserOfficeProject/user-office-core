@@ -26,7 +26,7 @@ context('Personal information tests', () => {
         roles: [
           initialDBData.roles.user,
           initialDBData.roles.userOfficer,
-          initialDBData.roles.sepChair,
+          initialDBData.roles.fapChair,
         ],
       });
     }
@@ -41,12 +41,7 @@ context('Personal information tests', () => {
 
     cy.contains('User roles');
 
-    cy.contains(
-      "[data-cy='role-selection-table'] table tbody tr td",
-      'User Officer'
-    )
-      .parent()
-      .contains('In Use');
+    cy.get('[data-cy="selected-role-user_officer"]').contains('In Use');
   });
 
   describe('Personal information advanced tests', () => {
@@ -127,7 +122,7 @@ context('Personal information tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="role-modal"]')
-        .contains('SEP Chair')
+        .contains('FAP Chair')
         .parent()
         .find('input[type="checkbox"]')
         .click();
@@ -152,17 +147,15 @@ context('Personal information tests', () => {
 
       cy.get('[data-cy="role-selection-table"]').contains('User roles');
 
-      cy.get('[data-cy="role-selection-table"]')
-        .contains('SEP Chair', { matchCase: false })
-        .parent()
-        .find('button')
-        .click();
+      cy.get(
+        '[data-cy="role-selection-table"] [data-cy="select-role-fap_chair"]'
+      ).click();
 
       cy.finishedLoading();
 
       cy.contains('Proposals to grade');
 
-      cy.get('[data-cy="SEPRoles-menu-items"]')
+      cy.get('[data-cy="FapRoles-menu-items"]')
         .find('.MuiListItem-root')
         .should('have.length', 2);
     });
@@ -173,7 +166,7 @@ context('Personal information tests', () => {
           id: initialDBData.users.officer.id,
           roles: [
             initialDBData.roles.userOfficer,
-            initialDBData.roles.sepChair,
+            initialDBData.roles.fapChair,
           ],
         });
       }
@@ -202,14 +195,11 @@ context('Personal information tests', () => {
 
       cy.contains('User roles');
 
-      cy.contains('SEP Chair', { matchCase: false })
-        .parent()
-        .find('button')
-        .click();
+      cy.get('[data-cy="select-role-fap_chair"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="SEPRoles-menu-items"]').should('exist');
+      cy.get('[data-cy="FapRoles-menu-items"]').should('exist');
     });
   });
 });

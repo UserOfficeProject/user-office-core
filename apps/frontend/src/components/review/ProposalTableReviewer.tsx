@@ -1,8 +1,9 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
@@ -11,6 +12,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
+import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
@@ -376,30 +378,41 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
 
   return (
     <>
-      <ReviewStatusFilter
-        reviewStatus={urlQueryParams.reviewStatus}
-        onChange={handleStatusFilterChange}
-      />
-      <CallFilter
-        shouldShowAll
-        calls={calls}
-        isLoading={loadingCalls}
-        callId={selectedCallId}
-        onChange={(callId) => {
-          setSelectedCallId(callId);
-          setUserWithReviewsFilter((filters) => ({ ...filters, callId }));
-        }}
-      />
-      <InstrumentFilter
-        shouldShowAll
-        instruments={instruments}
-        isLoading={loadingInstruments}
-        instrumentId={selectedInstrumentId}
-        onChange={(instrumentId) => {
-          setSelectedInstrumentId(instrumentId);
-          setUserWithReviewsFilter((filters) => ({ ...filters, instrumentId }));
-        }}
-      />
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <ReviewStatusFilter
+            reviewStatus={urlQueryParams.reviewStatus}
+            onChange={handleStatusFilterChange}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <CallFilter
+            shouldShowAll
+            calls={calls}
+            isLoading={loadingCalls}
+            callId={selectedCallId}
+            onChange={(callId) => {
+              setSelectedCallId(callId);
+              setUserWithReviewsFilter((filters) => ({ ...filters, callId }));
+            }}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <InstrumentFilter
+            shouldShowAll
+            instruments={instruments}
+            isLoading={loadingInstruments}
+            instrumentId={selectedInstrumentId}
+            onChange={(instrumentId) => {
+              setSelectedInstrumentId(instrumentId);
+              setUserWithReviewsFilter((filters) => ({
+                ...filters,
+                instrumentId,
+              }));
+            }}
+          />
+        </Grid>
+      </Grid>
       <ProposalReviewModal
         title={`Proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
@@ -411,12 +424,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         <ProposalReviewContent
           reviewId={urlQueryParams.reviewModal}
           tabNames={reviewerProposalReviewTabs}
-          sepId={
+          fapId={
             userData?.reviews.find((review) => {
               return (
                 review.proposal?.proposalId === proposalToReview?.proposalId
               );
-            })?.sepID
+            })?.fapID
           }
         />
       </ProposalReviewModal>

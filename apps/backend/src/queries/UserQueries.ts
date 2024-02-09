@@ -1,5 +1,4 @@
 import { logger } from '@user-office-software/duo-logger';
-import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -28,7 +27,11 @@ export default class UserQueries {
     return this.dataSource.getUser(id);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.INTERNAL_REVIEWER,
+  ])
   async get(agent: UserWithRole | null, id: number) {
     return this.dataSource.getUser(id);
   }
@@ -157,27 +160,24 @@ export default class UserQueries {
     isValid: boolean;
     payload: AuthJwtPayload | AuthJwtApiTokenPayload | null;
   }> {
+    let payload: AuthJwtPayload | AuthJwtApiTokenPayload | null = null;
+    let isValid = false;
+
     try {
-      const payload = verifyToken<AuthJwtPayload | AuthJwtApiTokenPayload>(
-        token
-      );
+      payload = verifyToken<AuthJwtPayload | AuthJwtApiTokenPayload>(token);
+      isValid = 'user' in payload || 'accessTokenId' in payload;
 
-      if (!('user' in payload) && !('accessTokenId' in payload)) {
-        throw new GraphQLError('Unknown or malformed token');
+      if (!isValid) {
+        logger.logWarn('Unknown or malformed token', { token, payload });
       }
-
-      return {
-        isValid: true,
-        payload,
-      };
     } catch (error) {
-      logger.logException('Bad token', error, { token });
-
-      return {
-        isValid: false,
-        payload: null,
-      };
+      logger.logWarn('The given token is invalid', { token, error });
     }
+
+    return {
+      isValid,
+      payload: isValid ? payload : null,
+    };
   }
 
   async checkExternalToken(externalToken: string): Promise<boolean> {

@@ -17,64 +17,64 @@ export class UpdateCallInput {
   @Field(() => Int)
   public id: number;
 
-  @Field()
-  public shortCode: string;
+  @Field(() => String, { nullable: true })
+  public shortCode?: string;
 
-  @Field()
-  public startCall: Date;
+  @Field(() => Date, { nullable: true })
+  public startCall?: Date;
 
-  @Field()
-  public endCall: Date;
+  @Field(() => Date, { nullable: true })
+  public endCall?: Date;
 
   @Field(() => Date, { nullable: true })
   public endCallInternal?: Date;
 
-  @Field()
-  public startReview: Date;
-
-  @Field()
-  public endReview: Date;
+  @Field(() => Date, { nullable: true })
+  public startReview?: Date;
 
   @Field(() => Date, { nullable: true })
-  public startSEPReview?: Date;
+  public endReview?: Date;
 
   @Field(() => Date, { nullable: true })
-  public endSEPReview?: Date;
+  public startFapReview?: Date;
 
-  @Field()
-  public startNotify: Date;
+  @Field(() => Date, { nullable: true })
+  public endFapReview?: Date;
 
-  @Field()
-  public endNotify: Date;
+  @Field(() => Date, { nullable: true })
+  public startNotify?: Date;
 
-  @Field()
-  public startCycle: Date;
+  @Field(() => Date, { nullable: true })
+  public endNotify?: Date;
 
-  @Field()
-  public endCycle: Date;
+  @Field(() => Date, { nullable: true })
+  public startCycle?: Date;
 
-  @Field({ nullable: true })
-  public referenceNumberFormat: string;
-
-  @Field(() => Int, { nullable: true })
-  public proposalSequence: number;
-
-  @Field()
-  public cycleComment: string;
+  @Field(() => Date, { nullable: true })
+  public endCycle?: Date;
 
   @Field({ nullable: true })
-  public submissionMessage: string;
-
-  @Field()
-  public surveyComment: string;
-
-  @Field(() => AllocationTimeUnits)
-  public allocationTimeUnit: AllocationTimeUnits;
-
-  @Field(() => Int)
-  public proposalWorkflowId: number;
+  public referenceNumberFormat?: string;
 
   @Field(() => Int, { nullable: true })
+  public proposalSequence?: number;
+
+  @Field(() => String, { nullable: true })
+  public cycleComment?: string;
+
+  @Field(() => String, { nullable: true })
+  public submissionMessage?: string;
+
+  @Field(() => String, { nullable: true })
+  public surveyComment?: string;
+
+  @Field(() => AllocationTimeUnits, { nullable: true })
+  public allocationTimeUnit?: AllocationTimeUnits;
+
+  @Field(() => Int, { nullable: true })
+  public proposalWorkflowId?: number;
+
+  @Field({ nullable: true })
   public callEnded?: boolean;
 
   @Field({ nullable: true })
@@ -84,10 +84,10 @@ export class UpdateCallInput {
   public callReviewEnded?: boolean;
 
   @Field(() => Int, { nullable: true })
-  public callSEPReviewEnded?: boolean;
+  public callFapReviewEnded?: boolean;
 
-  @Field(() => Int)
-  public templateId: number;
+  @Field(() => Int, { nullable: true })
+  public templateId?: number;
 
   @Field(() => Int, { nullable: true })
   public esiTemplateId?: number;
@@ -96,38 +96,38 @@ export class UpdateCallInput {
   public pdfTemplateId?: number;
 
   @Field({ nullable: true })
-  public title: string;
+  public title?: string;
 
   @Field({ nullable: true })
-  public description: string;
+  public description?: string;
 
-  @Field(() => [Int], { nullable: true })
-  public seps?: number[];
+  @Field(() => [Int!], { nullable: true })
+  public faps?: number[];
 
   @Field(() => Boolean, { nullable: true })
   public isActive?: boolean;
 }
 
 @InputType()
-export class InstrumentSepMappingInput {
+export class InstrumentFapMappingInput {
   @Field(() => Int)
   instrumentId: number;
 
   @Field(() => Int, { nullable: true })
-  sepId?: number;
+  fapId?: number;
 }
 
 @InputType()
 export class AssignInstrumentsToCallInput {
-  @Field(() => [InstrumentSepMappingInput])
-  instrumentSepIds: InstrumentSepMappingInput[];
+  @Field(() => [InstrumentFapMappingInput])
+  instrumentFapIds: InstrumentFapMappingInput[];
 
   @Field(() => Int)
   callId: number;
 }
 
 @InputType()
-export class UpdateSepToCallInstrumentInput {
+export class UpdateFapToCallInstrumentInput {
   @Field(() => Int)
   instrumentId: number;
 
@@ -135,11 +135,11 @@ export class UpdateSepToCallInstrumentInput {
   callId: number;
 
   @Field(() => Int, { nullable: true })
-  sepId?: number;
+  fapId?: number;
 }
 
 @InputType()
-export class RemoveSepFromCallInstrumentsInput {
+export class RemoveFapFromCallInstrumentsInput {
   @Field(() => [Int])
   instrumentIds: number[];
 
@@ -181,14 +181,14 @@ export class UpdateCallMutation {
   }
 
   @Mutation(() => Call)
-  updateSepToCallInstrument(
-    @Arg('updateSepToCallInstrumentInput')
-    updateSepToCallInstrumentInput: UpdateSepToCallInstrumentInput,
+  updateFapToCallInstrument(
+    @Arg('updateFapToCallInstrumentInput')
+    updateFapToCallInstrumentInput: UpdateFapToCallInstrumentInput,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.call.updateSepToCallInstrument(
+    return context.mutations.call.updateFapToCallInstrument(
       context.user,
-      updateSepToCallInstrumentInput
+      updateFapToCallInstrumentInput
     );
   }
 

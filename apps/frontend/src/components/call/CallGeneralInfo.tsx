@@ -1,6 +1,5 @@
 import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
@@ -31,6 +30,7 @@ import { DateTimePicker } from 'formik-mui-lab';
 import React, { useContext, useEffect, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import RefreshListIcon from 'components/common/RefresListIcon';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
@@ -42,10 +42,6 @@ import {
   UpdateCallMutationVariables,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-
-type AdornmentIconProps = {
-  onClick: (event: React.MouseEvent<HTMLElement>) => void;
-};
 
 const useStyles = makeStyles((theme) => ({
   iconVerticalAlign: {
@@ -208,19 +204,6 @@ const CallGeneralInfo = ({
     })
   )(TableRow);
 
-  const AdornmentIcon = (props: AdornmentIconProps) => {
-    return (
-      <IconButton
-        edge="end"
-        title="Refresh"
-        aria-label="Refresh the list"
-        onClick={props.onClick}
-      >
-        <RefreshIcon fontSize="small" />
-      </IconButton>
-    );
-  };
-
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
   }
@@ -371,7 +354,7 @@ const CallGeneralInfo = ({
           noOptionsText="No templates"
           items={templateOptions}
           InputProps={{ 'data-cy': 'call-template' }}
-          AdornmentIcon={<AdornmentIcon onClick={reloadTemplates} />}
+          AdornmentIcon={<RefreshListIcon onClick={reloadTemplates} />}
           required
         />
         <Link
@@ -394,7 +377,7 @@ const CallGeneralInfo = ({
             noOptionsText="No templates"
             items={esiTemplateOptions}
             InputProps={{ 'data-cy': 'call-esi-template' }}
-            AdornmentIcon={<AdornmentIcon onClick={reloadEsi} />}
+            AdornmentIcon={<RefreshListIcon onClick={reloadEsi} />}
             required
           />
           <Link
@@ -421,7 +404,7 @@ const CallGeneralInfo = ({
         noOptionsText="No templates"
         items={pdfTemplateOptions}
         InputProps={{ 'data-cy': 'call-pdf-template' }}
-        AdornmentIcon={<AdornmentIcon onClick={reloadPdfTemplates} />}
+        AdornmentIcon={<RefreshListIcon onClick={reloadPdfTemplates} />}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -432,7 +415,7 @@ const CallGeneralInfo = ({
         InputProps={{
           'data-cy': 'call-workflow',
         }}
-        AdornmentIcon={<AdornmentIcon onClick={reloadProposalWorkflows} />}
+        AdornmentIcon={<RefreshListIcon onClick={reloadProposalWorkflows} />}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>

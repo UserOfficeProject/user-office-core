@@ -8,6 +8,14 @@ import React from 'react';
 import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import {
+  body as defaultProposalBody,
+  header as defaultProposalHeader,
+  footer as defaultProposalFooter,
+  sampleDeclaration as defaultProposalSampleDeclaration,
+  dummyData as defaultProposalDummyData,
+} from './PdfTemplateDefaultData';
+
 const CreateTemplate = (props: {
   onComplete: (template: TemplateMetadataFragment) => void;
   groupId: TemplateGroupId;
@@ -30,6 +38,23 @@ const CreateTemplate = (props: {
             ...values,
             groupId,
           });
+
+          if (
+            createTemplate.groupId == TemplateGroupId.PDF_TEMPLATE &&
+            createTemplate.pdfTemplate
+          ) {
+            await api({
+              toastSuccessMessage: 'Template updated successfully!',
+            }).updatePdfTemplate({
+              pdfTemplateId: createTemplate.pdfTemplate.pdfTemplateId,
+              templateData: defaultProposalBody,
+              templateHeader: defaultProposalHeader,
+              templateFooter: defaultProposalFooter,
+              templateSampleDeclaration: defaultProposalSampleDeclaration,
+              dummyData: defaultProposalDummyData,
+            });
+          }
+
           onComplete(createTemplate);
         }}
         validationSchema={createTemplateValidationSchema}

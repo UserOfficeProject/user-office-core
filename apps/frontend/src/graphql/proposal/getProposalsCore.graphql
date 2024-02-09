@@ -32,8 +32,8 @@ query getProposalsCore(
       technicalStatus
       instrumentName
       callShortCode
-      sepCode
-      sepId
+      fapCode
+      fapId
       reviewAverage
       reviewDeviation
       instrumentId

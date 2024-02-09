@@ -53,3 +53,7 @@ export class Proposal {
 export class ProposalPks {
   constructor(public proposalPks: number[]) {}
 }
+
+export class Proposals {
+  constructor(public proposals: Proposal[]) {}
+}

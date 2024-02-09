@@ -13,6 +13,7 @@ import {
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
+  CreateCallInput,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
@@ -77,14 +78,14 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         endCall: getDateTimeFromISO(call.endCall),
         startReview: getDateTimeFromISO(call.startReview),
         endReview: getDateTimeFromISO(call.endReview),
-        startSEPReview: getDateTimeFromISO(call.startSEPReview),
-        endSEPReview: getDateTimeFromISO(call.endSEPReview),
+        startFapReview: getDateTimeFromISO(call.startFapReview),
+        endFapReview: getDateTimeFromISO(call.endFapReview),
         startNotify: getDateTimeFromISO(call.startNotify),
         endNotify: getDateTimeFromISO(call.endNotify),
         startCycle: getDateTimeFromISO(call.startCycle),
         endCycle: getDateTimeFromISO(call.endCycle),
         submissionMessage: call.submissionMessage || '',
-        seps: call.seps?.map((sep) => sep.id),
+        faps: call.faps?.map((fap) => fap.id),
       }
     : {
         shortCode: '',
@@ -93,8 +94,8 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,
-        startSEPReview: currentDayStart,
-        endSEPReview: currentDayEnd,
+        startFapReview: currentDayStart,
+        endFapReview: currentDayEnd,
         startNotify: currentDayStart,
         endNotify: currentDayEnd,
         startCycle: currentDayStart,
@@ -109,7 +110,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         title: '',
         description: '',
         submissionMessage: '',
-        seps: [],
+        faps: [],
       };
 
   return (
@@ -128,7 +129,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
           } else {
             const { createCall } = await api({
               toastSuccessMessage: 'Call created successfully!',
-            }).createCall(values as UpdateCallInput);
+            }).createCall(values as CreateCallInput);
 
             close(createCall as Call);
           }

@@ -24,9 +24,18 @@ import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 
 const columns = [
-  { title: 'Name', field: 'name' },
-  { title: 'Short code', field: 'shortCode' },
-  { title: 'Description', field: 'description' },
+  {
+    title: 'Name',
+    field: 'name',
+  },
+  {
+    title: 'Short code',
+    field: 'shortCode',
+  },
+  {
+    title: 'Description',
+    field: 'description',
+  },
   {
     title: 'Scientists',
     field: 'scientists.length',
@@ -190,7 +199,7 @@ const InstrumentTable = () => {
           createModal={createModal}
           detailPanel={[
             {
-              tooltip: 'Show Scientists',
+              tooltip: 'Show Manager and Scientists',
               render: AssignedScientists,
             },
           ]}

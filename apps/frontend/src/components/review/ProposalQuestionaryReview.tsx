@@ -47,6 +47,7 @@ export default function ProposalQuestionaryReview(
   return (
     <ProposalQuestionaryDetails
       questionaryId={data.questionaryId}
+      questionaryData={data.questionary}
       additionalDetails={additionalDetails}
       title="Proposal information"
       proposalPk={data.primaryKey}

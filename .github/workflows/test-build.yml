@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: 18.x
+  FRONTEND_SDK_KEY: sdk-frontend-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -79,16 +80,16 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -101,7 +102,7 @@ jobs:
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -112,7 +113,7 @@ jobs:
 
       - name: Cache frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -123,13 +124,12 @@ jobs:
 
       - name: Cache frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          key: ${{ env.FRONTEND_SDK_KEY }}
 
       - name: Generate frontend SDK
-        if: steps.cached-sdk-frontend.outputs.cache-hit != 'true'
         run: |
           cp apps/frontend/example.development.env apps/frontend/.env
           npm run generate:sdk
@@ -137,46 +137,46 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    needs: [resolve_dep, install-and-cache]
+    needs: install-and-cache
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            ${{ env.FRONTEND_SDK_KEY }}
             sdk-frontend-
 
       - run: npm ci
@@ -190,19 +190,19 @@ jobs:
 
   test_backend:
     runs-on: ubuntu-latest
-    needs: [resolve_dep, install-and-cache]
+    needs: build
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -225,7 +225,7 @@ jobs:
           npm run test:backend
   e2e:
     runs-on: ubuntu-latest
-    needs: [resolve_dep, install-and-cache]
+    needs: [resolve_dep, build]
 
     strategy:
       fail-fast: false
@@ -245,42 +245,42 @@ jobs:
           ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
+          key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
+            ${{ env.FRONTEND_SDK_KEY }}
             sdk-frontend-
 
       # TODO: See how to proceed with e2e caching because there is some error:
@@ -291,7 +291,7 @@ jobs:
       #   env:
       #     CYPRESS_CACHE_FOLDER: cache/Cypress
       #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v3
+      #   uses: actions/cache@v4
       #   with:
       #     path: apps/e2e/node_modules
       #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -398,61 +398,3 @@ jobs:
         with:
           name: cypress-screenshots
           path: apps/e2e/cypress/screenshots
-
-  push:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    # Don't build and push image if dependabot is creating the PR
-    if: github.actor != 'dependabot[bot]'
-    needs: [install-and-cache, e2e]
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # TODO: Maybe it is a good idea to use some caching mechanism here for building docker images.
-      - uses: actions/checkout@v3
-
-      # For debugging capture the selected branch
-      - name: Branch
-        run: echo "Branch ${{ github.head_ref }}"
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to GitHub Container Registry
-        # Don't login if dependabot is creating the PR
-        if: ${{ !startsWith(github.head_ref, 'dependabot') }}
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push backend
-        uses: docker/build-push-action@v4
-        with:
-          context: ./apps/backend
-          file: ./apps/backend/Dockerfile
-          # Build but don't push if dependabot is creating the PR
-          push: ${{ !startsWith(github.head_ref, 'dependabot') }}
-          tags: ghcr.io/userofficeproject/user-office-backend:${{ github.head_ref }}
-
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v3
-        with:
-          path: apps/frontend/src/generated
-          key: sdk-frontend-${{ hashFiles('**/**.graphql') }}
-          restore-keys: |
-            sdk-frontend-${{ hashFiles('**/**.graphql') }}
-            sdk-frontend-
-
-      - name: Build and push frontend
-        uses: docker/build-push-action@v4
-        with:
-          context: ./apps/frontend
-          file: ./apps/frontend/Dockerfile
-          # Build but don't push if dependabot is creating the PR
-          push: ${{ !startsWith(github.head_ref, 'dependabot') }}
-          tags: ghcr.io/userofficeproject/user-office-frontend:${{ github.head_ref }}

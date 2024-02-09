@@ -81,10 +81,10 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public callShortCode: string;
 
   @Field(() => String, { nullable: true })
-  public sepCode: string;
+  public fapCode: string;
 
   @Field(() => Int, { nullable: true })
-  public sepId: number;
+  public fapId: number;
 
   @Field(() => Float, { nullable: true })
   public reviewAverage: number;
@@ -112,9 +112,10 @@ export class ProposalResolver {
     @Root() proposal: ProposalView,
     @Ctx() context: ResolverContext
   ): Promise<User | null> {
-    return await context.queries.user.get(
-      context.user,
+    const user = await context.loaders.user.batchLoader.load(
       proposal.principalInvestigatorId
     );
+
+    return user ? user : null;
   }
 }

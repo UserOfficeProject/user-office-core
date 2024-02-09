@@ -1,0 +1,13 @@
+mutation removeMemberFromFapProposal(
+  $memberId: Int!
+  $fapId: Int!
+  $proposalPk: Int!
+) {
+  removeMemberFromFapProposal(
+    memberId: $memberId
+    fapId: $fapId
+    proposalPk: $proposalPk
+  ) {
+    id
+  }
+}

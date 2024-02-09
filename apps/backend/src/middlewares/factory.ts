@@ -7,7 +7,8 @@ import baseContext from '../buildContext';
 import { Tokens } from '../config/Tokens';
 import { DownloadType } from '../factory/service';
 import { UserWithRole } from '../models/User';
-import pdfDownload from './factory/pdf';
+import pdfDownload from './factory/pdf/download';
+import pdfPreview from './factory/pdf/preview';
 import xlsxDownload from './factory/xlsx';
 import zipDownload from './factory/zip';
 
@@ -65,12 +66,12 @@ const getLogContextFromRequest = (req: Request) => {
   return {};
 };
 
-const router = express.Router();
+const factoryDownloadRouter = express.Router();
 
-router.use(`/${DownloadType.PDF}`, pdfDownload());
-router.use(`/${DownloadType.XLSX}`, xlsxDownload());
-router.use(`/${DownloadType.ZIP}`, zipDownload());
-router.use(
+factoryDownloadRouter.use(`/${DownloadType.PDF}`, pdfDownload());
+factoryDownloadRouter.use(`/${DownloadType.XLSX}`, xlsxDownload());
+factoryDownloadRouter.use(`/${DownloadType.ZIP}`, zipDownload());
+factoryDownloadRouter.use(
   (
     err: Error | { error: Error; message: string } | string,
     req: Request,
@@ -105,58 +106,69 @@ router.use(
   }
 );
 
+const factoryPreviewRouter = express.Router();
+
+factoryPreviewRouter.use(`/${DownloadType.PDF}`, pdfPreview());
+
 export default function factory() {
-  return express.Router().use(
-    '/download',
-    async (req, res, next) => {
-      const accessTokenId = req.user?.accessTokenId;
-      const decodedUser = req.user;
-      if (decodedUser) {
-        if (accessTokenId) {
-          await getUserWithRoleFromAccessTokenId(accessTokenId)
-            .then((userWithRole) => {
-              if (!userWithRole || !userWithRole.accessPermissions) {
-                return res.status(401).send('INSUFFICIENT_PERMISSIONS');
-              }
-              res.locals.agent = userWithRole;
-              next();
-            })
-            .catch((e) => {
-              logger.logException(
-                `${defaultErrorMessage} INSUFFICIENT_PERMISSIONS`,
-                e
-              );
-              res
-                .status(401)
-                .send(`${defaultErrorMessage} INSUFFICIENT_PERMISSIONS`);
-            });
-        } else {
-          baseContext.queries.user
-            .getAgent(decodedUser.user.id)
-            .then(async (user) => {
-              if (!user) {
-                return res.status(401).send('EXTERNAL_TOKEN_INVALID');
-              }
-              req.user = {
-                user,
-                currentRole: decodedUser.currentRole,
-                isInternalUser: decodedUser.isInternalUser,
-                roles: [],
-              };
-              res.locals.agent = await getUserWithRoleFromExpressUser(
-                decodedUser
-              );
-              next();
-            })
-            .catch((e) => {
-              logger.logException(defaultErrorMessage, e);
-              res.status(500).send(defaultErrorMessage);
-            });
-        }
+  const router = express.Router();
+
+  const middleware = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const accessTokenId = req.user?.accessTokenId;
+    const decodedUser = req.user;
+    if (decodedUser) {
+      if (accessTokenId) {
+        await getUserWithRoleFromAccessTokenId(accessTokenId)
+          .then((userWithRole) => {
+            if (!userWithRole || !userWithRole.accessPermissions) {
+              return res.status(401).send('INSUFFICIENT_PERMISSIONS');
+            }
+            res.locals.agent = userWithRole;
+            next();
+          })
+          .catch((e) => {
+            logger.logException(
+              `${defaultErrorMessage} INSUFFICIENT_PERMISSIONS`,
+              e
+            );
+            res
+              .status(401)
+              .send(`${defaultErrorMessage} INSUFFICIENT_PERMISSIONS`);
+          });
       } else {
-        return res.status(401).send('EXTERNAL_TOKEN_INVALID');
+        baseContext.queries.user
+          .getAgent(decodedUser.user.id)
+          .then(async (user) => {
+            if (!user) {
+              return res.status(401).send('EXTERNAL_TOKEN_INVALID');
+            }
+            req.user = {
+              user,
+              currentRole: decodedUser.currentRole,
+              isInternalUser: decodedUser.isInternalUser,
+              roles: [],
+            };
+            res.locals.agent = await getUserWithRoleFromExpressUser(
+              decodedUser
+            );
+            next();
+          })
+          .catch((e) => {
+            logger.logException(defaultErrorMessage, e);
+            res.status(500).send(defaultErrorMessage);
+          });
       }
-    },
-    router
-  );
+    } else {
+      return res.status(401).send('EXTERNAL_TOKEN_INVALID');
+    }
+  };
+
+  router.use('/download', middleware, factoryDownloadRouter);
+  router.use('/preview', middleware, factoryPreviewRouter);
+
+  return router;
 }

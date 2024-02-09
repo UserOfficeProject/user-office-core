@@ -1,6 +1,7 @@
 import Archive from '@mui/icons-material/Archive';
 import Unarchive from '@mui/icons-material/Unarchive';
-import { Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -121,8 +122,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       field: 'proposalCount',
     },
     {
-      title: '#' + i18n.format(i18n.format(t('SEP'), 'plural'), 'lowercase'),
-      field: 'seps.length',
+      title: '#faps',
+      field: 'faps.length',
       emptyValue: '-',
     },
   ];
@@ -156,7 +157,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             shouldActivateCall ? 'activated' : 'deactivated'
           } successfully`,
         }).updateCall({
-          ...call,
+          id: call.id,
           isActive: shouldActivateCall,
         } as UpdateCallInput);
 
@@ -276,10 +277,14 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
 
   return (
     <div data-cy="calls-table">
-      <CallStatusFilter
-        callStatus={urlQueryParams.callStatus}
-        onChange={handleStatusFilterChange}
-      />
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <CallStatusFilter
+            callStatus={urlQueryParams.callStatus}
+            onChange={handleStatusFilterChange}
+          />
+        </Grid>
+      </Grid>
       {assigningInstrumentsCallId && (
         <InputDialog
           aria-labelledby="simple-modal-title"

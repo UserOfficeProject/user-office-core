@@ -1,3 +1,5 @@
+jest.mock('axios');
+
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
@@ -74,4 +76,80 @@ test('User officer should be able to get question by natural key', async () => {
   );
 
   return expect(question).not.toBe(null);
+});
+
+describe('getDynamicMultipleChoiceOptions', () => {
+  it('should return empty array if there is no question', async () => {
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'unknown_question_id'
+    );
+
+    expect(options).toEqual([]);
+  });
+
+  it('should return empty array if url is empty', async () => {
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionEmptyUrl'
+    );
+
+    expect(options).toEqual([]);
+  });
+
+  it('should return the options if the response is an array of strings', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(['option1', 'option2']),
+        ok: true,
+      } as Response)
+    );
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionEmptyJsonPath'
+    );
+
+    expect(options).toEqual(['option1', 'option2']);
+
+    // Check that the request was made with the correct url and headers
+    expect(fetchMock).toHaveBeenCalledWith('api-url', {
+      headers: {
+        header1: 'value1',
+        header2: 'value2',
+      },
+    });
+  });
+
+  it('should return empty array if the response is not an array and jsonPath is empty', async () => {
+    jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        json: () => Promise.resolve('not an array'),
+      } as Response)
+    );
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionEmptyJsonPath'
+    );
+
+    expect(options).toEqual([]);
+  });
+
+  it('should return the options if the response is not an array and jsonPath is set', async () => {
+    jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        json: () =>
+          Promise.resolve([{ option: 'option1' }, { option: 'option2' }]),
+        ok: true,
+      } as Response)
+    );
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionWithUrlAndJsonPath'
+    );
+
+    expect(options).toEqual(['option1', 'option2']);
+  });
 });

@@ -9,6 +9,7 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 
@@ -57,7 +58,6 @@ export const dummyUserOfficer = new User(
   'IT department',
   'Producer',
   'Dorris83@gmail.com',
-  true,
   '+46700568256',
   '',
   false,
@@ -89,7 +89,6 @@ export const dummyUser = new User(
   'IT department',
   'Architect',
   'Cleve30@yahoo.com',
-  true,
   '+38978414058',
   '+46700568256',
   false,
@@ -108,14 +107,14 @@ export const dummyUserWithRole: UserWithRole = {
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
 };
 
-export const dummySEPChairWithRole: UserWithRole = {
+export const dummyFapChairWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 4, title: 'SEP Chair', shortCode: 'sep_chair' },
+  currentRole: { id: 4, title: 'Fap Chair', shortCode: 'fap_chair' },
 };
 
-export const dummySEPSecretaryWithRole: UserWithRole = {
+export const dummyFapSecretaryWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 5, title: 'SEP Secretary', shortCode: 'sep_secretary' },
+  currentRole: { id: 5, title: 'Fap Secretary', shortCode: 'fap_secretary' },
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -165,7 +164,6 @@ export const dummyPlaceHolderUser = new User(
   'IT department',
   'Architect',
   'placeholder@ess.se',
-  true,
   '+46700568256',
   '',
   true,
@@ -192,7 +190,6 @@ export const dummyUserNotOnProposal = new User(
   'IT department',
   'Facilitator',
   'Tyrique41@hotmail.com',
-  true,
   '+46700568256',
   '',
   false,
@@ -256,32 +253,8 @@ export class UserDataSourceMock implements UserDataSource {
   async checkEmailExist(email: string): Promise<boolean> {
     return false;
   }
-  async getPasswordByEmail(email: string): Promise<string> {
-    return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
-  }
-  async setUserEmailVerified(id: number): Promise<User | null> {
-    return null;
-    // Do something here or remove the function.
-  }
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     return null;
-  }
-  async setUserPassword(
-    id: number,
-    password: string
-  ): Promise<BasicUserDetails> {
-    return new BasicUserDetails(
-      id,
-      'John',
-      'Smith',
-      'John',
-      'ESS',
-      2,
-      'Manager',
-      new Date('2019-07-17 08:25:12.23043+00'),
-      false,
-      'test@email.com'
-    );
   }
   async getByEmail(email: string): Promise<User | null> {
     if (dummyUser.email === email) {
@@ -301,9 +274,6 @@ export class UserDataSourceMock implements UserDataSource {
   async getByUsername(username: string): Promise<User | null> {
     return dummyUser;
   }
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
-  }
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     // Do something here or remove the function.
   }
@@ -319,9 +289,9 @@ export class UserDataSourceMock implements UserDataSource {
         },
       ];
     } else if (id === 1001) {
-      return [{ id: 2, shortCode: 'sep_reviewer', title: 'User' }];
-    } else if (id === dummySEPChairWithRole.id) {
-      return [{ id: 4, shortCode: 'sep_chair', title: 'SEP Chair' }];
+      return [{ id: 2, shortCode: 'fap_reviewer', title: 'Fap Reviewer' }];
+    } else if (id === dummyFapChairWithRole.id) {
+      return [{ id: 4, shortCode: 'fap_chair', title: 'Fap Chair' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
@@ -334,7 +304,7 @@ export class UserDataSourceMock implements UserDataSource {
     ];
   }
 
-  async update(user: User): Promise<User> {
+  async update(user: UpdateUserArgs): Promise<User> {
     return dummyUser;
   }
 
@@ -451,5 +421,9 @@ export class UserDataSourceMock implements UserDataSource {
 
   async mergeUsers(fromUserId: number, intoUserId: number): Promise<void> {
     return;
+  }
+
+  async getUsersByUserNumbers(id: readonly number[]): Promise<User[]> {
+    return [dummyUser, dummyUserOfficer];
   }
 }
