@@ -72,6 +72,7 @@
     "sanitize-html": "^2.7.1",
     "simple-oauth2": "^4.3.0",
     "soap": "^0.45.0",
+    "string-strip-html": "^8.4.0",
     "tsyringe": "^4.8.0",
     "type-graphql": "2.0.0-beta.1",
     "yup": "^0.32.11"
