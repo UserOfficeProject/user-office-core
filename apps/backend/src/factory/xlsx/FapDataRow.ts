@@ -12,7 +12,7 @@ export function getDataRow(
   fapMeetingDecision: FapMeetingDecision | null,
   proposal: Proposal | null,
   technicalReview: TechnicalReview | null,
-  fapProposal?: FapProposal
+  fapProposal: FapProposal | null
 ) {
   return {
     propShortCode: proposal?.proposalId,
