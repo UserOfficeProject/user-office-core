@@ -2,6 +2,7 @@ import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
+import { Review } from '../../models/Review';
 import { UserWithRole } from '../../models/User';
 import { average, getGrades } from '../../utils/mathFunctions';
 import { getDataRow } from './FapDataRow';
@@ -24,6 +25,9 @@ export type RowObj = {
   propFapRankOrder: number | null;
   inAvailZone?: string | null;
   feedback?: string;
+  daysRequested?: number;
+  reviews?: Review[] | null;
+  piCountry?: string | null;
 };
 
 const fapDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
@@ -180,49 +184,73 @@ export const collectFaplXLSXData = async (
     })
   );
 
+  const instrumentProposalsAnswers = await Promise.all(
+    instrumentsProposals.map((proposals) => {
+      return Promise.all(
+        proposals.map((proposal) =>
+          proposal
+            ? baseContext.queries.questionary.getQuestionarySteps(
+                user,
+                proposal.questionaryId
+              )
+            : null
+        )
+      );
+    })
+  );
+
   const out: FapXLSXData = [];
 
-  instruments.forEach((instrument, indx) => {
-    const proposals = instrumentsProposals[indx];
-    const proposalReviews = proposalsReviews[indx];
-    const proposalPrincipalInvestigators =
-      proposalsPrincipalInvestigators[indx];
-    const technicalReviews = proposalsTechnicalReviews[indx];
-    const fapProposals = instrumentsFapProposals[indx];
-    const fapMeetingDecisions = proposalsFapMeetingDecisions[indx];
+  await Promise.all(
+    instruments.map(async (instrument, indx) => {
+      const proposals = instrumentsProposals[indx];
+      const proposalReviews = proposalsReviews[indx];
+      const proposalPrincipalInvestigators =
+        proposalsPrincipalInvestigators[indx];
+      const technicalReviews = proposalsTechnicalReviews[indx];
+      const fapProposals = instrumentsFapProposals[indx];
+      const fapMeetingDecisions = proposalsFapMeetingDecisions[indx];
+      const proposalsAnswers = instrumentProposalsAnswers[indx];
 
-    const rows = proposals.map((proposal, pIndx) => {
-      const { firstname = '<missing>', lastname = '<missing>' } =
-        proposalPrincipalInvestigators[pIndx] ?? {};
-      const technicalReview =
-        technicalReviews[pIndx]?.find(
-          (technicalReview) => technicalReview.instrumentId === instrument.id
-        ) || null;
-      const reviews = proposalReviews[pIndx];
-      const fapProposal = fapProposals?.[pIndx];
-      const fapMeetingDecision = fapMeetingDecisions[pIndx];
+      const rows = await Promise.all(
+        proposals.map(async (proposal, pIndx) => {
+          const { firstname = '<missing>', lastname = '<missing>' } =
+            proposalPrincipalInvestigators[pIndx] ?? {};
+          const technicalReview =
+            technicalReviews[pIndx]?.find(
+              (technicalReview) =>
+                technicalReview.instrumentId === instrument.id
+            ) || null;
+          const reviews = proposalReviews[pIndx];
+          const fapProposal = fapProposals?.[pIndx];
+          const fapMeetingDecision = fapMeetingDecisions[pIndx];
+          const proposalAnswers = proposalsAnswers[pIndx];
 
-      const proposalAverageScore = average(getGrades(reviews)) || 0;
+          const proposalAverageScore = average(getGrades(reviews)) || 0;
 
-      return fapDataRow(
-        `${firstname} ${lastname}`,
-        proposalAverageScore,
-        instrument,
-        fapMeetingDecision,
-        proposal,
-        technicalReview,
-        fapProposal
+          return fapDataRow(
+            `${firstname} ${lastname}`,
+            proposalAverageScore,
+            instrument,
+            fapMeetingDecision,
+            proposal,
+            technicalReview,
+            fapProposal ? fapProposal : null,
+            proposalAnswers,
+            reviews
+          );
+        })
       );
-    });
 
-    out.push({
-      sheetName:
-        // Sheet names can't exceed 31 characters
-        // use the short code and cut everything after 30 chars
-        instrument.shortCode.substr(0, 30),
-      rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
-    });
-  });
+      out.push({
+        sheetName:
+          // Sheet names can't exceed 31 characters
+          // use the short code and cut everything after 30 chars
+          instrument.shortCode.substring(0, 30),
+        rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
+      });
+    })
+  );
 
   return {
     data: out,
