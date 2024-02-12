@@ -15,7 +15,7 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
-import { updatedCall } from '../support/utils';
+import { updatedCall, closedCall } from '../support/utils';
 
 const fapMembers = {
   chair: initialDBData.users.user2,
@@ -494,6 +494,13 @@ context('Fap reviews tests', () => {
     });
 
     it.only('Should be able to see how many proposals are assigned to a reviewer', () => {
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...closedCall,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        faps: [createdFapId],
+      });
       cy.assignProposalsToFap({
         fapId: createdFapId,
         proposals: [
