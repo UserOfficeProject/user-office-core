@@ -42,6 +42,7 @@ export class FapAssignment {
     public dateAssigned: Date,
     public reassigned: boolean,
     public dateReassigned: Date | null,
-    public emailSent: boolean
+    public emailSent: boolean,
+    public rank: number | null
   ) {}
 }

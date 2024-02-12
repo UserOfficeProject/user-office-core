@@ -1028,4 +1028,28 @@ export default class PostgresFapDataSource implements FapDataSource {
 
     return { ...fap, fapSecretaryUserIds: record.map((sec) => sec.user_id) };
   }
+
+  async setReviewerRank(
+    proposalPk: number,
+    reviewer_id: number,
+    rank: number
+  ): Promise<boolean> {
+    return database
+      .update(
+        {
+          rank: rank,
+        },
+        ['*']
+      )
+      .from('fap_assignments')
+      .where('proposal_pk', proposalPk)
+      .andWhere('fap_member_user_id', reviewer_id)
+      .then((records: FapAssignmentRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new GraphQLError('Fap assignment not found');
+        }
+
+        return true;
+      });
+  }
 }
