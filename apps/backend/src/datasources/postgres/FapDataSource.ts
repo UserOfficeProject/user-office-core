@@ -347,16 +347,10 @@ export default class PostgresFapDataSource implements FapDataSource {
     const call = (await this.callDataSource.getCalls(callFilter))[0];
 
     if (call === undefined) {
-      throw new GraphQLError(
-        `Call in review phase for FAP ID: ${fapId} not found`
-      );
+      return -1;
     }
-    const dummyCallId = 69;
-    /*const proposalPks = (await this.getFapProposals(fapId, call.id)).map(
-      (p) => p.proposalPk
-    );*/
 
-    const proposalPks = (await this.getFapProposals(fapId, dummyCallId)).map(
+    const proposalPks = (await this.getFapProposals(fapId, call.id)).map(
       (p) => p.proposalPk
     );
 
