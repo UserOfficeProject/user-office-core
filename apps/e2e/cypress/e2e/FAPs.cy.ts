@@ -494,6 +494,10 @@ context('Fap reviews tests', () => {
     });
 
     it.only('Should be able to see how many proposals are assigned to a reviewer', () => {
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get('[data-cy="fap-reviewers-table"]').contains('-');
+
       cy.updateCall({
         id: initialDBData.call.id,
         ...closedCall,
@@ -512,7 +516,6 @@ context('Fap reviews tests', () => {
         memberIds: [fapMembers.reviewer.id],
       });
 
-      cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=1`);
       cy.get('[data-cy="fap-reviewers-table"]').contains('0');
 
