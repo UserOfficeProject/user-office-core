@@ -9,9 +9,20 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Fap as FapBase } from '../../models/Fap';
+import {
+  Fap as FapBase,
+  FapProposalCount as FapProposalCountBase,
+} from '../../models/Fap';
 import { BasicUserDetails } from './BasicUserDetails';
 
+@ObjectType()
+export class FapProposalCount implements FapProposalCountBase {
+  @Field(() => Int)
+  public userId: number;
+
+  @Field(() => Int)
+  public count: number;
+}
 @ObjectType()
 export class Fap implements Partial<FapBase> {
   @Field(() => Int)
@@ -37,7 +48,7 @@ export class Fap implements Partial<FapBase> {
 
   public fapChairUserId: number | null;
 
-  public fapSecretaryUserIds: number[] | null;
+  public fapSecretariesUserIds: number[] | null;
 }
 
 @Resolver(() => Fap)
@@ -66,30 +77,34 @@ export class FapResolvers {
   }
 
   @FieldResolver(() => [BasicUserDetails])
-  async fapSecretary(@Root() fap: Fap, @Ctx() context: ResolverContext) {
-    if (!fap.fapSecretaryUserIds) {
+  async fapSecretaries(@Root() fap: Fap, @Ctx() context: ResolverContext) {
+    if (!fap.fapSecretariesUserIds) {
       return [];
     }
 
-    return fap.fapSecretaryUserIds.map((fapSecretaryUserId) =>
-      context.queries.user.getBasic(context.user, fapSecretaryUserId)
+    return fap.fapSecretariesUserIds.map((fapSecretariesUserId) =>
+      context.queries.user.getBasic(context.user, fapSecretariesUserId)
     );
   }
 
-  @FieldResolver(() => [Int])
+  @FieldResolver(() => [FapProposalCount])
   async fapSecretaryProposalCount(
     @Root() fap: Fap,
     @Ctx() context: ResolverContext
   ) {
-    if (!fap.fapSecretaryUserIds) {
+    if (!fap.fapSecretariesUserIds) {
       return [];
     }
 
-    return fap.fapSecretaryUserIds.map((fapSecretaryUserId) =>
-      context.queries.fap.dataSource.getFapReviewerProposalCount(
-        fapSecretaryUserId
-      )
-    );
+    return fap.fapSecretariesUserIds.map((fapSecretariesUserId) => {
+      return {
+        userId: fapSecretariesUserId,
+        count:
+          context.queries.fap.dataSource.getFapReviewerProposalCount(
+            fapSecretariesUserId
+          ),
+      };
+    });
   }
 
   @FieldResolver(() => Int)

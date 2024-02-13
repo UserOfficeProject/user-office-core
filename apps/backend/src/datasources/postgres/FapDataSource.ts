@@ -1026,6 +1026,6 @@ export default class PostgresFapDataSource implements FapDataSource {
       .select('*')
       .where({ fap_id: fap.id });
 
-    return { ...fap, fapSecretaryUserIds: record.map((sec) => sec.user_id) };
+    return { ...fap, fapSecretariesUserIds: record.map((sec) => sec.user_id) };
   }
 }

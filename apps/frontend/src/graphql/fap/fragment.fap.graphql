@@ -10,9 +10,12 @@ fragment fap on Fap {
     ...basicUserDetails
   }
   fapChairProposalCount
-  fapSecretary {
+  fapSecretaries {
     ...basicUserDetails
   }
-  fapSecretaryProposalCount
+  fapSecretaryProposalCount {
+    userId
+    count
+  }
   proposalCount
 }

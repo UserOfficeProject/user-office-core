@@ -312,15 +312,16 @@ const FapProposalsAndAssignmentsTable = ({
       )
         ? (data.fapChairProposalCount || 0) + 1
         : data.fapChairProposalCount,
-      fapSecretaryProposalCount: data.fapSecretaryProposalCount.map(
-        (value, index) =>
-          assignedMembers.find(
-            (assignedMember) =>
-              assignedMember.id === data.fapSecretary[index].id
+      fapSecretaryProposalCount: data.fapSecretaryProposalCount.map((value) => {
+        return {
+          userId: value.userId,
+          count: assignedMembers.find(
+            (assignedMember) => assignedMember.id === value.userId
           )
-            ? value + 1
-            : value
-      ),
+            ? value.count + 1
+            : value.count,
+        };
+      }),
     });
   };
 
@@ -482,10 +483,15 @@ const FapProposalsAndAssignmentsTable = ({
               ? data.fapChairProposalCount! - 1
               : data.fapChairProposalCount,
           fapSecretaryProposalCount: data.fapSecretaryProposalCount.map(
-            (value, index) =>
-              assignedReviewer.fapMemberUserId === data.fapSecretary[index].id
-                ? value - 1
-                : value
+            (value) => {
+              return {
+                userId: value.userId,
+                count:
+                  assignedReviewer.fapMemberUserId === value.userId
+                    ? value.count - 1
+                    : value.count,
+              };
+            }
           ),
         });
       };

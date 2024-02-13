@@ -119,13 +119,14 @@ const FapMembers = ({
     setFapSecretaryModalOpen(false);
     onFapUpdate({
       ...fapData,
-      fapSecretary:
-        fapData.fapSecretary?.concat([fapSecretary]) ?? fapData.fapSecretary,
+      fapSecretaries:
+        fapData.fapSecretaries?.concat([fapSecretary]) ??
+        fapData.fapSecretaries,
     });
 
     if (
       fapSecretary.id === user.id ||
-      fapData.fapSecretary?.find((sec) => sec.id === user.id)
+      fapData.fapSecretaries?.find((sec) => sec.id === user.id)
     ) {
       setRenewTokenValue();
     }
@@ -167,7 +168,7 @@ const FapMembers = ({
       case UserRole.FAP_SECRETARY:
         onFapUpdate({
           ...fapData,
-          fapSecretary: fapData.fapSecretary.filter(
+          fapSecretaries: fapData.fapSecretaries.filter(
             (sec) => sec.id !== user.id
           ),
         });
@@ -208,7 +209,7 @@ const FapMembers = ({
 
   const alreadySelectedMembers = FapReviewersData.map(
     ({ userId }) => userId
-  ).concat(fapData.fapSecretary.map((sec) => sec.id));
+  ).concat(fapData.fapSecretaries.map((sec) => sec.id));
 
   fapData.fapChair && alreadySelectedMembers.push(fapData.fapChair.id);
 
@@ -307,7 +308,7 @@ const FapMembers = ({
           />
         </Grid>
         <Grid item sm={6} xs={12}>
-          {fapData.fapSecretary.map((sec, index) => (
+          {fapData.fapSecretaries.map((sec, index) => (
             <TextField
               key={sec.id}
               name="FapSecretary"
@@ -343,10 +344,10 @@ const FapMembers = ({
                     </Tooltip>
                   </>
                 ),
-                startAdornment: fapData.fapSecretary && (
+                startAdornment: fapData.fapSecretaries && (
                   <Tooltip
                     title={`Number of proposals to review: ${
-                      fapData.fapSecretaryProposalCount[index] || 0
+                      fapData.fapSecretaryProposalCount[index].count || 0
                     }`}
                     sx={{ padding: '2px', marginRight: '4px' }}
                   >
