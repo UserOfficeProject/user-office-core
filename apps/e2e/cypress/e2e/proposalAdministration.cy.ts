@@ -433,7 +433,7 @@ context('Proposal administration tests', () => {
           }
 
           const currentYear = new Date().getFullYear();
-          const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
+          const FIXTURE_FILE_PATH = '2024_proposal_fixture.pdf';
           const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${newlyCreatedProposalId}.pdf`;
           const downloadsFolder = Cypress.config('downloadsFolder');
           const downloadFilePath = `${downloadsFolder}/${downloadedFileName}`;
