@@ -19,6 +19,7 @@ import PostgresProposalSettingsDataSource from '../datasources/postgres/Proposal
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
+import PostgresReviewMeetingDataSource from '../datasources/postgres/ReviewMeetingDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
@@ -71,6 +72,7 @@ mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
+mapClass(Tokens.ReviewMeetingDataSource, PostgresReviewMeetingDataSource);
 mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource

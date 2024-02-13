@@ -5,6 +5,7 @@ import { Instrument, InstrumentHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
+import { ReviewMeeting } from '../models/ReviewMeeting';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
@@ -289,6 +290,11 @@ interface FapReviewerNotified extends GeneralEvent {
   fapReview: Review;
 }
 
+interface ReviewMeetingNotifiedEvent extends GeneralEvent {
+  type: Event.REVIEW_MEETING_NOTIFIED;
+  reviewmeeting: ReviewMeeting;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -342,4 +348,5 @@ export type ApplicationEvent =
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
   | FapReviewerNotified
-  | ProposalStatusActionExecutedEvent;
+  | ProposalStatusActionExecutedEvent
+  | ReviewMeetingNotifiedEvent;

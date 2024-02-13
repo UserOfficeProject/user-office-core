@@ -34,6 +34,7 @@ export const Tokens = {
   UserAuthorization: Symbol('UserAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
+  ReviewMeetingDataSource: Symbol('ReviewMeetingDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
   FapDataColumns: Symbol('FapDataColumns'),

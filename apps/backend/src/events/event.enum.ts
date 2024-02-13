@@ -66,6 +66,7 @@ export enum Event {
   INTERNAL_REVIEW_CREATED = 'INTERNAL_REVIEW_CREATED',
   INTERNAL_REVIEW_UPDATED = 'INTERNAL_REVIEW_UPDATED',
   INTERNAL_REVIEW_DELETED = 'INTERNAL_REVIEW_DELETED',
+  REVIEW_MEETING_NOTIFIED = 'REVIEW_MEETING_NOTIFIED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -269,5 +270,9 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.INTERNAL_REVIEW_DELETED,
     'Event occurs when internal (technical) review is removed',
+  ],
+  [
+    Event.REVIEW_MEETING_NOTIFIED,
+    'Event occurs when call review meeting is created',
   ],
 ]);

@@ -1,0 +1,19 @@
+mutation updateReviewMeeting(
+  $reviewMeetingId: Int!
+  $instrumentId: Int
+  $name: String
+  $details: String
+  $creatorId: Int
+  $occursAt: DateTime
+) {
+  updateReviewMeeting(
+    reviewMeetingId: $reviewMeetingId
+    instrumentId: $instrumentId
+    name: $name
+    details: $details
+    occursAt: $occursAt
+    creatorId: $creatorId
+  ) {
+    ...reviewMeeting
+  }
+}

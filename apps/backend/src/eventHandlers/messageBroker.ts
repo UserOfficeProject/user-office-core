@@ -281,6 +281,16 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.REVIEW_MEETING_NOTIFIED: {
+        const jsonMessage = JSON.stringify(event.reviewmeeting);
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
     }
   };
 }

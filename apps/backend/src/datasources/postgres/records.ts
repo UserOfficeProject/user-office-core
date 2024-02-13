@@ -31,6 +31,7 @@ import {
 } from '../../models/questionTypes/QuestionRegistry';
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
+import { ReviewMeeting } from '../../models/ReviewMeeting';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
@@ -704,6 +705,18 @@ export interface ProposalWorkflowConnectionHasActionsRecord {
   readonly config: string;
 }
 
+export interface ReviewMeetingRecord {
+  readonly review_meeting_id: number;
+  readonly name: string;
+  readonly details: string;
+  readonly creator_id: number;
+  readonly instrument_id: number;
+  readonly notified: boolean;
+  readonly occurs_at: Date;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,
@@ -1273,4 +1286,17 @@ export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
     invite.created_at,
     invite.claimed_by,
     invite.claimed_at
+  );
+
+export const createReviewMeetingObject = (meeting: ReviewMeetingRecord) =>
+  new ReviewMeeting(
+    meeting.review_meeting_id,
+    meeting.name,
+    meeting.details,
+    meeting.creator_id,
+    meeting.instrument_id,
+    meeting.notified,
+    meeting.occurs_at,
+    meeting.created_at,
+    meeting.updated_at
   );

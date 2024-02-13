@@ -1,0 +1,18 @@
+fragment reviewMeeting on ReviewMeeting {
+  id
+  name
+  details
+  creatorId
+  instrumentId
+  notified
+  occursAt
+  instrument {
+    ...instrument
+  }
+  participants {
+    ...basicUserDetails
+  }
+  creator {
+    ...basicUserDetails
+  }
+}

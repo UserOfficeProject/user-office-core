@@ -1,0 +1,9 @@
+mutation assignUsersToReviewMeeting(
+  $usersIds: [Int!]!
+  $reviewMeetingId: Int!
+) {
+  assignUsersToReviewMeeting(
+    usersIds: $usersIds
+    reviewMeetingId: $reviewMeetingId
+  )
+}

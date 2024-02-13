@@ -1,0 +1,17 @@
+mutation createReviewMeeting(
+  $name: String!
+  $details: String!
+  $occursAt: DateTime!
+  $instrumentId: Int!
+  $creatorId: Int!
+) {
+  createReviewMeeting(
+    name: $name
+    details: $details
+    occursAt: $occursAt
+    instrumentId: $instrumentId
+    creatorId: $creatorId
+  ) {
+    ...reviewMeeting
+  }
+}

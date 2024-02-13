@@ -110,6 +110,10 @@ const PeoplePage = lazy(() => import('./user/PeoplePage'));
 const ProfilePage = lazy(() => import('./user/ProfilePage'));
 const UserPage = lazy(() => import('./user/UserPage'));
 
+const ReviewMeetingsPage = lazy(
+  () => import('./reviewMeetings/ReviewMeetingsPage')
+);
+
 type BottomNavItemProps = {
   /** Content of the information modal. */
   text?: string;
@@ -646,6 +650,12 @@ const Dashboard = () => {
               title="Declare Shipments"
               path="/DeclareShipments/:scheduledEventId"
               component={DeclareShipmentsPage}
+            />
+            <TitledRoute
+              setHeader={setHeader}
+              title="Call review meetings"
+              path="/CallReviewMeetings"
+              component={ReviewMeetingsPage}
             />
             <Can
               allowedRoles={[UserRole.USER_OFFICER]}

@@ -17,6 +17,7 @@ import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalSettingsMutations from '../mutations/ProposalSettingsMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
+import ReviewMeetingMutations from '../mutations/ReviewMeetingMutation';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
@@ -40,6 +41,7 @@ import ProposalEsiQueries from '../queries/ProposalEsiQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import ProposalSettingsQueries from '../queries/ProposalSettingsQueries';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
+import ReviewMeetingQueries from '../queries/ReviewMeetingQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
@@ -77,6 +79,7 @@ interface ResolverContextQueries {
   visit: VisitQueries;
   predefinedMessage: PredefinedMessageQueries;
   internalReview: InternalReviewQueries;
+  reviewMeeting: ReviewMeetingQueries;
 }
 
 interface ResolverContextMutations {
@@ -103,6 +106,7 @@ interface ResolverContextMutations {
   visit: VisitMutations;
   predefinedMessage: PredefinedMessageMutations;
   internalReview: InternalReviewMutations;
+  reviewMeeting: ReviewMeetingMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

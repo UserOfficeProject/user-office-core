@@ -1,0 +1,8 @@
+mutation notifyReviewMeeting($reviewMeetingId: Int!, $templateId: String!) {
+  notifyReviewMeeting(
+    reviewMeetingId: $reviewMeetingId
+    templateId: $templateId
+  ) {
+    ...reviewMeeting
+  }
+}

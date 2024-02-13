@@ -1,0 +1,5 @@
+mutation deleteReviewMeeting($reviewMeetingId: Int!) {
+  deleteReviewMeeting(reviewMeetingId: $reviewMeetingId) {
+    id
+  }
+}

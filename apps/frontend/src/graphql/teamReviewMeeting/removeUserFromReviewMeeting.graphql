@@ -1,0 +1,6 @@
+mutation removeUserFromReviewMeeting($userId: Int!, $reviewMeetingId: Int!) {
+  removeUserFromReviewMeeting(
+    userId: $userId
+    reviewMeetingId: $reviewMeetingId
+  )
+}

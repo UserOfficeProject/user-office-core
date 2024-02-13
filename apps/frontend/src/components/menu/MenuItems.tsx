@@ -15,6 +15,7 @@ import Settings from '@mui/icons-material/Settings';
 import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import VpnKey from '@mui/icons-material/VpnKey';
+import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import Collapse from '@mui/material/Collapse';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -167,6 +168,19 @@ const ProposalsMenuListItem = () => {
   );
 };
 
+const TeamMeetingsMenuListItem = () => {
+  return (
+    <Tooltip title="Call review mettings">
+      <ListItem component={NavLink} to="/CallReviewMeetings" button>
+        <ListItemIcon>
+          <WorkspacesIcon />
+        </ListItemIcon>
+        <ListItemText primary="Call review mettings" />
+      </ListItem>
+    </Tooltip>
+  );
+};
+
 const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const proposalDisabled = callsData.length === 0;
   const context = useContext(FeatureContext);
@@ -257,6 +271,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           </ListItem>
         </Tooltip>
       )}
+      {TeamMeetingsMenuListItem()}
       <Tooltip title="Calls">
         <ListItem component={NavLink} to="/Calls" button>
           <ListItemIcon>

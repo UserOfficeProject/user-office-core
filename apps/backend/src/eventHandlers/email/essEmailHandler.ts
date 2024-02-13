@@ -6,6 +6,7 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
+import { ReviewMeetingDataSource } from '../../datasources/ReviewMeetingDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -28,6 +29,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
   );
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
+  );
+  const reviewMeetingDataSource = container.resolve<ReviewMeetingDataSource>(
+    Tokens.ReviewMeetingDataSource
   );
 
   if (event.isRejection) {
@@ -259,6 +263,39 @@ export async function essEmailHandler(event: ApplicationEvent) {
         })
         .catch((err: string) => {
           logger.logError('Could not send email on Fap reviewer notify:', {
+            error: err,
+            event,
+          });
+        });
+
+      return;
+    }
+
+    case Event.REVIEW_MEETING_NOTIFIED: {
+      const reviewMeeting = event.reviewmeeting;
+      const participants = await reviewMeetingDataSource.getParticipants(
+        reviewMeeting.id
+      );
+      const templateId = JSON.parse(event.inputArgs ?? '{}')[0].templateId;
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+          },
+          substitution_data: {},
+          recipients: participants.map((participant) => {
+            return { address: participant.email };
+          }),
+        })
+        .then((res) => {
+          logger.logInfo('Email sent on proposal notify:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on proposal notify:', {
             error: err,
             event,
           });
