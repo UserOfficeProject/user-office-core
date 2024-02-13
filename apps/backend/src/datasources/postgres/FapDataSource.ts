@@ -335,29 +335,26 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getFapReviewerProposalCountCurrentRound(
-    reviewerId: number,
-    fapId: number
+    reviewerId: number
   ): Promise<number> {
     const callFilter = {
       isEnded: true,
-      fapIds: [fapId],
       isFapReviewEnded: false,
     };
 
-    const call = (await this.callDataSource.getCalls(callFilter))[0];
-
-    if (call === undefined) {
-      return -1;
-    }
-
-    const proposalPks = (await this.getFapProposals(fapId, call.id)).map(
-      (p) => p.proposalPk
+    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
+      (call) => call.id
     );
 
-    return database('fap_reviews')
-      .count('user_id')
-      .whereIn('proposal_pk', proposalPks)
-      .andWhere('user_id', reviewerId)
+    return await database
+      .count('sr.user_id')
+      .from('fap_reviews as sr')
+      .join('fap_proposals as sp', {
+        'sp.proposal_pk': 'sr.proposal_pk',
+      })
+      .whereIn('sp.call_id', callIds)
+      .andWhere('sr.user_id', reviewerId)
+      .groupBy('sr.user_id')
       .first()
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');

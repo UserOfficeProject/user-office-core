@@ -304,10 +304,7 @@ export class FapDataSourceMock implements FapDataSource {
     return dummyFapProposals.length;
   }
 
-  async getFapReviewerProposalCountCurrentRound(
-    reviewerId: number,
-    fapId: number
-  ) {
+  async getFapReviewerProposalCountCurrentRound(reviewerId: number) {
     return dummyFapProposals.length;
   }
 

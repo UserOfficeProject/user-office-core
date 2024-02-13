@@ -29,18 +29,7 @@ export function useFapReviewersData(
         }
 
         if (data.fapReviewers) {
-          const fapReviewersWithoutPropCount = data.fapReviewers.map(
-            (fapReviewer) => {
-              return {
-                ...fapReviewer,
-                proposalsCountByCall:
-                  fapReviewer.proposalsCountByCall === -1
-                    ? '-'
-                    : fapReviewer.proposalsCountByCall,
-              };
-            }
-          );
-          setFapReviewersData(fapReviewersWithoutPropCount);
+          setFapReviewersData(data.fapReviewers);
         }
         setLoadingMembers(false);
       });

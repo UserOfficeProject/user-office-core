@@ -494,17 +494,6 @@ context('Fap reviews tests', () => {
     });
 
     it.only('Should be able to see how many proposals are assigned to a reviewer', () => {
-      cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=1`);
-      cy.get('[data-cy="fap-reviewers-table"]').contains('-');
-
-      cy.updateCall({
-        id: initialDBData.call.id,
-        ...closedCall,
-        proposalWorkflowId: createdWorkflowId,
-        esiTemplateId: createdEsiTemplateId,
-        faps: [createdFapId],
-      });
       cy.assignProposalsToFap({
         fapId: createdFapId,
         proposals: [
@@ -515,14 +504,23 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer.id],
       });
-
-      cy.visit(`/FapPage/${createdFapId}?tab=1`);
-      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
-
       cy.assignFapReviewersToProposal({
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer.id],
         proposalPk: createdProposalPk,
+      });
+
+      cy.login('officer');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...closedCall,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        faps: [createdFapId],
       });
 
       cy.visit(`/FapPage/${createdFapId}?tab=1`);

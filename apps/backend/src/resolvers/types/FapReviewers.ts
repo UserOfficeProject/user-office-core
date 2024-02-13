@@ -53,8 +53,7 @@ export class FapUserResolver {
     @Ctx() context: ResolverContext
   ) {
     return context.queries.fap.dataSource.getFapReviewerProposalCountCurrentRound(
-      fapMember.userId,
-      fapMember.fapId
+      fapMember.userId
     );
   }
 }
