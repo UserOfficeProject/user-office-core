@@ -17,7 +17,7 @@ export const QuestionProposalBasisForm = (props: QuestionFormProps) => {
       {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
+        question: Yup.string().required('Question is required').max(256, 'There is a 256 max character limit'),
       })}
     >
       {() => (
