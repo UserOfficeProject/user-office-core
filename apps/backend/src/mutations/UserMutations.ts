@@ -4,7 +4,7 @@ import {
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   updateUserRolesValidationSchema,
-  updateUserValidationSchema,
+  updateUserValidationBackendSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
@@ -160,7 +160,7 @@ export default class UserMutations {
     }
   }
 
-  @ValidateArgs(updateUserValidationSchema)
+  @ValidateArgs(updateUserValidationBackendSchema)
   @Authorized()
   @EventBus(Event.USER_UPDATED)
   async update(
@@ -189,20 +189,9 @@ export default class UserMutations {
       });
     }
 
-    let organisationId = args.organisation;
-    // Check if user has other as selected org and if so create it
-    if (args.otherOrganisation) {
-      organisationId = await this.dataSource.createOrganisation(
-        args.otherOrganisation,
-        false,
-        args.organizationCountry
-      );
-    }
-
     user = {
       ...user,
       ...args,
-      organisation: organisationId ?? user.organisation,
     };
 
     return this.dataSource
@@ -364,7 +353,7 @@ export default class UserMutations {
           id: user.id,
           lastname: user.lastname,
           oidcSub: user.oidcSub,
-          organisation: user.organisation,
+          institutionId: user.institutionId,
           placeholder: user.placeholder,
           position: user.position,
           preferredname: user.preferredname,

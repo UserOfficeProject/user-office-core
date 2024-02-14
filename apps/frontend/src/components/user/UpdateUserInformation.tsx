@@ -101,8 +101,7 @@ export default function UpdateUserInformation(
     othergender: userData.gender,
     nationality: userData.nationality,
     birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
-    organisation: userData.organisation,
-    organizationCountry: 0,
+    institutionId: userData.institutionId,
     department: userData.department,
     position: userData.position,
     oldEmail: userData.email,
@@ -166,9 +165,7 @@ export default function UpdateUserInformation(
           id: props.id,
           ...values,
           nationality: +(values.nationality as number),
-          organisation: +values.organisation,
-          organizationCountry:
-            +values.organisation === 1 ? +values.organizationCountry : null,
+          institutionId: +values.institutionId,
           gender:
             values.gender === 'other' ? values.othergender : values.gender,
         } as UpdateUserMutationVariables;
@@ -350,34 +347,25 @@ export default function UpdateUserInformation(
                 disabled={true}
               />
               <FormikUIAutocomplete
-                name="organisation"
-                label="Organization"
+                name="institutionId"
+                label="Institution"
                 items={institutionsList}
-                data-cy="organisation"
+                data-cy="institution"
                 loading={loadingInstitutions}
-                noOptionsText="No organizations"
+                noOptionsText="No institutions"
               />
-              {+values.organisation === 1 && (
+              {+values.institutionId === 1 && (
                 <>
                   <Field
-                    name="otherOrganisation"
-                    label="Please specify organization"
-                    id="organisation-input"
+                    name="otherInstitution"
+                    label="Please specify institution"
+                    id="institution-input"
                     type="text"
                     component={TextField}
                     margin="normal"
                     fullWidth
-                    data-cy="otherOrganisation"
+                    data-cy="otherInstitution"
                     required
-                  />
-                  <FormikUIAutocomplete
-                    name="organizationCountry"
-                    label="Please specify organization country"
-                    items={countriesList}
-                    data-cy="organizationCountry"
-                    required
-                    loading={!countries}
-                    noOptionsText="No countries"
                   />
                 </>
               )}

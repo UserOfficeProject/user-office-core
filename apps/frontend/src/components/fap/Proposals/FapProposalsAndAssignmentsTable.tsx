@@ -343,24 +343,24 @@ const FapProposalsAndAssignmentsTable = ({
       selectedProposal.proposal.users.find((user) => user.id === member.id)
     );
 
-    const selectedReviewerWithSameOrganizationAsPI = memberUsers.find(
+    const selectedReviewerWithSameInstitutionAsPI = memberUsers.find(
       (member) =>
-        member.organizationId ===
-        selectedProposal.proposal.proposer?.organizationId
+        member.institutionId ===
+        selectedProposal.proposal.proposer?.institutionId
     );
 
-    const selectedReviewerWithSameOrganizationAsCoProposers =
-      memberUsers.filter((member) =>
+    const selectedReviewerWithSameInstitutionAsCoProposers = memberUsers.filter(
+      (member) =>
         selectedProposal.proposal.users.find(
-          (user) => user.organizationId === member.organizationId
+          (user) => user.institutionId === member.institutionId
         )
-      );
+    );
 
     const shouldShowWarning =
       !!selectedPI ||
       !!selectedCoProposers.length ||
-      selectedReviewerWithSameOrganizationAsPI ||
-      selectedReviewerWithSameOrganizationAsCoProposers;
+      selectedReviewerWithSameInstitutionAsPI ||
+      selectedReviewerWithSameInstitutionAsCoProposers;
 
     if (shouldShowWarning) {
       confirm(() => assignMemberToFapProposal(memberUsers), {
@@ -370,7 +370,7 @@ const FapProposalsAndAssignmentsTable = ({
         alertText: (
           <>
             Some of the selected reviewers are already part of the proposal as a
-            PI/Co-proposer or belong to the same organization{' '}
+            PI/Co-proposer or belong to the same institution{' '}
             <strong>
               <ul>
                 {!!selectedPI && <li>PI: {getFullUserName(selectedPI)}</li>}
@@ -384,16 +384,16 @@ const FapProposalsAndAssignmentsTable = ({
                       .join(', ')}
                   </li>
                 )}
-                {!!selectedReviewerWithSameOrganizationAsPI && (
+                {!!selectedReviewerWithSameInstitutionAsPI && (
                   <li>
-                    Same organization as PI:{' '}
-                    {getFullUserName(selectedReviewerWithSameOrganizationAsPI)}
+                    Same institution as PI:{' '}
+                    {getFullUserName(selectedReviewerWithSameInstitutionAsPI)}
                   </li>
                 )}
-                {!!selectedReviewerWithSameOrganizationAsCoProposers.length && (
+                {!!selectedReviewerWithSameInstitutionAsCoProposers.length && (
                   <li>
-                    Same organization as co-proposers:{' '}
-                    {selectedReviewerWithSameOrganizationAsCoProposers
+                    Same institution as co-proposers:{' '}
+                    {selectedReviewerWithSameInstitutionAsCoProposers
                       .map((selectedCoProposer) =>
                         getFullUserName(selectedCoProposer)
                       )

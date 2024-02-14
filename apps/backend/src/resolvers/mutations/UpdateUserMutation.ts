@@ -45,7 +45,7 @@ export class UpdateUserArgs {
   public birthdate?: Date;
 
   @Field(() => Int, { nullable: true })
-  public organisation?: number;
+  public institutionId?: number;
 
   @Field(() => String, { nullable: true })
   public department?: string;
@@ -67,12 +67,6 @@ export class UpdateUserArgs {
 
   @Field(() => [Int], { nullable: true })
   public roles?: number[];
-
-  @Field(() => String, { nullable: true })
-  public otherOrganisation?: string;
-
-  @Field(() => Int, { nullable: true })
-  public organizationCountry?: number;
 
   public oauthAccessToken?: string | null;
   public oauthIssuer?: string | null;

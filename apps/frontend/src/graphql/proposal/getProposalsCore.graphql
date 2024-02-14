@@ -45,7 +45,7 @@ query getProposalsCore(
         firstname
         lastname
         preferredname
-        organisation
+        institutionId
         email
       }
     }
