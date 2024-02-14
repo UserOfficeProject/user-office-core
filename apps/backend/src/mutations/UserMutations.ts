@@ -316,12 +316,14 @@ export default class UserMutations {
 
   async externalTokenLogin(
     externalToken: string,
-    redirecturi: string
+    redirecturi: string,
+    iss: string | null
   ): Promise<string | Rejection> {
     try {
       const user = await this.userAuth.externalTokenLogin(
         externalToken,
-        redirecturi
+        redirecturi,
+        iss
       );
 
       if (!user) {
@@ -363,11 +365,12 @@ export default class UserMutations {
       });
 
       return uosToken;
-    } catch (exception) {
+    } catch (error) {
       return rejection(
-        'Error occurred during external authentication',
+        (error as Error).message ||
+          'Error occurred during external authentication',
         {},
-        exception
+        error
       );
     }
   }

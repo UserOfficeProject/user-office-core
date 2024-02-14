@@ -183,7 +183,8 @@ export abstract class UserAuthorization {
 
   abstract externalTokenLogin(
     token: string,
-    redirectUri: string
+    redirectUri: string,
+    iss: string | null
   ): Promise<User | null>;
 
   abstract logout(token: AuthJwtPayload): Promise<string | Rejection>;
