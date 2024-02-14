@@ -152,6 +152,8 @@ const FapAssignedReviewersTable = ({
             reviewerId: rankReviewer?.reviewer as number,
             rank: value,
           });
+          updateView(rankReviewer?.proposal as number);
+          setRankReviewer(null);
         }}
       />
 
