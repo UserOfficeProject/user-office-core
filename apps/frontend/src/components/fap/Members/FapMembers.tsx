@@ -122,6 +122,12 @@ const FapMembers = ({
       fapSecretaries:
         fapData.fapSecretaries?.concat([fapSecretary]) ??
         fapData.fapSecretaries,
+      fapSecretaryProposalCount: fapData.fapSecretaryProposalCount.concat([
+        {
+          userId: fapSecretary.id,
+          count: 0,
+        },
+      ]),
     });
 
     if (
