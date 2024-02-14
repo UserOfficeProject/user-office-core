@@ -77,7 +77,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             email: user.email,
             inviterName: inviter.firstname,
             inviterLastname: inviter.lastname,
-            inviterOrg: inviter.organisation,
+            inviterOrg: inviter.institution,
             redeemCode: redeemCode[0].code,
           },
           recipients: [{ address: user.email }],
