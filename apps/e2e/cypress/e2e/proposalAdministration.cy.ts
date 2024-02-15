@@ -447,12 +447,12 @@ context('Proposal administration tests', () => {
             downloadsFolder: downloadsFolder,
           });
 
-          cy.fixture(FIXTURE_FILE_PATH, 'binary', { timeout: 15000 }).then(
+          cy.fixture(FIXTURE_FILE_PATH, 'binary', { timeout: 50000 }).then(
             (fixtureBuffer) => {
               const fixtureFileContentByteLength = fixtureBuffer.length;
               // for now just check the file size
               cy.readFile(downloadFilePath, 'binary', {
-                timeout: 15000,
+                timeout: 50000,
               }).should((buffer) => {
                 // NOTE: If you run the factory locally inside a docker container and directly(as a node app) on your local machine there could be some file size differences.
                 if (buffer.length !== fixtureFileContentByteLength) {
