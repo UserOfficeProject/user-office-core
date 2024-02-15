@@ -9,7 +9,7 @@ query getUserMe {
     gender
     nationality
     birthdate
-    organisation
+    institutionId
     department
     position
     email

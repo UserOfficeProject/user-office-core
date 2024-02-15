@@ -220,7 +220,7 @@ export class StfcUserDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
 
-  async createOrganisation(name: string, verified: boolean): Promise<number> {
+  async createInstitution(name: string, verified: boolean): Promise<number> {
     throw new Error('Method not implemented.');
   }
 
@@ -510,7 +510,7 @@ export class StfcUserDataSource implements UserDataSource {
     gender: string,
     nationality: number,
     birthdate: Date,
-    organisation: number,
+    institution: number,
     department: string,
     position: string,
     email: string,
@@ -533,5 +533,19 @@ export class StfcUserDataSource implements UserDataSource {
       userId.toString(),
       true
     ));
+  }
+
+  async getUsersRoles(
+    userIds: number[]
+  ): Promise<{ userId: number; roles: Role[] }[]> {
+    const usersWithRoles: { userId: number; roles: Role[] }[] =
+      await Promise.all(
+        userIds.map(async (userId) => ({
+          userId,
+          roles: await this.getUserRoles(userId),
+        }))
+      );
+
+    return usersWithRoles;
   }
 }

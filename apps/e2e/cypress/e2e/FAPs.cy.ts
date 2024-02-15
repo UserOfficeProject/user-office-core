@@ -531,7 +531,7 @@ context('Fap reviews tests', () => {
         // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          organisation: 2,
+          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
           gender: 'male',
@@ -608,6 +608,8 @@ context('Fap reviews tests', () => {
 
       cy.finishedLoading();
 
+      cy.contains('0 / 1').should('be.visible');
+
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(fapMembers.reviewer.lastName)
@@ -629,6 +631,10 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="save-grade"]').should('be.disabled');
       cy.get('[data-cy="submit-grade"]').should('be.disabled');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.finishedLoading();
+      cy.contains('1 / 1').should('be.visible');
     });
   });
 
@@ -668,7 +674,7 @@ context('Fap reviews tests', () => {
         // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          organisation: 2,
+          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           telephone_alt: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
