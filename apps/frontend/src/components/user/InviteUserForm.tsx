@@ -59,7 +59,7 @@ const InviteUserForm = ({
             id: createdUserId,
             firstname: values.firstname,
             lastname: values.lastname,
-            organisation: '',
+            institution: '',
           } as BasicUserDetails);
           close();
         }

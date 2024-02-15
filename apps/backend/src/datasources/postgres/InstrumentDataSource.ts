@@ -18,6 +18,7 @@ import {
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
   InstrumentHasProposalsRecord,
+  InstitutionRecord,
 } from './records';
 
 @injectable()
@@ -501,9 +502,9 @@ export default class PostgresInstrumentDataSource
       .join('instrument_has_scientists as ihs', {
         'u.user_id': 'ihs.user_id',
       })
-      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('ihs.instrument_id', instrumentId)
-      .then((usersRecord: UserRecord[]) => {
+      .then((usersRecord: Array<UserRecord & InstitutionRecord>) => {
         const users = usersRecord.map((user) => createBasicUserObject(user));
 
         return users;
