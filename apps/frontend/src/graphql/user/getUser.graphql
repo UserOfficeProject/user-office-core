@@ -9,7 +9,7 @@ query getUser($userId: Int!) {
     gender
     nationality
     birthdate
-    organisation
+    institutionId
     department
     position
     email

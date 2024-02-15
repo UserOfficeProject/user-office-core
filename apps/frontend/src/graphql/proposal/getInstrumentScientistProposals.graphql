@@ -30,7 +30,7 @@ query getInstrumentScientistProposals(
         firstname
         lastname
         preferredname
-        organisation
+        institutionId
         email
       }
     }

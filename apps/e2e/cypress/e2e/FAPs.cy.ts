@@ -531,7 +531,7 @@ context('Fap reviews tests', () => {
         // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          organisation: 2,
+          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
           gender: 'male',
@@ -674,7 +674,7 @@ context('Fap reviews tests', () => {
         // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          organisation: 2,
+          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           telephone_alt: faker.phone.number('+4670#######'),
           user_title: 'Dr.',

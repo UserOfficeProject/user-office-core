@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, Directive, Authorized } from 'type-graphql';
+import { Authorized, Directive, Field, Int, ObjectType } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { Roles } from '../../models/Role';
@@ -20,10 +20,10 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   public preferredname: string | undefined;
 
   @Field()
-  public organisation: string;
+  public institution: string;
 
   @Field(() => Int)
-  public organizationId: number;
+  public institutionId: number;
 
   @Field()
   public position: string;
