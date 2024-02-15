@@ -48,7 +48,7 @@ const initUserData: UserContextData = {
     firstname: '',
     lastname: '',
     oidcSub: '',
-    organisation: 0,
+    institutionId: 0,
     created: '',
     placeholder: false,
     preferredname: '',

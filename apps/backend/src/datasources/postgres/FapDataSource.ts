@@ -42,6 +42,7 @@ import {
   createReviewObject,
   UserRecord,
   createBasicUserObject,
+  InstitutionRecord,
 } from './records';
 
 export default class PostgresFapDataSource implements FapDataSource {
@@ -288,18 +289,22 @@ export default class PostgresFapDataSource implements FapDataSource {
     proposalPk: number,
     callId: number
   ): Promise<BasicUserDetails[]> {
-    const fapProposalReviewers: UserRecord[] = await database
-      .select(['users.*'])
-      .from('fap_reviews as sr')
-      .join('fap_proposals as sp', {
-        'sr.proposal_pk': 'sp.proposal_pk',
-        'sr.fap_id': 'sp.fap_id',
-      })
-      .join('users', {
-        'users.user_id': 'sr.user_id',
-      })
-      .where('sp.proposal_pk', proposalPk)
-      .andWhere('sp.call_id', callId);
+    const fapProposalReviewers: Array<UserRecord & InstitutionRecord> =
+      await database
+        .select(['users.*', 'institutions.*']) // Adjusted here
+        .from('fap_reviews as sr')
+        .join('fap_proposals as sp', {
+          'sr.proposal_pk': 'sp.proposal_pk',
+          'sr.fap_id': 'sp.fap_id',
+        })
+        .join('users', {
+          'users.user_id': 'sr.user_id',
+        })
+        .join('institutions', {
+          'users.institution_id': 'institutions.institution_id',
+        })
+        .where('sp.proposal_pk', proposalPk)
+        .andWhere('sp.call_id', callId);
 
     return fapProposalReviewers.map((fapProposalReviewer) =>
       createBasicUserObject(fapProposalReviewer)

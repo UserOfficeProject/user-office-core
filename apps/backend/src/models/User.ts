@@ -37,7 +37,7 @@ export class User {
     public gender: string,
     public nationality: number,
     public birthdate: Date,
-    public organisation: number,
+    public institutionId: number,
     public department: string,
     public position: string,
     public email: string,
@@ -87,8 +87,8 @@ export class BasicUserDetails {
     public firstname: string,
     public lastname: string,
     public preferredname: string,
-    public organisation: string,
-    public organizationId: number,
+    public institution: string,
+    public institutionId: number,
     public position: string,
     public created: Date,
     public placeholder: boolean,
@@ -104,7 +104,7 @@ export type UserJWT = Pick<
   | 'id'
   | 'lastname'
   | 'oidcSub'
-  | 'organisation'
+  | 'institutionId'
   | 'placeholder'
   | 'position'
   | 'preferredname'

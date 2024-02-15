@@ -36,12 +36,14 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
   public async externalTokenLogin(
     code: string,
-    redirectUri: string
+    redirectUri: string,
+    iss: string | null
   ): Promise<User | null> {
     try {
       const { userProfile, tokenSet } = await OpenIdClient.login(
         code,
-        redirectUri
+        redirectUri,
+        iss
       );
       const user = await this.upsertUser(userProfile, tokenSet);
 
@@ -52,7 +54,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         stack: (error as Error)?.stack,
       });
 
-      return null;
+      throw new Error(error as string);
     }
   }
 
@@ -100,9 +102,9 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
 
   private async getUserInstitutionId(userInfo: UserinfoResponse) {
-    if (userInfo.organisation) {
+    if (userInfo.institution_name) {
       const institutions = await this.adminDataSource.getInstitutions({
-        name: userInfo.organisation as string,
+        name: userInfo.institution_name as string,
       });
 
       if (institutions.length === 1) {
@@ -143,7 +145,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
-        organisation: institutionId ?? user.organisation,
+        institutionId: institutionId ?? user.institutionId,
         position: userInfo.position as string,
         preferredname: userInfo.preferred_username,
         telephone: userInfo.phone_number,
