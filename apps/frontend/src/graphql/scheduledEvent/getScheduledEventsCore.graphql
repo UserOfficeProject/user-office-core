@@ -11,7 +11,14 @@ query getScheduledEventsCore(
         ...basicUserDetails
       }
       instruments {
-        ...instrument
+        id
+        name
+        shortCode
+        description
+        managerUserId
+        scientists {
+          ...basicUserDetails
+        }
       }
     }
     esi {

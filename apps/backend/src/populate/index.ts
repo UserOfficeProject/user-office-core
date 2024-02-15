@@ -274,8 +274,8 @@ const createProposals = async () => {
       );
     }
 
-    instrumentDataSource.assignProposalsToInstrument(
-      [proposal.primaryKey],
+    instrumentDataSource.assignProposalToInstrument(
+      proposal.primaryKey,
       dummy.positiveNumber(MAX_INSTRUMENTS)
     );
   }, MAX_PROPOSALS);

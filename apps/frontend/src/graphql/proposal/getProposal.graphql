@@ -46,6 +46,7 @@ query getProposal($primaryKey: Int!) {
         lastname
         preferredname
       }
+      managementTimeAllocation
     }
     call {
       id

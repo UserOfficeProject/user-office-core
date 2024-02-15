@@ -388,7 +388,7 @@ export default class ProposalMutations {
       finalStatus,
       commentForManagement,
       commentForUser,
-      managementTimeAllocation,
+      managementTimeAllocations,
       managementDecisionSubmitted,
     } = args;
     const isChairOrSecretaryOfProposal =
@@ -433,8 +433,11 @@ export default class ProposalMutations {
       proposal.commentForManagement = commentForManagement;
     }
 
-    if (managementTimeAllocation !== undefined) {
-      proposal.managementTimeAllocation = managementTimeAllocation;
+    if (managementTimeAllocations?.length) {
+      await this.instrumentDataSource.updateProposalInstrumentTimeAllocation(
+        proposal.primaryKey,
+        managementTimeAllocations
+      );
     }
 
     if (managementDecisionSubmitted !== undefined) {
@@ -602,7 +605,6 @@ export default class ProposalMutations {
         notified: false,
         submitted: false,
         referenceNumberSequence: 0,
-        managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
       });
 

@@ -6,8 +6,10 @@ import {
   Instrument,
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
+  InstrumentWithManagementTime,
 } from '../../models/Instrument';
 import { BasicUserDetails } from '../../models/User';
+import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { FapDataSource } from '../FapDataSource';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -18,6 +20,7 @@ import {
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
   InstrumentHasProposalsRecord,
+  InstrumentWithManagementTimeRecord,
 } from './records';
 
 @injectable()
@@ -49,6 +52,19 @@ export default class PostgresInstrumentDataSource
       instrument.availability_time,
       instrument.submitted,
       instrument.fap_id
+    );
+  }
+
+  private createInstrumentWithManagementTimeObject(
+    instrument: InstrumentWithManagementTimeRecord
+  ) {
+    return new InstrumentWithManagementTime(
+      instrument.instrument_id,
+      instrument.name,
+      instrument.short_code,
+      instrument.description,
+      instrument.manager_user_id,
+      instrument.management_time_allocation
     );
   }
 
@@ -240,69 +256,44 @@ export default class PostgresInstrumentDataSource
     return this.createInstrumentObject(instrumentRecord);
   }
 
-  async assignProposalsToInstrument(
-    proposalPks: number[],
+  async assignProposalToInstrument(
+    proposalPk: number,
     instrumentId: number
   ): Promise<InstrumentHasProposals> {
-    const dataToInsert = proposalPks.map((proposalPk) => ({
+    const dataToInsert = {
       instrument_id: instrumentId,
       proposal_pk: proposalPk,
-    }));
+    };
 
-    const proposalInstrumentPairs: {
-      proposal_pk: number;
-      instrument_id: number;
-    }[] = await database.transaction(async (trx) => {
-      try {
-        /**
-         * NOTE: First delete all connections that should be changed,
-         * because currently we only support one proposal to be assigned on one instrument.
-         * So we don't end up in a situation that one proposal is assigned to multiple instruments
-         * which is not supported scenario by the frontend because it only shows one instrument per proposal.
-         */
-        await database('instrument_has_proposals')
-          .del()
-          .whereIn('proposal_pk', proposalPks)
-          .andWhere('instrument_id', instrumentId)
-          .transacting(trx);
+    return database('instrument_has_proposals')
+      .insert(dataToInsert)
+      .returning(['*'])
+      .then(([result]: InstrumentHasProposalsRecord[]) => {
+        if (result) {
+          return new InstrumentHasProposals(
+            instrumentId,
+            [result.proposal_pk],
+            false
+          );
+        }
 
-        const result = await database('instrument_has_proposals')
-          .insert(dataToInsert)
-          .returning(['*'])
-          .transacting(trx);
-
-        return await trx.commit(result);
-      } catch (error) {
         throw new GraphQLError(
-          `Could not assign proposals ${proposalPks} to instrument with id: ${instrumentId}`
+          `Could not assign proposal ${proposalPk} to instrument with id: ${instrumentId}`
         );
-      }
-    });
-
-    const returnedProposalPks = proposalInstrumentPairs.map(
-      (proposalInstrumentPair) => proposalInstrumentPair.proposal_pk
-    );
-
-    if (proposalInstrumentPairs?.length) {
-      /**
-       * NOTE: We need to return changed proposalPks because we listen to events and
-       * we need to do some changes on proposals based on what is changed.
-       */
-      return new InstrumentHasProposals(
-        instrumentId,
-        returnedProposalPks,
-        false
-      );
-    }
-
-    throw new GraphQLError(
-      `Could not assign proposals ${proposalPks} to instrument with id: ${instrumentId}`
-    );
+      });
   }
 
-  async removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean> {
+  async removeProposalsFromInstrument(
+    proposalPks: number[],
+    instrumentId?: number
+  ): Promise<boolean> {
     const result = await database('instrument_has_proposals')
       .whereIn('proposal_pk', proposalPks)
+      .modify((query) => {
+        if (instrumentId) {
+          query.andWhere('instrument_id', instrumentId);
+        }
+      })
       .del();
 
     if (result) {
@@ -314,7 +305,7 @@ export default class PostgresInstrumentDataSource
 
   async getInstrumentsByProposalPk(
     proposalPk: number
-  ): Promise<Instrument[] | null> {
+  ): Promise<InstrumentWithManagementTime[]> {
     return database
       .select([
         'i.instrument_id',
@@ -322,23 +313,55 @@ export default class PostgresInstrumentDataSource
         'short_code',
         'description',
         'manager_user_id',
+        'management_time_allocation',
       ])
       .from('instruments as i')
       .join('instrument_has_proposals as ihp', {
         'i.instrument_id': 'ihp.instrument_id',
       })
       .where('ihp.proposal_pk', proposalPk)
-      .then((instruments: InstrumentRecord[]) => {
-        // if (!instrument) {
-        //   return null;
-        // }
-
+      .then((instruments: InstrumentWithManagementTimeRecord[]) => {
         const result = instruments.map((instrument) =>
-          this.createInstrumentObject(instrument)
+          this.createInstrumentWithManagementTimeObject(instrument)
         );
 
         return result;
       });
+  }
+
+  async updateProposalInstrumentTimeAllocation(
+    proposalPk: number,
+    managementTimeAllocations: ManagementTimeAllocationsInput[]
+  ): Promise<boolean> {
+    const result = await database.transaction(async (trx) => {
+      const queries = managementTimeAllocations.map(
+        (managementTimeAllocation) =>
+          database('instrument_has_proposals')
+            .where('instrument_id', managementTimeAllocation.instrumentId)
+            .andWhere('proposal_pk', proposalPk)
+            .update({
+              management_time_allocation: managementTimeAllocation.value,
+            })
+            .transacting(trx)
+      );
+      try {
+        const value = await Promise.all(queries);
+
+        return trx.commit(value);
+      } catch (error) {
+        return trx.rollback(error);
+      }
+    });
+
+    if (!result) {
+      throw new GraphQLError(
+        `Cannot update proposal instrument time allocations: ${JSON.stringify(
+          managementTimeAllocations
+        )}`
+      );
+    }
+
+    return true;
   }
 
   async checkIfAllProposalsOnInstrumentSubmitted(

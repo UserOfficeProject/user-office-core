@@ -23,7 +23,7 @@ import { Call } from './Call';
 import { Fap } from './Fap';
 import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
-import { Instrument } from './Instrument';
+import { InstrumentWithManagementTime } from './Instrument';
 import { ProposalBookingCore, ProposalBookingFilter } from './ProposalBooking';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
@@ -81,9 +81,6 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => Boolean)
   public submitted: boolean;
-
-  @Field(() => Int, { nullable: true })
-  public managementTimeAllocation: number;
 
   @Field(() => Boolean)
   public managementDecisionSubmitted: boolean;
@@ -160,12 +157,15 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => [Instrument], { nullable: 'itemsAndList' })
+  @FieldResolver(() => [InstrumentWithManagementTime], {
+    nullable: 'itemsAndList',
+  })
   async instruments(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Instrument[] | null> {
-    return await context.queries.instrument.dataSource.getInstrumentsByProposalPk(
+  ): Promise<InstrumentWithManagementTime[]> {
+    return await context.queries.instrument.getInstrumentsByProposalPk(
+      context.user,
       proposal.primaryKey
     );
   }

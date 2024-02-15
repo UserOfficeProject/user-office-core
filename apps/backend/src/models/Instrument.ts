@@ -23,6 +23,19 @@ export class InstrumentWithAvailabilityTime extends Instrument {
   }
 }
 
+export class InstrumentWithManagementTime extends Instrument {
+  constructor(
+    public id: number,
+    public name: string,
+    public shortCode: string,
+    public description: string,
+    public managerUserId: number,
+    public managementTimeAllocation: number
+  ) {
+    super(id, name, shortCode, description, managerUserId);
+  }
+}
+
 export class InstrumentHasProposals {
   constructor(
     public instrumentId: number,

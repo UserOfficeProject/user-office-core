@@ -46,6 +46,12 @@ export class InstrumentWithAvailabilityTime extends Instrument {
   public fapId: number;
 }
 
+@ObjectType()
+export class InstrumentWithManagementTime extends Instrument {
+  @Field(() => Int, { nullable: true })
+  public managementTimeAllocation: number;
+}
+
 @Resolver(() => InstrumentWithAvailabilityTime)
 export class InstrumentWithAvailabilityTimeResolver {
   @FieldResolver(() => Fap, { nullable: true })

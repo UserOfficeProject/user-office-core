@@ -55,6 +55,7 @@ import {
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import {
   addColumns,
+  fromArrayToCommaSeparated,
   removeColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
@@ -144,14 +145,14 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
     title: 'Technical status',
     field: 'technicalStatuses',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalStatuses?.join(', ') || '-',
+      fromArrayToCommaSeparated(rowData.technicalStatuses),
   },
   {
     title: 'Technical time allocation',
     field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
       rowData.technicalTimeAllocations
-        ? `${rowData.technicalTimeAllocations?.join(', ')} (${
+        ? `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
             rowData.allocationTimeUnit
           }s)`
         : '-',
@@ -160,7 +161,7 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
     title: 'Assigned technical reviewer',
     field: 'technicalReviewAssigneeNames',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalReviewAssigneeNames?.join(', ') || '-',
+      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
   },
 ];
 
@@ -171,7 +172,7 @@ const instrumentManagementColumns = (
     title: t('instrument'),
     field: 'instrumentNames',
     render: (rowData: ProposalViewData) =>
-      rowData.instrumentNames?.join(', ') || '-',
+      fromArrayToCommaSeparated(rowData.instrumentNames),
   },
 ];
 

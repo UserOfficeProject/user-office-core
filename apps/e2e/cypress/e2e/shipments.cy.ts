@@ -26,10 +26,13 @@ context('Shipments tests', () => {
         this.skip();
       }
     });
+    // TODO: Check this if it doesn;t require the proposal to be assigned to instrument first
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
       managementDecisionSubmitted: true,
-      managementTimeAllocation: 2,
+      managementTimeAllocations: [
+        { instrumentId: initialDBData.instrument1.id, value: 5 },
+      ],
     });
     cy.createVisit({
       team: [coProposer.id, visitor.id, PI.id],

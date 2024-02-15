@@ -13,7 +13,7 @@ export class ProposalView {
     public finalStatus: number, // Should use ProposalEndStatus enum here
     public notified: boolean,
     public submitted: boolean,
-    public managementTimeAllocation: number,
+    public managementTimeAllocations: number[],
     public technicalReviewIds: number[],
     public technicalReviewAssigneeIds: number[],
     public technicalTimeAllocations: number[],

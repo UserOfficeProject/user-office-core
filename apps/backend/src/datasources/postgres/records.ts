@@ -137,7 +137,7 @@ export interface ProposalViewRecord {
   readonly proposal_id: string;
   readonly rank_order: number;
   readonly final_status: number;
-  readonly management_time_allocation: number;
+  readonly management_time_allocations: number[];
   readonly notified: boolean;
   readonly submitted: boolean;
   readonly technical_review_ids: number[];
@@ -481,6 +481,16 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly fap_id: number;
 }
 
+export interface InstrumentWithManagementTimeRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly manager_user_id: number;
+  readonly management_time_allocation: number;
+  readonly submitted: boolean;
+}
+
 export interface TemplateCategoryRecord {
   readonly template_category_id: number;
   readonly name: string;
@@ -754,7 +764,6 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.notified,
     proposal.submitted,
     proposal.reference_number_sequence,
-    proposal.management_time_allocation,
     proposal.management_decision_submitted
   );
 };
@@ -812,7 +821,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.final_status,
     proposal.notified,
     proposal.submitted,
-    proposal.management_time_allocation,
+    proposal.management_time_allocations,
     proposal.technical_review_ids,
     proposal.technical_review_assignee_ids,
     proposal.technical_time_allocations,

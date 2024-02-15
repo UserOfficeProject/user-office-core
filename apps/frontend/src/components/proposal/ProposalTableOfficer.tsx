@@ -52,6 +52,7 @@ import {
 } from 'hooks/proposal/useProposalsCoreData';
 import {
   addColumns,
+  fromArrayToCommaSeparated,
   fromProposalToProposalView,
   removeColumns,
   setSortDirectionOnSortColumn,
@@ -168,23 +169,21 @@ const technicalReviewColumns = [
     title: 'Technical status',
     field: 'technicalStatuses',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalStatuses?.join(', ') || '-',
+      fromArrayToCommaSeparated(rowData.technicalStatuses),
   },
   {
     title: 'Assigned technical reviewer',
     field: 'technicalReviewAssigneeNames',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalReviewAssigneeNames?.join(', ') || '-',
+      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
   },
   {
     title: 'Technical time allocation',
     field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalTimeAllocations && rowData.technicalTimeAllocations[0]
-        ? `${rowData.technicalTimeAllocations?.join(', ')} (${
-            rowData.allocationTimeUnit
-          }s)`
-        : '-',
+      `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
+        rowData.allocationTimeUnit
+      }s)`,
     hidden: true,
   },
 ];
@@ -196,7 +195,7 @@ const instrumentManagementColumns = (
     title: t('instrument'),
     field: 'instrumentNames',
     render: (rowData: ProposalViewData) =>
-      rowData.instrumentNames?.join(', ') || '-',
+      fromArrayToCommaSeparated(rowData.instrumentNames),
   },
 ];
 
@@ -204,7 +203,7 @@ const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
-    field: 'finalTimeAllocationRendered',
+    field: 'finalTimeAllocationsRendered',
     emptyValue: '-',
     hidden: true,
   },
@@ -704,9 +703,9 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      finalTimeAllocationRendered: proposal.managementTimeAllocation
-        ? `${proposal.managementTimeAllocation}(${proposal.allocationTimeUnit}s)`
-        : '-',
+      finalTimeAllocationsRendered: `${fromArrayToCommaSeparated(
+        proposal.managementTimeAllocations
+      )} (${proposal.allocationTimeUnit}s)`,
     })
   );
 

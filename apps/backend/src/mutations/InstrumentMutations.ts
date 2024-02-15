@@ -173,6 +173,33 @@ export default class InstrumentMutations {
       }
 
       for await (const proposalPk of args.proposalPks) {
+        const proposalInstruments =
+          await this.dataSource.getInstrumentsByProposalPk(proposalPk);
+
+        const proposalInstrumentsToRemove = proposalInstruments.filter(
+          (i) => !args.instrumentIds.includes(i.id)
+        );
+
+        if (proposalInstrumentsToRemove.length) {
+          await Promise.all(
+            proposalInstrumentsToRemove.map((i) => {
+              return this.dataSource.removeProposalsFromInstrument(
+                [proposalPk],
+                i.id
+              );
+            })
+          );
+        }
+
+        if (proposalInstruments.find((i) => i.id === instrumentId)) {
+          break;
+        }
+
+        await this.dataSource.assignProposalToInstrument(
+          proposalPk,
+          instrumentId
+        );
+
         const technicalReview =
           await this.reviewDataSource.getProposalInstrumentTechnicalReview(
             proposalPk,
@@ -208,17 +235,12 @@ export default class InstrumentMutations {
         }
       }
 
-      result = await this.dataSource.assignProposalsToInstrument(
+      // TODO: Check if this supplies enough information for the logs because we are sending only last instrument id.
+      result = new InstrumentHasProposals(
+        instrumentId,
         args.proposalPks,
-        instrumentId
+        false
       );
-
-      if (result.proposalPks.length !== args.proposalPks.length) {
-        return rejection('Could not assign proposal/s to instrument', {
-          agent,
-          args,
-        });
-      }
     }
 
     return result;

@@ -15,6 +15,7 @@ import ProposalAdmin, {
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
+  InstrumentWithManagementTime,
   Proposal,
   Review,
   TechnicalReview,
@@ -204,7 +205,18 @@ const ProposalReviewContent = ({
     <ProposalAdmin
       data={proposalData}
       setAdministration={(data: AdministrationFormData) =>
-        setProposalData({ ...proposalData, ...data })
+        setProposalData({
+          ...proposalData,
+          ...data,
+          instruments:
+            proposalData.instruments?.map((instrument) => ({
+              ...(instrument as InstrumentWithManagementTime),
+              managementTimeAllocation:
+                data.managementTimeAllocations?.find(
+                  (item) => item.instrumentId === instrument?.id
+                )?.value ?? null,
+            })) || [],
+        })
       }
     />
   );

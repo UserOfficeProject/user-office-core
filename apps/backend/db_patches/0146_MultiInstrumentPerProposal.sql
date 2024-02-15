@@ -10,6 +10,7 @@ BEGIN
 			SET instrument_id = (SELECT instrument_id FROM instrument_has_proposals WHERE technical_review.proposal_pk = instrument_has_proposals.proposal_pk);
 
 			ALTER TABLE technical_review DROP CONSTRAINT technical_review_proposal_id_key;
+			ALTER TABLE instrument_has_proposals ADD COLUMN instrument_has_proposals_id SERIAL NOT NULL;
 
 			-- drop view to allow recreating it
     	DROP VIEW proposal_table_view;
@@ -32,6 +33,7 @@ BEGIN
 		          t.technical_review_ids,
 							t.technical_review_assignee_ids,
 							t.technical_time_allocations,
+							ihp.management_time_allocations,
 		          t.technical_review_assignee_names,
 		          t.technical_review_statuses,
 		          t.technical_reviews_submitted,
@@ -75,16 +77,17 @@ BEGIN
 			) t ON t.proposal_pk = p.proposal_pk
 			LEFT JOIN (
 				SELECT proposal_pk,
-					array_agg(ihp.instrument_id) AS instrument_ids,
-					array_agg(i.name) AS instrument_names,
-					array_agg(i.manager_user_id) AS instrument_manager_ids
+					array_agg(ihp.instrument_id ORDER BY ihp.instrument_has_proposals_id ASC) AS instrument_ids,
+					array_agg(i.name ORDER BY ihp.instrument_has_proposals_id ASC) AS instrument_names,
+					array_agg(i.manager_user_id ORDER BY ihp.instrument_has_proposals_id ASC) AS instrument_manager_ids,
+					array_agg(ihp.management_time_allocation ORDER BY ihp.instrument_has_proposals_id ASC) AS management_time_allocations
 				FROM instrument_has_proposals ihp 
 				JOIN instruments i ON i.instrument_id = ihp.instrument_id
 				GROUP BY ihp.proposal_pk
 			) ihp ON ihp.proposal_pk = p.proposal_pk
 			LEFT JOIN (
 				SELECT proposal_pk,
-					array_agg(ihs.user_id) AS instrument_scientist_ids
+					array_agg(ihs.user_id ORDER BY ihp_2.instrument_has_proposals_id ASC) AS instrument_scientist_ids
 				FROM instrument_has_proposals ihp_2
 				LEFT JOIN instrument_has_scientists ihs ON ihp_2.instrument_id = ihs.instrument_id
 				GROUP BY ihp_2.proposal_pk
@@ -102,6 +105,10 @@ BEGIN
 		UPDATE status_changing_events
 		SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE'
 		WHERE status_changing_event = 'PROPOSAL_UNFEASIBLE';
+
+		ALTER TABLE instrument_has_proposals ADD COLUMN management_time_allocation INT DEFAULT NULL;
+		UPDATE instrument_has_proposals
+		SET management_time_allocation = (SELECT management_time_allocation FROM proposals WHERE proposals.proposal_pk = instrument_has_proposals.proposal_pk);
 
     END;
 	END IF;

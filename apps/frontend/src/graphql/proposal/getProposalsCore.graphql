@@ -25,7 +25,7 @@ query getProposalsCore(
       finalStatus
       notified
       submitted
-      managementTimeAllocation
+      managementTimeAllocations
       technicalTimeAllocations
       technicalReviewAssigneeIds
       technicalReviewAssigneeNames

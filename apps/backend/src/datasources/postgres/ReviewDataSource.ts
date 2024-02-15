@@ -75,6 +75,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .select()
       .from('technical_review')
       .where('proposal_pk', id)
+      .orderBy('technical_review_id')
       .then((reviews: TechnicalReviewRecord[]) => {
         return reviews.map((review) => createTechnicalReviewObject(review));
       });

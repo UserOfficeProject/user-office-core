@@ -17,7 +17,6 @@ import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
-import { Instrument } from '../models/Instrument';
 import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
@@ -38,9 +37,8 @@ type Member = {
 
 type ProposalMessageData = {
   abstract: string;
-  allocatedTime: number;
   callId: number;
-  instruments?: Pick<Instrument, 'id' | 'shortCode'>[];
+  instruments?: { id: number; shortCode: string; allocatedTime: number }[];
   members: Member[];
   newStatus?: string;
   proposalPk: number;
@@ -123,17 +121,17 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     throw new Error('Call not found');
   }
 
-  const proposalAllocatedTime = getSecondsPerAllocationTimeUnit(
-    proposal.managementTimeAllocation,
-    call.allocationTimeUnit
-  );
-
   const instruments = maybeInstruments?.length
     ? maybeInstruments.map((instr) => ({
         id: instr.id,
         shortCode: instr.shortCode,
+        allocatedTime: getSecondsPerAllocationTimeUnit(
+          instr.managementTimeAllocation,
+          call.allocationTimeUnit
+        ),
       }))
     : undefined;
+
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
@@ -141,7 +139,6 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     title: proposal.title,
     abstract: proposal.abstract,
     callId: call.id,
-    allocatedTime: proposalAllocatedTime,
     instrumentIds: instruments?.map((instrument) => instrument?.id),
     members: proposalUsersWithInstitution.map(
       (proposalUserWithInstitution) => ({

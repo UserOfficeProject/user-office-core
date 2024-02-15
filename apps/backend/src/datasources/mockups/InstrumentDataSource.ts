@@ -3,8 +3,10 @@ import {
   Instrument,
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
+  InstrumentWithManagementTime,
 } from '../../models/Instrument';
 import { BasicUserDetails } from '../../models/User';
+import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
 import { basicDummyUser } from './UserDataSource';
@@ -29,11 +31,21 @@ export const dummyInstrumentWithAvailabilityTime =
     1
   );
 
+export const dummyInstrumentWithManagementTime =
+  new InstrumentWithManagementTime(
+    1,
+    'Dummy instrument 1',
+    'instrument_1',
+    'This is test instrument.',
+    1,
+    10
+  );
+
 const dummyInstruments = [dummyInstrument];
 
 export const dummyInstrumentHasProposals = new InstrumentHasProposals(
   1,
-  [1, 2],
+  [1],
   true
 );
 
@@ -110,14 +122,17 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return [{ callId: 1, instrumentId: 1 }];
   }
 
-  async assignProposalsToInstrument(
-    proposalPks: number[],
+  async assignProposalToInstrument(
+    proposalPk: number,
     instrumentId: number
   ): Promise<InstrumentHasProposals> {
-    return new InstrumentHasProposals(instrumentId, proposalPks, false);
+    return new InstrumentHasProposals(instrumentId, [proposalPk], false);
   }
 
-  async removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean> {
+  async removeProposalsFromInstrument(
+    proposalPks: number[],
+    instrumentId?: number
+  ): Promise<boolean> {
     return true;
   }
 
@@ -154,8 +169,15 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
 
   async getInstrumentsByProposalPk(
     proposalPk: number
-  ): Promise<Instrument[] | null> {
-    return [dummyInstrument];
+  ): Promise<InstrumentWithManagementTime[]> {
+    return [dummyInstrumentWithManagementTime];
+  }
+
+  async updateProposalInstrumentTimeAllocation(
+    proposalPk: number,
+    managementTimeAllocations: ManagementTimeAllocationsInput[]
+  ): Promise<boolean> {
+    return true;
   }
 
   async setAvailabilityTimeOnInstrument(

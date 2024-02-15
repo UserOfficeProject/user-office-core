@@ -55,7 +55,6 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.notified || false,
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
-    values?.managementTimeAllocation || 0,
     values?.managementDecisionSubmitted || false
   );
 };
@@ -182,7 +181,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       false,
       false,
-      1,
+      [1],
       [1],
       [1],
       [1],

@@ -87,7 +87,10 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
       (technicalReview) =>
         `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
     ),
-    managementTimeAllocation: proposal.managementTimeAllocation || null,
+    managementTimeAllocations:
+      proposal.instruments?.map(
+        (instrument) => instrument?.managementTimeAllocation
+      ) || [],
     technicalStatuses: proposal.technicalReviews?.map((technicalReview) =>
       getTranslation(technicalReview?.status as ResourceId)
     ),
@@ -224,4 +227,13 @@ export function toArray<T>(input: T | T[]): T[] {
   }
 
   return [input];
+}
+
+export function fromArrayToCommaSeparated(
+  itemsArray?: (string | number | null | undefined)[] | null
+) {
+  return (
+    itemsArray?.map((technicalStatus) => technicalStatus ?? '-').join(', ') ||
+    '-'
+  );
 }

@@ -53,8 +53,8 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Boolean)
   public submitted: boolean;
 
-  @Field(() => Int, { nullable: true })
-  public managementTimeAllocation?: number;
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public managementTimeAllocations?: number[];
 
   @Field(() => [Int], { nullable: 'itemsAndList' })
   public technicalTimeAllocations?: number[];
