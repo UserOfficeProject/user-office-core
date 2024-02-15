@@ -7,6 +7,7 @@ import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Page } from '../../models/Admin';
+import { Country } from '../../models/Country';
 import { Feature, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
@@ -27,6 +28,7 @@ import database from './database';
 import {
   CountryRecord,
   createBasicUserObject,
+  createCountryObject,
   createFeatureObject,
   createInstitutionObject,
   createPageObject,
@@ -57,6 +59,22 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         country ? new Entry(country.country_id, country.country) : null
       );
   }
+  async getCountryByName(countryName: string): Promise<Country | null> {
+    return database
+      .select('*')
+      .from('countries')
+      .where('country', countryName)
+      .first()
+      .then((country: CountryRecord) => {
+        if (!country) {
+          throw new GraphQLError(
+            `Could not get country with country name:${countryName}`
+          );
+        }
+
+        return createCountryObject(country);
+      });
+  }
 
   async updateInstitution(
     institution: Institution
@@ -64,8 +82,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     const [institutionRecord]: InstitutionRecord[] = await database
       .update({
         institution: institution.name,
-        verified: institution.verified,
         country_id: institution.country,
+        ror_id: institution.rorId,
       })
       .from('institutions')
       .where('institution_id', institution.id)
@@ -85,7 +103,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .insert({
         institution: institution.name,
         country_id: institution.country,
-        verified: institution.verified,
+        ror_id: institution.rorId,
       })
       .into('institutions')
       .returning('*');
@@ -184,9 +202,6 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .orderByRaw('institution_id=1 desc')
       .orderBy('institution', 'asc')
       .modify((query) => {
-        if (filter?.isVerified) {
-          query.where('verified', filter.isVerified);
-        }
         if (filter?.name) {
           query.where('institution', filter.name);
         }
@@ -201,6 +216,38 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .select('*')
       .from('institutions')
       .where('institution_id', id)
+      .first()
+      .then((int?: InstitutionRecord) => {
+        if (!int) {
+          return null;
+        }
+
+        return createInstitutionObject(int);
+      });
+  }
+
+  async getInstitutionByRorId(rorId: string): Promise<Institution | null> {
+    return database
+      .select('*')
+      .from('institutions')
+      .where('ror_id', rorId)
+      .first()
+      .then((int?: InstitutionRecord) => {
+        if (!int) {
+          return null;
+        }
+
+        return createInstitutionObject(int);
+      });
+  }
+
+  async getInstitutionByName(
+    institutionName: string
+  ): Promise<Institution | null> {
+    return database
+      .select('*')
+      .from('institutions')
+      .where('institution', institutionName)
       .first()
       .then((int?: InstitutionRecord) => {
         if (!int) {

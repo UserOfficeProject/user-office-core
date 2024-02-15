@@ -12,6 +12,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { rejection, Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
+import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { NonNullableField } from '../utils/utilTypes';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -102,17 +103,33 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
 
   private async getUserInstitutionId(userInfo: UserinfoResponse) {
-    if (userInfo.institution_name) {
-      const institutions = await this.adminDataSource.getInstitutions({
-        name: userInfo.institution_name as string,
-      });
+    let institution = userInfo.institution_ror_id
+      ? await this.adminDataSource.getInstitutionByRorId(
+          userInfo.institution_ror_id as string
+        )
+      : await this.adminDataSource.getInstitutionByName(
+          userInfo.institution_name as string
+        );
 
-      if (institutions.length === 1) {
-        return institutions[0].id;
+    if (!institution) {
+      const institutionCountry = await this.adminDataSource.getCountryByName(
+        userInfo.institution_country as string
+      );
+      if (!institutionCountry || !institutionCountry.countryId) {
+        throw new GraphQLError('Invalid Country');
       }
+      const newInstitution: CreateInstitutionsArgs = {
+        name: userInfo.institution_name as string,
+        country: institutionCountry.countryId,
+        rorId: userInfo.institution_ror_id as string,
+      };
+
+      institution = await this.adminDataSource.createInstitution(
+        newInstitution
+      );
     }
 
-    return undefined;
+    return institution?.id;
   }
 
   private async upsertUser(
