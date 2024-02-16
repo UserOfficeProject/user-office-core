@@ -26,6 +26,14 @@ context('Proposal administration tests', () => {
   const existingQuestionaryId = 1;
   let createdProposalPk: number;
   let createdProposalId: string;
+  let createdInstrumentId: number;
+
+  const instrument1 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: existingUserId,
+  };
 
   beforeEach(() => {
     cy.resetDB();
@@ -34,27 +42,50 @@ context('Proposal administration tests', () => {
 
   describe('Proposal administration advanced search filter tests', () => {
     beforeEach(() => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal) {
-          createdProposalPk = result.createProposal.primaryKey;
-          createdProposalId = result.createProposal.proposalId;
-          cy.updateProposal({
-            proposalPk: result.createProposal.primaryKey,
-            proposerId: existingUserId,
-            title: proposalName1,
-            abstract: proposalAbstract1,
-          });
-          cy.answerTopic({
-            answers: [],
-            topicId: existingTopicId,
-            questionaryId: existingQuestionaryId,
-            isPartialSave: false,
-          });
-          cy.submitProposal({
-            proposalPk: result.createProposal.primaryKey,
-          });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        cy.updateUserRoles({
+          id: existingUserId,
+          roles: [
+            initialDBData.roles.user,
+            initialDBData.roles.instrumentScientist,
+          ],
+        });
+      }
+
+      cy.createProposal({ callId: initialDBData.call.id }).then(
+        ({ createProposal }) => {
+          if (createProposal) {
+            createdProposalPk = createProposal.primaryKey;
+            createdProposalId = createProposal.proposalId;
+            cy.updateProposal({
+              proposalPk: createProposal.primaryKey,
+              proposerId: existingUserId,
+              title: proposalName1,
+              abstract: proposalAbstract1,
+            });
+            cy.answerTopic({
+              answers: [],
+              topicId: existingTopicId,
+              questionaryId: existingQuestionaryId,
+              isPartialSave: false,
+            });
+            cy.submitProposal({
+              proposalPk: createProposal.primaryKey,
+            });
+
+            cy.createInstrument(instrument1).then((result) => {
+              if (result.createInstrument) {
+                createdInstrumentId = result.createInstrument.id;
+
+                cy.assignInstrumentToCall({
+                  callId: initialDBData.call.id,
+                  instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+                });
+              }
+            });
+          }
         }
-      });
+      );
       cy.login('officer');
       cy.visit('/');
     });
@@ -63,6 +94,12 @@ context('Proposal administration tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
+
+      cy.assignProposalsToInstruments({
+        instrumentIds: [initialDBData.instrument1.id],
+        proposalPks: [createdProposalPk],
+      });
+
       cy.contains('Proposals').click();
 
       cy.get('[data-cy=view-proposal]').click();
@@ -78,24 +115,45 @@ context('Proposal administration tests', () => {
         .contains('Accepted')
         .click();
 
-      cy.get('[data-cy="managementTimeAllocation"] label').should(
-        'include.text',
-        initialDBData.call.allocationTimeUnit
-      );
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] label`
+      ).should('include.text', initialDBData.call.allocationTimeUnit);
 
-      cy.get('[data-cy="managementTimeAllocation"] input')
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      )
         .clear()
         .type('-123')
         .blur();
-      cy.contains('Must be greater than or equal to');
+      cy.get<JQuery<HTMLInputElement>>(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      ).then(($input) => {
+        expect($input[0].validity.valid).to.be.false;
+        expect($input[0].validationMessage).to.include(
+          'Value must be greater than or equal to 0'
+        );
+      });
 
-      cy.get('[data-cy="managementTimeAllocation"] input')
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      )
         .clear()
         .type('987654321')
         .blur();
-      cy.contains('Must be less than or equal to');
+      cy.get<JQuery<HTMLInputElement>>(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      ).then(($input) => {
+        expect($input[0].validity.valid).to.be.false;
+        expect($input[0].validationMessage).to.include(
+          `Value must be less than or equal to ${1e5}`
+        );
+      });
 
-      cy.get('[data-cy="managementTimeAllocation"] input').clear().type('20');
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      )
+        .clear()
+        .type('20');
 
       cy.get('[data-cy="commentForUser"]').clear().type(textUser);
       cy.get('[data-cy="commentForManagement"]').clear().type(textManager);
@@ -128,10 +186,9 @@ context('Proposal administration tests', () => {
         textManager
       );
 
-      cy.get('[data-cy="managementTimeAllocation"] input').should(
-        'have.value',
-        '20'
-      );
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      ).should('have.value', '20');
 
       cy.get('[data-cy="is-management-decision-submitted"] input').should(
         'have.value',

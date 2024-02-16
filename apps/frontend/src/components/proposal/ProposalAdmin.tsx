@@ -5,7 +5,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { administrationProposalValidationSchema } from '@user-office-software/duo-validation/lib/Proposal';
 import { Formik, Form, Field, useFormikContext, FieldArray } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React, { ChangeEvent } from 'react';
@@ -96,7 +95,6 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
       </Typography>
       <Formik
         initialValues={initialValues}
-        validationSchema={administrationProposalValidationSchema}
         onSubmit={async (values): Promise<void> => {
           if (!values.managementTimeAllocations) {
             return;
@@ -173,6 +171,7 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                               {instrument?.name}:
                             </InputAdornment>
                           ),
+                          inputProps: { min: 0, max: 1e5 },
                         }}
                         fullWidth
                         autoComplete="off"
