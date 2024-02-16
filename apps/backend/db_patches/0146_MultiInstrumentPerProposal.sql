@@ -10,7 +10,11 @@ BEGIN
 			SET instrument_id = (SELECT instrument_id FROM instrument_has_proposals WHERE technical_review.proposal_pk = instrument_has_proposals.proposal_pk);
 
 			ALTER TABLE technical_review DROP CONSTRAINT technical_review_proposal_id_key;
+
 			ALTER TABLE instrument_has_proposals ADD COLUMN instrument_has_proposals_id SERIAL NOT NULL;
+			ALTER TABLE instrument_has_proposals ADD COLUMN management_time_allocation INT DEFAULT NULL;
+			UPDATE instrument_has_proposals
+			SET management_time_allocation = (SELECT management_time_allocation FROM proposals WHERE proposals.proposal_pk = instrument_has_proposals.proposal_pk);
 
 			-- drop view to allow recreating it
     	DROP VIEW proposal_table_view;
@@ -105,10 +109,6 @@ BEGIN
 		UPDATE status_changing_events
 		SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE'
 		WHERE status_changing_event = 'PROPOSAL_UNFEASIBLE';
-
-		ALTER TABLE instrument_has_proposals ADD COLUMN management_time_allocation INT DEFAULT NULL;
-		UPDATE instrument_has_proposals
-		SET management_time_allocation = (SELECT management_time_allocation FROM proposals WHERE proposals.proposal_pk = instrument_has_proposals.proposal_pk);
 
     END;
 	END IF;
