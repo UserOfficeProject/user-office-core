@@ -171,6 +171,7 @@ const login = (
       .externalTokenLogin({
         externalToken: externalToken as string,
         redirectUri: 'http://localhost:3000/external-auth', // has to be set because it is a required field
+        iss: null,
       })
       .then(async (resp) => {
         let token = resp.externalTokenLogin;

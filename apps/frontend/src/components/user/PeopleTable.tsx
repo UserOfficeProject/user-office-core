@@ -92,7 +92,7 @@ const localColumns = [
   { title: 'Firstname', field: 'firstname' },
   { title: 'Lastname', field: 'lastname' },
   { title: 'Preferred name', field: 'preferredname' },
-  { title: 'Organisation', field: 'organisation' },
+  { title: 'Institution', field: 'institution' },
 ];
 
 const getTitle = ({
@@ -144,7 +144,7 @@ const getUsersTableData = (
       query.filter
         ? user.firstname.toLowerCase().includes(query.filter?.toLowerCase()) ||
           user.lastname.toLowerCase().includes(query.filter?.toLowerCase()) ||
-          user.organisation.toLowerCase().includes(query.filter?.toLowerCase())
+          user.institution.toLowerCase().includes(query.filter?.toLowerCase())
         : true
     );
 
@@ -352,8 +352,8 @@ const PeopleTable = ({
             id: selectedItem.id,
             firstname: selectedItem.firstname,
             lastname: selectedItem.lastname,
-            organisation: selectedItem.organisation,
-            organizationId: selectedItem.organizationId,
+            institution: selectedItem.institution,
+            institutionId: selectedItem.institutionId,
           })) as BasicUserDetails[]),
         ]);
       }
@@ -373,8 +373,8 @@ const PeopleTable = ({
               id: selectedItem.id,
               firstname: selectedItem.firstname,
               lastname: selectedItem.lastname,
-              organisation: selectedItem.organisation,
-              organizationId: selectedItem.organizationId,
+              institution: selectedItem.institution,
+              institutionId: selectedItem.institutionId,
             },
           ] as BasicUserDetails[])
         : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
@@ -528,7 +528,7 @@ const PeopleTable = ({
             ...mtOptions,
             selectionProps: (rowdata: BasicUserDetails) => ({
               inputProps: {
-                'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
+                'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.institution}-select`,
               },
             }),
           }}
