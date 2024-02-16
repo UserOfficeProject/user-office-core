@@ -867,7 +867,9 @@ context('Instrument tests', () => {
         .find('[data-cy="proposal-final-status"] input')
         .should('be.disabled');
       cy.get('@dialog')
-        .find('[data-cy="managementTimeAllocation"] input')
+        .find(
+          `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+        )
         .should('be.disabled');
       cy.get('@dialog')
         .find('[data-cy="commentForUser"] textarea')
