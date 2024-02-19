@@ -103,6 +103,15 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
 
   private async getUserInstitutionId(userInfo: UserinfoResponse) {
+    const isOAuthLogin =
+      userInfo.institution_ror_id ||
+      userInfo.institution_name ||
+      userInfo.institution_country;
+
+    if (!isOAuthLogin) {
+      return undefined;
+    }
+
     let institution = userInfo.institution_ror_id
       ? await this.adminDataSource.getInstitutionByRorId(
           userInfo.institution_ror_id as string
@@ -112,9 +121,12 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         );
 
     if (!institution) {
-      const institutionCountry = await this.adminDataSource.getCountryByName(
-        userInfo.institution_country as string
-      );
+      const institutionCountry = userInfo.institution_country
+        ? await this.adminDataSource.getCountryByName(
+            userInfo.institution_country as string
+          )
+        : null;
+
       if (!institutionCountry || !institutionCountry.countryId) {
         throw new GraphQLError('Invalid Country');
       }

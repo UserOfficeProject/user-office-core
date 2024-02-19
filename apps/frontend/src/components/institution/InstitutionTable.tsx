@@ -79,7 +79,7 @@ const InstitutionPage = () => {
         delete={deleteInstitution}
         setData={setInstitutions}
         createModal={createModal}
-        hasAccess={{ create: false }}
+        hasAccess={{ create: false, update: true, remove: true }}
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
