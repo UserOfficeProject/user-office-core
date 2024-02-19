@@ -19,8 +19,8 @@ export class CreateInstitutionsArgs {
   @Field(() => Int)
   country: number;
 
-  @Field(() => Boolean)
-  verified: boolean;
+  @Field(() => String, { nullable: true })
+  rorId?: string;
 }
 
 @Resolver()

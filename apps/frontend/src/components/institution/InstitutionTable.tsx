@@ -1,4 +1,5 @@
 import { Typography } from '@mui/material';
+import { Link } from '@mui/material';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -18,9 +19,17 @@ const columns = [
   { title: 'Name', field: 'name' },
   { title: 'Country', field: 'country.value' },
   {
-    title: 'Verified',
-    field: 'verified',
-    lookup: { true: 'Yes', false: 'No' },
+    title: 'ROR ID',
+    field: 'rorId',
+    render: (rowData: Institution) => {
+      return rowData.rorId ? (
+        <Link href={rowData.rorId} target="_blank" title={rowData.rorId}>
+          {rowData.rorId}
+        </Link>
+      ) : (
+        '-'
+      );
+    },
   },
 ];
 
@@ -70,6 +79,7 @@ const InstitutionPage = () => {
         delete={deleteInstitution}
         setData={setInstitutions}
         createModal={createModal}
+        hasAccess={{ create: false }}
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">

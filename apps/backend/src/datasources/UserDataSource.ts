@@ -75,11 +75,7 @@ export interface UserDataSource {
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
   ensureDummyUsersExist(userIds: number[]): Promise<User[]>;
-  createInstitution(
-    name: string,
-    verified: boolean,
-    countryId?: number
-  ): Promise<number>;
+  createInstitution(name: string, countryId?: number): Promise<number>;
   update(user: UpdateUserArgs): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
   setUserNotPlaceholder(id: number): Promise<User | null>;

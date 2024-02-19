@@ -216,11 +216,7 @@ export class UserDataSourceMock implements UserDataSource {
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
   }
-  async createInstitution(
-    name: string,
-    verified: boolean,
-    countryId?: number
-  ): Promise<number> {
+  async createInstitution(name: string, countryId?: number): Promise<number> {
     return 1;
   }
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {

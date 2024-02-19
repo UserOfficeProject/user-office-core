@@ -93,7 +93,6 @@ export default class AdminMutations {
     }
 
     institution.name = args.name ?? institution.name;
-    institution.verified = args.verified ?? institution.verified;
     institution.country = args.country ?? institution.country;
 
     return await this.dataSource.updateInstitution(institution);
