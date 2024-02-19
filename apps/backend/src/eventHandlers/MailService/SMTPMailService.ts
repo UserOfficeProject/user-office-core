@@ -34,14 +34,7 @@ export class SMTPMailService extends MailService {
       transport: nodemailer.createTransport({
         host: process.env.EMAIL_AUTH_HOST,
         port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
-        ...(process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD
-          ? {
-              auth: {
-                user: process.env.EMAIL_AUTH_USERNAME,
-                pass: process.env.EMAIL_AUTH_PASSWORD,
-              },
-            }
-          : {}),
+        ...this.getSmtpAuthOptions(),
       }),
       juice: true,
       juiceResources: {
@@ -58,6 +51,24 @@ export class SMTPMailService extends MailService {
       process.env.EMAIL_TEMPLATE_PATH || '',
       `${template}.${type}`
     );
+  }
+
+  private getSmtpAuthOptions() {
+    if (process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD) {
+      return {
+        auth: {
+          user: process.env.EMAIL_AUTH_USERNAME,
+          pass: process.env.EMAIL_AUTH_PASSWORD,
+        },
+      };
+    }
+
+    return {
+      secure: false,
+      tls: {
+        rejectUnauthorized: false,
+      },
+    };
   }
 
   async sendMail(options: EmailSettings): ResultsPromise<SendMailResults> {
@@ -115,7 +126,7 @@ export class SMTPMailService extends MailService {
     return Promise.allSettled(emailPromises).then((results) => {
       results.forEach((result) => {
         if (result.status === 'rejected') {
-          logger.logWarn('Unable to send email to user', {
+          logger.logError('Unable to send email to user', {
             error: result.reason,
           });
           sendMailResults.total_rejected_recipients++;

@@ -39,8 +39,8 @@ const columns = [
     field: 'user.lastname',
   },
   {
-    title: 'Organization',
-    field: 'user.organisation',
+    title: 'Institution',
+    field: 'user.institution',
   },
   {
     title: '# proposals',

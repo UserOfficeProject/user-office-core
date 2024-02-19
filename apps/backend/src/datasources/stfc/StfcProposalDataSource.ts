@@ -23,8 +23,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     const result = database
       .select([
         'proposal_table_view.*',
-        'instruments.name AS call_instrument_name',
-        'instruments.instrument_id AS call_instrument_id',
         database.raw('count(*) OVER() AS full_count'),
       ])
       .from('proposal_table_view')
@@ -121,27 +119,18 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.offset(offset);
         }
       })
-      .then(
-        (
-          proposals: (ProposalViewRecord & {
-            call_instrument_id: number;
-            call_instrument_name: string;
-          })[]
-        ) => {
-          const props = proposals.map((proposal) => {
-            const prop = createProposalViewObject(proposal);
-            prop.instrumentId = proposal.call_instrument_id;
-            prop.instrumentName = proposal.call_instrument_name;
+      .then((proposals: ProposalViewRecord[]) => {
+        const props = proposals.map((proposal) => {
+          const prop = createProposalViewObject(proposal);
 
-            return prop;
-          });
+          return prop;
+        });
 
-          return {
-            totalCount: proposals[0] ? proposals[0].full_count : 0,
-            proposals: props,
-          };
-        }
-      );
+        return {
+          totalCount: proposals[0] ? proposals[0].full_count : 0,
+          proposals: props,
+        };
+      });
 
     return result;
   }
