@@ -91,6 +91,7 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     1,
     new Date('2000-01-01'),
     1,
+    stfcUser.orgName,
     stfcUser.deptName ?? '',
     '',
     stfcUser.email ?? '',
