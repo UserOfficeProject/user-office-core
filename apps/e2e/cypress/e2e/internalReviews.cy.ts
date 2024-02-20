@@ -93,7 +93,7 @@ context('Internal Review tests', () => {
   });
 
   it('User should not be able to see internal reviews page', () => {
-    cy.login('user3');
+    cy.login('user3', initialDBData.roles.user);
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
