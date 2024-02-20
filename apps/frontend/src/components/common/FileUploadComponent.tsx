@@ -365,6 +365,7 @@ export function FileUploadComponent(props: {
   id?: string;
   fileType: string;
   pdfPageLimit: number; // 0 is unlimited
+  omitFromPdf: boolean;
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
 }) {
