@@ -105,12 +105,21 @@ const FapAssignedReviewersTable = ({
   ];
 
   const FapAssignmentsWithIdAndFormattedDate =
-    fapProposal.assignments?.map((fapAssignment) =>
-      Object.assign(fapAssignment, {
-        id: fapAssignment.fapMemberUserId,
-        dateAssignedFormatted: toFormattedDateTime(fapAssignment.dateAssigned),
-      })
-    ) || [];
+    fapProposal.assignments
+      ?.map((fapAssignment) =>
+        Object.assign(fapAssignment, {
+          id: fapAssignment.fapMemberUserId,
+          dateAssignedFormatted: toFormattedDateTime(
+            fapAssignment.dateAssigned
+          ),
+        })
+      )
+      .sort((a, b) => {
+        const order = (a.rank ? a.rank : 0) >= (b.rank ? b.rank : 0);
+
+        return order ? 1 : -1;
+      }) || [];
+
   const proposalReviewModalShouldOpen =
     !!urlQueryParams.reviewerModal && openProposalPk === fapProposal.proposalPk;
 
@@ -183,8 +192,11 @@ const FapAssignedReviewersTable = ({
                     ),
                 reviewerModal: rowData.review.id,
               });
+              setOpenProposalPk(fapProposal.proposalPk);
             },
-            tooltip: 'Rank Reviewer',
+            tooltip: isDraftStatus(rowData?.review?.status)
+              ? 'Grade proposal'
+              : 'View review',
           }),
           (rowData) => ({
             icon: () => <FormatListNumberedIcon data-cy="rank-reviewer" />,
