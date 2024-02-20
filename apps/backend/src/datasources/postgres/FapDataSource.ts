@@ -492,8 +492,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     if (fap.fapChairUserId === userId) {
       shortCode = Roles.FAP_CHAIR;
     } else if (
-      !!fapSecretaries.find((security) => {
-        security.user_id === userId;
+      !!fapSecretaries.find((secretary) => {
+        secretary.user_id === userId;
       })
     ) {
       shortCode = Roles.FAP_SECRETARY;
@@ -621,8 +621,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${args.fapId}`);
   }
 
-  async removeMemberFromFap(args: UpdateMemberFapArgs, isMemberChair: boolean) {
-    if (isMemberChair) {
+  async removeMemberFromFap(args: UpdateMemberFapArgs) {
+    if (args.roleId === UserRole.FAP_CHAIR) {
       const updateResult = await database<FapRecord>('faps')
         .update({
           fap_chair_user_id: null,

@@ -229,15 +229,13 @@ export default class FapMutations {
       }
     }
 
-    return this.dataSource
-      .removeMemberFromFap(args, args.roleId === UserRole.FAP_CHAIR)
-      .catch((error) => {
-        return rejection(
-          'Could not remove member from scientific evaluation panel',
-          { agent },
-          error
-        );
-      });
+    return this.dataSource.removeMemberFromFap(args).catch((error) => {
+      return rejection(
+        'Could not remove member from scientific evaluation panel',
+        { agent },
+        error
+      );
+    });
   }
 
   @Authorized([Roles.USER_OFFICER])

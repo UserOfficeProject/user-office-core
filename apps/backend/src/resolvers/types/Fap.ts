@@ -88,7 +88,7 @@ export class FapResolvers {
   }
 
   @FieldResolver(() => [FapProposalCount])
-  async fapSecretaryProposalCount(
+  async fapSecretariesProposalCounts(
     @Root() fap: Fap,
     @Ctx() context: ResolverContext
   ) {

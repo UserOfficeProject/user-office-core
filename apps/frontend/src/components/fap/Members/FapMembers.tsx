@@ -122,12 +122,14 @@ const FapMembers = ({
       fapSecretaries:
         fapData.fapSecretaries?.concat([fapSecretary]) ??
         fapData.fapSecretaries,
-      fapSecretaryProposalCount: fapData.fapSecretaryProposalCount.concat([
-        {
-          userId: fapSecretary.id,
-          count: 0,
-        },
-      ]),
+      fapSecretariesProposalCounts: fapData.fapSecretariesProposalCounts.concat(
+        [
+          {
+            userId: fapSecretary.id,
+            count: 0,
+          },
+        ]
+      ),
     });
 
     if (
@@ -353,7 +355,7 @@ const FapMembers = ({
                 startAdornment: fapData.fapSecretaries && (
                   <Tooltip
                     title={`Number of proposals to review: ${
-                      fapData.fapSecretaryProposalCount[index].count || 0
+                      fapData.fapSecretariesProposalCounts[index].count || 0
                     }`}
                     sx={{ padding: '2px', marginRight: '4px' }}
                   >

@@ -13,7 +13,7 @@ fragment fap on Fap {
   fapSecretaries {
     ...basicUserDetails
   }
-  fapSecretaryProposalCount {
+  fapSecretariesProposalCounts {
     userId
     count
   }
