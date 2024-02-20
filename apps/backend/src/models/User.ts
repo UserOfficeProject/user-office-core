@@ -38,6 +38,7 @@ export class User {
     public nationality: number,
     public birthdate: Date,
     public institutionId: number,
+    public institution: string,
     public department: string,
     public position: string,
     public email: string,
