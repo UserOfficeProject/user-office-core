@@ -320,6 +320,7 @@ export default class PostgresInstrumentDataSource
       .join('instrument_has_proposals as ihp', {
         'i.instrument_id': 'ihp.instrument_id',
       })
+      .orderBy('ihp.instrument_has_proposals_id')
       .where('ihp.proposal_pk', proposalPk)
       .then((instruments: InstrumentWithManagementTimeRecord[]) => {
         const result = instruments.map((instrument) =>

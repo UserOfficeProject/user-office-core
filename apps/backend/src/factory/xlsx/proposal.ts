@@ -19,6 +19,7 @@ export const defaultProposalDataColumns = [
   'Proposal ID',
   'Title',
   'Principal Investigator',
+  'Instrument',
   'Technical Status',
   'Technical Comment',
   'Time(Days)',
@@ -76,11 +77,21 @@ export const collectProposalXLSXData = async (
       proposal.primaryKey
     );
 
-  // TODO: Review the technical review details
+  const instruments =
+    await baseContext.queries.instrument.getInstrumentsByProposalPk(
+      user,
+      proposal.primaryKey
+    );
+
   return [
     proposal.proposalId,
     proposal.title,
     `${proposer.firstname} ${proposer.lastname}`,
+    instruments.length
+      ? instruments
+          .map((instrument) => instrument.name ?? '<missing>')
+          .join(', ')
+      : '<missing>',
     technicalReviews.length
       ? technicalReviews
           .map((technicalReview) =>
@@ -94,14 +105,14 @@ export const collectProposalXLSXData = async (
           .join(', ')
       : '<missing>',
     technicalReviews
-      ?.map((technicalReview) => technicalReview?.publicComment ?? '<missing>')
-      .join(', ') ?? '<missing>',
+      ?.map((technicalReview) => technicalReview?.publicComment || '<missing>')
+      .join(', ') || '<missing>',
     technicalReviews
       ?.map((technicalReview) => technicalReview?.timeAllocation ?? '<missing>')
       .join(', ') ?? '<missing>',
     absoluteDifference(getGrades(reviews)) || 'NA',
     average(getGrades(reviews)) || 'NA',
-    proposal.commentForManagement ?? '<missing>',
+    proposal.commentForManagement || '<missing>',
     ProposalEndStatus[proposal.finalStatus] ?? '<missing>',
     fapMeetingDecision?.rankOrder ?? '<missing>',
   ];

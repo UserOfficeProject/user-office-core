@@ -141,7 +141,6 @@ const getInstrumentData = async (proposalPk: number) => {
     throw new Error(`Instruments not found for proposalPk: ${proposalPk}`);
   }
 
-  // TODO: Review the instrument shortcode information here.
   return {
     instrumentShortCodes: instruments
       .map((instrument) => instrument.shortCode)

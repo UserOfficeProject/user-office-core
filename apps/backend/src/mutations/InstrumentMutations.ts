@@ -102,7 +102,7 @@ export default class InstrumentMutations {
     inputArguments: AssignProposalsToInstrumentsArgs,
     instrumentId: number
   ) {
-    const fullProposals = await this.proposalDataSource.getProposalsByIds(
+    const fullProposals = await this.proposalDataSource.getProposalsByPks(
       inputArguments.proposalPks
     );
 

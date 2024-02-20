@@ -252,7 +252,7 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToFapUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
-    const proposals = await this.proposalDataSource.getProposalsByIds(
+    const proposals = await this.proposalDataSource.getProposalsByPks(
       args.proposalPks
     );
 

@@ -45,7 +45,6 @@ type ProposalMessageData = {
   proposer?: Member;
   shortCode: string;
   title: string;
-  instrumentIds?: number[]; // instrumentId is here for backwards compatibility. TODO: Review this comment!!!
   submitted: boolean;
 };
 
@@ -139,7 +138,6 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     title: proposal.title,
     abstract: proposal.abstract,
     callId: call.id,
-    instrumentIds: instruments?.map((instrument) => instrument?.id),
     members: proposalUsersWithInstitution.map(
       (proposalUserWithInstitution) => ({
         firstName: proposalUserWithInstitution.user.firstname,
