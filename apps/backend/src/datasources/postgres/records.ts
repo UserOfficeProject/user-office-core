@@ -252,6 +252,7 @@ export interface UserRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly institution_id: number;
+  readonly institution: string;
   readonly placeholder: boolean;
 }
 
@@ -911,6 +912,7 @@ export const createUserObject = (user: UserRecord) => {
     user.nationality,
     user.birthdate,
     user.institution_id,
+    user.institution,
     user.department,
     user.position,
     user.email,
