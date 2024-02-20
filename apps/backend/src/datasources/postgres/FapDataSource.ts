@@ -714,6 +714,43 @@ export default class PostgresFapDataSource implements FapDataSource {
     return fapUpdated;
   }
 
+  async assignMemberToFapProposals(
+    proposalPks: number[],
+    fapId: number,
+    memberId: number
+  ) {
+    await database.transaction(async (trx) => {
+      await trx<FapAssignmentRecord>('fap_assignments')
+        .insert(
+          proposalPks.map((proposalPk) => ({
+            proposal_pk: proposalPk,
+            fap_member_user_id: memberId,
+            fap_id: fapId,
+          }))
+        )
+        .returning<FapAssignmentRecord[]>(['*']);
+
+      await trx<ReviewRecord>('fap_reviews')
+        .insert(
+          proposalPks.map((proposalPk) => ({
+            user_id: memberId,
+            proposal_pk: proposalPk,
+            status: ReviewStatus.DRAFT,
+            fap_id: fapId,
+          }))
+        )
+        .returning<ReviewRecord[]>(['*']);
+    });
+
+    const updatedFap = await this.getFap(fapId);
+
+    if (updatedFap) {
+      return updatedFap;
+    }
+
+    throw new GraphQLError(`Fap not found ${fapId}`);
+  }
+
   async assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,
