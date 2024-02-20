@@ -1,3 +1,4 @@
+import { FileUploadConfig } from '../resolvers/types/FieldConfig';
 import {
   ConditionEvaluator,
   DependenciesLogicOperator,
@@ -8,6 +9,7 @@ import {
   FieldDependency,
   QuestionTemplateRelation,
   TemplateStep,
+  DataType,
 } from './Template';
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
@@ -41,8 +43,25 @@ export function getAllFields(collection: AbstractCollection) {
   collection.forEach((step) => {
     allFields = allFields.concat(step.fields);
   });
+  allFields = applyPdfFilters(allFields);
 
   return allFields;
+}
+
+function applyPdfFilters(allFields: AbstractField[]): AbstractField[] {
+  let fields = new Array<AbstractField>();
+  fields = allFields.filter((field) => {
+    if (
+      field.question.dataType === DataType.FILE_UPLOAD &&
+      (field.config as FileUploadConfig).omitFromPdf === true
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  return fields;
 }
 
 export function isDependencySatisfied(
