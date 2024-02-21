@@ -32,7 +32,6 @@ BEGIN
 		          p.final_status,
 		          p.notified,
 		          p.questionary_id,
-		          p.management_time_allocation,
 							p.submitted,
 		          t.technical_review_ids,
 							t.technical_review_assignee_ids,
@@ -109,6 +108,7 @@ BEGIN
 		UPDATE status_changing_events
 		SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE'
 		WHERE status_changing_event = 'PROPOSAL_UNFEASIBLE';
+		ALTER TABLE proposals DROP COLUMN management_time_allocation;
 
     END;
 	END IF;

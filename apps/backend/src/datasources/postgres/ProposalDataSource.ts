@@ -741,8 +741,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
            comment_for_user,
            notified,
            submitted,
-           management_decision_submitted,
-           management_time_allocation)
+           management_decision_submitted)
           SELECT title,
                  abstract,
                  status_id,
@@ -756,8 +755,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                  comment_for_user,
                  notified,
                  submitted,
-                 management_decision_submitted,
-                 management_time_allocation
+                 management_decision_submitted
           FROM proposals
           WHERE proposal_pk = ${sourceProposal.primaryKey} RETURNING *
       `)

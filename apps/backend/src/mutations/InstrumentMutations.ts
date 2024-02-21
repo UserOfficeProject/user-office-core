@@ -235,7 +235,6 @@ export default class InstrumentMutations {
         }
       }
 
-      // TODO: Check if this supplies enough information for the logs because we are sending only last instrument id.
       result = new InstrumentHasProposals(
         instrumentId,
         args.proposalPks,

@@ -124,7 +124,6 @@ export interface ProposalRecord {
   readonly notified: boolean;
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
-  readonly management_time_allocation: number;
   readonly management_decision_submitted: boolean;
 }
 export interface ProposalViewRecord {

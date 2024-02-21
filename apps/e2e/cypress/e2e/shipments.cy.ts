@@ -26,7 +26,6 @@ context('Shipments tests', () => {
         this.skip();
       }
     });
-    // TODO: Check this if it doesn;t require the proposal to be assigned to instrument first
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
       managementDecisionSubmitted: true,

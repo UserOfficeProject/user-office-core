@@ -38,7 +38,6 @@ context('visits tests', () => {
       proposerId: PI.id,
       users: [coProposer.id],
     });
-    // TODO: Check this if it doesn;t require the proposal to be assigned to instrument first
     cy.updateProposalManagementDecision({
       proposalPk: existingProposalId,
       statusId: acceptedStatusId,

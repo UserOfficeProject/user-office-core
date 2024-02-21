@@ -14,7 +14,7 @@ context('Experiments tests', () => {
     });
 
     cy.viewport(1920, 1080);
-    // TODO: Check this if it doesn;t require the proposal to be assigned to instrument first
+
     cy.updateProposalManagementDecision({
       proposalPk: initialDBData.proposal.id,
       statusId: 1,

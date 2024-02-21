@@ -428,7 +428,6 @@ const ProposalTableInstrumentScientist = ({
       isInstrumentScientist &&
       rowData.technicalReviewAssigneeIds?.includes(user.id);
 
-    // TODO: Review this logic here after testing the functionality
     const showView =
       rowData.technicalReviewsSubmitted?.every((submitted) => submitted) ||
       (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);

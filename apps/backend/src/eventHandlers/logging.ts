@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
@@ -137,10 +138,14 @@ export default function createHandler() {
           );
           break;
         default: {
-          const changedObjectId =
-            typeof (event as any)[event.key].id === 'number'
-              ? (event as any)[event.key].id
-              : (event as any)[event.key].primaryKey;
+          let changedObjectId: number;
+          if (typeof (event as any)[event.key].primaryKey === 'number') {
+            changedObjectId = (event as any)[event.key].primaryKey;
+          } else if (typeof (event as any)[event.key].proposalPk === 'number') {
+            changedObjectId = (event as any)[event.key].proposalPk;
+          } else {
+            changedObjectId = (event as any)[event.key].id;
+          }
           const description = event.description || '';
 
           await eventLogsDataSource.set(
