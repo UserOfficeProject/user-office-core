@@ -15,6 +15,7 @@ import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAcces
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
+  createCountry(countryName: string): Promise<Country>;
   getCountry(id: number): Promise<Entry | null>;
   getCountryByName(countryName: string): Promise<Country | null>;
   getInstitution(id: number): Promise<Institution | null>;

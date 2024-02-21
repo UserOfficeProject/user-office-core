@@ -121,21 +121,20 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         );
 
     if (!institution) {
-      const institutionCountry = userInfo.institution_country
-        ? await this.adminDataSource.getCountryByName(
-            userInfo.institution_country as string
-          )
-        : null;
+      let institutionCountry = await this.adminDataSource.getCountryByName(
+        userInfo.institution_country as string
+      );
 
       if (!institutionCountry || !institutionCountry.countryId) {
-        throw new GraphQLError('Invalid Country');
+        institutionCountry = await this.adminDataSource.createCountry(
+          userInfo.institution_country as string
+        );
       }
       const newInstitution: CreateInstitutionsArgs = {
         name: userInfo.institution_name as string,
         country: institutionCountry.countryId,
         rorId: userInfo.institution_ror_id as string,
       };
-
       institution = await this.adminDataSource.createInstitution(
         newInstitution
       );

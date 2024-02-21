@@ -49,6 +49,17 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 export default class PostgresAdminDataSource implements AdminDataSource {
   private autoUpgradedDBReady = false;
 
+  async createCountry(countryName: string): Promise<Country> {
+    return database
+      .insert({
+        country: countryName,
+      })
+      .into('countries')
+      .returning('*')
+      .then((country: CountryRecord[]) => {
+        return createCountryObject(country[0]);
+      });
+  }
   async getCountry(id: number): Promise<Entry | null> {
     return database
       .select('*')
@@ -67,9 +78,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .first()
       .then((country: CountryRecord) => {
         if (!country) {
-          throw new GraphQLError(
-            `Could not get country with country name:${countryName}`
-          );
+          return null;
         }
 
         return createCountryObject(country);
