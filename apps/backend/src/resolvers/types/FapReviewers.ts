@@ -46,4 +46,14 @@ export class FapUserResolver {
       fapMember.userId
     );
   }
+
+  @FieldResolver(() => Int)
+  async proposalsCountByCall(
+    @Root() fapMember: FapReviewer,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.fap.dataSource.getFapReviewerProposalCountCurrentRound(
+      fapMember.userId
+    );
+  }
 }

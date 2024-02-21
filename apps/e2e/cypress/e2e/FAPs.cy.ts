@@ -15,7 +15,7 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
-import { updatedCall } from '../support/utils';
+import { updatedCall, closedCall } from '../support/utils';
 
 const fapMembers = {
   chair: initialDBData.users.user2,
@@ -491,6 +491,40 @@ context('Fap reviews tests', () => {
         variant: 'error',
         text: 'Failed to delete proposal because, it has dependencies which need to be deleted first',
       });
+    });
+
+    it.only('Should be able to see how many proposals are assigned to a reviewer', () => {
+      cy.assignProposalsToFap({
+        fapId: createdFapId,
+        proposals: [
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+        ],
+      });
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+      });
+      cy.assignFapReviewersToProposal({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+        proposalPk: createdProposalPk,
+      });
+
+      cy.login('officer');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...closedCall,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        faps: [createdFapId],
+      });
+
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get('[data-cy="fap-reviewers-table"]').contains('1');
     });
   });
 
