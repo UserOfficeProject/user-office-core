@@ -44,16 +44,19 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
       ]);
 
       if (instruments.length == 0) {
-        logger.logWarn(
-          'Could not send email beacause no instrument was assigned to this call.',
+        logger.logError(
+          'Could not send email because no instrument was assigned to this call.',
           { event, call }
         );
 
         return;
       }
-      let piEmailTemplate: string;
+
       const isRapidAccess =
         call?.shortCode?.toLowerCase().includes('rapid') || false;
+
+      let piEmailTemplate: string;
+
       if (instruments[0].name === 'ISIS') {
         piEmailTemplate = isRapidAccess
           ? 'isis-rapid-proposal-submitted-pi'
@@ -61,9 +64,11 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
       } else {
         piEmailTemplate = 'clf-proposal-submitted-pi';
       }
+
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
+
       const participants = await userDataSource.getProposalUsersFull(
         event.proposal.primaryKey
       );
@@ -78,7 +83,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
         emailsToSend.push(piEmail);
       } else {
-        logger.logWarn(
+        logger.logError(
           'Could not send submission confirmation email to PI and participants, as the PI details could not be retrieved.',
           { event }
         );
