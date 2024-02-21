@@ -62,6 +62,9 @@ export class AdminDataSourceMock implements AdminDataSource {
     }));
   }
 
+  async createCountry(countryName: string): Promise<Country> {
+    return dummyCountry;
+  }
   async getCountryByName(countryName: string): Promise<Country | null> {
     return dummyCountry;
   }
