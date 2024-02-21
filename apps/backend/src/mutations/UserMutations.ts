@@ -339,10 +339,13 @@ export default class UserMutations {
         roles[0]
       );
 
-      // Set the current role to the highest possible, user officer, instrument scientist, user
+      // Set the current role to the highest possible, user officer, instrument scientist, FAP Panel member, user
       const currentRole =
         roles.find((role) => role.shortCode === Roles.USER_OFFICER) ||
         roles.find((role) => role.shortCode === Roles.INSTRUMENT_SCIENTIST) ||
+        roles.find((role) => role.shortCode === Roles.FAP_CHAIR) ||
+        roles.find((role) => role.shortCode === Roles.FAP_SECRETARY) ||
+        roles.find((role) => role.shortCode === Roles.FAP_REVIEWER) ||
         roles[0];
 
       const uosToken = signToken<AuthJwtPayload>({
