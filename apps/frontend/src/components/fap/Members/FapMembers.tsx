@@ -43,8 +43,8 @@ const columns = [
     field: 'user.institution',
   },
   {
-    title: '# proposals',
-    field: 'proposalsCount',
+    title: '# proposals currently assigned',
+    field: 'proposalsCountByCall',
   },
 ];
 

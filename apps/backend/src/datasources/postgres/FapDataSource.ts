@@ -1,6 +1,8 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import {
   Fap,
   FapAssignment,
@@ -21,6 +23,7 @@ import {
 import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
 import database from './database';
 import {
@@ -46,7 +49,12 @@ import {
   InstitutionRecord,
 } from './records';
 
+@injectable()
 export default class PostgresFapDataSource implements FapDataSource {
+  constructor(
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
+  ) {}
+
   async delete(id: number): Promise<Fap> {
     return database
       .where('faps.fap_id', id)
@@ -340,6 +348,33 @@ export default class PostgresFapDataSource implements FapDataSource {
     return database('fap_reviews')
       .count('user_id')
       .where('user_id', reviewerId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
+  }
+
+  async getFapReviewerProposalCountCurrentRound(
+    reviewerId: number
+  ): Promise<number> {
+    const callFilter = {
+      isEnded: true,
+      isFapReviewEnded: false,
+    };
+
+    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
+      (call) => call.id
+    );
+
+    return await database
+      .count('sr.user_id')
+      .from('fap_reviews as sr')
+      .join('fap_proposals as sp', {
+        'sp.proposal_pk': 'sr.proposal_pk',
+      })
+      .whereIn('sp.call_id', callIds)
+      .andWhere('sr.user_id', reviewerId)
+      .groupBy('sr.user_id')
       .first()
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
