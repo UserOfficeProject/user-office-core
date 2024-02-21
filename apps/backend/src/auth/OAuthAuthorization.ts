@@ -121,9 +121,11 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         );
 
     if (!institution) {
-      let institutionCountry = await this.adminDataSource.getCountryByName(
-        userInfo.institution_country as string
-      );
+      let institutionCountry = userInfo.institution_country
+        ? await this.adminDataSource.getCountryByName(
+            userInfo.institution_country as string
+          )
+        : null;
 
       if (!institutionCountry || !institutionCountry.countryId) {
         institutionCountry = await this.adminDataSource.createCountry(
