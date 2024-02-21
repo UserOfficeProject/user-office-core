@@ -79,7 +79,7 @@ export default class FapMutations {
       )
       .catch((err) => {
         return rejection(
-          'Could not create scientific evaluation panel',
+          'Could not create facility access panel',
           { agent },
           err
         );
@@ -105,7 +105,7 @@ export default class FapMutations {
       )
       .catch((err) => {
         return rejection(
-          'Could not update scientific evaluation panel',
+          'Could not update facility access panel',
           { agent },
           err
         );
@@ -231,7 +231,7 @@ export default class FapMutations {
 
     return this.dataSource.removeMemberFromFap(args).catch((error) => {
       return rejection(
-        'Could not remove member from scientific evaluation panel',
+        'Could not remove member from facility access panel',
         { agent },
         error
       );
@@ -296,10 +296,9 @@ export default class FapMutations {
     const result = await this.dataSource.assignProposalsToFap(args);
 
     if (result.proposalPks.length !== args.proposals.length) {
-      return rejection(
-        'Could not assign proposal to scientific evaluation panel',
-        { agent }
-      );
+      return rejection('Could not assign proposal to facility access panel', {
+        agent,
+      });
     }
 
     return result;
@@ -315,7 +314,7 @@ export default class FapMutations {
       .removeProposalsFromFap(args.proposalPks, args.fapId)
       .catch((err) => {
         return rejection(
-          'Could not remove assigned proposal from scientific evaluation panel',
+          'Could not remove assigned proposal from facility access panel',
           { agent },
           err
         );
@@ -373,7 +372,7 @@ export default class FapMutations {
       .assignMemberToFapProposal(args.proposalPk, args.fapId, args.memberIds)
       .catch((err) => {
         return rejection(
-          'Can not assign proposal to scientific evaluation panel',
+          'Can not assign proposal to facility access panel',
           { agent },
           err
         );
