@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -10,6 +11,7 @@ import { Proposal } from '../../models/Proposal';
 import { User } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null
@@ -85,11 +87,41 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
       }
 
       if (isRapidAccess) {
+        const questionaries = container.resolve<QuestionaryDataSource>(
+          Tokens.QuestionaryDataSource
+        );
+        const instruments = container.resolve<InstrumentDataSource>(
+          Tokens.InstrumentDataSource
+        );
+
+        const answer = await questionaries.getAnswer(
+          event.proposal.questionaryId,
+          'isis_instrument_picker'
+        );
+
+        let instrumentRequested;
+
+        if (answer) {
+          instrumentRequested = (
+            await instruments.getInstrument(answer?.answer.value)
+          )?.name;
+        }
+
+        if (!instrumentRequested) {
+          logger.logError(
+            'Could not include instrument in the Rapid submission confirmation email to User Office.',
+            { event }
+          );
+
+          instrumentRequested = '';
+        }
+
         const uoAddress = process.env.ISIS_UO_EMAIL;
 
         if (uoAddress) {
           const uoRapidEmail = uoRapidSubmissionEmail(
             event.proposal,
+            instrumentRequested,
             principalInvestigator,
             participants,
             uoAddress
@@ -98,7 +130,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           emailsToSend.push(uoRapidEmail);
         } else {
           logger.logError(
-            'Could not send Rapid submission confirmation email to User Office, as the User Office email address was not specified.',
+            'Could not send UO Rapid submission email, environment variable (ISIS_UO_EMAIL) not found.',
             { event }
           );
         }
@@ -205,6 +237,7 @@ const piSubmissionEmail = (
 
 const uoRapidSubmissionEmail = (
   proposal: Proposal,
+  instrument: string,
   pi: User | null,
   participants: User[],
   uoAddress: string
@@ -224,6 +257,7 @@ const uoRapidSubmissionEmail = (
               `${participant.preferredname} ${participant.lastname} `
           )
         : '-',
+    instrument: instrument,
   },
   recipients: [{ address: uoAddress }],
 });
