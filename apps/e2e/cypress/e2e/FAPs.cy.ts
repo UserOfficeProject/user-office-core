@@ -995,9 +995,11 @@ context('Fap meeting components tests', () => {
   let createdInstrumentId: number;
 
   beforeEach(function () {
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-      this.skip();
-    }
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {

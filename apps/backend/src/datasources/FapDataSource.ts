@@ -87,10 +87,7 @@ export interface FapDataSource {
     args: AssignChairOrSecretaryToFapInput
   ): Promise<Fap>;
   assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap>;
-  removeMemberFromFap(
-    args: UpdateMemberFapArgs,
-    isMemberChairOrSecretaryOfFap: boolean
-  ): Promise<Fap>;
+  removeMemberFromFap(args: UpdateMemberFapArgs): Promise<Fap>;
   assignProposalsToFap(args: AssignProposalsToFapArgs): Promise<ProposalPks>;
   removeMemberFromFapProposal(
     proposalPk: number,
