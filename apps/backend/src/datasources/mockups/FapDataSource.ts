@@ -161,10 +161,7 @@ export class FapDataSourceMock implements FapDataSource {
     throw new Error(`Fap not found ${args.fapId}`);
   }
 
-  async removeMemberFromFap(
-    args: UpdateMemberFapArgs,
-    isMemberChairOrSecretaryOfFap: boolean
-  ): Promise<Fap> {
+  async removeMemberFromFap(args: UpdateMemberFapArgs): Promise<Fap> {
     const fap = dummyFaps.find((element) => element.id === args.fapId);
 
     if (fap) {
@@ -303,6 +300,10 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getFapReviewerProposalCount(reviewerId: number) {
+    return dummyFapProposals.length;
+  }
+
+  async getFapReviewerProposalCountCurrentRound(reviewerId: number) {
     return dummyFapProposals.length;
   }
 

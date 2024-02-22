@@ -10,14 +10,14 @@ query getFapProposals($fapId: Int!, $callId: Int) {
       proposalId
       proposer {
         id
-        organizationId
+        institutionId
       }
       status {
         ...proposalStatus
       }
       users {
         id
-        organizationId
+        institutionId
       }
     }
     assignments {

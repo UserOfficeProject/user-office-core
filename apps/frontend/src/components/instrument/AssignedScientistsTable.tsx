@@ -41,8 +41,8 @@ const assignmentColumns = [
     field: 'lastname',
   },
   {
-    title: 'Organisation',
-    field: 'organisation',
+    title: 'Institution',
+    field: 'institution',
   },
 ];
 const beamLineManagerColumns = [
@@ -59,8 +59,8 @@ const beamLineManagerColumns = [
     field: 'email',
   },
   {
-    title: 'Organisation',
-    field: 'organisation',
+    title: 'Institution',
+    field: 'institution',
   },
 ];
 const AssignedScientistsTable = ({
@@ -108,7 +108,7 @@ const AssignedScientistsTable = ({
             firstname: instrument.beamlineManager?.firstname,
             lastname: instrument.beamlineManager?.lastname,
             email: instrument.beamlineManager?.email,
-            organisation: instrument.beamlineManager?.organisation,
+            institution: instrument.beamlineManager?.institution,
           },
         ]}
         options={{

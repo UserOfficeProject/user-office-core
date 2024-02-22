@@ -1,6 +1,8 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import {
   Fap,
   FapAssignment,
@@ -21,6 +23,7 @@ import {
 import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
 import database from './database';
 import {
@@ -43,9 +46,15 @@ import {
   UserRecord,
   createBasicUserObject,
   FapSecretariesRecord,
+  InstitutionRecord,
 } from './records';
 
+@injectable()
 export default class PostgresFapDataSource implements FapDataSource {
+  constructor(
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
+  ) {}
+
   async delete(id: number): Promise<Fap> {
     return database
       .where('faps.fap_id', id)
@@ -303,18 +312,22 @@ export default class PostgresFapDataSource implements FapDataSource {
     proposalPk: number,
     callId: number
   ): Promise<BasicUserDetails[]> {
-    const fapProposalReviewers: UserRecord[] = await database
-      .select(['users.*'])
-      .from('fap_reviews as sr')
-      .join('fap_proposals as sp', {
-        'sr.proposal_pk': 'sp.proposal_pk',
-        'sr.fap_id': 'sp.fap_id',
-      })
-      .join('users', {
-        'users.user_id': 'sr.user_id',
-      })
-      .where('sp.proposal_pk', proposalPk)
-      .andWhere('sp.call_id', callId);
+    const fapProposalReviewers: Array<UserRecord & InstitutionRecord> =
+      await database
+        .select(['users.*', 'institutions.*']) // Adjusted here
+        .from('fap_reviews as sr')
+        .join('fap_proposals as sp', {
+          'sr.proposal_pk': 'sp.proposal_pk',
+          'sr.fap_id': 'sp.fap_id',
+        })
+        .join('users', {
+          'users.user_id': 'sr.user_id',
+        })
+        .join('institutions', {
+          'users.institution_id': 'institutions.institution_id',
+        })
+        .where('sp.proposal_pk', proposalPk)
+        .andWhere('sp.call_id', callId);
 
     return fapProposalReviewers.map((fapProposalReviewer) =>
       createBasicUserObject(fapProposalReviewer)
@@ -335,6 +348,33 @@ export default class PostgresFapDataSource implements FapDataSource {
     return database('fap_reviews')
       .count('user_id')
       .where('user_id', reviewerId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
+  }
+
+  async getFapReviewerProposalCountCurrentRound(
+    reviewerId: number
+  ): Promise<number> {
+    const callFilter = {
+      isEnded: true,
+      isFapReviewEnded: false,
+    };
+
+    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
+      (call) => call.id
+    );
+
+    return await database
+      .count('sr.user_id')
+      .from('fap_reviews as sr')
+      .join('fap_proposals as sp', {
+        'sp.proposal_pk': 'sr.proposal_pk',
+      })
+      .whereIn('sp.call_id', callIds)
+      .andWhere('sr.user_id', reviewerId)
+      .groupBy('sr.user_id')
       .first()
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
@@ -487,8 +527,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     if (fap.fapChairUserId === userId) {
       shortCode = Roles.FAP_CHAIR;
     } else if (
-      !!fapSecretaries.find((security) => {
-        security.user_id === userId;
+      !!fapSecretaries.find((secretary) => {
+        secretary.user_id === userId;
       })
     ) {
       shortCode = Roles.FAP_SECRETARY;
@@ -616,8 +656,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${args.fapId}`);
   }
 
-  async removeMemberFromFap(args: UpdateMemberFapArgs, isMemberChair: boolean) {
-    if (isMemberChair) {
+  async removeMemberFromFap(args: UpdateMemberFapArgs) {
+    if (args.roleId === UserRole.FAP_CHAIR) {
       const updateResult = await database<FapRecord>('faps')
         .update({
           fap_chair_user_id: null,
@@ -1026,7 +1066,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .select('*')
       .where({ fap_id: fap.id });
 
-    return { ...fap, fapSecretaryUserIds: record.map((sec) => sec.user_id) };
+    return { ...fap, fapSecretariesUserIds: record.map((sec) => sec.user_id) };
   }
 
   async setReviewerRank(

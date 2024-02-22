@@ -22,6 +22,8 @@ const KEY_CODES = {
 
 const currentDayStart = DateTime.now().startOf('day');
 
+const closedCallStartDate = faker.date.past();
+
 export const updatedCall = {
   shortCode: faker.random.alphaNumeric(15),
   startCall: faker.date.past().toISOString().slice(0, 10),
@@ -38,6 +40,25 @@ export const updatedCall = {
   cycleComment: faker.lorem.word(10),
   surveyComment: faker.lorem.word(10),
   templateId: initialDBData.template.id,
+};
+
+export const closedCall = {
+  shortCode: faker.random.alphaNumeric(15),
+  startCall: closedCallStartDate.toISOString().slice(0, 10),
+  endCall: closedCallStartDate.toISOString().slice(0, 10),
+  startReview: currentDayStart,
+  endReview: currentDayStart,
+  startFapReview: faker.date.past(),
+  endFapReview: faker.date.future(),
+  startNotify: currentDayStart,
+  endNotify: currentDayStart,
+  startCycle: currentDayStart,
+  endCycle: currentDayStart,
+  allocationTimeUnit: AllocationTimeUnits.DAY,
+  cycleComment: faker.lorem.word(10),
+  surveyComment: faker.lorem.word(10),
+  templateId: initialDBData.template.id,
+  callFapReviewEnded: false,
 };
 
 export const getE2EApi = (token?: string | null) => {

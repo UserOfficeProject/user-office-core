@@ -1,3 +1,7 @@
+export class FapProposalCount {
+  constructor(public userId: number, public count: number) {}
+}
+
 export class Fap {
   constructor(
     public id: number,
@@ -8,7 +12,7 @@ export class Fap {
     public customGradeGuide: boolean | null,
     public active: boolean,
     public fapChairUserId: number | null,
-    public fapSecretaryUserIds: number[] | null
+    public fapSecretariesUserIds: number[] | null
   ) {}
 }
 

@@ -243,9 +243,7 @@ export interface UserRecord {
   readonly gender: string;
   readonly nationality: number;
   readonly birthdate: Date;
-  readonly organisation: number;
   readonly department: string;
-  readonly organisation_address: string;
   readonly position: string;
   readonly email: string;
   readonly telephone: string;
@@ -253,14 +251,9 @@ export interface UserRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
+  readonly institution_id: number;
   readonly institution: string;
   readonly placeholder: boolean;
-}
-
-export interface UserRecordWithInstitution {
-  user: UserRecord;
-  institution: InstitutionRecord;
-  country: CountryRecord;
 }
 
 export interface VisitRegistrationRecord {
@@ -912,7 +905,8 @@ export const createUserObject = (user: UserRecord) => {
     user.gender,
     user.nationality,
     user.birthdate,
-    user.organisation,
+    user.institution_id,
+    user.institution,
     user.department,
     user.position,
     user.email,
@@ -924,14 +918,14 @@ export const createUserObject = (user: UserRecord) => {
   );
 };
 
-export const createBasicUserObject = (user: UserRecord) => {
+export const createBasicUserObject = (user: UserRecord & InstitutionRecord) => {
   return new BasicUserDetails(
     user.user_id,
     user.firstname,
     user.lastname,
     user.preferredname,
     user.institution,
-    user.organisation,
+    user.institution_id,
     user.position,
     user.created_at,
     user.placeholder,
