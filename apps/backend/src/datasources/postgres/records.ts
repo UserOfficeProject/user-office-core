@@ -406,7 +406,11 @@ export interface FapRecord {
   readonly active: boolean;
   readonly full_count: number;
   readonly fap_chair_user_id: number | null;
-  readonly fap_secretary_user_id: number | null;
+}
+
+export interface FapSecretariesRecord {
+  readonly user_id: number;
+  readonly fap_id: number;
 }
 
 export interface FapProposalRecord {
@@ -1083,7 +1087,7 @@ export const createFapObject = (fap: FapRecord) => {
     fap.custom_grade_guide,
     fap.active,
     fap.fap_chair_user_id,
-    fap.fap_secretary_user_id
+    []
   );
 };
 
