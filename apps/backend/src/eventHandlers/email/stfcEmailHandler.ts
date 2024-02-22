@@ -3,7 +3,6 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
-import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -25,9 +24,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const InstrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
 
   switch (event.type) {
     /*
@@ -39,30 +35,29 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
       const call = await callDataSource.getCall(event.proposal.callId);
 
-      const instruments = await InstrumentDataSource.getInstrumentsByCallId([
-        event.proposal.callId,
-      ]);
+      const callTitle = call?.shortCode?.toLowerCase() || '';
 
-      if (instruments.length == 0) {
-        logger.logError(
-          'Could not send email because no instrument was assigned to this call.',
-          { event, call }
-        );
-
-        return;
-      }
-
-      const isRapidAccess =
-        call?.shortCode?.toLowerCase().includes('rapid') || false;
+      const isIsis = callTitle.includes('isis') || false;
+      const isRapidAccess = callTitle.includes('rapid') || false;
+      const isClf = ['artemis', 'hpl', 'lsf'].some((fac) =>
+        callTitle.includes(fac)
+      );
 
       let piEmailTemplate: string;
 
-      if (instruments[0].name === 'ISIS') {
+      if (isIsis) {
         piEmailTemplate = isRapidAccess
           ? 'isis-rapid-proposal-submitted-pi'
           : 'isis-proposal-submitted-pi';
-      } else {
+      } else if (isClf) {
         piEmailTemplate = 'clf-proposal-submitted-pi';
+      } else {
+        logger.logError(
+          'Could not send email because facility could not be determined from call title.',
+          { event, call, callTitle: call?.shortCode }
+        );
+
+        return;
       }
 
       const principalInvestigator = await userDataSource.getUser(
