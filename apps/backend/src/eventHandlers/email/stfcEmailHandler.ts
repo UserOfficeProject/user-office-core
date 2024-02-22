@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
@@ -11,7 +12,6 @@ import { Proposal } from '../../models/Proposal';
 import { User } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null
