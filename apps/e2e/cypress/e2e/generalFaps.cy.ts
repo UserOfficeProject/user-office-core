@@ -33,7 +33,7 @@ const fap2 = {
   gradeGuide: faker.random.words(8),
 };
 
-context('General scientific evaluation panel tests', () => {
+context('General facility access panel tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
@@ -199,7 +199,7 @@ context('General scientific evaluation panel tests', () => {
         }
       });
     });
-    it('Officer should be able to assign FAP Chair and FAP Secretary to existing FAP', function () {
+    it('Officer should be able to assign FAP Chair and multiple FAP Secretary to existing FAP', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: fapMembers.chair.id,
@@ -262,7 +262,7 @@ context('General scientific evaluation panel tests', () => {
         );
       });
 
-      cy.get('[aria-label="Set Fap Secretary"]').click();
+      cy.get('[data-cy="add-secretary-button"]').click();
 
       cy.finishedLoading();
 
@@ -297,11 +297,50 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('Members').click();
 
-      cy.get('input[id="FapSecretary"]').should((element) => {
-        expect(element.val()).to.contain(
-          `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
-        );
+      cy.get('input[id="FapSecretary-' + fapMembers.secretary.id + '"]').should(
+        (element) => {
+          expect(element.val()).to.contain(
+            `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
+          );
+        }
+      );
+
+      cy.get('[data-cy="add-secretary-button"]').click();
+
+      cy.finishedLoading();
+
+      searchMuiTableAsync(fapMembers.reviewer.lastName);
+
+      cy.get('[role="dialog"] table tbody tr')
+        .first()
+        .find('td.MuiTableCell-alignLeft')
+        .first()
+        .then((element) => {
+          selectedSecretaryUserFirstName = element.text();
+        });
+
+      cy.get('[role="dialog"] table tbody tr')
+        .first()
+        .find('td.MuiTableCell-alignLeft')
+        .eq(1)
+        .then((element) => {
+          selectedSecretaryUserLastName = element.text();
+        });
+
+      cy.get('[aria-label="Select user"]').first().click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Fap secretary assigned successfully',
       });
+
+      cy.get('input[id="FapSecretary-' + fapMembers.reviewer.id + '"]').should(
+        (element) => {
+          expect(element.val()).to.contain(
+            `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
+          );
+        }
+      );
     });
 
     it('Officer should be able to remove assigned Fap Chair and Fap Secretary from existing Fap', function () {
