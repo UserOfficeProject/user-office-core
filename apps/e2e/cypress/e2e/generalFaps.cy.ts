@@ -33,7 +33,7 @@ const fap2 = {
   gradeGuide: faker.random.words(8),
 };
 
-context('General scientific evaluation panel tests', () => {
+context('General facility access panel tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {

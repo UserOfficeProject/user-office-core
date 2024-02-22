@@ -15,7 +15,7 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
-import { updatedCall } from '../support/utils';
+import { updatedCall, closedCall } from '../support/utils';
 
 const fapMembers = {
   chair: initialDBData.users.user2,
@@ -492,6 +492,40 @@ context('Fap reviews tests', () => {
         text: 'Failed to delete proposal because, it has dependencies which need to be deleted first',
       });
     });
+
+    it.only('Should be able to see how many proposals are assigned to a reviewer', () => {
+      cy.assignProposalsToFap({
+        fapId: createdFapId,
+        proposals: [
+          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+        ],
+      });
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+      });
+      cy.assignFapReviewersToProposal({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+        proposalPk: createdProposalPk,
+      });
+
+      cy.login('officer');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...closedCall,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        faps: [createdFapId],
+      });
+
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get('[data-cy="fap-reviewers-table"]').contains('1');
+    });
   });
 
   describe('Fap Chair role', () => {
@@ -531,7 +565,7 @@ context('Fap reviews tests', () => {
         // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          organisation: 2,
+          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
           gender: 'male',
@@ -608,6 +642,8 @@ context('Fap reviews tests', () => {
 
       cy.finishedLoading();
 
+      cy.contains('0 / 1').should('be.visible');
+
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(fapMembers.reviewer.lastName)
@@ -629,6 +665,10 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="save-grade"]').should('be.disabled');
       cy.get('[data-cy="submit-grade"]').should('be.disabled');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.finishedLoading();
+      cy.contains('1 / 1').should('be.visible');
     });
   });
 
@@ -668,7 +708,7 @@ context('Fap reviews tests', () => {
         // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          organisation: 2,
+          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           telephone_alt: faker.phone.number('+4670#######'),
           user_title: 'Dr.',

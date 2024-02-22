@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 
 import { BasicUserDetails, UserRole } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
-import { getFullUserNameWithOrganisation } from 'utils/user';
+import { getFullUserNameWithInstitution } from 'utils/user';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -54,7 +54,7 @@ export default function ProposalParticipant(props: {
       <FormControl className={classes.container} margin="dense" fullWidth>
         <TextField
           label="Principal Investigator"
-          value={getFullUserNameWithOrganisation(props.principalInvestigator)}
+          value={getFullUserNameWithInstitution(props.principalInvestigator)}
           InputLabelProps={{ shrink: true }}
           InputProps={{
             readOnly: true,

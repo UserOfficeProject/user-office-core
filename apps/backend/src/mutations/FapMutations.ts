@@ -43,6 +43,7 @@ import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDe
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
 import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
+
 @injectable()
 export default class FapMutations {
   private proposalAuth = container.resolve(ProposalAuthorization);
@@ -78,7 +79,7 @@ export default class FapMutations {
       )
       .catch((err) => {
         return rejection(
-          'Could not create scientific evaluation panel',
+          'Could not create facility access panel',
           { agent },
           err
         );
@@ -104,7 +105,7 @@ export default class FapMutations {
       )
       .catch((err) => {
         return rejection(
-          'Could not update scientific evaluation panel',
+          'Could not update facility access panel',
           { agent },
           err
         );
@@ -137,7 +138,7 @@ export default class FapMutations {
       .assignChairOrSecretaryToFap(args.assignChairOrSecretaryToFapInput)
       .catch((error) => {
         return rejection(
-          'Could not assign chair and secretary to Fap',
+          'Could not assign chair or secretary to Fap please ensure they have the correct roles',
           { agent },
           error
         );
@@ -163,7 +164,8 @@ export default class FapMutations {
 
     return this.dataSource.assignReviewersToFap(args).catch((err) => {
       return rejection(
-        'Could not assign member to Fap because of an error',
+        'Could not assign member to Fap because of an error, please ensure all selected users have the correct role. ' +
+          err.message,
         { agent },
         err
       );
@@ -227,15 +229,13 @@ export default class FapMutations {
       }
     }
 
-    return this.dataSource
-      .removeMemberFromFap(args, args.roleId === UserRole.FAP_CHAIR)
-      .catch((error) => {
-        return rejection(
-          'Could not remove member from scientific evaluation panel',
-          { agent },
-          error
-        );
-      });
+    return this.dataSource.removeMemberFromFap(args).catch((error) => {
+      return rejection(
+        'Could not remove member from facility access panel',
+        { agent },
+        error
+      );
+    });
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -296,10 +296,9 @@ export default class FapMutations {
     const result = await this.dataSource.assignProposalsToFap(args);
 
     if (result.proposalPks.length !== args.proposals.length) {
-      return rejection(
-        'Could not assign proposal to scientific evaluation panel',
-        { agent }
-      );
+      return rejection('Could not assign proposal to facility access panel', {
+        agent,
+      });
     }
 
     return result;
@@ -315,7 +314,7 @@ export default class FapMutations {
       .removeProposalsFromFap(args.proposalPks, args.fapId)
       .catch((err) => {
         return rejection(
-          'Could not remove assigned proposal from scientific evaluation panel',
+          'Could not remove assigned proposal from facility access panel',
           { agent },
           err
         );
@@ -373,7 +372,7 @@ export default class FapMutations {
       .assignMemberToFapProposal(args.proposalPk, args.fapId, args.memberIds)
       .catch((err) => {
         return rejection(
-          'Can not assign proposal to scientific evaluation panel',
+          'Can not assign proposal to facility access panel',
           { agent },
           err
         );
