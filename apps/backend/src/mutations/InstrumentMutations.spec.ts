@@ -82,7 +82,23 @@ describe('Test Instrument Mutations', () => {
       )
     ).resolves.toEqual({
       proposalPks: [1, 2],
-      instrumentId: 1,
+      instrumentIds: [1],
+      submitted: false,
+    });
+  });
+
+  test('A logged in user officer can assign proposal/s to multiple instruments', () => {
+    return expect(
+      instrumentMutations.assignProposalsToInstruments(
+        dummyUserOfficerWithRole,
+        {
+          proposalPks: [1, 2],
+          instrumentIds: [1, 2],
+        }
+      )
+    ).resolves.toEqual({
+      proposalPks: [1, 2],
+      instrumentIds: [1, 2],
       submitted: false,
     });
   });

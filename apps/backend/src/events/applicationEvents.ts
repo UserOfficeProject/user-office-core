@@ -1,7 +1,7 @@
 import { Call } from '../models/Call';
 import { Fap } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
-import { Instrument, InstrumentHasProposals } from '../models/Instrument';
+import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
@@ -134,7 +134,7 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  instrumenthasproposals: InstrumentHasProposals;
+  instrumentshasproposals: InstrumentsHasProposals;
 }
 
 interface ProposalFapSelectedEvent extends GeneralEvent {
@@ -144,7 +144,7 @@ interface ProposalFapSelectedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
-  instrumenthasproposals: InstrumentHasProposals;
+  instrumenthasproposals: InstrumentsHasProposals;
 }
 
 interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {

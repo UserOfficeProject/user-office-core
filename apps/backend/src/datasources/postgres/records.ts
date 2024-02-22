@@ -447,7 +447,7 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
-export interface InstrumentHasProposalsRecord {
+export interface InstrumentHasProposalRecord {
   readonly instrument_id: number;
   readonly proposal_pk: number;
   readonly submitted: boolean;

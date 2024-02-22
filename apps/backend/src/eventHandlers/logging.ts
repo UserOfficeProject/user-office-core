@@ -53,24 +53,26 @@ export default function createHandler() {
           break;
         case Event.PROPOSAL_INSTRUMENT_SELECTED: {
           await Promise.all(
-            event.instrumenthasproposals.proposalPks.map(async (proposalPk) => {
-              const instruments =
-                await instrumentDataSource.getInstrumentsByProposalPk(
-                  proposalPk
+            event.instrumentshasproposals.proposalPks.map(
+              async (proposalPk) => {
+                const instruments =
+                  await instrumentDataSource.getInstrumentsByProposalPk(
+                    proposalPk
+                  );
+
+                const description = `Selected instruments: ${instruments
+                  ?.map((instrument) => instrument.name)
+                  .join(', ')}`;
+
+                return eventLogsDataSource.set(
+                  event.loggedInUserId,
+                  event.type,
+                  json,
+                  proposalPk.toString(),
+                  description
                 );
-
-              const description = `Selected instruments: ${instruments
-                ?.map((instrument) => instrument.name)
-                .join(', ')}`;
-
-              return eventLogsDataSource.set(
-                event.loggedInUserId,
-                event.type,
-                json,
-                proposalPk.toString(),
-                description
-              );
-            })
+              }
+            )
           );
           break;
         }
@@ -112,11 +114,13 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
+          const [instrumentId] = event.instrumenthasproposals.instrumentIds;
+
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
-            event.instrumenthasproposals.instrumentId.toString()
+            instrumentId.toString()
           );
           break;
         case Event.PROPOSAL_FAP_MEETING_SAVED:

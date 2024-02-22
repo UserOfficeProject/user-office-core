@@ -16,7 +16,7 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Instrument, InstrumentHasProposals } from '../models/Instrument';
+import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -132,7 +132,7 @@ export default class InstrumentMutations {
   async assignProposalsToInstruments(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentsArgs
-  ): Promise<InstrumentHasProposals | Rejection> {
+  ): Promise<InstrumentsHasProposals | Rejection> {
     return this.assignProposalsToInstrumentsInternal(agent, args);
   }
 
@@ -140,8 +140,8 @@ export default class InstrumentMutations {
   async assignProposalsToInstrumentsInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentsArgs
-  ): Promise<InstrumentHasProposals | Rejection> {
-    let result: InstrumentHasProposals | Rejection = rejection(
+  ): Promise<InstrumentsHasProposals | Rejection> {
+    let result: InstrumentsHasProposals | Rejection = rejection(
       'Could not assign proposal/s to instrument',
       {
         agent,
@@ -234,13 +234,13 @@ export default class InstrumentMutations {
           });
         }
       }
-
-      result = new InstrumentHasProposals(
-        instrumentId,
-        args.proposalPks,
-        false
-      );
     }
+
+    result = new InstrumentsHasProposals(
+      args.instrumentIds,
+      args.proposalPks,
+      false
+    );
 
     return result;
   }
@@ -322,7 +322,7 @@ export default class InstrumentMutations {
   async submitInstrument(
     agent: UserWithRole | null,
     args: InstrumentSubmitArgs
-  ): Promise<InstrumentHasProposals | Rejection> {
+  ): Promise<InstrumentsHasProposals | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))

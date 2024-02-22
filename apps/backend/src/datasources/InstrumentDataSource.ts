@@ -1,6 +1,6 @@
 import {
   Instrument,
-  InstrumentHasProposals,
+  InstrumentsHasProposals,
   InstrumentWithAvailabilityTime,
   InstrumentWithManagementTime,
 } from '../models/Instrument';
@@ -30,7 +30,7 @@ export interface InstrumentDataSource {
   assignProposalToInstrument(
     proposalPk: number,
     instrumentId: number
-  ): Promise<InstrumentHasProposals>;
+  ): Promise<InstrumentsHasProposals>;
   removeProposalsFromInstrument(
     proposalPks: number[],
     instrumentId?: number
@@ -71,7 +71,7 @@ export interface InstrumentDataSource {
   submitInstrument(
     proposalPks: number[],
     instrumentId: number
-  ): Promise<InstrumentHasProposals>;
+  ): Promise<InstrumentsHasProposals>;
   hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number

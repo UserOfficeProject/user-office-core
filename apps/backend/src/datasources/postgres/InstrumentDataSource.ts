@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import {
   Instrument,
-  InstrumentHasProposals,
+  InstrumentsHasProposals,
   InstrumentWithAvailabilityTime,
   InstrumentWithManagementTime,
 } from '../../models/Instrument';
@@ -19,7 +19,7 @@ import {
   UserRecord,
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
-  InstrumentHasProposalsRecord,
+  InstrumentHasProposalRecord,
   InstrumentWithManagementTimeRecord,
   InstitutionRecord,
 } from './records';
@@ -260,7 +260,7 @@ export default class PostgresInstrumentDataSource
   async assignProposalToInstrument(
     proposalPk: number,
     instrumentId: number
-  ): Promise<InstrumentHasProposals> {
+  ): Promise<InstrumentsHasProposals> {
     const dataToInsert = {
       instrument_id: instrumentId,
       proposal_pk: proposalPk,
@@ -269,10 +269,10 @@ export default class PostgresInstrumentDataSource
     return database('instrument_has_proposals')
       .insert(dataToInsert)
       .returning(['*'])
-      .then(([result]: InstrumentHasProposalsRecord[]) => {
+      .then(([result]: InstrumentHasProposalRecord[]) => {
         if (result) {
-          return new InstrumentHasProposals(
-            instrumentId,
+          return new InstrumentsHasProposals(
+            [instrumentId],
             [result.proposal_pk],
             false
           );
@@ -558,8 +558,8 @@ export default class PostgresInstrumentDataSource
   async submitInstrument(
     proposalPks: number[],
     instrumentId: number
-  ): Promise<InstrumentHasProposals> {
-    const records: InstrumentHasProposalsRecord[] = await database(
+  ): Promise<InstrumentsHasProposals> {
+    const records: InstrumentHasProposalRecord[] = await database(
       'instrument_has_proposals'
     )
       .update(
@@ -577,7 +577,7 @@ export default class PostgresInstrumentDataSource
       );
     }
 
-    return new InstrumentHasProposals(instrumentId, proposalPks, true);
+    return new InstrumentsHasProposals([instrumentId], proposalPks, true);
   }
 
   async hasInstrumentScientistInstrument(
@@ -627,7 +627,7 @@ export default class PostgresInstrumentDataSource
       .select()
       .where('proposal_pk', proposalPk)
       .first()
-      .then((result?: InstrumentHasProposalsRecord) => {
+      .then((result?: InstrumentHasProposalRecord) => {
         if (!result) {
           return false;
         }

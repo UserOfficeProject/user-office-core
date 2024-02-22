@@ -36,9 +36,9 @@ export class InstrumentWithManagementTime extends Instrument {
   }
 }
 
-export class InstrumentHasProposals {
+export class InstrumentsHasProposals {
   constructor(
-    public instrumentId: number,
+    public instrumentIds: number[],
     public proposalPks: number[],
     public submitted: boolean
   ) {}
