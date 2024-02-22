@@ -41,13 +41,14 @@ const RankInputModal: React.FC<RankInputModalProps> = ({
           fullWidth
           value={value}
           onChange={(e) => setValue(parseFloat(e.target.value))}
+          data-cy="rank-input"
         />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleSubmit} color="primary">
+        <Button onClick={handleSubmit} color="primary" data-cy="rank-submit">
           Submit
         </Button>
       </DialogActions>

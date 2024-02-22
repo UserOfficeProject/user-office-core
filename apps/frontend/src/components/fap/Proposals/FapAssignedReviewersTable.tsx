@@ -54,13 +54,14 @@ const assignmentColumns = [
     field: 'user.lastname',
   },
   {
+    title: 'Date assigned',
+    field: 'dateAssignedFormatted',
+  },
+  {
     title: 'rank',
     field: 'rank',
     emptyValue: '-',
-  },
-  {
-    title: 'Date assigned',
-    field: 'dateAssignedFormatted',
+    hidden: true,
   },
   { title: 'Review status', field: 'review.status' },
   {
@@ -103,6 +104,10 @@ const FapAssignedReviewersTable = ({
     PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
     PROPOSAL_MODAL_TAB_NAMES.GRADE,
   ];
+
+  assignmentColumns[
+    assignmentColumns.findIndex((col) => col.title === 'rank')
+  ].hidden = !hasAccessRights;
 
   const FapAssignmentsWithIdAndFormattedDate =
     fapProposal.assignments
