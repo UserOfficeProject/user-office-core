@@ -189,7 +189,6 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
         return;
       }
 
-      // TODO: Test this logic if the correct users are included
       const instrumentsPeople = await Promise.all(
         proposalInstruments.map(async (proposalInstrument) => {
           const beamLineManager = await usersDataSource.getBasicUserInfo(

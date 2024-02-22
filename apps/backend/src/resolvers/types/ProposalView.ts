@@ -102,7 +102,6 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public allocationTimeUnit: AllocationTimeUnits;
 }
 
-// TODO: Investigate if this could be removed and instead we keep all the information in the view. Like we do with the technical assignee name.
 @Resolver(() => ProposalView)
 export class ProposalResolver {
   @FieldResolver(() => User, { nullable: true })

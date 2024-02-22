@@ -106,14 +106,14 @@ export default class InstrumentMutations {
       inputArguments.proposalPks
     );
 
-    const allProposalsCallIds = fullProposals.map(
-      (fullProposal) => fullProposal.callId
-    );
+    const proposalsUniqueCallIds = fullProposals
+      .map((fullProposal) => fullProposal.callId)
+      .filter((proposal, index, array) => array.indexOf(proposal) === index);
 
     const proposalCallsWithInstrument =
       await this.dataSource.getCallsByInstrumentId(
         instrumentId,
-        allProposalsCallIds
+        proposalsUniqueCallIds
       );
 
     const proposalsOnSameCallAsInstrument = fullProposals.filter((proposal) =>
