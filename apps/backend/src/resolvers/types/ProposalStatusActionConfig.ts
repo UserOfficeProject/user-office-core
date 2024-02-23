@@ -5,6 +5,7 @@ export enum EmailStatusActionRecipients {
   CO_PROPOSERS = 'CO_PROPOSERS',
   INSTRUMENT_SCIENTISTS = 'INSTRUMENT_SCIENTISTS',
   FAP_REVIEWERS = 'FAP_REVIEWERS',
+  FAP_CHAIR_AND_SECRETARY = 'FAP_CHAIR_AND_SECRETARY',
   OTHER = 'OTHER',
 }
 
@@ -21,6 +22,10 @@ export const EmailStatusActionRecipientsWithDescription = new Map<
   [
     EmailStatusActionRecipients.FAP_REVIEWERS,
     'Fap reviewers that are assigned to review the proposal',
+  ],
+  [
+    EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
+    'The Chair and Secretaries of the FAP this proposal is associated with ',
   ],
   [
     EmailStatusActionRecipients.OTHER,
