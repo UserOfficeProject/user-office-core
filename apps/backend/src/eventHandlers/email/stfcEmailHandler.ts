@@ -39,8 +39,8 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
       const callTitle = call?.shortCode?.toLowerCase() || '';
 
-      const isIsis = callTitle.includes('isis') || false;
-      const isRapidAccess = callTitle.includes('rapid') || false;
+      const isIsis = callTitle.includes('isis');
+      const isRapidAccess = callTitle.includes('rapid');
       const isClf = ['artemis', 'hpl', 'lsf'].some((fac) =>
         callTitle.includes(fac)
       );
