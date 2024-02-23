@@ -39,8 +39,8 @@ export class InstrumentWithAvailabilityTime extends Instrument {
   @Field(() => Int, { nullable: true })
   public availabilityTime: number;
 
-  @Field(() => Boolean, { defaultValue: false })
-  public submitted: boolean;
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  public submitted?: boolean;
 
   @Field(() => Int, { nullable: true })
   public fapId: number;

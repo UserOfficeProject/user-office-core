@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { getUniqueArray } from 'utils/helperFunctions';
 
 type AssignProposalsToInstrumentsProps = {
   close: () => void;
@@ -31,9 +32,7 @@ const AssignProposalsToInstruments = ({
 
   const { instruments, loadingInstruments } = useInstrumentsData(callIds);
 
-  const uniqueInstrumentIds = instrumentIds.filter((value, index, self) => {
-    return self.indexOf(value) === index;
-  });
+  const uniqueInstrumentIds = getUniqueArray(instrumentIds);
 
   return (
     <Container

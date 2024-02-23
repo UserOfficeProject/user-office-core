@@ -16,6 +16,14 @@ BEGIN
 			UPDATE instrument_has_proposals
 			SET management_time_allocation = (SELECT management_time_allocation FROM proposals WHERE proposals.proposal_pk = instrument_has_proposals.proposal_pk);
 
+			ALTER TABLE fap_proposals ADD COLUMN instrument_id INT REFERENCES instruments (instrument_id);
+			UPDATE fap_proposals
+			SET instrument_id = (SELECT instrument_id FROM instrument_has_proposals WHERE fap_proposals.proposal_pk = instrument_has_proposals.proposal_pk);
+
+			ALTER TABLE fap_proposals ADD COLUMN fap_instrument_meeting_submitted BOOLEAN DEFAULT FALSE;
+			UPDATE fap_proposals
+			SET fap_instrument_meeting_submitted = (SELECT submitted FROM instrument_has_proposals WHERE fap_proposals.proposal_pk = instrument_has_proposals.proposal_pk);
+
 			-- drop view to allow recreating it
     	DROP VIEW proposal_table_view;
 
@@ -45,8 +53,9 @@ BEGIN
 		          ihp.instrument_names,
 							ihp.instrument_manager_ids,
 							ihp_2.instrument_scientist_ids,
-		          s.code AS fap_code,
-		          s.fap_id AS fap_id,
+		          f.code AS fap_code,
+		          f.fap_id AS fap_id,
+		          fp.instrument_id AS fap_instrument_id,
 							c.call_short_code,
 		          c.allocation_time_unit,
 		          c.call_id,
@@ -61,8 +70,8 @@ BEGIN
 		  FROM proposals p
 		  LEFT JOIN proposal_statuses ps ON ps.proposal_status_id = p.status_id
 		  LEFT JOIN call c ON c.call_id = p.call_id
-		  LEFT JOIN "fap_proposals" sp ON sp.proposal_pk = p.proposal_pk
-		  LEFT JOIN "faps" s ON s.fap_id = sp.fap_id
+		  LEFT JOIN "fap_proposals" fp ON fp.proposal_pk = p.proposal_pk
+		  LEFT JOIN "faps" f ON f.fap_id = fp.fap_id
 		  LEFT JOIN "fap_meeting_decisions" smd ON smd.proposal_pk = p.proposal_pk
 			LEFT JOIN (
 				SELECT proposal_pk,
@@ -109,6 +118,8 @@ BEGIN
 		SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE'
 		WHERE status_changing_event = 'PROPOSAL_UNFEASIBLE';
 		ALTER TABLE proposals DROP COLUMN management_time_allocation;
+		ALTER TABLE instrument_has_proposals DROP COLUMN submitted;
+		ALTER TABLE call_has_instruments DROP COLUMN submitted;
 
     END;
 	END IF;

@@ -907,6 +907,7 @@ context('Settings tests', () => {
               primaryKey: proposal.primaryKey,
             },
             fapId: initialDBData.fap.id,
+            fapInstrumentId: initialDBData.instrument1.id,
           });
           if (
             featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)
@@ -1011,6 +1012,7 @@ context('Settings tests', () => {
               primaryKey: proposal.primaryKey,
             },
             fapId: initialDBData.fap.id,
+            fapInstrumentId: initialDBData.instrument1.id,
           });
         }
       });

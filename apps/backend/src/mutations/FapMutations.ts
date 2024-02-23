@@ -273,6 +273,7 @@ export default class FapMutations {
               callId: callId,
             })),
           fapId: callHasInstrument.fapId,
+          fapInstrumentId: callHasInstrument.instrumentId,
         });
       }
     }

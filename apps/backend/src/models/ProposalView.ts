@@ -22,6 +22,7 @@ export class ProposalView {
     public technicalReviewsSubmitted: boolean[],
     public instrumentNames: string[],
     public instrumentIds: number[],
+    public fapInstrumentId: number,
     public callShortCode: string,
     public fapCode: string,
     public fapId: number,

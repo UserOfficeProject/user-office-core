@@ -36,6 +36,11 @@ export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
   return result;
 };
 
+export const getUniqueArray = <T,>(array: (T | null)[]) =>
+  array?.filter((value, index, self): value is T => {
+    return value !== null && self.indexOf(value) === index;
+  });
+
 export const setSortDirectionOnSortColumn = (
   columns: Column<any>[],
   sortColumn: number | null | undefined,

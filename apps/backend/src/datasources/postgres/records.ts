@@ -146,6 +146,7 @@ export interface ProposalViewRecord {
   readonly technical_review_assignee_ids: number[];
   readonly technical_review_assignee_names: string[];
   readonly instrument_ids: number[];
+  readonly fap_instrument_id: number;
   readonly instrument_names: string[];
   readonly call_short_code: string;
   readonly fap_id: number;
@@ -826,6 +827,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_reviews_submitted,
     proposal.instrument_names,
     proposal.instrument_ids,
+    proposal.fap_instrument_id,
     proposal.call_short_code,
     proposal.fap_code,
     proposal.fap_id,

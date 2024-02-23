@@ -41,6 +41,7 @@ import {
   Fap,
   InstrumentFragment,
   FeatureId,
+  GetInstrumentsByIdsQuery,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -79,6 +80,7 @@ export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
   instrumentIds: (number | null)[] | null;
+  fapInstrumentId: number | null;
   fapId: number | null;
   statusId: number;
 };
@@ -381,6 +383,7 @@ const ProposalTableOfficer = ({
               primaryKey: proposal.primaryKey,
               callId: proposal.callId,
               instrumentIds: proposal.instrumentIds || [],
+              fapInstrumentId: proposal.fapInstrumentId,
               fapId: proposal.fapId,
               statusId: proposal.statusId,
               workflowId: proposal.workflowId,
@@ -518,8 +521,17 @@ const ProposalTableOfficer = ({
     });
   };
 
-  const assignProposalsToFap = async (fap: Fap | null): Promise<void> => {
+  const assignProposalsToFap = async (
+    fap: Fap | null,
+    fapInstrument:
+      | NonNullable<GetInstrumentsByIdsQuery['instrumentsByIds']>[0]
+      | null
+  ): Promise<void> => {
     if (fap) {
+      if (!fapInstrument) {
+        return;
+      }
+
       await api({
         toastSuccessMessage:
           'Proposal/s assigned to the selected Fap successfully!',
@@ -529,6 +541,7 @@ const ProposalTableOfficer = ({
           callId: selectedProposal.callId,
         })),
         fapId: fap.id,
+        fapInstrumentId: fapInstrument.id,
       });
 
       // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
@@ -731,6 +744,12 @@ const ProposalTableOfficer = ({
             fapIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.fapId
             )}
+            proposalInstrumentIds={selectedProposals
+              .map((selectedProposal) => selectedProposal.instrumentIds)
+              .flat()}
+            proposalFapInstrumentIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.fapInstrumentId
+            )}
           />
         </DialogContent>
       </Dialog>
@@ -759,7 +778,9 @@ const ProposalTableOfficer = ({
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={openChangeProposalStatus}
+        maxWidth="xs"
         onClose={(): void => setOpenChangeProposalStatus(false)}
+        fullWidth
       >
         <DialogContent>
           <ChangeProposalStatus

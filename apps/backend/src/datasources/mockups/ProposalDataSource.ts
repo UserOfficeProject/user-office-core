@@ -190,6 +190,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       [false],
       ['instrument'],
       [1],
+      1,
       'call short code',
       'fap code',
       1,

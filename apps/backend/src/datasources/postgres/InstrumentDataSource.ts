@@ -159,7 +159,6 @@ export default class PostgresInstrumentDataSource
         'description',
         'manager_user_id',
         'chi.availability_time',
-        'chi.submitted',
         'chi.fap_id',
       ])
       .from('instruments as i')
@@ -407,7 +406,6 @@ export default class PostgresInstrumentDataSource
         'description',
         'manager_user_id',
         'chi.availability_time',
-        'chi.submitted',
         database.raw(
           `count(sp.proposal_pk) filter (where sp.fap_id = ${fapId} and sp.call_id = ${callId}) as proposal_count`
         ),
@@ -416,17 +414,14 @@ export default class PostgresInstrumentDataSource
         ),
       ])
       .from('instruments as i')
-      .join('instrument_has_proposals as ihp', {
-        'i.instrument_id': 'ihp.instrument_id',
-      })
       .join('fap_proposals as sp', {
-        'sp.proposal_pk': 'ihp.proposal_pk',
+        'sp.instrument_id': 'i.instrument_id',
       })
       .join('call_has_instruments as chi', {
         'chi.instrument_id': 'i.instrument_id',
         'chi.call_id': callId,
       })
-      .groupBy(['i.instrument_id', 'chi.availability_time', 'chi.submitted'])
+      .groupBy(['i.instrument_id', 'chi.availability_time'])
       .having(
         database.raw(
           `count(sp.proposal_pk) filter (where sp.fap_id = ${fapId} and sp.call_id = ${callId}) > 0`
@@ -560,11 +555,11 @@ export default class PostgresInstrumentDataSource
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
     const records: InstrumentHasProposalRecord[] = await database(
-      'instrument_has_proposals'
+      'fap_proposals'
     )
       .update(
         {
-          submitted: true,
+          fap_instrument_meeting_submitted: true,
         },
         ['*']
       )
@@ -573,7 +568,7 @@ export default class PostgresInstrumentDataSource
 
     if (!records?.length) {
       throw new GraphQLError(
-        `Some record from instrument_has_proposals not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+        `Some record from fap_proposals not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
       );
     }
 
