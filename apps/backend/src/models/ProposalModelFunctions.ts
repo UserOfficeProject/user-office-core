@@ -50,16 +50,13 @@ export function getAllFields(collection: AbstractCollection) {
 
 function applyPdfFilters(allFields: AbstractField[]): AbstractField[] {
   let fields = new Array<AbstractField>();
-  fields = allFields.filter((field) => {
-    if (
-      field.question.dataType === DataType.FILE_UPLOAD &&
-      (field.config as FileUploadConfig).omitFromPdf === true
-    ) {
-      return false;
-    } else {
-      return true;
-    }
-  });
+  fields = allFields.filter(
+    (field) =>
+      !(
+        field.question.dataType === DataType.FILE_UPLOAD &&
+        (field.config as FileUploadConfig).omitFromPdf === true
+      )
+  );
 
   return fields;
 }
