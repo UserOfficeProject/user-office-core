@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
+import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -25,9 +26,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const InstrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
 
   switch (event.type) {
     /*
@@ -39,31 +37,35 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
       const call = await callDataSource.getCall(event.proposal.callId);
 
-      const instruments = await InstrumentDataSource.getInstrumentsByCallId([
-        event.proposal.callId,
-      ]);
+      const callTitle = call?.shortCode?.toLowerCase() || '';
 
-      if (instruments.length == 0) {
-        logger.logWarn(
-          'Could not send email beacause no instrument was assigned to this call.',
-          { event, call }
+      const isIsis = callTitle.includes('isis');
+      const isRapidAccess = callTitle.includes('rapid');
+      const isClf = ['artemis', 'hpl', 'lsf'].some((fac) =>
+        callTitle.includes(fac)
+      );
+
+      let piEmailTemplate: string;
+
+      if (isIsis) {
+        piEmailTemplate = isRapidAccess
+          ? 'isis-rapid-proposal-submitted-pi'
+          : 'isis-proposal-submitted-pi';
+      } else if (isClf) {
+        piEmailTemplate = 'clf-proposal-submitted-pi';
+      } else {
+        logger.logError(
+          'Could not send email because facility could not be determined from call title.',
+          { event, call, callTitle: call?.shortCode }
         );
 
         return;
       }
-      let piEmailTemplate: string;
-      const isRapidAccess =
-        call?.shortCode?.toLowerCase().includes('rapid') || false;
-      if (instruments[0].name === 'ISIS') {
-        piEmailTemplate = isRapidAccess
-          ? 'isis-rapid-proposal-submitted-pi'
-          : 'isis-proposal-submitted-pi';
-      } else {
-        piEmailTemplate = 'clf-proposal-submitted-pi';
-      }
+
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
+
       const participants = await userDataSource.getProposalUsersFull(
         event.proposal.primaryKey
       );
@@ -78,18 +80,48 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
         emailsToSend.push(piEmail);
       } else {
-        logger.logWarn(
+        logger.logError(
           'Could not send submission confirmation email to PI and participants, as the PI details could not be retrieved.',
           { event }
         );
       }
 
       if (isRapidAccess) {
+        const questionaries = container.resolve<QuestionaryDataSource>(
+          Tokens.QuestionaryDataSource
+        );
+        const instruments = container.resolve<InstrumentDataSource>(
+          Tokens.InstrumentDataSource
+        );
+
+        const answer = await questionaries.getAnswer(
+          event.proposal.questionaryId,
+          'isis_instrument_picker'
+        );
+
+        let instrumentRequested;
+
+        if (answer) {
+          instrumentRequested = (
+            await instruments.getInstrument(answer?.answer.value)
+          )?.name;
+        }
+
+        if (!instrumentRequested) {
+          logger.logError(
+            'Could not include instrument in the Rapid submission confirmation email to User Office.',
+            { event }
+          );
+
+          instrumentRequested = '';
+        }
+
         const uoAddress = process.env.ISIS_UO_EMAIL;
 
         if (uoAddress) {
           const uoRapidEmail = uoRapidSubmissionEmail(
             event.proposal,
+            instrumentRequested,
             principalInvestigator,
             participants,
             uoAddress
@@ -98,7 +130,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           emailsToSend.push(uoRapidEmail);
         } else {
           logger.logError(
-            'Could not send Rapid submission confirmation email to User Office, as the User Office email address was not specified.',
+            'Could not send UO Rapid submission email, environment variable (ISIS_UO_EMAIL) not found.',
             { event }
           );
         }
@@ -205,6 +237,7 @@ const piSubmissionEmail = (
 
 const uoRapidSubmissionEmail = (
   proposal: Proposal,
+  instrument: string,
   pi: User | null,
   participants: User[],
   uoAddress: string
@@ -224,6 +257,7 @@ const uoRapidSubmissionEmail = (
               `${participant.preferredname} ${participant.lastname} `
           )
         : '-',
+    instrument: instrument,
   },
   recipients: [{ address: uoAddress }],
 });
