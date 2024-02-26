@@ -55,6 +55,7 @@ export const dummyUserOfficer = new User(
   12,
   new Date('1990-01-25'),
   3,
+  'Other',
   'IT department',
   'Producer',
   'Dorris83@gmail.com',
@@ -86,6 +87,7 @@ export const dummyUser = new User(
   2,
   new Date('1981-05-04'),
   3,
+  'Other',
   'IT department',
   'Architect',
   'Cleve30@yahoo.com',
@@ -161,6 +163,7 @@ export const dummyPlaceHolderUser = new User(
   2,
   new Date('1981-05-04'),
   3,
+  'Other',
   'IT department',
   'Architect',
   'placeholder@ess.se',
@@ -187,6 +190,7 @@ export const dummyUserNotOnProposal = new User(
   3,
   new Date('1991-11-08'),
   5,
+  'Other',
   'IT department',
   'Facilitator',
   'Tyrique41@hotmail.com',
@@ -216,7 +220,7 @@ export class UserDataSourceMock implements UserDataSource {
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
   }
-  async createOrganisation(
+  async createInstitution(
     name: string,
     verified: boolean,
     countryId?: number

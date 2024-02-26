@@ -34,7 +34,7 @@ const columns = [
     title: 'Role',
     render: (rowData: FapAssignedMember) => memberRole(rowData),
   },
-  { title: 'Organisation', field: 'organisation' },
+  { title: 'Institution', field: 'institution' },
 ];
 
 const AssignFapMemberToProposalModal = ({

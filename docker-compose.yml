@@ -61,6 +61,7 @@ services:
     image: 'ghcr.io/userofficeproject/user-office-frontend:develop'
     labels:
       - 'traefik.enable=true'
+      - 'traefik.http.services.frontend.loadbalancer.server.port=8080'
       - 'traefik.http.routers.frontend.rule=(Host(`localhost`) && PathPrefix(`/`))'
     depends_on:
       - backend

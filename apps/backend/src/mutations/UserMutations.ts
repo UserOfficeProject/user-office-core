@@ -4,7 +4,7 @@ import {
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   updateUserRolesValidationSchema,
-  updateUserValidationSchema,
+  updateUserValidationBackendSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
@@ -160,7 +160,7 @@ export default class UserMutations {
     }
   }
 
-  @ValidateArgs(updateUserValidationSchema)
+  @ValidateArgs(updateUserValidationBackendSchema)
   @Authorized()
   @EventBus(Event.USER_UPDATED)
   async update(
@@ -189,20 +189,9 @@ export default class UserMutations {
       });
     }
 
-    let organisationId = args.organisation;
-    // Check if user has other as selected org and if so create it
-    if (args.otherOrganisation) {
-      organisationId = await this.dataSource.createOrganisation(
-        args.otherOrganisation,
-        false,
-        args.organizationCountry
-      );
-    }
-
     user = {
       ...user,
       ...args,
-      organisation: organisationId ?? user.organisation,
     };
 
     return this.dataSource
@@ -327,12 +316,14 @@ export default class UserMutations {
 
   async externalTokenLogin(
     externalToken: string,
-    redirecturi: string
+    redirecturi: string,
+    iss: string | null
   ): Promise<string | Rejection> {
     try {
       const user = await this.userAuth.externalTokenLogin(
         externalToken,
-        redirecturi
+        redirecturi,
+        iss
       );
 
       if (!user) {
@@ -348,10 +339,13 @@ export default class UserMutations {
         roles[0]
       );
 
-      // Set the current role to the highest possible, user officer, instrument scientist, user
+      // Set the current role to the highest possible, user officer, instrument scientist, FAP Panel member, user
       const currentRole =
         roles.find((role) => role.shortCode === Roles.USER_OFFICER) ||
         roles.find((role) => role.shortCode === Roles.INSTRUMENT_SCIENTIST) ||
+        roles.find((role) => role.shortCode === Roles.FAP_CHAIR) ||
+        roles.find((role) => role.shortCode === Roles.FAP_SECRETARY) ||
+        roles.find((role) => role.shortCode === Roles.FAP_REVIEWER) ||
         roles[0];
 
       const uosToken = signToken<AuthJwtPayload>({
@@ -362,7 +356,7 @@ export default class UserMutations {
           id: user.id,
           lastname: user.lastname,
           oidcSub: user.oidcSub,
-          organisation: user.organisation,
+          institutionId: user.institutionId,
           placeholder: user.placeholder,
           position: user.position,
           preferredname: user.preferredname,
@@ -374,11 +368,12 @@ export default class UserMutations {
       });
 
       return uosToken;
-    } catch (exception) {
+    } catch (error) {
       return rejection(
-        'Error occurred during external authentication',
+        (error as Error).message ||
+          'Error occurred during external authentication',
         {},
-        exception
+        error
       );
     }
   }
