@@ -412,7 +412,12 @@ export default class FapMutations {
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   async updateTimeAllocation(
     agent: UserWithRole | null,
-    { fapId, proposalPk, fapTimeAllocation = null }: UpdateFapTimeAllocationArgs
+    {
+      fapId,
+      proposalPk,
+      fapTimeAllocation = null,
+      instrumentId,
+    }: UpdateFapTimeAllocationArgs
   ) {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
@@ -425,10 +430,13 @@ export default class FapMutations {
       );
     }
 
-    const isProposalInstrumentSubmitted =
-      await this.instrumentDataSource.isProposalInstrumentSubmitted(proposalPk);
+    const isFapProposalInstrumentSubmitted =
+      await this.dataSource.isFapProposalInstrumentSubmitted(
+        proposalPk,
+        instrumentId
+      );
 
-    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
         'Could not update the time allocation because the instrument is submitted',
         { agent, fapId, proposalPk }

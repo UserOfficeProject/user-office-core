@@ -88,14 +88,18 @@ export const dummyFapProposal = new FapProposal(
   1,
   1,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  false
 );
 
 export const anotherDummyFapProposal = new FapProposal(
   2,
   2,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  2,
+  true
 );
 
 export const dummyFapMeetingDecision = new FapMeetingDecision(
@@ -433,5 +437,15 @@ export class FapDataSourceMock implements FapDataSource {
 
   async getRelatedUsersOnFap(id: number): Promise<number[]> {
     return [];
+  }
+
+  async isFapProposalInstrumentSubmitted(
+    proposalPk: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return !!dummyFapProposals.find(
+      (dfp) =>
+        dfp.proposalPk === proposalPk && dfp.instrumentId === instrumentId
+    )?.fapInstrumentMeetingSubmitted;
   }
 }

@@ -682,6 +682,7 @@ const FapInstrumentProposalsTable = ({
         proposalPk={urlQueryParams.fapMeetingModal}
         meetingSubmitted={onMeetingSubmitted}
         fapId={fapId}
+        instrumentId={fapInstrument.id}
       />
       <MaterialTable
         icons={tableIcons}

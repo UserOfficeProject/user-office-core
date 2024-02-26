@@ -48,6 +48,7 @@ type FapMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
   proposalPk?: number | null;
   fapId: number;
+  instrumentId: number;
   meetingSubmitted: (data: FapMeetingDecision) => void;
   setProposalViewModalOpen: (isOpen: boolean) => void;
 };
@@ -58,6 +59,7 @@ const FapMeetingProposalViewModal = ({
   fapId,
   meetingSubmitted,
   setProposalViewModalOpen,
+  instrumentId,
 }: FapMeetingProposalViewModalProps) => {
   const classes = useStyles();
   const hasWriteAccess = useCheckAccess([
@@ -83,6 +85,11 @@ const FapMeetingProposalViewModal = ({
   };
 
   const fapTimeAllocation = FapProposalData?.fapTimeAllocation ?? null;
+
+  const getInstrumentTechnicalReview = () =>
+    proposalData.technicalReviews?.find(
+      (technicalReview) => technicalReview.instrumentId === instrumentId
+    );
 
   return (
     <>
@@ -136,22 +143,19 @@ const FapMeetingProposalViewModal = ({
                     <ExternalReviews
                       reviews={proposalData.reviews as Review[]}
                     />
-                    {proposalData.technicalReviews?.map((technicalReview) => (
-                      <TechnicalReviewInfo
-                        key={technicalReview.id}
-                        hasWriteAccess={finalHasWriteAccess}
-                        technicalReview={technicalReview}
-                        fapTimeAllocation={fapTimeAllocation}
-                        onFapTimeAllocationEdit={(fapTimeAllocation) =>
-                          setFapProposalData({
-                            ...FapProposalData,
-                            fapTimeAllocation,
-                          })
-                        }
-                        proposal={proposalData}
-                        fapId={fapId}
-                      />
-                    ))}
+                    <TechnicalReviewInfo
+                      hasWriteAccess={finalHasWriteAccess}
+                      technicalReview={getInstrumentTechnicalReview()}
+                      fapTimeAllocation={fapTimeAllocation}
+                      onFapTimeAllocationEdit={(fapTimeAllocation) =>
+                        setFapProposalData({
+                          ...FapProposalData,
+                          fapTimeAllocation,
+                        })
+                      }
+                      proposal={proposalData}
+                      fapId={fapId}
+                    />
 
                     <ProposalDetails proposal={proposalData} />
                   </>

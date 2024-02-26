@@ -11,6 +11,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -51,6 +52,8 @@ export default class ProposalMutations {
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
     @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
+    @inject(Tokens.FapDataSource)
+    private fapDataSource: FapDataSource,
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.GenericTemplateDataSource)
@@ -411,10 +414,10 @@ export default class ProposalMutations {
       );
     }
 
-    const isProposalInstrumentSubmitted =
-      await this.instrumentDataSource.isProposalInstrumentSubmitted(primaryKey);
+    const isFapProposalInstrumentSubmitted =
+      await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
-    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
         'Can not administer proposal because instrument is submitted',
         { args, agent }

@@ -114,7 +114,7 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
-          const [instrumentId] = event.instrumenthasproposals.instrumentIds;
+          const [instrumentId] = event.instrumentshasproposals.instrumentIds;
 
           await eventLogsDataSource.set(
             event.loggedInUserId,

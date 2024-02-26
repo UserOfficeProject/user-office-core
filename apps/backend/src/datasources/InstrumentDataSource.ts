@@ -81,5 +81,4 @@ export interface InstrumentDataSource {
     instrumentId: number,
     proposalPk: number
   ): Promise<boolean>;
-  isProposalInstrumentSubmitted(proposalPk: number): Promise<boolean>;
 }

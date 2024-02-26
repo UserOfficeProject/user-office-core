@@ -450,7 +450,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         'fp.proposal_pk',
         'fp.fap_id',
         'fp.fap_time_allocation',
-        'fp.fap_instrument_meeting_submitted as instrument_submitted',
+        'fp.fap_instrument_meeting_submitted',
       ])
       .from('fap_proposals as fp')
       .join('proposals as p', {
@@ -1069,5 +1069,27 @@ export default class PostgresFapDataSource implements FapDataSource {
       .where({ fap_id: fap.id });
 
     return { ...fap, fapSecretariesUserIds: record.map((sec) => sec.user_id) };
+  }
+
+  async isFapProposalInstrumentSubmitted(
+    proposalPk: number,
+    instrumentId?: number
+  ): Promise<boolean> {
+    return database('fap_proposals')
+      .select()
+      .where('proposal_pk', proposalPk)
+      .modify((query) => {
+        if (instrumentId) {
+          query.andWhere('instrument_id', instrumentId);
+        }
+      })
+      .first()
+      .then((result?: FapProposalRecord) => {
+        if (!result) {
+          return false;
+        }
+
+        return result.fap_instrument_meeting_submitted;
+      });
   }
 }

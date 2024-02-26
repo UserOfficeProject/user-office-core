@@ -382,7 +382,7 @@ export default class PostgresInstrumentDataSource
         );
 
       const allProposalsOnInstrumentSubmitted = allProposalsOnInstrument.every(
-        (item) => item.instrumentSubmitted
+        (item) => item.fapInstrumentMeetingSubmitted
       );
 
       instrumentsWithSubmittedFlag.push({
@@ -614,20 +614,6 @@ export default class PostgresInstrumentDataSource
       .first()
       .then((result: undefined | { count: string }) => {
         return result?.count === '1';
-      });
-  }
-
-  async isProposalInstrumentSubmitted(proposalPk: number): Promise<boolean> {
-    return database('instrument_has_proposals')
-      .select()
-      .where('proposal_pk', proposalPk)
-      .first()
-      .then((result?: InstrumentHasProposalRecord) => {
-        if (!result) {
-          return false;
-        }
-
-        return result.submitted;
       });
   }
 }

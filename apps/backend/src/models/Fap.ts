@@ -26,7 +26,8 @@ export class FapProposal {
     public fapId: number,
     public dateAssigned: Date,
     public fapTimeAllocation: number | null,
-    public instrumentSubmitted?: boolean
+    public instrumentId: number,
+    public fapInstrumentMeetingSubmitted: boolean
   ) {}
 }
 

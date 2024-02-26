@@ -419,7 +419,8 @@ export interface FapProposalRecord {
   readonly fap_id: number;
   readonly date_assigned: Date;
   readonly fap_time_allocation: number | null;
-  readonly instrument_submitted?: boolean;
+  readonly instrument_id: number;
+  readonly fap_instrument_meeting_submitted: boolean;
 }
 
 export interface FapAssignmentRecord {
@@ -1107,13 +1108,14 @@ export const createFapMeetingDecisionObject = (
   );
 };
 
-export const createFapProposalObject = (fapAssignment: FapProposalRecord) => {
+export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
   return new FapProposal(
-    fapAssignment.proposal_pk,
-    fapAssignment.fap_id,
-    fapAssignment.date_assigned,
-    fapAssignment.fap_time_allocation,
-    fapAssignment.instrument_submitted
+    fapProposal.proposal_pk,
+    fapProposal.fap_id,
+    fapProposal.date_assigned,
+    fapProposal.fap_time_allocation,
+    fapProposal.instrument_id,
+    fapProposal.fap_instrument_meeting_submitted
   );
 };
 export const createFapAssignmentObject = (

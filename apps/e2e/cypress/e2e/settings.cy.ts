@@ -860,6 +860,10 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="fap-selection-options"] li').first().click();
 
+      cy.get('[data-cy="fap-instrument-selection"]').click();
+
+      cy.get('[data-cy="fap-instrument-selection-options"] li').first().click();
+
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({

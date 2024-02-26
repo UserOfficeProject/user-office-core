@@ -144,7 +144,7 @@ interface ProposalFapSelectedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
-  instrumenthasproposals: InstrumentsHasProposals;
+  instrumentshasproposals: InstrumentsHasProposals;
 }
 
 interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
