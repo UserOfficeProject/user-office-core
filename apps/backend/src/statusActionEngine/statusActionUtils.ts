@@ -8,7 +8,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { BasicUserDetails } from '../models/User';
+import { BasicUserDetails, User } from '../models/User';
 import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
@@ -58,7 +58,7 @@ export type EmailReadyType = {
 
 export const getEmailReadyArrayOfUsersAndProposals = (
   emailReadyUsersWithProposals: EmailReadyType[],
-  users: BasicUserDetails[],
+  users: BasicUserDetails[] | User[],
   proposal: WorkflowEngineProposalType,
   recipientsWithEmailTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
@@ -145,7 +145,7 @@ export const getFapReviewersAndFormatOutputForEmailSending = async (
 ) => {
   const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
-  const SRs: EmailReadyType[] = [];
+  const FRs: EmailReadyType[] = [];
   await Promise.all(
     proposals.map(async (proposal) => {
       const allFapReviewers =
@@ -155,7 +155,7 @@ export const getFapReviewersAndFormatOutputForEmailSending = async (
         );
 
       getEmailReadyArrayOfUsersAndProposals(
-        SRs,
+        FRs,
         allFapReviewers,
         proposal,
         recipientWithTemplate
@@ -163,7 +163,43 @@ export const getFapReviewersAndFormatOutputForEmailSending = async (
     })
   );
 
-  return SRs;
+  return FRs;
+};
+
+export const getFapChairSecretariesAndFormatOutputForEmailSending = async (
+  proposals: WorkflowEngineProposalType[],
+  recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
+) => {
+  const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
+  const usersDataSource: UserDataSource = container.resolve(
+    Tokens.UserDataSource
+  );
+
+  const FCSs: EmailReadyType[] = [];
+  await Promise.all(
+    proposals.map(async (proposal) => {
+      const fap = await fapDataSource.getFapByProposalPk(proposal.primaryKey);
+
+      const fapChair = fap?.fapChairUserId ? [fap?.fapChairUserId] : [];
+
+      const fapChairAndSecsIds = fap?.fapSecretariesUserIds
+        ? fap.fapSecretariesUserIds.concat(fapChair)
+        : fapChair;
+
+      const fapChairAndSecs = await usersDataSource.getUsersByUserNumbers(
+        fapChairAndSecsIds
+      );
+
+      getEmailReadyArrayOfUsersAndProposals(
+        FCSs,
+        fapChairAndSecs,
+        proposal,
+        recipientWithTemplate
+      );
+    })
+  );
+
+  return FCSs;
 };
 
 export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
