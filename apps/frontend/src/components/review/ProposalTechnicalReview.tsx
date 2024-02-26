@@ -294,6 +294,7 @@ const ProposalTechnicalReview = ({
                     maxFiles={5}
                     fileType={'.pdf'}
                     pdfPageLimit={0}
+                    omitFromPdf={false}
                     onChange={(
                       fileMetaDataList: FileIdWithCaptionAndFigure[]
                     ) => {

@@ -22,6 +22,7 @@ fragment fieldConfig on FieldConfig {
     file_type
     max_files
     pdf_page_limit
+    omitFromPdf
     small_label
     required
     tooltip
