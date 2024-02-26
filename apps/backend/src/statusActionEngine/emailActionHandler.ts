@@ -16,6 +16,7 @@ import {
   getPIAndFormatOutputForEmailSending,
   getFapReviewersAndFormatOutputForEmailSending,
   publishMessageToTheEventBus,
+  getFapChairSecretariesAndFormatOutputForEmailSending,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -65,12 +66,24 @@ export const emailActionHandler = async (
         }
 
         case EmailStatusActionRecipients.FAP_REVIEWERS: {
-          const SRs = await getFapReviewersAndFormatOutputForEmailSending(
+          const FRs = await getFapReviewersAndFormatOutputForEmailSending(
             proposals,
             recipientWithTemplate
           );
 
-          sendMail(SRs);
+          sendMail(FRs);
+
+          break;
+        }
+
+        case EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY: {
+          const FCSs =
+            await getFapChairSecretariesAndFormatOutputForEmailSending(
+              proposals,
+              recipientWithTemplate
+            );
+
+          sendMail(FCSs);
 
           break;
         }
