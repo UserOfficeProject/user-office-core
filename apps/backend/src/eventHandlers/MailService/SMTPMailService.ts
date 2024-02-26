@@ -148,9 +148,14 @@ export class SMTPMailService extends MailService {
     return {
       results: [
         {
-          id: 'FAP-test-email',
-          name: 'FAP test email',
-          description: 'A test FAP message from STFC',
+          id: 'my-first-email',
+          name: 'My First Email',
+          description: 'A test message from STFC',
+        },
+        {
+          id: 'my-second-email',
+          name: 'My Second Email',
+          description: 'A test message from STFC',
         },
       ],
     };
