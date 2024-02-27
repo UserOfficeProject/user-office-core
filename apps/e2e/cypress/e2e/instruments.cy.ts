@@ -529,7 +529,6 @@ context('Instrument tests', () => {
         .click();
 
       cy.get('[data-cy=beamline-manager-surname]').type(scientist2.lastName);
-      cy.realPress('Enter');
 
       cy.get('[data-cy=findUser]').click();
 
