@@ -100,6 +100,16 @@ export interface FapDataSource {
     fapId: number,
     memberIds: number[]
   ): Promise<Fap>;
+  assignMemberToFapProposals(
+    proposalPks: number[],
+    fapId: number,
+    memberId: number
+  ): Promise<Fap>;
+  getFapProposalToNumReviewsNeededMap(
+    fapId: number,
+    callId: number
+  ): Promise<Map<FapProposal, number>>;
+  massAssignReviews(fapId: number, callId: number): Promise<Fap>;
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,

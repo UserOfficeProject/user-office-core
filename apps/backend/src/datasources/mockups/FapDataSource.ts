@@ -117,6 +117,11 @@ export const dummyFapProposals = [dummyFapProposal, anotherDummyFapProposal];
 
 export const dummyFapMembers = [dummyFapMember, anotherDummyFapMember];
 
+export const dummyFapProposalToNumReviewsNeededMap = new Map<
+  FapProposal,
+  number
+>([[dummyFapProposal, 1]]);
+
 export class FapDataSourceMock implements FapDataSource {
   async delete(id: number): Promise<Fap> {
     return dummyFap;
@@ -389,6 +394,34 @@ export class FapDataSourceMock implements FapDataSource {
     fapId: number,
     memberIds: number[]
   ) {
+    const fap = dummyFaps.find((element) => element.id === fapId);
+
+    if (fap) {
+      return fap;
+    }
+
+    throw new Error(`Fap not found ${fapId}`);
+  }
+
+  async assignMemberToFapProposals(
+    proposalPk: number[],
+    fapId: number,
+    memberIds: number
+  ) {
+    const fap = dummyFaps.find((element) => element.id === fapId);
+
+    if (fap) {
+      return fap;
+    }
+
+    throw new Error(`Fap not found ${fapId}`);
+  }
+
+  async getFapProposalToNumReviewsNeededMap(fapId: number, callId: number) {
+    return dummyFapProposalToNumReviewsNeededMap;
+  }
+
+  async massAssignReviews(fapId: number, callId: number) {
     const fap = dummyFaps.find((element) => element.id === fapId);
 
     if (fap) {

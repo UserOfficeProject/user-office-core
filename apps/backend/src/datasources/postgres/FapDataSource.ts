@@ -49,6 +49,8 @@ import {
   InstitutionRecord,
 } from './records';
 
+const DEFAULT_NUM_REVIEWS_REQUIRED = 2;
+
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
   constructor(
@@ -379,6 +381,22 @@ export default class PostgresFapDataSource implements FapDataSource {
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
       });
+  }
+
+  async getFapReviewsByCallAndFap(
+    callId: number,
+    fapId: number
+  ): Promise<Review[]> {
+    const fapReviews: ReviewRecord[] = await database
+      .select(['sr.*'])
+      .from('fap_reviews as sr')
+      .join('fap_proposals as sp', {
+        'sp.proposal_pk': 'sr.proposal_pk',
+      })
+      .where('sp.call_id', callId)
+      .andWhere('sp.fap_id', fapId);
+
+    return fapReviews.map((fapReview) => createReviewObject(fapReview));
   }
 
   async getFapReviewsByCallAndStatus(
@@ -806,6 +824,123 @@ export default class PostgresFapDataSource implements FapDataSource {
         )
         .returning<ReviewRecord[]>(['*']);
     });
+
+    const updatedFap = await this.getFap(fapId);
+
+    if (updatedFap) {
+      return updatedFap;
+    }
+
+    throw new GraphQLError(`Fap not found ${fapId}`);
+  }
+
+  async getFapProposalToNumReviewsNeededMap(fapId: number, callId: number) {
+    const fap = await this.getFap(fapId);
+    const numReviewsRequired = fap
+      ? fap.numberRatingsRequired
+      : DEFAULT_NUM_REVIEWS_REQUIRED;
+    const fapProposals = await this.getFapProposals(fapId, callId);
+    const fapReviews = await this.getFapReviewsByCallAndFap(callId, fapId);
+
+    const propNumReviewsMap = new Map<FapProposal, number>();
+
+    fapProposals.forEach((fapProposal) => {
+      const numReviewsStillNeeded =
+        numReviewsRequired -
+        fapReviews.filter(
+          (fapReview) => fapReview.proposalPk === fapProposal.proposalPk
+        ).length;
+      propNumReviewsMap.set(fapProposal, numReviewsStillNeeded);
+    });
+
+    return propNumReviewsMap;
+  }
+
+  async massAssignReviews(fapId: number, callId: number) {
+    let totalDifference = 0;
+    const reviewersAssignedReviewsMap = new Map<FapReviewer, number>();
+    const numReviewsToAssignToReviewer = new Map<FapReviewer, number>();
+    const reviewers = await this.getReviewers(fapId);
+    const reviewsNeededMap = await this.getFapProposalToNumReviewsNeededMap(
+      fapId,
+      callId
+    );
+
+    reviewers.forEach(async (reviewer) =>
+      reviewersAssignedReviewsMap.set(
+        reviewer,
+        await this.getFapReviewerProposalCountCurrentRound(reviewer.userId)
+      )
+    );
+    const highestNumberReviewsAssigned = [
+      ...reviewersAssignedReviewsMap.values(),
+    ].reduce((prev, current) => (prev && prev > current ? prev : current));
+
+    reviewers.forEach(async (reviewer) => {
+      const reviewerReviewCount =
+        reviewersAssignedReviewsMap.get(reviewer) ??
+        (await this.getFapReviewerProposalCountCurrentRound(reviewer.userId));
+      totalDifference += highestNumberReviewsAssigned - reviewerReviewCount;
+    });
+
+    const totalNumReviewsNeeded = [...reviewsNeededMap.values()].reduce(
+      (partialSum, a) => partialSum + a,
+      0
+    );
+
+    reviewers.forEach(async (reviewer) => {
+      const numReviewsAssigned =
+        reviewersAssignedReviewsMap.get(reviewer) ??
+        (await this.getFapReviewerProposalCountCurrentRound(reviewer.userId));
+      numReviewsToAssignToReviewer.set(
+        reviewer,
+        totalNumReviewsNeeded -
+          totalDifference +
+          highestNumberReviewsAssigned -
+          numReviewsAssigned
+      );
+    });
+
+    //while there are still reviews required
+    while (
+      [...reviewsNeededMap.values()].reduce(
+        (partialSum, a) => partialSum + a,
+        0
+      )
+    ) {
+      reviewers.forEach(async (reviewer) => {
+        let i = 0;
+        const reviewsToAssign: number[] = [];
+        [...reviewsNeededMap.keys()].forEach(async (review) => {
+          if (i === numReviewsToAssignToReviewer.get(reviewer)) {
+            return;
+          }
+
+          const numReviewsNeeded = reviewsNeededMap.get(review);
+          if (
+            numReviewsNeeded !== undefined &&
+            numReviewsNeeded > 0 &&
+            (
+              await this.getFapProposalAssignments(
+                fapId,
+                review.proposalPk,
+                reviewer.userId
+              )
+            ).length === 0
+          ) {
+            reviewsToAssign.push(review.proposalPk);
+            reviewsNeededMap.set(review, numReviewsNeeded - 1);
+            i++;
+          }
+        });
+
+        await this.assignMemberToFapProposals(
+          reviewsToAssign,
+          fapId,
+          reviewer.userId
+        );
+      });
+    }
 
     const updatedFap = await this.getFap(fapId);
 
