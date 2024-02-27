@@ -75,6 +75,18 @@ export const QuestionTemplateRelationFileUploadForm = (
                   data-cy="required"
                 />
                 <Field
+                  name="config.omitFromPdf"
+                  component={CheckboxWithLabel}
+                  type="checkbox"
+                  checked={
+                    (formikProps.values.config as FileUploadConfig).omitFromPdf
+                  }
+                  Label={{
+                    label: 'Omit from PDF',
+                  }}
+                  data-cy="omitFromPdf"
+                />
+                <Field
                   id="fileType"
                   name="config.file_type"
                   label="Accepted file types"
