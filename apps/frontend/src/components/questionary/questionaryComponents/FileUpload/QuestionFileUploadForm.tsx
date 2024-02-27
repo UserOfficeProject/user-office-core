@@ -94,6 +94,19 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
                 data-cy="required"
               />
               <Field
+                name="config.omitFromPdf"
+                id="Omit-from-pdf-checkbox"
+                component={CheckboxWithLabel}
+                checked={
+                  (formikProps.values.config as FileUploadConfig).omitFromPdf
+                }
+                type="checkbox"
+                Label={{
+                  label: 'Omit from PDF',
+                }}
+                data-cy="omitFromPdf"
+              />
+              <Field
                 id="fileType"
                 name="config.file_type"
                 label="Accepted file types"

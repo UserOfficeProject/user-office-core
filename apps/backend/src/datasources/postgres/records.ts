@@ -252,6 +252,7 @@ export interface UserRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly institution_id: number;
+  readonly institution: string;
   readonly placeholder: boolean;
 }
 
@@ -405,7 +406,11 @@ export interface FapRecord {
   readonly active: boolean;
   readonly full_count: number;
   readonly fap_chair_user_id: number | null;
-  readonly fap_secretary_user_id: number | null;
+}
+
+export interface FapSecretariesRecord {
+  readonly user_id: number;
+  readonly fap_id: number;
 }
 
 export interface FapProposalRecord {
@@ -900,6 +905,7 @@ export const createUserObject = (user: UserRecord) => {
     user.nationality,
     user.birthdate,
     user.institution_id,
+    user.institution,
     user.department,
     user.position,
     user.email,
@@ -1071,7 +1077,7 @@ export const createFapObject = (fap: FapRecord) => {
     fap.custom_grade_guide,
     fap.active,
     fap.fap_chair_user_id,
-    fap.fap_secretary_user_id
+    []
   );
 };
 
