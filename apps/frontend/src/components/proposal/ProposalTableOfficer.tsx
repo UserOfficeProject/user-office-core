@@ -843,7 +843,10 @@ const ProposalTableOfficer = ({
           setProposalsData(
             proposalsData.map((proposal) => {
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
-                return fromProposalToProposalView(updatedProposal);
+                return {
+                  ...fromProposalToProposalView(updatedProposal),
+                  fapInstrumentId: proposal.fapInstrumentId,
+                };
               } else {
                 return proposal;
               }

@@ -93,6 +93,7 @@ const SimpleTabs = ({
   const [query, setQuery] = useQueryParams({
     tab: withDefault(NumberParam, 0),
     modalTab: withDefault(NumberParam, 0),
+    verticalTab: withDefault(NumberParam, 0),
     modal: StringParam,
   });
   const noItems = children.length === 0;
@@ -110,7 +111,9 @@ const SimpleTabs = ({
   ) => {
     const tabValue = newValue > 0 ? newValue : undefined;
 
-    if (isInsideModal) {
+    if (isVerticalOrientation) {
+      setQuery({ verticalTab: tabValue });
+    } else if (isInsideModal) {
       setQuery({ modalTab: tabValue });
     } else {
       setQuery({ tab: tabValue });
@@ -119,22 +122,30 @@ const SimpleTabs = ({
 
   useEffect(() => {
     return () => {
-      if (isInsideModal) {
+      if (isVerticalOrientation) {
+        setQuery({ verticalTab: undefined });
+      } else if (isInsideModal) {
         setQuery({ modalTab: undefined });
       } else {
         setQuery({ tab: undefined });
       }
     };
-  }, [setQuery, isInsideModal]);
+  }, [setQuery, isInsideModal, isVerticalOrientation]);
 
   const tabsClasses = `${classes.tabs} ${
     isVerticalOrientation && classes.tabsRightBorder
   } ${noItems && classes.tabsNoItems}`;
 
+  const tabValue = isVerticalOrientation
+    ? query.verticalTab
+    : isInsideModal
+    ? query.modalTab
+    : query.tab;
+
   return (
     <Box className={isVerticalOrientation ? classes.root : ''}>
       <Tabs
-        value={isInsideModal ? query.modalTab : query.tab}
+        value={tabValue}
         onChange={handleChange}
         textColor="primary"
         variant="scrollable"
@@ -165,7 +176,7 @@ const SimpleTabs = ({
         children.map((tabContent, i) => (
           <TabPanel
             key={i}
-            value={isInsideModal ? query.modalTab : query.tab}
+            value={tabValue}
             index={i}
             dir={theme.direction}
             padding={tabPanelPadding}

@@ -29,6 +29,7 @@ query fapProposalsByInstrument(
         publicComment
         status
         timeAllocation
+        instrumentId
       }
     }
     assignments {

@@ -165,6 +165,7 @@ const ProposalReviewContent = ({
     proposalData.technicalReviews.length > 1 ? (
       <SimpleTabs
         orientation="vertical"
+        isInsideModal={isInsideModal}
         tabNames={
           proposalData.technicalReviews?.map(
             (technicalReview) =>
