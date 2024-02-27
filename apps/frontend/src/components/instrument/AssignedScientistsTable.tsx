@@ -2,7 +2,7 @@ import MaterialTable from '@material-table/core';
 import makeStyles from '@mui/styles/makeStyles';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -83,17 +83,6 @@ const AssignedScientistsTable = ({
 
     removeAssignedScientistFromInstrument(scientistId, instrument.id);
   };
-  useEffect(() => {
-    if (instrument.managerUserId) {
-      api()
-        .getBasicUserDetails({ userId: instrument.managerUserId })
-        .then((data) => {
-          return (instrument.beamlineManager = Object.create(
-            data.basicUserDetails
-          ));
-        });
-    }
-  });
 
   return (
     <div
@@ -116,7 +105,7 @@ const AssignedScientistsTable = ({
           paging: false,
           headerStyle: { backgroundColor: '#fafafa' },
         }}
-      ></MaterialTable>
+      />
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
