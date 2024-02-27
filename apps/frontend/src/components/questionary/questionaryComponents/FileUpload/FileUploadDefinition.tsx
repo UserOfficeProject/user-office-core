@@ -1,11 +1,11 @@
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import { fileUploadQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+import { createFileUploadValidationSchema } from '../FileUpload/createFileUploadValidationSchema';
 import FilesAnswerRenderer from './FilesAnswerRenderer';
 import FileUploadSearchCriteriaInput from './FileUploadSearchCriteriaInput';
 import { QuestionaryComponentFileUpload } from './QuestionaryComponentFileUpload';
@@ -25,7 +25,7 @@ export const fileUploadDefinition: QuestionaryComponentDefinition = {
     answerRenderer: FilesAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: fileUploadQuestionValidationSchema,
+  createYupValidationSchema: createFileUploadValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || [],
   searchCriteriaComponent: FileUploadSearchCriteriaInput,
 };
