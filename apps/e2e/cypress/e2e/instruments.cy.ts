@@ -80,6 +80,7 @@ context('Instrument tests', () => {
       cy.get('#description').type(instrument1.description);
 
       cy.get('[data-cy=beamline-manager-surname]').type(scientist1.lastName);
+      cy.realPress('Enter');
       cy.get('[data-cy=findUser]').click();
       cy.get('[data-cy=beamline-manager]').click();
       cy.get('[role=presentation]').contains(scientist1.lastName).click();
@@ -528,6 +529,7 @@ context('Instrument tests', () => {
         .click();
 
       cy.get('[data-cy=beamline-manager-surname]').type(scientist2.lastName);
+      cy.realPress('Enter');
 
       cy.get('[data-cy=findUser]').click();
 
