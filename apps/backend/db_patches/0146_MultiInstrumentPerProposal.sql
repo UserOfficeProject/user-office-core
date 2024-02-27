@@ -111,12 +111,16 @@ BEGIN
 		ALTER TABLE proposal_events ADD COLUMN proposal_all_feasibility_reviews_feasible BOOLEAN DEFAULT FALSE;
 		ALTER TABLE proposal_events RENAME COLUMN proposal_feasible TO proposal_feasibility_review_feasible;
 		ALTER TABLE proposal_events RENAME COLUMN proposal_unfeasible TO proposal_feasibility_review_unfeasible;
+		ALTER TABLE proposal_events RENAME COLUMN proposal_instrument_selected TO proposal_instruments_selected;
 		UPDATE status_changing_events
 		SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE'
 		WHERE status_changing_event = 'PROPOSAL_FEASIBLE';
 		UPDATE status_changing_events
 		SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE'
 		WHERE status_changing_event = 'PROPOSAL_UNFEASIBLE';
+		UPDATE status_changing_events
+		SET status_changing_event = 'PROPOSAL_INSTRUMENTS_SELECTED'
+		WHERE status_changing_event = 'PROPOSAL_INSTRUMENT_SELECTED';
 		ALTER TABLE proposals DROP COLUMN management_time_allocation;
 		ALTER TABLE instrument_has_proposals DROP COLUMN submitted;
 		ALTER TABLE call_has_instruments DROP COLUMN submitted;

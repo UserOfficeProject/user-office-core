@@ -189,7 +189,7 @@ context('Settings tests', () => {
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [
               Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
-              Event.PROPOSAL_INSTRUMENT_SELECTED,
+              Event.PROPOSAL_INSTRUMENTS_SELECTED,
             ],
           });
         }

@@ -104,7 +104,7 @@ const dummyProposalEvents = {
   call_ended_internal: false,
   call_review_ended: false,
   proposal_fap_selected: false,
-  proposal_instrument_selected: false,
+  proposal_instruments_selected: false,
   proposal_feasibility_review_submitted: false,
   proposal_sample_review_submitted: false,
   proposal_all_fap_reviews_submitted: false,

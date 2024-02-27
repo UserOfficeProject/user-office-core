@@ -136,7 +136,7 @@ export default class InstrumentMutations {
     return this.assignProposalsToInstrumentsInternal(agent, args);
   }
 
-  @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
+  @EventBus(Event.PROPOSAL_INSTRUMENTS_SELECTED)
   async assignProposalsToInstrumentsInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentsArgs

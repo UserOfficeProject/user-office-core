@@ -51,7 +51,7 @@ export default function createHandler() {
             event.emailinviteresponse.userId.toString()
           );
           break;
-        case Event.PROPOSAL_INSTRUMENT_SELECTED: {
+        case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(
               async (proposalPk) => {
