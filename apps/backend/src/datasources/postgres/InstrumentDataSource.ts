@@ -22,6 +22,7 @@ import {
   InstrumentHasProposalRecord,
   InstrumentWithManagementTimeRecord,
   InstitutionRecord,
+  FapProposalRecord,
 } from './records';
 
 @injectable()
@@ -287,14 +288,27 @@ export default class PostgresInstrumentDataSource
     proposalPks: number[],
     instrumentId?: number
   ): Promise<boolean> {
-    const result = await database('instrument_has_proposals')
-      .whereIn('proposal_pk', proposalPks)
-      .modify((query) => {
-        if (instrumentId) {
-          query.andWhere('instrument_id', instrumentId);
-        }
-      })
-      .del();
+    const result = await database.transaction(async (trx) => {
+      const ihp = await trx('instrument_has_proposals')
+        .del()
+        .whereIn('proposal_pk', proposalPks)
+        .modify((query) => {
+          if (instrumentId) {
+            query.andWhere('instrument_id', instrumentId);
+          }
+        });
+
+      await trx('technical_review')
+        .del()
+        .whereIn('proposal_pk', proposalPks)
+        .modify((query) => {
+          if (instrumentId) {
+            query.andWhere('instrument_id', instrumentId);
+          }
+        });
+
+      return await trx.commit(ihp);
+    });
 
     if (result) {
       return true;
@@ -554,12 +568,10 @@ export default class PostgresInstrumentDataSource
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
-    const records: InstrumentHasProposalRecord[] = await database(
-      'fap_proposals'
-    )
+    const records: FapProposalRecord[] = await database('fap_proposals')
       .update(
         {
-          fap_instrument_meeting_submitted: true,
+          fap_meeting_instrument_submitted: true,
         },
         ['*']
       )

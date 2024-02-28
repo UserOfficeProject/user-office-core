@@ -316,7 +316,7 @@ export default class InstrumentMutations {
       });
   }
 
-  @EventBus(Event.PROPOSAL_INSTRUMENT_SUBMITTED)
+  @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED)
   @ValidateArgs(submitInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async submitInstrument(

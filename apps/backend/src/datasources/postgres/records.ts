@@ -420,7 +420,7 @@ export interface FapProposalRecord {
   readonly date_assigned: Date;
   readonly fap_time_allocation: number | null;
   readonly instrument_id: number;
-  readonly fap_instrument_meeting_submitted: boolean;
+  readonly fap_meeting_instrument_submitted: boolean;
 }
 
 export interface FapAssignmentRecord {
@@ -457,6 +457,7 @@ export interface InstrumentHasProposalRecord {
   readonly instrument_id: number;
   readonly proposal_pk: number;
   readonly submitted: boolean;
+  readonly instrument_has_proposals_id: number;
 }
 
 export interface CallHasInstrumentRecord {
@@ -1115,7 +1116,7 @@ export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
     fapProposal.date_assigned,
     fapProposal.fap_time_allocation,
     fapProposal.instrument_id,
-    fapProposal.fap_instrument_meeting_submitted
+    fapProposal.fap_meeting_instrument_submitted
   );
 };
 export const createFapAssignmentObject = (

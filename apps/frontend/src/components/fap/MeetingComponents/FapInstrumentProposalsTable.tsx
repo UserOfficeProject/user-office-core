@@ -558,6 +558,7 @@ const FapInstrumentProposalsTable = ({
     if (
       tableBodyElement &&
       DragState.dropIndex !== tableDataId &&
+      DragState.row !== -1 &&
       DragState.row !== tableDataId
     ) {
       DragState.dropIndex = tableDataId;

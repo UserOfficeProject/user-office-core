@@ -11,7 +11,7 @@ BEGIN
 
 			ALTER TABLE technical_review DROP CONSTRAINT technical_review_proposal_id_key;
 
-			ALTER TABLE instrument_has_proposals ADD COLUMN instrument_has_proposals_id SERIAL NOT NULL;
+			ALTER TABLE instrument_has_proposals ADD COLUMN instrument_has_proposals_id SERIAL NOT NULL UNIQUE;
 			ALTER TABLE instrument_has_proposals ADD COLUMN management_time_allocation INT DEFAULT NULL;
 			UPDATE instrument_has_proposals
 			SET management_time_allocation = (SELECT management_time_allocation FROM proposals WHERE proposals.proposal_pk = instrument_has_proposals.proposal_pk);
@@ -20,9 +20,9 @@ BEGIN
 			UPDATE fap_proposals
 			SET instrument_id = (SELECT instrument_id FROM instrument_has_proposals WHERE fap_proposals.proposal_pk = instrument_has_proposals.proposal_pk);
 
-			ALTER TABLE fap_proposals ADD COLUMN fap_instrument_meeting_submitted BOOLEAN DEFAULT FALSE;
+			ALTER TABLE fap_proposals ADD COLUMN fap_meeting_instrument_submitted BOOLEAN DEFAULT FALSE;
 			UPDATE fap_proposals
-			SET fap_instrument_meeting_submitted = (SELECT submitted FROM instrument_has_proposals WHERE fap_proposals.proposal_pk = instrument_has_proposals.proposal_pk);
+			SET fap_meeting_instrument_submitted = (SELECT submitted FROM instrument_has_proposals WHERE fap_proposals.proposal_pk = instrument_has_proposals.proposal_pk);
 
 			-- drop view to allow recreating it
     	DROP VIEW proposal_table_view;
@@ -112,6 +112,7 @@ BEGIN
 		ALTER TABLE proposal_events RENAME COLUMN proposal_feasible TO proposal_feasibility_review_feasible;
 		ALTER TABLE proposal_events RENAME COLUMN proposal_unfeasible TO proposal_feasibility_review_unfeasible;
 		ALTER TABLE proposal_events RENAME COLUMN proposal_instrument_selected TO proposal_instruments_selected;
+		ALTER TABLE proposal_events RENAME COLUMN proposal_instrument_submitted TO proposal_fap_meeting_instrument_submitted;
 		UPDATE status_changing_events
 		SET status_changing_event = 'PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE'
 		WHERE status_changing_event = 'PROPOSAL_FEASIBLE';
@@ -121,9 +122,17 @@ BEGIN
 		UPDATE status_changing_events
 		SET status_changing_event = 'PROPOSAL_INSTRUMENTS_SELECTED'
 		WHERE status_changing_event = 'PROPOSAL_INSTRUMENT_SELECTED';
+		UPDATE status_changing_events
+		SET status_changing_event = 'PROPOSAL_INSTRUMENT_SUBMITTED'
+		WHERE status_changing_event = 'PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED';
 		ALTER TABLE proposals DROP COLUMN management_time_allocation;
 		ALTER TABLE instrument_has_proposals DROP COLUMN submitted;
 		ALTER TABLE call_has_instruments DROP COLUMN submitted;
+
+
+		-- TODO: Maybe we will need to remove(cleanup) all technical reviews that are not connected to any instrument/proposal assignment
+		-- Discuss this before merging the PR and if it is fine for everyone we can execute it.
+		-- DELETE FROM technical_review WHERE (proposal_pk, instrument_id) NOT IN (SELECT proposal_pk, instrument_id FROM instrument_has_proposals);
 
     END;
 	END IF;

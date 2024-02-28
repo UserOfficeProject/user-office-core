@@ -35,7 +35,7 @@ import TechnicalReviewInformation from './TechnicalReviewInformation';
 
 export enum PROPOSAL_MODAL_TAB_NAMES {
   PROPOSAL_INFORMATION = 'Proposal information',
-  TECHNICAL_REVIEW = 'Technical review',
+  TECHNICAL_REVIEW = 'Technical reviews',
   REVIEWS = 'Reviews',
   ADMIN = 'Admin',
   GRADE = 'Grade',
@@ -231,17 +231,17 @@ const ProposalReviewContent = ({
 
   const tabsContent = tabNames.map((tab, index) => {
     switch (tab) {
-      case 'Proposal information':
+      case PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION:
         return <Fragment key={index}>{ProposalInformationTab}</Fragment>;
-      case 'Technical review':
+      case PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW:
         return <Fragment key={index}>{TechnicalReviewTab}</Fragment>;
-      case 'Reviews':
+      case PROPOSAL_MODAL_TAB_NAMES.REVIEWS:
         return <Fragment key={index}>{AllProposalReviewsTab}</Fragment>;
-      case 'Admin':
+      case PROPOSAL_MODAL_TAB_NAMES.ADMIN:
         return <Fragment key={index}>{ProposalAdminTab}</Fragment>;
-      case 'Logs':
+      case PROPOSAL_MODAL_TAB_NAMES.LOGS:
         return <Fragment key={index}>{EventLogsTab}</Fragment>;
-      case 'Grade':
+      case PROPOSAL_MODAL_TAB_NAMES.GRADE:
         return <Fragment key={index}>{GradeTab}</Fragment>;
       default:
         return null;

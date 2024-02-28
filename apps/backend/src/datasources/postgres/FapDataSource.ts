@@ -450,7 +450,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         'fp.proposal_pk',
         'fp.fap_id',
         'fp.fap_time_allocation',
-        'fp.fap_instrument_meeting_submitted',
+        'fp.fap_meeting_instrument_submitted',
       ])
       .from('fap_proposals as fp')
       .join('proposals as p', {
@@ -1089,7 +1089,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           return false;
         }
 
-        return result.fap_instrument_meeting_submitted;
+        return result.fap_meeting_instrument_submitted;
       });
   }
 }
