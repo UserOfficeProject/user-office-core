@@ -65,9 +65,6 @@ export class MassAssignProposalsToFapReviewerArgs {
 
   @Field(() => Int)
   public callId: number;
-
-  @Field(() => [Int])
-  public proposalPks: number[];
 }
 
 @ArgsType()

@@ -109,7 +109,6 @@ export interface FapDataSource {
     fapId: number,
     callId: number
   ): Promise<Map<FapProposal, number>>;
-  massAssignReviews(fapId: number, callId: number): Promise<Fap>;
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,

@@ -2,13 +2,11 @@ import 'reflect-metadata';
 
 import { container } from 'tsyringe';
 
-import { dummyFap } from '../datasources/mockups/FapDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
 import FapMutations from './FapMutations';
 
 const FapMutationsInstance = container.resolve(FapMutations);
-const FapDataSourceMockInstance = container.resolve(FapDataSourceMock);
 
 describe('Test FapMutations', () => {
   /*test('A user cannot create Fap', async () => {
@@ -284,9 +282,7 @@ describe('Test FapMutations', () => {
     const result = (await FapMutationsInstance.massAssignReviews(
       dummyUserWithRole,
       {
-        proposalPks: [1],
         fapId: 1,
-        memberId: 1,
         callId: 1
       }
     )) as Rejection;
@@ -294,36 +290,43 @@ describe('Test FapMutations', () => {
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });*/
 
-  test('A userofficer can mass assign proposals to Fap members', () => {
+  /*test('A userofficer can mass assign proposals to Fap members', () => {
     return expect(
       FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
-        proposalPks: [1],
         fapId: 1,
         callId: 1,
       })
     ).resolves.toStrictEqual(dummyFap);
+  });*/
+
+  test('Proposals are evenly assigned to Fap members', async () => {
+    const mockAssignMemberToFapProposals = jest.spyOn(
+      FapDataSourceMock.prototype,
+      'assignMemberToFapProposals'
+    );
+
+    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+      fapId: 3,
+      callId: 1,
+    });
+    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
+
+    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 3, 1]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[2], 3, 4]);
   });
 
-  /*test('Proposals are evenly assigned to Fap members', () => {
-  const mockAssignMemberToFapProposals = jest.spyOn(FapDataSourceMock.prototype, 'assignMemberToFapProposals').mockImplementation(FapDataSourceMockInstance.assignMemberToFapProposals);
+  /*test('No proposals are assigned to Fap members when there are none to assign', async () => {
+  const mockAssignMemberToFapProposals = jest.spyOn(FapDataSourceMock.prototype, 'assignMemberToFapProposals');
 
-  FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole,
+  await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole,
     {
-    proposalPks: [1],
-    fapId: 1,
+    fapId: 4,
     callId: 1
     });
+    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(0);
+});*/
 
-  expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual(
-    [[1], 1, 1]
-  );
-});
-
-/*test('No proposals are assigned to Fap members when there are none to assign', () => {
-
-});
-
-test('Proposals are evenly assigned to Fap members who aready have assignments', () => {
+  /*test('Proposals are evenly assigned to Fap members who aready have assignments', () => {
 
 });
 

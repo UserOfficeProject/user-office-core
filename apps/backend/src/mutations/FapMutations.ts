@@ -468,61 +468,51 @@ export default class FapMutations {
         ));
       numReviewsToAssignToReviewer.set(
         reviewer,
-        totalNumReviewsNeeded -
-          totalDifference +
+        (totalNumReviewsNeeded - totalDifference) / reviewers.length +
           highestNumberReviewsAssigned -
           numReviewsAssigned
       );
     }
 
-    //while there are still reviews required
-    while (
-      [...reviewsNeededMap.values()].reduce(
-        (partialSum, a) => partialSum + a,
-        0
-      ) > 0
-    ) {
-      for (const reviewer of reviewers) {
-        let i = 0;
-        const reviewsToAssign: number[] = [];
+    for (const reviewer of reviewers) {
+      let i = 0;
+      const reviewsToAssign: number[] = [];
 
-        for (const review of [...reviewsNeededMap.keys()]) {
-          if (i === numReviewsToAssignToReviewer.get(reviewer)) {
-            break;
-          }
-
-          const numReviewsNeeded = reviewsNeededMap.get(review);
-          if (
-            true &&
-            numReviewsNeeded !== undefined &&
-            numReviewsNeeded > 0 &&
-            //if the review is not already assigned to the reviewer
-            (
-              await this.dataSource.getFapProposalAssignments(
-                args.fapId,
-                review.proposalPk,
-                reviewer.userId
-              )
-            ).length === 0
-          ) {
-            reviewsToAssign.push(review.proposalPk);
-            reviewsNeededMap.set(review, numReviewsNeeded - 1);
-            i++;
-          }
+      for (const review of [...reviewsNeededMap.keys()]) {
+        if (i === numReviewsToAssignToReviewer.get(reviewer)) {
+          break;
         }
 
-        await this.assignFapReviewerToProposals(agent, {
-          memberId: reviewer.userId,
-          fapId: args.fapId,
-          proposalPks: reviewsToAssign,
-        }).catch((err) => {
-          return rejection(
-            'Can not assign proposal to facility access panel',
-            { agent },
-            err
-          );
-        });
+        const numReviewsNeeded = reviewsNeededMap.get(review);
+        if (
+          numReviewsNeeded !== undefined &&
+          numReviewsNeeded > 0 &&
+          //if the review is not already assigned to the reviewer
+          (
+            await this.dataSource.getFapProposalAssignments(
+              args.fapId,
+              review.proposalPk,
+              reviewer.userId
+            )
+          ).length === 0
+        ) {
+          reviewsToAssign.push(review.proposalPk);
+          reviewsNeededMap.set(review, numReviewsNeeded - 1);
+          i++;
+        }
       }
+
+      await this.assignFapReviewerToProposals(agent, {
+        memberId: reviewer.userId,
+        fapId: args.fapId,
+        proposalPks: reviewsToAssign,
+      }).catch((err) => {
+        return rejection(
+          'Can not assign proposal to facility access panel',
+          { agent },
+          err
+        );
+      });
     }
 
     const updatedFap = await this.dataSource.getFap(args.fapId);
