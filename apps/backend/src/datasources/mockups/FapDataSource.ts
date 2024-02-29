@@ -349,7 +349,9 @@ export class FapDataSourceMock implements FapDataSource {
   ) {
     return dummyFapAssignments.filter(
       (assignment) =>
-        assignment.fapId === fapId && assignment.proposalPk === proposalPk
+        assignment.fapId === fapId &&
+        assignment.proposalPk === proposalPk &&
+        (reviewerId !== null ? assignment.fapMemberUserId === reviewerId : true)
     );
   }
 

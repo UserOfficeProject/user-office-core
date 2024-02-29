@@ -20,7 +20,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Fap } from '../models/Fap';
+import { Fap, FapReviewer } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
@@ -32,6 +32,8 @@ import {
   AssignReviewersToFapArgs,
   RemoveFapReviewerFromProposalArgs,
   AssignChairOrSecretaryToFapArgs,
+  MassAssignProposalsToFapReviewerArgs,
+  AssignFapReviewerToProposalsArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
   AssignProposalsToFapArgs,
@@ -377,6 +379,157 @@ export default class FapMutations {
           err
         );
       });
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
+  @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
+  async assignFapReviewerToProposals(
+    agent: UserWithRole | null,
+    args: AssignFapReviewerToProposalsArgs
+  ): Promise<Fap | Rejection> {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
+    ) {
+      return rejection(
+        'Can not assign Fap reviewers to proposal because of insufficient permissions',
+        { agent, args }
+      );
+    }
+
+    return this.dataSource
+      .assignMemberToFapProposals(args.proposalPks, args.fapId, args.memberId)
+      .catch((err) => {
+        return rejection(
+          'Can not assign proposal to facility access panel',
+          { agent },
+          err
+        );
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
+  async massAssignReviews(
+    agent: UserWithRole | null,
+    args: MassAssignProposalsToFapReviewerArgs
+  ): Promise<Fap | Rejection> {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
+    ) {
+      return rejection(
+        'Can not assign Fap reviewers to proposals because of insufficient permissions',
+        { agent, args }
+      );
+    }
+
+    let totalDifference = 0;
+    const reviewersAssignedReviewsMap = new Map<FapReviewer, number>();
+    const numReviewsToAssignToReviewer = new Map<FapReviewer, number>();
+    const reviewers = await this.dataSource.getReviewers(args.fapId);
+    const reviewsNeededMap =
+      await this.dataSource.getFapProposalToNumReviewsNeededMap(
+        args.fapId,
+        args.callId
+      );
+
+    for (const reviewer of reviewers) {
+      reviewersAssignedReviewsMap.set(
+        reviewer,
+        await this.dataSource.getFapReviewerProposalCountCurrentRound(
+          reviewer.userId
+        )
+      );
+    }
+
+    const highestNumberReviewsAssigned = [
+      ...reviewersAssignedReviewsMap.values(),
+    ].reduce((prev, current) => (prev && prev > current ? prev : current));
+
+    for (const reviewer of reviewers) {
+      const reviewerReviewCount =
+        reviewersAssignedReviewsMap.get(reviewer) ??
+        (await this.dataSource.getFapReviewerProposalCountCurrentRound(
+          reviewer.userId
+        ));
+      totalDifference += highestNumberReviewsAssigned - reviewerReviewCount;
+    }
+
+    const totalNumReviewsNeeded = [...reviewsNeededMap.values()].reduce(
+      (partialSum, a) => partialSum + a,
+      0
+    );
+
+    for (const reviewer of reviewers) {
+      const numReviewsAssigned =
+        reviewersAssignedReviewsMap.get(reviewer) ??
+        (await this.dataSource.getFapReviewerProposalCountCurrentRound(
+          reviewer.userId
+        ));
+      numReviewsToAssignToReviewer.set(
+        reviewer,
+        totalNumReviewsNeeded -
+          totalDifference +
+          highestNumberReviewsAssigned -
+          numReviewsAssigned
+      );
+    }
+
+    //while there are still reviews required
+    while (
+      [...reviewsNeededMap.values()].reduce(
+        (partialSum, a) => partialSum + a,
+        0
+      ) > 0
+    ) {
+      for (const reviewer of reviewers) {
+        let i = 0;
+        const reviewsToAssign: number[] = [];
+
+        for (const review of [...reviewsNeededMap.keys()]) {
+          if (i === numReviewsToAssignToReviewer.get(reviewer)) {
+            break;
+          }
+
+          const numReviewsNeeded = reviewsNeededMap.get(review);
+          if (
+            true &&
+            numReviewsNeeded !== undefined &&
+            numReviewsNeeded > 0 &&
+            //if the review is not already assigned to the reviewer
+            (
+              await this.dataSource.getFapProposalAssignments(
+                args.fapId,
+                review.proposalPk,
+                reviewer.userId
+              )
+            ).length === 0
+          ) {
+            reviewsToAssign.push(review.proposalPk);
+            reviewsNeededMap.set(review, numReviewsNeeded - 1);
+            i++;
+          }
+        }
+
+        await this.assignFapReviewerToProposals(agent, {
+          memberId: reviewer.userId,
+          fapId: args.fapId,
+          proposalPks: reviewsToAssign,
+        }).catch((err) => {
+          return rejection(
+            'Can not assign proposal to facility access panel',
+            { agent },
+            err
+          );
+        });
+      }
+    }
+
+    const updatedFap = await this.dataSource.getFap(args.fapId);
+
+    return updatedFap
+      ? updatedFap
+      : rejection('Can  not fetch updated Fap', { agent });
   }
 
   @ValidateArgs(assignFapMemberToProposalValidationSchema)

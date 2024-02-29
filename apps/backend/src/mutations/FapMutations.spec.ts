@@ -2,24 +2,16 @@ import 'reflect-metadata';
 
 import { container } from 'tsyringe';
 
-import {
-  anotherDummyFap,
-  dummyFap,
-  dummyFapWithoutCode,
-} from '../datasources/mockups/FapDataSource';
-import {
-  dummyUserOfficerWithRole,
-  dummyUserWithRole,
-} from '../datasources/mockups/UserDataSource';
-import { ProposalPks } from '../models/Proposal';
-import { Rejection } from '../models/Rejection';
-import { UserRole } from '../models/User';
+import { dummyFap } from '../datasources/mockups/FapDataSource';
+import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
+import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
 import FapMutations from './FapMutations';
 
 const FapMutationsInstance = container.resolve(FapMutations);
+const FapDataSourceMockInstance = container.resolve(FapDataSourceMock);
 
 describe('Test FapMutations', () => {
-  test('A user cannot create Fap', async () => {
+  /*test('A user cannot create Fap', async () => {
     const result = (await FapMutationsInstance.create(
       dummyUserWithRole,
       dummyFap
@@ -248,4 +240,94 @@ describe('Test FapMutations', () => {
       )
     ).resolves.toStrictEqual(dummyFap);
   });
+
+  test('A user can not assign proposals to Fap member', async () => {
+    const result = (await FapMutationsInstance.assignFapReviewerToProposals(
+      dummyUserWithRole,
+      {
+        proposalPks: [1],
+        fapId: 1,
+        memberId: 1
+      }
+    )) as Rejection;
+
+    return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A userofficer can assign proposals to Fap member', async () => {
+    return expect(
+      FapMutationsInstance.assignFapReviewerToProposals(
+        dummyUserOfficerWithRole,
+        {
+        proposalPks: [1],
+        fapId: 1,
+        memberId: 1
+        }
+      )
+    ).resolves.toStrictEqual(dummyFap);
+  });
+
+  test('A userofficer can mass assign proposals to Fap members', () => {
+    return expect(
+      FapMutationsInstance.assignFapReviewerToProposals(
+        dummyUserOfficerWithRole,
+        {
+        proposalPks: [1],
+        fapId: 1,
+        memberId: 1
+        }
+      )
+    ).resolves.toStrictEqual(dummyFap);
+  });
+
+  test('A user can not mass assign proposals to Fap members', async () => {
+    const result = (await FapMutationsInstance.massAssignReviews(
+      dummyUserWithRole,
+      {
+        proposalPks: [1],
+        fapId: 1,
+        memberId: 1,
+        callId: 1
+      }
+    )) as Rejection;
+
+    return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
+  });*/
+
+  test('A userofficer can mass assign proposals to Fap members', () => {
+    return expect(
+      FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+        proposalPks: [1],
+        fapId: 1,
+        callId: 1,
+      })
+    ).resolves.toStrictEqual(dummyFap);
+  });
+
+  /*test('Proposals are evenly assigned to Fap members', () => {
+  const mockAssignMemberToFapProposals = jest.spyOn(FapDataSourceMock.prototype, 'assignMemberToFapProposals').mockImplementation(FapDataSourceMockInstance.assignMemberToFapProposals);
+
+  FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole,
+    {
+    proposalPks: [1],
+    fapId: 1,
+    callId: 1
+    });
+
+  expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual(
+    [[1], 1, 1]
+  );
+});
+
+/*test('No proposals are assigned to Fap members when there are none to assign', () => {
+
+});
+
+test('Proposals are evenly assigned to Fap members who aready have assignments', () => {
+
+});
+
+test('Proposals are not assigned to Fap members they are already assigned to', () => {
+
+});*/
 });

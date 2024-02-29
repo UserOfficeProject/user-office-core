@@ -47,6 +47,30 @@ export class AssignFapReviewersToProposalArgs {
 }
 
 @ArgsType()
+export class AssignFapReviewerToProposalsArgs {
+  @Field(() => Int)
+  public memberId: number;
+
+  @Field(() => Int)
+  public fapId: number;
+
+  @Field(() => [Int])
+  public proposalPks: number[];
+}
+
+@ArgsType()
+export class MassAssignProposalsToFapReviewerArgs {
+  @Field(() => Int)
+  public fapId: number;
+
+  @Field(() => Int)
+  public callId: number;
+
+  @Field(() => [Int])
+  public proposalPks: number[];
+}
+
+@ArgsType()
 export class RemoveFapReviewerFromProposalArgs {
   @Field(() => Int)
   public memberId: number;
