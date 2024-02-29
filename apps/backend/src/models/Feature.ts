@@ -20,6 +20,7 @@ export enum FeatureId {
   SAMPLE_SAFETY = 'SAMPLE_SAFETY',
   OAUTH = 'OAUTH',
   STFC_IDLE_TIMER = 'STFC_IDLE_TIMER',
+  RABBITMQ_MESSAGE_BROKER = 'RABBITMQ_MESSAGE_BROKER',
 }
 
 export enum FeatureUpdateAction {

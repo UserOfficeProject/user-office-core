@@ -232,6 +232,9 @@ export default class AdminMutations {
       return rejection('Could not update features', { agent, args });
     }
 
+    // NOTE: After feature update re-map the dependent config
+    container.resolve<() => void>(Tokens.MapFeatureFlaggedConfig)();
+
     return updatedFeatures;
   }
 

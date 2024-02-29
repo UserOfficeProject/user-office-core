@@ -45,6 +45,12 @@ import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
+function mapFeatureFlaggedConfig() {
+  mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+  mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
+  mapValue(Tokens.EventBus, createApplicationEventBus());
+}
+
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
@@ -87,10 +93,7 @@ mapValue(Tokens.FapDataRow, getDataRow);
 mapValue(Tokens.PopulateRow, populateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
-
-mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
-mapValue(Tokens.EventBus, createApplicationEventBus());
-mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
+mapValue(Tokens.MapFeatureFlaggedConfig, mapFeatureFlaggedConfig);
 
 mapValue(
   Tokens.ConfigureEnvironment,

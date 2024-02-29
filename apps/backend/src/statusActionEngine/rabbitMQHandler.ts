@@ -12,8 +12,7 @@ export const rabbitMQActionHandler = async (
     return;
   }
 
-  const messageDescription =
-    'Proposal event successfully sent to the message broker';
+  const messageDescription = 'Sending proposal event to the message broker';
 
   return await Promise.all(
     config.exchanges.map((exchange) =>

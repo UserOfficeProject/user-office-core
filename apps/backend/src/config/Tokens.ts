@@ -39,4 +39,5 @@ export const Tokens = {
   FapDataColumns: Symbol('FapDataColumns'),
   FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),
+  MapFeatureFlaggedConfig: Symbol('MapFeatureFlaggedConfig'),
 };

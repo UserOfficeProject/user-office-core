@@ -6,6 +6,7 @@ import {
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -16,6 +17,7 @@ import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
+import { FeatureId } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { Instrument } from '../models/Instrument';
 import { Proposal } from '../models/Proposal';
@@ -191,7 +193,28 @@ const getSecondsPerAllocationTimeUnit = (
   }
 };
 
+const isRabbitMqEnabled = async () => {
+  const adminDataSource = container.resolve<AdminDataSource>(
+    Tokens.AdminDataSource
+  );
+  const features = await adminDataSource.getFeatures();
+
+  const isRabbitMqEnabled = features.find(
+    (feature) => feature.id === FeatureId.RABBITMQ_MESSAGE_BROKER
+  )?.isEnabled;
+
+  if (!isRabbitMqEnabled) {
+    logger.logDebug('RabbitMQ message broker disabled', {});
+  }
+
+  return isRabbitMqEnabled;
+};
+
 export async function createPostToRabbitMQHandler() {
+  if (!(await isRabbitMqEnabled())) {
+    return;
+  }
+
   const rabbitMQ = await getRabbitMQMessageBroker();
 
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -286,6 +309,10 @@ export async function createPostToRabbitMQHandler() {
 }
 
 export async function createListenToRabbitMQHandler() {
+  if (!(await isRabbitMqEnabled())) {
+    return;
+  }
+
   const EVENT_SCHEDULING_QUEUE_NAME = process.env
     .EVENT_SCHEDULING_QUEUE_NAME as Queue;
   const SCHEDULER_EXCHANGE_NAME = process.env.SCHEDULER_EXCHANGE_NAME;

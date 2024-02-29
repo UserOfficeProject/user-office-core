@@ -13,6 +13,10 @@ export class EventBus<T extends { type: string }> {
     for (let i = 0; i < this.handlers.length; i++) {
       const handler = await this.handlers[i];
       try {
+        if (!handler) {
+          return;
+        }
+
         await handler(event);
       } catch (err) {
         // Something happened, log it and continue

@@ -82,9 +82,11 @@ async function enableDefaultEssFeatures() {
       FeatureId.VISIT_MANAGEMENT,
       FeatureId.SAMPLE_SAFETY,
       FeatureId.OAUTH,
+      FeatureId.RABBITMQ_MESSAGE_BROKER,
     ],
     true
   );
+  container.resolve<() => void>(Tokens.MapFeatureFlaggedConfig)();
   await db.updateSettings({
     settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
     settingsValue: 'ME',

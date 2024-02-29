@@ -83,6 +83,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.STFC_IDLE_TIMER,
       FeatureId.TECHNICAL_REVIEW,
       FeatureId.FAP_REVIEW,
+      FeatureId.RABBITMQ_MESSAGE_BROKER,
     ],
     true
   );
