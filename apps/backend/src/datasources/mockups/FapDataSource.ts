@@ -71,6 +71,9 @@ export const anotherDummyFapMemberForNoReviewsNeeded = new FapReviewer(2, 4);
 export const dummyFapMemberUnevenAllocation = new FapReviewer(5, 5);
 export const anotherDummyFapMemberUnevenAllocation = new FapReviewer(6, 5);
 
+export const dummyFapMemberAlreadyAssigned = new FapReviewer(7, 6);
+export const dummyFapMemberNotAlreadyAssigned = new FapReviewer(8, 6);
+
 export const dummyFapAssignment = new FapAssignment(
   1,
   2,
@@ -95,6 +98,16 @@ export const andAnotherDummyFapAssignment = new FapAssignment(
   5,
   5,
   5,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false
+);
+
+export const yetAnotherDummyFapAssignment = new FapAssignment(
+  1,
+  7,
+  6,
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
@@ -152,6 +165,27 @@ export const thirdDummyFapProposalForUnevenMassAssignment = new FapProposal(
   null
 );
 
+export const firstDummyFapProposalForAlreadyAssigned = new FapProposal(
+  1,
+  6,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  null
+);
+
+export const secondDummyFapProposalForAlreadyAssigned = new FapProposal(
+  2,
+  6,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  null
+);
+
+export const thirdDummyFapProposalForAlreadyAssigned = new FapProposal(
+  3,
+  6,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  null
+);
+
 export const dummyFapMeetingDecision = new FapMeetingDecision(
   1,
   1,
@@ -166,6 +200,7 @@ export const dummyFapAssignments = [
   dummyFapAssignment,
   anotherDummyFapAssignment,
   andAnotherDummyFapAssignment,
+  yetAnotherDummyFapAssignment,
 ];
 
 export const dummyFapProposals = [dummyFapProposal, anotherDummyFapProposal];
@@ -187,6 +222,11 @@ export const dummyFapMembersUnevenAllocation = [
   anotherDummyFapMemberUnevenAllocation,
 ];
 
+export const dummyFapMembersAlreadyAssigned = [
+  dummyFapMemberAlreadyAssigned,
+  dummyFapMemberNotAlreadyAssigned,
+];
+
 export const dummyFapProposalToNumReviewsNeededMap = new Map<
   FapProposal,
   number
@@ -202,6 +242,15 @@ export const dummyFapProposalToNumReviewsNeededMapUneven = new Map<
   [firstDummyFapProposalForUnevenMassAssignment, 1],
   [secondDummyFapProposalForUnevenMassAssignment, 1],
   [thirdDummyFapProposalForUnevenMassAssignment, 1],
+]);
+
+export const dummyFapProposalToNumReviewsNeededMapAlreadyAssigned = new Map<
+  FapProposal,
+  number
+>([
+  [firstDummyFapProposalForAlreadyAssigned, 1],
+  [secondDummyFapProposalForAlreadyAssigned, 1],
+  [thirdDummyFapProposalForAlreadyAssigned, 1],
 ]);
 
 export const dummyFapProposalToNoReviewsNeededMap = new Map<
@@ -459,6 +508,9 @@ export class FapDataSourceMock implements FapDataSource {
       case 5:
         fapMembers = dummyFapMembersUnevenAllocation;
         break;
+      case 6:
+        fapMembers = dummyFapMembersAlreadyAssigned;
+        break;
       default:
         fapMembers = dummyFapMembers;
         break;
@@ -536,6 +588,11 @@ export class FapDataSourceMock implements FapDataSource {
       case 5:
         fapProposalToNumReviewsNeededMap = new Map(
           dummyFapProposalToNumReviewsNeededMapUneven
+        );
+        break;
+      case 6:
+        fapProposalToNumReviewsNeededMap = new Map(
+          dummyFapProposalToNumReviewsNeededMapAlreadyAssigned
         );
         break;
       default:
