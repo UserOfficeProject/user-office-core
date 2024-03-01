@@ -57,9 +57,8 @@ export default class ReviewQueries {
     agent: UserWithRole | null,
     proposalPk: number
   ): Promise<TechnicalReview | null> {
-    const technicalreview = await this.dataSource.getTechnicalReview(
-      proposalPk
-    );
+    const technicalreview =
+      await this.dataSource.getTechnicalReview(proposalPk);
 
     if (!technicalreview) {
       return null;

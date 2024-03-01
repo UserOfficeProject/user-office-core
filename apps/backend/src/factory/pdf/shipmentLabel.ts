@@ -162,9 +162,8 @@ const getScheduledEvent = async (scheduledEventId: number) => {
     Tokens.ScheduledEventDataSource
   );
 
-  const scheduledEvent = await dataSource.getScheduledEventCore(
-    scheduledEventId
-  );
+  const scheduledEvent =
+    await dataSource.getScheduledEventCore(scheduledEventId);
   if (!scheduledEvent) {
     throw new Error(`User not found for userId: ${scheduledEventId}`);
   }

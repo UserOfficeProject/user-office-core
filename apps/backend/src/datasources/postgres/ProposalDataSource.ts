@@ -1,5 +1,4 @@
 import { logger } from '@user-office-software/duo-logger';
-import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { injectable } from 'tsyringe';
@@ -211,7 +210,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async setProposalUsers(proposalPk: number, users: number[]): Promise<void> {
+  async setProposalUsers(proposalPk: number, userIds: number[]): Promise<void> {
     return database.transaction(async (trx) => {
       return database
         .from('proposal_user')
@@ -219,12 +218,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         .del()
         .transacting(trx)
         .then(() => {
-          return BluePromise.map(users, (user_id: number) => {
-            return database
-              .insert({ proposal_pk: proposalPk, user_id: user_id })
-              .into('proposal_user')
-              .transacting(trx);
-          });
+          return Promise.all(
+            userIds.map((userId) =>
+              database
+                .insert({ proposal_pk: proposalPk, user_id: userId })
+                .into('proposal_user')
+                .transacting(trx)
+            )
+          );
         })
         .then(() => {
           trx.commit;

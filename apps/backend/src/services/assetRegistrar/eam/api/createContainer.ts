@@ -42,9 +42,8 @@ async function getAnswer(
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
-  const question = await templateDataSource.getQuestionByNaturalKey(
-    questionKey
-  );
+  const question =
+    await templateDataSource.getQuestionByNaturalKey(questionKey);
   if (!question) {
     throw createAndLogError(
       `Template is not properly configured. Question ${questionKey} not found`,

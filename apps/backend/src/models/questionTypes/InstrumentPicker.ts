@@ -14,7 +14,10 @@ import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
 export class InstrumentOptionClass {
-  constructor(public id: number, public name: string) {}
+  constructor(
+    public id: number,
+    public name: string
+  ) {}
 }
 
 export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
@@ -84,9 +87,8 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       const instrumentMutations = container.resolve(InstrumentMutations);
       const fapMutation = container.resolve(FapMutations);
 
-      const proposal = await proposalDataSource.getByQuestionaryId(
-        questionaryId
-      );
+      const proposal =
+        await proposalDataSource.getByQuestionaryId(questionaryId);
 
       if (!proposal) {
         throw new GraphQLError('Proposal not found');

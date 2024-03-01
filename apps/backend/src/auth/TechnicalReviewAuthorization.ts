@@ -24,9 +24,8 @@ export class TechnicalReviewAuthorization {
       return false;
     }
 
-    const technicalReview = await this.reviewDataSource.getTechnicalReviewById(
-      technicalReviewId
-    );
+    const technicalReview =
+      await this.reviewDataSource.getTechnicalReviewById(technicalReviewId);
 
     if (
       technicalReview &&
@@ -49,9 +48,8 @@ export class TechnicalReviewAuthorization {
 
     if (typeof technicalreviewOrProposalPk === 'number') {
       const proposalPk = technicalreviewOrProposalPk;
-      technicalreview = await this.reviewDataSource.getTechnicalReview(
-        proposalPk
-      );
+      technicalreview =
+        await this.reviewDataSource.getTechnicalReview(proposalPk);
     } else {
       technicalreview = technicalreviewOrProposalPk;
     }

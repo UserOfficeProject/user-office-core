@@ -42,9 +42,8 @@ export default class InstrumentQueries {
     if (!callIds || callIds.length === 0) {
       return await this.dataSource.getInstruments();
     } else {
-      const instrumentsByCallIds = await this.dataSource.getInstrumentsByCallId(
-        callIds
-      );
+      const instrumentsByCallIds =
+        await this.dataSource.getInstrumentsByCallId(callIds);
 
       return {
         totalCount: instrumentsByCallIds.length,

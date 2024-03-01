@@ -160,9 +160,8 @@ export default class InstrumentMutations {
     const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
 
     for await (const proposalPk of proposalPks) {
-      const technicalReview = await this.reviewDataSource.getTechnicalReview(
-        proposalPk
-      );
+      const technicalReview =
+        await this.reviewDataSource.getTechnicalReview(proposalPk);
 
       if (technicalReview) {
         await this.proposalDataSource.updateProposalTechnicalReviewer({

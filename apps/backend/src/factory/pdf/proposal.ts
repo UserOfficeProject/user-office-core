@@ -72,9 +72,8 @@ const getSampleQuestionarySteps = async (
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
-  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
-    questionaryId
-  );
+  const questionarySteps =
+    await questionaryDataSource.getQuestionarySteps(questionaryId);
   if (!questionarySteps) {
     throw new Error(
       `Questionary steps for Questionary ID '${questionaryId}' not found, or the user has insufficient rights`
