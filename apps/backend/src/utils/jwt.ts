@@ -5,8 +5,8 @@ import jsonwebtoken, {
   VerifyOptions,
 } from 'jsonwebtoken';
 
-const secret = process.env.secret as string;
-const expiresIn = process.env.tokenLife as string;
+const secret = process.env.JWT_SECRET as string;
+const expiresIn = process.env.JWT_TOKEN_LIFE as string;
 
 if (!secret) {
   logger.logError(
