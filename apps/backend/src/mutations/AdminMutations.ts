@@ -32,7 +32,9 @@ const IS_BACKEND_VALIDATION = true;
 @injectable()
 export default class AdminMutations {
   constructor(
-    @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
+    @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource,
+    @inject(Tokens.MapFeatureFlaggedConfig)
+    private featureFlaggedConfig: () => void
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -233,7 +235,7 @@ export default class AdminMutations {
     }
 
     // NOTE: After feature update re-map the dependent config
-    container.resolve<() => void>(Tokens.MapFeatureFlaggedConfig)();
+    this.featureFlaggedConfig();
 
     return updatedFeatures;
   }

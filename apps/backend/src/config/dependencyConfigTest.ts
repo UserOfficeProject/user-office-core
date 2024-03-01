@@ -76,6 +76,10 @@ mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
+mapValue(Tokens.MapFeatureFlaggedConfig, () => {
+  // no op
+});
+
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.EventBus, jest.mocked(new EventBus()));
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());

@@ -46,6 +46,11 @@ import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
+function mapFeatureFlaggedConfig() {
+  mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+  mapValue(Tokens.EventBus, createApplicationEventBus());
+}
+
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
@@ -89,8 +94,7 @@ mapValue(Tokens.PopulateRow, populateStfcRow);
 
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 
-mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
-mapValue(Tokens.EventBus, createApplicationEventBus());
+mapValue(Tokens.MapFeatureFlaggedConfig, mapFeatureFlaggedConfig);
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
