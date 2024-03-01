@@ -89,6 +89,9 @@ mapValue(Tokens.EmailEventHandler, essEmailHandler);
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
+mapValue(Tokens.MapFeatureFlaggedConfig, () => {
+  // no op
+});
 
 mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
