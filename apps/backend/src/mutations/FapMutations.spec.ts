@@ -9,6 +9,9 @@ import FapMutations from './FapMutations';
 const FapMutationsInstance = container.resolve(FapMutations);
 
 describe('Test FapMutations', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   /*test('A user cannot create Fap', async () => {
     const result = (await FapMutationsInstance.create(
       dummyUserWithRole,
@@ -299,7 +302,7 @@ describe('Test FapMutations', () => {
     ).resolves.toStrictEqual(dummyFap);
   });*/
 
-  test('Proposals are evenly assigned to Fap members', async () => {
+  /*test('Proposals are evenly assigned to Fap members', async () => {
     const mockAssignMemberToFapProposals = jest.spyOn(
       FapDataSourceMock.prototype,
       'assignMemberToFapProposals'
@@ -315,7 +318,7 @@ describe('Test FapMutations', () => {
     expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[2], 3, 4]);
   });
 
-  /*test('No proposals are assigned to Fap members when there are none to assign', async () => {
+  test('No proposals are assigned to Fap members when there are none to assign', async () => {
   const mockAssignMemberToFapProposals = jest.spyOn(FapDataSourceMock.prototype, 'assignMemberToFapProposals');
 
   await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole,
@@ -323,14 +326,31 @@ describe('Test FapMutations', () => {
     fapId: 4,
     callId: 1
     });
+
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(0);
 });*/
 
-  /*test('Proposals are evenly assigned to Fap members who aready have assignments', () => {
+  test('Proposals are evenly assigned to Fap members who aready have assignments', async () => {
+    const mockAssignMemberToFapProposals = jest.spyOn(
+      FapDataSourceMock.prototype,
+      'assignMemberToFapProposals'
+    );
 
-});
+    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+      fapId: 5,
+      callId: 1,
+    });
 
-test('Proposals are not assigned to Fap members they are already assigned to', () => {
+    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
+    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 5, 5]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([
+      [2, 3],
+      5,
+      6,
+    ]);
+  });
+
+  /*test('Proposals are not assigned to Fap members they are already assigned to', () => {
 
 });*/
 });

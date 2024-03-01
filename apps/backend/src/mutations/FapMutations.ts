@@ -501,18 +501,19 @@ export default class FapMutations {
           i++;
         }
       }
-
-      await this.assignFapReviewerToProposals(agent, {
-        memberId: reviewer.userId,
-        fapId: args.fapId,
-        proposalPks: reviewsToAssign,
-      }).catch((err) => {
-        return rejection(
-          'Can not assign proposal to facility access panel',
-          { agent },
-          err
-        );
-      });
+      if (reviewsToAssign.length > 0) {
+        await this.assignFapReviewerToProposals(agent, {
+          memberId: reviewer.userId,
+          fapId: args.fapId,
+          proposalPks: reviewsToAssign,
+        }).catch((err) => {
+          return rejection(
+            'Can not assign proposal to facility access panel',
+            { agent },
+            err
+          );
+        });
+      }
     }
 
     const updatedFap = await this.dataSource.getFap(args.fapId);
