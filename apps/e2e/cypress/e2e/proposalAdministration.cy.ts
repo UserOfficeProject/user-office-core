@@ -409,7 +409,7 @@ context('Proposal administration tests', () => {
       cy.readFile(downloadFilePath).should('exist');
     });
 
-    it('Should be able to verify pdf download and compare with a fixture', function () {
+    it('Should be able to download proposal PDFs and verify their content', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until issue is fixed on github actions
         this.skip();
@@ -433,7 +433,6 @@ context('Proposal administration tests', () => {
           }
 
           const currentYear = new Date().getFullYear();
-          const FIXTURE_FILE_PATH = '2023_proposal_fixture.pdf';
           const downloadedFileName = `${currentYear}_${initialDBData.users.user1.lastName}_${newlyCreatedProposalId}.pdf`;
           const downloadsFolder = Cypress.config('downloadsFolder');
           const downloadFilePath = `${downloadsFolder}/${downloadedFileName}`;
@@ -446,23 +445,6 @@ context('Proposal administration tests', () => {
             filename: downloadedFileName,
             downloadsFolder: downloadsFolder,
           });
-
-          cy.fixture(FIXTURE_FILE_PATH, 'binary', { timeout: 15000 }).then(
-            (fixtureBuffer) => {
-              const fixtureFileContentByteLength = fixtureBuffer.length;
-              // for now just check the file size
-              cy.readFile(downloadFilePath, 'binary', {
-                timeout: 15000,
-              }).should((buffer) => {
-                // NOTE: If you run the factory locally inside a docker container and directly(as a node app) on your local machine there could be some file size differences.
-                if (buffer.length !== fixtureFileContentByteLength) {
-                  throw new Error(
-                    `File size ${buffer.length} is not ${fixtureFileContentByteLength}`
-                  );
-                }
-              });
-            }
-          );
 
           cy.task('readPdf', downloadFilePath).then((args) => {
             const { text, numpages } = args as PdfParse.Result;

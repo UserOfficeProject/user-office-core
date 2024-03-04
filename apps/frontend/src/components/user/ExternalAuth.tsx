@@ -120,12 +120,14 @@ function ExternalAuth() {
       const redirectURL = queryParams.size
         ? `/?${queryParams.toString()}`
         : '/';
+      const iss = queryParams.get('iss');
       setView(<ContactingAuthorizationServerMessage />);
 
       unauthorizedApi()
         .externalTokenLogin({
           externalToken: authorizationCode,
           redirectUri: currentUrlWithoutParams,
+          iss: iss,
         })
         .then(({ externalTokenLogin }) => {
           handleLogin(externalTokenLogin);
