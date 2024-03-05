@@ -82,6 +82,7 @@ async function enableDefaultEssFeatures() {
       FeatureId.VISIT_MANAGEMENT,
       FeatureId.SAMPLE_SAFETY,
       FeatureId.OAUTH,
+      FeatureId.USER_SURNAME_SEARCH_FILTER,
     ],
     true
   );

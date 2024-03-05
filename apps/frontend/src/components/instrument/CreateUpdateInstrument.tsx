@@ -5,16 +5,22 @@ import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
 } from '@user-office-software/duo-validation/lib/Instrument';
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikProps } from 'formik';
 import { TextField } from 'formik-mui';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
-import { BasicUserDetailsFragment, InstrumentFragment } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import {
+  BasicUserDetailsFragment,
+  FeatureId,
+  InstrumentFragment,
+  UserRole,
+} from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserNameWithEmail } from 'utils/user';
 
@@ -27,6 +33,10 @@ const CreateUpdateInstrument = ({
   close,
   instrument,
 }: CreateUpdateInstrumentProps) => {
+  const featureContext = useContext(FeatureContext);
+  const isUserSurnameSearchEnabled = !!featureContext.featuresMap.get(
+    FeatureId.USER_SURNAME_SEARCH_FILTER
+  )?.isEnabled;
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const [usersData, setUsersData] = useState(
@@ -43,7 +53,17 @@ const CreateUpdateInstrument = ({
         surname: '',
       };
 
-  const findUser = async (
+  useEffect(() => {
+    if (!isUserSurnameSearchEnabled) {
+      api()
+        .getUsers({ userRole: UserRole.INSTRUMENT_SCIENTIST })
+        .then((data) => {
+          setUsersData(data.users?.users || []);
+        });
+    }
+  }, [isUserSurnameSearchEnabled, api]);
+
+  const findUserBySurname = async (
     value: string,
     setFieldError: (field: string, message: string | undefined) => void
   ) => {
@@ -64,6 +84,36 @@ const CreateUpdateInstrument = ({
     } catch (error) {
       close(null);
     }
+  };
+
+  const SurnameSearchField = (
+    formikProps: FormikProps<typeof initialValues>
+  ) => {
+    const { values, setFieldError } = formikProps;
+
+    return isUserSurnameSearchEnabled ? (
+      <Stack direction="row" spacing={1} alignItems="baseline">
+        <Field
+          id="surname"
+          name="surname"
+          label="Surname"
+          type="text"
+          component={TextField}
+          fullWidth
+          flex="1"
+          data-cy="beamline-manager-surname"
+        />
+        <Button
+          data-cy="findUser"
+          type="button"
+          disabled={!values.surname}
+          onClick={() => findUserBySurname(values.surname, setFieldError)}
+          sx={{ minWidth: 'fit-content' }}
+        >
+          Find User
+        </Button>
+      </Stack>
+    ) : null;
   };
 
   return (
@@ -105,7 +155,7 @@ const CreateUpdateInstrument = ({
           : createInstrumentValidationSchema
       }
     >
-      {({ values, setFieldError }) => (
+      {(formikProps) => (
         <Form>
           <Typography variant="h6" component="h1">
             {(instrument ? 'Update ' : 'Create new ') +
@@ -147,27 +197,7 @@ const CreateUpdateInstrument = ({
             disabled={isExecutingCall}
             required
           />
-          <Stack direction="row" spacing={1} alignItems="baseline">
-            <Field
-              id="surname"
-              name="surname"
-              label="Surname"
-              type="text"
-              component={TextField}
-              fullWidth
-              flex="1"
-              data-cy="beamline-manager-surname"
-            />
-            <Button
-              data-cy="findUser"
-              type="button"
-              disabled={!values.surname}
-              onClick={() => findUser(values.surname, setFieldError)}
-              sx={{ minWidth: 'fit-content' }}
-            >
-              Find User
-            </Button>
-          </Stack>
+          <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
             label="Beamline manager"
