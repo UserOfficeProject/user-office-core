@@ -205,24 +205,15 @@ export const dummyFapAssignments = [
 
 export const dummyFapProposals = [dummyFapProposal, anotherDummyFapProposal];
 
-export const dummyFapMembers = [dummyFapMember, anotherDummyFapMember];
-
-export const dummyFapMembersWithNoReviews = [
+export const dummyFapMembers = [
+  dummyFapMember,
+  anotherDummyFapMember,
   dummyFapMemberWithNoReviews,
   anotherDummyFapMemberWithNoReviews,
-];
-
-export const dummyFapMembersForNoReviewsNeeded = [
   dummyFapMemberForNoReviewsNeeded,
   anotherDummyFapMemberForNoReviewsNeeded,
-];
-
-export const dummyFapMembersUnevenAllocation = [
   dummyFapMemberUnevenAllocation,
   anotherDummyFapMemberUnevenAllocation,
-];
-
-export const dummyFapMembersAlreadyAssigned = [
   dummyFapMemberAlreadyAssigned,
   dummyFapMemberNotAlreadyAssigned,
 ];
@@ -497,26 +488,7 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getReviewers(fapId: number) {
-    let fapMembers: FapReviewer[];
-    switch (fapId) {
-      case 3:
-        fapMembers = dummyFapMembersWithNoReviews;
-        break;
-      case 4:
-        fapMembers = dummyFapMembersForNoReviewsNeeded;
-        break;
-      case 5:
-        fapMembers = dummyFapMembersUnevenAllocation;
-        break;
-      case 6:
-        fapMembers = dummyFapMembersAlreadyAssigned;
-        break;
-      default:
-        fapMembers = dummyFapMembers;
-        break;
-    }
-
-    return fapMembers.filter((member) => member.fapId === fapId);
+    return dummyFapMembers.filter((member) => member.fapId === fapId);
   }
 
   async getFapUsersByProposalPkAndCallId(proposalPk: number, callId: number) {
@@ -579,7 +551,7 @@ export class FapDataSourceMock implements FapDataSource {
     throw new Error(`Fap not found ${fapId}`);
   }
 
-  async getFapProposalToNumReviewsNeededMap(fapId: number, callId: number) {
+  async getFapProposalToNumReviewsNeededMap(fapId: number) {
     let fapProposalToNumReviewsNeededMap: Map<FapProposal, number>;
     switch (fapId) {
       case 4:

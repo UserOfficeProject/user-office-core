@@ -106,8 +106,7 @@ export interface FapDataSource {
     memberId: number
   ): Promise<Fap>;
   getFapProposalToNumReviewsNeededMap(
-    fapId: number,
-    callId: number
+    fapId: number
   ): Promise<Map<FapProposal, number>>;
   updateTimeAllocation(
     fapId: number,

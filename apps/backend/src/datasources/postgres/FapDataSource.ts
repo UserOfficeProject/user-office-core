@@ -834,11 +834,26 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${fapId}`);
   }
 
-  async getFapProposalToNumReviewsNeededMap(fapId: number, callId: number) {
+  async getCallInReviewForFap(fapId: number) {
+    const callFilter = {
+      isEnded: true,
+      isFapReviewEnded: false,
+      fapIds: [fapId],
+    };
+
+    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
+      (call) => call.id
+    );
+
+    return callIds[0];
+  }
+
+  async getFapProposalToNumReviewsNeededMap(fapId: number) {
     const fap = await this.getFap(fapId);
     const numReviewsRequired = fap
       ? fap.numberRatingsRequired
       : DEFAULT_NUM_REVIEWS_REQUIRED;
+    const callId = await this.getCallInReviewForFap(fapId);
     const fapProposals = await this.getFapProposals(fapId, callId);
     const fapReviews = await this.getFapReviewsByCallAndFap(callId, fapId);
 

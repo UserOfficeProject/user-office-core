@@ -59,12 +59,9 @@ export class AssignFapReviewerToProposalsArgs {
 }
 
 @ArgsType()
-export class MassAssignProposalsToFapReviewerArgs {
+export class MassAssignReviewsArgs {
   @Field(() => Int)
   public fapId: number;
-
-  @Field(() => Int)
-  public callId: number;
 }
 
 @ArgsType()
@@ -144,6 +141,14 @@ export class AssignMembersToFapMutation {
       context.user,
       args
     );
+  }
+
+  @Mutation(() => Fap)
+  async massAssignReviews(
+    @Args() args: MassAssignReviewsArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.mutations.fap.massAssignReviews(context.user, args);
   }
 
   @Mutation(() => Fap)

@@ -297,7 +297,6 @@ describe('Test FapMutations', () => {
       dummyUserWithRole,
       {
         fapId: 1,
-        callId: 1,
       }
     )) as Rejection;
 
@@ -308,7 +307,6 @@ describe('Test FapMutations', () => {
     return expect(
       FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
         fapId: 1,
-        callId: 1,
       })
     ).resolves.toStrictEqual(dummyFap);
   });
@@ -321,7 +319,6 @@ describe('Test FapMutations', () => {
 
     await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
       fapId: 3,
-      callId: 1,
     });
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
 
@@ -337,7 +334,6 @@ describe('Test FapMutations', () => {
 
     await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
       fapId: 4,
-      callId: 1,
     });
 
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(0);
@@ -351,7 +347,6 @@ describe('Test FapMutations', () => {
 
     await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
       fapId: 5,
-      callId: 1,
     });
 
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
@@ -371,7 +366,6 @@ describe('Test FapMutations', () => {
 
     await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
       fapId: 6,
-      callId: 1,
     });
 
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);

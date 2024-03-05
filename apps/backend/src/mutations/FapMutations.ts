@@ -32,7 +32,7 @@ import {
   AssignReviewersToFapArgs,
   RemoveFapReviewerFromProposalArgs,
   AssignChairOrSecretaryToFapArgs,
-  MassAssignProposalsToFapReviewerArgs,
+  MassAssignReviewsArgs,
   AssignFapReviewerToProposalsArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
@@ -409,9 +409,10 @@ export default class FapMutations {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
+  @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async massAssignReviews(
     agent: UserWithRole | null,
-    args: MassAssignProposalsToFapReviewerArgs
+    args: MassAssignReviewsArgs
   ): Promise<Fap | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -428,10 +429,7 @@ export default class FapMutations {
     const numReviewsToAssignToReviewer = new Map<FapReviewer, number>();
     const reviewers = await this.dataSource.getReviewers(args.fapId);
     const reviewsNeededMap =
-      await this.dataSource.getFapProposalToNumReviewsNeededMap(
-        args.fapId,
-        args.callId
-      );
+      await this.dataSource.getFapProposalToNumReviewsNeededMap(args.fapId);
 
     for (const reviewer of reviewers) {
       reviewersAssignedReviewsMap.set(
