@@ -35,7 +35,7 @@ const CreateUpdateInstrument = ({
 }: CreateUpdateInstrumentProps) => {
   const featureContext = useContext(FeatureContext);
   const isUserSurnameSearchEnabled = !!featureContext.featuresMap.get(
-    FeatureId.USER_SURNAME_SEARCH_FILTER
+    FeatureId.USER_SEARCH_FILTER
   )?.isEnabled;
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
