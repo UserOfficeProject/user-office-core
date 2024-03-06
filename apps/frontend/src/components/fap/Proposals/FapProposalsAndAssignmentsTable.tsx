@@ -3,11 +3,12 @@ import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
-import { IconButton, Tooltip, Typography } from '@mui/material';
+import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import React, { useContext, useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { useCheckAccess } from 'components/common/Can';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -20,7 +21,14 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
-import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
+import {
+  UserRole,
+  Review,
+  SettingsId,
+  Fap,
+  GetFapMembersQuery,
+  Maybe,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import {
   useFapProposalsData,
@@ -251,6 +259,111 @@ const FapProposalsAndAssignmentsTable = ({
       description:
         'Are you sure you want to remove the selected proposal/s from this Fap?',
     })();
+  };
+
+  const convertToFapAssignedMember = (
+    getFapMembersQuery: GetFapMembersQuery
+  ) => {
+    const fapAssignedMembers: FapAssignedMember[] = [];
+    if (getFapMembersQuery.fapMembers === null) {
+      return fapAssignedMembers;
+    }
+    for (const fapMember of getFapMembersQuery.fapMembers) {
+      const fapAssignedMember: FapAssignedMember = {
+        ...fapMember.user,
+        role: fapMember.role,
+      };
+    }
+
+    return fapAssignedMembers;
+  };
+
+  const handleUndefinedValue = <T,>(
+    value: T | null | undefined,
+    defaultValue: T
+  ): Maybe<T> => {
+    return value !== undefined ? value : defaultValue;
+  };
+
+  const massAssignFapProposalsToMembers = async () => {
+    const fapMembers = convertToFapAssignedMember(
+      await api().getFapMembers({
+        fapId: data.id,
+      })
+    );
+
+    const callInReview = (
+      await api().getCallInReviewForFap({
+        fapId: data.id,
+      })
+    ).callInReviewForFap;
+
+    const fapProposals =
+      (await api().getFapProposals({ fapId: data.id, callId: callInReview }))
+        .fapProposals || [];
+
+    await api({
+      toastSuccessMessage: 'Members assigned',
+    }).massAssignReviews({
+      fapId: data.id,
+    });
+
+    const updatedFap = await api().getFap({ id: data.id });
+
+    /*setFapProposalsData((fapProposalData) =>
+      fapProposalData.map((proposalItem) => {
+        if (proposalItem.proposalPk === proposalPk) {
+          const newAssignments: FapProposalAssignmentType[] = [
+            ...(proposalItem.assignments ?? []),
+            ...fapMembers.map(({ role = null, ...user }) => ({
+              proposalPk: proposalItem.proposalPk,
+              fapMemberUserId: user.id,
+              dateAssigned: DateTime.now(),
+              user,
+              role,
+              review:
+                proposalReviews.find(({ userID }) => userID === user.id) ??
+                null,
+            })),
+          ];
+
+          return {
+            ...proposalItem,
+            assignments: newAssignments,
+          };
+        } else {
+          return proposalItem;
+        }
+      })
+    );*/
+
+    onAssignmentsUpdate({
+      ...data,
+      fapChairProposalCount: fapMembers.find(
+        (assignedMember) => assignedMember.id === data.fapChair?.id
+      )
+        ? handleUndefinedValue(
+            updatedFap.fap?.fapChairProposalCount,
+            data.fapChairProposalCount
+          )
+        : data.fapChairProposalCount,
+      fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
+        (value, index) => {
+          const fapSecretariesProposalCount =
+            updatedFap.fap?.fapSecretariesProposalCounts[index].count ||
+            value.count;
+
+          return {
+            userId: value.userId,
+            count: fapMembers.find(
+              (assignedMember) => assignedMember.id === value.userId
+            )
+              ? fapSecretariesProposalCount
+              : value.count,
+          };
+        }
+      ),
+    });
   };
 
   const assignMemberToFapProposal = async (
@@ -608,6 +721,17 @@ const FapProposalsAndAssignmentsTable = ({
             },
           }}
         />
+        {hasRightToAssignReviewers ? (
+          <ActionButtonContainer>
+            <Button
+              type="button"
+              onClick={() => assignMemberToFapProposal([])}
+              data-cy="mass-assign-reviews"
+            >
+              Assign all reviews
+            </Button>
+          </ActionButtonContainer>
+        ) : null}
       </div>
     </>
   );

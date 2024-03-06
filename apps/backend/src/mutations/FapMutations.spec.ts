@@ -253,45 +253,6 @@ describe('Test FapMutations', () => {
     ).resolves.toStrictEqual(dummyFap);
   });
 
-  test('A user can not assign proposals to Fap member', async () => {
-    const result = (await FapMutationsInstance.assignFapReviewerToProposals(
-      dummyUserWithRole,
-      {
-        proposalPks: [1],
-        fapId: 1,
-        memberId: 1,
-      }
-    )) as Rejection;
-
-    return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
-  });
-
-  test('A userofficer can assign proposals to Fap member', async () => {
-    return expect(
-      FapMutationsInstance.assignFapReviewerToProposals(
-        dummyUserOfficerWithRole,
-        {
-          proposalPks: [1],
-          fapId: 1,
-          memberId: 1,
-        }
-      )
-    ).resolves.toStrictEqual(dummyFap);
-  });
-
-  test('A userofficer can assign proposals to Fap members', () => {
-    return expect(
-      FapMutationsInstance.assignFapReviewerToProposals(
-        dummyUserOfficerWithRole,
-        {
-          proposalPks: [1],
-          fapId: 1,
-          memberId: 1,
-        }
-      )
-    ).resolves.toStrictEqual(dummyFap);
-  });
-
   test('A user can not mass assign proposals to Fap members', async () => {
     const result = (await FapMutationsInstance.massAssignReviews(
       dummyUserWithRole,

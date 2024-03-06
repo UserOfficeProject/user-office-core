@@ -1,0 +1,9 @@
+mutation massAssignReviews(
+  $fapId: Int!
+) {
+  massAssignReviews(
+    fapId: $fapId
+  ) {
+    id
+  }
+}

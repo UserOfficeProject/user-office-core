@@ -613,4 +613,8 @@ export class FapDataSourceMock implements FapDataSource {
   async getRelatedUsersOnFap(id: number): Promise<number[]> {
     return [];
   }
+
+  async getCallInReviewForFap(fapId: number): Promise<number> {
+    return 1;
+  }
 }

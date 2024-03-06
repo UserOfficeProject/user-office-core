@@ -33,7 +33,6 @@ import {
   RemoveFapReviewerFromProposalArgs,
   AssignChairOrSecretaryToFapArgs,
   MassAssignReviewsArgs,
-  AssignFapReviewerToProposalsArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
   AssignProposalsToFapArgs,
@@ -383,33 +382,6 @@ export default class FapMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async assignFapReviewerToProposals(
-    agent: UserWithRole | null,
-    args: AssignFapReviewerToProposalsArgs
-  ): Promise<Fap | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
-      return rejection(
-        'Can not assign Fap reviewers to proposal because of insufficient permissions',
-        { agent, args }
-      );
-    }
-
-    return this.dataSource
-      .assignMemberToFapProposals(args.proposalPks, args.fapId, args.memberId)
-      .catch((err) => {
-        return rejection(
-          'Can not assign proposal to facility access panel',
-          { agent },
-          err
-        );
-      });
-  }
-
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
-  @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async massAssignReviews(
     agent: UserWithRole | null,
     args: MassAssignReviewsArgs
@@ -500,17 +472,19 @@ export default class FapMutations {
         }
       }
       if (reviewsToAssign.length > 0) {
-        await this.assignFapReviewerToProposals(agent, {
-          memberId: reviewer.userId,
-          fapId: args.fapId,
-          proposalPks: reviewsToAssign,
-        }).catch((err) => {
-          return rejection(
-            'Can not assign proposal to facility access panel',
-            { agent },
-            err
-          );
-        });
+        this.dataSource
+          .assignMemberToFapProposals(
+            reviewsToAssign,
+            args.fapId,
+            reviewer.userId
+          )
+          .catch((err) => {
+            return rejection(
+              'Can not assign proposal to facility access panel',
+              { agent },
+              err
+            );
+          });
       }
     }
 

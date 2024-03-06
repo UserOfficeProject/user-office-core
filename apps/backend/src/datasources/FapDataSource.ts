@@ -129,4 +129,5 @@ export interface FapDataSource {
     proposalPks: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]>;
   getRelatedUsersOnFap(id: number): Promise<number[]>;
+  getCallInReviewForFap(fapId: number): Promise<number>;
 }

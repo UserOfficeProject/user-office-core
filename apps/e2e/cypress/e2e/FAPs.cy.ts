@@ -493,7 +493,7 @@ context('Fap reviews tests', () => {
       });
     });
 
-    it.only('Should be able to see how many proposals are assigned to a reviewer', () => {
+    it('Should be able to see how many proposals are assigned to a reviewer', () => {
       cy.assignProposalsToFap({
         fapId: createdFapId,
         proposals: [
