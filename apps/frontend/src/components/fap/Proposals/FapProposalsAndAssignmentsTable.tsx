@@ -273,6 +273,7 @@ const FapProposalsAndAssignmentsTable = ({
         ...fapMember.user,
         role: fapMember.role,
       };
+      fapAssignedMembers.push(fapAssignedMember);
     }
 
     return fapAssignedMembers;
@@ -286,6 +287,14 @@ const FapProposalsAndAssignmentsTable = ({
   };
 
   const massAssignFapProposalsToMembers = async () => {
+    await api({
+      toastSuccessMessage: 'Members assigned',
+    }).massAssignReviews({
+      fapId: data.id,
+    });
+
+    const updatedFap = await api().getFap({ id: data.id });
+
     const fapMembers = convertToFapAssignedMember(
       await api().getFapMembers({
         fapId: data.id,
@@ -298,34 +307,19 @@ const FapProposalsAndAssignmentsTable = ({
       })
     ).callInReviewForFap;
 
-    const fapProposals =
+    const updatedFapProposals =
       (await api().getFapProposals({ fapId: data.id, callId: callInReview }))
         .fapProposals || [];
 
-    await api({
-      toastSuccessMessage: 'Members assigned',
-    }).massAssignReviews({
-      fapId: data.id,
-    });
-
-    const updatedFap = await api().getFap({ id: data.id });
-
-    /*setFapProposalsData((fapProposalData) =>
+    setFapProposalsData((fapProposalData) =>
       fapProposalData.map((proposalItem) => {
-        if (proposalItem.proposalPk === proposalPk) {
-          const newAssignments: FapProposalAssignmentType[] = [
-            ...(proposalItem.assignments ?? []),
-            ...fapMembers.map(({ role = null, ...user }) => ({
-              proposalPk: proposalItem.proposalPk,
-              fapMemberUserId: user.id,
-              dateAssigned: DateTime.now(),
-              user,
-              role,
-              review:
-                proposalReviews.find(({ userID }) => userID === user.id) ??
-                null,
-            })),
-          ];
+        const updatedProposalDataItem = updatedFapProposals.find(
+          (updatedFapProposal) =>
+            updatedFapProposal.proposalPk === proposalItem.proposalPk
+        );
+        if (updatedProposalDataItem?.assignments != null) {
+          const newAssignments: FapProposalAssignmentType[] =
+            updatedProposalDataItem.assignments;
 
           return {
             ...proposalItem,
@@ -335,7 +329,7 @@ const FapProposalsAndAssignmentsTable = ({
           return proposalItem;
         }
       })
-    );*/
+    );
 
     onAssignmentsUpdate({
       ...data,
@@ -725,8 +719,9 @@ const FapProposalsAndAssignmentsTable = ({
           <ActionButtonContainer>
             <Button
               type="button"
-              onClick={() => assignMemberToFapProposal([])}
+              onClick={() => massAssignFapProposalsToMembers()}
               data-cy="mass-assign-reviews"
+              disabled={!FapProposalsData.length}
             >
               Assign all reviews
             </Button>
