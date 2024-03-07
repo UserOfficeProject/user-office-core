@@ -31,7 +31,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       .filter((id: number) => !isNaN(id));
 
     const meta: MetaBase = {
-      collectionFilename: `proposals_${getCurrentTimestamp()}.pdf`,
+      collectionFilename: `proposals_${getCurrentTimestamp()}`,
       singleFilename: '',
     };
 
