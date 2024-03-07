@@ -189,8 +189,4 @@ export default class FapQueries {
   async getProposalsFaps(agent: UserWithRole | null, proposalPks: number[]) {
     return await this.dataSource.getFapsByProposalPks(proposalPks);
   }
-
-  async getCallInReviewForFap(agent: UserWithRole | null, fapId: number) {
-    return await this.dataSource.getCallInReviewForFap(fapId);
-  }
 }

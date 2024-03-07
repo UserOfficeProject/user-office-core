@@ -65,12 +65,4 @@ export class FapQuery {
       callId,
     });
   }
-
-  @Query(() => Number, { nullable: true })
-  async callInReviewForFap(
-    @Arg('fapId', () => Int) fapId: number,
-    @Ctx() context: ResolverContext
-  ): Promise<number | null> {
-    return context.queries.fap.getCallInReviewForFap(context.user, fapId);
-  }
 }

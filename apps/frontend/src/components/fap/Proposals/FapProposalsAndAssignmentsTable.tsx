@@ -21,14 +21,7 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
-import {
-  UserRole,
-  Review,
-  SettingsId,
-  Fap,
-  GetFapMembersQuery,
-  Maybe,
-} from 'generated/sdk';
+import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import {
   useFapProposalsData,
@@ -261,31 +254,6 @@ const FapProposalsAndAssignmentsTable = ({
     })();
   };
 
-  const convertToFapAssignedMember = (
-    getFapMembersQuery: GetFapMembersQuery
-  ) => {
-    const fapAssignedMembers: FapAssignedMember[] = [];
-    if (getFapMembersQuery.fapMembers === null) {
-      return fapAssignedMembers;
-    }
-    for (const fapMember of getFapMembersQuery.fapMembers) {
-      const fapAssignedMember: FapAssignedMember = {
-        ...fapMember.user,
-        role: fapMember.role,
-      };
-      fapAssignedMembers.push(fapAssignedMember);
-    }
-
-    return fapAssignedMembers;
-  };
-
-  const handleUndefinedValue = <T,>(
-    value: T | null | undefined,
-    defaultValue: T
-  ): Maybe<T> => {
-    return value !== undefined ? value : defaultValue;
-  };
-
   const massAssignFapProposalsToMembers = async () => {
     await api({
       toastSuccessMessage: 'Members assigned',
@@ -293,71 +261,15 @@ const FapProposalsAndAssignmentsTable = ({
       fapId: data.id,
     });
 
-    const updatedFap = await api().getFap({ id: data.id });
-
-    const fapMembers = convertToFapAssignedMember(
-      await api().getFapMembers({
-        fapId: data.id,
-      })
-    );
-
-    const callInReview = (
-      await api().getCallInReviewForFap({
-        fapId: data.id,
-      })
-    ).callInReviewForFap;
+    const updatedFap = (await api().getFap({ id: data.id })).fap || data;
 
     const updatedFapProposals =
-      (await api().getFapProposals({ fapId: data.id, callId: callInReview }))
+      (await api().getFapProposals({ fapId: data.id, callId: selectedCallId }))
         .fapProposals || [];
 
-    setFapProposalsData((fapProposalData) =>
-      fapProposalData.map((proposalItem) => {
-        const updatedProposalDataItem = updatedFapProposals.find(
-          (updatedFapProposal) =>
-            updatedFapProposal.proposalPk === proposalItem.proposalPk
-        );
-        if (updatedProposalDataItem?.assignments != null) {
-          const newAssignments: FapProposalAssignmentType[] =
-            updatedProposalDataItem.assignments;
+    setFapProposalsData(updatedFapProposals);
 
-          return {
-            ...proposalItem,
-            assignments: newAssignments,
-          };
-        } else {
-          return proposalItem;
-        }
-      })
-    );
-
-    onAssignmentsUpdate({
-      ...data,
-      fapChairProposalCount: fapMembers.find(
-        (assignedMember) => assignedMember.id === data.fapChair?.id
-      )
-        ? handleUndefinedValue(
-            updatedFap.fap?.fapChairProposalCount,
-            data.fapChairProposalCount
-          )
-        : data.fapChairProposalCount,
-      fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
-        (value, index) => {
-          const fapSecretariesProposalCount =
-            updatedFap.fap?.fapSecretariesProposalCounts[index].count ||
-            value.count;
-
-          return {
-            userId: value.userId,
-            count: fapMembers.find(
-              (assignedMember) => assignedMember.id === value.userId
-            )
-              ? fapSecretariesProposalCount
-              : value.count,
-          };
-        }
-      ),
-    });
+    onAssignmentsUpdate(updatedFap);
   };
 
   const assignMemberToFapProposal = async (

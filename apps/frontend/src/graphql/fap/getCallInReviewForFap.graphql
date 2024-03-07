@@ -1,3 +1,0 @@
-query getCallInReviewForFap($fapId: Int!) {
-  callInReviewForFap(fapId: $fapId)
-}
