@@ -44,15 +44,6 @@ describe('Test Admin Mutations', () => {
     ).resolves.toBe(dummyInstitution);
   });
 
-  test('A user officer can create a institution', () => {
-    return expect(
-      adminMutations.createInstitutions(
-        dummyUserOfficerWithRole,
-        dummyInstitution
-      )
-    ).resolves.toBe(dummyInstitution);
-  });
-
   test('A user officer can update a institution', () => {
     return expect(
       adminMutations.updateInstitutions(

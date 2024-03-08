@@ -17,7 +17,6 @@ import { Roles } from '../models/Role';
 import { Settings } from '../models/Settings';
 import { UserWithRole } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
-import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
@@ -96,20 +95,6 @@ export default class AdminMutations {
     institution.country = args.country ?? institution.country;
 
     return await this.dataSource.updateInstitution(institution);
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async createInstitutions(
-    agent: UserWithRole | null,
-    args: CreateInstitutionsArgs
-  ): Promise<Institution | Rejection> {
-    const institution = await this.dataSource.createInstitution(args);
-
-    if (!institution) {
-      return rejection('Could not create institution');
-    }
-
-    return institution;
   }
 
   @Authorized([Roles.USER_OFFICER])

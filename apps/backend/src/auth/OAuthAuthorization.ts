@@ -12,7 +12,6 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { rejection, Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { NonNullableField } from '../utils/utilTypes';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -134,7 +133,7 @@ export class OAuthAuthorization extends UserAuthorization {
           userInfo.institution_country
         );
       }
-      const newInstitution: CreateInstitutionsArgs = {
+      const newInstitution = {
         name: userInfo.institution_name,
         country: institutionCountry.countryId,
         rorId: userInfo.institution_ror_id,

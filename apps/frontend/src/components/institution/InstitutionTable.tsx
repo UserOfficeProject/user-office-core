@@ -13,7 +13,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-import CreateUpdateInstitution from './CreateUpdateInstitution';
+import UpdateInstitution from './UpdateInstitution';
 
 const columns = [
   { title: 'Name', field: 'name' },
@@ -65,11 +65,9 @@ const InstitutionPage = () => {
     onCreate: FunctionType<void, [Institution | null]>,
     editInstitution: Institution | null
   ) => (
-    <CreateUpdateInstitution
+    <UpdateInstitution
       institution={editInstitution}
-      close={(institution: Institution | null) =>
-        !!editInstitution ? onUpdate(institution) : onCreate(institution)
-      }
+      close={(institution: Institution | null) => onUpdate(institution)}
     />
   );
 

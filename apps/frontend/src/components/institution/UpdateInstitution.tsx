@@ -16,15 +16,12 @@ import { Institution } from 'generated/sdk';
 import { useCountries } from 'hooks/user/useCountries';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-type CreateUpdateInstitutionProps = {
+type UpdateInstitutionProps = {
   close: (institution: Institution | null) => void;
   institution: Institution | null;
 };
 
-const CreateUpdateInstitution = ({
-  close,
-  institution,
-}: CreateUpdateInstitutionProps) => {
+const UpdateInstitution = ({ close, institution }: UpdateInstitutionProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const history = useHistory();
   const countries = useCountries();
@@ -41,20 +38,6 @@ const CreateUpdateInstitution = ({
   if (!countries) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
-
-  const createInstitution = async (name: string, country: number) => {
-    try {
-      const { createInstitution } = await api({
-        toastSuccessMessage: 'Institution created successfully!',
-      }).createInstitution({
-        name,
-        country,
-      });
-      close(createInstitution);
-    } catch (error) {
-      close(null);
-    }
-  };
 
   const updateInstitution = async (
     id: number,
@@ -80,13 +63,12 @@ const CreateUpdateInstitution = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        institution
-          ? await updateInstitution(
-              institution.id,
-              values.country as number,
-              values.name
-            )
-          : await createInstitution(values.name, values.country as number);
+        institution &&
+          updateInstitution(
+            institution.id,
+            values.country as number,
+            values.name
+          );
       }}
       validationSchema={Yup.object().shape({
         name: Yup.string().required(),
@@ -96,7 +78,7 @@ const CreateUpdateInstitution = ({
       {() => (
         <Form>
           <Typography variant="h6" component="h1">
-            {institution ? 'Update' : 'Create new'} institution
+            Update institution
           </Typography>
           <Field
             name="name"
@@ -144,7 +126,7 @@ const CreateUpdateInstitution = ({
               startIcon={<Check />}
             >
               {isExecutingCall && <UOLoader size={14} />}
-              {institution ? 'Update' : 'Create'}
+              {institution && 'Update'}
             </Button>
           </ActionButtonContainer>
         </Form>
@@ -153,7 +135,7 @@ const CreateUpdateInstitution = ({
   );
 };
 
-CreateUpdateInstitution.propTypes = {
+UpdateInstitution.propTypes = {
   institution: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
@@ -165,4 +147,4 @@ CreateUpdateInstitution.propTypes = {
   close: PropTypes.func.isRequired,
 };
 
-export default CreateUpdateInstitution;
+export default UpdateInstitution;
