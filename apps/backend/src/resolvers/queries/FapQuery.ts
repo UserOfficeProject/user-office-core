@@ -3,7 +3,7 @@ import { Query, Ctx, Resolver, Arg, Int } from 'type-graphql';
 import { ResolverContext } from '../../context';
 import { Fap } from '../types/Fap';
 import { FapProposal } from '../types/FapProposal';
-import { FapReviewer } from '../types/FapReviwers';
+import { FapReviewer } from '../types/FapReviewers';
 
 @Resolver()
 export class FapQuery {

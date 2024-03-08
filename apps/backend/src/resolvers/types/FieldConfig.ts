@@ -76,6 +76,9 @@ export class EmbellishmentConfig {
 
 @ObjectType()
 export class FileUploadConfig extends ConfigBase {
+  @Field(() => Boolean)
+  omitFromPdf: boolean;
+
   @Field(() => [String])
   file_type: string[];
 
