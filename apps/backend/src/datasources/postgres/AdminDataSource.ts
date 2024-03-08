@@ -216,7 +216,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         }
       })
       .then((intDB: InstitutionRecord[]) =>
-        intDB.map((int) => createInstitutionObject(int))
+        intDB.map((inst) => createInstitutionObject(inst))
       );
   }
 
@@ -226,12 +226,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('institutions')
       .where('institution_id', id)
       .first()
-      .then((int?: InstitutionRecord) => {
-        if (!int) {
+      .then((inst?: InstitutionRecord) => {
+        if (!inst) {
           return null;
         }
 
-        return createInstitutionObject(int);
+        return createInstitutionObject(inst);
       });
   }
 
@@ -241,12 +241,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('institutions')
       .where('ror_id', rorId)
       .first()
-      .then((int?: InstitutionRecord) => {
-        if (!int) {
+      .then((inst?: InstitutionRecord) => {
+        if (!inst) {
           return null;
         }
 
-        return createInstitutionObject(int);
+        return createInstitutionObject(inst);
       });
   }
 
@@ -258,12 +258,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('institutions')
       .where('institution', institutionName)
       .first()
-      .then((int?: InstitutionRecord) => {
-        if (!int) {
+      .then((inst?: InstitutionRecord) => {
+        if (!inst) {
           return null;
         }
 
-        return createInstitutionObject(int);
+        return createInstitutionObject(inst);
       });
   }
 

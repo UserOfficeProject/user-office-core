@@ -353,7 +353,7 @@ export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
   readonly country_id: number;
-  readonly ror_id?: string;
+  readonly ror_id: string;
 }
 
 export interface UnitRecord {

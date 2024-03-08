@@ -656,7 +656,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   async createInstitution(
     name: string,
     countryId: number | null = null,
-    rorId = null
+    rorId: string | null = null
   ): Promise<number> {
     const [institution]: InstitutionRecord[] = await database
       .insert({

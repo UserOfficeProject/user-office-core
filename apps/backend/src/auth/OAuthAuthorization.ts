@@ -21,7 +21,13 @@ type ValidUser = NonNullableField<
   'oidcSub' | 'oauthAccessToken' | 'oauthRefreshToken'
 >;
 
-export abstract class OAuthAuthorization extends UserAuthorization {
+interface UserinfoResponseWithInssitution extends UserinfoResponse {
+  institution_ror_id?: string;
+  institution_name?: string;
+  institution_country?: string;
+}
+
+export class OAuthAuthorization extends UserAuthorization {
   private db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
 
   constructor() {
@@ -46,6 +52,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         redirectUri,
         iss
       );
+
       const user = await this.upsertUser(userProfile, tokenSet);
 
       return user;
@@ -102,40 +109,35 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     });
   }
 
-  private async getUserInstitutionId(userInfo: UserinfoResponse) {
-    const isOAuthLogin =
-      userInfo.institution_ror_id ||
-      userInfo.institution_name ||
-      userInfo.institution_country;
-
-    if (!isOAuthLogin) {
+  private async getUserInstitutionId(
+    userInfo: UserinfoResponseWithInssitution
+  ) {
+    if (!userInfo.institution_name || !userInfo.institution_country) {
       return undefined;
     }
 
     let institution = userInfo.institution_ror_id
       ? await this.adminDataSource.getInstitutionByRorId(
-          userInfo.institution_ror_id as string
+          userInfo.institution_ror_id
         )
       : await this.adminDataSource.getInstitutionByName(
-          userInfo.institution_name as string
+          userInfo.institution_name
         );
 
     if (!institution) {
-      let institutionCountry = userInfo.institution_country
-        ? await this.adminDataSource.getCountryByName(
-            userInfo.institution_country as string
-          )
-        : null;
+      let institutionCountry = await this.adminDataSource.getCountryByName(
+        userInfo.institution_country
+      );
 
       if (!institutionCountry) {
         institutionCountry = await this.adminDataSource.createCountry(
-          userInfo.institution_country as string
+          userInfo.institution_country
         );
       }
       const newInstitution: CreateInstitutionsArgs = {
-        name: userInfo.institution_name as string,
+        name: userInfo.institution_name,
         country: institutionCountry.countryId,
-        rorId: userInfo.institution_ror_id as string,
+        rorId: userInfo.institution_ror_id,
       };
       institution = await this.adminDataSource.createInstitution(
         newInstitution
@@ -154,6 +156,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
       userInfo.sub
     );
+
     const userWithEmailMatch = await this.userDataSource.getByEmail(
       userInfo.email
     );
