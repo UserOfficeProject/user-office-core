@@ -20,7 +20,6 @@ import { Institution } from '../models/Institution';
 import { Instrument } from '../models/Instrument';
 import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
-import { isRabbitMqDisabled } from '../utils/helperFunctions';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 export const EXCHANGE_NAME =
@@ -193,10 +192,6 @@ const getSecondsPerAllocationTimeUnit = (
 };
 
 export async function createPostToRabbitMQHandler() {
-  if (isRabbitMqDisabled) {
-    return createSkipPostingHandler();
-  }
-
   const rabbitMQ = await getRabbitMQMessageBroker();
 
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -291,10 +286,6 @@ export async function createPostToRabbitMQHandler() {
 }
 
 export async function createListenToRabbitMQHandler() {
-  if (isRabbitMqDisabled) {
-    return createSkipListeningHandler();
-  }
-
   const EVENT_SCHEDULING_QUEUE_NAME = process.env
     .RABBITMQ_SCHEDULER_EXCHANGE_NAME as Queue;
   const SCHEDULER_EXCHANGE_NAME = process.env.RABBITMQ_SCHEDULER_EXCHANGE_NAME;
