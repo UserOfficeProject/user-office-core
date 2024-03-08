@@ -1,7 +1,7 @@
 DO
 $DO$
 BEGIN
-	IF register_patch('CreateUpdateUserIdFunc.sql', 'Chi Kai Lam', 'Update user id for merging', '2024-02-15') THEN
+  IF register_patch('CreateUpdateUserIdFunc.sql', 'Chi Kai Lam', 'Update user id for merging', '2024-02-15') THEN
     BEGIN
       
       CREATE OR REPLACE FUNCTION UPDATE_USER_ID(INOUT P_OLD_USER_ID BIGINT, INOUT P_NEW_USER_ID BIGINT)
@@ -94,6 +94,6 @@ BEGIN
       END;
       $$;
     END;
-	END IF;
+  END IF;
 END;
 $DO$;
