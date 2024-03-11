@@ -4,6 +4,6 @@ mutation massAssignReviews(
   massAssignReviews(
     fapId: $fapId
   ) {
-    id
+    ...fap
   }
 }

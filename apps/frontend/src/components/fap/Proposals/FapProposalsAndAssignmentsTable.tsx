@@ -255,13 +255,13 @@ const FapProposalsAndAssignmentsTable = ({
   };
 
   const massAssignFapProposalsToMembers = async () => {
-    await api({
-      toastSuccessMessage: 'Members assigned',
-    }).massAssignReviews({
-      fapId: data.id,
-    });
-
-    const updatedFap = (await api().getFap({ id: data.id })).fap || data;
+    const updatedFap = (
+      await api({
+        toastSuccessMessage: 'Members assigned',
+      }).massAssignReviews({
+        fapId: data.id,
+      })
+    ).massAssignReviews;
 
     const updatedFapProposals =
       (await api().getFapProposals({ fapId: data.id, callId: selectedCallId }))
