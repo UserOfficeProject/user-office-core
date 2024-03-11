@@ -32,7 +32,7 @@ const UpdateInstitution = ({ close, institution }: UpdateInstitutionProps) => {
       }
     : {
         name: '',
-        country: null,
+        country: undefined,
       };
 
   if (!countries) {
@@ -64,11 +64,8 @@ const UpdateInstitution = ({ close, institution }: UpdateInstitutionProps) => {
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
         institution &&
-          updateInstitution(
-            institution.id,
-            values.country as number,
-            values.name
-          );
+          values.country &&
+          updateInstitution(institution.id, values.country, values.name);
       }}
       validationSchema={Yup.object().shape({
         name: Yup.string().required(),
