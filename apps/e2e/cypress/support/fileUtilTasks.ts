@@ -50,3 +50,10 @@ export const readPdf = (pathToPdf: string) => {
     });
   });
 };
+
+export const unzip = (args: { source: string; destination: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const AdmZip = require('adm-zip');
+  const zip = new AdmZip(args.source);
+  zip.extractAllTo(args.destination);
+};
