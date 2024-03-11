@@ -56,4 +56,6 @@ export const unzip = (args: { source: string; destination: string }) => {
   const AdmZip = require('adm-zip');
   const zip = new AdmZip(args.source);
   zip.extractAllTo(args.destination);
+
+  return 'Files extracted to' + args.destination;
 };
