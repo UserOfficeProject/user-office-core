@@ -11,6 +11,9 @@ import {
 } from '../postgres/records';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
+import { StfcUserDataSource } from './StfcUserDataSource';
+
+const stfcUserDataSource = new StfcUserDataSource();
 
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
@@ -108,5 +111,65 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       });
 
     return result;
+  }
+
+  async getProposalsFromView(
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
+    const proposals = await super.getProposalsFromView(
+      filter,
+      first,
+      offset,
+      sortField,
+      sortDirection,
+      searchText
+    );
+
+    const technicalReviewers = new Set(
+      proposals.proposalViews
+        .filter((proposal) => !!proposal.technicalReviewAssigneeId)
+        .map((proposal) => proposal.technicalReviewAssigneeId.toString())
+    );
+
+    const technicalReviewersDetails =
+      await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
+        Array.from(technicalReviewers),
+        false
+      );
+
+    const propsWithTechReviewerDetails = proposals.proposalViews.map(
+      (proposal) => {
+        const user =
+          !!proposal.technicalReviewAssigneeId &&
+          technicalReviewersDetails.find(
+            (user) =>
+              user.userNumber === proposal.technicalReviewAssigneeId.toString()
+          );
+
+        const userDetails = user
+          ? {
+              technicalReviewAssigneeFirstName: user?.firstNameKnownAs
+                ? user.firstNameKnownAs
+                : user?.givenName ?? '',
+              technicalReviewAssigneeLastName: user?.familyName ?? '',
+            }
+          : {};
+
+        return {
+          ...proposal,
+          ...userDetails,
+        };
+      }
+    );
+
+    return {
+      proposalViews: propsWithTechReviewerDetails,
+      totalCount: proposals.totalCount,
+    };
   }
 }
