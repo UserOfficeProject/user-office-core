@@ -516,7 +516,7 @@ context('Proposal administration tests', () => {
           });
 
           // NOTE: We can't test the multi file download file size because the title and abstract are random and it can vary between some numbers. That's why we only test the file content.
-          const downloadedMultiFileName = `${currentYear}_proposals_${createdProposalPk}_${newlyCreatedProposalPk}.zip`;
+          const downloadedMultiFileName = `${currentYear}_proposals.zip`;
           const multiFileDownloadPath = `${downloadsFolder}/${downloadedMultiFileName}`;
 
           cy.task('downloadFile', {
@@ -527,17 +527,18 @@ context('Proposal administration tests', () => {
             filename: downloadedMultiFileName,
             downloadsFolder: downloadsFolder,
           });
-          const outputDir = `${downloadsFolder}/${currentYear}_proposals_${createdProposalPk}_${newlyCreatedProposalPk}_extracted`;
+          const outputDir = `${downloadsFolder}/${currentYear}_proposals_extracted`;
 
           cy.task('unzip', {
             source: multiFileDownloadPath,
             destination: outputDir,
           });
 
-          const downloadedFileName1 = `${currentYear}_${initialDBData.users.user1.lastName}_${createdProposalId}.pdf`;
+          const downloadedFileName1 = `${newlyCreatedProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
+          const downloadedFileName2 = `${createdProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
 
-          const pathToPdf1 = `${outputDir}/${downloadedFileName}`;
-          const pathToPdf2 = `${outputDir}/${downloadedFileName1}`;
+          const pathToPdf1 = `${outputDir}/${downloadedFileName1}`;
+          const pathToPdf2 = `${outputDir}/${downloadedFileName2}`;
 
           cy.task('readPdf', pathToPdf1).then((args) => {
             const { text, numpages } = args as PdfParse.Result;
