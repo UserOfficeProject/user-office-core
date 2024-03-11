@@ -516,7 +516,7 @@ context('Proposal administration tests', () => {
           });
 
           // NOTE: We can't test the multi file download file size because the title and abstract are random and it can vary between some numbers. That's why we only test the file content.
-          const downloadedMultiFileName = `${currentYear}_proposals_${createdProposalPk}_${newlyCreatedProposalPk}.pdf`;
+          const downloadedMultiFileName = `${currentYear}_proposals_${createdProposalPk}_${newlyCreatedProposalPk}.zip`;
           const multiFileDownloadPath = `${downloadsFolder}/${downloadedMultiFileName}`;
 
           cy.task('downloadFile', {
@@ -527,18 +527,36 @@ context('Proposal administration tests', () => {
             filename: downloadedMultiFileName,
             downloadsFolder: downloadsFolder,
           });
+          const outputDir = `${downloadsFolder}/${currentYear}_proposals_${createdProposalPk}_${newlyCreatedProposalPk}_extracted`;
 
-          cy.task('readPdf', multiFileDownloadPath).then((args) => {
+          cy.task('unzip', {
+            source: multiFileDownloadPath,
+            destination: outputDir,
+          });
+
+          const downloadedFileName1 = `${currentYear}_${initialDBData.users.user1.lastName}_${createdProposalId}.pdf`;
+
+          const pathToPdf1 = `${outputDir}/${downloadedFileName}`;
+          const pathToPdf2 = `${outputDir}/${downloadedFileName1}`;
+
+          cy.task('readPdf', pathToPdf1).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(newlyCreatedProposalId);
+            expect(text).to.include(proposalFixedName);
+            expect(text).to.include(proposalFixedAbstract);
+
+            expect(numpages).to.equal(1);
+          });
+
+          cy.task('readPdf', pathToPdf2).then((args) => {
             const { text, numpages } = args as PdfParse.Result;
 
             expect(text).to.include(createdProposalId);
             expect(text).to.include(proposalName1);
             expect(text).to.include(proposalAbstract1);
-            expect(text).to.include(newlyCreatedProposalId);
-            expect(text).to.include(proposalFixedName);
-            expect(text).to.include(proposalFixedAbstract);
 
-            expect(numpages).to.equal(2);
+            expect(numpages).to.equal(1);
           });
         }
       });
