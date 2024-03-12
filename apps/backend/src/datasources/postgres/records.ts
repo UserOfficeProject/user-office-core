@@ -354,7 +354,7 @@ export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
   readonly country_id: number;
-  readonly verified: boolean;
+  readonly ror_id: string;
 }
 
 export interface UnitRecord {
@@ -1199,7 +1199,7 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.institution_id,
     institution.institution,
     institution.country_id,
-    institution.verified
+    institution.ror_id
   );
 };
 
