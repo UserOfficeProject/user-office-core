@@ -23,6 +23,9 @@ const useStyles = makeStyles(() => ({
       paddingLeft: '40px',
       paddingRight: '10px',
     },
+    '& .MuiAlert-message': {
+      overflow: 'visible',
+    },
   },
 }));
 
