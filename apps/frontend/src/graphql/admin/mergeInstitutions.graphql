@@ -9,10 +9,10 @@ mutation mergeInstitutions(
     newTitle: $newTitle
   ) {
     id
-    verified
     name
     country {
       ...country
     }
+    rorId
   }
 }

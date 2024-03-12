@@ -15,6 +15,7 @@ context('Personal information tests', () => {
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
   const otherOrg = faker.commerce.department();
+  const otherInstitution = 'Other';
   const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.number('0##########');
@@ -70,6 +71,12 @@ context('Personal information tests', () => {
       cy.get("[name='department']").clear().type(newDepartment);
 
       cy.get("[name='telephone']").clear().type(newTelephone);
+
+      cy.get("[name='institutionId']").clear().type(otherInstitution);
+
+      cy.get('[data-cy="institution-options"] li')
+        .contains(otherInstitution)
+        .click();
 
       cy.get("[name='otherInstitution']").clear().type(otherOrg);
 

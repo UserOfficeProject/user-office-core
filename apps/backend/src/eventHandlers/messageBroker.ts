@@ -209,6 +209,7 @@ export async function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_CREATED:
       case Event.PROPOSAL_UPDATED:
       case Event.PROPOSAL_SUBMITTED:
+      case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_DELETED:
       case Event.PROPOSAL_STATUS_ACTION_EXECUTED: {
         const jsonMessage = await getProposalMessageData(event.proposal);
