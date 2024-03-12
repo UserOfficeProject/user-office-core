@@ -9,7 +9,7 @@ on:
       - unlabeled
 
 jobs:
-  check:
+  check-pr-title:
     runs-on: ubuntu-latest
     steps:
       - uses: thehanimo/pr-title-checker@v1.4.1
