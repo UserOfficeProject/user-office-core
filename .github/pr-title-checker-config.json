@@ -1,0 +1,16 @@
+{
+  "LABEL": {
+    "name": "PR title formatting",
+    "color": "EEEEEE"
+  },
+  "CHECKS": {
+    "NOTE": "You can test the regex here: https://regex101.com/r/W2f7Yr/1",
+    "regexp": "((?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?<scope>\\(\\w+\\))?(?<breaking_change>!?): (?<summary>[\\w -]+))(?<body>[\\w\\s-]+)(?<footer>(?<=\\v\\v)(?<footer_token>[\\w-]+): (?<footer_value>[\\w -]+)|$)",
+    "regexpFlags": "gm"
+  },
+  "MESSAGES": {
+    "success": "All OK",
+    "failure": "Failing CI test",
+    "notice": ""
+  }
+}
