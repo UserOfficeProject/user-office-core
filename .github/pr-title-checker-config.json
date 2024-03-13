@@ -9,7 +9,7 @@
   },
   "MESSAGES": {
     "success": "All OK",
-    "failure": "Failing CI test",
+    "failure": "PR title not following the semantic-release guidelines",
     "notice": ""
   }
 }
