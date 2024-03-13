@@ -4,6 +4,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import database from '../postgres/database';
 import {
   createProposalViewObject,
@@ -130,33 +131,39 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       searchText
     );
 
-    const technicalReviewers = new Set(
+    const technicalReviewers = removeDuplicates(
       proposals.proposalViews
-        .filter((proposal) => !!proposal.technicalReviewAssigneeId)
-        .map((proposal) => proposal.technicalReviewAssigneeId.toString())
+        .filter((proposal) => !!proposal.technicalReviewAssigneeIds.length)
+        .map((proposal) => proposal.technicalReviewAssigneeIds.map(String))
+        .flat()
     );
 
     const technicalReviewersDetails =
       await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
-        Array.from(technicalReviewers),
+        technicalReviewers,
         false
       );
 
     const propsWithTechReviewerDetails = proposals.proposalViews.map(
       (proposal) => {
-        const user =
-          !!proposal.technicalReviewAssigneeId &&
-          technicalReviewersDetails.find(
-            (user) =>
-              user.userNumber === proposal.technicalReviewAssigneeId.toString()
+        const users =
+          !!proposal.technicalReviewAssigneeIds &&
+          technicalReviewersDetails.filter((user) =>
+            proposal.technicalReviewAssigneeIds.find(
+              (id) => id.toString() === user.userNumber
+            )
           );
 
-        const userDetails = user
+        const userDetails = users.length
           ? {
-              technicalReviewAssigneeFirstName: user?.firstNameKnownAs
-                ? user.firstNameKnownAs
-                : user?.givenName ?? '',
-              technicalReviewAssigneeLastName: user?.familyName ?? '',
+              technicalReviewAssigneeNames: users.map((user) => {
+                const firstName = user?.firstNameKnownAs
+                  ? user.firstNameKnownAs
+                  : user?.givenName ?? '';
+                const lastName = user?.familyName ?? '';
+
+                return `${firstName} ${lastName}`;
+              }),
             }
           : {};
 
