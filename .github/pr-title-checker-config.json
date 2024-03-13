@@ -4,7 +4,7 @@
   },
   "CHECKS": {
     "NOTE": "You can test the regex here: https://regex101.com/r/W2f7Yr/1",
-    "regexp": "((?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?<scope>\\(\\w+\\))?(?<breaking_change>!?): (?<summary>[\\w -]+))(?<body>[\\w\\s-]+)(?<footer>(?<=\\v\\v)(?<footer_token>[\\w-]+): (?<footer_value>[\\w -]+)|$)",
+    "regexp": "((?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?<scope>\(\w+\))?(?<breaking_change>!?): (?<body>.+)$)",
     "regexpFlags": "gm"
   },
   "MESSAGES": {
