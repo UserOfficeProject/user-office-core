@@ -382,7 +382,7 @@ export default class FapMutations {
 
   /**
    * Assigns all remaining reviews needed for a FAP among its members. Attempts to distribute reviews as evenly as possible.
-   * Assumes there is ony one open call for a FAP at a time.
+   * Assumes there is ony one call in the review phase for a FAP at a time.
    * @param agent User
    * @param args ID of the FAP to mass assign reviews for
    * @returns Updated FAP

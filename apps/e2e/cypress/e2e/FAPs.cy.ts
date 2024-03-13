@@ -475,6 +475,63 @@ context('Fap reviews tests', () => {
       cy.contains(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL);
     });
 
+    it('Should not be able to mass assign reviews when there is more than one call in the review phase', () => {
+      cy.createCall({
+        ...closedCall,
+        esiTemplateId: createdEsiTemplateId,
+        proposalWorkflowId: createdWorkflowId,
+        faps: [createdFapId],
+      });
+
+      cy.assignProposalsToFap({
+        fapId: createdFapId,
+        proposals: [
+          { callId: createdCallId, primaryKey: secondCreatedProposalPk },
+          { callId: createdCallId, primaryKey: thirdCreatedProposalPk },
+        ],
+      });
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id, fapMembers.reviewer2.id],
+      });
+
+      cy.on('uncaught:exception', (err) => {
+        expect(err.message).to.include(
+          `More than one call found in review phase for FAP: ${createdFapId}`
+        );
+
+        // return false to prevent the error from
+        // failing this test
+        return false;
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="mass-assign-reviews"]').click();
+
+      cy.finishedLoading();
+
+      cy.notification({
+        variant: 'error',
+        text: `More than one call found in review phase for FAP: ${createdFapId}`,
+      });
+
+      cy.get('[role="dialog"]').should('not.exist');
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+      cy.contains(fapMembers.reviewer.lastName).should('not.exist');
+      cy.get('[aria-label="Detail panel visibility toggle"]').eq(1).click();
+      cy.contains(fapMembers.reviewer2.lastName).should('not.exist');
+
+      cy.contains('Logs').click();
+
+      cy.finishedLoading();
+
+      cy.contains(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL).should('not.exist');
+    });
+
     it('Officer should be able to read/write reviews', () => {
       cy.assignProposalsToFap({
         fapId: createdFapId,
