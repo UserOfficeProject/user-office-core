@@ -150,7 +150,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           !!proposal.technicalReviewAssigneeIds &&
           technicalReviewersDetails.filter((user) =>
             proposal.technicalReviewAssigneeIds.find(
-              (id) => id.toString() === user.userNumber
+              (id) => id?.toString() === user.userNumber
             )
           );
 
