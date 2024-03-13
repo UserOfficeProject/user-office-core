@@ -845,6 +845,10 @@ export default class PostgresFapDataSource implements FapDataSource {
       (call) => call.id
     );
 
+    if (callIds.length > 1) {
+      throw new GraphQLError(`More than one open call found for FAP: ${fapId}`);
+    }
+
     return callIds[0];
   }
 

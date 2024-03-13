@@ -380,6 +380,13 @@ export default class FapMutations {
       });
   }
 
+  /**
+   * Assigns all remaining reviews needed for a FAP among its members. Attempts to distribute reviews as evenly as possible.
+   * Assumes there is ony one open call for a FAP at a time.
+   * @param agent User
+   * @param args ID of the FAP to mass assign reviews for
+   * @returns Updated FAP
+   */
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async massAssignReviews(
