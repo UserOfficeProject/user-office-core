@@ -1,7 +1,6 @@
 {
   "LABEL": {
-    "name": "PR title formatting",
-    "color": "EEEEEE"
+    "name": ""
   },
   "CHECKS": {
     "NOTE": "You can test the regex here: https://regex101.com/r/W2f7Yr/1",
