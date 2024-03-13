@@ -3,7 +3,7 @@
     "name": ""
   },
   "CHECKS": {
-    "NOTE": "You can test the regex here: https://regex101.com/r/W2f7Yr/1",
+    "NOTE": "You can test the regex here: https://regex101.com/r/tpV16r/1",
     "regexp": "((?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?<scope>\\(\\w+\\))?(?<breaking_change>!?): (?<body>.+)$)",
     "regexpFlags": "gm"
   },
