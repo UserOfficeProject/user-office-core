@@ -129,11 +129,6 @@ BEGIN
 		ALTER TABLE instrument_has_proposals DROP COLUMN submitted;
 		ALTER TABLE call_has_instruments DROP COLUMN submitted;
 
-
-		-- TODO: Maybe we will need to remove(cleanup) all technical reviews that are not connected to any instrument/proposal assignment
-		-- Discuss this before merging the PR and if it is fine for everyone we can execute it.
-		-- DELETE FROM technical_review WHERE (proposal_pk, instrument_id) NOT IN (SELECT proposal_pk, instrument_id FROM instrument_has_proposals);
-
     END;
 	END IF;
 END;
