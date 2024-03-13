@@ -133,7 +133,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const technicalReviewers = removeDuplicates(
       proposals.proposalViews
-        .filter((proposal) => !!proposal.technicalReviewAssigneeIds.length)
+        .filter((proposal) => !!proposal.technicalReviewAssigneeIds?.length)
         .map((proposal) => proposal.technicalReviewAssigneeIds.map(String))
         .flat()
     );
@@ -154,7 +154,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             )
           );
 
-        const userDetails = users.length
+        const userDetails = users?.length
           ? {
               technicalReviewAssigneeNames: users.map((user) => {
                 const firstName = user?.firstNameKnownAs
