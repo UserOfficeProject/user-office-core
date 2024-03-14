@@ -19,11 +19,11 @@ export class UpdateInstitutionsArgs {
   @Field(() => String, { nullable: true })
   name: string;
 
-  @Field(() => Boolean, { nullable: true })
-  verified: boolean;
-
   @Field(() => Int)
   country: number;
+
+  @Field(() => String, { nullable: true })
+  rorId?: string;
 }
 
 @Resolver()
