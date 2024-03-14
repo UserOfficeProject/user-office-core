@@ -300,6 +300,21 @@ describe('Test FapMutations', () => {
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(0);
   });
 
+  test('Proposal needing multiple reviews is assigned', async () => {
+    const mockAssignMemberToFapProposals = jest.spyOn(
+      FapDataSourceMock.prototype,
+      'assignMemberToFapProposals'
+    );
+
+    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+      fapId: 7,
+    });
+    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
+
+    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 7, 9]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[1], 7, 10]);
+  });
+
   test('Proposals are evenly assigned to Fap members who aready have assignments', async () => {
     const mockAssignMemberToFapProposals = jest.spyOn(
       FapDataSourceMock.prototype,

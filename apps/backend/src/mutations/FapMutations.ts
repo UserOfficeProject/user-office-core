@@ -418,22 +418,22 @@ export default class FapMutations {
       );
     }
 
-    for (const review of [...reviewsNeededMap.keys()]) {
-      const numReviewsNeeded = reviewsNeededMap.get(review);
+    for (const fapProposal of [...reviewsNeededMap.keys()]) {
+      while ((reviewsNeededMap.get(fapProposal) ?? 0) > 0) {
+        const numReviewsNeeded = reviewsNeededMap.get(fapProposal) ?? 0;
 
-      if (numReviewsNeeded !== undefined && numReviewsNeeded > 0) {
         const fapReviewer = await this.getReviewerWithMinNumReviews(
           reviewersAssignedReviewsMap,
           reviewsToAssign,
-          review.proposalPk,
+          fapProposal.proposalPk,
           args.fapId
         );
 
         const reviewersPendingAssignments =
           reviewsToAssign.get(fapReviewer) ?? [];
-        reviewersPendingAssignments.push(review);
+        reviewersPendingAssignments.push(fapProposal);
         reviewsToAssign.set(fapReviewer, reviewersPendingAssignments);
-        reviewsNeededMap.set(review, numReviewsNeeded - 1);
+        reviewsNeededMap.set(fapProposal, numReviewsNeeded - 1);
       }
     }
 
@@ -457,7 +457,7 @@ export default class FapMutations {
 
     return updatedFap
       ? updatedFap
-      : rejection('Can  not fetch updated Fap', { agent });
+      : rejection('Can not fetch updated Fap', { agent });
   }
 
   async getReviewerWithMinNumReviews(
@@ -476,17 +476,19 @@ export default class FapMutations {
       const numPendingReviews = (pendingAssignments.get(fapReviewer) ?? [])
         .length;
       const totalReviews = numReviews + numPendingReviews;
-
-      if (
-        totalReviews < minReviews &&
+      const isAssigned =
+        (pendingAssignments.get(fapReviewer) ?? []).some(
+          (fapProposal) => fapProposal.proposalPk === proposalPk
+        ) ||
         (
           await this.dataSource.getFapProposalAssignments(
             fapId,
             proposalPk,
             fapReviewer.userId
           )
-        ).length === 0
-      ) {
+        ).length > 0;
+
+      if (totalReviews < minReviews && !isAssigned) {
         minReviews = totalReviews;
         fapReviewerWithMinNumReviews = fapReviewer;
       }
