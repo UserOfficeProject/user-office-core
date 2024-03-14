@@ -105,7 +105,7 @@ export const andAnotherDummyFapAssignment = new FapAssignment(
 );
 
 export const yetAnotherDummyFapAssignment = new FapAssignment(
-  1,
+  2,
   7,
   6,
   new Date('2020-04-20 08:25:12.23043+00'),

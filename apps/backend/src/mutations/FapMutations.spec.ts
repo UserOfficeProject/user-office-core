@@ -311,12 +311,12 @@ describe('Test FapMutations', () => {
     });
 
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 5, 5]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([
-      [2, 3],
+    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([
+      [1, 3],
       5,
       6,
     ]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[2], 5, 5]);
   });
 
   test('Proposals are not assigned to Fap members they are already assigned to', async () => {
@@ -330,11 +330,11 @@ describe('Test FapMutations', () => {
     });
 
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[2], 6, 7]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([
-      [1, 3],
+    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([
+      [1, 2],
       6,
       8,
     ]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[3], 6, 7]);
   });
 });

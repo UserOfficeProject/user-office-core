@@ -20,7 +20,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Fap, FapReviewer } from '../models/Fap';
+import { Fap, FapProposal, FapReviewer } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
@@ -403,9 +403,8 @@ export default class FapMutations {
       );
     }
 
-    let totalDifference = 0;
+    const reviewsToAssign = new Map<FapReviewer, FapProposal[]>();
     const reviewersAssignedReviewsMap = new Map<FapReviewer, number>();
-    const numReviewsToAssignToReviewer = new Map<FapReviewer, number>();
     const reviewers = await this.dataSource.getReviewers(args.fapId);
     const reviewsNeededMap =
       await this.dataSource.getFapProposalToNumReviewsNeededMap(args.fapId);
@@ -419,72 +418,31 @@ export default class FapMutations {
       );
     }
 
-    const highestNumberReviewsAssigned = [
-      ...reviewersAssignedReviewsMap.values(),
-    ].reduce((prev, current) => (prev && prev > current ? prev : current));
+    for (const review of [...reviewsNeededMap.keys()]) {
+      const numReviewsNeeded = reviewsNeededMap.get(review);
 
-    for (const reviewer of reviewers) {
-      const reviewerReviewCount =
-        reviewersAssignedReviewsMap.get(reviewer) ??
-        (await this.dataSource.getFapReviewerProposalCountCurrentRound(
-          reviewer.userId
-        ));
-      totalDifference += highestNumberReviewsAssigned - reviewerReviewCount;
-    }
+      if (numReviewsNeeded !== undefined && numReviewsNeeded > 0) {
+        const fapReviewer = await this.getReviewerWithMinNumReviews(
+          reviewersAssignedReviewsMap,
+          reviewsToAssign,
+          review.proposalPk,
+          args.fapId
+        );
 
-    const totalNumReviewsNeeded = [...reviewsNeededMap.values()].reduce(
-      (partialSum, a) => partialSum + a,
-      0
-    );
-
-    for (const reviewer of reviewers) {
-      const numReviewsAssigned =
-        reviewersAssignedReviewsMap.get(reviewer) ??
-        (await this.dataSource.getFapReviewerProposalCountCurrentRound(
-          reviewer.userId
-        ));
-      numReviewsToAssignToReviewer.set(
-        reviewer,
-        (totalNumReviewsNeeded - totalDifference) / reviewers.length +
-          highestNumberReviewsAssigned -
-          numReviewsAssigned
-      );
-    }
-
-    for (const reviewer of reviewers) {
-      let i = 0;
-      const reviewsToAssign: number[] = [];
-
-      for (const review of [...reviewsNeededMap.keys()]) {
-        if (i === numReviewsToAssignToReviewer.get(reviewer)) {
-          break;
-        }
-
-        const numReviewsNeeded = reviewsNeededMap.get(review);
-        if (
-          numReviewsNeeded !== undefined &&
-          numReviewsNeeded > 0 &&
-          //if the review is not already assigned to the reviewer
-          (
-            await this.dataSource.getFapProposalAssignments(
-              args.fapId,
-              review.proposalPk,
-              reviewer.userId
-            )
-          ).length === 0
-        ) {
-          reviewsToAssign.push(review.proposalPk);
-          reviewsNeededMap.set(review, numReviewsNeeded - 1);
-          i++;
-        }
+        const reviewersPendingAssignments =
+          reviewsToAssign.get(fapReviewer) ?? [];
+        reviewersPendingAssignments.push(review);
+        reviewsToAssign.set(fapReviewer, reviewersPendingAssignments);
+        reviewsNeededMap.set(review, numReviewsNeeded - 1);
       }
-      if (reviewsToAssign.length > 0) {
+    }
+
+    for (const reviewer of [...reviewsToAssign.keys()]) {
+      const reviews =
+        reviewsToAssign.get(reviewer)?.map((review) => review.proposalPk) ?? [];
+      if (reviews.length > 0) {
         this.dataSource
-          .assignMemberToFapProposals(
-            reviewsToAssign,
-            args.fapId,
-            reviewer.userId
-          )
+          .assignMemberToFapProposals(reviews, args.fapId, reviewer.userId)
           .catch((err) => {
             return rejection(
               'Can not assign proposal to facility access panel',
@@ -500,6 +458,41 @@ export default class FapMutations {
     return updatedFap
       ? updatedFap
       : rejection('Can  not fetch updated Fap', { agent });
+  }
+
+  async getReviewerWithMinNumReviews(
+    reviewersAssignedReviewsMap: Map<FapReviewer, number>,
+    pendingAssignments: Map<FapReviewer, FapProposal[]>,
+    proposalPk: number,
+    fapId: number
+  ): Promise<FapReviewer> {
+    let fapReviewerWithMinNumReviews = [
+      ...reviewersAssignedReviewsMap.keys(),
+    ][0];
+    let minReviews = Number.MAX_VALUE;
+
+    for (const fapReviewer of [...reviewersAssignedReviewsMap.keys()]) {
+      const numReviews = reviewersAssignedReviewsMap.get(fapReviewer) ?? 0;
+      const numPendingReviews = (pendingAssignments.get(fapReviewer) ?? [])
+        .length;
+      const totalReviews = numReviews + numPendingReviews;
+
+      if (
+        totalReviews < minReviews &&
+        (
+          await this.dataSource.getFapProposalAssignments(
+            fapId,
+            proposalPk,
+            fapReviewer.userId
+          )
+        ).length === 0
+      ) {
+        minReviews = totalReviews;
+        fapReviewerWithMinNumReviews = fapReviewer;
+      }
+    }
+
+    return fapReviewerWithMinNumReviews;
   }
 
   @ValidateArgs(assignFapMemberToProposalValidationSchema)
