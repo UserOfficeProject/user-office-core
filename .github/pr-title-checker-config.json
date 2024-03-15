@@ -3,8 +3,8 @@
     "name": ""
   },
   "CHECKS": {
-    "NOTE": "You can test the regex here: https://regex101.com/r/nshG5j/1",
-    "regexp": "((?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?<scope>\\(\\w+\\)|\\(\\*?\\))?(?<breaking_change>!?): (?<body>([a-z]).+[^.])$)",
+    "NOTE": "You can test the regex here: https://regex101.com/r/i99pPo/1",
+    "regexp": "(^(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?<scope>\\([\\w\\s]+\\)|\\(\\*+\\))?(?<breaking_change>!?): (?<body>([a-z]).+[^.|\\s])$)",
     "regexpFlags": "gm"
   },
   "MESSAGES": {
