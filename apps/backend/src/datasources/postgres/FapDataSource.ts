@@ -335,9 +335,11 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getFapProposalCount(fapId: number): Promise<number> {
-    return database('fap_proposals')
-      .count('fap_id')
-      .where('fap_id', fapId)
+    return database('fap_proposals as fp')
+      .join('proposals as p', { 'p.proposal_pk': 'fp.proposal_pk' })
+      .count('fp.fap_id')
+      .where('fp.fap_id', fapId)
+      .andWhere('p.submitted', true)
       .first()
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
