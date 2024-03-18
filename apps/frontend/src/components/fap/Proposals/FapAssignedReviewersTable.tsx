@@ -1,4 +1,5 @@
 import MaterialTable from '@material-table/core';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
 import makeStyles from '@mui/styles/makeStyles';
@@ -17,6 +18,9 @@ import {
   FapProposalType,
 } from 'hooks/fap/useFapProposalsData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+import RankInputModal from './RankInputModal';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -53,6 +57,12 @@ const assignmentColumns = [
     title: 'Date assigned',
     field: 'dateAssignedFormatted',
   },
+  {
+    title: 'rank',
+    field: 'rank',
+    emptyValue: '-',
+    hidden: true,
+  },
   { title: 'Review status', field: 'review.status' },
   {
     title: 'Grade',
@@ -66,6 +76,7 @@ const FapAssignedReviewersTable = ({
   removeAssignedReviewer,
   updateView,
 }: FapAssignedReviewersTableProps) => {
+  const { api } = useDataApiWithFeedback();
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     reviewerModal: NumberParam,
     modalTab: NumberParam,
@@ -77,6 +88,10 @@ const FapAssignedReviewersTable = ({
     UserRole.FAP_CHAIR,
     UserRole.FAP_SECRETARY,
   ]);
+  const [rankReviewer, setRankReviewer] = useState<null | {
+    reviewer: number | null;
+    proposal: number;
+  }>(null);
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -90,13 +105,26 @@ const FapAssignedReviewersTable = ({
     PROPOSAL_MODAL_TAB_NAMES.GRADE,
   ];
 
+  assignmentColumns[
+    assignmentColumns.findIndex((col) => col.title === 'rank')
+  ].hidden = !hasAccessRights;
+
   const FapAssignmentsWithIdAndFormattedDate =
-    fapProposal.assignments?.map((fapAssignment) =>
-      Object.assign(fapAssignment, {
-        id: fapAssignment.fapMemberUserId,
-        dateAssignedFormatted: toFormattedDateTime(fapAssignment.dateAssigned),
-      })
-    ) || [];
+    fapProposal.assignments
+      ?.map((fapAssignment) =>
+        Object.assign(fapAssignment, {
+          id: fapAssignment.fapMemberUserId,
+          dateAssignedFormatted: toFormattedDateTime(
+            fapAssignment.dateAssigned
+          ),
+        })
+      )
+      .sort((a, b) => {
+        const order = (a.rank ? a.rank : 0) >= (b.rank ? b.rank : 0);
+
+        return order ? 1 : -1;
+      }) || [];
+
   const proposalReviewModalShouldOpen =
     !!urlQueryParams.reviewerModal && openProposalPk === fapProposal.proposalPk;
 
@@ -129,6 +157,19 @@ const FapAssignedReviewersTable = ({
           tabNames={reviewProposalTabNames}
         />
       </ProposalReviewModal>
+      <RankInputModal
+        open={!!rankReviewer}
+        onClose={() => setRankReviewer(null)}
+        onSubmit={(value) => {
+          api().saveReviewerRank({
+            proposalPk: rankReviewer?.proposal as number,
+            reviewerId: rankReviewer?.reviewer as number,
+            rank: value,
+          });
+          updateView(rankReviewer?.proposal as number);
+          setRankReviewer(null);
+        }}
+      />
 
       <MaterialTable
         icons={tableIcons}
@@ -161,6 +202,16 @@ const FapAssignedReviewersTable = ({
             tooltip: isDraftStatus(rowData?.review?.status)
               ? 'Grade proposal'
               : 'View review',
+          }),
+          (rowData) => ({
+            icon: () => <FormatListNumberedIcon data-cy="rank-reviewer" />,
+            onClick: () => {
+              setRankReviewer({
+                proposal: rowData.proposalPk,
+                reviewer: rowData.fapMemberUserId,
+              });
+            },
+            tooltip: 'Rank Reviewer',
           }),
         ]}
         options={{

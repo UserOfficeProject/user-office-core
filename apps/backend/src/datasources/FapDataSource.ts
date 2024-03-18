@@ -121,4 +121,9 @@ export interface FapDataSource {
     proposalPks: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]>;
   getRelatedUsersOnFap(id: number): Promise<number[]>;
+  setReviewerRank(
+    proposalPk: number,
+    reviewerId: number,
+    rank: number
+  ): Promise<boolean>;
 }

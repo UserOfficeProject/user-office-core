@@ -69,7 +69,8 @@ export const dummyFapAssignment = new FapAssignment(
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
-  false
+  false,
+  null
 );
 
 export const anotherDummyFapAssignment = new FapAssignment(
@@ -79,7 +80,8 @@ export const anotherDummyFapAssignment = new FapAssignment(
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
-  false
+  false,
+  null
 );
 
 export const dummyFapReview = new Review(1, 1, 1, 'Dummy Fap review', 7, 0, 1);
@@ -433,5 +435,13 @@ export class FapDataSourceMock implements FapDataSource {
 
   async getRelatedUsersOnFap(id: number): Promise<number[]> {
     return [];
+  }
+
+  async setReviewerRank(
+    proposalPk: number,
+    reviewer_id: number,
+    rank: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 }
