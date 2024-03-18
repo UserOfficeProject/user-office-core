@@ -162,7 +162,12 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return database
       .select()
       .from('fap_reviews')
-      .where('proposal_pk', id)
+      .join('fap_assignments', {
+        'fap_assignments.proposal_pk': 'fap_reviews.proposal_pk',
+        'fap_assignments.fap_member_user_id': 'fap_reviews.user_id',
+      })
+      .where('fap_reviews.proposal_pk', id)
+      .orderBy('fap_assignments.rank', 'asc')
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => createReviewObject(review));
       });

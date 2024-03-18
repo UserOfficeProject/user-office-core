@@ -289,6 +289,7 @@ const FapProposalsAndAssignmentsTable = ({
               dateAssigned: DateTime.now(),
               user,
               role,
+              rank: null,
               review:
                 proposalReviews.find(({ userID }) => userID === user.id) ??
                 null,

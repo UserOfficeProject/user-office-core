@@ -429,6 +429,7 @@ export interface FapAssignmentRecord {
   readonly reassigned: boolean;
   readonly date_reassigned: Date;
   readonly email_sent: boolean;
+  readonly rank: number | null;
 }
 
 export interface FapReviewerRecord {
@@ -1114,7 +1115,8 @@ export const createFapAssignmentObject = (
     fapAssignment.date_assigned,
     fapAssignment.reassigned,
     fapAssignment.date_reassigned,
-    fapAssignment.email_sent
+    fapAssignment.email_sent,
+    fapAssignment.rank
   );
 };
 
