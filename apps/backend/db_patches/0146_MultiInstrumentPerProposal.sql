@@ -23,6 +23,10 @@ BEGIN
 			ALTER TABLE fap_proposals ADD COLUMN fap_meeting_instrument_submitted BOOLEAN DEFAULT FALSE;
 			UPDATE fap_proposals
 			SET fap_meeting_instrument_submitted = (SELECT submitted FROM instrument_has_proposals WHERE fap_proposals.proposal_pk = instrument_has_proposals.proposal_pk);
+			
+			ALTER TABLE scheduled_events ADD COLUMN instrument_id INT REFERENCES instruments (instrument_id);
+			UPDATE scheduled_events
+			SET instrument_id = (SELECT instrument_id FROM instrument_has_proposals WHERE scheduled_events.proposal_pk = instrument_has_proposals.proposal_pk);
 
 			-- drop view to allow recreating it
     	DROP VIEW proposal_table_view;

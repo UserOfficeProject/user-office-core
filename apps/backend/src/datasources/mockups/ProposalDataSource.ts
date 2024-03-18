@@ -77,6 +77,7 @@ const dummyScheduledEventCore = new ScheduledEventCore(
   1,
   1,
   ProposalBookingStatusCore.ACTIVE,
+  1,
   1
 );
 

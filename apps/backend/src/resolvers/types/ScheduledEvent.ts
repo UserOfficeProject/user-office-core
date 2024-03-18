@@ -16,6 +16,7 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { Feedback } from './Feedback';
 import { FeedbackRequest } from './FeedbackRequest';
+import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import {
   ProposalBookingStatusCore,
@@ -46,6 +47,9 @@ export class ScheduledEventCore {
 
   @Field(() => Int, { nullable: true })
   proposalPk: number | null;
+
+  @Field(() => Int)
+  instrumentId: number;
 }
 
 @Resolver(() => ScheduledEventCore)
@@ -125,5 +129,13 @@ export class ScheduledEventResolver {
     }
 
     return context.queries.proposal.get(context.user, event.proposalPk);
+  }
+
+  @FieldResolver(() => Instrument)
+  async instrument(
+    @Root() event: ScheduledEventCore,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.instrument.get(context.user, event.instrumentId);
   }
 }

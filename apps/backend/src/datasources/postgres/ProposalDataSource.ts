@@ -943,6 +943,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         proposal_pk: eventMessage.proposalPk,
         status: eventMessage.status,
         local_contact: eventMessage.localContactId,
+        instrument_id: eventMessage.instrumentId,
       })
       .into('scheduled_events')
       .returning(['*']);
@@ -988,6 +989,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         eventMessage.map((event) => event.id)
       )
       .andWhere('proposal_booking_id', eventMessage[0].proposalBookingId)
+      .andWhere('instrument_id', eventMessage[0].instrumentId)
       .del()
       .returning('*');
 

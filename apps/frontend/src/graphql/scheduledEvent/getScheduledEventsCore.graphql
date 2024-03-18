@@ -10,16 +10,6 @@ query getScheduledEventsCore(
       proposer {
         ...basicUserDetails
       }
-      instruments {
-        id
-        name
-        shortCode
-        description
-        managerUserId
-        scientists {
-          ...basicUserDetails
-        }
-      }
     }
     esi {
       ...esi

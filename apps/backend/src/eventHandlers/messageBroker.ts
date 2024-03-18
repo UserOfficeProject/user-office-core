@@ -338,6 +338,7 @@ export async function createListenToRabbitMQHandler() {
             proposalPk: message.proposalPk,
             status: message.status,
             localContactId: message.localContact,
+            instrumentId: message.instrumentId,
           } as ScheduledEventCore;
 
           await proposalDataSource.addProposalBookingScheduledEvent(
@@ -373,6 +374,7 @@ export async function createListenToRabbitMQHandler() {
             proposalPk: scheduledEvent.proposalPk,
             status: scheduledEvent.status,
             localContactId: scheduledEvent.localContactId,
+            instrumentId: scheduledEvent.instrumentId,
           }));
 
           await proposalDataSource.removeProposalBookingScheduledEvents(
