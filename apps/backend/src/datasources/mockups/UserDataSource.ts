@@ -214,17 +214,13 @@ export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
-  getByOIDCSub(oidcSub: string): Promise<User | null> {
-    throw new Error('Method not implemented.');
+  async getByOIDCSub(oidcSub: string): Promise<User | null> {
+    return dummyUser;
   }
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
   }
-  async createInstitution(
-    name: string,
-    verified: boolean,
-    countryId?: number
-  ): Promise<number> {
+  async createInstitution(name: string, countryId?: number): Promise<number> {
     return 1;
   }
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {

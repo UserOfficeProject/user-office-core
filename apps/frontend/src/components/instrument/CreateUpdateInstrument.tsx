@@ -1,38 +1,28 @@
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
 } from '@user-office-software/duo-validation/lib/Instrument';
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikProps } from 'formik';
 import { TextField } from 'formik-mui';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
-import { BasicUserDetailsFragment, InstrumentFragment } from 'generated/sdk';
-import { useUsersDataByFilter } from 'hooks/user/useUsersDataByFilter';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import {
+  BasicUserDetailsFragment,
+  FeatureId,
+  InstrumentFragment,
+  UserRole,
+} from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserNameWithEmail } from 'utils/user';
-
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  findButton: {
-    marginLeft: '10px',
-    whiteSpace: 'nowrap',
-  },
-  findBySurnameForm: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'baseline',
-  },
-}));
 
 type CreateUpdateInstrumentProps = {
   close: (instrumentAdded: InstrumentFragment | null) => void;
@@ -43,24 +33,88 @@ const CreateUpdateInstrument = ({
   close,
   instrument,
 }: CreateUpdateInstrumentProps) => {
-  const classes = useStyles();
+  const featureContext = useContext(FeatureContext);
+  const isUserSurnameSearchEnabled = !!featureContext.featuresMap.get(
+    FeatureId.USER_SEARCH_FILTER
+  )?.isEnabled;
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { usersData, setUsersData } = useUsersDataByFilter(instrument);
-  const surnameInitialValue = { surname: '' };
-
-  if (!usersData) {
-    return <UOLoader />;
-  }
+  const [usersData, setUsersData] = useState(
+    instrument?.beamlineManager ? [instrument?.beamlineManager] : []
+  );
 
   const initialValues = instrument
-    ? instrument
+    ? { ...instrument, surname: '' }
     : {
         name: '',
         shortCode: '',
         description: '',
         managerUserId: null,
+        surname: '',
       };
+
+  useEffect(() => {
+    if (!isUserSurnameSearchEnabled) {
+      api()
+        .getUsers({ userRole: UserRole.INSTRUMENT_SCIENTIST })
+        .then((data) => {
+          setUsersData(data.users?.users || []);
+        });
+    }
+  }, [isUserSurnameSearchEnabled, api]);
+
+  const findUserBySurname = async (
+    value: string,
+    setFieldError: (field: string, message: string | undefined) => void
+  ) => {
+    if (!value) {
+      return;
+    }
+
+    try {
+      await api()
+        .getUsers({ filter: value })
+        .then((data) => {
+          if (data.users?.totalCount == 0) {
+            setFieldError('surname', 'No users found with that surname');
+          } else {
+            setUsersData(data.users?.users || []);
+          }
+        });
+    } catch (error) {
+      close(null);
+    }
+  };
+
+  const SurnameSearchField = (
+    formikProps: FormikProps<typeof initialValues>
+  ) => {
+    const { values, setFieldError } = formikProps;
+
+    return isUserSurnameSearchEnabled ? (
+      <Stack direction="row" spacing={1} alignItems="baseline">
+        <Field
+          id="surname"
+          name="surname"
+          label="Surname"
+          type="text"
+          component={TextField}
+          fullWidth
+          flex="1"
+          data-cy="beamline-manager-surname"
+        />
+        <Button
+          data-cy="findUser"
+          type="button"
+          disabled={!values.surname}
+          onClick={() => findUserBySurname(values.surname, setFieldError)}
+          sx={{ minWidth: 'fit-content' }}
+        >
+          Find User
+        </Button>
+      </Stack>
+    ) : null;
+  };
 
   return (
     <Formik
@@ -101,7 +155,7 @@ const CreateUpdateInstrument = ({
           : createInstrumentValidationSchema
       }
     >
-      {() => (
+      {(formikProps) => (
         <Form>
           <Typography variant="h6" component="h1">
             {(instrument ? 'Update ' : 'Create new ') +
@@ -143,57 +197,12 @@ const CreateUpdateInstrument = ({
             disabled={isExecutingCall}
             required
           />
-          <Formik
-            initialValues={surnameInitialValue}
-            onSubmit={async (values, { setFieldError }): Promise<void> => {
-              try {
-                await api()
-                  .getUsers({ filter: values.surname })
-                  .then((data) => {
-                    if (data.users?.totalCount == 0)
-                      setFieldError(
-                        'surname',
-                        'No users found with that surname'
-                      );
-                    else
-                      setUsersData(data.users || { totalCount: 0, users: [] });
-                  });
-              } catch (error) {
-                close(null);
-              }
-            }}
-          >
-            {(inner) => {
-              return (
-                <Form className={classes.findBySurnameForm}>
-                  <Field
-                    id="surname"
-                    name="surname"
-                    label="Surname"
-                    type="text"
-                    component={TextField}
-                    fullWidth
-                    flex="1"
-                    data-cy="beamline-manager-surname"
-                  />
-                  <Button
-                    data-cy="findUser"
-                    type="button"
-                    disabled={!inner.values.surname}
-                    className={classes.findButton}
-                    onClick={inner.submitForm}
-                  >
-                    Find User
-                  </Button>
-                </Form>
-              );
-            }}
-          </Formik>
+          <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
             label="Beamline manager"
             noOptionsText="No one"
-            items={usersData.users
+            items={usersData
               .sort(
                 (a: BasicUserDetailsFragment, b: BasicUserDetailsFragment) =>
                   a.firstname > b.firstname ? 1 : -1
@@ -210,8 +219,8 @@ const CreateUpdateInstrument = ({
 
           <Button
             type="submit"
+            sx={{ marginTop: 2 }}
             fullWidth
-            className={classes.submit}
             data-cy="submit"
             disabled={isExecutingCall}
           >
