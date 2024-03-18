@@ -31,8 +31,9 @@ const QuestionDependencyList = ({
   form,
 }: QuestionDependencyListProps) => {
   const field: QuestionTemplateRelation = form.values;
+  const defaultOperator = DependenciesLogicOperator.AND;
   const [logicOperator, setLogicOperator] = useState<DependenciesLogicOperator>(
-    field.dependenciesOperator || DependenciesLogicOperator.AND
+    field.dependenciesOperator || defaultOperator
   );
 
   useEffect(() => {
@@ -147,6 +148,10 @@ const QuestionDependencyList = ({
                     <IconButton
                       onClick={(): void => {
                         remove(i);
+
+                        if (field.dependencies.length === 1) {
+                          setLogicOperator(defaultOperator);
+                        }
                       }}
                     >
                       <ClearIcon />
