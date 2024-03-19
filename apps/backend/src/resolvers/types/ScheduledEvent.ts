@@ -48,8 +48,8 @@ export class ScheduledEventCore {
   @Field(() => Int, { nullable: true })
   proposalPk: number | null;
 
-  @Field(() => Int)
-  instrumentId: number;
+  @Field(() => Int, { nullable: true })
+  instrumentId?: number | null;
 }
 
 @Resolver(() => ScheduledEventCore)
@@ -136,6 +136,10 @@ export class ScheduledEventResolver {
     @Root() event: ScheduledEventCore,
     @Ctx() context: ResolverContext
   ) {
+    if (!event.instrumentId) {
+      return null;
+    }
+
     return context.queries.instrument.get(context.user, event.instrumentId);
   }
 }
