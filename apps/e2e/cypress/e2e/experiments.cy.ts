@@ -51,11 +51,11 @@ context('Experiments tests', () => {
 
       cy.get('[data-cy=instrument-filter]').click();
       cy.get('[role=presentation]').contains('Instrument 2').click();
-      cy.contains('0-0 of 0');
+      cy.contains('1-1 of 1');
 
       cy.get('[data-cy=instrument-filter]').click();
       cy.get('[role=presentation]').contains('Instrument 1').click();
-      cy.contains('1-4 of 4');
+      cy.contains('1-3 of 3');
     });
 
     it('Can filter by date', () => {
