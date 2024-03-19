@@ -1,0 +1,7 @@
+mutation saveReviewerRank($proposalPk: Int!, $reviewerId: Int!, $rank: Int!) {
+  saveReviewerRank(
+    proposalPk: $proposalPk
+    reviewerId: $reviewerId
+    rank: $rank
+  )
+}
