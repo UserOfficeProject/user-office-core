@@ -1,6 +1,5 @@
 mutation deleteInstitution($id: Int!) {
   deleteInstitution(id: $id) {
     id
-    verified
   }
 }

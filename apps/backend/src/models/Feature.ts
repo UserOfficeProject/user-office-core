@@ -20,6 +20,7 @@ export enum FeatureId {
   SAMPLE_SAFETY = 'SAMPLE_SAFETY',
   OAUTH = 'OAUTH',
   STFC_IDLE_TIMER = 'STFC_IDLE_TIMER',
+  USER_SEARCH_FILTER = 'USER_SEARCH_FILTER',
 }
 
 export enum FeatureUpdateAction {

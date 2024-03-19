@@ -135,10 +135,30 @@ context('Settings tests', () => {
     const proposalAbstract = faker.lorem.words(5);
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
+    const instrument1 = {
+      name: faker.random.words(2),
+      shortCode: faker.random.alphaNumeric(15),
+      description: faker.random.words(5),
+      managerUserId: initialDBData.users.user1.id,
+    };
     let workflowDroppableGroupId: string;
     let createdWorkflowId: number;
     let prevProposalStatusId: number;
     let createdEsiTemplateId: number;
+    let createdInstrumentId: number;
+
+    const createInstrumentAndAssignItToCall = () => {
+      cy.createInstrument(instrument1).then((result) => {
+        if (result.createInstrument) {
+          createdInstrumentId = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+          });
+        }
+      });
+    };
 
     const addMultipleStatusesToProposalWorkflowWithChangingEvents = () => {
       cy.addProposalWorkflowStatus({
@@ -914,6 +934,7 @@ context('Settings tests', () => {
 
     it('User Officer should be able to filter proposals based on statuses', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      createInstrumentAndAssignItToCall();
       cy.createProposal({ callId: initialDBData.call.id });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
@@ -926,6 +947,15 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.assignProposalsToInstrument({
+            instrumentId: createdInstrumentId,
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: proposal.primaryKey,
+              },
+            ],
+          });
           cy.addProposalTechnicalReview({
             proposalPk: proposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
