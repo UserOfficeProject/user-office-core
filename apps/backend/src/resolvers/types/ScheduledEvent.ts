@@ -131,7 +131,7 @@ export class ScheduledEventResolver {
     return context.queries.proposal.get(context.user, event.proposalPk);
   }
 
-  @FieldResolver(() => Instrument)
+  @FieldResolver(() => Instrument, { nullable: true })
   async instrument(
     @Root() event: ScheduledEventCore,
     @Ctx() context: ResolverContext
