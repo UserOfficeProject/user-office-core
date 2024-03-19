@@ -92,10 +92,14 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     {
       title: `Start Date (${timezone})`,
       field: 'formattedStartCall',
+      customSort: (a: Call, b: Call) =>
+        new Date(a.startCall).getTime() - new Date(b.startCall).getTime(),
     },
     {
       title: `End Date (${timezone})`,
       field: 'formattedEndCall',
+      customSort: (a: Call, b: Call) =>
+        new Date(a.endCall).getTime() - new Date(b.endCall).getTime(),
     },
     {
       title: 'Reference number format',
