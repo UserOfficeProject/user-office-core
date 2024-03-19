@@ -125,4 +125,9 @@ export interface FapDataSource {
     proposalPk: number,
     instrumentId?: number
   ): Promise<boolean>;
+  setReviewerRank(
+    proposalPk: number,
+    reviewerId: number,
+    rank: number
+  ): Promise<boolean>;
 }

@@ -25,6 +25,7 @@ query getFapProposals($fapId: Int!, $callId: Int) {
       proposalPk
       fapMemberUserId
       dateAssigned
+      rank
       user {
         ...basicUserDetails
       }

@@ -366,6 +366,17 @@ context('Fap reviews tests', () => {
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
       cy.contains(fapMembers.reviewer.lastName);
 
+      cy.contains(fapMembers.reviewer.lastName)
+        .parent()
+        .find('[data-cy="rank-reviewer"]')
+        .click();
+
+      cy.get('[data-cy="rank-input"]').type('4564654');
+
+      cy.get('[data-cy="rank-submit"]').click();
+
+      cy.contains(fapMembers.reviewer.lastName).parent().contains('4564654');
+
       cy.contains('Logs').click();
 
       cy.finishedLoading();
