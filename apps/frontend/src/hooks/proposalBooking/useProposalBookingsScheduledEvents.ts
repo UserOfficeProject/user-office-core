@@ -33,7 +33,7 @@ export type ProposalScheduledEvent = Pick<
   } & {
     users: BasicUserDetailsFragment[];
   };
-  instruments: (Pick<Instrument, 'id' | 'name'> | null)[] | null;
+  instrument: Pick<Instrument, 'id' | 'name'> | null;
 } & {
   visit:
     | (VisitFragment & {
@@ -87,7 +87,7 @@ export function useProposalBookingsScheduledEvents({
         if (data.me?.proposals) {
           const proposalScheduledEvent: ProposalScheduledEvent[] = [];
           data.me?.proposals.forEach((proposal) =>
-            proposal.proposalBookingCore?.scheduledEvents.forEach(
+            proposal.proposalBookingsCore?.scheduledEvents.forEach(
               (scheduledEvent) => {
                 proposalScheduledEvent.push({
                   id: scheduledEvent.id,
@@ -105,7 +105,7 @@ export function useProposalBookingsScheduledEvents({
                     managementDecisionSubmitted:
                       proposal.managementDecisionSubmitted,
                   },
-                  instruments: proposal.instruments,
+                  instrument: scheduledEvent.instrument,
                   visit: scheduledEvent.visit,
                   esi: scheduledEvent.esi,
                   feedback: scheduledEvent.feedback,

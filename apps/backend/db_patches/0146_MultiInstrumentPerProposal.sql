@@ -133,6 +133,8 @@ BEGIN
 		ALTER TABLE instrument_has_proposals DROP COLUMN submitted;
 		ALTER TABLE call_has_instruments DROP COLUMN submitted;
 
+		DROP FUNCTION IF EXISTS before_scheduled_events_insert_or_update() CASCADE;
+
     END;
 	END IF;
 END;

@@ -19,6 +19,7 @@ import {
   ProposalBookingScheduledEventFilterCore,
 } from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import { ProposalDataSource } from '../ProposalDataSource';
 import {
   ProposalsFilter,
@@ -878,37 +879,40 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
-  async getProposalBookingByProposalPk(
+  async getProposalBookingsByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter
-  ): Promise<{ id: number } | null> {
-    const result: ScheduledEventRecord = await database<ScheduledEventRecord>(
-      'scheduled_events'
-    )
+  ): Promise<{ ids: number[] } | null> {
+    const result: ScheduledEventRecord[] = await database<
+      ScheduledEventRecord[]
+    >('scheduled_events')
       .select()
       .where('proposal_pk', proposalPk)
       .modify((qb) => {
         if (filter?.status) {
           qb.whereIn('status', filter.status);
         }
-      })
-      .first();
+      });
 
     if (result) {
-      return { id: result.proposal_booking_id };
+      return {
+        ids: removeDuplicates(
+          result.map((bookingId) => bookingId.proposal_booking_id)
+        ),
+      };
     } else {
       return null;
     }
   }
 
-  async proposalBookingScheduledEvents(
-    proposalBookingId: number,
+  async getAllProposalBookingsScheduledEvents(
+    proposalBookingIds: number[],
     filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     const scheduledEventRecords: ScheduledEventRecord[] =
       await database<ScheduledEventRecord>('scheduled_events')
         .select()
-        .where('proposal_booking_id', proposalBookingId)
+        .whereIn('proposal_booking_id', proposalBookingIds)
         .orderBy('starts_at', 'asc')
         .modify((qb) => {
           if (filter?.status) {

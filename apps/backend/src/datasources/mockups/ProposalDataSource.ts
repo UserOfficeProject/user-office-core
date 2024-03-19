@@ -368,15 +368,15 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return new Proposals(allProposals);
   }
 
-  async getProposalBookingByProposalPk(
+  async getProposalBookingsByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter
-  ): Promise<{ id: number } | null> {
-    return { id: 1 };
+  ): Promise<{ ids: number[] } | null> {
+    return { ids: [1] };
   }
 
-  async proposalBookingScheduledEvents(
-    proposalBookingId: number,
+  async getAllProposalBookingsScheduledEvents(
+    proposalBookingIds: number[],
     filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     return [dummyScheduledEventCore];

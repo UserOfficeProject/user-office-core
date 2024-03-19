@@ -78,12 +78,12 @@ export interface ProposalDataSource {
     statusId: number,
     proposalPks: number[]
   ): Promise<Proposals>;
-  getProposalBookingByProposalPk(
+  getProposalBookingsByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter
-  ): Promise<{ id: number } | null>;
-  proposalBookingScheduledEvents(
-    proposalBookingId: number,
+  ): Promise<{ ids: number[] } | null>;
+  getAllProposalBookingsScheduledEvents(
+    proposalBookingIds: number[],
     filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null>;
   addProposalBookingScheduledEvent(

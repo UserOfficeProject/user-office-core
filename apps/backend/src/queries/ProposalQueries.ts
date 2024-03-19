@@ -126,7 +126,7 @@ export default class ProposalQueries {
   }
 
   @Authorized()
-  async getProposalBookingByProposalPk(
+  async getProposalBookingsByProposalPk(
     agent: UserWithRole | null,
     {
       proposalPk,
@@ -138,29 +138,25 @@ export default class ProposalQueries {
       return null;
     }
 
-    const proposalBooking =
-      await this.dataSource.getProposalBookingByProposalPk(proposalPk, filter);
+    const proposalBookings =
+      await this.dataSource.getProposalBookingsByProposalPk(proposalPk, filter);
 
-    if (!proposalBooking) {
-      return null;
-    }
-
-    return proposalBooking;
+    return proposalBookings;
   }
 
   @Authorized()
-  async proposalBookingScheduledEvents(
+  async getAllProposalBookingsScheduledEvents(
     agent: UserWithRole | null,
     {
-      proposalBookingId,
+      proposalBookingIds,
       filter,
     }: {
-      proposalBookingId: number;
+      proposalBookingIds: number[];
       filter?: ProposalBookingScheduledEventFilterCore;
     }
   ) {
-    return await this.dataSource.proposalBookingScheduledEvents(
-      proposalBookingId,
+    return await this.dataSource.getAllProposalBookingsScheduledEvents(
+      proposalBookingIds,
       filter
     );
   }
