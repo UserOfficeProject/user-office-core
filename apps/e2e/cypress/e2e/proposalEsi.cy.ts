@@ -41,7 +41,9 @@ context('visits tests', () => {
     cy.updateProposalManagementDecision({
       proposalPk: existingProposalId,
       statusId: acceptedStatusId,
-      managementTimeAllocation: 5,
+      managementTimeAllocations: [
+        { instrumentId: initialDBData.instrument1.id, value: 5 },
+      ],
       managementDecisionSubmitted: true,
     });
     cy.createVisit({

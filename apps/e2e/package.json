@@ -14,7 +14,7 @@
     "jwt-decode": "^3.1.2",
     "luxon": "^2.5.2",
     "pdf-parse": "^1.1.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^6.0.0",
@@ -22,16 +22,16 @@
     "@types/luxon": "^2.4.0",
     "@types/node": "^16.0.0",
     "@types/pdf-parse": "^1.1.1",
-    "@typescript-eslint/eslint-plugin": "^5.28.0",
-    "@typescript-eslint/parser": "^5.28.0",
-    "eslint": "^8.17.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-cypress": "^2.14.0",
-    "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-unused-imports": "^2.0.0",
-    "ts-loader": "^9.4.3",
-    "webpack": "^5.84.1"
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-cypress": "^2.15.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.89.0"
   },
   "engines": {
     "npm": ">=9.0.0",
