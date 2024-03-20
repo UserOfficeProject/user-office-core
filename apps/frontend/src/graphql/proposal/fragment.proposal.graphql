@@ -17,7 +17,6 @@ fragment proposal on Proposal {
   questionaryId
   notified
   submitted
-  managementTimeAllocation
   managementDecisionSubmitted
   fapMeetingDecision {
     ...fapMeetingDecision

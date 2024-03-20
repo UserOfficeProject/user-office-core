@@ -103,10 +103,45 @@ export default function createCustomHandler() {
           event.technicalreview.proposalPk
         );
 
+        const allProposalTechnicalReviews =
+          await reviewDataSource.getTechnicalReviews(
+            event.technicalreview.proposalPk
+          );
+
+        const allTechnicalReviewsSubmitted = allProposalTechnicalReviews?.every(
+          (technicalReview) => technicalReview.submitted
+        );
+
+        if (allTechnicalReviewsSubmitted) {
+          eventBus.publish({
+            type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED,
+            proposal: foundProposal,
+            isRejection: false,
+            key: 'proposal',
+            loggedInUserId: event.loggedInUserId,
+          });
+
+          const allTechnicalReviewsFeasible =
+            allProposalTechnicalReviews?.every(
+              (technicalReview) =>
+                technicalReview.status === TechnicalReviewStatus.FEASIBLE
+            );
+
+          if (allTechnicalReviewsFeasible) {
+            eventBus.publish({
+              type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE,
+              proposal: foundProposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
+        }
+
         switch (event.technicalreview.status) {
           case TechnicalReviewStatus.FEASIBLE:
             eventBus.publish({
-              type: Event.PROPOSAL_FEASIBLE,
+              type: Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
               proposal: foundProposal,
               isRejection: false,
               key: 'proposal',
@@ -115,7 +150,7 @@ export default function createCustomHandler() {
             break;
           case TechnicalReviewStatus.UNFEASIBLE:
             eventBus.publish({
-              type: Event.PROPOSAL_UNFEASIBLE,
+              type: Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
               proposal: foundProposal,
               isRejection: false,
               key: 'proposal',

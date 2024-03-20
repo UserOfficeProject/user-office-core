@@ -19,6 +19,7 @@ export const defaultProposalDataColumns = [
   'Proposal ID',
   'Title',
   'Principal Investigator',
+  'Instrument',
   'Technical Status',
   'Technical Comment',
   'Time(Days)',
@@ -59,8 +60,8 @@ export const collectProposalXLSXData = async (
     );
   }
 
-  const technicalReview =
-    await baseContext.queries.review.technicalReviewForProposal(
+  const technicalReviews =
+    await baseContext.queries.review.technicalReviewsForProposal(
       user,
       proposal.primaryKey
     );
@@ -76,20 +77,42 @@ export const collectProposalXLSXData = async (
       proposal.primaryKey
     );
 
+  const instruments =
+    await baseContext.queries.instrument.getInstrumentsByProposalPk(
+      user,
+      proposal.primaryKey
+    );
+
   return [
     proposal.proposalId,
     proposal.title,
     `${proposer.firstname} ${proposer.lastname}`,
-    technicalReview?.status !== undefined && technicalReview?.status !== null
-      ? getTranslation(
-          TechnicalReviewStatus[technicalReview?.status] as ResourceId
-        )
+    instruments.length
+      ? instruments
+          .map((instrument) => instrument.name ?? '<missing>')
+          .join(', ')
       : '<missing>',
-    technicalReview?.publicComment ?? '<missing>',
-    technicalReview?.timeAllocation ?? '<missing>',
+    technicalReviews.length
+      ? technicalReviews
+          .map((technicalReview) =>
+            technicalReview?.status !== undefined &&
+            technicalReview?.status !== null
+              ? getTranslation(
+                  TechnicalReviewStatus[technicalReview?.status] as ResourceId
+                )
+              : '<missing>'
+          )
+          .join(', ')
+      : '<missing>',
+    technicalReviews
+      ?.map((technicalReview) => technicalReview?.publicComment || '<missing>')
+      .join(', ') || '<missing>',
+    technicalReviews
+      ?.map((technicalReview) => technicalReview?.timeAllocation ?? '<missing>')
+      .join(', ') ?? '<missing>',
     absoluteDifference(getGrades(reviews)) || 'NA',
     average(getGrades(reviews)) || 'NA',
-    proposal.commentForManagement ?? '<missing>',
+    proposal.commentForManagement || '<missing>',
     ProposalEndStatus[proposal.finalStatus] ?? '<missing>',
     fapMeetingDecision?.rankOrder ?? '<missing>',
   ];

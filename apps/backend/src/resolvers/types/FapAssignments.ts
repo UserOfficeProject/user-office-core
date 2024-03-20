@@ -36,6 +36,9 @@ export class FapAssignment {
 
   @Field(() => Boolean)
   public emailSent: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public rank: number | null;
 }
 
 @Resolver(() => FapAssignment)
