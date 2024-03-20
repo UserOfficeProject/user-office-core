@@ -76,16 +76,15 @@ context('Internal Review tests', () => {
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
-      cy.assignProposalsToInstrument({
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
-        instrumentId: createdInstrumentId,
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
       }).then(() => {
         // NOTE: Get the technical review id for later usage.
         cy.updateTechnicalReviewAssignee({
           proposalPks: [createdProposalPk],
           userId: scientist1.id,
+          instrumentId: createdInstrumentId,
         }).then((result) => {
           technicalReviewId = result.updateTechnicalReviewAssignee[0].id;
         });

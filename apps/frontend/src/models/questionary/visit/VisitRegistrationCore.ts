@@ -4,6 +4,6 @@ export type VisitRegistrationCore = NonNullable<
   NonNullable<
     NonNullable<
       NonNullable<GetUserProposalBookingsWithEventsQuery['me']>['proposals']
-    >[0]['proposalBookingCore']
+    >[0]['proposalBookingsCore']
   >['scheduledEvents'][0]['visit']
 >['registrations'][0];

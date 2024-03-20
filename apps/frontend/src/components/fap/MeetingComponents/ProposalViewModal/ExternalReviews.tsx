@@ -33,7 +33,7 @@ const ExternalReviews = ({ reviews }: ExternalReviewsProps) => {
 
   return (
     <div data-cy="Fap-meeting-components-external-reviews">
-      <StyledPaper>
+      <StyledPaper margin={[0]}>
         <Typography
           variant="h6"
           component="h2"

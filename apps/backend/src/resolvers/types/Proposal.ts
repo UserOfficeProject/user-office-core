@@ -23,8 +23,8 @@ import { Call } from './Call';
 import { Fap } from './Fap';
 import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
-import { Instrument } from './Instrument';
-import { ProposalBookingCore, ProposalBookingFilter } from './ProposalBooking';
+import { InstrumentWithManagementTime } from './Instrument';
+import { ProposalBookingsCore, ProposalBookingFilter } from './ProposalBooking';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
@@ -81,9 +81,6 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => Boolean)
   public submitted: boolean;
-
-  @Field(() => Int, { nullable: true })
-  public managementTimeAllocation: number;
 
   @Field(() => Boolean)
   public managementDecisionSubmitted: boolean;
@@ -149,23 +146,26 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => TechnicalReview, { nullable: true })
-  async technicalReview(
+  @FieldResolver(() => [TechnicalReview])
+  async technicalReviews(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<TechnicalReview | null> {
-    return await context.queries.review.technicalReviewForProposal(
+  ): Promise<TechnicalReview[]> {
+    return await context.queries.review.technicalReviewsForProposal(
       context.user,
       proposal.primaryKey
     );
   }
 
-  @FieldResolver(() => Instrument, { nullable: true })
-  async instrument(
+  @FieldResolver(() => [InstrumentWithManagementTime], {
+    nullable: 'itemsAndList',
+  })
+  async instruments(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Instrument | null> {
-    return await context.queries.instrument.dataSource.getInstrumentByProposalPk(
+  ): Promise<InstrumentWithManagementTime[]> {
+    return await context.queries.instrument.getInstrumentsByProposalPk(
+      context.user,
       proposal.primaryKey
     );
   }
@@ -243,14 +243,14 @@ export class ProposalResolver {
       proposalPk: proposal.primaryKey,
     });
   }
-  @FieldResolver(() => ProposalBookingCore, { nullable: true })
-  proposalBookingCore(
+  @FieldResolver(() => ProposalBookingsCore, { nullable: true })
+  proposalBookingsCore(
     @Root() proposal: Proposal,
     @Ctx() ctx: ResolverContext,
     @Arg('filter', () => ProposalBookingFilter, { nullable: true })
     filter?: ProposalBookingFilter
   ) {
-    return ctx.queries.proposal.getProposalBookingByProposalPk(ctx.user, {
+    return ctx.queries.proposal.getProposalBookingsByProposalPk(ctx.user, {
       proposalPk: proposal.primaryKey,
       filter,
     });

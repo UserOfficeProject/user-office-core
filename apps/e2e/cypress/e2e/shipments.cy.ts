@@ -29,7 +29,9 @@ context('Shipments tests', () => {
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
       managementDecisionSubmitted: true,
-      managementTimeAllocation: 2,
+      managementTimeAllocations: [
+        { instrumentId: initialDBData.instrument1.id, value: 5 },
+      ],
     });
     cy.createVisit({
       team: [coProposer.id, visitor.id, PI.id],

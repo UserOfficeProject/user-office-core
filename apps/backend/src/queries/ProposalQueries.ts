@@ -30,8 +30,6 @@ export default class ProposalQueries {
   @Authorized()
   async get(agent: UserWithRole | null, primaryKey: number) {
     let proposal = await this.dataSource.get(primaryKey);
-    const proposalTechnicalReview =
-      await this.reviewDataSource.getTechnicalReview(primaryKey);
 
     if (!proposal) {
       return null;
@@ -50,13 +48,7 @@ export default class ProposalQueries {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
 
-    if (
-      (await this.hasReadRights(agent, proposal)) === true ||
-      (await this.userAuth.isInternalReviewerOnTechnicalReview(
-        agent,
-        proposalTechnicalReview?.id
-      ))
-    ) {
+    if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
     } else {
       return null;
@@ -134,7 +126,7 @@ export default class ProposalQueries {
   }
 
   @Authorized()
-  async getProposalBookingByProposalPk(
+  async getProposalBookingsByProposalPk(
     agent: UserWithRole | null,
     {
       proposalPk,
@@ -146,29 +138,25 @@ export default class ProposalQueries {
       return null;
     }
 
-    const proposalBooking =
-      await this.dataSource.getProposalBookingByProposalPk(proposalPk, filter);
+    const proposalBookings =
+      await this.dataSource.getProposalBookingsByProposalPk(proposalPk, filter);
 
-    if (!proposalBooking) {
-      return null;
-    }
-
-    return proposalBooking;
+    return proposalBookings;
   }
 
   @Authorized()
-  async proposalBookingScheduledEvents(
+  async getAllProposalBookingsScheduledEvents(
     agent: UserWithRole | null,
     {
-      proposalBookingId,
+      proposalBookingIds,
       filter,
     }: {
-      proposalBookingId: number;
+      proposalBookingIds: number[];
       filter?: ProposalBookingScheduledEventFilterCore;
     }
   ) {
-    return await this.dataSource.proposalBookingScheduledEvents(
-      proposalBookingId,
+    return await this.dataSource.getAllProposalBookingsScheduledEvents(
+      proposalBookingIds,
       filter
     );
   }

@@ -77,7 +77,7 @@ const ChangeProposalStatus = ({
         validationSchema={changeProposalStatusValidationSchema}
       >
         {({ isSubmitting, values }): JSX.Element => (
-          <Form style={{ width: '240px' }}>
+          <Form>
             <Typography
               variant="h6"
               component="h1"

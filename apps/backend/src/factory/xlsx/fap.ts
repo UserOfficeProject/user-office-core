@@ -147,7 +147,7 @@ export const collectFaplXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.review.technicalReviewForProposal(
+            ? baseContext.queries.review.technicalReviewsForProposal(
                 user,
                 proposal.primaryKey
               )
@@ -216,7 +216,11 @@ export const collectFaplXLSXData = async (
         proposals.map(async (proposal, pIndx) => {
           const { firstname = '<missing>', lastname = '<missing>' } =
             proposalPrincipalInvestigators[pIndx] ?? {};
-          const technicalReview = technicalReviews[pIndx];
+          const technicalReview =
+            technicalReviews[pIndx]?.find(
+              (technicalReview) =>
+                technicalReview.instrumentId === instrument.id
+            ) || null;
           const reviews = proposalReviews[pIndx];
           const fapProposal = fapProposals?.[pIndx];
           const fapMeetingDecision = fapMeetingDecisions[pIndx];

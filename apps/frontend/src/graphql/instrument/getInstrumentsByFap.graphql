@@ -1,0 +1,13 @@
+query getInstrumentsByFap($fapId: Int!, $callId: Int!) {
+  instrumentsByFap(fapId: $fapId, callId: $callId) {
+    id
+    name
+    shortCode
+    description
+    availabilityTime
+    submitted
+    scientists {
+      ...basicUserDetails
+    }
+  }
+}
