@@ -1,12 +1,14 @@
 mutation updateFapTimeAllocation(
   $fapId: Int!
   $proposalPk: Int!
-  $fapTimeAllocation: Int
+  $fapTimeAllocation: Int,
+  $instrumentId: Int!
 ) {
   updateFapTimeAllocation(
     fapId: $fapId
     proposalPk: $proposalPk
     fapTimeAllocation: $fapTimeAllocation
+    instrumentId: $instrumentId
   ) {
     fapId
   }

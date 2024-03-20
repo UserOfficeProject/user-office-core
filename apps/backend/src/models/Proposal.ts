@@ -45,7 +45,6 @@ export class Proposal {
     public notified: boolean,
     public submitted: boolean,
     public referenceNumberSequence: number,
-    public managementTimeAllocation: number,
     public managementDecisionSubmitted: boolean
   ) {}
 }

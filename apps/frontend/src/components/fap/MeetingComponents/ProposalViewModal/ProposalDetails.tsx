@@ -94,7 +94,11 @@ const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
               </TableRow>
               <TableRow key="instrumentAndPdf">
                 <TableCell className={classes.textBold}>Instrument</TableCell>
-                <TableCell>{proposal.instrument?.name}</TableCell>
+                <TableCell>
+                  {proposal.instruments
+                    ?.map((instrument) => instrument?.name)
+                    .join(', ')}
+                </TableCell>
                 <TableCell className={classes.textBold}>PDF</TableCell>
                 <TableCell>
                   <Button
