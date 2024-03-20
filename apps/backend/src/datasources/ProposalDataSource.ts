@@ -41,7 +41,7 @@ export interface ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter
   ): Promise<Proposal[]>;
-  getProposalsByIds(ids: number[]): Promise<Proposal[]>;
+  getProposalsByPks(pks: number[]): Promise<Proposal[]>;
   // Write
   create(
     proposer_id: number,
@@ -78,12 +78,12 @@ export interface ProposalDataSource {
     statusId: number,
     proposalPks: number[]
   ): Promise<Proposals>;
-  getProposalBookingByProposalPk(
+  getProposalBookingsByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter
-  ): Promise<{ id: number } | null>;
-  proposalBookingScheduledEvents(
-    proposalBookingId: number,
+  ): Promise<{ ids: number[] } | null>;
+  getAllProposalBookingsScheduledEvents(
+    proposalBookingIds: number[],
     filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null>;
   addProposalBookingScheduledEvent(

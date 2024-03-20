@@ -10,9 +10,6 @@ query getScheduledEventsCore(
       proposer {
         ...basicUserDetails
       }
-      instrument {
-        ...instrument
-      }
     }
     esi {
       ...esi

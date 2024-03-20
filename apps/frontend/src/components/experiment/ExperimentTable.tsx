@@ -46,7 +46,7 @@ const columns = (t: TFunction<'translation', undefined, 'translation'>) => [
   },
   {
     title: t('instrument'),
-    field: 'proposal.instrument.name',
+    field: 'instrument.name',
   },
 ];
 

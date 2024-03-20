@@ -6,8 +6,8 @@ BEGIN
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (2, 'Instrument 2', 'INSTR2', 'Test instrument 2', 0);
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (3, 'Instrument 3', 'INSTR3', 'Test instrument 3', 0);
   
-  INSERT INTO call_has_instruments (call_id, instrument_id, availability_time, submitted) VALUES (1, 1, NULL, false);
-  INSERT INTO call_has_instruments (call_id, instrument_id, availability_time, submitted) VALUES (1, 3, NULL, false);
+  INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 1, NULL);
+  INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 3, NULL);
 
   INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (1, NOW(), 1);
 
@@ -48,7 +48,7 @@ BEGIN
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (1, 1);
 
-  INSERT INTO technical_review (technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id) VALUES (1, 1, '', 2, 0, '', 0);
+  INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, instrument_id) VALUES (1, 1, '', 2, 0, '', 0, 1);
 
 END;
 $DO$

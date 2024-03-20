@@ -2,19 +2,11 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext } from 'react';
 import { StringParam, useQueryParams, withDefault } from 'use-query-params';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { ReviewerFilter, SettingsId } from 'generated/sdk';
-
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-}));
 
 type ReviewerFilterComponentProps = {
   reviewer: string;
@@ -38,13 +30,12 @@ const ReviewerFilterComponent = ({
   if (!reviewerFilter) {
     reviewerFilter = ReviewerFilter.ME;
   }
-  const classes = useStyles();
   const [, setQuery] = useQueryParams({
     reviewer: withDefault(StringParam, reviewerFilter),
   });
 
   return (
-    <FormControl className={classes.formControl}>
+    <FormControl fullWidth>
       <InputLabel shrink>Reviewer</InputLabel>
       <Select
         id="reviewer-selection"

@@ -25,10 +25,11 @@ query fapProposalsByInstrument(
         grade
         status
       }
-      technicalReview {
+      technicalReviews {
         publicComment
         status
         timeAllocation
+        instrumentId
       }
     }
     assignments {

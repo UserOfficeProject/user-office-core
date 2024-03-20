@@ -29,7 +29,7 @@ const getRequest = (
   shipmentSenderName: string,
   shipmentSenderEmail: string,
   shipmentSenderPhone: string,
-  instrumentShortCode: string
+  instrumentShortCodes: string[]
 ) => `<?xml version="1.0" encoding="utf-8"?>
 <Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<Header>
@@ -345,7 +345,7 @@ const getRequest = (
 								<ORGANIZATIONCODE>*</ORGANIZATIONCODE>
 							</ORGANIZATIONID>
 						</CLASSID>
-						<TEXTFIELD>${instrumentShortCode}</TEXTFIELD>
+						<TEXTFIELD>${instrumentShortCodes.join(', ')}</TEXTFIELD>
 						<LOVSETTINGS>
 							<LOV_TYPE>-</LOV_TYPE>
 							<LOV_VALIDATE>-</LOV_VALIDATE>

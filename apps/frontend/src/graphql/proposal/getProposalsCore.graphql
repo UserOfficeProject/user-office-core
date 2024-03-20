@@ -24,22 +24,22 @@ query getProposalsCore(
       rankOrder
       finalStatus
       notified
-      managementTimeAllocation
-      technicalTimeAllocation
-      technicalReviewAssigneeId
-      technicalReviewAssigneeFirstName
-      technicalReviewAssigneeLastName
-      technicalStatus
-      instrumentName
+      submitted
+      managementTimeAllocations
+      technicalTimeAllocations
+      technicalReviewAssigneeIds
+      technicalReviewAssigneeNames
+      technicalStatuses
+      instrumentNames
+      instrumentIds
+      fapInstrumentId
       callShortCode
       fapCode
       fapId
       reviewAverage
       reviewDeviation
-      instrumentId
       callId
       workflowId
-      submitted
       allocationTimeUnit
       principalInvestigator {
         firstname

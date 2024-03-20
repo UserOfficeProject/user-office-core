@@ -21,7 +21,7 @@ import { TextField } from 'formik-mui';
 import React from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
-import SimpleTabs from 'components/common/TabPanel';
+import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import {
   PermissionsWithAccessToken,

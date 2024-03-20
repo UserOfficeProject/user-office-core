@@ -23,7 +23,6 @@ import {
   CoreTechnicalReviewFragment,
   UserRole,
   Proposal,
-  AddTechnicalReviewMutation,
 } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -47,7 +46,7 @@ type TechnicalReviewFormType = {
 };
 
 type ProposalTechnicalReviewProps = {
-  data: CoreTechnicalReviewFragment | null | undefined;
+  data: CoreTechnicalReviewFragment;
   setReview: (data: CoreTechnicalReviewFragment) => void;
   proposal: Proposal;
   confirm: WithConfirmType;
@@ -69,18 +68,19 @@ const ProposalTechnicalReview = ({
   const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
 
   useEffect(() => {
-    if (data?.files) {
+    if (data.files) {
       setFileList(JSON.parse(data.files));
     }
-  }, [data?.files]);
+  }, [data.files]);
 
   const initialValues: TechnicalReviewFormType = {
-    status: data?.status || '',
-    timeAllocation: data?.timeAllocation || '',
-    comment: data?.comment || '',
-    publicComment: data?.publicComment || '',
-    submitted: data?.submitted || false,
-    files: data?.files || '',
+    status: data.status || '',
+    timeAllocation:
+      typeof data.timeAllocation === 'number' ? data.timeAllocation : '',
+    comment: data.comment || '',
+    publicComment: data.publicComment || '',
+    submitted: data.submitted || false,
+    files: data.files || '',
   };
 
   const statusOptions: Option[] = [
@@ -119,10 +119,8 @@ const ProposalTechnicalReview = ({
           shouldSubmit ? 'submitted' : 'updated'
         } successfully!`;
 
-    let result;
-
     if (method === 'submitTechnicalReviews') {
-      result = await api({ toastSuccessMessage })[method]({
+      await api({ toastSuccessMessage })[method]({
         technicalReviews: [
           {
             proposalPk: proposal.primaryKey,
@@ -134,11 +132,12 @@ const ProposalTechnicalReview = ({
             submitted: shouldSubmit,
             reviewerId: user.id,
             files: fileList ? JSON.stringify(fileList) : null,
+            instrumentId: data.instrumentId,
           },
         ],
       });
     } else {
-      result = await api({ toastSuccessMessage })[method]({
+      await api({ toastSuccessMessage })[method]({
         proposalPk: proposal.primaryKey,
         timeAllocation: +values.timeAllocation,
         comment: values.comment,
@@ -147,43 +146,33 @@ const ProposalTechnicalReview = ({
         submitted: shouldSubmit,
         reviewerId: user.id,
         files: fileList ? JSON.stringify(fileList) : null,
+        instrumentId: data.instrumentId,
       });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!(result as any)[method].rejection) {
-      let technicalReviewId = null;
-
-      if (method === 'addTechnicalReview') {
-        technicalReviewId = (result as AddTechnicalReviewMutation)
-          .addTechnicalReview.id;
-      }
-
-      setReview({
-        id: technicalReviewId,
-        proposalPk: data?.proposalPk,
-        timeAllocation: +values.timeAllocation,
-        comment: values.comment,
-        publicComment: values.publicComment,
-        status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
-        submitted: shouldSubmit,
-      } as CoreTechnicalReviewFragment);
-    }
+    setReview({
+      id: data.id,
+      proposalPk: data.proposalPk,
+      timeAllocation: +values.timeAllocation,
+      comment: values.comment,
+      publicComment: values.publicComment,
+      status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
+      submitted: shouldSubmit,
+      instrumentId: data.instrumentId,
+    } as CoreTechnicalReviewFragment);
   };
 
   const shouldDisableForm = (isSubmitting: boolean) =>
-    ((isSubmitting || data?.submitted) && !isUserOfficer) || isInternalReviewer;
+    ((isSubmitting || data.submitted) && !isUserOfficer) || isInternalReviewer;
 
   return (
     <>
       <Typography variant="h6" component="h2" gutterBottom>
         Technical Review
       </Typography>
-      {proposal.technicalReview?.technicalReviewAssignee && (
+      {data.technicalReviewAssignee && (
         <Typography variant="subtitle2" data-cy="reviewed-by-info">
-          {`Reviewed by ${getFullUserName(
-            proposal.technicalReview.technicalReviewAssignee
-          )}`}
+          {`Reviewed by ${getFullUserName(data.technicalReviewAssignee)}`}
         </Typography>
       )}
       <Formik
@@ -388,14 +377,14 @@ const ProposalTechnicalReview = ({
                   {!isUserOfficer && (
                     <Button
                       disabled={
-                        isSubmitting || data?.submitted || isInternalReviewer
+                        isSubmitting || data.submitted || isInternalReviewer
                       }
                       type="submit"
                       className={classes.submitButton}
                       onClick={() => setShouldSubmit(true)}
                       data-cy="submit-technical-review"
                     >
-                      {data?.submitted ? 'Submitted' : 'Save and Submit'}
+                      {data.submitted ? 'Submitted' : 'Save and Submit'}
                     </Button>
                   )}
                 </StyledButtonContainer>

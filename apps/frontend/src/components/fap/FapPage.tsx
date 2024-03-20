@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
-import SimpleTabs from 'components/common/TabPanel';
+import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import { Fap, UserRole } from 'generated/sdk';
