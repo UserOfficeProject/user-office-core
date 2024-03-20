@@ -28,6 +28,7 @@ export class ChangeProposalsStatusInput {
   @Field(() => Int)
   public statusId: number;
 
+  // TODO: It is better to collect the data here on the backend then sending callId and workflowId as arguments.
   @Field(() => [ProposalSelectionInput])
   public proposals: ProposalSelectionInput[];
 }

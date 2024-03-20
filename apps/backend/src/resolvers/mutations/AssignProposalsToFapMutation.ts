@@ -20,6 +20,9 @@ export class AssignProposalsToFapArgs {
 
   @Field(() => Int)
   public fapId: number;
+
+  @Field(() => Int)
+  public fapInstrumentId: number;
 }
 
 export class AssignProposalsToFapUsingCallInstrumentArgs {

@@ -198,6 +198,7 @@ describe('Test FapMutations', () => {
       FapMutationsInstance.assignProposalsToFap(dummyUserOfficerWithRole, {
         proposals: [{ primaryKey: 1, callId: 1 }],
         fapId: 1,
+        fapInstrumentId: 1,
       })
     ).resolves.toStrictEqual(new ProposalPks([1]));
   });

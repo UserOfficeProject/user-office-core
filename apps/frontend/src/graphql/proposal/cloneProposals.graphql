@@ -16,7 +16,7 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
       ...questionary
       isCompleted
     }
-    technicalReview {
+    technicalReviews {
       ...coreTechnicalReview
     }
     reviews {
@@ -32,7 +32,7 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
         id
       }
     }
-    instrument {
+    instruments {
       id
       name
       shortCode

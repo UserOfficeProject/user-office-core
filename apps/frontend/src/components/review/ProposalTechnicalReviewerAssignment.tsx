@@ -3,17 +3,23 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
-import { ProposalData } from 'hooks/proposal/useProposalData';
+import {
+  ProposalDataInstrument,
+  ProposalDataTechnicalReview,
+} from 'hooks/proposal/useProposalData';
 
 import AssignTechnicalReview from './AssignTechnicalReview';
 
 type ProposalTechnicalReviewerAssignmentProps = {
-  proposalData: ProposalData;
-  setProposalData: Dispatch<SetStateAction<ProposalData | null>>;
+  technicalReview: ProposalDataTechnicalReview;
+  instrument: ProposalDataInstrument;
+  onTechnicalReviewUpdated: (
+    updatedTechnicalReview: ProposalDataTechnicalReview
+  ) => void;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -29,8 +35,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ProposalTechnicalReviewerAssignment = ({
-  proposalData,
-  setProposalData,
+  technicalReview,
+  instrument,
+  onTechnicalReviewUpdated,
 }: ProposalTechnicalReviewerAssignmentProps) => {
   const classes = useStyles();
   const [showReassign, setShowReassign] = useState(false);
@@ -43,7 +50,7 @@ const ProposalTechnicalReviewerAssignment = ({
       className={clsx(
         classes.reassignContainer,
         !isUserOfficer &&
-          proposalData.technicalReview?.submitted &&
+          technicalReview?.submitted &&
           classes.reassignContainerDisabled
       )}
     >
@@ -55,13 +62,11 @@ const ProposalTechnicalReviewerAssignment = ({
         proposal, you can re-assign it to someone else
       </p>
       <>
-        {proposalData.technicalReview?.technicalReviewAssigneeId !== null ||
-        showReassign ? (
+        {technicalReview?.technicalReviewAssigneeId !== null || showReassign ? (
           <AssignTechnicalReview
-            proposal={proposalData}
-            onProposalUpdated={(updatedProposal) => {
-              setProposalData(updatedProposal);
-            }}
+            technicalReview={technicalReview}
+            instrument={instrument}
+            onTechnicalReviewUpdated={onTechnicalReviewUpdated}
           />
         ) : (
           <Button

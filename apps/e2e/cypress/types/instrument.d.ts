@@ -4,8 +4,8 @@ import {
   AssignInstrumentsToCallMutation,
   AssignScientistsToInstrumentMutationVariables,
   AssignScientistsToInstrumentMutation,
-  AssignProposalsToInstrumentMutationVariables,
-  AssignProposalsToInstrumentMutation,
+  AssignProposalsToInstrumentsMutationVariables,
+  AssignProposalsToInstrumentsMutation,
   AssignInstrumentsToCallMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
@@ -54,22 +54,19 @@ declare global {
       ) => Cypress.Chainable<AssignScientistsToInstrumentMutation>;
 
       /**
-       * Assigns selected proposal/s to an instrument
+       * Assigns selected proposal/s to instrument/s
        *
-       * @returns {typeof assignProposalsToInstrument}
+       * @returns {typeof assignProposalsToInstruments}
        * @memberof Chainable
        * @example
-       *    cy.assignProposalsToInstrument({
-       *      proposals: {
-       *        callId: 1,
-       *        primaryKey: 1
-       *      },
-       *      instrumentId: 1
+       *    cy.assignProposalsToInstruments({
+       *      proposalPks: [1],
+       *      instrumentId: [1]
        *    });
        */
-      assignProposalsToInstrument: (
-        assignProposalsToInstrumentInput: AssignProposalsToInstrumentMutationVariables
-      ) => Cypress.Chainable<AssignProposalsToInstrumentMutation>;
+      assignProposalsToInstruments: (
+        assignProposalsToInstrumentsInput: AssignProposalsToInstrumentsMutationVariables
+      ) => Cypress.Chainable<AssignProposalsToInstrumentsMutation>;
 
       /**
        * Assigns an instrument/s to a selected call

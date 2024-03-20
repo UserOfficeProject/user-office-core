@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
-import SimpleTabs from 'components/common/TabPanel';
+import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import ExternalReviews from 'components/fap/MeetingComponents/ProposalViewModal/ExternalReviews';
@@ -15,14 +15,17 @@ import ProposalAdmin, {
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
+  InstrumentWithManagementTime,
   Proposal,
   Review,
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
-import { useProposalData } from 'hooks/proposal/useProposalData';
+import {
+  ProposalDataTechnicalReview,
+  useProposalData,
+} from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
-import { StyledPaper } from 'styles/StyledComponents';
 
 import InternalReviews from '../internalReview/InternalReviews';
 import ProposalGrade from './ProposalGrade';
@@ -32,7 +35,7 @@ import TechnicalReviewInformation from './TechnicalReviewInformation';
 
 export enum PROPOSAL_MODAL_TAB_NAMES {
   PROPOSAL_INFORMATION = 'Proposal information',
-  TECHNICAL_REVIEW = 'Technical review',
+  TECHNICAL_REVIEW = 'Technical reviews',
   REVIEWS = 'Reviews',
   ADMIN = 'Admin',
   GRADE = 'Grade',
@@ -91,43 +94,94 @@ const ProposalReviewContent = ({
     />
   );
 
-  const TechnicalReviewTab =
-    isUserOfficer ||
-    (isInstrumentScientist &&
-      proposalData.technicalReview?.technicalReviewAssigneeId === user.id) ||
-    isInternalReviewer ? (
-      <>
-        {!!proposalData.technicalReview && (
-          <InternalReviews
-            technicalReviewId={proposalData.technicalReview.id}
-            technicalReviewSubmitted={proposalData.technicalReview.submitted}
-          />
-        )}
-        {!!proposalData.instrument && (
-          <ProposalTechnicalReviewerAssignment
-            proposalData={proposalData}
-            setProposalData={setProposalData}
-          />
-        )}
-        <ProposalTechnicalReview
-          proposal={proposalData as Proposal}
-          data={proposalData.technicalReview}
-          setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
-            setProposalData({
-              ...proposalData,
-              technicalReview: {
-                ...proposalData.technicalReview,
-                ...data,
-              } as TechnicalReview,
-            })
-          }
-        />
-      </>
-    ) : (
-      <TechnicalReviewInformation
-        data={proposalData.technicalReview as TechnicalReview}
-      />
+  const getTechnicalReviewInstrument = (instrumentId: number) =>
+    proposalData.instruments?.find(
+      (instrument) => instrument?.id === instrumentId
     );
+
+  const technicalReviewsContent = proposalData.technicalReviews.map(
+    (technicalReview) => {
+      const technicalReviewInstrument = getTechnicalReviewInstrument(
+        technicalReview.instrumentId
+      );
+
+      return isUserOfficer ||
+        (isInstrumentScientist &&
+          technicalReview?.technicalReviewAssigneeId === user.id) ||
+        isInternalReviewer ? (
+        <Fragment key={technicalReview.id}>
+          {!!technicalReview && (
+            <InternalReviews
+              technicalReviewId={technicalReview.id}
+              technicalReviewSubmitted={technicalReview.submitted}
+            />
+          )}
+          {!!technicalReviewInstrument && (
+            <ProposalTechnicalReviewerAssignment
+              technicalReview={technicalReview}
+              instrument={technicalReviewInstrument}
+              onTechnicalReviewUpdated={(
+                updatedTechnicalReview: ProposalDataTechnicalReview
+              ) => {
+                setProposalData({
+                  ...proposalData,
+                  technicalReviews:
+                    proposalData.technicalReviews.map((tReview) =>
+                      updatedTechnicalReview.id === tReview.id
+                        ? updatedTechnicalReview
+                        : tReview
+                    ) || [],
+                });
+              }}
+            />
+          )}
+          <ProposalTechnicalReview
+            proposal={proposalData as Proposal}
+            data={technicalReview}
+            setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+              setProposalData({
+                ...proposalData,
+                technicalReviews:
+                  proposalData.technicalReviews.map((technicalReview) => {
+                    if (technicalReview.id === data?.id) {
+                      return { ...technicalReview, ...data };
+                    } else {
+                      return {
+                        ...technicalReview,
+                      };
+                    }
+                  }) || null,
+              })
+            }
+          />
+        </Fragment>
+      ) : (
+        <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
+      );
+    }
+  );
+
+  const TechnicalReviewTab = proposalData.technicalReviews.length ? (
+    proposalData.technicalReviews.length > 1 ? (
+      <SimpleTabs
+        orientation="vertical"
+        isInsideModal={isInsideModal}
+        tabNames={
+          proposalData.technicalReviews?.map(
+            (technicalReview) =>
+              getTechnicalReviewInstrument(technicalReview.instrumentId)
+                ?.name || 'None'
+          ) || []
+        }
+      >
+        {technicalReviewsContent as JSX.Element[]}
+      </SimpleTabs>
+    ) : (
+      technicalReviewsContent
+    )
+  ) : (
+    <div>No technical reviews found for the selected proposal</div>
+  );
 
   const GradeTab = (
     <ProposalGrade
@@ -152,7 +206,18 @@ const ProposalReviewContent = ({
     <ProposalAdmin
       data={proposalData}
       setAdministration={(data: AdministrationFormData) =>
-        setProposalData({ ...proposalData, ...data })
+        setProposalData({
+          ...proposalData,
+          ...data,
+          instruments:
+            proposalData.instruments?.map((instrument) => ({
+              ...(instrument as InstrumentWithManagementTime),
+              managementTimeAllocation:
+                data.managementTimeAllocations?.find(
+                  (item) => item.instrumentId === instrument?.id
+                )?.value ?? null,
+            })) || [],
+        })
       }
     />
   );
@@ -166,17 +231,17 @@ const ProposalReviewContent = ({
 
   const tabsContent = tabNames.map((tab, index) => {
     switch (tab) {
-      case 'Proposal information':
+      case PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION:
         return <Fragment key={index}>{ProposalInformationTab}</Fragment>;
-      case 'Technical review':
+      case PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW:
         return <Fragment key={index}>{TechnicalReviewTab}</Fragment>;
-      case 'Reviews':
+      case PROPOSAL_MODAL_TAB_NAMES.REVIEWS:
         return <Fragment key={index}>{AllProposalReviewsTab}</Fragment>;
-      case 'Admin':
+      case PROPOSAL_MODAL_TAB_NAMES.ADMIN:
         return <Fragment key={index}>{ProposalAdminTab}</Fragment>;
-      case 'Logs':
+      case PROPOSAL_MODAL_TAB_NAMES.LOGS:
         return <Fragment key={index}>{EventLogsTab}</Fragment>;
-      case 'Grade':
+      case PROPOSAL_MODAL_TAB_NAMES.GRADE:
         return <Fragment key={index}>{GradeTab}</Fragment>;
       default:
         return null;
@@ -184,7 +249,7 @@ const ProposalReviewContent = ({
   });
 
   return (
-    <StyledPaper>
+    <>
       {tabNames.length > 1 ? (
         <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
           {tabsContent}
@@ -192,7 +257,7 @@ const ProposalReviewContent = ({
       ) : (
         <>{tabsContent}</>
       )}
-    </StyledPaper>
+    </>
   );
 };
 
