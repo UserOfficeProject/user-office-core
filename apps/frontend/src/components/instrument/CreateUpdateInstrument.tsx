@@ -200,7 +200,7 @@ const CreateUpdateInstrument = ({
           <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
-            label="Beamline manager"
+            label="Instrument Contact"
             noOptionsText="No one"
             items={usersData
               .sort(

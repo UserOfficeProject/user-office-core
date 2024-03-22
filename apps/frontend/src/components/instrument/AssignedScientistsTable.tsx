@@ -91,7 +91,7 @@ const AssignedScientistsTable = ({
     >
       <MaterialTable
         columns={beamLineManagerColumns}
-        title={`Beamline Manager`}
+        title={`Instrument Contact`}
         data={[
           {
             firstname: instrument.beamlineManager?.firstname,

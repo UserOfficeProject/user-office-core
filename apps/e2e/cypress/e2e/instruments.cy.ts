@@ -518,7 +518,7 @@ context('Instrument tests', () => {
         .should('contain.text', 'No records to display');
     });
 
-    it('User Officer should be able to update beamline manager', () => {
+    it('User Officer should be able to update instrument contact', () => {
       cy.contains('Instruments').click();
 
       cy.contains(instrument1.name)
