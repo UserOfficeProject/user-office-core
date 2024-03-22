@@ -1,4 +1,5 @@
 import { Page } from '../../models/Admin';
+import { Country } from '../../models/Country';
 import { Entry } from '../../models/Entry';
 import { Feature, FeatureId, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
@@ -11,7 +12,8 @@ import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSe
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 
-export const dummyInstitution = new Institution(1, 'ESS', 1, true);
+export const dummyInstitution = new Institution(1, 'ESS', 1);
+export const dummyCountry = new Country(173, 'Sweden');
 export const dummyApiAccessToken = new Permissions(
   'kkmgdyzpj26uxubxoyl',
   'ESS access token',
@@ -60,6 +62,21 @@ export class AdminDataSourceMock implements AdminDataSource {
     }));
   }
 
+  async createCountry(countryName: string): Promise<Country> {
+    return dummyCountry;
+  }
+  async getCountryByName(countryName: string): Promise<Country | null> {
+    return dummyCountry;
+  }
+
+  async getInstitutionByRorId(rorId: string): Promise<Institution | null> {
+    return dummyInstitution;
+  }
+  async getInstitutionByName(
+    institutionName: string
+  ): Promise<Institution | null> {
+    return dummyInstitution;
+  }
   async getInstitutionUsers(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails[]> {

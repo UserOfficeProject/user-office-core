@@ -1,10 +1,9 @@
 import { Check, MergeType } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import Button from '@mui/material/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
-import { Checkbox, TextField } from 'formik-mui';
+import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useHistory } from 'react-router';
@@ -17,15 +16,12 @@ import { Institution } from 'generated/sdk';
 import { useCountries } from 'hooks/user/useCountries';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-type CreateUpdateInstitutionProps = {
+type UpdateInstitutionProps = {
   close: (institution: Institution | null) => void;
   institution: Institution | null;
 };
 
-const CreateUpdateInstitution = ({
-  close,
-  institution,
-}: CreateUpdateInstitutionProps) => {
+const UpdateInstitution = ({ close, institution }: UpdateInstitutionProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const history = useHistory();
   const countries = useCountries();
@@ -33,40 +29,18 @@ const CreateUpdateInstitution = ({
     ? {
         name: institution.name,
         country: institution.country?.id,
-        verified: institution.verified,
       }
     : {
         name: '',
-        country: null,
-        verified: false,
+        country: undefined,
       };
 
   if (!countries) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
 
-  const createInstitution = async (
-    verified: boolean,
-    name: string,
-    country: number
-  ) => {
-    try {
-      const { createInstitution } = await api({
-        toastSuccessMessage: 'Institution created successfully!',
-      }).createInstitution({
-        name,
-        country,
-        verified,
-      });
-      close(createInstitution);
-    } catch (error) {
-      close(null);
-    }
-  };
-
   const updateInstitution = async (
     id: number,
-    verified: boolean,
     country: number,
     name: string
   ) => {
@@ -76,7 +50,6 @@ const CreateUpdateInstitution = ({
       }).updateInstitution({
         id,
         name,
-        verified,
         country,
       });
 
@@ -90,29 +63,19 @@ const CreateUpdateInstitution = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        institution
-          ? await updateInstitution(
-              institution.id,
-              values.verified,
-              values.country as number,
-              values.name
-            )
-          : await createInstitution(
-              values.verified,
-              values.name,
-              values.country as number
-            );
+        institution &&
+          values.country &&
+          updateInstitution(institution.id, values.country, values.name);
       }}
       validationSchema={Yup.object().shape({
         name: Yup.string().required(),
-        verified: Yup.boolean().required(),
         country: Yup.number().positive('Country is required').required(),
       })}
     >
-      {({ values, setFieldValue }) => (
+      {() => (
         <Form>
           <Typography variant="h6" component="h1">
-            {institution ? 'Update' : 'Create new'} institution
+            Update institution
           </Typography>
           <Field
             name="name"
@@ -133,27 +96,6 @@ const CreateUpdateInstitution = ({
             })}
             data-cy="country"
             required
-          />
-          <FormControlLabel
-            style={{ marginTop: '10px' }}
-            control={
-              <Field
-                id="verified"
-                name="verified"
-                type="checkbox"
-                component={Checkbox}
-                checked={values.verified}
-                onChange={(): void =>
-                  setFieldValue('verified', !values.verified)
-                }
-                inputProps={{
-                  'aria-label': 'primary checkbox',
-                  'data-cy': 'institution-verified',
-                }}
-                disabled={isExecutingCall}
-              />
-            }
-            label="Verified"
           />
           <ActionButtonContainer>
             {institution && (
@@ -181,7 +123,7 @@ const CreateUpdateInstitution = ({
               startIcon={<Check />}
             >
               {isExecutingCall && <UOLoader size={14} />}
-              {institution ? 'Update' : 'Create'}
+              {institution && 'Update'}
             </Button>
           </ActionButtonContainer>
         </Form>
@@ -190,11 +132,10 @@ const CreateUpdateInstitution = ({
   );
 };
 
-CreateUpdateInstitution.propTypes = {
+UpdateInstitution.propTypes = {
   institution: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-    verified: PropTypes.bool.isRequired,
     country: PropTypes.shape({
       id: PropTypes.number.isRequired,
       value: PropTypes.string.isRequired,
@@ -203,4 +144,4 @@ CreateUpdateInstitution.propTypes = {
   close: PropTypes.func.isRequired,
 };
 
-export default CreateUpdateInstitution;
+export default UpdateInstitution;
