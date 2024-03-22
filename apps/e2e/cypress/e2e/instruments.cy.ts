@@ -758,6 +758,8 @@ context('Instrument tests', () => {
 
       cy.contains('Proposal(s)').click();
 
+      cy.contains('Download as PDF').click();
+
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         '2 selected items'
