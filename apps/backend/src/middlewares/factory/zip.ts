@@ -99,6 +99,8 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       throw new Error('Could not get proposal details');
     }
 
+    meta.singleFilename = `proposals_${getCurrentTimestamp()}`;
+
     const userRole = req.user.currentRole;
     callFactoryService<ProposalPDFData, MetaBase>(
       DownloadType.ZIP,
