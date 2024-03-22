@@ -32,7 +32,8 @@ export class FapProposal {
     public fapId: number,
     public dateAssigned: Date,
     public fapTimeAllocation: number | null,
-    public instrumentSubmitted?: boolean
+    public instrumentId: number,
+    public fapInstrumentMeetingSubmitted: boolean
   ) {}
 }
 
@@ -52,6 +53,7 @@ export class FapAssignment {
     public dateAssigned: Date,
     public reassigned: boolean,
     public dateReassigned: Date | null,
-    public emailSent: boolean
+    public emailSent: boolean,
+    public rank: number | null
   ) {}
 }

@@ -37,10 +37,11 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       config.tooltip = '';
       config.variant = 'dropdown';
       config.instruments = [];
+      config.isMultipleSelect = false;
 
       return config;
     },
-    getDefaultAnswer: () => null,
+    getDefaultAnswer: () => [],
     filterQuery: (queryBuilder, filter) => {
       const value = JSON.parse(filter.value).value;
       switch (filter.compareOperator) {
@@ -95,19 +96,26 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       }
 
       const { value } = JSON.parse(answer.value);
-      const instrumentId = value;
+      const instrumentIds = value
+        ? Array.isArray(value)
+          ? value
+          : [value]
+        : null;
 
-      // Assign the Proposals to Instrument
-      await instrumentMutations.assignProposalsToInstrumentInternal(null, {
-        instrumentId,
-        proposals: [
-          { primaryKey: proposal.primaryKey, callId: proposal.callId },
-        ],
+      if (!instrumentIds?.length) {
+        return;
+      }
+
+      // Assign the Proposals to Instruments
+      await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
+        instrumentIds,
+        proposalPks: [proposal.primaryKey],
       });
 
+      // TODO: Check this when starting with FAP part for multi instrument. For now only the first instrument FAP is assigned just to be backwards compatible.
       // Assign the Proposals to Fap using Call Instrument
       await fapMutation.assignProposalsToFapUsingCallInstrumentInternal(null, {
-        instrumentId: instrumentId,
+        instrumentId: instrumentIds[0],
         proposalPks: [proposal.primaryKey],
       });
     },

@@ -274,8 +274,8 @@ const createProposals = async () => {
       );
     }
 
-    instrumentDataSource.assignProposalsToInstrument(
-      [proposal.primaryKey],
+    instrumentDataSource.assignProposalToInstrument(
+      proposal.primaryKey,
       dummy.positiveNumber(MAX_INSTRUMENTS)
     );
   }, MAX_PROPOSALS);
@@ -295,6 +295,7 @@ const createReviews = async () => {
         timeAllocation: dummy.positiveNumber(10),
         submitted: faker.datatype.boolean(),
         reviewerId: 1,
+        instrumentId: 1,
         files: '[]',
       },
       false
@@ -332,6 +333,7 @@ const createFaps = async () => {
       await fapDataSource.assignProposalsToFap({
         proposals: [{ primaryKey: proposalPk, callId: 1 }],
         fapId: fap.id,
+        fapInstrumentId: 1,
       });
       await fapDataSource.assignMemberToFapProposal(proposalPk, fap.id, [
         tmpUserId,

@@ -138,9 +138,8 @@ export class OAuthAuthorization extends UserAuthorization {
         country: institutionCountry.countryId,
         rorId: userInfo.institution_ror_id,
       };
-      institution = await this.adminDataSource.createInstitution(
-        newInstitution
-      );
+      institution =
+        await this.adminDataSource.createInstitution(newInstitution);
     }
 
     return institution?.id;

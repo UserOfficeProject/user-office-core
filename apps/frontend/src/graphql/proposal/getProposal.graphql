@@ -11,7 +11,7 @@ query getProposal($primaryKey: Int!) {
       ...questionary
       isCompleted
     }
-    technicalReview {
+    technicalReviews {
       ...coreTechnicalReview
       reviewer {
         ...basicUserDetails
@@ -30,7 +30,7 @@ query getProposal($primaryKey: Int!) {
         id
       }
     }
-    instrument {
+    instruments {
       id
       name
       shortCode
@@ -46,6 +46,7 @@ query getProposal($primaryKey: Int!) {
         lastname
         preferredname
       }
+      managementTimeAllocation
     }
     call {
       id

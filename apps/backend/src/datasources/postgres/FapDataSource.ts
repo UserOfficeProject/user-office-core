@@ -335,9 +335,11 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getFapProposalCount(fapId: number): Promise<number> {
-    return database('fap_proposals')
-      .count('fap_id')
-      .where('fap_id', fapId)
+    return database('fap_proposals as fp')
+      .join('proposals as p', { 'p.proposal_pk': 'fp.proposal_pk' })
+      .count('fp.fap_id')
+      .where('fp.fap_id', fapId)
+      .andWhere('p.submitted', true)
       .first()
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
@@ -447,24 +449,21 @@ export default class PostgresFapDataSource implements FapDataSource {
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select([
-        'sp.proposal_pk',
-        'sp.fap_id',
-        'sp.fap_time_allocation',
-        'ihp.submitted as instrument_submitted',
+        'fp.proposal_pk',
+        'fp.fap_id',
+        'fp.fap_time_allocation',
+        'fp.fap_meeting_instrument_submitted',
       ])
-      .from('fap_proposals as sp')
-      .join('instrument_has_proposals as ihp', {
-        'sp.proposal_pk': 'ihp.proposal_pk',
-      })
+      .from('fap_proposals as fp')
       .join('proposals as p', {
-        'p.proposal_pk': 'sp.proposal_pk',
+        'p.proposal_pk': 'fp.proposal_pk',
         'p.call_id': callId,
       })
       .join('proposal_statuses as ps', {
         'p.status_id': 'ps.proposal_status_id',
       })
-      .where('sp.fap_id', fapId)
-      .andWhere('ihp.instrument_id', instrumentId);
+      .where('fp.fap_id', fapId)
+      .andWhere('fp.instrument_id', instrumentId);
 
     return fapProposals.map((fapProposal) =>
       createFapProposalObject(fapProposal)
@@ -696,9 +695,14 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${args.fapId}`);
   }
 
-  async assignProposalsToFap({ proposals, fapId }: AssignProposalsToFapArgs) {
+  async assignProposalsToFap({
+    proposals,
+    fapId,
+    fapInstrumentId,
+  }: AssignProposalsToFapArgs) {
     const dataToInsert = proposals.map((proposal) => ({
       fap_id: fapId,
+      instrument_id: fapInstrumentId,
       proposal_pk: proposal.primaryKey,
       call_id: proposal.callId,
     }));
@@ -1067,5 +1071,51 @@ export default class PostgresFapDataSource implements FapDataSource {
       .where({ fap_id: fap.id });
 
     return { ...fap, fapSecretariesUserIds: record.map((sec) => sec.user_id) };
+  }
+
+  async isFapProposalInstrumentSubmitted(
+    proposalPk: number,
+    instrumentId?: number
+  ): Promise<boolean> {
+    return database('fap_proposals')
+      .select()
+      .where('proposal_pk', proposalPk)
+      .modify((query) => {
+        if (instrumentId) {
+          query.andWhere('instrument_id', instrumentId);
+        }
+      })
+      .first()
+      .then((result?: FapProposalRecord) => {
+        if (!result) {
+          return false;
+        }
+
+        return result.fap_meeting_instrument_submitted;
+      });
+  }
+
+  async setReviewerRank(
+    proposalPk: number,
+    reviewer_id: number,
+    rank: number
+  ): Promise<boolean> {
+    return database
+      .update(
+        {
+          rank: rank,
+        },
+        ['*']
+      )
+      .from('fap_assignments')
+      .where('proposal_pk', proposalPk)
+      .andWhere('fap_member_user_id', reviewer_id)
+      .then((records: FapAssignmentRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new GraphQLError('Fap assignment not found');
+        }
+
+        return true;
+      });
   }
 }

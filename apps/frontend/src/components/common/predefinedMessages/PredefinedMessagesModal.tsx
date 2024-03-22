@@ -203,7 +203,6 @@ const PredefinedMessagesModal = ({
       ) : (
         <Formik
           initialValues={initialValues}
-          // validationSchema={administrationProposalValidationSchema}
           onSubmit={async (values): Promise<void> => {
             if (!values.message || !values?.title) {
               return;
