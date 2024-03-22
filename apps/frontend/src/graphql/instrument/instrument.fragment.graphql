@@ -4,7 +4,7 @@ fragment instrument on Instrument {
   shortCode
   description
   managerUserId
-  beamlineManager {
+  instrumentContact {
     ...basicUserDetails
   }
   scientists {
