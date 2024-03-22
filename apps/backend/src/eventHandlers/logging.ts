@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
@@ -50,24 +51,28 @@ export default function createHandler() {
             event.emailinviteresponse.userId.toString()
           );
           break;
-        case Event.PROPOSAL_INSTRUMENT_SELECTED: {
+        case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
-            event.instrumenthasproposals.proposalPks.map(async (proposalPk) => {
-              const instrument =
-                await instrumentDataSource.getInstrumentByProposalPk(
-                  proposalPk
+            event.instrumentshasproposals.proposalPks.map(
+              async (proposalPk) => {
+                const instruments =
+                  await instrumentDataSource.getInstrumentsByProposalPk(
+                    proposalPk
+                  );
+
+                const description = `Selected instruments: ${instruments
+                  ?.map((instrument) => instrument.name)
+                  .join(', ')}`;
+
+                return eventLogsDataSource.set(
+                  event.loggedInUserId,
+                  event.type,
+                  json,
+                  proposalPk.toString(),
+                  description
                 );
-
-              const description = `Selected instrument: ${instrument?.name}`;
-
-              return eventLogsDataSource.set(
-                event.loggedInUserId,
-                event.type,
-                json,
-                proposalPk.toString(),
-                description
-              );
-            })
+              }
+            )
           );
           break;
         }
@@ -108,13 +113,28 @@ export default function createHandler() {
             })
           );
           break;
-        case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
-          await eventLogsDataSource.set(
-            event.loggedInUserId,
-            event.type,
-            json,
-            event.instrumenthasproposals.instrumentId.toString()
+        case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED:
+          const [instrumentId] = event.instrumentshasproposals.instrumentIds;
+          const instrument = await instrumentDataSource.getInstrument(
+            instrumentId
           );
+
+          const description = `Submitted instrument: ${instrument?.name}`;
+
+          await Promise.all(
+            event.instrumentshasproposals.proposalPks.map(
+              async (proposalPk) => {
+                return eventLogsDataSource.set(
+                  event.loggedInUserId,
+                  event.type,
+                  json,
+                  proposalPk.toString(),
+                  description
+                );
+              }
+            )
+          );
+
           break;
         case Event.PROPOSAL_FAP_MEETING_SAVED:
         case Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN:
@@ -135,10 +155,14 @@ export default function createHandler() {
           );
           break;
         default: {
-          const changedObjectId =
-            typeof (event as any)[event.key].id === 'number'
-              ? (event as any)[event.key].id
-              : (event as any)[event.key].primaryKey;
+          let changedObjectId: number;
+          if (typeof (event as any)[event.key].primaryKey === 'number') {
+            changedObjectId = (event as any)[event.key].primaryKey;
+          } else if (typeof (event as any)[event.key].proposalPk === 'number') {
+            changedObjectId = (event as any)[event.key].proposalPk;
+          } else {
+            changedObjectId = (event as any)[event.key].id;
+          }
           const description = event.description || '';
 
           await eventLogsDataSource.set(

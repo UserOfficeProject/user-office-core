@@ -4,7 +4,7 @@ mutation administrationProposal(
   $statusId: Int
   $commentForUser: String
   $commentForManagement: String
-  $managementTimeAllocation: Int
+  $managementTimeAllocations: [ManagementTimeAllocationsInput!]!
   $managementDecisionSubmitted: Boolean
 ) {
   administrationProposal(
@@ -13,7 +13,7 @@ mutation administrationProposal(
     statusId: $statusId
     commentForUser: $commentForUser
     commentForManagement: $commentForManagement
-    managementTimeAllocation: $managementTimeAllocation
+    managementTimeAllocations: $managementTimeAllocations
     managementDecisionSubmitted: $managementDecisionSubmitted
   ) {
     primaryKey

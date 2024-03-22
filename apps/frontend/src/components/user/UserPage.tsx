@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
-import SimpleTabs from 'components/common/TabPanel';
+import SimpleTabs from 'components/common/SimpleTabs';
 import EventLogList from 'components/eventLog/EventLogList';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
