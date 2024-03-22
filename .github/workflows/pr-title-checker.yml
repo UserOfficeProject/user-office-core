@@ -1,4 +1,4 @@
-name: PR Title Checker
+n update: PR Title Checker
 
 on:
   pull_request:
