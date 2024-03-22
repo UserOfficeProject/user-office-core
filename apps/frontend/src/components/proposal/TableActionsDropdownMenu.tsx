@@ -10,7 +10,6 @@ import React, { useEffect } from 'react';
 type TableActionsDropdownMenuProps = {
   event: null | HTMLElement;
   handleClose: (option: string) => void;
-  options: string[];
 };
 
 export enum DownloadMenuOption {
@@ -106,7 +105,6 @@ const MenuItemWithSubMenuAccordion = ({ data, handleClose }: MenuData) => {
 const TableActionsDropdownMenu = ({
   event,
   handleClose,
-  options,
 }: TableActionsDropdownMenuProps) => {
   const [anchorElement, setAnchorElement] = React.useState<null | HTMLElement>(
     null
