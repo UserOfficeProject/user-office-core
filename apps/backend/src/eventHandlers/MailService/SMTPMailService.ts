@@ -141,21 +141,30 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  // TODO: This might need some attention from STFC and return the templates used in their email sending service.
   async getEmailTemplates(
     includeDraft = false
   ): ResultsPromise<STFCEmailTemplate[]> {
     return {
       results: [
         {
-          id: 'my-first-email',
-          name: 'My First Email',
-          description: 'A test message from STFC',
+          id: 'call-created-email',
+          name: 'Call Created Email',
         },
         {
-          id: 'my-second-email',
-          name: 'My Second Email',
-          description: 'A test message from STFC',
+          id: 'clf-proposal-submitted-pi',
+          name: 'CLF PI Co-I Submission Email',
+        },
+        {
+          id: 'isis-proposal-submitted-pi',
+          name: 'ISIS PI Co-I Submission Email',
+        },
+        {
+          id: 'isis-rapid-proposal-submitted-pi',
+          name: 'ISIS Rapid PI Co-I Submission Email',
+        },
+        {
+          id: 'isis-rapid-proposal-submitted-uo',
+          name: 'ISIS Rapid User Office Submission Email',
         },
       ],
     };
