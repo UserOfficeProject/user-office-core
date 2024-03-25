@@ -18,8 +18,8 @@ export enum DownloadMenuOption {
 }
 
 export enum PdfDownloadMenuOption {
-  PDF = 'Download as PDF',
-  ZIP = 'Download as ZIP',
+  PDF = 'Download as single file',
+  ZIP = 'Download as multiple files',
 }
 
 type MenuData = {
