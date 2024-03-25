@@ -81,7 +81,7 @@ export class InstrumentResolver {
   }
 
   @FieldResolver(() => BasicUserDetails, { nullable: true })
-  async beamlineManager(
+  async instrumentContact(
     @Root() instrument: Instrument,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {
