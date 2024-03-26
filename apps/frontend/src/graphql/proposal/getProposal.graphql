@@ -34,7 +34,7 @@ query getProposal($primaryKey: Int!) {
       id
       name
       shortCode
-      beamlineManager {
+      instrumentContact {
         id
         firstname
         lastname
