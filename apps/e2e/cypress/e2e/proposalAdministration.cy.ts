@@ -333,7 +333,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Proposal(s)').click();
-      cy.contains('Download as PDF').click();
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -348,7 +348,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Proposal(s)').click();
-      cy.contains('Download as PDF').click();
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -457,7 +457,7 @@ context('Proposal administration tests', () => {
 
       cy.contains('Proposal(s)').click();
 
-      cy.contains('Download as PDF').click();
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
