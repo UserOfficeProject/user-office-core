@@ -58,7 +58,7 @@ export async function getStfcDataRow(
 export function populateStfcRow(row: RowObj) {
   const individualReviews = row.reviews?.flatMap((rev) => [
     rev.grade,
-    stripHtml(rev.comment).result,
+    rev.comment && stripHtml(rev.comment).result,
   ]);
 
   return [
