@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import {
   FeatureId,
+  ProposalEndStatus,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -14,7 +15,7 @@ context('visits tests', () => {
   const coProposer = initialDBData.users.user2;
   const visitor = initialDBData.users.user3;
   const PI = initialDBData.users.user1;
-  const acceptedStatusId = 1;
+  const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
   const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
@@ -35,7 +36,7 @@ context('visits tests', () => {
     });
     cy.updateProposalManagementDecision({
       proposalPk: existingProposalId,
-      statusId: acceptedStatusId,
+      finalStatus: acceptedStatus,
       managementTimeAllocations: [
         { instrumentId: initialDBData.instrument1.id, value: 5 },
       ],

@@ -475,9 +475,7 @@ context('Template tests', () => {
 
       cy.contains(fileQuestion);
       cy.contains('Save and continue').click();
-      cy.contains(fileQuestion)
-        .parent()
-        .contains('field must have at least 1 items');
+      cy.contains(fileQuestion).parent().contains('Please upload a file');
 
       cy.intercept({
         method: 'POST',

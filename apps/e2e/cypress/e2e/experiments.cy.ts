@@ -1,4 +1,7 @@
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  ProposalEndStatus,
+} from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -17,7 +20,7 @@ context('Experiments tests', () => {
 
     cy.updateProposalManagementDecision({
       proposalPk: initialDBData.proposal.id,
-      statusId: 1,
+      finalStatus: ProposalEndStatus.ACCEPTED,
       managementTimeAllocations: [
         { instrumentId: initialDBData.instrument1.id, value: 5 },
       ],

@@ -33,11 +33,8 @@ export class AdministrationProposalArgs {
   @Field(() => String, { nullable: true })
   public commentForManagement?: string;
 
-  @Field(() => ProposalEndStatus, { nullable: true })
-  public finalStatus?: ProposalEndStatus;
-
-  @Field(() => Int, { nullable: true })
-  public statusId?: number;
+  @Field(() => ProposalEndStatus)
+  public finalStatus: ProposalEndStatus;
 
   @Field(() => [ManagementTimeAllocationsInput])
   public managementTimeAllocations: ManagementTimeAllocationsInput[];

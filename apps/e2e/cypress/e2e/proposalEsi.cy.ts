@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  ProposalEndStatus,
+} from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -8,7 +11,7 @@ const coProposer = initialDBData.users.user2;
 const visitor = initialDBData.users.user3;
 const PI = initialDBData.users.user1;
 const existingProposalId = initialDBData.proposal.id;
-const acceptedStatusId = 1;
+const acceptedStatus = ProposalEndStatus.ACCEPTED;
 const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
 const proposalEsiIconCyTag = 'finish-safety-input-form-icon';
@@ -40,7 +43,7 @@ context('visits tests', () => {
     });
     cy.updateProposalManagementDecision({
       proposalPk: existingProposalId,
-      statusId: acceptedStatusId,
+      finalStatus: acceptedStatus,
       managementTimeAllocations: [
         { instrumentId: initialDBData.instrument1.id, value: 5 },
       ],
