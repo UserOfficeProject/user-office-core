@@ -18,7 +18,7 @@ import UserMutations from './UserMutations';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface');
 
-const secret = process.env.secret as string;
+const secret = process.env.JWT_SECRET as string;
 
 const goodToken = jsonwebtoken.sign(
   {

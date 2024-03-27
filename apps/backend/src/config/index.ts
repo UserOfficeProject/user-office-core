@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 
 switch (process.env.DEPENDENCY_CONFIG) {
+  case 'base':
+    require('./dependencyConfigBase');
+    break;
   case 'e2e':
     require('./dependencyConfigE2E');
     break;
@@ -16,7 +19,7 @@ switch (process.env.DEPENDENCY_CONFIG) {
   default:
     throw new Error(
       `process.env.DEPENDENCY_CONFIG contains invalid value '${process.env.DEPENDENCY_CONFIG}'.
-       Available values are <e2e|ess|stfc|test>`
+       Available values are <base|e2e|ess|stfc|test>`
     );
 }
 

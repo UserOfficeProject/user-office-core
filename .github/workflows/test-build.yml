@@ -43,7 +43,6 @@ jobs:
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
-
           GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
 
           CHECK_IF_IMAGE_EXISTS=$(curl -H "Authorization: Bearer $GHCR_TOKEN" https://ghcr.io/v2/userofficeproject/user-office-factory/tags/list | jq --arg TAG ${{ github.head_ref }} '.tags as $t | $TAG | IN($t[])')
@@ -54,13 +53,11 @@ jobs:
               FACTORY_TAGS=$((FACTORY_TAGS+1))
           fi
 
-
           echo $CHECK_IF_IMAGE_EXISTS
 
           if [[ $CHECK_IF_IMAGE_EXISTS == null  ]]; then 
               FACTORY_TAGS=$((FACTORY_TAGS+1))
           fi
-
 
           FACTORY_TAG=develop
           if [[ $FACTORY_TAGS == "2" ]]; then
@@ -184,8 +181,8 @@ jobs:
       - run: npm run build
         env:
           NODE_ENV: development
-          secret: ${{secrets.secret}}
-          tokenLife: 7d
+          JWT_SECRET: ${{secrets.secret}}
+          JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: wrong_token_for_test
 
   test_backend:
@@ -214,9 +211,9 @@ jobs:
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
           PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
-          secret: dummysecret
+          JWT_SECRET: dummysecret
           NODE_ENV: development
-          tokenLife: 7d
+          JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: dummytoken
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
         run: |
@@ -306,7 +303,7 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
-     
+
       - name: Run e2e tests stfc
         env:
           USER_OFFICE_BACKEND_DIR: apps/backend
@@ -319,10 +316,10 @@ jobs:
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
           PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: stfc
-          secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
-          baseURL: localhost:3000
-          tokenLife: 7d
+          BASE_URL: localhost:3000
+          JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: dummytoken
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
           USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
@@ -350,7 +347,7 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run e2e:after:dev:stfc
-  
+
       - name: Run e2e tests
         env:
           USER_OFFICE_BACKEND_DIR: apps/backend
@@ -363,10 +360,10 @@ jobs:
           DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
           PING_PUBLIC_CRT: dummypingsecret
           DEPENDENCY_CONFIG: e2e
-          secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
           NODE_ENV: development
-          baseURL: localhost:3000
-          tokenLife: 7d
+          BASE_URL: localhost:3000
+          JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: dummytoken
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
           USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
@@ -389,8 +386,6 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run e2e:after:dev -- --dns-result-order=ipv4first
-  
-
 
       - name: Upload cypres screenshots
         if: failure()
