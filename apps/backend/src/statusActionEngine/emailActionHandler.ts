@@ -125,6 +125,9 @@ const sendMail = async (recipientsWithData: EmailReadyType[]) => {
           },
           substitution_data: {
             proposals: recipientWithData.proposals,
+            pi: recipientWithData.pi,
+            coProposers: recipientWithData.coProposers,
+            // The firstName, lastName, preferredName of the main recipient
             firstName: recipientWithData.firstName,
             lastName: recipientWithData.lastName,
             preferredName: recipientWithData.preferredName,
