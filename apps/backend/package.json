@@ -52,7 +52,7 @@
     "dataloader": "^2.2.2",
     "dotenv": "^14.3.2",
     "email-templates": "^11.1.1",
-    "express": "^4.17.3",
+    "express": "^4.19.2",
     "express-jwt": "^6.1.2",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
