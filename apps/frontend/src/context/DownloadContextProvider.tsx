@@ -116,6 +116,7 @@ export enum PREPARE_DOWNLOAD_TYPE {
   PDF_SHIPMENT_LABEL,
   PDF_GENERIC_TEMPLATE,
   ZIP_ATTACHMENT,
+  ZIP_PROPOSAL,
   XLSX_PROPOSAL,
   XLSX_FAP,
 }
@@ -172,6 +173,8 @@ function generateLink(
       }
 
       return `/download/zip/attachment/${ids}?questionIds=${options?.questionIds}`;
+    case PREPARE_DOWNLOAD_TYPE.ZIP_PROPOSAL:
+      return '/download/zip/proposal/' + ids;
     default:
       throw new Error('Unknown type:' + type);
   }

@@ -62,7 +62,7 @@ jobs:
           fi
 
 
-          FACTORY_TAG=develop
+          FACTORY_TAG=738
           if [[ $FACTORY_TAGS == "2" ]]; then
             FACTORY_TAG="${{ github.head_ref }}"
           fi
