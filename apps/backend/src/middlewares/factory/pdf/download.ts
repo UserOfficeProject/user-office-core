@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import { container } from 'tsyringe';
 
@@ -14,53 +15,76 @@ import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
 
-router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
-  try {
-    if (!req.user) {
-      throw new Error('Not authorized');
-    }
-    const factoryServices =
-      container.resolve<DownloadTypeServices>(FactoryServices);
-
-    const userWithRole = {
-      ...res.locals.agent,
-    };
-    const proposalPks: number[] = req.params.proposal_pks
-      .split(',')
-      .map((n: string) => parseInt(n))
-      .filter((id: number) => !isNaN(id));
-
-    const meta: MetaBase = {
-      collectionFilename: `proposals_${getCurrentTimestamp()}.pdf`,
-      singleFilename: '',
-    };
-
-    const data = await factoryServices.getPdfProposals(
-      userWithRole,
-      proposalPks,
-      meta,
-      {
-        filter: req.query?.filter?.toString(),
-      }
-    );
-
-    if (!data) {
-      throw new Error('Could not get proposal details');
-    }
-
-    const userRole = req.user.currentRole;
-    callFactoryService<ProposalPDFData, MetaBase>(
-      DownloadType.PDF,
-      PDFType.PROPOSAL,
-      { data, meta, userRole },
-      req,
-      res,
-      next
-    );
-  } catch (e) {
-    next(e);
+const corsOptionsDelegate = function (req: any, callback: any) {
+  let corsOptions;
+  let allowlist;
+  if (process.env && process.env.WHITELISTED_ORIGINS) {
+    const whitelistedOrigins = process.env.WHITELISTED_ORIGINS as string;
+    allowlist = whitelistedOrigins.split(',');
   }
-});
+  if (
+    Array.isArray(allowlist) &&
+    allowlist.length !== 0 &&
+    allowlist.indexOf(req.header('Origin')) !== -1
+  ) {
+    corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false }; // disable CORS for this request
+  }
+  callback(null, corsOptions); // callback expects two parameters: error and options
+};
+
+router.get(
+  `/${PDFType.PROPOSAL}/:proposal_pks`,
+  cors(corsOptionsDelegate),
+  async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new Error('Not authorized');
+      }
+      const factoryServices =
+        container.resolve<DownloadTypeServices>(FactoryServices);
+
+      const userWithRole = {
+        ...res.locals.agent,
+      };
+      const proposalPks: number[] = req.params.proposal_pks
+        .split(',')
+        .map((n: string) => parseInt(n))
+        .filter((id: number) => !isNaN(id));
+
+      const meta: MetaBase = {
+        collectionFilename: `proposals_${getCurrentTimestamp()}.pdf`,
+        singleFilename: '',
+      };
+
+      const data = await factoryServices.getPdfProposals(
+        userWithRole,
+        proposalPks,
+        meta,
+        {
+          filter: req.query?.filter?.toString(),
+        }
+      );
+
+      if (!data) {
+        throw new Error('Could not get proposal details');
+      }
+
+      const userRole = req.user.currentRole;
+      callFactoryService<ProposalPDFData, MetaBase>(
+        DownloadType.PDF,
+        PDFType.PROPOSAL,
+        { data, meta, userRole },
+        req,
+        res,
+        next
+      );
+    } catch (e) {
+      next(e);
+    }
+  }
+);
 
 router.get(`/${PDFType.SAMPLE}/:sample_ids`, async (req, res, next) => {
   try {
