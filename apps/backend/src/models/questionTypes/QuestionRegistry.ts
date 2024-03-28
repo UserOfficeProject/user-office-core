@@ -52,46 +52,46 @@ import { visitBasisDefinition } from './VisitBasis';
 export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
   ? BooleanConfig
   : T extends DataType.DATE
-  ? DateConfig
-  : T extends DataType.EMBELLISHMENT
-  ? EmbellishmentConfig
-  : T extends DataType.FILE_UPLOAD
-  ? FileUploadConfig
-  : T extends DataType.GENERIC_TEMPLATE
-  ? GenericTemplateBasisConfig
-  : T extends DataType.SELECTION_FROM_OPTIONS
-  ? SelectionFromOptionsConfig
-  : T extends DataType.TEXT_INPUT
-  ? TextInputConfig
-  : T extends DataType.SAMPLE_DECLARATION
-  ? SampleDeclarationConfig
-  : T extends DataType.SAMPLE_BASIS
-  ? SampleBasisConfig
-  : T extends DataType.PROPOSAL_BASIS
-  ? ProposalBasisConfig
-  : T extends DataType.INTERVAL
-  ? IntervalConfig
-  : T extends DataType.NUMBER_INPUT
-  ? NumberInputConfig
-  : T extends DataType.SHIPMENT_BASIS
-  ? ShipmentBasisConfig
-  : T extends DataType.RICH_TEXT_INPUT
-  ? RichTextInputConfig
-  : T extends DataType.VISIT_BASIS
-  ? VisitBasisConfig
-  : T extends DataType.GENERIC_TEMPLATE_BASIS
-  ? GenericTemplateBasisConfig
-  : T extends DataType.PROPOSAL_ESI_BASIS
-  ? ProposalEsiBasisConfig
-  : T extends DataType.SAMPLE_ESI_BASIS
-  ? SampleEsiBasisConfig
-  : T extends DataType.FEEDBACK_BASIS
-  ? FeedbackBasisConfig
-  : T extends DataType.DYNAMIC_MULTIPLE_CHOICE
-  ? DynamicMultipleChoiceConfig
-  : T extends DataType.INSTRUMENT_PICKER
-  ? InstrumentPickerConfig
-  : never;
+    ? DateConfig
+    : T extends DataType.EMBELLISHMENT
+      ? EmbellishmentConfig
+      : T extends DataType.FILE_UPLOAD
+        ? FileUploadConfig
+        : T extends DataType.GENERIC_TEMPLATE
+          ? GenericTemplateBasisConfig
+          : T extends DataType.SELECTION_FROM_OPTIONS
+            ? SelectionFromOptionsConfig
+            : T extends DataType.TEXT_INPUT
+              ? TextInputConfig
+              : T extends DataType.SAMPLE_DECLARATION
+                ? SampleDeclarationConfig
+                : T extends DataType.SAMPLE_BASIS
+                  ? SampleBasisConfig
+                  : T extends DataType.PROPOSAL_BASIS
+                    ? ProposalBasisConfig
+                    : T extends DataType.INTERVAL
+                      ? IntervalConfig
+                      : T extends DataType.NUMBER_INPUT
+                        ? NumberInputConfig
+                        : T extends DataType.SHIPMENT_BASIS
+                          ? ShipmentBasisConfig
+                          : T extends DataType.RICH_TEXT_INPUT
+                            ? RichTextInputConfig
+                            : T extends DataType.VISIT_BASIS
+                              ? VisitBasisConfig
+                              : T extends DataType.GENERIC_TEMPLATE_BASIS
+                                ? GenericTemplateBasisConfig
+                                : T extends DataType.PROPOSAL_ESI_BASIS
+                                  ? ProposalEsiBasisConfig
+                                  : T extends DataType.SAMPLE_ESI_BASIS
+                                    ? SampleEsiBasisConfig
+                                    : T extends DataType.FEEDBACK_BASIS
+                                      ? FeedbackBasisConfig
+                                      : T extends DataType.DYNAMIC_MULTIPLE_CHOICE
+                                        ? DynamicMultipleChoiceConfig
+                                        : T extends DataType.INSTRUMENT_PICKER
+                                          ? InstrumentPickerConfig
+                                          : never;
 
 export interface Question<T extends DataType> {
   /**

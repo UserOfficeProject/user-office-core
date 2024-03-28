@@ -53,9 +53,8 @@ export default class ProposalEsiQueries {
     user: UserWithRole | null,
     questionaryId: number
   ): Promise<Questionary> {
-    const questionary = await this.questionaryDataSource.getQuestionary(
-      questionaryId
-    );
+    const questionary =
+      await this.questionaryDataSource.getQuestionary(questionaryId);
     if (!questionary) {
       throw new GraphQLError(
         'Unexpected error. ESI must have a questionary, but not found'

@@ -190,9 +190,8 @@ export class StfcUserAuthorization extends UserAuthorization {
     // This is needed to satisfy the FOREIGN_KEY constraints
     // in tables that link to a user (such as proposals)
     const userNumber = parseInt(stfcUser.userNumber);
-    const dummyUser = await this.userDataSource.ensureDummyUserExists(
-      userNumber
-    );
+    const dummyUser =
+      await this.userDataSource.ensureDummyUserExists(userNumber);
 
     // With dummyUser created and written (ensureDummyUserExists), info can now
     // be added to it without persisting it to the database, which is not wanted.

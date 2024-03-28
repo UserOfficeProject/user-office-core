@@ -53,9 +53,8 @@ export default class FeedbackQueries {
     agent: UserWithRole | null,
     eventId: number
   ) {
-    const feedback = await this.dataSource.getFeedbackByScheduledEventId(
-      eventId
-    );
+    const feedback =
+      await this.dataSource.getFeedbackByScheduledEventId(eventId);
     if (!feedback) {
       return null;
     }
@@ -68,9 +67,8 @@ export default class FeedbackQueries {
   }
 
   async getQuestionary(questionaryId: number): Promise<Questionary> {
-    const questionary = await this.questionaryDataSource.getQuestionary(
-      questionaryId
-    );
+    const questionary =
+      await this.questionaryDataSource.getQuestionary(questionaryId);
     if (!questionary) {
       throw new GraphQLError(
         'Unexpected error. Feedback must have a questionary, but not found'

@@ -146,9 +146,8 @@ export default class ProposalSettingsQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async getStatusAction(agent: UserWithRole | null, actionId: number) {
-    const statusAction = await this.statusActionsDataSource.getStatusAction(
-      actionId
-    );
+    const statusAction =
+      await this.statusActionsDataSource.getStatusAction(actionId);
 
     return statusAction;
   }

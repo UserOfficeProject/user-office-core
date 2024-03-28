@@ -35,9 +35,8 @@ export default class QuestionaryMutations {
     questionaryId: number,
     topicId: number
   ) {
-    const templateSteps = await this.templateDataSource.getTemplateSteps(
-      templateId
-    );
+    const templateSteps =
+      await this.templateDataSource.getTemplateSteps(templateId);
     const stepQuestions = templateSteps.find(
       (step) => step.topic.id === topicId
     )?.fields;

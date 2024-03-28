@@ -90,11 +90,17 @@ export class TemplateGroup {
 }
 
 export class TemplateStep {
-  constructor(public topic: Topic, public fields: QuestionTemplateRelation[]) {}
+  constructor(
+    public topic: Topic,
+    public fields: QuestionTemplateRelation[]
+  ) {}
 }
 
 export class TemplateCategory {
-  constructor(public categoryId: TemplateCategoryId, public name: string) {}
+  constructor(
+    public categoryId: TemplateCategoryId,
+    public name: string
+  ) {}
 }
 
 export enum TemplateCategoryId {
@@ -120,7 +126,10 @@ export enum TemplateGroupId {
 }
 
 export class FieldCondition {
-  constructor(public condition: EvaluatorOperator, public params: any) {}
+  constructor(
+    public condition: EvaluatorOperator,
+    public params: any
+  ) {}
 }
 
 export class Template {
@@ -173,7 +182,10 @@ export class TemplateValidation {
 }
 
 export class TemplateExportMetadata {
-  constructor(public version: string, public exportDate: Date) {}
+  constructor(
+    public version: string,
+    public exportDate: Date
+  ) {}
 }
 
 export class TemplateExportData {

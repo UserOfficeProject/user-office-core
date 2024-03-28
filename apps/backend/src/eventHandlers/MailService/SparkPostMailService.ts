@@ -31,18 +31,18 @@ export class SparkPostMailService extends MailService {
         isProduction
           ? recipient
           : typeof recipient.address === 'string'
-          ? {
-              address: {
-                email: <string>this.sinkEmail,
-                header_to: recipient.address,
-              },
-            }
-          : {
-              address: {
-                email: <string>this.sinkEmail,
-                header_to: `${recipient.address.email}; original_header_to_${recipient.address.header_to}`,
-              },
-            }
+            ? {
+                address: {
+                  email: <string>this.sinkEmail,
+                  header_to: recipient.address,
+                },
+              }
+            : {
+                address: {
+                  email: <string>this.sinkEmail,
+                  header_to: `${recipient.address.email}; original_header_to_${recipient.address.header_to}`,
+                },
+              }
       ),
     };
   }

@@ -1,4 +1,3 @@
-import { Role } from '../models/Role';
 import { AuthJwtPayload, AuthJwtApiTokenPayload } from '../models/User';
 
 type AuthJwtPayloadUnionType = AuthJwtPayload & AuthJwtApiTokenPayload;

@@ -24,9 +24,8 @@ export class FeedbackAuthorization {
     let feedback;
 
     if (typeof feedbackOrFeedbackId === 'number') {
-      feedback = await this.feedbackDataSource.getFeedback(
-        feedbackOrFeedbackId
-      );
+      feedback =
+        await this.feedbackDataSource.getFeedback(feedbackOrFeedbackId);
     } else {
       feedback = feedbackOrFeedbackId;
     }

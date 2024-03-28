@@ -174,9 +174,8 @@ export default class TemplateMutations {
     });
 
     if (firstQuestionId) {
-      const sampleBasisQuestion = await this.dataSource.getQuestion(
-        firstQuestionId
-      );
+      const sampleBasisQuestion =
+        await this.dataSource.getQuestion(firstQuestionId);
       if (!sampleBasisQuestion) {
         return rejection(
           'Missing question with firstQuestionId from the database',
@@ -506,9 +505,8 @@ export default class TemplateMutations {
     try {
       const templateExport = this.convertStringToTemplateExport(templateAsJson);
 
-      const validation = await this.dataSource.validateTemplateExport(
-        templateExport
-      );
+      const validation =
+        await this.dataSource.validateTemplateExport(templateExport);
 
       return validation;
     } catch (error) {
