@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import { Typography } from '@mui/material';
@@ -8,6 +7,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import FapInstrumentProposalsTable from 'components/fap/MeetingComponents/FapInstrumentProposalsTable';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useDownloadXLSXFap } from 'hooks/fap/useDownloadXLSXFap';

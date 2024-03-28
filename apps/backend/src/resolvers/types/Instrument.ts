@@ -39,11 +39,17 @@ export class InstrumentWithAvailabilityTime extends Instrument {
   @Field(() => Int, { nullable: true })
   public availabilityTime: number;
 
-  @Field(() => Boolean, { defaultValue: false })
-  public submitted: boolean;
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  public submitted?: boolean;
 
   @Field(() => Int, { nullable: true })
   public fapId: number;
+}
+
+@ObjectType()
+export class InstrumentWithManagementTime extends Instrument {
+  @Field(() => Int, { nullable: true })
+  public managementTimeAllocation: number;
 }
 
 @Resolver(() => InstrumentWithAvailabilityTime)
@@ -75,7 +81,7 @@ export class InstrumentResolver {
   }
 
   @FieldResolver(() => BasicUserDetails, { nullable: true })
-  async beamlineManager(
+  async instrumentContact(
     @Root() instrument: Instrument,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {

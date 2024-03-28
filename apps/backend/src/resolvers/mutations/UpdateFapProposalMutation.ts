@@ -19,6 +19,9 @@ export class UpdateFapTimeAllocationArgs {
   @Field(() => Int)
   proposalPk: number;
 
+  @Field(() => Int)
+  instrumentId: number;
+
   @Field(() => Int, { nullable: true })
   fapTimeAllocation?: number | null;
 }

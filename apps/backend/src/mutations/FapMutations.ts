@@ -41,6 +41,7 @@ import {
 import { CreateFapArgs } from '../resolvers/mutations/CreateFapMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
+import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
 import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
 
@@ -250,7 +251,7 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToFapUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
-    const proposals = await this.proposalDataSource.getProposalsByIds(
+    const proposals = await this.proposalDataSource.getProposalsByPks(
       args.proposalPks
     );
 
@@ -273,6 +274,7 @@ export default class FapMutations {
               callId: callId,
             })),
           fapId: callHasInstrument.fapId,
+          fapInstrumentId: callHasInstrument.instrumentId,
         });
       }
     }
@@ -411,7 +413,12 @@ export default class FapMutations {
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   async updateTimeAllocation(
     agent: UserWithRole | null,
-    { fapId, proposalPk, fapTimeAllocation = null }: UpdateFapTimeAllocationArgs
+    {
+      fapId,
+      proposalPk,
+      fapTimeAllocation = null,
+      instrumentId,
+    }: UpdateFapTimeAllocationArgs
   ) {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
@@ -424,10 +431,13 @@ export default class FapMutations {
       );
     }
 
-    const isProposalInstrumentSubmitted =
-      await this.instrumentDataSource.isProposalInstrumentSubmitted(proposalPk);
+    const isFapProposalInstrumentSubmitted =
+      await this.dataSource.isFapProposalInstrumentSubmitted(
+        proposalPk,
+        instrumentId
+      );
 
-    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
         'Could not update the time allocation because the instrument is submitted',
         { agent, fapId, proposalPk }
@@ -512,6 +522,22 @@ export default class FapMutations {
       }
 
       return allFapDecisions[0];
+    } catch (error) {
+      return rejection('Something went wrong', { args, error });
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async saveReviewerRank(
+    agent: UserWithRole | null,
+    args: SaveReviewerRankArg
+  ): Promise<boolean | Rejection> {
+    try {
+      return await this.dataSource.setReviewerRank(
+        args.proposalPk,
+        args.reviewerId,
+        args.rank
+      );
     } catch (error) {
       return rejection('Something went wrong', { args, error });
     }
