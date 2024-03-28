@@ -130,7 +130,7 @@ context('Internal Review tests', () => {
       .clear()
       .type(title);
 
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
       cy.get('[data-cy="create-modal"]')
         .find('[data-cy="internal-reviewer-surname"] input')
         .type(scientist2.lastName);
@@ -205,7 +205,8 @@ context('Internal Review tests', () => {
       .find('[data-cy="title"] input')
       .clear()
       .type(newTitle);
-    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
       cy.get('[data-cy="create-modal"]')
         .find('[data-cy="internal-reviewer-surname"] input')
         .type(scientist2.lastName);

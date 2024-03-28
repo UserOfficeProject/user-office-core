@@ -47,13 +47,9 @@ const CreateUpdateInternalReview = ({
     internalReview?.reviewerId ? [internalReview?.reviewer] : []
   );
   const featureContext = useContext(FeatureContext);
-  const isUserSurnameSearchEnabled = !!featureContext.featuresMap.get(
+  const isUserSurnameSearchEnabled = featureContext.featuresMap.get(
     FeatureId.USER_SEARCH_FILTER
   )?.isEnabled;
-
-  // if (!usersData) {
-  //   return <UOLoader />;
-  // }
 
   const initialValues = internalReview
     ? {
