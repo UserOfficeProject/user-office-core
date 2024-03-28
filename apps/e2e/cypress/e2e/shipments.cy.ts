@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  ProposalEndStatus,
+} from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -28,6 +31,7 @@ context('Shipments tests', () => {
     });
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
+      finalStatus: ProposalEndStatus.ACCEPTED,
       managementDecisionSubmitted: true,
       managementTimeAllocations: [
         { instrumentId: initialDBData.instrument1.id, value: 5 },

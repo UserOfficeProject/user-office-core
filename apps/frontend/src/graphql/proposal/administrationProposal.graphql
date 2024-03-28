@@ -1,7 +1,6 @@
 mutation administrationProposal(
   $proposalPk: Int!
-  $finalStatus: ProposalEndStatus
-  $statusId: Int
+  $finalStatus: ProposalEndStatus!
   $commentForUser: String
   $commentForManagement: String
   $managementTimeAllocations: [ManagementTimeAllocationsInput!]!
@@ -10,7 +9,6 @@ mutation administrationProposal(
   administrationProposal(
     proposalPk: $proposalPk
     finalStatus: $finalStatus
-    statusId: $statusId
     commentForUser: $commentForUser
     commentForManagement: $commentForManagement
     managementTimeAllocations: $managementTimeAllocations
