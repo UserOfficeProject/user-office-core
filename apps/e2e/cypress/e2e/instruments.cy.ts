@@ -79,9 +79,14 @@ context('Instrument tests', () => {
       cy.get('#shortCode').type(instrument1.shortCode);
       cy.get('#description').type(instrument1.description);
 
-      cy.get('[data-cy=instrument-contact-surname]').type(scientist1.lastName);
-      cy.realPress('Enter');
-      cy.get('[data-cy=findUser]').click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]').type(
+          scientist1.lastName
+        );
+        cy.realPress('Enter');
+        cy.get('[data-cy=findUser]').click();
+      }
+
       cy.get('[data-cy=instrument-contact]').click();
       cy.get('[role=presentation]').contains(scientist1.lastName).click();
 
@@ -525,12 +530,13 @@ context('Instrument tests', () => {
         .parent()
         .find('[aria-label="Edit"]')
         .click();
-
-      cy.get('[data-cy=instrument-contact-surname]').type(scientist2.lastName);
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.get('[data-cy=instrument-contact]').click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]').type(
+          scientist2.lastName
+        );
+        cy.get('[data-cy=findUser]').click();
+        cy.get('[data-cy=instrument-contact]').click();
+      }
 
       cy.get('[role=presentation]').contains(scientist2.lastName).click();
 
