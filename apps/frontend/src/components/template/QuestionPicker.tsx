@@ -141,9 +141,15 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
       return true;
     }
 
-    const textMatch = question.question
-      .toLowerCase()
-      .includes(questionFilter.searchText.toLowerCase());
+    const textMatch =
+      question.dataType == 'EMBELLISHMENT'
+        ? (question.config as EmbellishmentConfig).plain
+            .toLowerCase()
+            .includes(questionFilter.searchText.toLowerCase())
+        : question.question
+            .toLowerCase()
+            .includes(questionFilter.searchText.toLowerCase());
+
     const dataTypeMatch =
       questionFilter.dataType === 'all'
         ? true
