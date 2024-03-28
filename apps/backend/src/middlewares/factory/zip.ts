@@ -82,7 +82,7 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       .filter((id: number) => !isNaN(id));
 
     const meta: MetaBase = {
-      collectionFilename: `proposals_${getCurrentTimestamp()}`,
+      collectionFilename: `proposals_${getCurrentTimestamp()}.zip`,
       singleFilename: '',
     };
 
@@ -99,7 +99,7 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       throw new Error('Could not get proposal details');
     }
 
-    meta.singleFilename = `proposals_${getCurrentTimestamp()}`;
+    meta.singleFilename = `proposals_${getCurrentTimestamp()}.zip`;
 
     const userRole = req.user.currentRole;
     callFactoryService<ProposalPDFData, MetaBase>(
