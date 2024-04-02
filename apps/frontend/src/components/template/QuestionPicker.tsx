@@ -27,6 +27,7 @@ import {
 import {
   DataType,
   DependenciesLogicOperator,
+  EmbellishmentConfig,
   Question,
   Template,
   TemplateGroupId,
