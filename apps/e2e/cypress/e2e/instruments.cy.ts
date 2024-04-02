@@ -535,9 +535,8 @@ context('Instrument tests', () => {
           scientist2.lastName
         );
         cy.get('[data-cy=findUser]').click();
-        cy.get('[data-cy=instrument-contact]').click();
       }
-
+      cy.get('[data-cy=instrument-contact]').click();
       cy.get('[role=presentation]').contains(scientist2.lastName).click();
 
       cy.get('[role=presentation] [data-cy=submit]').click();
