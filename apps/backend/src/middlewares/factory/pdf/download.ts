@@ -18,8 +18,9 @@ const router = express.Router();
 const corsOptionsDelegate = function (req: any, callback: any) {
   let corsOptions;
   let allowlist;
-  if (process.env && process.env.WHITELISTED_ORIGINS) {
-    const whitelistedOrigins = process.env.WHITELISTED_ORIGINS as string;
+  if (process.env && process.env.PDF_DOWNLOAD_WHITELISTED_ORIGINS) {
+    const whitelistedOrigins = process.env
+      .PDF_DOWNLOAD_WHITELISTED_ORIGINS as string;
     allowlist = whitelistedOrigins.split(',');
   }
   if (
