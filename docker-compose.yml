@@ -59,7 +59,7 @@ services:
       - backend
 
   backend:
-    image: 'user-office-backend:local_22_03_2024'
+    image: 'user-office-backend:develop'
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
@@ -70,7 +70,6 @@ services:
       AUTH_DISCOVERY_URL: http://host.docker.internal:5001/.well-known/openid-configuration
       AUTH_CLIENT_ID: useroffice
       AUTH_CLIENT_SECRET: useroffice
-      DEPENDENCY_CONFIG: base
       TZ: Europe/Stockholm
       DATE_FORMAT: dd-MM-yyyy
       DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
