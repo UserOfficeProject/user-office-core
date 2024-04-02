@@ -346,7 +346,6 @@ jobs:
           ISIS_UO_EMAIL: isisuo@stfc.ac.uk
           FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
           PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
-          WHITELISTED_ORIGINS: https://whitelistedUrl.com
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 

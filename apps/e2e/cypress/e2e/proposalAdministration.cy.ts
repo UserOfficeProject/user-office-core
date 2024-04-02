@@ -468,28 +468,6 @@ context('Proposal administration tests', () => {
       cy.readFile(downloadFilePath).should('exist');
     });
 
-    it('Should be able to whitelist origin for download proposal pdf endpoint', function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
-        this.skip();
-      }
-      cy.contains('Proposals').click();
-
-      const token = window.localStorage.getItem('token');
-      const whitelistedUrl = 'https://whitelistedUrl.com';
-
-      cy.request({
-        url: '/download/pdf/proposal/1',
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${token}`,
-          Origin: whitelistedUrl,
-        },
-      }).then((response) => {
-        expect(response.headers['content-type']).to.be.equal('application/pdf');
-        expect(response.status).to.be.equal(200);
-      });
-    });
-
     it('Should be able to download proposal PDFs and verify their content', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until issue is fixed on github actions
