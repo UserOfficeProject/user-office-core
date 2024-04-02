@@ -557,20 +557,18 @@ context('Proposal administration tests', () => {
             filename: downloadedMultiFileZipName,
             downloadsFolder: downloadsFolder,
           });
-          const outputDir = `${downloadsFolder}/${currentYear}_proposals_extracted`;
+
+          const extractedFilesDir = `${downloadsFolder}/${currentYear}_proposals_extracted`;
 
           cy.task('unzip', {
             source: multiFileZipDownloadPath,
-            destination: outputDir,
+            destination: extractedFilesDir,
           });
 
-          const downloadedFileName1 = `${newlyCreatedProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
-          const downloadedFileName2 = `${createdProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
-
-          const pathToPdf1 = `${outputDir}/${downloadedFileName1}`;
-          const pathToPdf2 = `${outputDir}/${downloadedFileName2}`;
-
-          cy.task('readPdf', pathToPdf1).then((args) => {
+          cy.task(
+            'readPdf',
+            `${extractedFilesDir}/${newlyCreatedProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`
+          ).then((args) => {
             const { text, numpages } = args as PdfParse.Result;
 
             expect(text).to.include(newlyCreatedProposalId);
@@ -580,7 +578,10 @@ context('Proposal administration tests', () => {
             expect(numpages).to.equal(1);
           });
 
-          cy.task('readPdf', pathToPdf2).then((args) => {
+          cy.task(
+            'readPdf',
+            `${extractedFilesDir}/${createdProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`
+          ).then((args) => {
             const { text, numpages } = args as PdfParse.Result;
 
             expect(text).to.include(createdProposalId);
