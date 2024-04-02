@@ -87,7 +87,7 @@ export function areDependenciesSatisfied(
   fieldId: string
 ) {
   const field = getFieldById(questionary, fieldId);
-  if (!field || !field.dependencies) {
+  if (!field || !field.dependencies || field.dependencies.length === 0) {
     return true;
   }
 

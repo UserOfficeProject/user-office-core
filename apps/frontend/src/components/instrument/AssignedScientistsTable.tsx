@@ -45,7 +45,7 @@ const assignmentColumns = [
     field: 'institution',
   },
 ];
-const beamLineManagerColumns = [
+const instrumentContactColumns = [
   {
     title: 'Name',
     field: 'firstname',
@@ -90,14 +90,14 @@ const AssignedScientistsTable = ({
       data-cy="instrument-scientist-assignments-table"
     >
       <MaterialTable
-        columns={beamLineManagerColumns}
-        title={`Beamline Manager`}
+        columns={instrumentContactColumns}
+        title={`Instrument Contact`}
         data={[
           {
-            firstname: instrument.beamlineManager?.firstname,
-            lastname: instrument.beamlineManager?.lastname,
-            email: instrument.beamlineManager?.email,
-            institution: instrument.beamlineManager?.institution,
+            firstname: instrument.instrumentContact?.firstname,
+            lastname: instrument.instrumentContact?.lastname,
+            email: instrument.instrumentContact?.email,
+            institution: instrument.instrumentContact?.institution,
           },
         ]}
         options={{

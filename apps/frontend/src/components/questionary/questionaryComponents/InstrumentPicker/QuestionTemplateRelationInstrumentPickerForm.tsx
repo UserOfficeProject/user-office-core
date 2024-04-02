@@ -2,6 +2,7 @@ import React from 'react';
 import * as Yup from 'yup';
 
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { InstrumentPickerConfig } from 'generated/sdk';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -23,7 +24,9 @@ export const QuestionTemplateRelationInstrumentPickerForm = (
       {() => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
-          <QuestionInstrumentPickerFormCommon />
+          <QuestionInstrumentPickerFormCommon
+            config={props.questionRel.question.config as InstrumentPickerConfig}
+          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

@@ -130,4 +130,13 @@ export interface FapDataSource {
   ): Promise<FapProposalWithReviewGradesAndRanking[]>;
   getRelatedUsersOnFap(id: number): Promise<number[]>;
   getCallInReviewForFap(fapId: number): Promise<number>;
+  isFapProposalInstrumentSubmitted(
+    proposalPk: number,
+    instrumentId?: number
+  ): Promise<boolean>;
+  setReviewerRank(
+    proposalPk: number,
+    reviewerId: number,
+    rank: number
+  ): Promise<boolean>;
 }

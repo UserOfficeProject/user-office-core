@@ -4,6 +4,7 @@ query getFapProposals($fapId: Int!, $callId: Int) {
     dateAssigned
     fapId
     fapTimeAllocation
+    instrumentSubmitted
     proposal {
       title
       primaryKey
@@ -24,6 +25,7 @@ query getFapProposals($fapId: Int!, $callId: Int) {
       proposalPk
       fapMemberUserId
       dateAssigned
+      rank
       user {
         ...basicUserDetails
       }

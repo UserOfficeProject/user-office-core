@@ -3,6 +3,7 @@ import {
   ArgsType,
   Ctx,
   Field,
+  InputType,
   Int,
   Mutation,
   Resolver,
@@ -11,6 +12,15 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { Proposal } from '../types/Proposal';
+
+@InputType()
+export class ManagementTimeAllocationsInput {
+  @Field(() => Int)
+  public instrumentId: number;
+
+  @Field(() => Int)
+  public value: number;
+}
 
 @ArgsType()
 export class AdministrationProposalArgs {
@@ -23,14 +33,11 @@ export class AdministrationProposalArgs {
   @Field(() => String, { nullable: true })
   public commentForManagement?: string;
 
-  @Field(() => ProposalEndStatus, { nullable: true })
-  public finalStatus?: ProposalEndStatus;
+  @Field(() => ProposalEndStatus)
+  public finalStatus: ProposalEndStatus;
 
-  @Field(() => Int, { nullable: true })
-  public statusId?: number;
-
-  @Field(() => Int, { nullable: true })
-  public managementTimeAllocation?: number;
+  @Field(() => [ManagementTimeAllocationsInput])
+  public managementTimeAllocations: ManagementTimeAllocationsInput[];
 
   @Field(() => Boolean, { nullable: true })
   public managementDecisionSubmitted?: boolean;

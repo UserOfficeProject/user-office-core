@@ -19,6 +19,7 @@ import {
   ProposalBookingScheduledEventFilterCore,
 } from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import { ProposalDataSource } from '../ProposalDataSource';
 import {
   ProposalsFilter,
@@ -47,13 +48,13 @@ const fieldMap: { [key: string]: string } = {
   rankOrder: 'rank_order',
   reviewAverage: 'average',
   reviewDeviation: 'deviation',
-  callShortCode: 'proposal_table_view.call_short_code',
-  instrumentName: 'instrument_name',
-  statusName: 'proposal_table_view.proposal_status_id',
-  proposalId: 'proposal_table_view.proposal_id',
+  callShortCode: 'call_short_code',
+  instrumentNames: 'instrument_names',
+  statusName: 'proposal_status_id',
+  proposalId: 'proposal_id',
   title: 'title',
-  submitted: 'proposal_table_view.submitted',
-  notified: 'proposal_table_view.notified',
+  submitted: 'submitted',
+  notified: 'notified',
 };
 
 export async function calculateReferenceNumber(
@@ -94,10 +95,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async updateProposalTechnicalReviewer({
     userId,
     proposalPks,
+    instrumentId,
   }: UpdateTechnicalReviewAssigneeInput): Promise<TechnicalReview[]> {
     const response = await database('technical_review')
       .update('technical_review_assignee_id', userId)
       .whereIn('proposal_pk', proposalPks)
+      .andWhere('instrument_id', instrumentId)
       .returning('*')
       .then((technicalReviews: TechnicalReviewRecord[]) => {
         return technicalReviews.map((technicalReview) =>
@@ -254,7 +257,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           comment_for_management: proposal.commentForManagement,
           notified: proposal.notified,
           submitted: proposal.submitted,
-          management_time_allocation: proposal.managementTimeAllocation,
           management_decision_submitted: proposal.managementDecisionSubmitted,
         },
         ['*']
@@ -342,11 +344,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     query
-      .leftJoin(
-        'answers',
-        'answers.questionary_id',
-        'proposal_table_view.questionary_id'
-      )
+      .leftJoin('answers', 'answers.questionary_id', 'ptw.questionary_id')
       .andWhere('answers.question_id', questionFilter.questionId)
       .modify(questionFilterQuery, questionFilter);
 
@@ -362,24 +360,30 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     return database
+      .with(
+        'ptw',
+        database
+          .select([
+            '*',
+            database.raw(
+              // eslint-disable-next-line quotes
+              "array_to_string(instrument_names, ',') all_instrument_names"
+            ),
+          ])
+          .from('proposal_table_view')
+      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('proposal_table_view')
+      .from('ptw')
       .modify((query) => {
         if (filter?.callId) {
-          query.where('proposal_table_view.call_id', filter?.callId);
+          query.where('call_id', filter?.callId);
         }
         if (filter?.instrumentId) {
-          query.where(
-            'proposal_table_view.instrument_id',
-            filter?.instrumentId
-          );
+          query.whereRaw('? = ANY(instrument_ids)', filter?.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
-          query.where(
-            'proposal_table_view.proposal_status_id',
-            filter?.proposalStatusId
-          );
+          query.where('proposal_status_id', filter?.proposalStatusId);
         }
 
         if (filter?.shortCodes) {
@@ -388,7 +392,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
         if (filter?.questionFilter) {
@@ -404,10 +408,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText = `%${searchText}%`;
 
           query
-            .whereRaw('proposal_table_view.proposal_id ILIKE ?', searchText)
-            .orWhereRaw('proposal_table_view.title ILIKE ?', searchText)
+            .whereRaw('proposal_id ILIKE ?', searchText)
+            .orWhereRaw('title ILIKE ?', searchText)
             .orWhereRaw('proposal_status_name ILIKE ?', searchText)
-            .orWhereRaw('instrument_name ILIKE ?', searchText);
+            .orWhereRaw('all_instrument_names ILIKE ?', searchText);
         }
 
         if (sortField && sortDirection) {
@@ -419,10 +423,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.referenceNumbers) {
-          query.whereIn(
-            'proposal_table_view.proposal_id',
-            filter.referenceNumbers
-          );
+          query.whereIn('proposal_id', filter.referenceNumbers);
         }
         if (first) {
           query.limit(first);
@@ -531,61 +532,52 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return database
-      .select([
-        'proposal_table_view.*',
-        database.raw('count(*) OVER() AS full_count'),
-      ])
-      .from('proposal_table_view')
-      .join('instruments', {
-        'instruments.instrument_id': 'proposal_table_view.instrument_id',
-      })
-      .leftJoin('instrument_has_scientists', {
-        'instrument_has_scientists.instrument_id':
-          'proposal_table_view.instrument_id',
-      })
-      .leftJoin(
-        'internal_reviews',
-        'proposal_table_view.technical_review_id',
-        'internal_reviews.technical_review_id'
+      .with(
+        'ptw',
+        database
+          .select([
+            '*',
+            database.raw(
+              // eslint-disable-next-line quotes
+              "array_to_string(instrument_names, ',') all_instrument_names"
+            ),
+          ])
+          .from('proposal_table_view')
       )
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('ptw')
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
-          this.where('internal_reviews.reviewer_id', user.id);
+          this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
         } else {
-          this.where('instrument_has_scientists.user_id', user.id).orWhere(
-            'instruments.manager_user_id',
+          this.whereRaw(
+            '? = ANY(instrument_scientist_ids)',
             user.id
-          );
+          ).orWhereRaw('? = ANY(instrument_manager_ids)', user.id);
         }
       })
-      .distinct('proposal_table_view.proposal_pk')
-      .orderBy('proposal_table_view.proposal_pk', 'desc')
+      .distinct('proposal_pk')
+      .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
           query
-            .where('proposal_table_view.title', 'ilike', `%${filter.text}%`)
+            .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
+            .orWhere('all_instrument_names', 'ilike', `%${filter.text}%`);
         }
         if (filter?.callId) {
-          query.where('proposal_table_view.call_id', filter.callId);
+          query.where('call_id', filter.callId);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
-          query.where(
-            'proposal_table_view.technical_review_assignee_id',
-            user.id
-          );
+          query.whereRaw('? = ANY(technical_review_assignee_ids)', user.id);
         }
         if (filter?.instrumentId) {
-          query.where('instruments.instrument_id', filter.instrumentId);
+          query.whereRaw('? = ANY(instrument_ids)', filter.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
-          query.where(
-            'proposal_table_view.proposal_status_id',
-            filter?.proposalStatusId
-          );
+          query.where('proposal_status_id', filter?.proposalStatusId);
         }
 
         if (filter?.shortCodes) {
@@ -594,7 +586,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
@@ -605,10 +597,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.referenceNumbers) {
-          query.whereIn(
-            'proposal_table_view.proposal_id',
-            filter.referenceNumbers
-          );
+          query.whereIn('proposal_id', filter.referenceNumbers);
         }
 
         if (first) {
@@ -678,9 +667,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
   }
 
-  async getProposalsByIds(proposalIds: number[]): Promise<Proposal[]> {
+  async getProposalsByPks(proposalPks: number[]): Promise<Proposal[]> {
     return database('proposals')
-      .whereIn('proposal_pk', proposalIds)
+      .whereIn('proposal_pk', proposalPks)
       .then((proposals: ProposalRecord[]) =>
         proposals.map((proposal) => createProposalObject(proposal))
       );
@@ -753,8 +742,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
            comment_for_user,
            notified,
            submitted,
-           management_decision_submitted,
-           management_time_allocation)
+           management_decision_submitted)
           SELECT title,
                  abstract,
                  status_id,
@@ -768,8 +756,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                  comment_for_user,
                  notified,
                  submitted,
-                 management_decision_submitted,
-                 management_time_allocation
+                 management_decision_submitted
           FROM proposals
           WHERE proposal_pk = ${sourceProposal.primaryKey} RETURNING *
       `)
@@ -892,37 +879,40 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
-  async getProposalBookingByProposalPk(
+  async getProposalBookingsByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter
-  ): Promise<{ id: number } | null> {
-    const result: ScheduledEventRecord = await database<ScheduledEventRecord>(
-      'scheduled_events'
-    )
+  ): Promise<{ ids: number[] } | null> {
+    const result: ScheduledEventRecord[] = await database<
+      ScheduledEventRecord[]
+    >('scheduled_events')
       .select()
       .where('proposal_pk', proposalPk)
       .modify((qb) => {
         if (filter?.status) {
           qb.whereIn('status', filter.status);
         }
-      })
-      .first();
+      });
 
     if (result) {
-      return { id: result.proposal_booking_id };
+      return {
+        ids: removeDuplicates(
+          result.map((bookingId) => bookingId.proposal_booking_id)
+        ),
+      };
     } else {
       return null;
     }
   }
 
-  async proposalBookingScheduledEvents(
-    proposalBookingId: number,
+  async getAllProposalBookingsScheduledEvents(
+    proposalBookingIds: number[],
     filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     const scheduledEventRecords: ScheduledEventRecord[] =
       await database<ScheduledEventRecord>('scheduled_events')
         .select()
-        .where('proposal_booking_id', proposalBookingId)
+        .whereIn('proposal_booking_id', proposalBookingIds)
         .orderBy('starts_at', 'asc')
         .modify((qb) => {
           if (filter?.status) {
@@ -957,6 +947,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         proposal_pk: eventMessage.proposalPk,
         status: eventMessage.status,
         local_contact: eventMessage.localContactId,
+        instrument_id: eventMessage.instrumentId,
       })
       .into('scheduled_events')
       .returning(['*']);
@@ -1002,6 +993,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         eventMessage.map((event) => event.id)
       )
       .andWhere('proposal_booking_id', eventMessage[0].proposalBookingId)
+      .andWhere('instrument_id', eventMessage[0].instrumentId)
       .del()
       .returning('*');
 

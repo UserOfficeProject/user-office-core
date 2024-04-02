@@ -84,7 +84,8 @@ export const dummyFapAssignment = new FapAssignment(
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
-  false
+  false,
+  null
 );
 
 export const anotherDummyFapAssignment = new FapAssignment(
@@ -94,7 +95,8 @@ export const anotherDummyFapAssignment = new FapAssignment(
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
-  false
+  false,
+  null
 );
 
 export const andAnotherDummyFapAssignment = new FapAssignment(
@@ -104,7 +106,8 @@ export const andAnotherDummyFapAssignment = new FapAssignment(
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
-  false
+  false,
+  null
 );
 
 export const yetAnotherDummyFapAssignment = new FapAssignment(
@@ -114,7 +117,8 @@ export const yetAnotherDummyFapAssignment = new FapAssignment(
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
-  false
+  false,
+  null
 );
 
 export const dummyFapReview = new Review(1, 1, 1, 'Dummy Fap review', 7, 0, 1);
@@ -123,77 +127,99 @@ export const dummyFapProposal = new FapProposal(
   1,
   1,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  false
 );
 
 export const anotherDummyFapProposal = new FapProposal(
   2,
   2,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  2,
+  true
 );
 
 export const dummyFapProposalForMassAssignment = new FapProposal(
   1,
   3,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const anotherDummyFapProposalForMassAssignment = new FapProposal(
   2,
   3,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const firstDummyFapProposalForUnevenMassAssignment = new FapProposal(
   1,
   5,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const secondDummyFapProposalForUnevenMassAssignment = new FapProposal(
   2,
   5,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const thirdDummyFapProposalForUnevenMassAssignment = new FapProposal(
   3,
   5,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const firstDummyFapProposalForAlreadyAssigned = new FapProposal(
   1,
   6,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const secondDummyFapProposalForAlreadyAssigned = new FapProposal(
   2,
   6,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const thirdDummyFapProposalForAlreadyAssigned = new FapProposal(
   3,
   6,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const dummyFapProposalForMassAssignmentNeedsTwoReviews = new FapProposal(
   1,
   7,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null
+  null,
+  1,
+  true
 );
 
 export const dummyFapMeetingDecision = new FapMeetingDecision(
@@ -637,5 +663,22 @@ export class FapDataSourceMock implements FapDataSource {
 
   async getCallInReviewForFap(fapId: number): Promise<number> {
     return 1;
+  }
+  async isFapProposalInstrumentSubmitted(
+    proposalPk: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return !!dummyFapProposals.find(
+      (dfp) =>
+        dfp.proposalPk === proposalPk && dfp.instrumentId === instrumentId
+    )?.fapInstrumentMeetingSubmitted;
+  }
+
+  async setReviewerRank(
+    proposalPk: number,
+    reviewer_id: number,
+    rank: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 }

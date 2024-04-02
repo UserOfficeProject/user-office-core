@@ -17,7 +17,6 @@ import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
-import { Instrument } from '../models/Instrument';
 import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
@@ -38,16 +37,14 @@ type Member = {
 
 type ProposalMessageData = {
   abstract: string;
-  allocatedTime: number;
   callId: number;
-  instrument?: Pick<Instrument, 'id' | 'shortCode'>;
+  instruments?: { id: number; shortCode: string; allocatedTime: number }[];
   members: Member[];
   newStatus?: string;
   proposalPk: number;
   proposer?: Member;
   shortCode: string;
   title: string;
-  instrumentId?: number; // instrumentId is here for backwards compatibility.
   submitted: boolean;
 };
 
@@ -115,35 +112,32 @@ export const getProposalMessageData = async (proposal: Proposal) => {
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
-  const maybeInstrument = await instrumentDataSource.getInstrumentByProposalPk(
-    proposal.primaryKey
-  );
+  const maybeInstruments =
+    await instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey);
 
   const call = await callDataSource.getCall(proposal.callId);
   if (!call) {
     throw new Error('Call not found');
   }
 
-  const proposalAllocatedTime = getSecondsPerAllocationTimeUnit(
-    proposal.managementTimeAllocation,
-    call.allocationTimeUnit
-  );
-
-  const instrument = maybeInstrument
-    ? {
-        id: maybeInstrument.id,
-        shortCode: maybeInstrument.shortCode,
-      }
+  const instruments = maybeInstruments?.length
+    ? maybeInstruments.map((instr) => ({
+        id: instr.id,
+        shortCode: instr.shortCode,
+        allocatedTime: getSecondsPerAllocationTimeUnit(
+          instr.managementTimeAllocation,
+          call.allocationTimeUnit
+        ),
+      }))
     : undefined;
+
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
-    instrument: instrument,
+    instruments: instruments,
     title: proposal.title,
     abstract: proposal.abstract,
     callId: call.id,
-    allocatedTime: proposalAllocatedTime,
-    instrumentId: instrument?.id,
     members: proposalUsersWithInstitution.map(
       (proposalUserWithInstitution) => ({
         firstName: proposalUserWithInstitution.user.firstname,
@@ -344,6 +338,7 @@ export async function createListenToRabbitMQHandler() {
             proposalPk: message.proposalPk,
             status: message.status,
             localContactId: message.localContact,
+            instrumentId: message.instrumentId,
           } as ScheduledEventCore;
 
           await proposalDataSource.addProposalBookingScheduledEvent(
@@ -379,6 +374,7 @@ export async function createListenToRabbitMQHandler() {
             proposalPk: scheduledEvent.proposalPk,
             status: scheduledEvent.status,
             localContactId: scheduledEvent.localContactId,
+            instrumentId: scheduledEvent.instrumentId,
           }));
 
           await proposalDataSource.removeProposalBookingScheduledEvents(
