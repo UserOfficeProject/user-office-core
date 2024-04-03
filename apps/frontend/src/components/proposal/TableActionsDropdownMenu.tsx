@@ -1,3 +1,4 @@
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
   AccordionDetails,
@@ -74,6 +75,7 @@ const MenuItemWithSubMenuAccordion = ({ data, handleClose }: MenuData) => {
               classes={{
                 content: 'custom-accordion',
               }}
+              expandIcon={<ExpandMoreIcon />}
             >
               <span>{key}</span>
             </AccordionSummary>
