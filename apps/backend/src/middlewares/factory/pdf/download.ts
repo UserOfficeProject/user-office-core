@@ -15,6 +15,7 @@ import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const corsOptionsDelegate = function (req: any, callback: any) {
   let corsOptions;
   let allowlist;
