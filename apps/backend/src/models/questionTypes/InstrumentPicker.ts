@@ -41,7 +41,8 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
 
       return config;
     },
-    getDefaultAnswer: () => [],
+    getDefaultAnswer: (field) =>
+      (field.config as InstrumentPickerConfig).isMultipleSelect ? [] : null,
     filterQuery: (queryBuilder, filter) => {
       const value = JSON.parse(filter.value).value;
       switch (filter.compareOperator) {
