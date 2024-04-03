@@ -1309,6 +1309,15 @@ context('Proposal tests', () => {
       description: 'Instrument 1',
       managerUserId: initialDBData.users.user1.id,
     };
+    const instrument2 = {
+      name: 'Instrument 2',
+      shortCode: 'Instrument 2',
+      description: 'Instrument 2',
+      managerUserId: initialDBData.users.user1.id,
+    };
+    let topicId: number;
+    let instrumentPickerQuestionId: string;
+
     beforeEach(() => {
       // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -1335,12 +1344,18 @@ context('Proposal tests', () => {
           instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
         });
       });
+      cy.createInstrument(instrument2).then((result) => {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+        });
+      });
       cy.createTopic({
         templateId: initialDBData.template.id,
         sortOrder: 1,
       }).then((topicResult) => {
         if (topicResult.createTopic) {
-          const topicId =
+          topicId =
             topicResult.createTopic.steps[
               topicResult.createTopic.steps.length - 1
             ].topic.id;
@@ -1348,12 +1363,14 @@ context('Proposal tests', () => {
             categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
             dataType: DataType.INSTRUMENT_PICKER,
           }).then((result) => {
+            instrumentPickerQuestionId = result.createQuestion.id;
             cy.updateQuestion({
               id: result.createQuestion.id,
               question: instrumentPickerQuestion,
+              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
             });
             cy.createQuestionTemplateRelation({
-              questionId: result.createQuestion.id,
+              questionId: instrumentPickerQuestionId,
               templateId: initialDBData.template.id,
               sortOrder: 0,
               topicId: topicId,
@@ -1404,6 +1421,61 @@ context('Proposal tests', () => {
       cy.contains(title).parent().contains(instrument.name);
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('td', instrument.name).should('exist');
+    });
+
+    it('Multiple instruments should be automatically assigned to the proposal', () => {
+      cy.updateQuestionTemplateRelationSettings({
+        questionId: instrumentPickerQuestionId,
+        templateId: initialDBData.template.id,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true}`,
+        dependencies: [],
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.contains('Save and continue').click();
+      cy.get('[role="button"]').first().click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[role="option"]').contains('Instrument 2').click();
+      cy.get('body').type('{esc}');
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().contains(instrument2.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+      cy.contains('td', instrument2.name).should('exist');
     });
   });
 });
