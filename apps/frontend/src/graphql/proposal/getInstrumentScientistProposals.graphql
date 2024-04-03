@@ -25,7 +25,7 @@ query getInstrumentScientistProposals(
       allocationTimeUnit
       callShortCode
       statusName
-      fapCode
+      fapCodes
       principalInvestigator {
         firstname
         lastname

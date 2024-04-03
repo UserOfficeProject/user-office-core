@@ -147,11 +147,11 @@ export interface ProposalViewRecord {
   readonly technical_review_assignee_ids: number[];
   readonly technical_review_assignee_names: string[];
   readonly instrument_ids: number[];
-  readonly fap_instrument_id: number;
+  readonly fap_instrument_ids: number[];
   readonly instrument_names: string[];
   readonly call_short_code: string;
-  readonly fap_id: number;
-  readonly fap_code: string;
+  readonly fap_ids: number[];
+  readonly fap_codes: string[];
   readonly average: number;
   readonly deviation: number;
   readonly call_id: number;
@@ -420,7 +420,8 @@ export interface FapProposalRecord {
   readonly fap_id: number;
   readonly date_assigned: Date;
   readonly fap_time_allocation: number | null;
-  readonly instrument_id: number;
+  readonly instrument_id: number | null;
+  readonly call_id: number;
   readonly fap_meeting_instrument_submitted: boolean;
 }
 
@@ -831,10 +832,10 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_reviews_submitted,
     proposal.instrument_names,
     proposal.instrument_ids,
-    proposal.fap_instrument_id,
+    proposal.fap_instrument_ids,
     proposal.call_short_code,
-    proposal.fap_code,
-    proposal.fap_id,
+    proposal.fap_codes,
+    proposal.fap_ids,
     proposal.average,
     proposal.deviation,
     proposal.allocation_time_unit,
@@ -1118,6 +1119,7 @@ export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
     fapProposal.date_assigned,
     fapProposal.fap_time_allocation,
     fapProposal.instrument_id,
+    fapProposal.call_id,
     fapProposal.fap_meeting_instrument_submitted
   );
 };

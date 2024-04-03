@@ -14,15 +14,15 @@ import { Fap } from '../types/Fap';
 import { ProposalSelectionInput } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
-export class AssignProposalsToFapArgs {
+export class AssignProposalsToFapsArgs {
   @Field(() => [ProposalSelectionInput])
   public proposals: ProposalSelectionInput[];
 
-  @Field(() => Int)
-  public fapId: number;
+  @Field(() => [Int])
+  public fapIds: number[];
 
-  @Field(() => Int)
-  public fapInstrumentId: number;
+  @Field(() => [Int])
+  public fapInstrumentIds: number[];
 }
 
 export class AssignProposalsToFapUsingCallInstrumentArgs {
@@ -34,22 +34,22 @@ export class AssignProposalsToFapUsingCallInstrumentArgs {
 }
 
 @ArgsType()
-export class RemoveProposalsFromFapArgs {
+export class RemoveProposalsFromFapsArgs {
   @Field(() => [Int])
   public proposalPks: number[];
 
-  @Field(() => Int)
-  public fapId: number;
+  @Field(() => [Int])
+  public fapIds: number[];
 }
 
 @Resolver()
-export class AssignProposalsToFapMutation {
+export class AssignProposalsToFapsMutation {
   @Mutation(() => Boolean)
-  async assignProposalsToFap(
-    @Args() args: AssignProposalsToFapArgs,
+  async assignProposalsToFaps(
+    @Args() args: AssignProposalsToFapsArgs,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.fap.assignProposalsToFap(
+    const res = await context.mutations.fap.assignProposalsToFaps(
       context.user,
       args
     );
@@ -58,10 +58,10 @@ export class AssignProposalsToFapMutation {
   }
 
   @Mutation(() => Fap)
-  async removeProposalsFromFap(
-    @Args() args: RemoveProposalsFromFapArgs,
+  async removeProposalsFromFaps(
+    @Args() args: RemoveProposalsFromFapsArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.fap.removeProposalsFromFap(context.user, args);
+    return context.mutations.fap.removeProposalsFromFaps(context.user, args);
   }
 }

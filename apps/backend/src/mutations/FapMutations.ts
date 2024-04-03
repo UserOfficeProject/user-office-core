@@ -34,10 +34,10 @@ import {
   AssignChairOrSecretaryToFapArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
-  AssignProposalsToFapArgs,
+  AssignProposalsToFapsArgs,
   AssignProposalsToFapUsingCallInstrumentArgs,
-  RemoveProposalsFromFapArgs,
-} from '../resolvers/mutations/AssignProposalsToFapMutation';
+  RemoveProposalsFromFapsArgs,
+} from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { CreateFapArgs } from '../resolvers/mutations/CreateFapMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
@@ -266,15 +266,16 @@ export default class FapMutations {
         (callHasInstrument) => callHasInstrument.callId === callId
       );
       if (callHasInstrument && callHasInstrument.fapId) {
-        await this.assignProposalsToFapInternal(agent, {
+        await this.assignProposalsToFapsInternal(agent, {
           proposals: proposals
             .filter((proposal) => proposal.callId === callId)
             .map((proposal) => ({
               ...proposal,
               callId: callId,
             })),
-          fapId: callHasInstrument.fapId,
-          fapInstrumentId: callHasInstrument.instrumentId,
+          // TODO: Check the fapIds and fapInstrumentIds passed here
+          fapIds: [callHasInstrument.fapId],
+          fapInstrumentIds: [callHasInstrument.instrumentId],
         });
       }
     }
@@ -283,19 +284,19 @@ export default class FapMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async assignProposalsToFap(
+  async assignProposalsToFaps(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapArgs
+    args: AssignProposalsToFapsArgs
   ): Promise<ProposalPks | Rejection> {
-    return this.assignProposalsToFapInternal(agent, args);
+    return this.assignProposalsToFapsInternal(agent, args);
   }
 
   @EventBus(Event.PROPOSAL_FAP_SELECTED)
-  async assignProposalsToFapInternal(
+  async assignProposalsToFapsInternal(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapArgs
+    args: AssignProposalsToFapsArgs
   ): Promise<ProposalPks | Rejection> {
-    const result = await this.dataSource.assignProposalsToFap(args);
+    const result = await this.dataSource.assignProposalsToFaps(args);
 
     if (result.proposalPks.length !== args.proposals.length) {
       return rejection('Could not assign proposal to facility access panel', {
@@ -308,19 +309,17 @@ export default class FapMutations {
 
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.FAP_PROPOSAL_REMOVED)
-  async removeProposalsFromFap(
+  async removeProposalsFromFaps(
     agent: UserWithRole | null,
-    args: RemoveProposalsFromFapArgs
+    args: RemoveProposalsFromFapsArgs
   ): Promise<Fap | Rejection> {
-    return this.dataSource
-      .removeProposalsFromFap(args.proposalPks, args.fapId)
-      .catch((err) => {
-        return rejection(
-          'Could not remove assigned proposal from facility access panel',
-          { agent },
-          err
-        );
-      });
+    return this.dataSource.removeProposalsFromFaps(args).catch((err) => {
+      return rejection(
+        'Could not remove assigned proposal from facility access panel',
+        { agent },
+        err
+      );
+    });
   }
 
   @Authorized([Roles.USER_OFFICER])

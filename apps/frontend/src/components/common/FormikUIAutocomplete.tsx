@@ -22,6 +22,7 @@ type FormikUIAutocompleteProps = {
   multiple?: boolean;
   'data-cy'?: string;
   AdornmentIcon?: MUITextFieldProps;
+  isOptionEqualToValue?: () => boolean;
 };
 
 const FormikUIAutocomplete = ({
@@ -84,6 +85,7 @@ const FormikUIAutocomplete = ({
       )}
       ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
       data-cy={props['data-cy']}
+      isOptionEqualToValue={props.isOptionEqualToValue}
     />
   );
 };

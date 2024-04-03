@@ -25,7 +25,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
-import AssignProposalsToFap from 'components/fap/Proposals/AssignProposalsToFap';
+import AssignProposalsToFaps from 'components/fap/Proposals/AssignProposalsToFaps';
 import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -80,8 +80,8 @@ export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
   instrumentIds: (number | null)[] | null;
-  fapInstrumentId: number | null;
-  fapId: number | null;
+  fapInstrumentIds: number[] | null;
+  fapIds: number[] | null;
   statusId: number;
 };
 
@@ -217,7 +217,12 @@ const FapReviewColumns = [
     hidden: true,
   },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
-  { title: 'Fap', field: 'fapCode', emptyValue: '-' },
+  {
+    title: 'Fap',
+    field: 'fapCodes',
+    render: (rowData: ProposalViewData) =>
+      fromArrayToCommaSeparated(rowData.fapCodes),
+  },
 ];
 
 const PREFETCH_SIZE = 200;
@@ -383,8 +388,8 @@ const ProposalTableOfficer = ({
               primaryKey: proposal.primaryKey,
               callId: proposal.callId,
               instrumentIds: proposal.instrumentIds || [],
-              fapInstrumentId: proposal.fapInstrumentId,
-              fapId: proposal.fapId,
+              fapInstrumentIds: proposal.fapInstrumentIds,
+              fapIds: proposal.fapIds,
               statusId: proposal.statusId,
               workflowId: proposal.workflowId,
               title: proposal.title,
@@ -521,27 +526,27 @@ const ProposalTableOfficer = ({
     });
   };
 
-  const assignProposalsToFap = async (
-    fap: Fap | null,
-    fapInstrument:
-      | NonNullable<GetInstrumentsByIdsQuery['instrumentsByIds']>[0]
-      | null
+  const assignProposalsToFaps = async (
+    fapIds: number[] | null,
+    fapInstrumentIds: number[] | null
   ): Promise<void> => {
-    if (fap) {
-      if (!fapInstrument) {
+    if (fapIds) {
+      if (!fapInstrumentIds) {
         return;
       }
+
+      debugger;
 
       await api({
         toastSuccessMessage:
           'Proposal/s assigned to the selected Fap successfully!',
-      }).assignProposalsToFap({
+      }).assignProposalsToFaps({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
         })),
-        fapId: fap.id,
-        fapInstrumentId: fapInstrument.id,
+        fapIds: fapIds,
+        fapInstrumentIds: fapInstrumentIds,
       });
 
       // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
@@ -549,11 +554,11 @@ const ProposalTableOfficer = ({
     } else {
       await api({
         toastSuccessMessage: 'Proposal/s removed from the Fap successfully!',
-      }).removeProposalsFromFap({
+      }).removeProposalsFromFaps({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
-        fapId: selectedProposals[0].fapId as number,
+        // fapId: selectedProposals[0].fapIds?.[0] as number,
       });
 
       setProposalsData((proposalsData) =>
@@ -564,8 +569,8 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.fapCode = null;
-            prop.fapId = null;
+            prop.fapCodes = null;
+            prop.fapIds = null;
           }
 
           return prop;
@@ -727,6 +732,11 @@ const ProposalTableOfficer = ({
   const allPrefetchedProposalsSelected =
     preselectedProposalsData.length === urlQueryParams.selection.length;
 
+  console.log(
+    selectedProposals,
+    selectedProposals.map((selectedProposal) => selectedProposal.fapIds).flat()
+  );
+
   return (
     <>
       <Dialog
@@ -738,18 +748,18 @@ const ProposalTableOfficer = ({
         fullWidth
       >
         <DialogContent>
-          <AssignProposalsToFap
-            assignProposalsToFap={assignProposalsToFap}
+          <AssignProposalsToFaps
+            assignProposalsToFaps={assignProposalsToFaps}
             close={(): void => setOpenAssignment(false)}
             fapIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.fapId
+              (selectedProposal) => selectedProposal.fapIds
             )}
             proposalInstrumentIds={selectedProposals
               .map((selectedProposal) => selectedProposal.instrumentIds)
               .flat()}
-            proposalFapInstrumentIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.fapInstrumentId
-            )}
+            proposalFapInstrumentIds={selectedProposals
+              .map((selectedProposal) => selectedProposal.fapInstrumentIds)
+              .flat()}
           />
         </DialogContent>
       </Dialog>
@@ -845,7 +855,7 @@ const ProposalTableOfficer = ({
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...fromProposalToProposalView(updatedProposal),
-                  fapInstrumentId: proposal.fapInstrumentId,
+                  fapInstrumentIds: proposal.fapInstrumentIds,
                 };
               } else {
                 return proposal;

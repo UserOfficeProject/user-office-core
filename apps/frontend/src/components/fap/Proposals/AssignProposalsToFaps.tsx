@@ -8,31 +8,34 @@ import React, { useContext, useMemo } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { UserContext } from 'context/UserContextProvider';
-import { UserRole, Fap, GetInstrumentsByIdsQuery } from 'generated/sdk';
+import {
+  UserRole,
+  // Fap,
+  // GetInstrumentsByIdsQuery,
+  // Instrument,
+} from 'generated/sdk';
 import { useFapsData } from 'hooks/fap/useFapsData';
 import { useInstrumentsByIdsData } from 'hooks/instrument/useInstrumentsByIdsData';
 import { getUniqueArray } from 'utils/helperFunctions';
 
-type AssignProposalToFapProps = {
+type AssignProposalToFapsProps = {
   close: () => void;
-  assignProposalsToFap: (
-    fap: Fap | null,
-    fapInstrument:
-      | NonNullable<GetInstrumentsByIdsQuery['instrumentsByIds']>[0]
-      | null
+  assignProposalsToFaps: (
+    faps: number[] | null,
+    fapInstruments: number[] | null
   ) => Promise<void>;
-  fapIds: (number | null)[];
+  fapIds: (number[] | null)[];
   proposalInstrumentIds: (number | null)[];
   proposalFapInstrumentIds: (number | null)[];
 };
 
-const AssignProposalsToFap = ({
+const AssignProposalsToFaps = ({
   close,
-  assignProposalsToFap,
+  assignProposalsToFaps,
   fapIds,
   proposalInstrumentIds,
   proposalFapInstrumentIds,
-}: AssignProposalToFapProps) => {
+}: AssignProposalToFapsProps) => {
   const { currentRole } = useContext(UserContext);
   const { faps, loadingFaps } = useFapsData({
     filter: '',
@@ -46,16 +49,20 @@ const AssignProposalsToFap = ({
   const { instruments, loadingInstruments } =
     useInstrumentsByIdsData(uniqueInstrumentIds);
 
+  // TODO: Add this array comparison into a helper function and/or make it nicer
   const allSelectedProposalsHaveSameFap = fapIds.every(
-    (item) => item === fapIds[0]
+    (item) =>
+      item?.sort((a, b) => (a && b ? a - b : 0)).toString() ===
+      fapIds[0]?.sort((a, b) => (a && b ? a - b : 0)).toString()
   );
 
-  const selectedProposalsFap =
-    allSelectedProposalsHaveSameFap && fapIds[0] ? fapIds[0] : null;
+  const selectedProposalsFaps =
+    allSelectedProposalsHaveSameFap && fapIds[0] ? fapIds[0] : [];
 
-  const selectedFapInstrumentId = allSelectedProposalsHaveSameFap
-    ? proposalFapInstrumentIds[0]
-    : null;
+  const selectedFapInstrumentIds =
+    allSelectedProposalsHaveSameFap && proposalFapInstrumentIds[0]
+      ? getUniqueArray(proposalFapInstrumentIds)
+      : [];
 
   return (
     <Container
@@ -65,18 +72,26 @@ const AssignProposalsToFap = ({
     >
       <Formik
         initialValues={{
-          selectedFapId: selectedProposalsFap,
-          selectedFapInstrumentId: selectedFapInstrumentId,
+          selectedFapIds: selectedProposalsFaps,
+          selectedFapInstrumentIds: selectedFapInstrumentIds,
         }}
         onSubmit={async (values): Promise<void> => {
-          const selectedFap =
-            faps.find((fap) => fap.id === values.selectedFapId) || null;
-          const selectedFapInstrument =
-            instruments?.find(
-              (instrument) => instrument.id === values.selectedFapInstrumentId
-            ) || null;
+          // const selectedFaps = values.selectedFapIds.map(
+          //   (selectedFapId) =>
+          //     faps.find((fap) => fap.id === selectedFapId) as Fap
+          // );
 
-          await assignProposalsToFap(selectedFap, selectedFapInstrument);
+          // const selectedFapInstruments = values.selectedFapInstrumentIds.map(
+          //   (selectedFapInstrumentId) =>
+          //     instruments?.find(
+          //       (instrument) => instrument.id === selectedFapInstrumentId
+          //     ) as Instrument
+          // );
+
+          await assignProposalsToFaps(
+            values.selectedFapIds,
+            values.selectedFapInstrumentIds
+          );
           close();
         }}
       >
@@ -89,8 +104,9 @@ const AssignProposalsToFap = ({
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormikUIAutocomplete
-                  name="selectedFapId"
+                  name="selectedFapIds"
                   label="Select FAP"
+                  multiple={true}
                   loading={loadingFaps}
                   items={faps.map((fap) => ({
                     value: fap.id,
@@ -100,11 +116,12 @@ const AssignProposalsToFap = ({
                   noOptionsText="No FAPs"
                   data-cy="fap-selection"
                 />
-                {values.selectedFapId && (
+                {!!values.selectedFapIds?.length && (
                   <FormikUIAutocomplete
-                    name="selectedFapInstrumentId"
+                    name="selectedFapInstrumentIds"
                     label="Select FAP instrument"
                     loading={loadingInstruments}
+                    multiple={true}
                     items={
                       instruments?.map((instrument) => ({
                         value: instrument.id,
@@ -114,12 +131,11 @@ const AssignProposalsToFap = ({
                     disabled={isSubmitting}
                     noOptionsText="No instruments"
                     data-cy="fap-instrument-selection"
-                    required={!!values.selectedFapId}
                   />
                 )}
               </Grid>
             </Grid>
-            {!values.selectedFapId && (
+            {!values.selectedFapIds?.length && (
               <Alert severity="warning" data-cy="remove-fap-alert">
                 Be aware that leaving FAP selection empty will remove assigned
                 FAP from proposal/s and delete all FAP reviews on that
@@ -142,4 +158,4 @@ const AssignProposalsToFap = ({
   );
 };
 
-export default AssignProposalsToFap;
+export default AssignProposalsToFaps;

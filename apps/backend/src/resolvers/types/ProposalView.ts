@@ -77,17 +77,17 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => [Int], { nullable: 'itemsAndList' })
   public instrumentIds?: number[];
 
-  @Field(() => Int, { nullable: true })
-  public fapInstrumentId?: number;
+  @Field(() => [Int], { nullable: true })
+  public fapInstrumentIds?: number[];
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;
 
-  @Field(() => String, { nullable: true })
-  public fapCode: string;
+  @Field(() => [String], { nullable: true })
+  public fapCodes: string[];
 
-  @Field(() => Int, { nullable: true })
-  public fapId: number;
+  @Field(() => [Int], { nullable: true })
+  public fapIds: number[];
 
   @Field(() => Float, { nullable: true })
   public reviewAverage: number;

@@ -15,7 +15,8 @@ import {
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
-import { AssignProposalsToFapArgs } from '../resolvers/mutations/AssignProposalsToFapMutation';
+import { AssignProposalsToFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
+import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
 
@@ -88,13 +89,13 @@ export interface FapDataSource {
   ): Promise<Fap>;
   assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap>;
   removeMemberFromFap(args: UpdateMemberFapArgs): Promise<Fap>;
-  assignProposalsToFap(args: AssignProposalsToFapArgs): Promise<ProposalPks>;
+  assignProposalsToFaps(args: AssignProposalsToFapsArgs): Promise<ProposalPks>;
   removeMemberFromFapProposal(
     proposalPk: number,
     fapId: number,
     memberId: number
   ): Promise<Fap>;
-  removeProposalsFromFap(proposalPks: number[], fapId: number): Promise<Fap>;
+  removeProposalsFromFaps(args: RemoveProposalsFromFapsArgs): Promise<Fap>;
   assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,
@@ -123,7 +124,7 @@ export interface FapDataSource {
   getRelatedUsersOnFap(id: number): Promise<number[]>;
   isFapProposalInstrumentSubmitted(
     proposalPk: number,
-    instrumentId?: number
+    instrumentId?: number | null
   ): Promise<boolean>;
   setReviewerRank(
     proposalPk: number,

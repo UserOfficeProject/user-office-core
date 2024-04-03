@@ -107,8 +107,9 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
       average(getGradesFromReviews(proposal.reviews ?? [])) || null,
     reviewDeviation:
       standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    fapId: proposal.fap?.id,
-    fapCode: proposal.fap?.code,
+    // TODO: Check fapIds and codes
+    fapIds: [proposal.fap?.id],
+    fapCodes: [proposal.fap?.code],
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,

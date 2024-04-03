@@ -1,0 +1,5 @@
+mutation removeProposalsFromFaps($proposalPks: [Int!]!, $fapId: Int!) {
+  removeProposalsFromFaps(proposalPks: $proposalPks, fapId: $fapId) {
+    id
+  }
+}
