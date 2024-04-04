@@ -582,7 +582,7 @@ export interface ProposalEventsRecord {
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
-  readonly proposal_fap_selected: boolean;
+  readonly proposal_faps_selected: boolean;
   readonly proposal_instruments_selected: boolean;
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;

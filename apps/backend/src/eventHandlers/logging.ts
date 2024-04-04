@@ -76,7 +76,7 @@ export default function createHandler() {
           );
           break;
         }
-        case Event.PROPOSAL_FAP_SELECTED:
+        case Event.PROPOSAL_FAPS_SELECTED:
           await Promise.all(
             event.proposalpks.proposalPks.map(async (proposalPk) => {
               const fap = await fapDataSource.getFapByProposalPk(proposalPk);

@@ -291,12 +291,34 @@ export default class FapMutations {
     return this.assignProposalsToFapsInternal(agent, args);
   }
 
-  @EventBus(Event.PROPOSAL_FAP_SELECTED)
+  @EventBus(Event.PROPOSAL_FAPS_SELECTED)
   async assignProposalsToFapsInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToFapsArgs
   ): Promise<ProposalPks | Rejection> {
     const result = await this.dataSource.assignProposalsToFaps(args);
+
+    if (!args.fapInstrumentIds.length) {
+      return rejection(
+        'Proposal cannot be assigned to FAP without specifying the instrument',
+        {
+          agent,
+        }
+      );
+    }
+
+    if (
+      args.fapIds.length > 1 &&
+      args.fapInstrumentIds.length > 1 &&
+      args.fapIds.length !== args.fapInstrumentIds.length
+    ) {
+      return rejection(
+        'All proposal FAPs should have their own instrument accordingly',
+        {
+          agent,
+        }
+      );
+    }
 
     if (result.proposalPks.length !== args.proposals.length) {
       return rejection('Could not assign proposal to facility access panel', {

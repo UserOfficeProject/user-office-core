@@ -278,9 +278,9 @@ context('Fap reviews tests', () => {
     });
 
     it('Officer should be able to see proposal details in modal inside proposals and assignments', () => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -307,9 +307,9 @@ context('Fap reviews tests', () => {
     });
 
     it('Proposal should contain standard deviation field inside proposals and assignments', () => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -323,9 +323,9 @@ context('Fap reviews tests', () => {
     });
 
     it('Officer should be able to assign Fap member to proposal in existing Fap', () => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -385,9 +385,9 @@ context('Fap reviews tests', () => {
     });
 
     it('Officer should be able to read/write reviews', () => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -416,9 +416,9 @@ context('Fap reviews tests', () => {
     });
 
     it('Officer should be able to submit and un-submit reviews', () => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -478,9 +478,9 @@ context('Fap reviews tests', () => {
     });
 
     it('Officer should get error when trying to delete proposal which has dependencies (like reviews)', () => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -518,9 +518,9 @@ context('Fap reviews tests', () => {
     });
 
     it.only('Should be able to see how many proposals are assigned to a reviewer', () => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -562,9 +562,9 @@ context('Fap reviews tests', () => {
           roleId: UserRole.FAP_CHAIR,
         },
       });
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -707,9 +707,9 @@ context('Fap reviews tests', () => {
           roleId: UserRole.FAP_SECRETARY,
         },
       });
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -822,9 +822,9 @@ context('Fap reviews tests', () => {
 
   describe('Fap Reviewer role', () => {
     beforeEach(() => {
-      cy.assignProposalsToFap({
-        fapId: createdFapId,
-        fapInstrumentId: newlyCreatedInstrumentId,
+      cy.assignProposalsToFaps({
+        fapIds: [createdFapId],
+        fapInstrumentIds: [newlyCreatedInstrumentId],
         proposals: [
           { callId: initialDBData.call.id, primaryKey: createdProposalPk },
         ],
@@ -858,9 +858,9 @@ context('Fap reviews tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
 
-          cy.assignProposalsToFap({
-            fapId: createdFapId,
-            fapInstrumentId: newlyCreatedInstrumentId,
+          cy.assignProposalsToFaps({
+            fapIds: [createdFapId],
+            fapInstrumentIds: [newlyCreatedInstrumentId],
             proposals: [
               { callId: initialDBData.call.id, primaryKey: createdProposal2Pk },
             ],
@@ -1052,9 +1052,9 @@ context('Fap meeting components tests', () => {
           proposalPks: [createdProposalPk],
         });
 
-        cy.assignProposalsToFap({
-          fapId: createdFapId,
-          fapInstrumentId: createdInstrumentId,
+        cy.assignProposalsToFaps({
+          fapIds: [createdFapId],
+          fapInstrumentIds: [createdInstrumentId],
           proposals: [
             { callId: initialDBData.call.id, primaryKey: createdProposalPk },
           ],
@@ -1179,9 +1179,9 @@ context('Fap meeting components tests', () => {
                   proposalPks: [createdProposal.primaryKey],
                 });
 
-                cy.assignProposalsToFap({
-                  fapId: createdFapId,
-                  fapInstrumentId: createdInstrument2Id,
+                cy.assignProposalsToFaps({
+                  fapIds: [createdFapId],
+                  fapInstrumentIds: [createdInstrument2Id],
                   proposals: [
                     {
                       callId: initialDBData.call.id,
@@ -1250,9 +1250,9 @@ context('Fap meeting components tests', () => {
             proposalPks: [createdProposal.primaryKey],
           });
 
-          cy.assignProposalsToFap({
-            fapId: createdFapId,
-            fapInstrumentId: createdInstrumentId,
+          cy.assignProposalsToFaps({
+            fapIds: [createdFapId],
+            fapInstrumentIds: [createdInstrumentId],
             proposals: [
               {
                 callId: initialDBData.call.id,
@@ -1351,9 +1351,9 @@ context('Fap meeting components tests', () => {
             proposalPks: [createdProposal.primaryKey],
           });
 
-          cy.assignProposalsToFap({
-            fapId: createdFapId,
-            fapInstrumentId: createdInstrumentId,
+          cy.assignProposalsToFaps({
+            fapIds: [createdFapId],
+            fapInstrumentIds: [createdInstrumentId],
             proposals: [
               {
                 callId: initialDBData.call.id,
@@ -1501,9 +1501,9 @@ context('Fap meeting components tests', () => {
               gradeGuide: fap2.gradeGuide,
             }).then((fapResult) => {
               if (fapResult.createFap) {
-                cy.assignProposalsToFap({
-                  fapId: fapResult.createFap.id,
-                  fapInstrumentId: createdInstrumentId,
+                cy.assignProposalsToFaps({
+                  fapIds: [fapResult.createFap.id],
+                  fapInstrumentIds: [createdInstrumentId],
                   proposals: [
                     {
                       callId: initialDBData.call.id,
@@ -1879,9 +1879,9 @@ context('Fap meeting components tests', () => {
               gradeGuide: fap2.gradeGuide,
             }).then((fapResult) => {
               if (fapResult.createFap) {
-                cy.assignProposalsToFap({
-                  fapId: fapResult.createFap.id,
-                  fapInstrumentId: createdInstrumentId,
+                cy.assignProposalsToFaps({
+                  fapIds: [fapResult.createFap.id],
+                  fapInstrumentIds: [createdInstrumentId],
                   proposals: [
                     {
                       callId: initialDBData.call.id,

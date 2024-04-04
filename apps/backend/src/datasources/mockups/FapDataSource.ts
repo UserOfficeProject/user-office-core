@@ -15,7 +15,10 @@ import {
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
 } from '../../resolvers/mutations/AssignMembersToFapMutation';
-import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
+import {
+  AssignProposalsToFapsArgs,
+  RemoveProposalsFromFapsArgs,
+} from '../../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { FapDataSource } from '../FapDataSource';
@@ -92,6 +95,7 @@ export const dummyFapProposal = new FapProposal(
   new Date('2020-04-20 08:25:12.23043+00'),
   null,
   1,
+  1,
   false
 );
 
@@ -101,6 +105,7 @@ export const anotherDummyFapProposal = new FapProposal(
   new Date('2020-04-20 08:25:12.23043+00'),
   null,
   2,
+  1,
   true
 );
 
@@ -370,24 +375,24 @@ export class FapDataSourceMock implements FapDataSource {
     return { id: 4, shortCode: 'fap_chair', title: 'Fap Chair' };
   }
 
-  async assignProposalsToFap({ proposals, fapId }: AssignProposalsToFapArgs) {
-    const fap = dummyFaps.find((element) => element.id === fapId);
+  async assignProposalsToFaps({ fapIds }: AssignProposalsToFapsArgs) {
+    const fap = dummyFaps.find((element) => fapIds.includes(element.id));
 
     if (fap) {
       return new ProposalPks([1]);
     }
 
-    throw new Error(`Fap not found ${fapId}`);
+    throw new Error(`FAPs not found ${fapIds}`);
   }
 
-  async removeProposalsFromFap(proposalPks: number[], fapId: number) {
-    const fap = dummyFaps.find((element) => element.id === fapId);
+  async removeProposalsFromFaps({ fapIds }: RemoveProposalsFromFapsArgs) {
+    const fap = dummyFaps.find((element) => fapIds.includes(element.id));
 
     if (fap) {
       return fap;
     }
 
-    throw new Error(`Fap not found ${fapId}`);
+    throw new Error(`FAPs not found ${fapIds}`);
   }
 
   async assignMemberToFapProposal(

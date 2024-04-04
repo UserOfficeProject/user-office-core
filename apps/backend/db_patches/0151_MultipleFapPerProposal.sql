@@ -94,6 +94,12 @@ BEGIN
 			-- ) ihp_2 ON ihp_2.proposal_pk = p.proposal_pk
 			-- ORDER BY proposal_pk;
 
+			-- ALTER TABLE proposal_events RENAME COLUMN proposal_fap_selected TO proposal_faps_selected;
+
+			-- UPDATE status_changing_events
+			-- SET status_changing_event = 'PROPOSAL_FAPS_SELECTED'
+			-- WHERE status_changing_event = 'PROPOSAL_FAP_SELECTED';
+
     END;
 	END IF;
 END;

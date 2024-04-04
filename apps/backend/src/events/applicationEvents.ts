@@ -137,8 +137,8 @@ interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   instrumentshasproposals: InstrumentsHasProposals;
 }
 
-interface ProposalFapSelectedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_SELECTED;
+interface ProposalFapsSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAPS_SELECTED;
   proposalpks: ProposalPks;
 }
 
@@ -339,7 +339,7 @@ export type ApplicationEvent =
   | ProposalAllFapReviewsSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
-  | ProposalFapSelectedEvent
+  | ProposalFapsSelectedEvent
   | ProposalInstrumentSubmittedEvent
   | ProposalFapMeetingSubmittedEvent
   | ProposalStatusChangedByWorkflowEvent

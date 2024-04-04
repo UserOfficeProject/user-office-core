@@ -195,20 +195,20 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can assign proposal to Fap', () => {
     return expect(
-      FapMutationsInstance.assignProposalsToFap(dummyUserOfficerWithRole, {
+      FapMutationsInstance.assignProposalsToFaps(dummyUserOfficerWithRole, {
         proposals: [{ primaryKey: 1, callId: 1 }],
-        fapId: 1,
-        fapInstrumentId: 1,
+        fapIds: [1],
+        fapInstrumentIds: [1],
       })
     ).resolves.toStrictEqual(new ProposalPks([1]));
   });
 
   test('A user can not remove proposal from Fap', async () => {
-    const result = (await FapMutationsInstance.removeProposalsFromFap(
+    const result = (await FapMutationsInstance.removeProposalsFromFaps(
       dummyUserWithRole,
       {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       }
     )) as Rejection;
 
@@ -217,9 +217,9 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can remove proposal from Fap', () => {
     return expect(
-      FapMutationsInstance.removeProposalsFromFap(dummyUserOfficerWithRole, {
+      FapMutationsInstance.removeProposalsFromFaps(dummyUserOfficerWithRole, {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       })
     ).resolves.toStrictEqual(dummyFap);
   });

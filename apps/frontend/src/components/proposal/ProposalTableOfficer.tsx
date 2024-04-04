@@ -38,10 +38,8 @@ import {
   ProposalsFilter,
   ProposalStatus,
   ProposalSelectionInput,
-  Fap,
   InstrumentFragment,
   FeatureId,
-  GetInstrumentsByIdsQuery,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -80,7 +78,7 @@ export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
   instrumentIds: (number | null)[] | null;
-  fapInstrumentIds: number[] | null;
+  fapInstrumentIds: (number | null)[] | null;
   fapIds: number[] | null;
   statusId: number;
 };
@@ -530,12 +528,10 @@ const ProposalTableOfficer = ({
     fapIds: number[] | null,
     fapInstrumentIds: number[] | null
   ): Promise<void> => {
-    if (fapIds) {
+    if (fapIds?.length) {
       if (!fapInstrumentIds) {
         return;
       }
-
-      debugger;
 
       await api({
         toastSuccessMessage:
@@ -558,7 +554,9 @@ const ProposalTableOfficer = ({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
-        // fapId: selectedProposals[0].fapIds?.[0] as number,
+        fapIds: selectedProposals
+          .map((selectedProposal) => selectedProposal.fapIds || [])
+          .flat(),
       });
 
       setProposalsData((proposalsData) =>
@@ -731,11 +729,6 @@ const ProposalTableOfficer = ({
     totalCount <= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
   const allPrefetchedProposalsSelected =
     preselectedProposalsData.length === urlQueryParams.selection.length;
-
-  console.log(
-    selectedProposals,
-    selectedProposals.map((selectedProposal) => selectedProposal.fapIds).flat()
-  );
 
   return (
     <>

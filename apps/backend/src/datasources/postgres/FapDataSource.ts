@@ -26,6 +26,7 @@ import {
 } from '../../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
 import database from './database';
@@ -698,7 +699,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${args.fapId}`);
   }
 
-  async assignProposalsToFap({
+  async assignProposalsToFaps({
     proposals,
     fapIds,
     fapInstrumentIds,
@@ -707,25 +708,44 @@ export default class PostgresFapDataSource implements FapDataSource {
       FapProposalRecord,
       'call_id' | 'fap_id' | 'instrument_id' | 'proposal_pk'
     >[] = [];
-    fapIds.forEach((fapId, index) => {
-      proposals.forEach((proposal) => {
-        dataToInsert.push({
-          call_id: proposal.callId,
-          fap_id: fapId,
-          instrument_id: fapInstrumentIds[index] || null,
-          proposal_pk: proposal.primaryKey,
+
+    if (fapIds.length === 1) {
+      // NOTE: This is the case where we want to have one FAPs but proposal is assgned to one or more instruments that go to the same FAP panel for revew.
+      fapInstrumentIds.forEach((fapInstrumentId) => {
+        proposals.forEach((proposal) => {
+          dataToInsert.push({
+            call_id: proposal.callId,
+            fap_id: fapIds[0],
+            instrument_id: fapInstrumentId,
+            proposal_pk: proposal.primaryKey,
+          });
         });
       });
-    });
-
-    console.log(dataToInsert);
-
-    // proposals.map((proposal) => ({
-    //   fap_id: fapId,
-    //   instrument_id: fapInstrumentId,
-    //   proposal_pk: proposal.primaryKey,
-    //   call_id: proposal.callId,
-    // }));
+    } else if (fapInstrumentIds.length === 1) {
+      // NOTE: This is the case where we want to have multiple FAPs but proposal is assgned to one instrument that go under different FAPs for revew.
+      fapIds.forEach((fapId) => {
+        proposals.forEach((proposal) => {
+          dataToInsert.push({
+            call_id: proposal.callId,
+            fap_id: fapId,
+            instrument_id: fapInstrumentIds[0],
+            proposal_pk: proposal.primaryKey,
+          });
+        });
+      });
+    } else {
+      // NOTE: This is the case where the proposal is assigned to multiple instruments and each one of them has its own FAP.
+      fapIds.forEach((fapId, index) => {
+        proposals.forEach((proposal) => {
+          dataToInsert.push({
+            call_id: proposal.callId,
+            fap_id: fapId,
+            instrument_id: fapInstrumentIds[index],
+            proposal_pk: proposal.primaryKey,
+          });
+        });
+      });
+    }
 
     const proposalFapPairs: {
       proposal_pk: number;
@@ -754,8 +774,8 @@ export default class PostgresFapDataSource implements FapDataSource {
       }
     });
 
-    const returnedProposalPks = proposalFapPairs.map(
-      (proposalFapPair) => proposalFapPair.proposal_pk
+    const returnedProposalPks = removeDuplicates(
+      proposalFapPairs.map((proposalFapPair) => proposalFapPair.proposal_pk)
     );
 
     if (proposalFapPairs?.length) {
