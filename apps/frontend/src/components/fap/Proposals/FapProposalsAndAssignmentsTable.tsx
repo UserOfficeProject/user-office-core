@@ -258,10 +258,10 @@ const FapProposalsAndAssignmentsTable = ({
     const updatedFap = (
       await api({
         toastSuccessMessage: 'Members assigned',
-      }).massAssignReviews({
+      }).massAssignFapReviews({
         fapId: data.id,
       })
-    ).massAssignReviews;
+    ).massAssignFapReviews;
 
     const updatedFapProposals =
       (await api().getFapProposals({ fapId: data.id, callId: selectedCallId }))

@@ -1,7 +1,7 @@
-mutation massAssignReviews(
+mutation massAssignFapReviews(
   $fapId: Int!
 ) {
-  massAssignReviews(
+  massAssignFapReviews(
     fapId: $fapId
   ) {
     ...fap

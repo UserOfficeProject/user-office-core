@@ -14,6 +14,7 @@ import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
 import { Review, ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
+import { SettingsId } from '../../models/Settings';
 import { BasicUserDetails, UserRole } from '../../models/User';
 import {
   UpdateMemberFapArgs,
@@ -23,6 +24,7 @@ import {
 import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { AdminDataSource } from '../AdminDataSource';
 import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
 import database from './database';
@@ -49,12 +51,11 @@ import {
   InstitutionRecord,
 } from './records';
 
-const DEFAULT_NUM_REVIEWS_REQUIRED = 2;
-
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
   constructor(
-    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
+    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
   ) {}
 
   async delete(id: number): Promise<Fap> {
@@ -838,7 +839,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${fapId}`);
   }
 
-  async getCallInReviewForFap(fapId: number) {
+  private async getCallInReviewForFap(fapId: number) {
     const callFilter = {
       isEnded: true,
       isFapReviewEnded: false,
@@ -859,6 +860,11 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getFapProposalToNumReviewsNeededMap(fapId: number) {
+    const DEFAULT_NUM_REVIEWS_REQUIRED =
+      await this.adminDataSource.getSettingOrDefault(
+        SettingsId.DEFAULT_NUM_REVIEWS_REQUIRED,
+        2
+      );
     const fap = await this.getFap(fapId);
     const numReviewsRequired = fap
       ? fap.numberRatingsRequired

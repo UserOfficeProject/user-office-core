@@ -391,7 +391,7 @@ export default class FapMutations {
    */
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async massAssignReviews(
+  async massAssignFapReviews(
     agent: UserWithRole | null,
     args: MassAssignReviewsArgs
   ): Promise<Fap | Rejection> {

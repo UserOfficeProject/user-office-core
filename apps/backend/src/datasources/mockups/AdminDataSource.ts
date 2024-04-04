@@ -41,6 +41,7 @@ export class AdminDataSourceMock implements AdminDataSource {
       new Settings(SettingsId.FEEDBACK_MAX_REQUESTS, '', '2'),
       new Settings(SettingsId.FEEDBACK_EXHAUST_DAYS, '', '90'),
       new Settings(SettingsId.FEEDBACK_FREQUENCY_DAYS, '', '14'),
+      new Settings(SettingsId.DEFAULT_NUM_REVIEWS_REQUIRED, '', '2'),
     ];
   }
   async setFeatures(
@@ -143,6 +144,22 @@ export class AdminDataSourceMock implements AdminDataSource {
     }
 
     return setting;
+  }
+
+  async getSettingOrDefault(
+    settingId: SettingsId,
+    defaultValue: number
+  ): Promise<number> {
+    const settingValue = await this.getSetting(settingId);
+    if (settingValue === null) {
+      return defaultValue;
+    }
+    const settingValueAsNumber = parseInt(settingValue.settingsValue, 10);
+    if (isNaN(settingValueAsNumber)) {
+      return defaultValue;
+    }
+
+    return settingValueAsNumber;
   }
 
   async getTokenAndPermissionsById(

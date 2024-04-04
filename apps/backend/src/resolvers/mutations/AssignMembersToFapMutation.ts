@@ -132,11 +132,11 @@ export class AssignMembersToFapMutation {
   }
 
   @Mutation(() => Fap)
-  async massAssignReviews(
+  async massAssignFapReviews(
     @Args() args: MassAssignReviewsArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.fap.massAssignReviews(context.user, args);
+    return context.mutations.fap.massAssignFapReviews(context.user, args);
   }
 
   @Mutation(() => Fap)

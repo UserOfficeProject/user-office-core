@@ -661,10 +661,6 @@ export class FapDataSourceMock implements FapDataSource {
     return [];
   }
 
-  async getCallInReviewForFap(fapId: number): Promise<number> {
-    return 1;
-  }
-
   async isFapProposalInstrumentSubmitted(
     proposalPk: number,
     instrumentId: number

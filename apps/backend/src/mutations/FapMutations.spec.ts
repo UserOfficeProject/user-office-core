@@ -255,7 +255,7 @@ describe('Test FapMutations', () => {
   });
 
   test('A user can not mass assign proposals to Fap members', async () => {
-    const result = (await FapMutationsInstance.massAssignReviews(
+    const result = (await FapMutationsInstance.massAssignFapReviews(
       dummyUserWithRole,
       {
         fapId: 1,
@@ -267,7 +267,7 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can mass assign proposals to Fap members', () => {
     return expect(
-      FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+      FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
         fapId: 1,
       })
     ).resolves.toStrictEqual(dummyFap);
@@ -279,7 +279,7 @@ describe('Test FapMutations', () => {
       'assignMemberToFapProposals'
     );
 
-    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
       fapId: 3,
     });
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
@@ -294,7 +294,7 @@ describe('Test FapMutations', () => {
       'assignMemberToFapProposals'
     );
 
-    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
       fapId: 4,
     });
 
@@ -307,7 +307,7 @@ describe('Test FapMutations', () => {
       'assignMemberToFapProposals'
     );
 
-    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
       fapId: 7,
     });
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
@@ -322,7 +322,7 @@ describe('Test FapMutations', () => {
       'assignMemberToFapProposals'
     );
 
-    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
       fapId: 5,
     });
 
@@ -341,7 +341,7 @@ describe('Test FapMutations', () => {
       'assignMemberToFapProposals'
     );
 
-    await FapMutationsInstance.massAssignReviews(dummyUserOfficerWithRole, {
+    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
       fapId: 6,
     });
 
