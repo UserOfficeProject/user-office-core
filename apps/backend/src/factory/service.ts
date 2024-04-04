@@ -26,6 +26,7 @@ export enum PDFType {
 }
 export enum ZIPType {
   ATTACHMENT = 'attachment',
+  PROPOSAL = 'proposal',
 }
 
 export type MetaBase = { collectionFilename: string; singleFilename: string };
