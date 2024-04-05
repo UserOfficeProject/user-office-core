@@ -34,7 +34,7 @@
     "@types/yup": "^0.29.13",
     "@uiw/react-codemirror": "^4.21.7",
     "@user-office-software/duo-localisation": "^1.2.0",
-    "@user-office-software/duo-validation": "^4.0.4",
+    "@user-office-software/duo-validation": "^5.0.2",
     "clsx": "^1.1.1",
     "formik": "^2.2.9",
     "formik-mui": "^4.0.0-alpha.3",
@@ -111,7 +111,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.6.1",
     "react-test-renderer": "^17.0.0",
-    "vite": "^5.0.12"
+    "vite": "^5.0.13"
   },
   "engines": {
     "npm": ">=9.0.0",

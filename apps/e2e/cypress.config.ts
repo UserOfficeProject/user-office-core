@@ -4,7 +4,7 @@ import { createServer, Server } from 'http';
 import webpackPreprocessor from '@cypress/webpack-preprocessor';
 import { defineConfig } from 'cypress';
 
-import { downloadFile, readPdf } from './cypress/support/fileUtilTasks';
+import { downloadFile, readPdf, unzip } from './cypress/support/fileUtilTasks';
 
 function replaceLastOccurrenceInString(
   string: string,
@@ -104,6 +104,8 @@ module.exports = defineConfig({
       on('task', {
         readPdf,
       });
+
+      on('task', { unzip });
     },
   },
 });

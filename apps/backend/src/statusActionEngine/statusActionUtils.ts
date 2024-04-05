@@ -254,11 +254,11 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
 
       const instrumentsPeople = await Promise.all(
         proposalInstruments.map(async (proposalInstrument) => {
-          const beamLineManager = await usersDataSource.getBasicUserInfo(
+          const instrumentContact = await usersDataSource.getBasicUserInfo(
             proposalInstrument.managerUserId
           );
 
-          if (!beamLineManager) {
+          if (!instrumentContact) {
             return;
           }
 
@@ -267,7 +267,7 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
               proposalInstrument.id
             );
 
-          return [beamLineManager, ...instrumentScientists];
+          return [instrumentContact, ...instrumentScientists];
         })
       );
 

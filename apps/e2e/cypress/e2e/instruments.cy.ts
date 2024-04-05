@@ -79,10 +79,15 @@ context('Instrument tests', () => {
       cy.get('#shortCode').type(instrument1.shortCode);
       cy.get('#description').type(instrument1.description);
 
-      cy.get('[data-cy=beamline-manager-surname]').type(scientist1.lastName);
-      cy.realPress('Enter');
-      cy.get('[data-cy=findUser]').click();
-      cy.get('[data-cy=beamline-manager]').click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]').type(
+          scientist1.lastName
+        );
+        cy.realPress('Enter');
+        cy.get('[data-cy=findUser]').click();
+      }
+
+      cy.get('[data-cy=instrument-contact]').click();
       cy.get('[role=presentation]').contains(scientist1.lastName).click();
 
       cy.get('[data-cy="submit"]').click();
@@ -518,20 +523,20 @@ context('Instrument tests', () => {
         .should('contain.text', 'No records to display');
     });
 
-    it('User Officer should be able to update beamline manager', () => {
+    it('User Officer should be able to update instrument contact', () => {
       cy.contains('Instruments').click();
 
       cy.contains(instrument1.name)
         .parent()
         .find('[aria-label="Edit"]')
         .click();
-
-      cy.get('[data-cy=beamline-manager-surname]').type(scientist2.lastName);
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.get('[data-cy=beamline-manager]').click();
-
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]').type(
+          scientist2.lastName
+        );
+        cy.get('[data-cy=findUser]').click();
+      }
+      cy.get('[data-cy=instrument-contact]').click();
       cy.get('[role=presentation]').contains(scientist2.lastName).click();
 
       cy.get('[role=presentation] [data-cy=submit]').click();
@@ -757,6 +762,8 @@ context('Instrument tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Proposal(s)').click();
+
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(

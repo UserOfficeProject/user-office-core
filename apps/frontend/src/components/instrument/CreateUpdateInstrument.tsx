@@ -34,13 +34,13 @@ const CreateUpdateInstrument = ({
   instrument,
 }: CreateUpdateInstrumentProps) => {
   const featureContext = useContext(FeatureContext);
-  const isUserSurnameSearchEnabled = !!featureContext.featuresMap.get(
+  const isUserSurnameSearchEnabled = featureContext.featuresMap.get(
     FeatureId.USER_SEARCH_FILTER
   )?.isEnabled;
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const [usersData, setUsersData] = useState(
-    instrument?.beamlineManager ? [instrument?.beamlineManager] : []
+    instrument?.instrumentContact ? [instrument?.instrumentContact] : []
   );
 
   const initialValues = instrument
@@ -101,7 +101,7 @@ const CreateUpdateInstrument = ({
           component={TextField}
           fullWidth
           flex="1"
-          data-cy="beamline-manager-surname"
+          data-cy="instrument-contact-surname"
         />
         <Button
           data-cy="findUser"
@@ -200,7 +200,7 @@ const CreateUpdateInstrument = ({
           <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
-            label="Beamline manager"
+            label="Instrument Contact"
             noOptionsText="No one"
             items={usersData
               .sort(
@@ -212,7 +212,7 @@ const CreateUpdateInstrument = ({
                 value: user.id,
               }))}
             InputProps={{
-              'data-cy': 'beamline-manager',
+              'data-cy': 'instrument-contact',
             }}
             required
           />

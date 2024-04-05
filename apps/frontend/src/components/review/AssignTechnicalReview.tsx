@@ -42,12 +42,12 @@ function AssignTechnicalReview({
   );
 
   const usersData = instrument?.scientists || [];
-  const beamlineManagerAlreadyExists = instrument?.scientists.find(
-    (scientist) => scientist.id === instrument?.beamlineManager?.id
+  const instrumentContactAlreadyExists = instrument?.scientists.find(
+    (scientist) => scientist.id === instrument?.instrumentContact?.id
   );
 
-  if (instrument?.beamlineManager && !beamlineManagerAlreadyExists) {
-    usersData.push(instrument?.beamlineManager);
+  if (instrument?.instrumentContact && !instrumentContactAlreadyExists) {
+    usersData.push(instrument?.instrumentContact);
   }
 
   const userIdToUser = (userId?: number | null) =>
