@@ -9,16 +9,10 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
-import { rejection, Rejection } from '../models/Rejection';
+import { Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { NonNullableField } from '../utils/utilTypes';
 import { UserAuthorization } from './UserAuthorization';
-
-type ValidUser = NonNullableField<
-  User,
-  'oidcSub' | 'oauthAccessToken' | 'oauthRefreshToken'
->;
 
 interface UserinfoResponseWithInssitution extends UserinfoResponse {
   institution_ror_id?: string;
@@ -66,26 +60,7 @@ export class OAuthAuthorization extends UserAuthorization {
   }
 
   async logout(uosToken: AuthJwtPayload): Promise<string | Rejection> {
-    const oidcSub = uosToken.user.oidcSub;
-
-    if (!oidcSub) {
-      return rejection('INVALID_USER');
-    }
-
-    try {
-      // get and validate user form datasource
-      const user = this.validateUser(
-        await this.userDataSource.getByOIDCSub(oidcSub)
-      );
-
-      await OpenIdClient.logout(user.oauthAccessToken);
-
-      return 'logged out';
-    } catch (error) {
-      return rejection('Error ocurred while logging out', {
-        error: (error as Error)?.message,
-      });
-    }
+    return 'logged out';
   }
 
   public async isExternalTokenValid(code: string): Promise<boolean> {
@@ -173,7 +148,6 @@ export class OAuthAuthorization extends UserAuthorization {
         firstname: userInfo.given_name,
         gender: userInfo.gender,
         lastname: userInfo.family_name,
-        oauthAccessToken: tokenSet.access_token,
         oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
@@ -194,7 +168,6 @@ export class OAuthAuthorization extends UserAuthorization {
         userInfo.email,
         userInfo.preferred_username,
         userInfo.sub,
-        tokenSet.access_token,
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
         'unspecified',
@@ -215,17 +188,5 @@ export class OAuthAuthorization extends UserAuthorization {
 
       return newUser;
     }
-  }
-
-  private validateUser(user: User | null): ValidUser {
-    if (!user?.oidcSub || !user?.oauthAccessToken) {
-      logger.logError('Invalid user', {
-        authorizer: this.constructor.name,
-        user,
-      });
-      throw new GraphQLError('Invalid user');
-    }
-
-    return user as ValidUser;
   }
 }
