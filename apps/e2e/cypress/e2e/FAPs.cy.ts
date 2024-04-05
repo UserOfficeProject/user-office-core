@@ -205,6 +205,11 @@ function initializationBeforeTests() {
       });
     }
   });
+
+  cy.assignInstrumentToCall({
+    callId: initialDBData.call.id,
+    instrumentFapIds: [{ instrumentId: newlyCreatedInstrumentId }],
+  });
   cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
     const createdProposal = result.createProposal;
     if (createdProposal) {
@@ -224,6 +229,10 @@ function initializationBeforeTests() {
         proposals: [
           { callId: initialDBData.call.id, primaryKey: firstCreatedProposalPk },
         ],
+      });
+      cy.assignProposalsToInstruments({
+        instrumentIds: [newlyCreatedInstrumentId],
+        proposalPks: [createdProposal.primaryKey],
       });
     }
   });
@@ -330,9 +339,11 @@ context('Fap reviews tests', () => {
         'Mui-disabled'
       );
       cy.get('[data-cy="fap-selection"]').click();
-
       cy.get('[data-cy="fap-selection-options"]').contains(fap1.code).click();
-
+      cy.get('[data-cy="fap-instrument-selection"]').click();
+      cy.get('[data-cy="fap-instrument-selection-options"]')
+        .contains(instrument.name)
+        .click();
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({
