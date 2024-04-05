@@ -206,10 +206,6 @@ function initializationBeforeTests() {
     }
   });
 
-  cy.assignInstrumentToCall({
-    callId: initialDBData.call.id,
-    instrumentFapIds: [{ instrumentId: newlyCreatedInstrumentId }],
-  });
   cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
     const createdProposal = result.createProposal;
     if (createdProposal) {
@@ -229,10 +225,6 @@ function initializationBeforeTests() {
         proposals: [
           { callId: initialDBData.call.id, primaryKey: firstCreatedProposalPk },
         ],
-      });
-      cy.assignProposalsToInstruments({
-        instrumentIds: [newlyCreatedInstrumentId],
-        proposalPks: [createdProposal.primaryKey],
       });
     }
   });
@@ -319,7 +311,15 @@ context('Fap reviews tests', () => {
       });
     });
 
-    it('Officer should be able to assign proposal to existing Fap', function () {
+    it.only('Officer should be able to assign proposal to existing Fap', function () {
+      cy.assignInstrumentToCall({
+        callId: initialDBData.call.id,
+        instrumentFapIds: [{ instrumentId: newlyCreatedInstrumentId }],
+      });
+      cy.assignProposalsToInstruments({
+        instrumentIds: [newlyCreatedInstrumentId],
+        proposalPks: [firstCreatedProposalPk],
+      });
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=2`);
 
