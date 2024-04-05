@@ -1279,13 +1279,13 @@ context('Fap reviews tests', () => {
       cy.contains(fapMembers.reviewer.lastName).parent().contains('SUBMITTED');
       cy.contains(fapMembers.reviewer2.lastName).parent().contains('SUBMITTED');
     });
-  });
 
-  it('Fap Reviewer should not be able to mass assign Fap members to proposals in existing Fap', () => {
-    cy.visit(`/FapPage/${createdFapId}?tab=2`);
+    it('Fap Reviewer should not be able to mass assign Fap members to proposals in existing Fap', () => {
+      cy.visit(`/FapPage/${createdFapId}?tab=2`);
 
-    cy.finishedLoading();
-    cy.get('[data-cy="mass-assign-reviews"]').should('not.exist');
+      cy.finishedLoading();
+      cy.get('[data-cy="mass-assign-reviews"]').should('not.exist');
+    });
   });
 });
 
