@@ -24,8 +24,7 @@ To be able to start both backend and frontend locally you will need to:
 2. Start the application using `npm run dev` or `npm run start`
 
 ## Check the .env file
-If .env file is not preset during startup of the project, it will be created using example.env file template
-The `example.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
+If .env file is not preset during startup of the project, it will be created using `example.development.env` file template. The `example.development.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
 
 ## Running with docker-compose
 
