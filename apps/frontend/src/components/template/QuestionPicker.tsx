@@ -143,7 +143,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     }
 
     const textMatch =
-      question.dataType == 'EMBELLISHMENT'
+      question.dataType == DataType.EMBELLISHMENT
         ? (question.config as EmbellishmentConfig).plain
             .toLowerCase()
             .includes(questionFilter.searchText.toLowerCase())
