@@ -20,11 +20,9 @@ export type SparkPostTemplate = {
   last_update_time: string;
 };
 
-// TODO: This might need some attention from STFC and return the templates used in their email sending service.
 export type STFCEmailTemplate = {
   id: string;
   name: string;
-  description: string;
 };
 
 export type SendMailResults = {
