@@ -39,6 +39,8 @@ export default {
     id: 1,
     shortCode: 'call 1',
     allocationTimeUnit: AllocationTimeUnits.DAY,
+    endCall: '01-01-2030',
+    callFapReviewEnded: false,
   },
   template: {
     id: 1,
