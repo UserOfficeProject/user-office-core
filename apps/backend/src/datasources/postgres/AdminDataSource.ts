@@ -450,6 +450,22 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
+  async getSettingOrDefault(
+    settingId: SettingsId,
+    defaultValue: number
+  ): Promise<number> {
+    const settingValue = await this.getSetting(settingId);
+    if (settingValue === null) {
+      return defaultValue;
+    }
+    const settingValueAsNumber = parseInt(settingValue.settingsValue, 10);
+    if (isNaN(settingValueAsNumber)) {
+      return defaultValue;
+    }
+
+    return settingValueAsNumber;
+  }
+
   async getTokenAndPermissionsById(
     accessTokenId: string
   ): Promise<Permissions> {
