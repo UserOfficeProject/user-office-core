@@ -860,15 +860,15 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getFapProposalToNumReviewsNeededMap(fapId: number) {
-    const DEFAULT_NUM_REVIEWS_REQUIRED =
+    const DEFAULT_NUM_FAP_REVIEWS_REQUIRED =
       await this.adminDataSource.getSettingOrDefault(
-        SettingsId.DEFAULT_NUM_REVIEWS_REQUIRED,
+        SettingsId.DEFAULT_NUM_FAP_REVIEWS_REQUIRED,
         2
       );
     const fap = await this.getFap(fapId);
     const numReviewsRequired = fap
       ? fap.numberRatingsRequired
-      : DEFAULT_NUM_REVIEWS_REQUIRED;
+      : DEFAULT_NUM_FAP_REVIEWS_REQUIRED;
     const callId = await this.getCallInReviewForFap(fapId);
     const fapProposals = await this.getFapProposals(fapId, callId);
     const fapReviews = await this.getFapReviewsByCallAndFap(callId, fapId);

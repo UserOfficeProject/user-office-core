@@ -41,7 +41,7 @@ export class AdminDataSourceMock implements AdminDataSource {
       new Settings(SettingsId.FEEDBACK_MAX_REQUESTS, '', '2'),
       new Settings(SettingsId.FEEDBACK_EXHAUST_DAYS, '', '90'),
       new Settings(SettingsId.FEEDBACK_FREQUENCY_DAYS, '', '14'),
-      new Settings(SettingsId.DEFAULT_NUM_REVIEWS_REQUIRED, '', '2'),
+      new Settings(SettingsId.DEFAULT_NUM_FAP_REVIEWS_REQUIRED, '', '2'),
     ];
   }
   async setFeatures(
