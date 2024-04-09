@@ -32,7 +32,10 @@ query getProposalsCore(
       technicalStatuses
       instrumentNames
       instrumentIds
-      fapInstrumentIds
+      fapInstruments {
+        fapId
+        instrumentId
+      }
       callShortCode
       fapCodes
       fapIds

@@ -7,6 +7,7 @@ import {
   FieldResolver,
   Resolver,
   Root,
+  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -17,6 +18,16 @@ import {
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 import { User } from './User';
+
+@InputType('FapInstrumentInput')
+@ObjectType()
+export class FapInstrument {
+  @Field(() => Int, { nullable: true })
+  fapId: number | null;
+
+  @Field(() => Int)
+  instrumentId: number;
+}
 
 @ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
@@ -77,8 +88,8 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => [Int], { nullable: 'itemsAndList' })
   public instrumentIds?: number[];
 
-  @Field(() => [Int], { nullable: 'itemsAndList' })
-  public fapInstrumentIds?: (number | null)[];
+  @Field(() => [FapInstrument], { nullable: true })
+  public fapInstruments: FapInstrument[] | null;
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;

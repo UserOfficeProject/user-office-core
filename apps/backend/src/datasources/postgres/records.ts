@@ -58,6 +58,7 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
+import { FapInstrument } from '../../resolvers/types/ProposalView';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
 
@@ -147,7 +148,7 @@ export interface ProposalViewRecord {
   readonly technical_review_assignee_ids: number[];
   readonly technical_review_assignee_names: string[];
   readonly instrument_ids: number[];
-  readonly fap_instrument_ids: number[];
+  readonly fap_instruments: FapInstrument[];
   readonly instrument_names: string[];
   readonly call_short_code: string;
   readonly fap_ids: number[];
@@ -417,7 +418,7 @@ export interface FapSecretariesRecord {
 
 export interface FapProposalRecord {
   readonly proposal_pk: number;
-  readonly fap_id: number;
+  readonly fap_id: number | null;
   readonly date_assigned: Date;
   readonly fap_time_allocation: number | null;
   readonly instrument_id: number | null;
@@ -832,7 +833,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_reviews_submitted,
     proposal.instrument_names,
     proposal.instrument_ids,
-    proposal.fap_instrument_ids,
+    proposal.fap_instruments,
     proposal.call_short_code,
     proposal.fap_codes,
     proposal.fap_ids,

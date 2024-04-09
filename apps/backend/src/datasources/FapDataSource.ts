@@ -49,6 +49,7 @@ export interface FapDataSource {
   getFapsByCallId(callId: number): Promise<Fap[]>;
   getFapByProposalPk(proposalPk: number): Promise<Fap | null>;
   getFapsByProposalPks(proposalPks: number[]): Promise<FapProposal[]>;
+  getFapsByProposalPk(proposalPk: number): Promise<Fap[]>;
   getFaps(filter?: FapsFilter): Promise<{ totalCount: number; faps: Fap[] }>;
   getFapProposalAssignments(
     fapId: number,
@@ -95,7 +96,9 @@ export interface FapDataSource {
     fapId: number,
     memberId: number
   ): Promise<Fap>;
-  removeProposalsFromFaps(args: RemoveProposalsFromFapsArgs): Promise<Fap>;
+  removeProposalsFromFaps(
+    args: RemoveProposalsFromFapsArgs
+  ): Promise<FapProposal[]>;
   assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,

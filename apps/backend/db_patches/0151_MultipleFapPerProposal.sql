@@ -5,6 +5,10 @@ BEGIN
 	BEGIN
 
 			-- ALTER TABLE fap_proposals ADD COLUMN fap_proposals_id SERIAL NOT NULL UNIQUE;
+			-- ALTER TABLE fap_proposals DROP CONSTRAINT fap_proposals_pkey;
+			-- ALTER TABLE fap_proposals ADD PRIMARY KEY (fap_proposals_id);
+			-- ALTER TABLE fap_proposals ALTER COLUMN fap_id DROP NOT NULL;
+
 			-- -- drop view to allow recreating it
     	-- DROP VIEW proposal_table_view;
 
@@ -37,6 +41,7 @@ BEGIN
 			-- 				fp.fap_ids as fap_ids,
 			-- 				fp.fap_codes as fap_codes,
 		  --         fp.instrument_ids AS fap_instrument_ids,
+			--				fp.fap_instruments,
 			-- 				c.call_short_code,
 		  --         c.allocation_time_unit,
 		  --         c.call_id,
@@ -56,6 +61,7 @@ BEGIN
 			-- 		array_agg(f.fap_id ORDER BY fp.fap_proposals_id ASC) AS fap_ids,
 			-- 		array_agg(f.code ORDER BY fp.fap_proposals_id ASC) AS fap_codes,
 			-- 		array_agg(fp.instrument_id ORDER BY fp.fap_proposals_id ASC) AS instrument_ids
+			--		array_agg(jsonb_build_object('instrumentId', fp_1.instrument_id, 'fapId', f.fap_id )) AS fap_instruments
 			-- 	FROM fap_proposals fp 
 			-- 	JOIN faps f ON f.fap_id = fp.fap_id
 			-- 	GROUP BY fp.proposal_pk
@@ -95,6 +101,7 @@ BEGIN
 			-- ORDER BY proposal_pk;
 
 			-- ALTER TABLE proposal_events RENAME COLUMN proposal_fap_selected TO proposal_faps_selected;
+			-- ALTER TABLE proposal_events ADD COLUMN proposal_faps_removed BOOLEAN DEFAULT false;
 
 			-- UPDATE status_changing_events
 			-- SET status_changing_event = 'PROPOSAL_FAPS_SELECTED'

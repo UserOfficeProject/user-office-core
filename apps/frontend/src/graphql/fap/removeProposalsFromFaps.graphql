@@ -1,5 +1,5 @@
 mutation removeProposalsFromFaps($proposalPks: [Int!]!, $fapIds: [Int!]!) {
   removeProposalsFromFaps(proposalPks: $proposalPks, fapIds: $fapIds) {
-    id
+    fapId
   }
 }

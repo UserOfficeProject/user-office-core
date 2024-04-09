@@ -10,7 +10,8 @@ import {
 
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
-import { Fap } from '../types/Fap';
+import { FapProposal } from '../types/FapProposal';
+import { FapInstrument } from '../types/ProposalView';
 import { ProposalSelectionInput } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
@@ -18,11 +19,8 @@ export class AssignProposalsToFapsArgs {
   @Field(() => [ProposalSelectionInput])
   public proposals: ProposalSelectionInput[];
 
-  @Field(() => [Int])
-  public fapIds: number[];
-
-  @Field(() => [Int])
-  public fapInstrumentIds: number[];
+  @Field(() => [FapInstrument])
+  public fapInstruments: FapInstrument[];
 }
 
 export class AssignProposalsToFapUsingCallInstrumentArgs {
@@ -57,7 +55,7 @@ export class AssignProposalsToFapsMutation {
     return isRejection(res) ? res : true;
   }
 
-  @Mutation(() => Fap)
+  @Mutation(() => [FapProposal])
   async removeProposalsFromFaps(
     @Args() args: RemoveProposalsFromFapsArgs,
     @Ctx() context: ResolverContext

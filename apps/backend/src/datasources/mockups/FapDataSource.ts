@@ -344,6 +344,10 @@ export class FapDataSourceMock implements FapDataSource {
     return [dummyFapProposal];
   }
 
+  async getFapsByProposalPk(proposalPk: number) {
+    return dummyFaps;
+  }
+
   async getFapsByCallId(callId: number): Promise<Fap[]> {
     return [dummyFap];
   }
@@ -375,7 +379,8 @@ export class FapDataSourceMock implements FapDataSource {
     return { id: 4, shortCode: 'fap_chair', title: 'Fap Chair' };
   }
 
-  async assignProposalsToFaps({ fapIds }: AssignProposalsToFapsArgs) {
+  async assignProposalsToFaps({ fapInstruments }: AssignProposalsToFapsArgs) {
+    const fapIds = fapInstruments.map((fapInstrument) => fapInstrument.fapId);
     const fap = dummyFaps.find((element) => fapIds.includes(element.id));
 
     if (fap) {
@@ -386,10 +391,12 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async removeProposalsFromFaps({ fapIds }: RemoveProposalsFromFapsArgs) {
-    const fap = dummyFaps.find((element) => fapIds.includes(element.id));
+    const fap = dummyFapProposals.find(
+      (element) => element.fapId && fapIds.includes(element.fapId)
+    );
 
     if (fap) {
-      return fap;
+      return [fap];
     }
 
     throw new Error(`FAPs not found ${fapIds}`);

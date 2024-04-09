@@ -1,5 +1,5 @@
 import { Call } from '../models/Call';
-import { Fap } from '../models/Fap';
+import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
@@ -237,8 +237,8 @@ interface FapMemberRemovedFromProposalEvent extends GeneralEvent {
 }
 
 interface FapProposalRemovedEvent extends GeneralEvent {
-  type: Event.FAP_PROPOSAL_REMOVED;
-  fap: Fap;
+  type: Event.PROPOSAL_FAPS_REMOVED;
+  array: FapProposal[];
 }
 
 interface FapMemberRemovedEvent extends GeneralEvent {

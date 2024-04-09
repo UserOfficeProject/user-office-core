@@ -76,12 +76,14 @@ export default function createHandler() {
           );
           break;
         }
-        case Event.PROPOSAL_FAPS_SELECTED:
+        case Event.PROPOSAL_FAPS_SELECTED: {
           await Promise.all(
             event.proposalpks.proposalPks.map(async (proposalPk) => {
-              const fap = await fapDataSource.getFapByProposalPk(proposalPk);
+              const faps = await fapDataSource.getFapsByProposalPk(proposalPk);
 
-              const description = `Selected Fap: ${fap?.code}`;
+              const description = `Selected FAPs: ${faps
+                ?.map((fap) => fap.code)
+                .join(', ')}`;
 
               return eventLogsDataSource.set(
                 event.loggedInUserId,
@@ -93,6 +95,28 @@ export default function createHandler() {
             })
           );
           break;
+        }
+        case Event.PROPOSAL_FAPS_REMOVED: {
+          const key = 'proposalPk';
+          const uniqueFapProposals = [
+            ...new Map(event.array.map((item) => [item[key], item])).values(),
+          ];
+
+          await Promise.all(
+            uniqueFapProposals.map(async (fapProposal) => {
+              const description = 'All proposal FAPs removed';
+
+              return eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                fapProposal.proposalPk.toString(),
+                description
+              );
+            })
+          );
+          break;
+        }
         case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
           await Promise.all(
             event.proposals.proposals.map(async (proposal) => {

@@ -1,3 +1,4 @@
+import { FapInstrument } from '../resolvers/types/ProposalView';
 import { AllocationTimeUnits } from './Call';
 import { TechnicalReviewStatus } from './TechnicalReview';
 export class ProposalView {
@@ -22,7 +23,7 @@ export class ProposalView {
     public technicalReviewsSubmitted: boolean[],
     public instrumentNames: string[],
     public instrumentIds: number[],
-    public fapInstrumentIds: number[],
+    public fapInstruments: FapInstrument[],
     public callShortCode: string,
     public fapCodes: string[],
     public fapIds: number[],

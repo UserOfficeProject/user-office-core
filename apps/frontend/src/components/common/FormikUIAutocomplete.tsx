@@ -18,7 +18,11 @@ type FormikUIAutocompleteProps = {
   required?: boolean;
   disabled?: boolean;
   TextFieldProps?: MUITextFieldProps;
-  InputProps?: Partial<InputProps> & { 'data-cy': string };
+  InputProps?: Partial<InputProps> & {
+    'data-cy'?: string;
+    startAdornment?: React.ReactNode;
+    endAdornment?: React.ReactNode;
+  };
   multiple?: boolean;
   'data-cy'?: string;
   AdornmentIcon?: MUITextFieldProps;

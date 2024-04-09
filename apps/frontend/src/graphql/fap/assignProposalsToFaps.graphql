@@ -1,11 +1,9 @@
 mutation assignProposalsToFaps(
   $proposals: [ProposalSelectionInput!]!
-  $fapIds: [Int!]!
-  $fapInstrumentIds: [Int!]!
+  $fapInstruments: [FapInstrumentInput!]!
 ) {
   assignProposalsToFaps(
     proposals: $proposals
-    fapIds: $fapIds
-    fapInstrumentIds: $fapInstrumentIds
+    fapInstruments: $fapInstruments
   )
 }
