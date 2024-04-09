@@ -49,14 +49,6 @@ services:
     depends_on:
       - db
 
-  rabbitmq:
-    image: 'rabbitmq:3-management'
-    ports:
-      - '15672:15672'
-      - '5672:5672'
-    volumes:
-      - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
-
   frontend:
     image: 'ghcr.io/userofficeproject/user-office-frontend:develop'
     labels:
@@ -67,21 +59,17 @@ services:
       - backend
 
   backend:
-    image: 'ghcr.io/userofficeproject/user-office-backend:develop'
+    image: 'user-office-backend:develop'
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
-      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
-      tokenLife: 7d
-      baseURL: localhost:33000
-      SPARKPOST_TOKEN: dummytoken
+      JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      JWT_TOKEN_LIFE: 7d
+      BASE_URL: localhost:33000
       NODE_ENV: development
-      UO_FEATURE_DISABLE_EAM: 1
       USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500/generate
-      RABBITMQ_HOSTNAME: rabbitmq
       AUTH_DISCOVERY_URL: http://host.docker.internal:5001/.well-known/openid-configuration
       AUTH_CLIENT_ID: useroffice
       AUTH_CLIENT_SECRET: useroffice
-      DEPENDENCY_CONFIG: ess
       TZ: Europe/Stockholm
       DATE_FORMAT: dd-MM-yyyy
       DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
