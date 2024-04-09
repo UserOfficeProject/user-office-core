@@ -20,8 +20,8 @@ Thank you for your interest in contributing to our project!
 
 To be able to start both backend and frontend locally you will need to:
 
-1. Install all needed dependencies with `npm install`
-2. Start the application using `npm run dev` or `npm run start`
+1. Install all needed dependencies with `npm install`.
+2. Start the application using `npm run dev` or `npm run start`.
 
 ## Check the .env file
 If .env file is not preset during startup of the project, it will be created using `example.development.env` file template. The `example.development.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
