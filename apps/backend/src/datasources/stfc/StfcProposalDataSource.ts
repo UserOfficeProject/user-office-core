@@ -39,14 +39,32 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('ptw')
+      .join(
+        'call_has_instruments',
+        'call_has_instruments.call_id',
+        '=',
+        'ptw.call_id'
+      )
+      .join(
+        'instruments',
+        'instruments.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
+      .join(
+        'instrument_has_scientists',
+        'instrument_has_scientists.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
           this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
         } else {
-          this.whereRaw(
-            '? = ANY(instrument_scientist_ids)',
+          this.where('instrument_has_scientists.user_id', user.id).orWhere(
+            'instruments.manager_user_id',
             user.id
-          ).orWhereRaw('? = ANY(instrument_manager_ids)', user.id);
+          );
         }
       })
       .distinct('proposal_pk')
