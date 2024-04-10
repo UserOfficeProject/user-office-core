@@ -20,7 +20,7 @@ type AssignProposalToFapsProps = {
   assignProposalsToFaps: (
     fapInstruments: FapInstrumentInput[]
   ) => Promise<void>;
-  proposalInstrumentIds: (number | null)[];
+  proposalInstrumentIds: ((number | null)[] | null)[];
   proposalFapInstruments?: (FapInstrument | null)[];
 };
 
@@ -36,25 +36,36 @@ const AssignProposalsToFaps = ({
     active: true,
     role: currentRole as UserRole,
   });
-  const uniqueInstrumentIds = useMemo(
-    () => getUniqueArray(proposalInstrumentIds),
-    [proposalInstrumentIds]
-  );
+  const instrumentsPerProposal = [...proposalInstrumentIds];
+  const uniqueInstrumentIds = useMemo(() => {
+    console.log('eeeeeeeeee');
+
+    return getUniqueArray(proposalInstrumentIds.flat());
+  }, [proposalInstrumentIds]);
+  console.log(uniqueInstrumentIds);
   const { instruments, loadingInstruments } =
     useInstrumentsByIdsData(uniqueInstrumentIds);
 
-  const allSelectedProposalsHaveSameInstruments = proposalInstrumentIds.every(
-    (instrumentId) => instrumentId === proposalInstrumentIds[0]
+  console.log(loadingInstruments, instruments);
+
+  if (loadingInstruments || !instruments) {
+    return <UOLoader sx={{ marginLeft: '50%', marginTop: '10px' }} />;
+  }
+  const allSelectedProposalsHaveSameInstruments = instrumentsPerProposal.every(
+    (item) =>
+      item?.sort((a, b) => (a && b ? a - b : 0)).toString() ===
+      instrumentsPerProposal[0]?.sort((a, b) => (a && b ? a - b : 0)).toString()
   );
 
   const initialValues: Record<string, number | undefined | null> = {};
 
-  proposalFapInstruments?.forEach((fapInstrument) => {
-    if (fapInstrument) {
-      initialValues[`selectedFapIds_${fapInstrument.instrumentId}`] =
-        fapInstrument.fapId || null;
-    }
+  instruments.forEach((instrument) => {
+    initialValues[`selectedFapIds_${instrument.id}`] =
+      proposalFapInstruments?.find((i) => i?.instrumentId === instrument.id)
+        ?.fapId || null;
   });
+
+  console.log(initialValues, proposalFapInstruments);
 
   const hasEmptyValue = (values: Record<string, number | undefined | null>) =>
     Object.values(values).every((v) => v !== undefined && v !== null);
@@ -86,38 +97,53 @@ const AssignProposalsToFaps = ({
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                {!isSubmitting && (loadingFaps || loadingInstruments) ? (
-                  <UOLoader sx={{ marginLeft: '50%', marginTop: '10px' }} />
-                ) : (
-                  instruments?.map((instrument) => (
-                    <FormikUIAutocomplete
-                      key={instrument.id}
-                      name={`selectedFapIds_${instrument.id}`}
-                      label="Select FAP"
-                      items={faps.map((fap) => ({
-                        value: fap.id,
-                        text: fap.code,
-                      }))}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            {instrument?.name}:
-                          </InputAdornment>
-                        ),
-                      }}
-                      disabled={isSubmitting}
-                      noOptionsText="No FAPs"
-                      data-cy="fap-selection"
-                    />
-                  ))
-                )}
+                {instruments.map((instrument) => (
+                  <FormikUIAutocomplete
+                    key={instrument.id}
+                    name={`selectedFapIds_${instrument.id}`}
+                    label="Select FAP"
+                    loading={loadingFaps}
+                    items={faps.map((fap) => ({
+                      value: fap.id,
+                      text: fap.code,
+                    }))}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {instrument?.name}:
+                        </InputAdornment>
+                      ),
+                    }}
+                    disabled={isSubmitting}
+                    noOptionsText="No FAPs"
+                    data-cy="fap-selection"
+                  />
+                ))}
               </Grid>
             </Grid>
-            {!hasEmptyValue(values) && (
+
+            {!instruments?.length && (
+              <Alert severity="warning" data-cy="different-instruments">
+                Selected proposal/s do NOT have any instruments assigned. Please
+                assign instruments first and then you can select FAPs
+                accordingly.
+              </Alert>
+            )}
+
+            {proposalFapInstruments?.[0] && !hasEmptyValue(values) && (
               <Alert severity="warning" data-cy="remove-fap-alert">
                 Be aware that leaving FAP selection empty will remove assigned
                 FAP from proposal/s and delete all FAP reviews on that
                 assignment.
+              </Alert>
+            )}
+
+            {!allSelectedProposalsHaveSameInstruments && (
+              <Alert severity="warning" data-cy="different-instruments">
+                It is NOT recommended to do group assignment of FAPs to
+                proposals that differ in their instruments. If you want to
+                continue be aware that proposals will get FAPs assigned ONLY to
+                their own instruments accordingly and not for all instruments.
               </Alert>
             )}
             <Button

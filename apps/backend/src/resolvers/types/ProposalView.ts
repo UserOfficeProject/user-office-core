@@ -30,6 +30,63 @@ export class FapInstrument {
 }
 
 @ObjectType()
+export class ProposalViewInstrument {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  name: string;
+
+  @Field(() => Int)
+  managerUserId: number;
+
+  @Field(() => Int, { nullable: true })
+  managementTimeAllocation: number;
+}
+
+@ObjectType()
+export class ProposalViewFap {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  code: string;
+}
+
+@ObjectType()
+export class ProposalViewTechnicalReviewAsignee {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String, { nullable: true })
+  firstName: string;
+
+  @Field(() => String, { nullable: true })
+  lastName: string;
+}
+
+@ObjectType()
+export class ProposalViewTechnicalReview {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => TechnicalReviewStatus, { nullable: true })
+  status: TechnicalReviewStatus;
+
+  @Field(() => Boolean)
+  submitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  timeAllocation: number;
+
+  @Field(() => ProposalViewTechnicalReviewAsignee)
+  technicalReviewAsignee: ProposalViewTechnicalReviewAsignee;
+
+  @Field(() => [Int], { nullable: true })
+  internalTechnicalReviewerIds: number[];
+}
+
+@ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int)
   public primaryKey: number;
@@ -64,41 +121,20 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Boolean)
   public submitted: boolean;
 
-  @Field(() => [Int], { nullable: 'itemsAndList' })
-  public managementTimeAllocations?: number[];
+  @Field(() => [ProposalViewInstrument], { nullable: true })
+  public instruments: ProposalViewInstrument[];
 
-  @Field(() => [Int], { nullable: 'itemsAndList' })
-  public technicalTimeAllocations?: number[];
+  @Field(() => [ProposalViewTechnicalReview], { nullable: true })
+  public technicalReviews: ProposalViewTechnicalReview[];
 
-  @Field(() => [Int], { nullable: 'itemsAndList' })
-  public technicalReviewAssigneeIds?: number[];
-
-  @Field(() => [String], { nullable: 'itemsAndList' })
-  public technicalReviewAssigneeNames?: string[];
-
-  @Field(() => [TechnicalReviewStatus], { nullable: 'itemsAndList' })
-  public technicalStatuses?: TechnicalReviewStatus[];
-
-  @Field(() => [Int], { nullable: 'itemsAndList' })
-  public technicalReviewsSubmitted?: boolean[];
-
-  @Field(() => [String], { nullable: 'itemsAndList' })
-  public instrumentNames?: string[];
-
-  @Field(() => [Int], { nullable: 'itemsAndList' })
-  public instrumentIds?: number[];
+  @Field(() => [ProposalViewFap], { nullable: true })
+  public faps: ProposalViewFap[];
 
   @Field(() => [FapInstrument], { nullable: true })
   public fapInstruments: FapInstrument[] | null;
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;
-
-  @Field(() => [String], { nullable: true })
-  public fapCodes: string[];
-
-  @Field(() => [Int], { nullable: true })
-  public fapIds: number[];
 
   @Field(() => Float, { nullable: true })
   public reviewAverage: number;

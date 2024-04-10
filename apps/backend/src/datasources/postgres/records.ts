@@ -58,7 +58,12 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
-import { FapInstrument } from '../../resolvers/types/ProposalView';
+import {
+  FapInstrument,
+  ProposalViewFap,
+  ProposalViewInstrument,
+  ProposalViewTechnicalReview,
+} from '../../resolvers/types/ProposalView';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
 
@@ -138,21 +143,13 @@ export interface ProposalViewRecord {
   readonly proposal_id: string;
   readonly rank_order: number;
   readonly final_status: number;
-  readonly management_time_allocations: number[];
   readonly notified: boolean;
   readonly submitted: boolean;
-  readonly technical_review_ids: number[];
-  readonly technical_time_allocations: number[];
-  readonly technical_review_statuses: number[];
-  readonly technical_reviews_submitted: boolean[];
-  readonly technical_review_assignee_ids: number[];
-  readonly technical_review_assignee_names: string[];
-  readonly instrument_ids: number[];
+  readonly instruments: ProposalViewInstrument[];
+  readonly technical_reviews: ProposalViewTechnicalReview[];
+  readonly faps: ProposalViewFap[];
   readonly fap_instruments: FapInstrument[];
-  readonly instrument_names: string[];
   readonly call_short_code: string;
-  readonly fap_ids: number[];
-  readonly fap_codes: string[];
   readonly average: number;
   readonly deviation: number;
   readonly call_id: number;
@@ -417,13 +414,18 @@ export interface FapSecretariesRecord {
 
 export interface FapProposalRecord {
   readonly proposal_pk: number;
-  readonly fap_id: number | null;
+  readonly fap_id: number;
   readonly date_assigned: Date;
   readonly fap_time_allocation: number | null;
   readonly instrument_id: number | null;
   readonly call_id: number;
   readonly fap_meeting_instrument_submitted: boolean;
 }
+
+export type AssignProposalsToFapsInput = Pick<
+  FapProposalRecord,
+  'call_id' | 'fap_id' | 'instrument_id' | 'proposal_pk'
+>;
 
 export interface FapAssignmentRecord {
   readonly proposal_pk: number;
@@ -823,19 +825,11 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.final_status,
     proposal.notified,
     proposal.submitted,
-    proposal.management_time_allocations,
-    proposal.technical_review_ids,
-    proposal.technical_review_assignee_ids,
-    proposal.technical_time_allocations,
-    proposal.technical_review_assignee_names,
-    proposal.technical_review_statuses,
-    proposal.technical_reviews_submitted,
-    proposal.instrument_names,
-    proposal.instrument_ids,
+    proposal.instruments,
+    proposal.technical_reviews,
+    proposal.faps,
     proposal.fap_instruments,
     proposal.call_short_code,
-    proposal.fap_codes,
-    proposal.fap_ids,
     proposal.average,
     proposal.deviation,
     proposal.allocation_time_unit,

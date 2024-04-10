@@ -16,6 +16,7 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { AssignProposalsToFapsInput } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
@@ -309,7 +310,34 @@ export default class FapMutations {
       );
     }
 
-    const result = await this.dataSource.assignProposalsToFaps(args);
+    const dataToInsert: AssignProposalsToFapsInput[] = [];
+
+    for (const proposal of args.proposals) {
+      for (const fapInstrument of args.fapInstruments) {
+        const proposalAssignedInstruments =
+          await this.instrumentDataSource.getInstrumentsByProposalPk(
+            proposal.primaryKey
+          );
+
+        // NOTE: This doublechecks if the proposal is assigned to the instrument at all.
+        if (
+          !proposalAssignedInstruments.find(
+            (instrument) => instrument.id === fapInstrument.instrumentId
+          )
+        ) {
+          break;
+        }
+
+        dataToInsert.push({
+          call_id: proposal.callId,
+          fap_id: fapInstrument.fapId,
+          instrument_id: fapInstrument.instrumentId,
+          proposal_pk: proposal.primaryKey,
+        });
+      }
+    }
+
+    const result = await this.dataSource.assignProposalsToFaps(dataToInsert);
 
     if (result.proposalPks.length !== args.proposals.length) {
       return rejection('Could not assign proposal to facility access panel', {

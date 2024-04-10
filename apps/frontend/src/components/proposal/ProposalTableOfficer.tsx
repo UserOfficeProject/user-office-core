@@ -759,9 +759,9 @@ const ProposalTableOfficer = ({
             proposalFapInstruments={selectedProposals
               .map((selectedProposal) => selectedProposal.fapInstruments)
               .flat()}
-            proposalInstrumentIds={selectedProposals
-              .map((selectedProposal) => selectedProposal.instrumentIds)
-              .flat()}
+            proposalInstrumentIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.instrumentIds
+            )}
           />
         </DialogContent>
       </Dialog>

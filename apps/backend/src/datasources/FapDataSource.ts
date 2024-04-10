@@ -15,10 +15,10 @@ import {
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
-import { AssignProposalsToFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
+import { AssignProposalsToFapsInput } from './postgres/records';
 
 export interface FapDataSource {
   create(
@@ -90,7 +90,9 @@ export interface FapDataSource {
   ): Promise<Fap>;
   assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap>;
   removeMemberFromFap(args: UpdateMemberFapArgs): Promise<Fap>;
-  assignProposalsToFaps(args: AssignProposalsToFapsArgs): Promise<ProposalPks>;
+  assignProposalsToFaps(
+    args: AssignProposalsToFapsInput[]
+  ): Promise<ProposalPks>;
   removeMemberFromFapProposal(
     proposalPk: number,
     fapId: number,

@@ -21,10 +21,7 @@ import {
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
 } from '../../resolvers/mutations/AssignMembersToFapMutation';
-import {
-  AssignProposalsToFapsArgs,
-  RemoveProposalsFromFapsArgs,
-} from '../../resolvers/mutations/AssignProposalsToFapsMutation';
+import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { removeDuplicates } from '../../utils/helperFunctions';
@@ -53,6 +50,7 @@ import {
   createBasicUserObject,
   FapSecretariesRecord,
   InstitutionRecord,
+  AssignProposalsToFapsInput,
 } from './records';
 
 @injectable()
@@ -728,26 +726,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${args.fapId}`);
   }
 
-  async assignProposalsToFaps({
-    proposals,
-    fapInstruments,
-  }: AssignProposalsToFapsArgs) {
-    const dataToInsert: Pick<
-      FapProposalRecord,
-      'call_id' | 'fap_id' | 'instrument_id' | 'proposal_pk'
-    >[] = [];
-
-    fapInstruments.forEach((fapInstrument) => {
-      proposals.forEach((proposal) => {
-        dataToInsert.push({
-          call_id: proposal.callId,
-          fap_id: fapInstrument.fapId,
-          instrument_id: fapInstrument.instrumentId,
-          proposal_pk: proposal.primaryKey,
-        });
-      });
-    });
-
+  async assignProposalsToFaps(dataToInsert: AssignProposalsToFapsInput[]) {
     const proposalFapPairs: {
       proposal_pk: number;
       fap_id: number;
@@ -758,7 +737,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           .del()
           .whereIn(
             'proposal_pk',
-            proposals.map((proposal) => proposal.primaryKey)
+            dataToInsert.map((data) => data.proposal_pk)
           )
           .transacting(trx);
 
@@ -770,8 +749,10 @@ export default class PostgresFapDataSource implements FapDataSource {
         return await trx.commit(result);
       } catch (error) {
         throw new GraphQLError(
-          `Could not assign proposals ${proposals.toString()} to FAPs with ids: ${fapInstruments
-            .map((fapInstrument) => fapInstrument.fapId)
+          `Could not assign proposals ${dataToInsert
+            .map((data) => data.proposal_pk)
+            .toString()} to FAPs with ids: ${dataToInsert
+            .map((data) => data.fap_id)
             .toString()}`
         );
       }
@@ -790,7 +771,11 @@ export default class PostgresFapDataSource implements FapDataSource {
     }
 
     throw new GraphQLError(
-      `Could not assign proposals ${proposals} to FAPs with ids: ${fapInstruments.toString()}`
+      `Could not assign proposals ${dataToInsert
+        .map((data) => data.proposal_pk)
+        .toString()} to FAPs with ids: ${dataToInsert
+        .map((data) => data.fap_id)
+        .toString()}`
     );
   }
 

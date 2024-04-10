@@ -1,6 +1,10 @@
-import { FapInstrument } from '../resolvers/types/ProposalView';
+import {
+  FapInstrument,
+  ProposalViewFap,
+  ProposalViewInstrument,
+  ProposalViewTechnicalReview,
+} from '../resolvers/types/ProposalView';
 import { AllocationTimeUnits } from './Call';
-import { TechnicalReviewStatus } from './TechnicalReview';
 export class ProposalView {
   constructor(
     public primaryKey: number,
@@ -14,19 +18,11 @@ export class ProposalView {
     public finalStatus: number, // Should use ProposalEndStatus enum here
     public notified: boolean,
     public submitted: boolean,
-    public managementTimeAllocations: number[],
-    public technicalReviewIds: number[],
-    public technicalReviewAssigneeIds: number[],
-    public technicalTimeAllocations: number[],
-    public technicalReviewAssigneeNames: string[],
-    public technicalStatuses: TechnicalReviewStatus[],
-    public technicalReviewsSubmitted: boolean[],
-    public instrumentNames: string[],
-    public instrumentIds: number[],
-    public fapInstruments: FapInstrument[],
+    public instruments: ProposalViewInstrument[] | null,
+    public technicalReviews: ProposalViewTechnicalReview[] | null,
+    public faps: ProposalViewFap[] | null,
+    public fapInstruments: FapInstrument[] | null,
     public callShortCode: string,
-    public fapCodes: string[],
-    public fapIds: number[],
     public reviewAverage: number,
     public reviewDeviation: number,
     public allocationTimeUnit: AllocationTimeUnits,

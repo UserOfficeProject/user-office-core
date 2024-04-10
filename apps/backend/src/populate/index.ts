@@ -330,10 +330,14 @@ const createFaps = async () => {
     const proposalPks = createUniqueIntArray(5, MAX_PROPOSALS);
     for (const proposalPk of proposalPks) {
       const tmpUserId = dummy.positiveNumber(MAX_USERS);
-      await fapDataSource.assignProposalsToFaps({
-        proposals: [{ primaryKey: proposalPk, callId: 1 }],
-        fapInstruments: [{ fapId: fap.id, instrumentId: 1 }],
-      });
+      await fapDataSource.assignProposalsToFaps([
+        {
+          call_id: 1,
+          proposal_pk: proposalPk,
+          instrument_id: 1,
+          fap_id: fap.id,
+        },
+      ]);
       await fapDataSource.assignMemberToFapProposal(proposalPk, fap.id, [
         tmpUserId,
       ]);

@@ -23,7 +23,7 @@ export class FapReviewer {
 export class FapProposal {
   constructor(
     public proposalPk: number,
-    public fapId: number | null,
+    public fapId: number,
     public dateAssigned: Date,
     public fapTimeAllocation: number | null,
     public instrumentId: number | null,
