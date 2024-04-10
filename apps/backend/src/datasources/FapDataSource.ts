@@ -104,6 +104,14 @@ export interface FapDataSource {
     fapId: number,
     memberIds: number[]
   ): Promise<Fap>;
+  assignMemberToFapProposals(
+    proposalPks: number[],
+    fapId: number,
+    memberId: number
+  ): Promise<Fap>;
+  getFapProposalToNumReviewsNeededMap(
+    fapId: number
+  ): Promise<Map<FapProposal, number>>;
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,
