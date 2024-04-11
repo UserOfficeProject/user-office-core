@@ -42,6 +42,7 @@ import {
   FeatureId,
   FapInstrumentInput,
   FapInstrument,
+  ProposalViewInstrument,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -60,6 +61,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
@@ -82,7 +84,7 @@ type ProposalTableOfficerProps = {
 export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
-  instrumentIds: (number | null)[] | null;
+  instruments: ProposalViewInstrument[] | null;
   fapInstruments: FapInstrument[] | null;
   statusId: number;
 };
@@ -173,21 +175,31 @@ const technicalReviewColumns = [
     title: 'Technical status',
     field: 'technicalStatuses',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalStatuses),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map(
+          (technicalReview) => technicalReview.status
+        )
+      ),
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssigneeNames',
+    field: 'technicalReviewAssignees',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((technicalReview) =>
+          getFullUserName(technicalReview.technicalReviewAssignee)
+        )
+      ),
   },
   {
     title: 'Technical time allocation',
     field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
-      `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
-        rowData.allocationTimeUnit
-      }s)`,
+      `${fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map(
+          (technicalReview) => technicalReview.timeAllocation
+        )
+      )} (${rowData.allocationTimeUnit}s)`,
     hidden: true,
   },
 ];
@@ -199,7 +211,11 @@ const instrumentManagementColumns = (
     title: t('instrument'),
     field: 'instrumentNames',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.instrumentNames),
+      fromArrayToCommaSeparated(
+        rowData.instruments?.map((instrument) => instrument.name)
+      ),
+    customFilterAndSearch: (filter: any, rowData: ProposalViewData) =>
+      !!rowData.instruments?.some((i) => i.name.includes(filter)),
   },
 ];
 
@@ -211,19 +227,11 @@ const FapReviewColumns = [
     emptyValue: '-',
     hidden: true,
   },
-  { title: 'Deviation', field: 'reviewDeviation', emptyValue: '-' },
-  {
-    title: 'Average Score',
-    field: 'reviewAverage',
-    emptyValue: '-',
-    hidden: true,
-  },
-  { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
   {
     title: 'Fap',
     field: 'fapCodes',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.fapCodes),
+      fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
   },
 ];
 
@@ -391,7 +399,7 @@ const ProposalTableOfficer = ({
             selected.push({
               primaryKey: proposal.primaryKey,
               callId: proposal.callId,
-              instrumentIds: proposal.instrumentIds || [],
+              instruments: proposal.instruments || [],
               fapInstruments: proposal.fapInstruments,
               statusId: proposal.statusId,
               workflowId: proposal.workflowId,
@@ -579,8 +587,7 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.fapCodes = null;
-            prop.fapIds = null;
+            prop.faps = null;
           }
 
           return prop;
@@ -627,8 +634,7 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.instrumentNames = null;
-            prop.instrumentIds = null;
+            prop.instruments = null;
           }
 
           return prop;
@@ -732,7 +738,9 @@ const ProposalTableOfficer = ({
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
       finalTimeAllocationsRendered: `${fromArrayToCommaSeparated(
-        proposal.managementTimeAllocations
+        proposal.instruments?.map(
+          (instrument) => instrument.managementTimeAllocation
+        )
       )} (${proposal.allocationTimeUnit}s)`,
     })
   );
@@ -759,8 +767,8 @@ const ProposalTableOfficer = ({
             proposalFapInstruments={selectedProposals
               .map((selectedProposal) => selectedProposal.fapInstruments)
               .flat()}
-            proposalInstrumentIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.instrumentIds
+            proposalInstruments={selectedProposals.map(
+              (selectedProposal) => selectedProposal.instruments
             )}
           />
         </DialogContent>
@@ -781,7 +789,11 @@ const ProposalTableOfficer = ({
               (selectedProposal) => selectedProposal.callId
             )}
             instrumentIds={selectedProposals
-              .map((selectedProposal) => selectedProposal.instrumentIds)
+              .map((selectedProposal) =>
+                (selectedProposal.instruments || []).map(
+                  (instrument) => instrument.id
+                )
+              )
               .flat()}
           />
         </DialogContent>
@@ -802,7 +814,7 @@ const ProposalTableOfficer = ({
               (selectedProposal) => selectedProposal.statusId
             )}
             allSelectedProposalsHaveInstrument={selectedProposals.every(
-              (selectedProposal) => selectedProposal.instrumentIds?.length
+              (selectedProposal) => selectedProposal.instruments?.length
             )}
           />
         </DialogContent>

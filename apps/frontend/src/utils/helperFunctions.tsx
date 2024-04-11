@@ -16,11 +16,6 @@ import {
 } from 'generated/sdk';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 
-import {
-  average,
-  getGradesFromReviews,
-  standardDeviation,
-} from './mathFunctions';
 import { FunctionType } from './utilTypes';
 
 export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
@@ -71,6 +66,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
   ({
     primaryKey: proposal.primaryKey,
     principalInvestigator: proposal.proposer || null,
+    principalInvestigatorId: proposal.proposer?.id,
     title: proposal.title,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,
@@ -80,36 +76,22 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     proposalId: proposal.proposalId,
     rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-    technicalTimeAllocations:
-      proposal.technicalReviews?.map(
-        (technicalReview) => technicalReview?.timeAllocation
-      ) || null,
-    technicalReviewAssigneeIds:
-      proposal.technicalReviews?.map(
-        (technicalReview) => technicalReview.technicalReviewAssigneeId
-      ) || null,
-    technicalReviewAssigneeNames: proposal.technicalReviews?.map(
-      (technicalReview) =>
-        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
-    ),
-    managementTimeAllocations:
-      proposal.instruments?.map(
-        (instrument) => instrument?.managementTimeAllocation
-      ) || [],
-    technicalStatuses: proposal.technicalReviews?.map((technicalReview) =>
-      getTranslation(technicalReview?.status as ResourceId)
-    ),
-    instrumentNames:
-      proposal.instruments?.map((instrument) => instrument?.name) || null,
-    instrumentIds:
-      proposal.instruments?.map((instrument) => instrument?.id) || null,
-    reviewAverage:
-      average(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    reviewDeviation:
-      standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    // TODO: Check fapIds and codes
-    fapIds: [proposal.fap?.id],
-    fapCodes: [proposal.fap?.code],
+    instruments: [],
+    technicalReviews:
+      proposal.technicalReviews.map((tr) => ({
+        id: tr.id,
+        status: tr.status,
+        submitted: tr.submitted,
+        timeAllocation: tr.timeAllocation,
+        technicalReviewAssignee: {
+          id: tr.technicalReviewAssignee?.id,
+          firstname: tr.technicalReviewAssignee?.firstname,
+          lastname: tr.technicalReviewAssignee?.lastname,
+        },
+      })) || null,
+    // TODO: Check faps and fapInstruments here
+    faps: [{ ...proposal.fap }],
+    fapInstruments: [],
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
@@ -238,8 +220,5 @@ export function toArray<T>(input: T | T[]): T[] {
 export function fromArrayToCommaSeparated(
   itemsArray?: (string | number | null | undefined)[] | null
 ) {
-  return (
-    itemsArray?.map((technicalStatus) => technicalStatus ?? '-').join(', ') ||
-    '-'
-  );
+  return itemsArray?.map((item) => item ?? '-').join(', ') || '-';
 }

@@ -1,6 +1,6 @@
 import {
   Field,
-  Float,
+  // Float,
   Int,
   ObjectType,
   Ctx,
@@ -54,15 +54,15 @@ export class ProposalViewFap {
 }
 
 @ObjectType()
-export class ProposalViewTechnicalReviewAsignee {
+export class ProposalViewTechnicalReviewAssignee {
   @Field(() => Int)
   id: number;
 
-  @Field(() => String, { nullable: true })
-  firstName: string;
+  @Field(() => String)
+  firstname: string;
 
-  @Field(() => String, { nullable: true })
-  lastName: string;
+  @Field(() => String)
+  lastname: string;
 }
 
 @ObjectType()
@@ -79,11 +79,8 @@ export class ProposalViewTechnicalReview {
   @Field(() => Int, { nullable: true })
   timeAllocation: number;
 
-  @Field(() => ProposalViewTechnicalReviewAsignee)
-  technicalReviewAsignee: ProposalViewTechnicalReviewAsignee;
-
-  @Field(() => [Int], { nullable: true })
-  internalTechnicalReviewerIds: number[];
+  @Field(() => ProposalViewTechnicalReviewAssignee)
+  technicalReviewAssignee: ProposalViewTechnicalReviewAssignee;
 }
 
 @ObjectType()
@@ -109,8 +106,8 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String)
   public proposalId: string;
 
-  @Field(() => Int, { nullable: true })
-  public rankOrder: number;
+  // @Field(() => Int, { nullable: true })
+  // public rankOrder: number;
 
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus: ProposalEndStatus;
@@ -122,13 +119,13 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public submitted: boolean;
 
   @Field(() => [ProposalViewInstrument], { nullable: true })
-  public instruments: ProposalViewInstrument[];
+  public instruments: ProposalViewInstrument[] | null;
 
   @Field(() => [ProposalViewTechnicalReview], { nullable: true })
-  public technicalReviews: ProposalViewTechnicalReview[];
+  public technicalReviews: ProposalViewTechnicalReview[] | null;
 
   @Field(() => [ProposalViewFap], { nullable: true })
-  public faps: ProposalViewFap[];
+  public faps: ProposalViewFap[] | null;
 
   @Field(() => [FapInstrument], { nullable: true })
   public fapInstruments: FapInstrument[] | null;
@@ -136,11 +133,11 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String, { nullable: true })
   public callShortCode: string;
 
-  @Field(() => Float, { nullable: true })
-  public reviewAverage: number;
+  // @Field(() => Float, { nullable: true })
+  // public reviewAverage: number;
 
-  @Field(() => Float, { nullable: true })
-  public reviewDeviation: number;
+  // @Field(() => Float, { nullable: true })
+  // public reviewDeviation: number;
 
   @Field(() => Int)
   public callId: number;

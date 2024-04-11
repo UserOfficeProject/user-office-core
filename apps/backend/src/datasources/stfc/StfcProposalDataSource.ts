@@ -4,6 +4,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
+import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import database from '../postgres/database';
 import {
@@ -25,25 +26,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     const result = database
-      .with(
-        'ptw',
-        database
-          .select([
-            '*',
-            database.raw(
-              // eslint-disable-next-line quotes
-              "array_to_string(instrument_names, ',') all_instrument_names"
-            ),
-          ])
-          .from('proposal_table_view')
-      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('ptw')
+      .from('proposal_table_view')
       .join(
         'call_has_instruments',
         'call_has_instruments.call_id',
         '=',
-        'ptw.call_id'
+        'proposal_table_view.call_id'
       )
       .join(
         'instruments',
@@ -58,6 +47,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         'call_has_instruments.instrument_id'
       )
       .where(function () {
+        // TODO: Check this as well....
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
           this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
         } else {
@@ -75,7 +65,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('all_instrument_names', 'ilike', `%${filter.text}%`);
+            .orWhere('instrument_names', 'ilike', `%${filter.text}%`);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           query.whereRaw('? = ANY(technical_review_assignee_ids)', user.id);
@@ -151,8 +141,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const technicalReviewers = removeDuplicates(
       proposals.proposalViews
-        .filter((proposal) => !!proposal.technicalReviewAssigneeIds?.length)
-        .map((proposal) => proposal.technicalReviewAssigneeIds.map(String))
+        .filter((proposal) => !!proposal.technicalReviews?.length)
+        .map(({ technicalReviews }) =>
+          (technicalReviews as ProposalViewTechnicalReview[]).map(
+            (techicalReview) =>
+              techicalReview.technicalReviewAssignee.id.toString()
+          )
+        )
         .flat()
     );
 
@@ -164,26 +159,27 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const propsWithTechReviewerDetails = proposals.proposalViews.map(
       (proposal) => {
-        const users =
-          !!proposal.technicalReviewAssigneeIds &&
-          technicalReviewersDetails.filter((user) =>
-            proposal.technicalReviewAssigneeIds.find(
-              (id) => id?.toString() === user.userNumber
-            )
+        let userDetails = {};
+        if (proposal.technicalReviews) {
+          const { technicalReviews } = proposal;
+
+          const users = technicalReviewersDetails.filter((user) =>
+            technicalReviews.find((id) => id?.toString() === user.userNumber)
           );
 
-        const userDetails = users?.length
-          ? {
-              technicalReviewAssigneeNames: users.map((user) => {
-                const firstName = user?.firstNameKnownAs
-                  ? user.firstNameKnownAs
-                  : user?.givenName ?? '';
-                const lastName = user?.familyName ?? '';
+          userDetails = users?.length
+            ? {
+                technicalReviewAssigneeNames: users.map((user) => {
+                  const firstName = user?.firstNameKnownAs
+                    ? user.firstNameKnownAs
+                    : user?.givenName ?? '';
+                  const lastName = user?.familyName ?? '';
 
-                return `${firstName} ${lastName}`;
-              }),
-            }
-          : {};
+                  return `${firstName} ${lastName}`;
+                }),
+              }
+            : {};
+        }
 
         return {
           ...proposal,

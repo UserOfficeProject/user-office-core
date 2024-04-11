@@ -14,18 +14,27 @@ query getInstrumentScientistProposals(
       title
       submitted
       finalStatus
-      technicalReviewAssigneeIds
-      technicalReviewAssigneeNames
-      technicalStatuses
-      technicalTimeAllocations
       statusName
-      technicalReviewsSubmitted
-      instrumentIds
-      instrumentNames
       allocationTimeUnit
       callShortCode
-      statusName
-      fapCodes
+      instruments {
+        id
+        name
+      }
+      technicalReviews {
+        id
+        technicalReviewAssignee {
+          id
+          firstname
+          lastname
+        }
+        timeAllocation
+        status
+        submitted
+      }
+      faps {
+        code
+      }
       principalInvestigator {
         firstname
         lastname

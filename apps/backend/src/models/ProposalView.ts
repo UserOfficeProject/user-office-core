@@ -14,7 +14,7 @@ export class ProposalView {
     public statusName: string,
     public statusDescription: string,
     public proposalId: string,
-    public rankOrder: number,
+    // public rankOrder: number,
     public finalStatus: number, // Should use ProposalEndStatus enum here
     public notified: boolean,
     public submitted: boolean,
@@ -23,8 +23,8 @@ export class ProposalView {
     public faps: ProposalViewFap[] | null,
     public fapInstruments: FapInstrument[] | null,
     public callShortCode: string,
-    public reviewAverage: number,
-    public reviewDeviation: number,
+    // public reviewAverage: number,
+    // public reviewDeviation: number,
     public allocationTimeUnit: AllocationTimeUnits,
     public callId: number,
     public workflowId: number

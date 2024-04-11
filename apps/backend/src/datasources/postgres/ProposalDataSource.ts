@@ -360,20 +360,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     return database
-      .with(
-        'ptw',
-        database
-          .select([
-            '*',
-            database.raw(
-              // eslint-disable-next-line quotes
-              "array_to_string(instrument_names, ',') all_instrument_names"
-            ),
-          ])
-          .from('proposal_table_view')
-      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('ptw')
+      .from('proposal_table_view')
       .modify((query) => {
         if (filter?.callId) {
           query.where('call_id', filter?.callId);
@@ -411,7 +399,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .whereRaw('proposal_id ILIKE ?', searchText)
             .orWhereRaw('title ILIKE ?', searchText)
             .orWhereRaw('proposal_status_name ILIKE ?', searchText)
-            .orWhereRaw('all_instrument_names ILIKE ?', searchText);
+            .orWhereRaw('instrument_names ILIKE ?', searchText);
         }
 
         if (sortField && sortDirection) {
@@ -532,21 +520,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return database
-      .with(
-        'ptw',
-        database
-          .select([
-            '*',
-            database.raw(
-              // eslint-disable-next-line quotes
-              "array_to_string(instrument_names, ',') all_instrument_names"
-            ),
-          ])
-          .from('proposal_table_view')
-      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('ptw')
+      .from('proposal_table_view')
       .where(function () {
+        // TODO: Check this part if it still works. Maybe we will need to add back the instrument_manager_ids and internal_technical_reviewer_ids collumns for searching purpose
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
           this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
         } else {
@@ -564,7 +541,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('all_instrument_names', 'ilike', `%${filter.text}%`);
+            .orWhere('instrument_names', 'ilike', `%${filter.text}%`);
         }
         if (filter?.callId) {
           query.where('call_id', filter.callId);

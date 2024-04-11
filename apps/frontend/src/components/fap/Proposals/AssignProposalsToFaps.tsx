@@ -5,29 +5,32 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import { FapInstrument, FapInstrumentInput, UserRole } from 'generated/sdk';
+import {
+  FapInstrument,
+  FapInstrumentInput,
+  ProposalViewInstrument,
+  UserRole,
+} from 'generated/sdk';
 import { useFapsData } from 'hooks/fap/useFapsData';
-import { useInstrumentsByIdsData } from 'hooks/instrument/useInstrumentsByIdsData';
-import { getUniqueArray } from 'utils/helperFunctions';
+import { getUniqueArrayBy } from 'utils/helperFunctions';
 
 type AssignProposalToFapsProps = {
   close: () => void;
   assignProposalsToFaps: (
     fapInstruments: FapInstrumentInput[]
   ) => Promise<void>;
-  proposalInstrumentIds: ((number | null)[] | null)[];
+  proposalInstruments: (ProposalViewInstrument[] | null)[];
   proposalFapInstruments?: (FapInstrument | null)[];
 };
 
 const AssignProposalsToFaps = ({
   close,
   assignProposalsToFaps,
-  proposalInstrumentIds,
+  proposalInstruments,
   proposalFapInstruments,
 }: AssignProposalToFapsProps) => {
   const { currentRole } = useContext(UserContext);
@@ -36,36 +39,48 @@ const AssignProposalsToFaps = ({
     active: true,
     role: currentRole as UserRole,
   });
-  const instrumentsPerProposal = [...proposalInstrumentIds];
-  const uniqueInstrumentIds = useMemo(() => {
-    console.log('eeeeeeeeee');
+  // const instrumentsPerProposal = [...proposalInstrumentIds];
+  // const uniqueInstrumentIds = useMemo(() => {
+  //   console.log('eeeeeeeeee');
 
-    return getUniqueArray(proposalInstrumentIds.flat());
-  }, [proposalInstrumentIds]);
-  console.log(uniqueInstrumentIds);
-  const { instruments, loadingInstruments } =
-    useInstrumentsByIdsData(uniqueInstrumentIds);
+  //   return getUniqueArray(proposalInstrumentIds.flat());
+  // }, [proposalInstrumentIds]);
+  console.log(proposalInstruments);
+  const proposalsUniqueInstruments: ProposalViewInstrument[] = getUniqueArrayBy(
+    proposalInstruments.flat(),
+    'id'
+  );
+  // const { instruments, loadingInstruments } =
+  //   useInstrumentsByIdsData(uniqueInstrumentIds);
 
-  console.log(loadingInstruments, instruments);
+  console.log(proposalsUniqueInstruments);
 
-  if (loadingInstruments || !instruments) {
-    return <UOLoader sx={{ marginLeft: '50%', marginTop: '10px' }} />;
-  }
-  const allSelectedProposalsHaveSameInstruments = instrumentsPerProposal.every(
+  // if (loadingInstruments || !instruments) {
+  //   return <UOLoader sx={{ marginLeft: '50%', marginTop: '10px' }} />;
+  // }
+  const allSelectedProposalsHaveSameInstruments = [
+    ...proposalInstruments,
+  ].every(
     (item) =>
-      item?.sort((a, b) => (a && b ? a - b : 0)).toString() ===
-      instrumentsPerProposal[0]?.sort((a, b) => (a && b ? a - b : 0)).toString()
+      item?.sort((a, b) => (a && b ? a.id - b.id : 0)).toString() ===
+      proposalInstruments[0]
+        ?.sort((a, b) => (a && b ? a.id - b.id : 0))
+        .toString()
   );
 
   const initialValues: Record<string, number | undefined | null> = {};
 
-  instruments.forEach((instrument) => {
+  proposalsUniqueInstruments.forEach((instrument) => {
     initialValues[`selectedFapIds_${instrument.id}`] =
       proposalFapInstruments?.find((i) => i?.instrumentId === instrument.id)
         ?.fapId || null;
   });
 
-  console.log(initialValues, proposalFapInstruments);
+  console.log(
+    initialValues,
+    proposalFapInstruments,
+    allSelectedProposalsHaveSameInstruments
+  );
 
   const hasEmptyValue = (values: Record<string, number | undefined | null>) =>
     Object.values(values).every((v) => v !== undefined && v !== null);
@@ -80,7 +95,7 @@ const AssignProposalsToFaps = ({
         initialValues={{ ...initialValues }}
         onSubmit={async (values): Promise<void> => {
           const fapInstruments: FapInstrumentInput[] =
-            instruments?.map((instrument) => ({
+            proposalsUniqueInstruments?.map((instrument) => ({
               instrumentId: instrument.id,
               fapId: values[`selectedFapIds_${instrument.id}`] || null,
             })) || [];
@@ -97,7 +112,7 @@ const AssignProposalsToFaps = ({
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                {instruments.map((instrument) => (
+                {proposalsUniqueInstruments.map((instrument) => (
                   <FormikUIAutocomplete
                     key={instrument.id}
                     name={`selectedFapIds_${instrument.id}`}
@@ -122,7 +137,7 @@ const AssignProposalsToFaps = ({
               </Grid>
             </Grid>
 
-            {!instruments?.length && (
+            {!proposalsUniqueInstruments?.length && (
               <Alert severity="warning" data-cy="different-instruments">
                 Selected proposal/s do NOT have any instruments assigned. Please
                 assign instruments first and then you can select FAPs

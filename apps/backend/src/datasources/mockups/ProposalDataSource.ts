@@ -179,7 +179,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       '',
       'shortCode',
       1,
-      1,
       false,
       false,
       [
@@ -196,19 +195,16 @@ export class ProposalDataSourceMock implements ProposalDataSource {
           status: TechnicalReviewStatus.FEASIBLE,
           submitted: false,
           timeAllocation: 1,
-          technicalReviewAsignee: {
+          technicalReviewAssignee: {
             id: 1,
-            firstName: 'Carl',
-            lastName: 'Carlsson',
+            firstname: 'Carl',
+            lastname: 'Carlsson',
           },
-          internalTechnicalReviewerIds: [1],
         },
       ],
       [{ id: 1, code: 'fap code' }],
       [{ instrumentId: 1, fapId: 1 }],
       'call short code',
-      1,
-      1,
       AllocationTimeUnits.Day,
       1,
       1

@@ -201,8 +201,7 @@ describe('Test FapMutations', () => {
     return expect(
       FapMutationsInstance.assignProposalsToFaps(dummyUserOfficerWithRole, {
         proposals: [{ primaryKey: 1, callId: 1 }],
-        fapIds: [1],
-        fapInstrumentIds: [1],
+        fapInstruments: [{ fapId: 1, instrumentId: 1 }],
       })
     ).resolves.toStrictEqual(new ProposalPks([1]));
   });

@@ -319,11 +319,12 @@ export default class FapMutations {
             proposal.primaryKey
           );
 
-        // NOTE: This doublechecks if the proposal is assigned to the instrument at all.
+        // NOTE: This doublechecks if the proposal is assigned to the instrument at all or have FAP selected.
         if (
           !proposalAssignedInstruments.find(
             (instrument) => instrument.id === fapInstrument.instrumentId
-          )
+          ) ||
+          !fapInstrument.fapId
         ) {
           break;
         }

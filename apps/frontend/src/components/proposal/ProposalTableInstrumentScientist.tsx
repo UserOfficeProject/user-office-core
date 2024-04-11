@@ -61,6 +61,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
@@ -141,25 +142,29 @@ let columns: Column<ProposalViewData>[] = [
 const technicalReviewColumns: Column<ProposalViewData>[] = [
   {
     title: 'Technical status',
-    field: 'technicalStatuses',
+    // field: 'technicalStatuses',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalStatuses),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) => tr.status)
+      ),
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocations',
+    // field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalTimeAllocations
-        ? `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
-            rowData.allocationTimeUnit
-          }s)`
-        : '-',
+      `${fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) => tr.timeAllocation)
+      )} (${rowData.allocationTimeUnit}s)`,
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssigneeNames',
+    // field: 'technicalReviewAssigneeNames',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) =>
+          getFullUserName(tr.technicalReviewAssignee)
+        )
+      ),
   },
 ];
 
@@ -170,7 +175,7 @@ const instrumentManagementColumns = (
     title: t('instrument'),
     field: 'instrumentNames',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.instrumentNames),
+      fromArrayToCommaSeparated(rowData.instruments?.map((i) => i.name)),
   },
 ];
 
@@ -424,10 +429,12 @@ const ProposalTableInstrumentScientist = ({
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
       isInstrumentScientist &&
-      rowData.technicalReviewAssigneeIds?.includes(user.id);
+      rowData.technicalReviews
+        ?.map((tr) => tr.technicalReviewAssignee.id)
+        .includes(user.id);
 
     const showView =
-      rowData.technicalReviewsSubmitted?.every((submitted) => submitted) ||
+      rowData.technicalReviews?.every((tr) => tr.submitted) ||
       (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
     return (
@@ -473,14 +480,14 @@ const ProposalTableInstrumentScientist = ({
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
       const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] = [];
       selectedProposals.forEach((proposal) => {
-        if (proposal.instrumentIds) {
-          proposal.instrumentIds.forEach((instrumentId) => {
-            if (instrumentId) {
+        if (proposal.instruments) {
+          proposal.instruments.forEach((i) => {
+            if (i.id) {
               submittedTechnicalReviewsInput.push({
                 proposalPk: proposal.primaryKey,
                 reviewerId: user.id,
                 submitted: true,
-                instrumentId: instrumentId,
+                instrumentId: i.id,
               });
             }
           });
@@ -495,12 +502,16 @@ const ProposalTableInstrumentScientist = ({
 
       const newProposalsData = proposalsData.map((proposalData) => ({
         ...proposalData,
-        technicalReviewsSubmitted: selectedProposals.find(
-          (selectedProposal) =>
-            selectedProposal.primaryKey === proposalData.primaryKey
-        )
-          ? [1]
-          : proposalData.technicalReviewsSubmitted,
+        technicalReviews:
+          proposalData.technicalReviews?.map((tr) => ({
+            ...tr,
+            submitted: selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === proposalData.primaryKey
+            )
+              ? true
+              : tr.submitted,
+          })) || [],
       }));
       setProposalsData(newProposalsData);
     }
@@ -575,19 +586,15 @@ const ProposalTableInstrumentScientist = ({
     const invalid = [];
 
     for await (const proposal of selectedProposals) {
-      if (
-        proposal.technicalStatuses?.length &&
-        proposal.technicalTimeAllocations?.length &&
-        proposal.technicalStatuses?.length ===
-          proposal.technicalTimeAllocations?.length
-      ) {
+      const { technicalReviews } = proposal;
+      if (technicalReviews?.length) {
         const isValidSchema = (
           await Promise.all(
-            proposal.technicalStatuses.map(
-              async (technicalStatus, index) =>
+            technicalReviews.map(
+              async (tr) =>
                 await proposalTechnicalReviewValidationSchema.isValid({
-                  status: technicalStatus,
-                  timeAllocation: proposal.technicalTimeAllocations?.[index],
+                  status: tr.status,
+                  timeAllocation: tr.timeAllocation,
                 })
             )
           )
