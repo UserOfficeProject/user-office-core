@@ -42,7 +42,7 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => Date, { nullable: true })
   public created?: Date;
 
-  @Field()
+  @Field({ nullable: true })
   public country: string;
 }
 
