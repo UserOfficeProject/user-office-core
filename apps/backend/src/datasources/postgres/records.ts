@@ -239,7 +239,6 @@ export interface UserRecord {
   readonly preferredname: string;
   readonly oidc_sub: string | null;
   readonly oauth_refresh_token: string | null;
-  readonly oauth_access_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;
   readonly nationality: number;
@@ -915,7 +914,6 @@ export const createUserObject = (user: UserRecord) => {
     user.preferredname,
     user.oidc_sub,
     user.oauth_refresh_token,
-    user.oauth_access_token,
     user.oauth_issuer,
     user.gender,
     user.nationality,
