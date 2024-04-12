@@ -214,8 +214,7 @@ const instrumentManagementColumns = (
       fromArrayToCommaSeparated(
         rowData.instruments?.map((instrument) => instrument.name)
       ),
-    customFilterAndSearch: (filter: any, rowData: ProposalViewData) =>
-      !!rowData.instruments?.some((i) => i.name.includes(filter)),
+    customFilterAndSearch: () => true,
   },
 ];
 

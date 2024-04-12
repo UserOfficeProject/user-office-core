@@ -13,8 +13,7 @@ BEGIN
     	DROP VIEW proposal_table_view;
 
     	-- re-create newest view query with order by
-		  CREATE VIEW proposal_table_view
-		  AS
+		  CREATE VIEW proposal_table_view AS
 			SELECT
 				p.proposal_pk,
 				p.title,
@@ -29,10 +28,6 @@ BEGIN
 				p.submitted,
 				t.technical_reviews,
 				ihp.instruments,
-				-- NOTE: instrument_names and instrument_ids are here for search purposes only they are not used in the ProposalView model.
-				ihp.instrument_names,
-				ihp.instrument_ids,
-				ihp_2.instrument_scientist_ids,
 				fp.faps,
 				fp.fap_instruments,
 				c.call_short_code,
@@ -45,13 +40,13 @@ BEGIN
 			LEFT JOIN (
 				SELECT
 					fp_1.proposal_pk,
-					array_agg(
+					jsonb_agg(
 						jsonb_build_object(
 							'id', f.fap_id,
 							'code', f.code
 						) ORDER BY fp_1.fap_proposals_id ASC
 					) AS faps,
-					array_agg(
+					jsonb_agg(
 						jsonb_build_object(
 							'instrumentId', fp_1.instrument_id,
 							'fapId', f.fap_id
@@ -65,7 +60,7 @@ BEGIN
 			LEFT JOIN (
 				SELECT
 					t_1.proposal_pk,
-					array_agg(
+					jsonb_agg(
 						jsonb_build_object(
 							'id', t_1.technical_review_id,
 							'timeAllocation', t_1.time_allocation,
@@ -76,41 +71,37 @@ BEGIN
 							),
 							'status', t_1.status,
 							'submitted', t_1.submitted,
-							'internalTechnicalReviewerIds', ir.reviewer_id
+							'internalReviewers', (
+								SELECT jsonb_agg(jsonb_build_object('id', ir.reviewer_id))
+								FROM internal_reviews ir
+								WHERE ir.technical_review_id = t_1.technical_review_id
+							)
 						) ORDER BY t_1.technical_review_id ASC
 					) AS technical_reviews
 				FROM technical_review t_1
 				LEFT JOIN users u ON u.user_id = t_1.technical_review_assignee_id
-				LEFT JOIN internal_reviews ir ON ir.technical_review_id = t_1.technical_review_id
 				GROUP BY t_1.proposal_pk
 			) t ON t.proposal_pk = p.proposal_pk
 			LEFT JOIN (
 				SELECT
 					ihp_1.proposal_pk,
-					string_agg(i.name, ',') AS instrument_names,
-					array_agg(ihp_1.instrument_id) AS instrument_ids,
-					array_agg(
+					jsonb_agg(
 						jsonb_build_object(
 							'id', ihp_1.instrument_id,
 							'name', i.name,
 							'managerUserId', i.manager_user_id,
-							'managementTimeAllocation', ihp_1.management_time_allocation
+							'managementTimeAllocation', ihp_1.management_time_allocation,
+							'scientists', (
+								SELECT jsonb_agg(jsonb_build_object('id', ihs.user_id))
+								FROM instrument_has_scientists ihs
+								WHERE ihs.instrument_id = ihp_1.instrument_id
+							)
 						) ORDER BY ihp_1.instrument_has_proposals_id ASC
 					) AS instruments
 				FROM instrument_has_proposals ihp_1
 				JOIN instruments i ON i.instrument_id = ihp_1.instrument_id
 				GROUP BY ihp_1.proposal_pk
 			) ihp ON ihp.proposal_pk = p.proposal_pk
-			LEFT JOIN (
-				SELECT
-					ihp_2_1.proposal_pk,
-					array_agg(
-						ihs.user_id ORDER BY ihp_2_1.instrument_has_proposals_id
-					) AS instrument_scientist_ids
-				FROM instrument_has_proposals ihp_2_1
-				LEFT JOIN instrument_has_scientists ihs ON ihp_2_1.instrument_id = ihs.instrument_id
-				GROUP BY ihp_2_1.proposal_pk
-			) ihp_2 ON ihp_2.proposal_pk = p.proposal_pk
 			ORDER BY p.proposal_pk;
 
 			ALTER TABLE proposal_events RENAME COLUMN proposal_fap_selected TO proposal_faps_selected;
