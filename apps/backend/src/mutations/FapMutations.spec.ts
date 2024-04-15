@@ -225,7 +225,7 @@ describe('Test FapMutations', () => {
         proposalPks: [1],
         fapIds: [1],
       })
-    ).resolves.toStrictEqual(dummyFapProposal);
+    ).resolves.toStrictEqual([dummyFapProposal]);
   });
 
   test('A user can not assign Fap member to proposal', async () => {
