@@ -910,8 +910,12 @@ context('Settings tests', () => {
               callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            fapIds: [initialDBData.fap.id],
-            fapInstrumentIds: [initialDBData.instrument1.id],
+            fapInstruments: [
+              {
+                instrumentId: initialDBData.instrument1.id,
+                fapId: initialDBData.fap.id,
+              },
+            ],
           });
           if (
             featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)
@@ -1015,8 +1019,12 @@ context('Settings tests', () => {
               callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            fapIds: [initialDBData.fap.id],
-            fapInstrumentIds: [initialDBData.instrument1.id],
+            fapInstruments: [
+              {
+                instrumentId: initialDBData.instrument1.id,
+                fapId: initialDBData.fap.id,
+              },
+            ],
           });
         }
       });
