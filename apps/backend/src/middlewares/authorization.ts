@@ -2,7 +2,7 @@ import jwt from 'express-jwt';
 
 import { JwtAlg } from '../utils/jwt';
 
-const secret = process.env.secret as string;
+const secret = process.env.JWT_SECRET as string;
 
 const authorization = () =>
   jwt({

@@ -32,7 +32,6 @@ export class User {
     public preferredname: string | undefined,
     public oidcSub: string | null,
     public oauthRefreshToken: string | null,
-    public oauthAccessToken: string | null,
     public oauthIssuer: string | null,
     public gender: string,
     public nationality: number,

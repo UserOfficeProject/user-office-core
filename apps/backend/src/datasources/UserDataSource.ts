@@ -60,7 +60,6 @@ export interface UserDataSource {
     username: string,
     preferredname: string | undefined,
     oidc_sub: string,
-    oauth_accesstoken: string,
     oauth_refreshtoken: string,
     oauth_issuer: string,
     gender: string,

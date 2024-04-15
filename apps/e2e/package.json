@@ -6,6 +6,7 @@
   "dependencies": {
     "@faker-js/faker": "^7.5.0",
     "@types/luxon": "^2.4.0",
+    "adm-zip": "^0.4.13",
     "cypress": "^13.2.0",
     "cypress-real-events": "^1.10.3",
     "graphql": "^16.8.1",
