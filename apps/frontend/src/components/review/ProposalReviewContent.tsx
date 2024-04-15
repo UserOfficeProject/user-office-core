@@ -197,7 +197,7 @@ const ProposalReviewContent = ({
       <ExternalReviews reviews={proposalData.reviews as Review[]} />
       <FapMeetingDecision
         fapMeetingDecision={proposalData.fapMeetingDecision}
-        fap={proposalData.fap}
+        faps={proposalData.faps}
       />
     </>
   );

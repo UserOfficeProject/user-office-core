@@ -76,11 +76,16 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     proposalId: proposal.proposalId,
     rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-    instruments: [],
+    instruments: proposal.instruments?.map((instrument) => ({
+      id: instrument?.id,
+      name: instrument?.name,
+      managerUserId: instrument?.managerUserId,
+      managementTimeAllocation: instrument?.managementTimeAllocation,
+    })),
     technicalReviews:
       proposal.technicalReviews.map((tr) => ({
         id: tr.id,
-        status: tr.status,
+        status: getTranslation(tr.status as ResourceId),
         submitted: tr.submitted,
         timeAllocation: tr.timeAllocation,
         technicalReviewAssignee: {
@@ -89,8 +94,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
           lastname: tr.technicalReviewAssignee?.lastname,
         },
       })) || null,
-    // TODO: Check faps and fapInstruments here
-    faps: [{ ...proposal.fap }],
+    faps: proposal.faps,
     fapInstruments: [],
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,

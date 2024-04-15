@@ -39,25 +39,12 @@ const AssignProposalsToFaps = ({
     active: true,
     role: currentRole as UserRole,
   });
-  // const instrumentsPerProposal = [...proposalInstrumentIds];
-  // const uniqueInstrumentIds = useMemo(() => {
-  //   console.log('eeeeeeeeee');
 
-  //   return getUniqueArray(proposalInstrumentIds.flat());
-  // }, [proposalInstrumentIds]);
-  console.log(proposalInstruments);
   const proposalsUniqueInstruments: ProposalViewInstrument[] = getUniqueArrayBy(
     proposalInstruments.flat(),
     'id'
   );
-  // const { instruments, loadingInstruments } =
-  //   useInstrumentsByIdsData(uniqueInstrumentIds);
 
-  console.log(proposalsUniqueInstruments);
-
-  // if (loadingInstruments || !instruments) {
-  //   return <UOLoader sx={{ marginLeft: '50%', marginTop: '10px' }} />;
-  // }
   const allSelectedProposalsHaveSameInstruments = [
     ...proposalInstruments,
   ].every(
@@ -75,12 +62,6 @@ const AssignProposalsToFaps = ({
       proposalFapInstruments?.find((i) => i?.instrumentId === instrument.id)
         ?.fapId || null;
   });
-
-  console.log(
-    initialValues,
-    proposalFapInstruments,
-    allSelectedProposalsHaveSameInstruments
-  );
 
   const hasEmptyValue = (values: Record<string, number | undefined | null>) =>
     Object.values(values).every((v) => v !== undefined && v !== null);
@@ -158,7 +139,7 @@ const AssignProposalsToFaps = ({
                 It is NOT recommended to do group assignment of FAPs to
                 proposals that differ in their instruments. If you want to
                 continue be aware that proposals will get FAPs assigned ONLY to
-                their own instruments accordingly and not for all instruments.
+                their own instruments accordingly and not to all instruments.
               </Alert>
             )}
             <Button

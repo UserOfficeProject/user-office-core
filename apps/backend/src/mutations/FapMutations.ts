@@ -326,7 +326,7 @@ export default class FapMutations {
           ) ||
           !fapInstrument.fapId
         ) {
-          break;
+          continue;
         }
 
         dataToInsert.push({
