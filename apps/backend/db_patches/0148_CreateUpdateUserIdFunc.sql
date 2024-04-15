@@ -110,9 +110,9 @@ BEGIN
 			        DEL_SQL := DEL_SQL || ' AND EXISTS ( SELECT '  || EXIST_SEL || ' FROM ' || MTR_REC.TABLE_NAME || ' T2 WHERE T2.' || EXIST_WH || '); ';
             END IF;
             RAISE NOTICE '%',UPD_SQL;
-      		  EXECUTE UPD_SQL;
+      		  EXECUTE UPD_SQL; 
             IF LENGTH(DEL_SQL) > 0 THEN 
-              RAISE NOTICE '%',DEL_SQL;
+              RAISE NOTICE '%',DEL_SQL; 
       		    EXECUTE DEL_SQL;
             END IF;
           END LOOP;
