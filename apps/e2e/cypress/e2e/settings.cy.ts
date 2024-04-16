@@ -854,15 +854,18 @@ context('Settings tests', () => {
 
       cy.get("[aria-label='Assign proposals to Fap']").first().click();
 
-      cy.get('#selectedFapId-input').should('not.have.class', 'Mui-disabled');
+      cy.get('[data-cy="fap-selection"] input').should(
+        'not.have.class',
+        'Mui-disabled'
+      );
 
-      cy.get('#selectedFapId-input').first().click();
+      cy.get('[data-cy="fap-selection"]').contains(
+        initialDBData.instrument1.name
+      );
+
+      cy.get('[data-cy="fap-selection"]').click();
 
       cy.get('[data-cy="fap-selection-options"] li').first().click();
-
-      cy.get('[data-cy="fap-instrument-selection"]').click();
-
-      cy.get('[data-cy="fap-instrument-selection-options"] li').first().click();
 
       cy.get('[data-cy="submit"]').click();
 

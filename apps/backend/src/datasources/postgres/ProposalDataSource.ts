@@ -344,7 +344,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     query
-      .leftJoin('answers', 'answers.questionary_id', 'ptw.questionary_id')
+      .leftJoin(
+        'answers',
+        'answers.questionary_id',
+        'proposal_table_view.questionary_id'
+      )
       .andWhere('answers.question_id', questionFilter.questionId)
       .modify(questionFilterQuery, questionFilter);
 

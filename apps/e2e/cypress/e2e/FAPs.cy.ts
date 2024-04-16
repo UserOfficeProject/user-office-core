@@ -311,7 +311,7 @@ context('Fap reviews tests', () => {
       });
     });
 
-    it.only('Officer should be able to assign proposal to existing Fap', function () {
+    it('Officer should be able to assign proposal to existing Fap', () => {
       cy.assignInstrumentToCall({
         callId: initialDBData.call.id,
         instrumentFapIds: [{ instrumentId: newlyCreatedInstrumentId }],
@@ -338,12 +338,10 @@ context('Fap reviews tests', () => {
         'not.have.class',
         'Mui-disabled'
       );
+      cy.get('[data-cy="fap-selection"]').contains(instrument.name);
       cy.get('[data-cy="fap-selection"]').click();
       cy.get('[data-cy="fap-selection-options"]').contains(fap1.code).click();
-      cy.get('[data-cy="fap-instrument-selection"]').click();
-      cy.get('[data-cy="fap-instrument-selection-options"]')
-        .contains(instrument.name)
-        .click();
+
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({
