@@ -202,6 +202,58 @@ function initializationBeforeTests() {
         faps: [createdFapId],
       }).then((result) => {
         createdCallId = result.createCall.id;
+
+        cy.createProposal({ callId: createdCallId }).then((result) => {
+          const createdProposal = result.createProposal;
+          if (createdProposal) {
+            secondCreatedProposalPk = createdProposal.primaryKey;
+
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: proposal2.title,
+              abstract: proposal2.abstract,
+              proposerId: initialDBData.users.user1.id,
+            });
+
+            // Manually changing the proposal status to be shown in the Faps. -------->
+            cy.changeProposalsStatus({
+              statusId: initialDBData.proposalStatuses.fapReview.id,
+              proposals: [
+                { callId: createdCallId, primaryKey: secondCreatedProposalPk },
+              ],
+            });
+          }
+        });
+
+        cy.createProposal({ callId: createdCallId }).then((result) => {
+          const createdProposal = result.createProposal;
+          if (createdProposal) {
+            thirdCreatedProposalPk = createdProposal.primaryKey;
+
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: proposal3.title,
+              abstract: proposal3.abstract,
+              proposerId: initialDBData.users.user2.id,
+            });
+
+            // Manually changing the proposal status to be shown in the Faps. -------->
+            cy.changeProposalsStatus({
+              statusId: initialDBData.proposalStatuses.fapReview.id,
+              proposals: [
+                { callId: createdCallId, primaryKey: thirdCreatedProposalPk },
+              ],
+            });
+          }
+        });
+
+        cy.updateCall({
+          id: createdCallId,
+          ...closedCall,
+          proposalWorkflowId: createdWorkflowId,
+          esiTemplateId: createdEsiTemplateId,
+          faps: [createdFapId],
+        });
       });
     }
   });
@@ -227,58 +279,6 @@ function initializationBeforeTests() {
         ],
       });
     }
-  });
-
-  cy.createProposal({ callId: createdCallId }).then((result) => {
-    const createdProposal = result.createProposal;
-    if (createdProposal) {
-      secondCreatedProposalPk = createdProposal.primaryKey;
-
-      cy.updateProposal({
-        proposalPk: createdProposal.primaryKey,
-        title: proposal2.title,
-        abstract: proposal2.abstract,
-        proposerId: initialDBData.users.user1.id,
-      });
-
-      // Manually changing the proposal status to be shown in the Faps. -------->
-      cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapReview.id,
-        proposals: [
-          { callId: createdCallId, primaryKey: secondCreatedProposalPk },
-        ],
-      });
-    }
-  });
-
-  cy.createProposal({ callId: createdCallId }).then((result) => {
-    const createdProposal = result.createProposal;
-    if (createdProposal) {
-      thirdCreatedProposalPk = createdProposal.primaryKey;
-
-      cy.updateProposal({
-        proposalPk: createdProposal.primaryKey,
-        title: proposal3.title,
-        abstract: proposal3.abstract,
-        proposerId: initialDBData.users.user2.id,
-      });
-
-      // Manually changing the proposal status to be shown in the Faps. -------->
-      cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapReview.id,
-        proposals: [
-          { callId: createdCallId, primaryKey: thirdCreatedProposalPk },
-        ],
-      });
-    }
-  });
-
-  cy.updateCall({
-    id: createdCallId,
-    ...closedCall,
-    proposalWorkflowId: createdWorkflowId,
-    esiTemplateId: createdEsiTemplateId,
-    faps: [createdFapId],
   });
 }
 
