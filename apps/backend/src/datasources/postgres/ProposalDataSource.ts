@@ -528,28 +528,26 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
-      .distinct('proposal_pk')
-      .orderBy('proposal_pk', 'desc')
-      .modify((query) => {
-        // TODO: Check/test this part if it still works
+      .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains internalReviewers array of objects with id equal to user.id
-          query.whereRaw(
+          this.whereRaw(
             'jsonb_path_exists(technical_reviews, \'$[*].internalReviewers[*].id \\? (@.type() == "number" && @ == :userId:)\')',
             { userId: user.id }
           );
         } else {
-          query
-            .whereRaw(
-              'jsonb_path_exists(instruments, \'$[*].scientists[*].id \\? (@.type() == "number" && @ == :userId:)\')',
-              { userId: user.id }
-            )
-            .orWhereRaw(
-              'jsonb_path_exists(instruments, \'$[*].managerUserId \\? (@.type() == "number" && @ == :userId:)\')',
-              { userId: user.id }
-            );
+          this.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].scientists[*].id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          ).orWhereRaw(
+            'jsonb_path_exists(instruments, \'$[*].managerUserId \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
         }
-
+      })
+      .distinct('proposal_pk')
+      .orderBy('proposal_pk', 'desc')
+      .modify((query) => {
         if (filter?.text) {
           query
             .where('title', 'ilike', `%${filter.text}%`)

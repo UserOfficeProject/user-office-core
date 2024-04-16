@@ -290,7 +290,7 @@ export interface TechnicalReviewRecord {
   readonly submitted: boolean;
   readonly reviewer_id: number;
   readonly files: string;
-  readonly technical_review_assignee_id: number | null;
+  readonly technical_review_assignee_id: number;
   readonly instrument_id: number;
 }
 
@@ -821,7 +821,6 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_status_name,
     proposal.proposal_status_description,
     proposal.proposal_id,
-    // proposal.rank_order,
     proposal.final_status,
     proposal.notified,
     proposal.submitted,
@@ -830,8 +829,6 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.faps,
     proposal.fap_instruments,
     proposal.call_short_code,
-    // proposal.average,
-    // proposal.deviation,
     proposal.allocation_time_unit,
     proposal.call_id,
     proposal.proposal_workflow_id

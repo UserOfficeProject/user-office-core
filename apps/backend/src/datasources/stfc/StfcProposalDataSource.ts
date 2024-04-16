@@ -178,31 +178,36 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const propsWithTechReviewerDetails = proposals.proposalViews.map(
       (proposal) => {
-        let userDetails = {};
-        if (proposal.technicalReviews) {
-          const { technicalReviews } = proposal;
+        let proposalTecnicalReviews: ProposalViewTechnicalReview[] = [];
+        const { technicalReviews } = proposal;
 
-          const users = technicalReviewersDetails.filter((user) =>
-            technicalReviews.find((id) => id?.toString() === user.userNumber)
-          );
+        if (technicalReviews?.length) {
+          proposalTecnicalReviews = technicalReviews.map((technicalReview) => {
+            const userDetails = technicalReviewersDetails.find(
+              (trd) =>
+                trd.userNumber ===
+                technicalReview.technicalReviewAssignee.id.toString()
+            );
 
-          userDetails = users?.length
-            ? {
-                technicalReviewAssigneeNames: users.map((user) => {
-                  const firstName = user?.firstNameKnownAs
-                    ? user.firstNameKnownAs
-                    : user?.givenName ?? '';
-                  const lastName = user?.familyName ?? '';
+            const firstName = userDetails?.firstNameKnownAs
+              ? userDetails.firstNameKnownAs
+              : userDetails?.givenName ?? '';
+            const lastName = userDetails?.familyName ?? '';
 
-                  return `${firstName} ${lastName}`;
-                }),
-              }
-            : {};
+            return {
+              ...technicalReview,
+              technicalReviewAssignee: {
+                id: technicalReview.id,
+                firstname: firstName,
+                lastname: lastName,
+              },
+            };
+          });
         }
 
         return {
           ...proposal,
-          ...userDetails,
+          technicalReviews: proposalTecnicalReviews,
         };
       }
     );

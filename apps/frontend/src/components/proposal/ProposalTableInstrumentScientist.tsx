@@ -6,10 +6,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import {
-  ResourceId,
-  getTranslation,
-} from '@user-office-software/duo-localisation';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
 import React, { useContext, useState, useEffect } from 'react';
@@ -42,6 +38,7 @@ import {
   SubmitTechnicalReviewInput,
   SettingsId,
   UserRole,
+  ProposalViewTechnicalReviewAssignee,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -142,7 +139,7 @@ let columns: Column<ProposalViewData>[] = [
 const technicalReviewColumns: Column<ProposalViewData>[] = [
   {
     title: 'Technical status',
-    // field: 'technicalStatuses',
+    field: 'technicalStatuses',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(
         rowData.technicalReviews?.map((tr) => tr.status)
@@ -150,7 +147,7 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
   },
   {
     title: 'Technical time allocation',
-    // field: 'technicalTimeAllocations',
+    field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
       `${fromArrayToCommaSeparated(
         rowData.technicalReviews?.map((tr) => tr.timeAllocation)
@@ -158,7 +155,7 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
   },
   {
     title: 'Assigned technical reviewer',
-    // field: 'technicalReviewAssigneeNames',
+    field: 'technicalReviewAssigneeNames',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(
         rowData.technicalReviews?.map((tr) =>
@@ -742,28 +739,20 @@ const ProposalTableInstrumentScientist = ({
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...proposal,
-                  technicalReviewAssigneeIds:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) =>
-                        technicalReview.technicalReviewAssigneeId
-                    ) || null,
-                  technicalReviewAssigneeNames:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) =>
-                        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
-                    ) || null,
-                  technicalReviewsSubmitted:
-                    updatedProposal.technicalReviews?.map((technicalReview) =>
-                      technicalReview.submitted ? 1 : 0
-                    ) || null,
-                  technicalStatuses:
-                    updatedProposal.technicalReviews?.map((technicalReview) =>
-                      getTranslation(technicalReview?.status as ResourceId)
-                    ) || null,
-                  technicalTimeAllocations:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) => technicalReview.timeAllocation
-                    ) || null,
+                  technicalReviews: updatedProposal.technicalReviews.map(
+                    (technicalReview) => {
+                      const technicalReviewAssignee =
+                        technicalReview.technicalReviewAssignee as ProposalViewTechnicalReviewAssignee;
+
+                      return {
+                        id: technicalReview.id,
+                        status: technicalReview.status,
+                        submitted: technicalReview.submitted,
+                        timeAllocation: technicalReview.timeAllocation,
+                        technicalReviewAssignee: technicalReviewAssignee,
+                      };
+                    }
+                  ),
                 };
               } else {
                 return proposal;
