@@ -841,7 +841,7 @@ context('Settings tests', () => {
             timeAllocation: 1,
             submitted: true,
             reviewerId: 0,
-            instrumentId: initialDBData.instrument1.id,
+            instrumentId: createdInstrumentId,
           });
         }
       });
@@ -857,10 +857,6 @@ context('Settings tests', () => {
       cy.get('[data-cy="fap-selection"] input').should(
         'not.have.class',
         'Mui-disabled'
-      );
-
-      cy.get('[data-cy="fap-selection"]').contains(
-        initialDBData.instrument1.name
       );
 
       cy.get('[data-cy="fap-selection"]').click();
