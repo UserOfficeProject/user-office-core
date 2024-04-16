@@ -726,6 +726,43 @@ context('GenericTemplates tests', () => {
 
       cy.contains(genericTemplateTitle);
     });
+
+    it('should be a character limit to the template proposal question for office user', () => {
+      cy.createTemplate({
+        name: proposalTemplateName,
+        groupId: TemplateGroupId.PROPOSAL,
+      });
+      const char256 =
+        ')T33SNyZ9ALcpn8@;V&fytV3_FFWPn.}!&H_Fw(2uXC@Q#[-irgk?z{*#}z9}hBS=#]URgUq!kzZ[)p2KmRd$.S:vy0=,we@3vL}$fSJ1V,z0!j]N*4nS4qEQ,em7uH%gwY*{f8F5-=.)Bj!/[tv6bb9.ud*ua01dN79a6[q;wwh8Wu6GA&y&iE+zNhTy9@KRiUTkS4{C9Z]Z?eNiN)EaW{r6e!P4?U/b2h=aYrb_1;T4S!bcw6)bj[UVK8xTYG/';
+      // this is a string that contain 256 character, used for testing purposes within this it
+
+      cy.login('officer');
+      cy.visit('/'); // this somehow logins to an office user, and to the proposal access point page
+
+      cy.finishedLoading();
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.get('[data-cy=create-new-button]').click();
+
+      cy.get('[data-cy=name] input').type(genericTemplateName[0]);
+
+      cy.get('[data-cy=description]').type(genericTemplateDescription[0]);
+
+      cy.get('[data-cy=submit]').click();
+
+      cy.get('[data-cy="proposal-question-id"').click();
+
+      cy.get('[data-cy=natural-key]').click();
+
+      cy.get('[data-cy="question"')
+        .click()
+        .clear()
+        .type(char256, { parseSpecialCharSequences: false }); // need to figure out how to make a string lnegth 264 characters with Faker
+
+      cy.get('[data-cy="submit"').click(); //if the user input > (char limit) -> get thrown an error
+      //if user input <= (char limit) -> no error should occur
+    });
   });
 
   describe('Generic template cloning tests', () => {
