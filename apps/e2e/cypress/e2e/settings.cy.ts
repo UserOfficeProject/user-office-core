@@ -905,10 +905,7 @@ context('Settings tests', () => {
           });
 
           cy.assignProposalsToFaps({
-            proposals: {
-              callId: initialDBData.call.id,
-              primaryKey: proposal.primaryKey,
-            },
+            proposalPks: [proposal.primaryKey],
             fapInstruments: [
               {
                 instrumentId: initialDBData.instrument1.id,
@@ -1014,10 +1011,7 @@ context('Settings tests', () => {
           });
 
           cy.assignProposalsToFaps({
-            proposals: {
-              callId: initialDBData.call.id,
-              primaryKey: proposal.primaryKey,
-            },
+            proposalPks: [proposal.primaryKey],
             fapInstruments: [
               {
                 instrumentId: initialDBData.instrument1.id,

@@ -37,7 +37,6 @@ import {
   Proposal,
   ProposalsFilter,
   ProposalStatus,
-  ProposalSelectionInput,
   InstrumentFragment,
   FeatureId,
   FapInstrumentInput,
@@ -81,9 +80,11 @@ type ProposalTableOfficerProps = {
   confirm: WithConfirmType;
 };
 
-export type ProposalSelectionType = ProposalSelectionInput & {
+export type ProposalSelectionType = {
   title: string;
   proposalId: string;
+  primaryKey: number;
+  callId: number;
   instruments: ProposalViewInstrument[] | null;
   fapInstruments: FapInstrument[] | null;
   statusId: number;
@@ -401,7 +402,6 @@ const ProposalTableOfficer = ({
               instruments: proposal.instruments || [],
               fapInstruments: proposal.fapInstruments,
               statusId: proposal.statusId,
-              workflowId: proposal.workflowId,
               title: proposal.title,
               proposalId: proposal.proposalId,
             });
@@ -552,10 +552,9 @@ const ProposalTableOfficer = ({
         toastSuccessMessage:
           'Proposal/s assigned to the selected Fap successfully!',
       }).assignProposalsToFaps({
-        proposals: selectedProposals.map((selectedProposal) => ({
-          primaryKey: selectedProposal.primaryKey,
-          callId: selectedProposal.callId,
-        })),
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
+        ),
         fapInstruments: fapInstsruments,
       });
 
@@ -675,11 +674,9 @@ const ProposalTableOfficer = ({
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
       }).changeProposalsStatus({
-        proposals: selectedProposals.map((selectedProposal) => ({
-          primaryKey: selectedProposal.primaryKey,
-          callId: selectedProposal.callId,
-          workflowId: selectedProposal.workflowId,
-        })),
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
+        ),
         statusId: status.id,
       });
       const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';

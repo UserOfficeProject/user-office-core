@@ -269,12 +269,9 @@ export default class FapMutations {
       );
       if (callHasInstrument && callHasInstrument.fapId) {
         await this.assignProposalsToFapsInternal(agent, {
-          proposals: proposals
+          proposalPks: proposals
             .filter((proposal) => proposal.callId === callId)
-            .map((proposal) => ({
-              ...proposal,
-              callId: callId,
-            })),
+            .map((proposal) => proposal.primaryKey),
           fapInstruments: [
             {
               fapId: callHasInstrument.fapId,
@@ -312,12 +309,20 @@ export default class FapMutations {
 
     const dataToInsert: AssignProposalsToFapsInput[] = [];
 
-    for (const proposal of args.proposals) {
+    for (const proposalPk of args.proposalPks) {
       for (const fapInstrument of args.fapInstruments) {
         const proposalAssignedInstruments =
           await this.instrumentDataSource.getInstrumentsByProposalPk(
-            proposal.primaryKey
+            proposalPk
           );
+
+        const fullProposal = await this.proposalDataSource.get(proposalPk);
+
+        if (!fullProposal) {
+          return rejection(`Proposal not found with id: ${proposalPk}`, {
+            args,
+          });
+        }
 
         // NOTE: This doublechecks if the proposal is assigned to the instrument at all or have FAP selected.
         if (
@@ -330,17 +335,17 @@ export default class FapMutations {
         }
 
         dataToInsert.push({
-          call_id: proposal.callId,
+          call_id: fullProposal.callId,
           fap_id: fapInstrument.fapId,
           instrument_id: fapInstrument.instrumentId,
-          proposal_pk: proposal.primaryKey,
+          proposal_pk: proposalPk,
         });
       }
     }
 
     const result = await this.dataSource.assignProposalsToFaps(dataToInsert);
 
-    if (result.proposalPks.length !== args.proposals.length) {
+    if (result.proposalPks.length !== args.proposalPks.length) {
       return rejection('Could not assign proposal to facility access panel', {
         agent,
       });

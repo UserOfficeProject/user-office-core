@@ -12,12 +12,11 @@ import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 import { FapProposal } from '../types/FapProposal';
 import { FapInstrument } from '../types/ProposalView';
-import { ProposalSelectionInput } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
 export class AssignProposalsToFapsArgs {
-  @Field(() => [ProposalSelectionInput])
-  public proposals: ProposalSelectionInput[];
+  @Field(() => [Int])
+  public proposalPks: number[];
 
   @Field(() => [FapInstrument])
   public fapInstruments: FapInstrument[];
