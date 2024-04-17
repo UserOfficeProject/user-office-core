@@ -179,125 +179,127 @@ function createWorkflowAndEsiTemplate() {
 
 function initializationBeforeTests() {
   createWorkflowAndEsiTemplate();
-  cy.createInstrument(instrument).then((result) => {
-    const createdInstrument = result.createInstrument;
-    if (createdInstrument) {
-      newlyCreatedInstrumentId = createdInstrument.id;
-    }
-  });
+  cy.then(() => {
+    cy.createInstrument(instrument).then((result) => {
+      const createdInstrument = result.createInstrument;
+      if (createdInstrument) {
+        newlyCreatedInstrumentId = createdInstrument.id;
+      }
+    });
 
-  cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-    const createdProposal = result.createProposal;
-    if (createdProposal) {
-      firstCreatedProposalPk = createdProposal.primaryKey;
-      firstCreatedProposalId = createdProposal.proposalId;
+    cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+      const createdProposal = result.createProposal;
+      if (createdProposal) {
+        firstCreatedProposalPk = createdProposal.primaryKey;
+        firstCreatedProposalId = createdProposal.proposalId;
 
-      cy.updateProposal({
-        proposalPk: createdProposal.primaryKey,
-        title: proposal1.title,
-        abstract: proposal1.abstract,
-        proposerId: initialDBData.users.user1.id,
-      });
+        cy.updateProposal({
+          proposalPk: createdProposal.primaryKey,
+          title: proposal1.title,
+          abstract: proposal1.abstract,
+          proposerId: initialDBData.users.user1.id,
+        });
 
-      // Manually changing the proposal status to be shown in the Faps. -------->
-      cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapReview.id,
-        proposalPks: [firstCreatedProposalPk],
-      });
-
-      cy.assignInstrumentToCall({
-        callId: initialDBData.call.id,
-        instrumentFapIds: { instrumentId: newlyCreatedInstrumentId },
-      });
-
-      cy.assignProposalsToInstruments({
-        instrumentIds: [newlyCreatedInstrumentId],
-        proposalPks: [firstCreatedProposalPk],
-      });
-    }
-  });
-  cy.createFap({
-    code: fap1.code,
-    description: fap1.description,
-    numberRatingsRequired: 2,
-    gradeGuide: fap1.gradeGuide,
-    active: true,
-  }).then((result) => {
-    if (result.createFap) {
-      createdFapId = result.createFap.id;
-
-      cy.createCall({
-        ...updatedCall,
-        esiTemplateId: createdEsiTemplateId,
-        proposalWorkflowId: createdWorkflowId,
-        faps: [createdFapId],
-      }).then((result) => {
-        createdCallId = result.createCall.id;
+        // Manually changing the proposal status to be shown in the Faps. -------->
+        cy.changeProposalsStatus({
+          statusId: initialDBData.proposalStatuses.fapReview.id,
+          proposalPks: [firstCreatedProposalPk],
+        });
 
         cy.assignInstrumentToCall({
-          callId: createdCallId,
+          callId: initialDBData.call.id,
           instrumentFapIds: { instrumentId: newlyCreatedInstrumentId },
         });
 
-        cy.createProposal({ callId: createdCallId }).then((result) => {
-          const createdProposal = result.createProposal;
-          if (createdProposal) {
-            secondCreatedProposalPk = createdProposal.primaryKey;
-
-            cy.updateProposal({
-              proposalPk: createdProposal.primaryKey,
-              title: proposal2.title,
-              abstract: proposal2.abstract,
-              proposerId: initialDBData.users.user1.id,
-            });
-
-            // Manually changing the proposal status to be shown in the Faps. -------->
-            cy.changeProposalsStatus({
-              statusId: initialDBData.proposalStatuses.fapReview.id,
-              proposalPks: [secondCreatedProposalPk],
-            });
-
-            cy.assignProposalsToInstruments({
-              instrumentIds: [newlyCreatedInstrumentId],
-              proposalPks: [secondCreatedProposalPk],
-            });
-          }
+        cy.assignProposalsToInstruments({
+          instrumentIds: [newlyCreatedInstrumentId],
+          proposalPks: [firstCreatedProposalPk],
         });
+      }
+    });
+    cy.createFap({
+      code: fap1.code,
+      description: fap1.description,
+      numberRatingsRequired: 2,
+      gradeGuide: fap1.gradeGuide,
+      active: true,
+    }).then((result) => {
+      if (result.createFap) {
+        createdFapId = result.createFap.id;
 
-        cy.createProposal({ callId: createdCallId }).then((result) => {
-          const createdProposal = result.createProposal;
-          if (createdProposal) {
-            thirdCreatedProposalPk = createdProposal.primaryKey;
-
-            cy.updateProposal({
-              proposalPk: createdProposal.primaryKey,
-              title: proposal3.title,
-              abstract: proposal3.abstract,
-              proposerId: initialDBData.users.user2.id,
-            });
-
-            // Manually changing the proposal status to be shown in the Faps. -------->
-            cy.changeProposalsStatus({
-              statusId: initialDBData.proposalStatuses.fapReview.id,
-              proposalPks: [thirdCreatedProposalPk],
-            });
-
-            cy.assignProposalsToInstruments({
-              instrumentIds: [newlyCreatedInstrumentId],
-              proposalPks: [thirdCreatedProposalPk],
-            });
-          }
-        });
-
-        cy.updateCall({
-          id: createdCallId,
-          ...closedCall,
-          proposalWorkflowId: createdWorkflowId,
+        cy.createCall({
+          ...updatedCall,
           esiTemplateId: createdEsiTemplateId,
+          proposalWorkflowId: createdWorkflowId,
           faps: [createdFapId],
+        }).then((result) => {
+          createdCallId = result.createCall.id;
+
+          cy.assignInstrumentToCall({
+            callId: createdCallId,
+            instrumentFapIds: { instrumentId: newlyCreatedInstrumentId },
+          });
+
+          cy.createProposal({ callId: createdCallId }).then((result) => {
+            const createdProposal = result.createProposal;
+            if (createdProposal) {
+              secondCreatedProposalPk = createdProposal.primaryKey;
+
+              cy.updateProposal({
+                proposalPk: createdProposal.primaryKey,
+                title: proposal2.title,
+                abstract: proposal2.abstract,
+                proposerId: initialDBData.users.user1.id,
+              });
+
+              // Manually changing the proposal status to be shown in the Faps. -------->
+              cy.changeProposalsStatus({
+                statusId: initialDBData.proposalStatuses.fapReview.id,
+                proposalPks: [secondCreatedProposalPk],
+              });
+
+              cy.assignProposalsToInstruments({
+                instrumentIds: [newlyCreatedInstrumentId],
+                proposalPks: [secondCreatedProposalPk],
+              });
+            }
+          });
+
+          cy.createProposal({ callId: createdCallId }).then((result) => {
+            const createdProposal = result.createProposal;
+            if (createdProposal) {
+              thirdCreatedProposalPk = createdProposal.primaryKey;
+
+              cy.updateProposal({
+                proposalPk: createdProposal.primaryKey,
+                title: proposal3.title,
+                abstract: proposal3.abstract,
+                proposerId: initialDBData.users.user2.id,
+              });
+
+              // Manually changing the proposal status to be shown in the Faps. -------->
+              cy.changeProposalsStatus({
+                statusId: initialDBData.proposalStatuses.fapReview.id,
+                proposalPks: [thirdCreatedProposalPk],
+              });
+
+              cy.assignProposalsToInstruments({
+                instrumentIds: [newlyCreatedInstrumentId],
+                proposalPks: [thirdCreatedProposalPk],
+              });
+            }
+          });
+
+          cy.updateCall({
+            id: createdCallId,
+            ...closedCall,
+            proposalWorkflowId: createdWorkflowId,
+            esiTemplateId: createdEsiTemplateId,
+            faps: [createdFapId],
+          });
         });
-      });
-    }
+      }
+    });
   });
 }
 
@@ -1301,80 +1303,82 @@ context('Fap meeting components tests', () => {
       updateUsersRoles();
     });
     initializationBeforeTests();
-    cy.assignProposalsToFaps({
-      fapInstruments: [
-        { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
-      ],
-      proposalPks: [firstCreatedProposalPk],
-    });
-    cy.assignReviewersToFap({
-      fapId: createdFapId,
-      memberIds: [fapMembers.reviewer.id],
-    });
-    cy.assignFapReviewersToProposal({
-      fapId: createdFapId,
-      memberIds: [fapMembers.reviewer.id],
-      proposalPk: firstCreatedProposalPk,
-    });
-    cy.updateUserRoles({
-      id: scientist.id,
-      roles: [initialDBData.roles.instrumentScientist],
-    });
-    cy.addProposalTechnicalReview({
-      proposalPk: firstCreatedProposalPk,
-      status: TechnicalReviewStatus.FEASIBLE,
-      timeAllocation: firstProposalTimeAllocation,
-      submitted: true,
-      reviewerId: 0,
-      instrumentId: newlyCreatedInstrumentId,
-    });
-    cy.createInstrument(instrument).then((result) => {
-      const createdInstrument = result.createInstrument;
-      if (createdInstrument) {
-        createdInstrumentId = createdInstrument.id;
+    cy.then(() => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+      });
+      cy.assignFapReviewersToProposal({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+        proposalPk: firstCreatedProposalPk,
+      });
+      cy.updateUserRoles({
+        id: scientist.id,
+        roles: [initialDBData.roles.instrumentScientist],
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: newlyCreatedInstrumentId,
+      });
+      cy.createInstrument(instrument).then((result) => {
+        const createdInstrument = result.createInstrument;
+        if (createdInstrument) {
+          createdInstrumentId = createdInstrument.id;
 
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId }],
-        });
-        cy.assignProposalsToInstruments({
-          instrumentIds: [createdInstrumentId],
-          proposalPks: [firstCreatedProposalPk],
-        });
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+          });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [firstCreatedProposalPk],
+          });
 
-        cy.assignProposalsToFaps({
-          fapInstruments: [
-            { instrumentId: createdInstrumentId, fapId: createdFapId },
-          ],
-          proposalPks: [firstCreatedProposalPk],
-        });
-        cy.updateUserRoles({
-          id: scientist.id,
-          roles: [initialDBData.roles.instrumentScientist],
-        });
-        cy.addProposalTechnicalReview({
-          proposalPk: firstCreatedProposalPk,
-          status: TechnicalReviewStatus.FEASIBLE,
-          timeAllocation: firstProposalTimeAllocation,
-          submitted: true,
-          reviewerId: 0,
-          instrumentId: createdInstrumentId,
-        });
+          cy.assignProposalsToFaps({
+            fapInstruments: [
+              { instrumentId: createdInstrumentId, fapId: createdFapId },
+            ],
+            proposalPks: [firstCreatedProposalPk],
+          });
+          cy.updateUserRoles({
+            id: scientist.id,
+            roles: [initialDBData.roles.instrumentScientist],
+          });
+          cy.addProposalTechnicalReview({
+            proposalPk: firstCreatedProposalPk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: firstProposalTimeAllocation,
+            submitted: true,
+            reviewerId: 0,
+            instrumentId: createdInstrumentId,
+          });
 
-        cy.setInstrumentAvailabilityTime({
-          callId: initialDBData.call.id,
-          instrumentId: createdInstrumentId,
-          availabilityTime: instrumentAvailabilityTime,
-        });
-      }
-    });
-    // NOTE: Assign Fap to a call.
-    cy.updateCall({
-      id: initialDBData.call.id,
-      ...updatedCall,
-      proposalWorkflowId: createdWorkflowId,
-      esiTemplateId: createdEsiTemplateId,
-      faps: [createdFapId],
+          cy.setInstrumentAvailabilityTime({
+            callId: initialDBData.call.id,
+            instrumentId: createdInstrumentId,
+            availabilityTime: instrumentAvailabilityTime,
+          });
+        }
+      });
+      // NOTE: Assign Fap to a call.
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...updatedCall,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        faps: [createdFapId],
+      });
     });
   });
 
