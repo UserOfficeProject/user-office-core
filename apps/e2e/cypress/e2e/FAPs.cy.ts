@@ -2446,6 +2446,12 @@ context('Automatic Fap assignment to Proposal', () => {
     description: faker.random.words(5),
     managerUserId: scientist1.id,
   };
+  const instrument2 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+  };
 
   beforeEach(function () {
     cy.resetDB();
@@ -2456,17 +2462,55 @@ context('Automatic Fap assignment to Proposal', () => {
       updateUsersRoles();
     });
     initializationBeforeTests();
+
+    cy.then(() => {
+      cy.createInstrument(instrument1).then((result) => {
+        if (result.createInstrument) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [
+              {
+                instrumentId: result.createInstrument.id,
+                fapId: initialDBData.fap.id,
+              },
+            ],
+          });
+
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            (response) => {
+              if (response.createProposal) {
+                firstCreatedProposalPk = response.createProposal.primaryKey;
+              }
+            }
+          );
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [firstCreatedProposalPk],
+            instrumentIds: [result.createInstrument.id],
+          });
+        }
+      });
+    });
   });
 
-  it('Automatic Fap assignment to Proposal, when an Instrument is assigned to a Proposal', () => {
-    cy.createInstrument(instrument1).then((result) => {
+  it('Automatic FAP assignment to Proposal, when an Instrument is assigned to a Proposal', () => {
+    cy.login('officer');
+    cy.visit('/Proposals');
+
+    cy.contains('td', firstCreatedProposalId)
+      .siblings()
+      .should('contain.text', initialDBData.fap.code);
+  });
+
+  it('Automatic FAPs assignment to Proposal, when multiple Instruments are assigned to a Proposal', () => {
+    cy.createInstrument(instrument2).then((result) => {
       if (result.createInstrument) {
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
           instrumentFapIds: [
             {
               instrumentId: result.createInstrument.id,
-              fapId: initialDBData.fap.id,
+              fapId: createdFapId,
             },
           ],
         });
@@ -2490,6 +2534,9 @@ context('Automatic Fap assignment to Proposal', () => {
         cy.contains('td', firstCreatedProposalId)
           .siblings()
           .should('contain.text', initialDBData.fap.code);
+        cy.contains('td', firstCreatedProposalId)
+          .siblings()
+          .should('contain.text', fap1.code);
       }
     });
   });

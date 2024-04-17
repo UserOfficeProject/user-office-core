@@ -37,7 +37,7 @@ import {
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
   AssignProposalsToFapsArgs,
-  AssignProposalsToFapUsingCallInstrumentArgs,
+  AssignProposalsToFapsUsingCallInstrumentArgs,
   RemoveProposalsFromFapsArgs,
 } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { CreateFapArgs } from '../resolvers/mutations/CreateFapMutation';
@@ -244,40 +244,37 @@ export default class FapMutations {
   @Authorized([Roles.USER_OFFICER])
   async assignProposalsToFapUsingCallInstrument(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapUsingCallInstrumentArgs
+    args: AssignProposalsToFapsUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
     return this.assignProposalsToFapUsingCallInstrumentInternal(agent, args);
   }
 
   async assignProposalsToFapUsingCallInstrumentInternal(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapUsingCallInstrumentArgs
+    args: AssignProposalsToFapsUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
     const proposals = await this.proposalDataSource.getProposalsByPks(
       args.proposalPks
     );
 
     const callHasInstruments =
-      await this.callDataSource.getCallHasInstrumentsByInstrumentId(
-        args.instrumentId
+      await this.callDataSource.getCallHasInstrumentsByInstrumentIds(
+        args.instrumentIds
       );
 
     const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
     for (const callId of callIds) {
-      const callHasInstrument = callHasInstruments.find(
-        (callHasInstrument) => callHasInstrument.callId === callId
-      );
-      if (callHasInstrument && callHasInstrument.fapId) {
+      if (callHasInstruments.length) {
         await this.assignProposalsToFapsInternal(agent, {
           proposalPks: proposals
             .filter((proposal) => proposal.callId === callId)
             .map((proposal) => proposal.primaryKey),
-          fapInstruments: [
-            {
+          fapInstruments: callHasInstruments
+            .filter((callHasInstrument) => callHasInstrument.fapId)
+            .map((callHasInstrument) => ({
               fapId: callHasInstrument.fapId,
               instrumentId: callHasInstrument.instrumentId,
-            },
-          ],
+            })),
         });
       }
     }

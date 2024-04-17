@@ -22,12 +22,12 @@ export class AssignProposalsToFapsArgs {
   public fapInstruments: FapInstrument[];
 }
 
-export class AssignProposalsToFapUsingCallInstrumentArgs {
+export class AssignProposalsToFapsUsingCallInstrumentArgs {
   @Field(() => [Int])
   public proposalPks: number[];
 
-  @Field(() => Int)
-  public instrumentId: number;
+  @Field(() => [Int])
+  public instrumentIds: number[];
 }
 
 @ArgsType()

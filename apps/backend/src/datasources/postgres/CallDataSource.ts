@@ -133,13 +133,13 @@ export default class PostgresCallDataSource implements CallDataSource {
     );
   }
 
-  async getCallHasInstrumentsByInstrumentId(
-    instrumentId: number
+  async getCallHasInstrumentsByInstrumentIds(
+    instrumentIds: number[]
   ): Promise<CallHasInstrument[]> {
     return database
       .select()
       .from('call_has_instruments')
-      .where('instrument_id', instrumentId)
+      .whereIn('instrument_id', instrumentIds)
       .then((callHasInstrument: CallHasInstrumentRecord[]) =>
         callHasInstrument.map((callHasInstrument) =>
           createCallHasInstrumentObject(callHasInstrument)
