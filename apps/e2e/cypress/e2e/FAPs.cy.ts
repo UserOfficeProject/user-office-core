@@ -1288,12 +1288,12 @@ context('Fap meeting components tests', () => {
   let createdInstrumentId: number;
 
   beforeEach(function () {
+    cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
       }
     });
-    cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
@@ -1326,7 +1326,7 @@ context('Fap meeting components tests', () => {
       timeAllocation: firstProposalTimeAllocation,
       submitted: true,
       reviewerId: 0,
-      instrumentId: 0,
+      instrumentId: newlyCreatedInstrumentId,
     });
     cy.createInstrument(instrument).then((result) => {
       const createdInstrument = result.createInstrument;
@@ -1347,15 +1347,6 @@ context('Fap meeting components tests', () => {
             { instrumentId: createdInstrumentId, fapId: createdFapId },
           ],
           proposalPks: [firstCreatedProposalPk],
-        });
-        cy.assignReviewersToFap({
-          fapId: createdFapId,
-          memberIds: [fapMembers.reviewer.id],
-        });
-        cy.assignFapReviewersToProposal({
-          fapId: createdFapId,
-          memberIds: [fapMembers.reviewer.id],
-          proposalPk: firstCreatedProposalPk,
         });
         cy.updateUserRoles({
           id: scientist.id,
@@ -2377,68 +2368,68 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy=save-grade]').click();
       cy.notification({ variant: 'success', text: 'Updated' });
     });
-  });
 
-  it('Fap Reviewer should be able to give non integer review', () => {
-    cy.login(initialDBData.users.officer);
-    cy.visit('/');
-    cy.finishedLoading();
+    it('Fap Reviewer should be able to give non integer review', () => {
+      cy.login(initialDBData.users.officer);
+      cy.visit('/');
+      cy.finishedLoading();
 
-    cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
-    cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();
 
-    cy.get('[data-cy="settings-table"]')
-      .get('input[aria-label="Search"]')
-      .type('GRADE_PRECISION');
+      cy.get('[data-cy="settings-table"]')
+        .get('input[aria-label="Search"]')
+        .type('GRADE_PRECISION');
 
-    cy.get('[data-cy="settings-table"]')
-      .contains('GRADE_PRECISION')
-      .parent()
-      .find('button[aria-label="Edit"]')
-      .click();
+      cy.get('[data-cy="settings-table"]')
+        .contains('GRADE_PRECISION')
+        .parent()
+        .find('button[aria-label="Edit"]')
+        .click();
 
-    cy.get('[data-cy="settings-table"]')
-      .contains('GRADE_PRECISION')
-      .parent()
-      .find(`input[value="1"]`)
-      .clear()
-      .type('0.01');
+      cy.get('[data-cy="settings-table"]')
+        .contains('GRADE_PRECISION')
+        .parent()
+        .find(`input[value="1"]`)
+        .clear()
+        .type('0.01');
 
-    cy.get('[data-cy="settings-table"]')
-      .contains('GRADE_PRECISION')
-      .parent()
-      .find('button[aria-label="Save"]')
-      .click();
+      cy.get('[data-cy="settings-table"]')
+        .contains('GRADE_PRECISION')
+        .parent()
+        .find('button[aria-label="Save"]')
+        .click();
 
-    cy.logout();
+      cy.logout();
 
-    cy.login(fapMembers.reviewer);
-    cy.visit('/');
-    cy.finishedLoading();
+      cy.login(fapMembers.reviewer);
+      cy.visit('/');
+      cy.finishedLoading();
 
-    cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy="grade-proposal-icon"]').click();
 
-    cy.setTinyMceContent('comment', faker.lorem.words(3));
-    cy.get('#grade-proposal').type('0.001');
+      cy.setTinyMceContent('comment', faker.lorem.words(3));
+      cy.get('#grade-proposal').type('0.001');
 
-    cy.get('[data-cy="save-grade"]').click();
+      cy.get('[data-cy="save-grade"]').click();
 
-    cy.contains('Lowest grade is 1');
+      cy.contains('Lowest grade is 1');
 
-    cy.get('#grade-proposal').clear().type('1.001');
+      cy.get('#grade-proposal').clear().type('1.001');
 
-    cy.get('[data-cy="save-grade"]').click();
+      cy.get('[data-cy="save-grade"]').click();
 
-    cy.get('[data-cy="grade-proposal"] input').then(($input) => {
-      expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-        'Please enter a valid value. The two nearest valid values are 1 and 1.01.'
-      );
+      cy.get('[data-cy="grade-proposal"] input').then(($input) => {
+        expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
+          'Please enter a valid value. The two nearest valid values are 1 and 1.01.'
+        );
+      });
+
+      cy.get('#grade-proposal').clear().type('1.01');
+
+      cy.get('[data-cy=save-grade]').click();
+      cy.notification({ variant: 'success', text: 'Updated' });
     });
-
-    cy.get('#grade-proposal').clear().type('1.01');
-
-    cy.get('[data-cy=save-grade]').click();
-    cy.notification({ variant: 'success', text: 'Updated' });
   });
 });
 
