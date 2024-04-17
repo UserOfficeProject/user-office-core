@@ -84,7 +84,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           emailReadyUserWithProposals.email === recipient.email
       );
 
-      if (foundIndex !== -1) {
+      if (foundIndex !== -1 && recipientsWithEmailTemplate?.combineEmails) {
         emailReadyUsersWithProposals[foundIndex].proposals.push(proposal);
       } else {
         // Always make the PI and CoProposers available in templates
@@ -120,22 +120,18 @@ export const getPIAndFormatOutputForEmailSending = async (
   );
 
   const PIs: EmailReadyType[] = [];
-  await Promise.all(
-    proposals.map(async (proposal) => {
-      const PI = await usersDataSource.getBasicUserInfo(proposal.proposerId);
+  for (const proposal of proposals) {
+    const PI = await usersDataSource.getBasicUserInfo(proposal.proposerId);
 
-      if (!PI) {
-        return;
-      }
-
+    if (PI) {
       await getEmailReadyArrayOfUsersAndProposals(
         PIs,
         [PI],
         proposal,
         recipientWithTemplate
       );
-    })
-  );
+    }
+  }
 
   return PIs;
 };
@@ -148,20 +144,18 @@ export const getCoProposersAndFormatOutputForEmailSending = async (
     Tokens.UserDataSource
   );
   const CoPs: EmailReadyType[] = [];
-  await Promise.all(
-    proposals.map(async (proposal) => {
-      const coProposers = await usersDataSource.getProposalUsers(
-        proposal.primaryKey
-      );
+  for (const proposal of proposals) {
+    const coProposers = await usersDataSource.getProposalUsers(
+      proposal.primaryKey
+    );
 
-      await getEmailReadyArrayOfUsersAndProposals(
-        CoPs,
-        coProposers,
-        proposal,
-        recipientWithTemplate
-      );
-    })
-  );
+    await getEmailReadyArrayOfUsersAndProposals(
+      CoPs,
+      coProposers,
+      proposal,
+      recipientWithTemplate
+    );
+  }
 
   return CoPs;
 };
@@ -173,22 +167,20 @@ export const getFapReviewersAndFormatOutputForEmailSending = async (
   const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
   const FRs: EmailReadyType[] = [];
-  await Promise.all(
-    proposals.map(async (proposal) => {
-      const allFapReviewers =
-        await fapDataSource.getFapUsersByProposalPkAndCallId(
-          proposal.primaryKey,
-          proposal.callId
-        );
-
-      await getEmailReadyArrayOfUsersAndProposals(
-        FRs,
-        allFapReviewers,
-        proposal,
-        recipientWithTemplate
+  for (const proposal of proposals) {
+    const allFapReviewers =
+      await fapDataSource.getFapUsersByProposalPkAndCallId(
+        proposal.primaryKey,
+        proposal.callId
       );
-    })
-  );
+
+    await getEmailReadyArrayOfUsersAndProposals(
+      FRs,
+      allFapReviewers,
+      proposal,
+      recipientWithTemplate
+    );
+  }
 
   return FRs;
 };
@@ -203,28 +195,26 @@ export const getFapChairSecretariesAndFormatOutputForEmailSending = async (
   );
 
   const FCSs: EmailReadyType[] = [];
-  await Promise.all(
-    proposals.map(async (proposal) => {
-      const fap = await fapDataSource.getFapByProposalPk(proposal.primaryKey);
+  for (const proposal of proposals) {
+    const fap = await fapDataSource.getFapByProposalPk(proposal.primaryKey);
 
-      const fapChair = fap?.fapChairUserId ? [fap?.fapChairUserId] : [];
+    const fapChair = fap?.fapChairUserId ? [fap?.fapChairUserId] : [];
 
-      const fapChairAndSecsIds = fap?.fapSecretariesUserIds
-        ? fap.fapSecretariesUserIds.concat(fapChair)
-        : fapChair;
+    const fapChairAndSecsIds = fap?.fapSecretariesUserIds
+      ? fap.fapSecretariesUserIds.concat(fapChair)
+      : fapChair;
 
-      const fapChairAndSecs = await usersDataSource.getUsersByUserNumbers(
-        fapChairAndSecsIds
-      );
+    const fapChairAndSecs = await usersDataSource.getUsersByUserNumbers(
+      fapChairAndSecsIds
+    );
 
-      await getEmailReadyArrayOfUsersAndProposals(
-        FCSs,
-        fapChairAndSecs,
-        proposal,
-        recipientWithTemplate
-      );
-    })
-  );
+    await getEmailReadyArrayOfUsersAndProposals(
+      FCSs,
+      fapChairAndSecs,
+      proposal,
+      recipientWithTemplate
+    );
+  }
 
   return FCSs;
 };
@@ -241,51 +231,49 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
   );
 
   const ISs: EmailReadyType[] = [];
-  await Promise.all(
-    proposals.map(async (proposal) => {
-      const proposalInstruments =
-        await instrumentDataSource.getInstrumentsByProposalPk(
-          proposal.primaryKey
+  for (const proposal of proposals) {
+    const proposalInstruments =
+      await instrumentDataSource.getInstrumentsByProposalPk(
+        proposal.primaryKey
+      );
+
+    if (!proposalInstruments?.length) {
+      return ISs;
+    }
+
+    const instrumentsPeople = await Promise.all(
+      proposalInstruments.map(async (proposalInstrument) => {
+        const instrumentContact = await usersDataSource.getBasicUserInfo(
+          proposalInstrument.managerUserId
         );
 
-      if (!proposalInstruments?.length) {
-        return;
-      }
+        if (!instrumentContact) {
+          return;
+        }
 
-      const instrumentsPeople = await Promise.all(
-        proposalInstruments.map(async (proposalInstrument) => {
-          const instrumentContact = await usersDataSource.getBasicUserInfo(
-            proposalInstrument.managerUserId
+        const instrumentScientists =
+          await instrumentDataSource.getInstrumentScientists(
+            proposalInstrument.id
           );
 
-          if (!instrumentContact) {
-            return;
-          }
+        return [instrumentContact, ...instrumentScientists];
+      })
+    );
 
-          const instrumentScientists =
-            await instrumentDataSource.getInstrumentScientists(
-              proposalInstrument.id
-            );
-
-          return [instrumentContact, ...instrumentScientists];
-        })
+    const filteredInstrumentPeople = instrumentsPeople
+      .flat()
+      .filter(
+        (user, i, array): user is BasicUserDetails =>
+          !!user && array.findIndex((v2) => v2?.id === user?.id) === i
       );
 
-      const filteredInstrumentPeople = instrumentsPeople
-        .flat()
-        .filter(
-          (user, i, array): user is BasicUserDetails =>
-            !!user && array.findIndex((v2) => v2?.id === user?.id) === i
-        );
-
-      await getEmailReadyArrayOfUsersAndProposals(
-        ISs,
-        filteredInstrumentPeople,
-        proposal,
-        recipientWithTemplate
-      );
-    })
-  );
+    await getEmailReadyArrayOfUsersAndProposals(
+      ISs,
+      filteredInstrumentPeople,
+      proposal,
+      recipientWithTemplate
+    );
+  }
 
   return ISs;
 };
