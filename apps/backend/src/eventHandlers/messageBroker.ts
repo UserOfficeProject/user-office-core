@@ -180,6 +180,8 @@ const getSecondsPerAllocationTimeUnit = (
   switch (unit) {
     case AllocationTimeUnits.Hour:
       return timeAllocation * 60 * 60;
+    case AllocationTimeUnits.Week:
+      return timeAllocation * 7 * 24 * 60 * 60;
     default:
       return timeAllocation * 24 * 60 * 60;
   }

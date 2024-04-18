@@ -9,4 +9,5 @@ fragment basicUserDetails on BasicUserDetails {
   created
   placeholder
   email
+  country
 }
