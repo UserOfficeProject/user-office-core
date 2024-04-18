@@ -54,34 +54,61 @@ export type EmailReadyType = {
   firstName?: string;
   lastName?: string;
   preferredName?: string;
+  pi?: BasicUserDetails | null;
+  coProposers?: BasicUserDetails[] | null;
 };
 
-export const getEmailReadyArrayOfUsersAndProposals = (
+/**
+ * Populates an array of EmailReadyType[] objects containing all user and proposal data needed to send one or more emails.
+ * The PI and CoProposers are always included as commonly used data, regardless of the recipient.
+ *
+ * @param emailReadyUsersWithProposals - An empty array of email ready users with their associated proposals.
+ * @param recipientUsers - The list of users to send the email to (e.g. a single PI or multiple FAP Reviewers).
+ * @param proposal - The proposal associated with the event.
+ * @param recipientsWithEmailTemplate - The recipient category (e.g. FAP Reviewers) with the associated email template.
+ */
+export const getEmailReadyArrayOfUsersAndProposals = async (
   emailReadyUsersWithProposals: EmailReadyType[],
-  users: BasicUserDetails[] | User[],
+  recipientUsers: BasicUserDetails[] | User[],
   proposal: WorkflowEngineProposalType,
   recipientsWithEmailTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
-  users.forEach((user) => {
-    const foundIndex = emailReadyUsersWithProposals.findIndex(
-      (emailReadyUserWithProposals) =>
-        emailReadyUserWithProposals.email === user.email
-    );
+  const usersDataSource: UserDataSource = container.resolve(
+    Tokens.UserDataSource
+  );
 
-    if (foundIndex !== -1) {
-      emailReadyUsersWithProposals[foundIndex].proposals.push(proposal);
-    } else {
-      emailReadyUsersWithProposals.push({
-        id: recipientsWithEmailTemplate.recipient.name,
-        proposals: [proposal],
-        template: recipientsWithEmailTemplate.emailTemplate.id,
-        email: user.email,
-        firstName: user.firstname,
-        lastName: user.lastname,
-        preferredName: user.preferredname,
-      });
-    }
-  });
+  await Promise.all(
+    recipientUsers.map(async (recipient) => {
+      const foundIndex = emailReadyUsersWithProposals.findIndex(
+        (emailReadyUserWithProposals) =>
+          emailReadyUserWithProposals.email === recipient.email
+      );
+
+      if (foundIndex !== -1) {
+        emailReadyUsersWithProposals[foundIndex].proposals.push(proposal);
+      } else {
+        // Always make the PI and CoProposers available in templates
+        const pi = proposal
+          ? await usersDataSource.getBasicUserInfo(proposal.proposerId)
+          : null;
+        const coProposers = proposal
+          ? await usersDataSource.getProposalUsers(proposal.primaryKey)
+          : null;
+
+        emailReadyUsersWithProposals.push({
+          id: recipientsWithEmailTemplate.recipient.name,
+          proposals: [proposal],
+          template: recipientsWithEmailTemplate.emailTemplate.id,
+          email: recipient.email,
+          firstName: recipient.firstname,
+          lastName: recipient.lastname,
+          preferredName: recipient.preferredname,
+          pi: pi,
+          coProposers: coProposers,
+        });
+      }
+    })
+  );
 };
 
 export const getPIAndFormatOutputForEmailSending = async (
@@ -101,7 +128,7 @@ export const getPIAndFormatOutputForEmailSending = async (
         return;
       }
 
-      getEmailReadyArrayOfUsersAndProposals(
+      await getEmailReadyArrayOfUsersAndProposals(
         PIs,
         [PI],
         proposal,
@@ -120,15 +147,15 @@ export const getCoProposersAndFormatOutputForEmailSending = async (
   const usersDataSource: UserDataSource = container.resolve(
     Tokens.UserDataSource
   );
-  const PIs: EmailReadyType[] = [];
+  const CoPs: EmailReadyType[] = [];
   await Promise.all(
     proposals.map(async (proposal) => {
       const coProposers = await usersDataSource.getProposalUsers(
         proposal.primaryKey
       );
 
-      getEmailReadyArrayOfUsersAndProposals(
-        PIs,
+      await getEmailReadyArrayOfUsersAndProposals(
+        CoPs,
         coProposers,
         proposal,
         recipientWithTemplate
@@ -136,7 +163,7 @@ export const getCoProposersAndFormatOutputForEmailSending = async (
     })
   );
 
-  return PIs;
+  return CoPs;
 };
 
 export const getFapReviewersAndFormatOutputForEmailSending = async (
@@ -154,7 +181,7 @@ export const getFapReviewersAndFormatOutputForEmailSending = async (
           proposal.callId
         );
 
-      getEmailReadyArrayOfUsersAndProposals(
+      await getEmailReadyArrayOfUsersAndProposals(
         FRs,
         allFapReviewers,
         proposal,
@@ -189,7 +216,7 @@ export const getFapChairSecretariesAndFormatOutputForEmailSending = async (
       const fapChairAndSecs =
         await usersDataSource.getUsersByUserNumbers(fapChairAndSecsIds);
 
-      getEmailReadyArrayOfUsersAndProposals(
+      await getEmailReadyArrayOfUsersAndProposals(
         FCSs,
         fapChairAndSecs,
         proposal,
@@ -250,7 +277,7 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
             !!user && array.findIndex((v2) => v2?.id === user?.id) === i
         );
 
-      getEmailReadyArrayOfUsersAndProposals(
+      await getEmailReadyArrayOfUsersAndProposals(
         ISs,
         filteredInstrumentPeople,
         proposal,
