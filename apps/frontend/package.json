@@ -34,7 +34,7 @@
     "@types/yup": "^0.29.13",
     "@uiw/react-codemirror": "^4.21.7",
     "@user-office-software/duo-localisation": "^1.2.0",
-    "@user-office-software/duo-validation": "^5.0.1",
+    "@user-office-software/duo-validation": "^5.0.2",
     "clsx": "^1.1.1",
     "formik": "^2.2.9",
     "formik-mui": "^4.0.0-alpha.3",
@@ -50,7 +50,7 @@
     "luxon": "^2.5.2",
     "mime": "^3.0.0",
     "notistack": "^2.0.4",
-    "npm": "^10.4.0",
+    "npm": "^10.5.2",
     "pdfjs-dist": "^3.4.120",
     "query-string": "^6.14.0",
     "react": "^17.0.2",
@@ -111,7 +111,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.6.1",
     "react-test-renderer": "^17.0.0",
-    "vite": "^5.0.12"
+    "vite": "^5.0.13"
   },
   "engines": {
     "npm": ">=9.0.0",

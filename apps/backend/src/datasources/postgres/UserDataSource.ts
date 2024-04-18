@@ -89,7 +89,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       placeholder,
       oidcSub,
       oauthRefreshToken,
-      oauthAccessToken,
       oauthIssuer,
     } = user;
 
@@ -112,7 +111,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         placeholder,
         oidc_sub: oidcSub,
         oauth_refresh_token: oauthRefreshToken,
-        oauth_access_token: oauthAccessToken,
         oauth_issuer: oauthIssuer,
       })
       .from('users')
@@ -134,7 +132,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         preferredname: firstname,
         oidc_sub: '',
         oauth_refresh_token: '',
-        oauth_access_token: '',
         oauth_issuer: '',
         gender: '',
         nationality: null,
@@ -304,7 +301,6 @@ export default class PostgresUserDataSource implements UserDataSource {
     username: string,
     preferredname: string | undefined,
     oidc_sub: string,
-    oauth_access_token: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,
@@ -326,7 +322,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         username,
         preferredname,
         oidc_sub,
-        oauth_access_token,
         oauth_refresh_token,
         oauth_issuer,
         gender,
