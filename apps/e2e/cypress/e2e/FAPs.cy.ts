@@ -2484,11 +2484,6 @@ context('Automatic Fap assignment to Proposal', () => {
               if (response.createProposal) {
                 firstAutoAssignProposalPk = response.createProposal.primaryKey;
                 firstAutoAssignProposalId = response.createProposal.proposalId;
-
-                cy.assignProposalsToInstruments({
-                  proposalPks: [firstAutoAssignProposalPk],
-                  instrumentIds: [result.createInstrument.id],
-                });
               }
             }
           );
@@ -2498,6 +2493,11 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 
   it('Automatic FAP assignment to Proposal, when an Instrument is assigned to a Proposal', () => {
+    cy.assignProposalsToInstruments({
+      proposalPks: [firstAutoAssignProposalPk],
+      instrumentIds: [firstAutoAssignmentInstrumentId],
+    });
+
     cy.login('officer');
     cy.visit('/Proposals');
 
