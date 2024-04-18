@@ -5,12 +5,12 @@ import ScienceIcon from 'components/common/icons/ScienceIcon';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import InstrumentPickerAnswerRenderer from './InstrumentPickerAnswerRenderer';
 import InstrumentPickerSearchCriteriaComponent from './InstrumentPickerSearchCriteriaComponent';
 import { QuestionaryComponentInstrumentPicker } from './QuestionaryComponentInstrumentPicker';
 import { QuestionInstrumentPickerForm } from './QuestionInstrumentPickerForm';
 import { QuestionTemplateRelationInstrumentPickerForm } from './QuestionTemplateRelationInstrumentPickerForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.INSTRUMENT_PICKER,

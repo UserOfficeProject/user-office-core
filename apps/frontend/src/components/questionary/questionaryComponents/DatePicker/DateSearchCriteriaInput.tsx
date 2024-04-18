@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  TextFieldProps,
   useTheme,
 } from '@mui/material';
 import { DateTime } from 'luxon';
@@ -80,7 +81,7 @@ function DateSearchCriteriaInput({
           <DatePicker
             inputFormat={format || undefined}
             mask={mask}
-            renderInput={(props) => (
+            renderInput={(props: TextFieldProps) => (
               <TextField
                 {...props}
                 margin="none"

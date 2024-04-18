@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import PropTypes from 'prop-types';
 import React, { useContext, useRef } from 'react';
 
