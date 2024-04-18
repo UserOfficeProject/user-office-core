@@ -2437,8 +2437,10 @@ context('Fap meeting components tests', () => {
   });
 });
 
-// TODO: Review this test when the automatic FAP assignment to proposal is in place again after changes with multi-instrument proposals.
 context('Automatic Fap assignment to Proposal', () => {
+  let firstAutoAssignmentInstrumentId: number;
+  let firstAutoAssignProposalPk: number;
+  let firstAutoAssignProposalId: string;
   const scientist1 = initialDBData.users.user1;
   const instrument1 = {
     name: faker.random.words(2),
@@ -2466,6 +2468,7 @@ context('Automatic Fap assignment to Proposal', () => {
     cy.then(() => {
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {
+          firstAutoAssignmentInstrumentId = result.createInstrument.id;
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
             instrumentFapIds: [
@@ -2479,15 +2482,16 @@ context('Automatic Fap assignment to Proposal', () => {
           cy.createProposal({ callId: initialDBData.call.id }).then(
             (response) => {
               if (response.createProposal) {
-                firstCreatedProposalPk = response.createProposal.primaryKey;
+                firstAutoAssignProposalPk = response.createProposal.primaryKey;
+                firstAutoAssignProposalId = response.createProposal.proposalId;
+
+                cy.assignProposalsToInstruments({
+                  proposalPks: [firstAutoAssignProposalPk],
+                  instrumentIds: [result.createInstrument.id],
+                });
               }
             }
           );
-
-          cy.assignProposalsToInstruments({
-            proposalPks: [firstCreatedProposalPk],
-            instrumentIds: [result.createInstrument.id],
-          });
         }
       });
     });
@@ -2497,7 +2501,7 @@ context('Automatic Fap assignment to Proposal', () => {
     cy.login('officer');
     cy.visit('/Proposals');
 
-    cy.contains('td', firstCreatedProposalId)
+    cy.contains('td', firstAutoAssignProposalId)
       .siblings()
       .should('contain.text', initialDBData.fap.code);
   });
@@ -2515,26 +2519,21 @@ context('Automatic Fap assignment to Proposal', () => {
           ],
         });
 
-        cy.createProposal({ callId: initialDBData.call.id }).then(
-          (response) => {
-            if (response.createProposal) {
-              firstCreatedProposalPk = response.createProposal.primaryKey;
-            }
-          }
-        );
-
         cy.assignProposalsToInstruments({
-          proposalPks: [firstCreatedProposalPk],
-          instrumentIds: [result.createInstrument.id],
+          proposalPks: [firstAutoAssignProposalPk],
+          instrumentIds: [
+            result.createInstrument.id,
+            firstAutoAssignmentInstrumentId,
+          ],
         });
 
         cy.login('officer');
         cy.visit('/Proposals');
 
-        cy.contains('td', firstCreatedProposalId)
+        cy.contains('td', firstAutoAssignProposalId)
           .siblings()
           .should('contain.text', initialDBData.fap.code);
-        cy.contains('td', firstCreatedProposalId)
+        cy.contains('td', firstAutoAssignProposalId)
           .siblings()
           .should('contain.text', fap1.code);
       }
