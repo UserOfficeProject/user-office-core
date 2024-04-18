@@ -25,14 +25,14 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    const result = database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+    const proposals = database
+      .select('proposal_pk')
       .from('proposal_table_view')
       .join(
         'call_has_instruments',
         'call_has_instruments.call_id',
         '=',
-        'proposal_table_view.call_id'
+        'ptw.call_id'
       )
       .join(
         'instruments',
@@ -40,33 +40,36 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'call_has_instruments.instrument_id'
       )
-      .join(
+      .leftJoin(
         'instrument_has_scientists',
         'instrument_has_scientists.instrument_id',
         '=',
         'call_has_instruments.instrument_id'
       )
-      .distinct('proposal_pk')
-      .orderBy('proposal_pk', 'desc')
-      .modify((query) => {
-        // TODO: Check/test this part if it still works
+      .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains internalReviewers array of objects with id equal to user.id
-          query.whereRaw(
+          this.whereRaw(
             'jsonb_path_exists(technical_reviews, \'$[*].internalReviewers[*].id \\? (@.type() == "number" && @ == :userId:)\')',
             { userId: user.id }
           );
         } else {
-          query
-            .whereRaw(
-              'jsonb_path_exists(instruments, \'$[*].scientists[*].id \\? (@.type() == "number" && @ == :userId:)\')',
-              { userId: user.id }
-            )
-            .orWhereRaw(
-              'jsonb_path_exists(instruments, \'$[*].managerUserId \\? (@.type() == "number" && @ == :userId:)\')',
-              { userId: user.id }
-            );
+          this.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].scientists[*].id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          ).orWhereRaw(
+            'jsonb_path_exists(instruments, \'$[*].managerUserId \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
         }
+      });
+
+    const result = database
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('ptw')
+      .whereIn('proposal_pk', proposals)
+      .orderBy('proposal_pk', 'desc')
+      .modify((query) => {
         if (filter?.text) {
           query
             .where('title', 'ilike', `%${filter.text}%`)
