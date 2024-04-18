@@ -70,7 +70,8 @@ export function toEssBasicUserDetails(
     '',
     new Date(),
     false,
-    stfcUser.email ?? ''
+    stfcUser.email ?? '',
+    stfcUser.country ?? ''
   );
 }
 

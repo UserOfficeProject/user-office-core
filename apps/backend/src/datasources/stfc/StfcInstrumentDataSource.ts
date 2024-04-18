@@ -4,6 +4,7 @@ import { BasicUserDetails } from '../../models/User';
 import database from '../postgres/database';
 import PostgresInstrumentDataSource from '../postgres/InstrumentDataSource';
 import {
+  CountryRecord,
   InstitutionRecord,
   UserRecord,
   createBasicUserObject,
@@ -28,11 +29,15 @@ export default class StfcInstrumentDataSource extends PostgresInstrumentDataSour
       })
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('ihs.instrument_id', instrumentId)
-      .then((usersRecord: Array<UserRecord & InstitutionRecord>) => {
-        const users = usersRecord.map((user) => createBasicUserObject(user));
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          const users = usersRecord.map((user) => createBasicUserObject(user));
 
-        return users;
-      });
+          return users;
+        }
+      );
 
     const userNumbers = users.map((user) => user.id.toString());
     const stfcUsers =
