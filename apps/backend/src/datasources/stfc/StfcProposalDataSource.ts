@@ -32,7 +32,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         'call_has_instruments',
         'call_has_instruments.call_id',
         '=',
-        'ptw.call_id'
+        'proposal_table_view.call_id'
       )
       .join(
         'instruments',
