@@ -19,7 +19,7 @@
     "@graphql-typed-document-node/core": "^3.2.0",
     "@material-table/core": "^0.2.33",
     "@mui/icons-material": "^5.5.0",
-    "@mui/lab": "^5.0.0-alpha.72",
+    "@mui/lab": "5.0.0-alpha.72",
     "@mui/material": "^5.14.4",
     "@mui/styles": "^5.5.0",
     "@react-pdf-viewer/core": "^3.12.0",
