@@ -311,7 +311,7 @@ context('Fap reviews tests', () => {
       });
     });
 
-    it.only('Officer should be able to assign proposal to existing Fap', function () {
+    it('Officer should be able to assign proposal to existing Fap', function () {
       cy.assignInstrumentToCall({
         callId: initialDBData.call.id,
         instrumentFapIds: [{ instrumentId: newlyCreatedInstrumentId }],
