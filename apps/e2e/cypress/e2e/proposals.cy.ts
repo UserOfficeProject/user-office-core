@@ -844,7 +844,7 @@ context('Proposal tests', () => {
 
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -905,7 +905,7 @@ context('Proposal tests', () => {
 
   describe('Proposal internal and external basic tests', () => {
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -1319,7 +1319,7 @@ context('Proposal tests', () => {
     let instrumentPickerQuestionId: string;
 
     beforeEach(() => {
-      // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page after each test.
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
       cy.window().then((win) => {
         win.location.href = 'about:blank';
@@ -1397,7 +1397,8 @@ context('Proposal tests', () => {
         .type(abstract)
         .should('have.value', abstract);
       cy.contains('Save and continue').click();
-      cy.get('[role="button"]').first().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
       cy.get('[role="option"]').contains('Instrument 1').click();
       cy.contains('Save and continue').click();
       cy.finishedLoading();
