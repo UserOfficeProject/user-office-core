@@ -1449,7 +1449,8 @@ context('Proposal tests', () => {
         .type(abstract)
         .should('have.value', abstract);
       cy.contains('Save and continue').click();
-      cy.get('[role="button"]').first().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
       cy.get('[role="option"]').contains('Instrument 1').click();
       cy.get('[role="option"]').contains('Instrument 2').click();
       cy.get('body').type('{esc}');
