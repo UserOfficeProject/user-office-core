@@ -4,9 +4,9 @@ import * as Yup from 'yup';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { InstrumentPickerConfig } from 'generated/sdk';
 
+import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
-import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
 
 export const QuestionTemplateRelationInstrumentPickerForm = (
   props: QuestionTemplateRelationFormProps
