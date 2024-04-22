@@ -32,12 +32,12 @@ import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, UserRole } from 'generated/sdk';
 
+import { TemplateMenuListItem } from './TemplateMenuListItem';
 import BoxIcon from '../common/icons/BoxIcon';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
-import { TemplateMenuListItem } from './TemplateMenuListItem';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;

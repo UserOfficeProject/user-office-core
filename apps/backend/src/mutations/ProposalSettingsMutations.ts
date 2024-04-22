@@ -157,8 +157,8 @@ export default class ProposalSettingsMutations {
         nextProposalStatusId: nextShouldNotBeTouched
           ? workflowConnection.nextProposalStatusId
           : proposalWorkflowConnections[index + 1]
-          ? proposalWorkflowConnections[index + 1].proposalStatusId
-          : null,
+            ? proposalWorkflowConnections[index + 1].proposalStatusId
+            : null,
       };
     });
   }
