@@ -49,6 +49,7 @@ import {
   createBasicUserObject,
   FapSecretariesRecord,
   InstitutionRecord,
+  CountryRecord,
 } from './records';
 
 @injectable()
@@ -315,7 +316,10 @@ export default class PostgresFapDataSource implements FapDataSource {
     proposalPk: number,
     callId: number
   ): Promise<BasicUserDetails[]> {
-    const fapProposalReviewers: Array<UserRecord & InstitutionRecord> =
+    const fapProposalReviewers: Array<
+      // eslint-disable-next-line prettier/prettier
+      UserRecord & InstitutionRecord & CountryRecord > =
+      // eslint-disable-next-line prettier/prettier
       await database
         .select(['users.*', 'institutions.*']) // Adjusted here
         .from('fap_reviews as sr')
