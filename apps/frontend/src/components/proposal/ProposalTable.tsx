@@ -268,8 +268,8 @@ const ProposalTable = ({
               tooltip: isSubmitted
                 ? 'Only draft proposals can be deleted'
                 : !isPI
-                ? 'Only PI can delete proposal'
-                : 'Delete proposal',
+                  ? 'Only PI can delete proposal'
+                  : 'Delete proposal',
               disabled: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(

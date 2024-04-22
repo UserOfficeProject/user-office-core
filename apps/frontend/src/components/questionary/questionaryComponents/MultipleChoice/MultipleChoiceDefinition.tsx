@@ -6,11 +6,11 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import MultipleChoiceSearchCriteriaComponent from 'components/questionary/questionaryComponents/MultipleChoice/MultipleChoiceSearchCriteriaComponent';
 import { DataType } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import MultipleChoiceAnswerRenderer from './MultipleChoiceAnswerRenderer';
 import { QuestionaryComponentMultipleChoice } from './QuestionaryComponentMultipleChoice';
 import { QuestionMultipleChoiceForm } from './QuestionMultipleChoiceForm';
 import { QuestionTemplateRelationMultipleChoiceForm } from './QuestionTemplateRelationMultipleChoiceForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const multipleChoiceDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SELECTION_FROM_OPTIONS,

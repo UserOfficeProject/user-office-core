@@ -1,9 +1,9 @@
 import { Sdk, TemplateGroupId } from 'generated/sdk';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
-import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { GenericTemplateStepDisplayElementFactory } from './GenericTemplateStepDisplayElementFactory';
 import { GenericTemplateWizardStepFactory } from './GenericTemplateWizardStepFactory';
+import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 
 export const genericTemplateQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.GENERIC_TEMPLATE,

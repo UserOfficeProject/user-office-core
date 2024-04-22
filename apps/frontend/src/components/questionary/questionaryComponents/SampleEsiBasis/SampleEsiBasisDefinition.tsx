@@ -4,10 +4,10 @@ import EsiIcon from 'components/common/icons/EsiIcon';
 import { DataType } from 'generated/sdk';
 import { SampleEsiSubmissionState } from 'models/questionary/sampleEsi/SampleEsiSubmissionState';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createSampleEsiBasisValidationSchema } from './createSampleEsiValidationSchema';
 import { QuestionSampleEsiBasisForm } from './QuestionSampleEsiBasisForm';
 import { QuestionTemplateRelationSampleEsiBasisForm } from './QuestionTemplateRelationSampleEsiBasisForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const sampleEsiBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SAMPLE_ESI_BASIS,

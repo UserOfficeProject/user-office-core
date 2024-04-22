@@ -81,8 +81,8 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               config.isMultipleSelect
                 ? stateValue
                 : stateValue.length > 0
-                ? stateValue[0]
-                : ''
+                  ? stateValue[0]
+                  : ''
             }
             onChange={handleOnChange}
             multiple={config.isMultipleSelect}

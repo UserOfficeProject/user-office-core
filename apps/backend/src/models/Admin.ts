@@ -1,3 +1,6 @@
 export class Page {
-  constructor(public id: number, public content: string) {}
+  constructor(
+    public id: number,
+    public content: string
+  ) {}
 }

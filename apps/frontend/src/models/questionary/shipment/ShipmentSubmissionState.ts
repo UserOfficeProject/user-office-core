@@ -2,9 +2,9 @@ import { immerable } from 'immer';
 
 import { Questionary, SampleFragment } from 'generated/sdk';
 
-import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 import { TemplateGroupId } from './../../../generated/sdk';
 import { ShipmentWithQuestionary } from './ShipmentWithQuestionary';
+import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class ShipmentSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
