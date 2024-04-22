@@ -256,7 +256,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('input[id="FapChair-"]' + fapMembers.chair.id + '"]').should(
+      cy.get('input[id="FapChair-' + fapMembers.chair.id + '"]').should(
         (element) => {
           expect(element.val()).to.equal(
             `${selectedChairUserFirstName} ${selectedChairUserLastName}`
