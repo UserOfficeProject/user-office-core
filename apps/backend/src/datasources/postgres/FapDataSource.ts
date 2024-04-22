@@ -153,7 +153,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           qb.where('faps.fap_id', fapId);
         }
         if (role.shortCode === Roles.FAP_CHAIR) {
-          qb.where('fap_chair_user_id', userId);
+          qb.where('fap_chairs.user_id', userId);
         } else if (role.shortCode === Roles.FAP_SECRETARY) {
           qb.where('fap_secretaries.user_id', userId);
         } else {
