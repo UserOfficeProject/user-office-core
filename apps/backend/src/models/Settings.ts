@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export class Settings {
   constructor(
     public id: SettingsId,

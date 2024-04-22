@@ -2,8 +2,6 @@
 /* eslint-disable quotes */
 import 'reflect-metadata';
 
-import BluePromise from 'bluebird';
-
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { dummyCallFactory } from '../mockups/CallDataSource';
@@ -255,11 +253,13 @@ describe('Call update with reference numbers', () => {
   test('In a call with 1000 proposals, when the format is changed, all proposals are correctly updated', async () => {
     const call = await createCall({ format: '192{digits:4}' });
     const expectedRefNums: string[] = [];
-    await BluePromise.mapSeries(new Array(1000), async function (_prop, index) {
-      expectedRefNums.push('221' + String(index).padStart(5, '0'));
+    await Promise.all(
+      new Array(1000).map(async (_prop, index) => {
+        expectedRefNums.push('221' + String(index).padStart(5, '0'));
 
-      return await createSubmittedProposal(call.id, index, index);
-    });
+        return await createSubmittedProposal(call.id, index, index);
+      })
+    );
 
     await callDataSource.update(
       dummyCallFactory({

@@ -59,7 +59,7 @@ services:
       - backend
 
   backend:
-    image: 'user-office-backend:develop'
+    image: 'ghcr.io/userofficeproject/user-office-backend:develop'
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH

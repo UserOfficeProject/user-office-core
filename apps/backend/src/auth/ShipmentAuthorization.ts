@@ -22,9 +22,8 @@ export class ShipmentAuthorization {
     let shipment;
 
     if (typeof shipmentOrShipmentId === 'number') {
-      shipment = await this.shipmentDataSource.getShipment(
-        shipmentOrShipmentId
-      );
+      shipment =
+        await this.shipmentDataSource.getShipment(shipmentOrShipmentId);
     } else {
       shipment = shipmentOrShipmentId;
     }
