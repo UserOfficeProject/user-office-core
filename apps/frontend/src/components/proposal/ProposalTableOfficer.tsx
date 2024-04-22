@@ -66,7 +66,10 @@ import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
-import TableActionsDropdownMenu from './TableActionsDropdownMenu';
+import TableActionsDropdownMenu, {
+  DownloadMenuOption,
+  PdfDownloadMenuOption,
+} from './TableActionsDropdownMenu';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
@@ -223,10 +226,6 @@ const FapReviewColumns = [
 const PREFETCH_SIZE = 200;
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
 
-enum DownloadMenuOption {
-  PROPOSAL = 'Proposal(s)',
-  ATTACHMENT = 'Attachment(s)',
-}
 /**
  * NOTE: This toolbar "select all" option works only with all prefetched proposals. Currently that value is set to "PREFETCH_SIZE=200"
  * For example if we change the PREFETCH_SIZE to 100, that would mean that it can select up to 100 prefetched proposals at once.
@@ -340,10 +339,16 @@ const ProposalTableOfficer = ({
     setActionsMenuAnchorElement(event.currentTarget);
   };
   const handleClose = (selectedOption: string) => {
-    if (selectedOption === DownloadMenuOption.PROPOSAL) {
+    if (selectedOption === PdfDownloadMenuOption.PDF) {
       downloadPDFProposal(
         selectedProposals?.map((proposal) => proposal.primaryKey),
         selectedProposals?.[0].title
+      );
+    } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
+      downloadPDFProposal(
+        selectedProposals?.map((proposal) => proposal.primaryKey),
+        selectedProposals?.[0].title,
+        'zip'
       );
     } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
       setOpenDownloadAttachment(true);
@@ -834,7 +839,6 @@ const ProposalTableOfficer = ({
       <TableActionsDropdownMenu
         event={actionsMenuAnchorElement}
         handleClose={handleClose}
-        options={Object.values(DownloadMenuOption)}
       />
       <ProposalReviewModal
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}

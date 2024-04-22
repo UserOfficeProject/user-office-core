@@ -14,6 +14,7 @@ import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
 import { Review, ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
+import { SettingsId } from '../../models/Settings';
 import { BasicUserDetails, UserRole } from '../../models/User';
 import {
   UpdateMemberFapArgs,
@@ -23,6 +24,7 @@ import {
 import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { AdminDataSource } from '../AdminDataSource';
 import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
 import database from './database';
@@ -52,7 +54,8 @@ import {
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
   constructor(
-    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
+    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
   ) {}
 
   async delete(id: number): Promise<Fap> {
@@ -381,6 +384,22 @@ export default class PostgresFapDataSource implements FapDataSource {
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
       });
+  }
+
+  async getFapReviewsByCallAndFap(
+    callId: number,
+    fapId: number
+  ): Promise<Review[]> {
+    const fapReviews: ReviewRecord[] = await database
+      .select(['sr.*'])
+      .from('fap_reviews as sr')
+      .join('fap_proposals as sp', {
+        'sp.proposal_pk': 'sr.proposal_pk',
+      })
+      .where('sp.call_id', callId)
+      .andWhere('sp.fap_id', fapId);
+
+    return fapReviews.map((fapReview) => createReviewObject(fapReview));
   }
 
   async getFapReviewsByCallAndStatus(
@@ -781,6 +800,91 @@ export default class PostgresFapDataSource implements FapDataSource {
     }
 
     return fapUpdated;
+  }
+
+  async assignMemberToFapProposals(
+    proposalPks: number[],
+    fapId: number,
+    memberId: number
+  ) {
+    await database.transaction(async (trx) => {
+      await trx<FapAssignmentRecord>('fap_assignments')
+        .insert(
+          proposalPks.map((proposalPk) => ({
+            proposal_pk: proposalPk,
+            fap_member_user_id: memberId,
+            fap_id: fapId,
+          }))
+        )
+        .returning<FapAssignmentRecord[]>(['*']);
+
+      await trx<ReviewRecord>('fap_reviews')
+        .insert(
+          proposalPks.map((proposalPk) => ({
+            user_id: memberId,
+            proposal_pk: proposalPk,
+            status: ReviewStatus.DRAFT,
+            fap_id: fapId,
+          }))
+        )
+        .returning<ReviewRecord[]>(['*']);
+    });
+
+    const updatedFap = await this.getFap(fapId);
+
+    if (updatedFap) {
+      return updatedFap;
+    }
+
+    throw new GraphQLError(`Fap not found ${fapId}`);
+  }
+
+  private async getCallInReviewForFap(fapId: number) {
+    const callFilter = {
+      isEnded: true,
+      isFapReviewEnded: false,
+      fapIds: [fapId],
+    };
+
+    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
+      (call) => call.id
+    );
+
+    if (callIds.length > 1) {
+      throw new GraphQLError(
+        `More than one call found in review phase for FAP: ${fapId}`
+      );
+    }
+
+    return callIds[0];
+  }
+
+  async getFapProposalToNumReviewsNeededMap(fapId: number) {
+    const DEFAULT_NUM_FAP_REVIEWS_REQUIRED =
+      await this.adminDataSource.getSettingOrDefault(
+        SettingsId.DEFAULT_NUM_FAP_REVIEWS_REQUIRED,
+        2
+      );
+    const fap = await this.getFap(fapId);
+    const numReviewsRequired = fap
+      ? fap.numberRatingsRequired
+      : DEFAULT_NUM_FAP_REVIEWS_REQUIRED;
+    const callId = await this.getCallInReviewForFap(fapId);
+    const fapProposals = await this.getFapProposals(fapId, callId);
+    const fapReviews = await this.getFapReviewsByCallAndFap(callId, fapId);
+
+    const propNumReviewsMap = new Map<FapProposal, number>();
+
+    fapProposals.forEach((fapProposal) => {
+      const numReviewsStillNeeded =
+        numReviewsRequired -
+        fapReviews.filter(
+          (fapReview) => fapReview.proposalPk === fapProposal.proposalPk
+        ).length;
+      propNumReviewsMap.set(fapProposal, numReviewsStillNeeded);
+    });
+
+    return propNumReviewsMap;
   }
 
   async assignMemberToFapProposal(

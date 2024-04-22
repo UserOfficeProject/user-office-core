@@ -333,6 +333,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Proposal(s)').click();
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -347,6 +348,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Proposal(s)').click();
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -455,6 +457,8 @@ context('Proposal administration tests', () => {
 
       cy.contains('Proposal(s)').click();
 
+      cy.contains('Download as single file').click();
+
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         proposalName1
@@ -539,6 +543,52 @@ context('Proposal administration tests', () => {
             expect(text).to.include(proposalFixedAbstract);
 
             expect(numpages).to.equal(2);
+          });
+
+          // NOTE: We can't test the multi file download file size because the title and abstract are random and it can vary between some numbers. That's why we only test the file content.
+          const downloadedMultiFileZipName = `${currentYear}_proposals.zip`;
+          const multiFileZipDownloadPath = `${downloadsFolder}/${downloadedMultiFileZipName}`;
+
+          cy.task('downloadFile', {
+            url: `${Cypress.config(
+              'baseUrl'
+            )}/download/zip/proposal/${createdProposalPk},${newlyCreatedProposalPk}`,
+            token,
+            filename: downloadedMultiFileZipName,
+            downloadsFolder: downloadsFolder,
+          });
+
+          const extractedFilesDir = `${downloadsFolder}/${currentYear}_proposals_extracted`;
+
+          cy.task('unzip', {
+            source: multiFileZipDownloadPath,
+            destination: extractedFilesDir,
+          });
+
+          cy.task(
+            'readPdf',
+            `${extractedFilesDir}/${newlyCreatedProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`
+          ).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(newlyCreatedProposalId);
+            expect(text).to.include(proposalFixedName);
+            expect(text).to.include(proposalFixedAbstract);
+
+            expect(numpages).to.equal(1);
+          });
+
+          cy.task(
+            'readPdf',
+            `${extractedFilesDir}/${createdProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`
+          ).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(createdProposalId);
+            expect(text).to.include(proposalName1);
+            expect(text).to.include(proposalAbstract1);
+
+            expect(numpages).to.equal(1);
           });
         }
       });

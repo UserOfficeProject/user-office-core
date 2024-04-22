@@ -67,7 +67,10 @@ import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
-import TableActionsDropdownMenu from './TableActionsDropdownMenu';
+import TableActionsDropdownMenu, {
+  DownloadMenuOption,
+  PdfDownloadMenuOption,
+} from './TableActionsDropdownMenu';
 
 type QueryParameters = {
   query: {
@@ -78,11 +81,6 @@ type QueryParameters = {
 };
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
-
-enum DownloadMenuOption {
-  PROPOSAL = 'Proposal(s)',
-  ATTACHMENT = 'Attachment(s)',
-}
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -556,10 +554,16 @@ const ProposalTableInstrumentScientist = ({
     setActionsMenuAnchorElement(event.currentTarget);
   };
   const handleClose = (selectedOption: string) => {
-    if (selectedOption === DownloadMenuOption.PROPOSAL) {
+    if (selectedOption === PdfDownloadMenuOption.PDF) {
       downloadPDFProposal(
         selectedProposals?.map((proposal) => proposal.primaryKey),
         selectedProposals?.[0].title || ''
+      );
+    } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
+      downloadPDFProposal(
+        selectedProposals?.map((proposal) => proposal.primaryKey),
+        selectedProposals?.[0].title || '',
+        'zip'
       );
     } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
       setOpenDownloadAttachment(true);
@@ -806,7 +810,6 @@ const ProposalTableInstrumentScientist = ({
       <TableActionsDropdownMenu
         event={actionsMenuAnchorElement}
         handleClose={handleClose}
-        options={Object.values(DownloadMenuOption)}
       />
       {isInstrumentScientist && (
         <Grid container spacing={2}>

@@ -22,7 +22,7 @@ import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 export const EXCHANGE_NAME =
-  process.env.CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
+  process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
 
 type Member = {
   id: string;
@@ -180,6 +180,8 @@ const getSecondsPerAllocationTimeUnit = (
   switch (unit) {
     case AllocationTimeUnits.Hour:
       return timeAllocation * 60 * 60;
+    case AllocationTimeUnits.Week:
+      return timeAllocation * 7 * 24 * 60 * 60;
     default:
       return timeAllocation * 24 * 60 * 60;
   }
@@ -282,8 +284,8 @@ export async function createPostToRabbitMQHandler() {
 
 export async function createListenToRabbitMQHandler() {
   const EVENT_SCHEDULING_QUEUE_NAME = process.env
-    .EVENT_SCHEDULING_QUEUE_NAME as Queue;
-  const SCHEDULER_EXCHANGE_NAME = process.env.SCHEDULER_EXCHANGE_NAME;
+    .RABBITMQ_SCHEDULER_EXCHANGE_NAME as Queue;
+  const SCHEDULER_EXCHANGE_NAME = process.env.RABBITMQ_SCHEDULER_EXCHANGE_NAME;
 
   if (!SCHEDULER_EXCHANGE_NAME) {
     throw new Error('SCHEDULER_EXCHANGE_NAME environment variable not set');
