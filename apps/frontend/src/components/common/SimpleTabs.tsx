@@ -139,8 +139,8 @@ const SimpleTabs = ({
   const tabValue = isVerticalOrientation
     ? query.verticalTab
     : isInsideModal
-    ? query.modalTab
-    : query.tab;
+      ? query.modalTab
+      : query.tab;
 
   return (
     <Box className={isVerticalOrientation ? classes.root : ''}>

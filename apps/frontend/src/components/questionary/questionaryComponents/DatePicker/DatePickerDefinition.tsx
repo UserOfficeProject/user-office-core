@@ -5,13 +5,13 @@ import React from 'react';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import DateAnswerRenderer from './DateAnswerRenderer';
 import DateSearchCriteriaInput from './DateSearchCriteriaInput';
 import { preSubmitDateTransform } from './preSubmitDateTransform';
 import { QuestionaryComponentDatePicker } from './QuestionaryComponentDatePicker';
 import { QuestionDateForm } from './QuestionDateForm';
 import { QuestionTemplateRelationDateForm } from './QuestionTemplateRelationDateForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const dateDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.DATE,

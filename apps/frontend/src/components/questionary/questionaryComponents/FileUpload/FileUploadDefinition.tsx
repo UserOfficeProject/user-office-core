@@ -5,12 +5,12 @@ import React from 'react';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import FilesAnswerRenderer from './FilesAnswerRenderer';
 import FileUploadSearchCriteriaInput from './FileUploadSearchCriteriaInput';
 import { QuestionaryComponentFileUpload } from './QuestionaryComponentFileUpload';
 import { QuestionFileUploadForm } from './QuestionFileUploadForm';
 import { QuestionTemplateRelationFileUploadForm } from './QuestionTemplateRelationFileUploadForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const fileUploadDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.FILE_UPLOAD,

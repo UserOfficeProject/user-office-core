@@ -931,7 +931,9 @@ export const createUserObject = (user: UserRecord) => {
   );
 };
 
-export const createBasicUserObject = (user: UserRecord & InstitutionRecord) => {
+export const createBasicUserObject = (
+  user: UserRecord & InstitutionRecord & CountryRecord
+) => {
   return new BasicUserDetails(
     user.user_id,
     user.firstname,
@@ -942,7 +944,8 @@ export const createBasicUserObject = (user: UserRecord & InstitutionRecord) => {
     user.position,
     user.created_at,
     user.placeholder,
-    user.email
+    user.email,
+    user.country
   );
 };
 

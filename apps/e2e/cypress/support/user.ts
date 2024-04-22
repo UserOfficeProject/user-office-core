@@ -10,7 +10,7 @@ import {
   UpdateUserRolesMutationVariables,
   User,
 } from '@user-office-software-libs/shared-types';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 import featureFlags from './featureFlags';
 import initialDBData from './initialDBData';
