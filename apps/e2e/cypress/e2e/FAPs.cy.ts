@@ -203,86 +203,91 @@ function initializationBeforeTests() {
           faps: [createdFapId],
         }).then((result) => {
           createdCallId = result.createCall.id;
+
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            (result) => {
+              const createdProposal = result.createProposal;
+              if (createdProposal) {
+                firstCreatedProposalPk = createdProposal.primaryKey;
+                firstCreatedProposalId = createdProposal.proposalId;
+
+                cy.updateProposal({
+                  proposalPk: createdProposal.primaryKey,
+                  title: proposal1.title,
+                  abstract: proposal1.abstract,
+                  proposerId: initialDBData.users.user1.id,
+                });
+
+                // Manually changing the proposal status to be shown in the Faps. -------->
+                cy.changeProposalsStatus({
+                  statusId: initialDBData.proposalStatuses.fapReview.id,
+                  proposals: [
+                    {
+                      callId: initialDBData.call.id,
+                      primaryKey: firstCreatedProposalPk,
+                    },
+                  ],
+                });
+              }
+            }
+          );
+
+          cy.createProposal({ callId: createdCallId }).then((result) => {
+            const createdProposal = result.createProposal;
+            if (createdProposal) {
+              secondCreatedProposalPk = createdProposal.primaryKey;
+
+              cy.updateProposal({
+                proposalPk: createdProposal.primaryKey,
+                title: proposal2.title,
+                abstract: proposal2.abstract,
+                proposerId: initialDBData.users.user1.id,
+              });
+
+              // Manually changing the proposal status to be shown in the Faps. -------->
+              cy.changeProposalsStatus({
+                statusId: initialDBData.proposalStatuses.fapReview.id,
+                proposals: [
+                  {
+                    callId: createdCallId,
+                    primaryKey: secondCreatedProposalPk,
+                  },
+                ],
+              });
+            }
+          });
+
+          cy.createProposal({ callId: createdCallId }).then((result) => {
+            const createdProposal = result.createProposal;
+            if (createdProposal) {
+              thirdCreatedProposalPk = createdProposal.primaryKey;
+
+              cy.updateProposal({
+                proposalPk: createdProposal.primaryKey,
+                title: proposal3.title,
+                abstract: proposal3.abstract,
+                proposerId: initialDBData.users.user2.id,
+              });
+
+              // Manually changing the proposal status to be shown in the Faps. -------->
+              cy.changeProposalsStatus({
+                statusId: initialDBData.proposalStatuses.fapReview.id,
+                proposals: [
+                  { callId: createdCallId, primaryKey: thirdCreatedProposalPk },
+                ],
+              });
+            }
+          });
+
+          cy.updateCall({
+            id: createdCallId,
+            ...closedCall,
+            proposalWorkflowId: createdWorkflowId,
+            esiTemplateId: createdEsiTemplateId,
+            faps: [createdFapId],
+          });
         });
       }
-    });
-
-    cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-      const createdProposal = result.createProposal;
-      if (createdProposal) {
-        firstCreatedProposalPk = createdProposal.primaryKey;
-        firstCreatedProposalId = createdProposal.proposalId;
-
-        cy.updateProposal({
-          proposalPk: createdProposal.primaryKey,
-          title: proposal1.title,
-          abstract: proposal1.abstract,
-          proposerId: initialDBData.users.user1.id,
-        });
-
-        // Manually changing the proposal status to be shown in the Faps. -------->
-        cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.fapReview.id,
-          proposals: [
-            {
-              callId: initialDBData.call.id,
-              primaryKey: firstCreatedProposalPk,
-            },
-          ],
-        });
-      }
-    });
-
-    cy.createProposal({ callId: createdCallId }).then((result) => {
-      const createdProposal = result.createProposal;
-      if (createdProposal) {
-        secondCreatedProposalPk = createdProposal.primaryKey;
-
-        cy.updateProposal({
-          proposalPk: createdProposal.primaryKey,
-          title: proposal2.title,
-          abstract: proposal2.abstract,
-          proposerId: initialDBData.users.user1.id,
-        });
-
-        // Manually changing the proposal status to be shown in the Faps. -------->
-        cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.fapReview.id,
-          proposals: [
-            { callId: createdCallId, primaryKey: secondCreatedProposalPk },
-          ],
-        });
-      }
-    });
-
-    cy.createProposal({ callId: createdCallId }).then((result) => {
-      const createdProposal = result.createProposal;
-      if (createdProposal) {
-        thirdCreatedProposalPk = createdProposal.primaryKey;
-
-        cy.updateProposal({
-          proposalPk: createdProposal.primaryKey,
-          title: proposal3.title,
-          abstract: proposal3.abstract,
-          proposerId: initialDBData.users.user2.id,
-        });
-
-        // Manually changing the proposal status to be shown in the Faps. -------->
-        cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.fapReview.id,
-          proposals: [
-            { callId: createdCallId, primaryKey: thirdCreatedProposalPk },
-          ],
-        });
-      }
-    });
-
-    cy.updateCall({
-      id: createdCallId,
-      ...closedCall,
-      proposalWorkflowId: createdWorkflowId,
-      esiTemplateId: createdEsiTemplateId,
-      faps: [createdFapId],
     });
   });
 }
@@ -1338,7 +1343,7 @@ context('Fap meeting components tests', () => {
         timeAllocation: firstProposalTimeAllocation,
         submitted: true,
         reviewerId: 0,
-        instrumentId: 0,
+        instrumentId: newlyCreatedInstrumentId,
       });
       cy.createInstrument(instrument).then((result) => {
         const createdInstrument = result.createInstrument;
@@ -1363,15 +1368,6 @@ context('Fap meeting components tests', () => {
                 primaryKey: firstCreatedProposalPk,
               },
             ],
-          });
-          cy.assignReviewersToFap({
-            fapId: createdFapId,
-            memberIds: [fapMembers.reviewer.id],
-          });
-          cy.assignFapReviewersToProposal({
-            fapId: createdFapId,
-            memberIds: [fapMembers.reviewer.id],
-            proposalPk: firstCreatedProposalPk,
           });
           cy.updateUserRoles({
             id: scientist.id,
