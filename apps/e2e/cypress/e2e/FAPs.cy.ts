@@ -1926,7 +1926,7 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .first()
         .find('td')
-        .eq(6)
+        .eq(7)
         .should('not.contain.text', '-')
         .should('contain.text', '1');
 
