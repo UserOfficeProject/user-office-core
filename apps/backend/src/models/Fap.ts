@@ -1,5 +1,8 @@
 export class FapProposalCount {
-  constructor(public userId: number, public count: number) {}
+  constructor(
+    public userId: number,
+    public count: number
+  ) {}
 }
 
 export class Fap {
@@ -17,7 +20,10 @@ export class Fap {
 }
 
 export class FapReviewer {
-  constructor(public userId: number, public fapId: number) {}
+  constructor(
+    public userId: number,
+    public fapId: number
+  ) {}
 }
 
 export class FapProposal {

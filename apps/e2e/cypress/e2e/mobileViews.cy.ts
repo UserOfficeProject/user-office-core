@@ -15,7 +15,7 @@ context('Mobile views tests', () => {
 
     cy.get('[data-cy="officer-proposals-table"]').should('exist');
 
-    cy.get('[data-cy="officer-menu-items"]').should('not.be.visible');
+    cy.get('[data-cy="officer-menu-items"]').should('not.exist');
 
     cy.get('[data-cy="open-drawer"]').click({ force: true });
 

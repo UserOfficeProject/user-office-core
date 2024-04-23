@@ -3,11 +3,11 @@ import React from 'react';
 
 import { DataType } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import EmbellishmentQuestionRenderer from './EmbellishmentQuestionRenderer';
 import { QuestionaryComponentEmbellishment } from './QuestionaryComponentEmbellishment';
 import { QuestionEmbellishmentForm } from './QuestionEmbellishmentForm';
 import { QuestionTemplateRelationEmbellishmentForm } from './QuestionTemplateRelationEmbellishmentForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const embellishmentDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.EMBELLISHMENT,
