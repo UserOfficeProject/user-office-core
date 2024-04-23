@@ -532,7 +532,7 @@ context('General facility access panel tests', () => {
       cy.get('[aria-label="Remove Fap chair"]').should('not.exist');
       cy.get('[aria-label="Remove Fap secretary"]').should('not.exist');
     });
-    ``;
+
     it('Fap Chair should be able to modify Fap Reviewers', () => {
       cy.changeActiveRole(initialDBData.roles.fapChair);
 
