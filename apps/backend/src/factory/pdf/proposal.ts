@@ -367,10 +367,9 @@ export const collectProposalPDFData = async (
   }
 
   // Get Reviews
-  const reviews = await baseContext.queries.review.reviewsForProposal(
-    user,
-    proposal.primaryKey
-  );
+  const reviews = await baseContext.queries.review.reviewsForProposal(user, {
+    proposalPk: proposal.primaryKey,
+  });
 
   if (reviews) out.fapReviews = reviews;
 

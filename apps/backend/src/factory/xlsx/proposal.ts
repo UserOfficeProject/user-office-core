@@ -7,11 +7,6 @@ import baseContext from '../../buildContext';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
-import {
-  absoluteDifference,
-  average,
-  getGrades,
-} from '../../utils/mathFunctions';
 
 type ProposalXLSData = Array<string | number>;
 
@@ -23,11 +18,8 @@ export const defaultProposalDataColumns = [
   'Technical Status',
   'Technical Comment',
   'Time(Days)',
-  'Score difference',
-  'Average Score',
   'Comment Management',
   'Decision',
-  'Order',
 ];
 
 // Note: to optimize, we could create a query to collect everything
@@ -66,17 +58,6 @@ export const collectProposalXLSXData = async (
       proposal.primaryKey
     );
 
-  const reviews = await baseContext.queries.review.reviewsForProposal(
-    user,
-    proposalPk
-  );
-
-  const fapMeetingDecision =
-    await baseContext.queries.fap.getProposalFapMeetingDecision(
-      user,
-      proposal.primaryKey
-    );
-
   const instruments =
     await baseContext.queries.instrument.getInstrumentsByProposalPk(
       user,
@@ -110,10 +91,7 @@ export const collectProposalXLSXData = async (
     technicalReviews
       ?.map((technicalReview) => technicalReview?.timeAllocation ?? '<missing>')
       .join(', ') ?? '<missing>',
-    absoluteDifference(getGrades(reviews)) || 'NA',
-    average(getGrades(reviews)) || 'NA',
     proposal.commentForManagement || '<missing>',
     ProposalEndStatus[proposal.finalStatus] ?? '<missing>',
-    fapMeetingDecision?.rankOrder ?? '<missing>',
   ];
 };

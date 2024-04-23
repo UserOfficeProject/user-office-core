@@ -58,7 +58,7 @@ const assignmentColumns = [
     field: 'dateAssignedFormatted',
   },
   {
-    title: 'rank',
+    title: 'Rank',
     field: 'rank',
     emptyValue: '-',
     hidden: true,
@@ -106,7 +106,7 @@ const FapAssignedReviewersTable = ({
   ];
 
   assignmentColumns[
-    assignmentColumns.findIndex((col) => col.title === 'rank')
+    assignmentColumns.findIndex((col) => col.field === 'rank')
   ].hidden = !hasAccessRights;
 
   const FapAssignmentsWithIdAndFormattedDate =

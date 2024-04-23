@@ -241,6 +241,8 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   'Dummy comment for user',
   'Dummy comment for management',
   true,
+  1,
+  1,
   1
 );
 
@@ -378,7 +380,8 @@ export class FapDataSourceMock implements FapDataSource {
 
   async getFapProposal(
     fapId: number,
-    proposalPk: number
+    proposalPk: number,
+    instrumentId?: number
   ): Promise<FapProposal | null> {
     throw new Error('Method not implemented.');
   }

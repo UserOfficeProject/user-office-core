@@ -41,9 +41,15 @@ export default class ReviewQueries {
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async reviewsForProposal(
     agent: UserWithRole | null,
-    proposalPk: number
+    {
+      proposalPk,
+      fapId,
+    }: {
+      proposalPk: number;
+      fapId?: number;
+    }
   ): Promise<Review[] | null> {
-    const reviews = await this.dataSource.getProposalReviews(proposalPk);
+    const reviews = await this.dataSource.getProposalReviews(proposalPk, fapId);
 
     const permittedReviews = reviews.filter(
       async (review) => await this.reviewAuth.hasReadRights(agent, review)

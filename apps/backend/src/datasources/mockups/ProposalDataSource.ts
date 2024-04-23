@@ -66,6 +66,8 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   'Dummy comment for user',
   'Dummy comment for management',
   true,
+  1,
+  1,
   1
 );
 

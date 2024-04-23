@@ -21,7 +21,7 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
           ...basicUserDetails
         }
       }
-      reviews {
+      reviews(fapId: $fapId) {
         id
         grade
         comment

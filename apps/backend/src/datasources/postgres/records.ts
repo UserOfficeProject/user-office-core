@@ -567,6 +567,8 @@ export interface FapMeetingDecisionRecord {
   readonly recommendation: ProposalEndStatus;
   readonly submitted: boolean;
   readonly submitted_by: number | null;
+  readonly instrument_id: number;
+  readonly fap_id: number;
 }
 
 export interface FapProposalWithReviewGradesAndRankingRecord {
@@ -1101,7 +1103,9 @@ export const createFapMeetingDecisionObject = (
     fapMeetingDecisionRecord.comment_for_user,
     fapMeetingDecisionRecord.comment_for_management,
     fapMeetingDecisionRecord.submitted,
-    fapMeetingDecisionRecord.submitted_by
+    fapMeetingDecisionRecord.submitted_by,
+    fapMeetingDecisionRecord.instrument_id,
+    fapMeetingDecisionRecord.fap_id
   );
 };
 
