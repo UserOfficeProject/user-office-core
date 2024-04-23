@@ -61,20 +61,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       });
 
     const result = database
-      .with(
-        'ptw',
-        database
-          .select([
-            '*',
-            database.raw(
-              // eslint-disable-next-line quotes
-              "array_to_string(instrument_names, ',') all_instrument_names"
-            ),
-          ])
-          .from('proposal_table_view')
-      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('ptw')
+      .from('proposal_table_view')
       .whereIn('proposal_pk', proposals)
       .orderBy('proposal_pk', 'desc')
       .modify((query) => {
