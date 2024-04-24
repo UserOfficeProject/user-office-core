@@ -3,7 +3,7 @@ import Clear from '@mui/icons-material/Clear';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import Person from '@mui/icons-material/Person';
 import PersonAdd from '@mui/icons-material/PersonAdd';
-import { Button } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
@@ -378,31 +378,22 @@ const FapMembers = ({
         </Grid>
       </Grid>
       {isUserOfficer && (
-        <Grid>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%',
-            }}
+        <Stack direction="row" display="flex" justifyContent="space-between">
+          <Button
+            onClick={() => setFapChairModalOpen(true)}
+            aria-label="Add New FAP Chair Button"
+            data-cy="add-chair-button"
           >
-            <Button
-              onClick={() => setFapChairModalOpen(true)}
-              aria-label="Add New FAP Chair Button"
-              data-cy="add-chair-button"
-            >
-              Add Chair
-            </Button>
-            <Button
-              onClick={() => setFapSecretaryModalOpen(true)}
-              aria-label="Add New FAP Secretary Button"
-              data-cy="add-secretary-button"
-            >
-              Add Secretary
-            </Button>
-          </div>
-        </Grid>
+            Add Chair
+          </Button>
+          <Button
+            onClick={() => setFapSecretaryModalOpen(true)}
+            aria-label="Add New FAP Secretary Button"
+            data-cy="add-secretary-button"
+          >
+            Add Secretary
+          </Button>
+        </Stack>
       )}
       <Grid container spacing={3}>
         <Grid data-cy="fap-reviewers-table" item xs={12}>
