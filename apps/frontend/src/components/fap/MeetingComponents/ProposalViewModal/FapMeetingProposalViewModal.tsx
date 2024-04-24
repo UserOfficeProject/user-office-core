@@ -135,7 +135,7 @@ const FapMeetingProposalViewModal = ({
                           proposal: {
                             ...proposalData,
                             fapMeetingDecisions:
-                              proposalData.fapMeetingDecisions.map((fmd) => {
+                              proposalData.fapMeetingDecisions?.map((fmd) => {
                                 if (fmd.instrumentId === data.instrumentId) {
                                   return data;
                                 }
@@ -166,7 +166,10 @@ const FapMeetingProposalViewModal = ({
                       fapId={fapId}
                     />
 
-                    <ProposalDetails proposal={proposalData} />
+                    <ProposalDetails
+                      proposal={proposalData}
+                      instrumentId={instrumentId}
+                    />
                   </>
                 )}
               </div>

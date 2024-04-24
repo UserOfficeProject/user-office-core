@@ -178,7 +178,7 @@ const FapInstrumentProposalsTable = ({
     {
       title: 'Current rank',
       render: (rowData: FapProposal) => {
-        const rankOrder = rowData.proposal.fapMeetingDecisions.find(
+        const rankOrder = rowData.proposal.fapMeetingDecisions?.find(
           (fmd) => fmd.instrumentId === fapInstrument.id
         )?.rankOrder;
 
@@ -213,7 +213,7 @@ const FapInstrumentProposalsTable = ({
     {
       title: 'Fap meeting submitted',
       render: (rowData: FapProposal) => {
-        const submitted = rowData.proposal.fapMeetingDecisions.find(
+        const submitted = rowData.proposal.fapMeetingDecisions?.find(
           (fmd) => fmd.instrumentId === fapInstrument.id
         )?.submitted;
 
@@ -223,7 +223,7 @@ const FapInstrumentProposalsTable = ({
     {
       title: 'Recommendation',
       render: (rowData: FapProposal) => {
-        const recommendation = rowData.proposal.fapMeetingDecisions.find(
+        const recommendation = rowData.proposal.fapMeetingDecisions?.find(
           (fmd) => fmd.instrumentId === fapInstrument.id
         )?.recommendation;
 
@@ -255,10 +255,10 @@ const FapInstrumentProposalsTable = ({
   }, [fapInstrument.submitted]);
 
   const sortByRankOrder = (a: FapProposal, b: FapProposal) => {
-    const fapMeetingDecisionA = a.proposal.fapMeetingDecisions.find(
+    const fapMeetingDecisionA = a.proposal.fapMeetingDecisions?.find(
       (fmd) => fmd.instrumentId === fapInstrument.id
     );
-    const fapMeetingDecisionB = b.proposal.fapMeetingDecisions.find(
+    const fapMeetingDecisionB = b.proposal.fapMeetingDecisions?.find(
       (fmd) => fmd.instrumentId === fapInstrument.id
     );
     if (
@@ -458,24 +458,21 @@ const FapInstrumentProposalsTable = ({
 
   const updateAllProposalRankings = (proposals: FapProposal[]) => {
     const proposalsWithUpdatedRanking = proposals.map((item, index) => {
-      const fapMeetingDecisions =
-        item.proposal.fapMeetingDecisions.map((fmd) => {
-          if (fmd.instrumentId === fapInstrument.id) {
-            return {
-              proposalPk: item.proposal.primaryKey,
-              rankOrder: index + 1,
-              commentForManagement: fmd.commentForManagement || null,
-              commentForUser: fmd.commentForUser || null,
-              recommendation: fmd.recommendation || null,
-              submitted: fmd.submitted || false,
-              submittedBy: fmd.submittedBy || null,
-              instrumentId: fmd.instrumentId,
-              fapId: fmd.fapId,
-            };
-          }
-
-          return fmd;
-        }) || null;
+      const fapMeetingDecision = item.proposal.fapMeetingDecisions?.[0];
+      const fapMeetingDecisions = [
+        {
+          proposalPk: item.proposal.primaryKey,
+          rankOrder: index + 1,
+          commentForManagement:
+            fapMeetingDecision?.commentForManagement || null,
+          commentForUser: fapMeetingDecision?.commentForUser || null,
+          recommendation: fapMeetingDecision?.recommendation || null,
+          submitted: fapMeetingDecision?.submitted || false,
+          submittedBy: fapMeetingDecision?.submittedBy || null,
+          instrumentId: fapMeetingDecision?.instrumentId || fapInstrument.id,
+          fapId: fapId,
+        },
+      ];
 
       return {
         ...item,
@@ -528,6 +525,7 @@ const FapInstrumentProposalsTable = ({
           (fmd) => fmd.instrumentId === fapInstrument.id
         )?.rankOrder,
         instrumentId: fapInstrument.id,
+        fapId: fapId,
       }))
       .filter(
         (fmd): fmd is ProposalPkWithRankOrder => fmd.rankOrder !== undefined

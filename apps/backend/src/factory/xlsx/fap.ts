@@ -132,10 +132,10 @@ export const collectFaplXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.review.reviewsForProposal(
-                user,
-                proposal.primaryKey
-              )
+            ? baseContext.queries.review.reviewsForProposal(user, {
+                proposalPk: proposal.primaryKey,
+                fapId: fapId,
+              })
             : null
         )
       );
@@ -162,10 +162,10 @@ export const collectFaplXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.fap.getProposalFapMeetingDecision(
-                user,
-                proposal.primaryKey
-              )
+            ? baseContext.queries.fap.getProposalFapMeetingDecisions(user, {
+                proposalPk: proposal.primaryKey,
+                fapId: fapId,
+              })
             : null
         )
       );
@@ -223,7 +223,7 @@ export const collectFaplXLSXData = async (
             ) || null;
           const reviews = proposalReviews[pIndx];
           const fapProposal = fapProposals?.[pIndx];
-          const fapMeetingDecision = fapMeetingDecisions[pIndx];
+          const proposalFapMeetingDecisions = fapMeetingDecisions[pIndx];
           const proposalAnswers = proposalsAnswers[pIndx];
 
           const proposalAverageScore = average(getGrades(reviews)) || 0;
@@ -232,7 +232,9 @@ export const collectFaplXLSXData = async (
             `${firstname} ${lastname}`,
             proposalAverageScore,
             instrument,
-            fapMeetingDecision,
+            proposalFapMeetingDecisions?.find(
+              (fmd) => fmd.instrumentId === instrument.id
+            ) || null,
             proposal,
             technicalReview,
             fapProposal ? fapProposal : null,

@@ -1947,6 +1947,8 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
+          instrumentId: createdInstrumentId,
+          fapId: createdFapId,
         },
       });
       cy.submitInstrument({
@@ -2204,6 +2206,8 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
+          instrumentId: createdInstrumentId,
+          fapId: createdFapId,
         },
       });
       cy.submitInstrument({
@@ -2285,6 +2289,8 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
+          instrumentId: createdInstrumentId,
+          fapId: createdFapId,
         },
       });
       cy.submitInstrument({

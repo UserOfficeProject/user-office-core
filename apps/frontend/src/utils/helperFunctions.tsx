@@ -74,7 +74,6 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
-    rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
     instruments: proposal.instruments?.map((instrument) => ({
       id: instrument?.id,

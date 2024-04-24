@@ -57,7 +57,7 @@ const FinalRankingForm = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
 
-  const fapMeetingDecision = proposalData.fapMeetingDecisions.find(
+  const fapMeetingDecision = proposalData.fapMeetingDecisions?.find(
     (fmd) => fmd.instrumentId === instrumentId
   );
 

@@ -291,6 +291,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     const { proposalReviews } = await api().getProposalReviews({
       proposalPk,
+      fapId: data.id,
     });
 
     if (!proposalReviews) {

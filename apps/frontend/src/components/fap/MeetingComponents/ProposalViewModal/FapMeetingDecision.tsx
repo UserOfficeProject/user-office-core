@@ -8,7 +8,6 @@ import React, { Fragment } from 'react';
 
 import {
   Maybe,
-  Fap,
   FapMeetingDecision as FapMeetingDecisionType,
 } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
@@ -24,18 +23,15 @@ const useStyles = makeStyles((theme) => ({
 
 type FapMeetingDecisionProps = {
   fapMeetingDecisions: Maybe<FapMeetingDecisionType[]>;
-  faps: Maybe<Pick<Fap, 'id' | 'code'>[]>;
 };
 
 const FapMeetingDecision = ({
   fapMeetingDecisions,
-  faps,
 }: FapMeetingDecisionProps) => {
   const classes = useStyles();
 
   return (
     <div data-cy="faps-meeting-components-decision">
-      {/* {faps?.map((fap) => ( */}
       <StyledPaper margin={[2, 0]}>
         {fapMeetingDecisions?.map((fmd) => (
           <Fragment key={fmd.instrumentId}>
@@ -83,7 +79,6 @@ const FapMeetingDecision = ({
           </Fragment>
         ))}
       </StyledPaper>
-      {/* ))} */}
     </div>
   );
 };

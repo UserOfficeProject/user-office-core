@@ -201,7 +201,7 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => [FapMeetingDecision])
+  @FieldResolver(() => [FapMeetingDecision], { nullable: true })
   async fapMeetingDecisions(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext,
