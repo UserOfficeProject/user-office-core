@@ -139,9 +139,8 @@ export default function createHandler() {
           break;
         case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED:
           const [instrumentId] = event.instrumentshasproposals.instrumentIds;
-          const instrument = await instrumentDataSource.getInstrument(
-            instrumentId
-          );
+          const instrument =
+            await instrumentDataSource.getInstrument(instrumentId);
 
           const description = `Submitted instrument: ${instrument?.name}`;
 

@@ -56,7 +56,6 @@ BEGIN
 				JOIN faps f ON f.fap_id = fp_1.fap_id
 				GROUP BY fp_1.proposal_pk
 			) fp ON fp.proposal_pk = p.proposal_pk
-			LEFT JOIN fap_meeting_decisions fmd ON fmd.proposal_pk = p.proposal_pk
 			LEFT JOIN (
 				SELECT
 					t_1.proposal_pk,

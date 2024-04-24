@@ -142,9 +142,8 @@ export default class FapQueries {
   ) {
     let reviewerId = null;
 
-    const proposalEvents = await this.proposalDataSource.getProposalEvents(
-      proposalPk
-    );
+    const proposalEvents =
+      await this.proposalDataSource.getProposalEvents(proposalPk);
 
     // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
     if (
