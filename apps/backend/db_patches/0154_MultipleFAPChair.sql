@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('MultipleFAPChair.sql', 'Thomas Cottee Meldrum', 'Multiple FAP Chair', '2023-01-19') THEN
+	IF register_patch('MultipleFAPChair.sql', 'Thomas Cottee Meldrum', 'Multiple FAP Chair', '2024-04-24') THEN
 	BEGIN
 
 		CREATE TABLE "fap_chairs" (
