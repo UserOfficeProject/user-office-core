@@ -141,7 +141,6 @@ export interface ProposalViewRecord {
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
   readonly proposal_id: string;
-  readonly rank_order: number;
   readonly final_status: number;
   readonly notified: boolean;
   readonly submitted: boolean;
@@ -150,8 +149,6 @@ export interface ProposalViewRecord {
   readonly faps: ProposalViewFap[];
   readonly fap_instruments: FapInstrument[];
   readonly call_short_code: string;
-  readonly average: number;
-  readonly deviation: number;
   readonly call_id: number;
   readonly proposal_workflow_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;

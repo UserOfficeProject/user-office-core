@@ -106,9 +106,6 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String)
   public proposalId: string;
 
-  // @Field(() => Int, { nullable: true })
-  // public rankOrder: number;
-
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus: ProposalEndStatus;
 
@@ -132,12 +129,6 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;
-
-  // @Field(() => Float, { nullable: true })
-  // public reviewAverage: number;
-
-  // @Field(() => Float, { nullable: true })
-  // public reviewDeviation: number;
 
   @Field(() => Int)
   public callId: number;
