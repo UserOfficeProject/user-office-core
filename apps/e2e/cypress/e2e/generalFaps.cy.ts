@@ -223,7 +223,7 @@ context('General facility access panel tests', () => {
 
       cy.contains('Members').click();
 
-      cy.get('[aria-label="Set Fap Chair"]').click();
+      cy.get('[data-cy="add-chair-button"]').click();
 
       cy.finishedLoading();
 
@@ -256,11 +256,13 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('input[id="FapChair"]').should((element) => {
-        expect(element.val()).to.equal(
-          `${selectedChairUserFirstName} ${selectedChairUserLastName}`
-        );
-      });
+      cy.get('input[id="FapChair-' + fapMembers.chair.id + '"]').should(
+        (element) => {
+          expect(element.val()).to.equal(
+            `${selectedChairUserFirstName} ${selectedChairUserLastName}`
+          );
+        }
+      );
 
       cy.get('[data-cy="add-secretary-button"]').click();
 
@@ -521,6 +523,9 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('[data-cy="add-chair-button"]').should('not.exist');
+      cy.get('[data-cy="add-secretary-button"]').should('not.exist');
+
       cy.get('[aria-label="Set Fap Chair"]').should('not.exist');
       cy.get('[aria-label="Set Fap Secretary"]').should('not.exist');
 
@@ -643,6 +648,9 @@ context('General facility access panel tests', () => {
       cy.contains('Members').click();
 
       cy.finishedLoading();
+
+      cy.get('[data-cy="add-chair-button"]').should('not.exist');
+      cy.get('[data-cy="add-secretary-button"]').should('not.exist');
 
       cy.get('[aria-label="Set Fap Chair"]').should('not.exist');
       cy.get('[aria-label="Set Fap Secretary"]').should('not.exist');

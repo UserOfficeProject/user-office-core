@@ -141,7 +141,6 @@ export interface ProposalViewRecord {
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
   readonly proposal_id: string;
-  readonly rank_order: number;
   readonly final_status: number;
   readonly notified: boolean;
   readonly submitted: boolean;
@@ -150,8 +149,6 @@ export interface ProposalViewRecord {
   readonly faps: ProposalViewFap[];
   readonly fap_instruments: FapInstrument[];
   readonly call_short_code: string;
-  readonly average: number;
-  readonly deviation: number;
   readonly call_id: number;
   readonly proposal_workflow_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
@@ -404,10 +401,14 @@ export interface FapRecord {
   readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
-  readonly fap_chair_user_id: number | null;
 }
 
 export interface FapSecretariesRecord {
+  readonly user_id: number;
+  readonly fap_id: number;
+}
+
+export interface FapChairsRecord {
   readonly user_id: number;
   readonly fap_id: number;
 }
@@ -1088,7 +1089,7 @@ export const createFapObject = (fap: FapRecord) => {
     fap.grade_guide,
     fap.custom_grade_guide,
     fap.active,
-    fap.fap_chair_user_id,
+    [],
     []
   );
 };
