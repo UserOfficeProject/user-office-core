@@ -307,11 +307,16 @@ const FapProposalsAndAssignmentsTable = ({
 
     onAssignmentsUpdate({
       ...data,
-      fapChairProposalCount: assignedMembers.find(
-        (assignedMember) => assignedMember.id === data.fapChair?.id
-      )
-        ? (data.fapChairProposalCount || 0) + 1
-        : data.fapChairProposalCount,
+      fapChairsProposalCounts: data.fapChairsProposalCounts.map((value) => {
+        return {
+          userId: value.userId,
+          count: assignedMembers.find(
+            (assignedMember) => assignedMember.id === value.userId
+          )
+            ? value.count + 1
+            : value.count,
+        };
+      }),
       fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
         (value) => {
           return {
@@ -480,10 +485,15 @@ const FapProposalsAndAssignmentsTable = ({
 
         onAssignmentsUpdate({
           ...data,
-          fapChairProposalCount:
-            assignedReviewer.fapMemberUserId === data.fapChair?.id
-              ? data.fapChairProposalCount! - 1
-              : data.fapChairProposalCount,
+          fapChairsProposalCounts: data.fapChairsProposalCounts.map((value) => {
+            return {
+              userId: value.userId,
+              count:
+                assignedReviewer.fapMemberUserId === value.userId
+                  ? value.count - 1
+                  : value.count,
+            };
+          }),
           fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
             (value) => {
               return {

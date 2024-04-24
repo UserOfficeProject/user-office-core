@@ -23,11 +23,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    const result = database
-      .select([
-        'proposal_table_view.*',
-        database.raw('count(*) OVER() AS full_count'),
-      ])
+    const proposals = database
+      .select('proposal_pk')
       .from('proposal_table_view')
       .join(
         'call_has_instruments',
@@ -41,7 +38,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'call_has_instruments.instrument_id'
       )
-      .join(
+      .leftJoin(
         'instrument_has_scientists',
         'instrument_has_scientists.instrument_id',
         '=',
@@ -61,9 +58,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             user.id
           );
         }
-      })
-      .distinct('proposal_table_view.proposal_pk')
-      .orderBy('proposal_table_view.proposal_pk', 'desc')
+      });
+
+    const result = database
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('proposal_table_view')
+      .whereIn('proposal_pk', proposals)
+      .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
           query
