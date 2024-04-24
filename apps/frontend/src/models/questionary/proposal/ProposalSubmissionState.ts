@@ -3,8 +3,8 @@ import { immerable } from 'immer';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';
 import { Questionary, TemplateGroupId } from 'generated/sdk';
 
-import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 import { ProposalWithQuestionary } from './ProposalWithQuestionary';
+import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class ProposalSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;

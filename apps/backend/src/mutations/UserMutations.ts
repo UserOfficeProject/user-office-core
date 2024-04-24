@@ -132,7 +132,7 @@ export default class UserMutations {
       args.userRole === UserRole.FAP_CHAIR &&
       this.userAuth.isUserOfficer(agent)
     ) {
-      // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in faparate call.
+      // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in separate call.
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.FAP_CHAIR;
     } else if (

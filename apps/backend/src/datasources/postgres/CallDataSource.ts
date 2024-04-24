@@ -1,5 +1,4 @@
 import { logger } from '@user-office-software/duo-logger';
-import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
@@ -236,9 +235,11 @@ export default class PostgresCallDataSource implements CallDataSource {
           .forUpdate()
           .transacting(trx);
 
+        const { referenceNumberFormat } = args;
+
         if (
-          args.referenceNumberFormat &&
-          args.referenceNumberFormat !== preUpdateCall.reference_number_format
+          referenceNumberFormat &&
+          referenceNumberFormat !== preUpdateCall.reference_number_format
         ) {
           const proposals = (await database
             .select('p.proposal_pk', 'p.reference_number_sequence')
@@ -250,21 +251,19 @@ export default class PostgresCallDataSource implements CallDataSource {
             'proposal_pk' | 'reference_number_sequence'
           >[];
 
-          await BluePromise.map(
-            proposals,
-            async (p) => {
-              await database
+          await Promise.all(
+            proposals.map(async (proposal) =>
+              database
                 .update({
                   proposal_id: await calculateReferenceNumber(
-                    args.referenceNumberFormat!,
-                    p.reference_number_sequence
+                    referenceNumberFormat,
+                    proposal.reference_number_sequence
                   ),
                 })
                 .from('proposals')
-                .where('proposal_pk', p.proposal_pk)
-                .transacting(trx);
-            },
-            { concurrency: 50 }
+                .where('proposal_pk', proposal.proposal_pk)
+                .transacting(trx)
+            )
           );
         }
 

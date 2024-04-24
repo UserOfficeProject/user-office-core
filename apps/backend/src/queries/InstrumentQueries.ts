@@ -50,9 +50,8 @@ export default class InstrumentQueries {
     if (!callIds || callIds.length === 0) {
       return await this.dataSource.getInstruments();
     } else {
-      const instrumentsByCallIds = await this.dataSource.getInstrumentsByCallId(
-        callIds
-      );
+      const instrumentsByCallIds =
+        await this.dataSource.getInstrumentsByCallId(callIds);
 
       return {
         totalCount: instrumentsByCallIds.length,
@@ -79,9 +78,8 @@ export default class InstrumentQueries {
     agent: UserWithRole | null,
     proposalPk: number
   ): Promise<InstrumentWithManagementTime[]> {
-    const instruments = await this.dataSource.getInstrumentsByProposalPk(
-      proposalPk
-    );
+    const instruments =
+      await this.dataSource.getInstrumentsByProposalPk(proposalPk);
 
     return instruments;
   }

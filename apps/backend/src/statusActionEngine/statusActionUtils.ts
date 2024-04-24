@@ -213,9 +213,8 @@ export const getFapChairSecretariesAndFormatOutputForEmailSending = async (
         ? fap.fapSecretariesUserIds.concat(fapChair)
         : fapChair;
 
-      const fapChairAndSecs = await usersDataSource.getUsersByUserNumbers(
-        fapChairAndSecsIds
-      );
+      const fapChairAndSecs =
+        await usersDataSource.getUsersByUserNumbers(fapChairAndSecsIds);
 
       await getEmailReadyArrayOfUsersAndProposals(
         FCSs,

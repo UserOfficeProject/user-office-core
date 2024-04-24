@@ -27,11 +27,11 @@ import {
 } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
 
-import InternalReviews from '../internalReview/InternalReviews';
 import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
+import InternalReviews from '../internalReview/InternalReviews';
 
 export enum PROPOSAL_MODAL_TAB_NAMES {
   PROPOSAL_INFORMATION = 'Proposal information',
