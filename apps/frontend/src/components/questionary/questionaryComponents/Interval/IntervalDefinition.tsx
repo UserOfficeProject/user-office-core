@@ -5,12 +5,12 @@ import React from 'react';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType, IntervalConfig } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { IntervalAnswerRenderer } from './IntervalAnswerRenderer';
 import IntervalSearchCriteriaComponent from './IntervalSearchCriteriaComponent';
 import { QuestionaryComponentInterval } from './QuestionaryComponentInterval';
 import { QuestionIntervalForm } from './QuestionIntervalForm';
 import { QuestionTemplateRelationIntervalForm } from './QuestionTemplateRelationIntervalForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const intervalDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.INTERVAL,

@@ -44,8 +44,8 @@ const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
       ? parse(fap.gradeGuide)
       : noContents
     : pageContent
-    ? parse(pageContent)
-    : noContents;
+      ? parse(pageContent)
+      : noContents;
 
   return <StyledContainer>{content}</StyledContainer>;
 };

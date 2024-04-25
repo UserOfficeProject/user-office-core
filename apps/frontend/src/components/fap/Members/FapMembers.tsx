@@ -3,7 +3,7 @@ import Clear from '@mui/icons-material/Clear';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import Person from '@mui/icons-material/Person';
 import PersonAdd from '@mui/icons-material/PersonAdd';
-import { Button } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
@@ -91,10 +91,19 @@ const FapMembers = ({
     setFapChairModalOpen(false);
     onFapUpdate({
       ...fapData,
-      fapChair,
+      fapChairs: fapData.fapChairs?.concat([fapChair]) ?? fapData.fapChairs,
+      fapChairsProposalCounts: fapData.fapChairsProposalCounts.concat([
+        {
+          userId: fapChair.id,
+          count: 0,
+        },
+      ]),
     });
 
-    if (fapChair.id === user.id || fapData.fapChair?.id === user.id) {
+    if (
+      fapChair.id === user.id ||
+      fapData.fapChairs?.find((chair) => chair.id === user.id)
+    ) {
       setRenewTokenValue();
     }
   };
@@ -184,7 +193,7 @@ const FapMembers = ({
       case UserRole.FAP_CHAIR:
         onFapUpdate({
           ...fapData,
-          fapChair: null,
+          fapChairs: fapData.fapChairs.filter((chair) => chair.id !== user.id),
         });
     }
   };
@@ -215,11 +224,9 @@ const FapMembers = ({
 
   const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
 
-  const alreadySelectedMembers = FapReviewersData.map(
-    ({ userId }) => userId
-  ).concat(fapData.fapSecretaries.map((sec) => sec.id));
-
-  fapData.fapChair && alreadySelectedMembers.push(fapData.fapChair.id);
+  const alreadySelectedMembers = FapReviewersData.map(({ userId }) => userId)
+    .concat(fapData.fapSecretaries.map((sec) => sec.id))
+    .concat(fapData.fapChairs.map((chair) => chair.id));
 
   const FapReviewersDataWithId = FapReviewersData.map((fapReviewer) =>
     Object.assign(fapReviewer, { id: fapReviewer.userId })
@@ -260,60 +267,60 @@ const FapMembers = ({
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>
-          <TextField
-            name="FapChair"
-            id="FapChair"
-            label="Fap Chair"
-            type="text"
-            value={getFullUserName(fapData.fapChair)}
-            margin="normal"
-            fullWidth
-            data-cy="FapChair"
-            required
-            InputProps={{
-              readOnly: true,
-              endAdornment: isUserOfficer && (
-                <>
-                  {fapData.fapChair && (
-                    <Tooltip title="Remove Fap Chair">
+          {fapData.fapChairs.map((chair, index) => (
+            <TextField
+              key={chair.id}
+              name="FapChair"
+              id={'FapChair-' + chair.id}
+              label="Fap Chair"
+              type="text"
+              value={getFullUserName(chair)}
+              margin="normal"
+              fullWidth
+              data-cy="FapChair"
+              required
+              InputProps={{
+                readOnly: true,
+                endAdornment: isUserOfficer && (
+                  <>
+                    {
+                      <Tooltip title="Remove Fap Chair">
+                        <IconButton
+                          aria-label="Remove Fap chair"
+                          onClick={() =>
+                            removeChairOrSecretary(chair, UserRole.FAP_CHAIR)
+                          }
+                        >
+                          <Clear />
+                        </IconButton>
+                      </Tooltip>
+                    }
+                    <Tooltip title="Set Fap Chair">
                       <IconButton
-                        aria-label="Remove Fap chair"
-                        onClick={() =>
-                          removeChairOrSecretary(
-                            fapData.fapChair as BasicUserDetails,
-                            UserRole.FAP_CHAIR
-                          )
-                        }
+                        edge="start"
+                        onClick={() => setFapChairModalOpen(true)}
                       >
-                        <Clear />
+                        <Person />
                       </IconButton>
                     </Tooltip>
-                  )}
-                  <Tooltip title="Set Fap Chair">
-                    <IconButton
-                      edge="start"
-                      onClick={() => setFapChairModalOpen(true)}
-                    >
-                      <Person />
-                    </IconButton>
+                  </>
+                ),
+                startAdornment: fapData.fapChairs && (
+                  <Tooltip
+                    title={`Number of proposals to review: ${
+                      fapData.fapChairsProposalCounts[index].count || 0
+                    }`}
+                    sx={{ padding: '2px', marginRight: '4px' }}
+                  >
+                    <InfoOutlined
+                      fontSize="small"
+                      data-cy="fap-chair-reviews-info"
+                    />
                   </Tooltip>
-                </>
-              ),
-              startAdornment: fapData.fapChair && (
-                <Tooltip
-                  title={`Number of proposals to review: ${
-                    fapData.fapChairProposalCount || 0
-                  }`}
-                  sx={{ padding: '2px', marginRight: '4px' }}
-                >
-                  <InfoOutlined
-                    fontSize="small"
-                    data-cy="fap-chair-reviews-info"
-                  />
-                </Tooltip>
-              ),
-            }}
-          />
+                ),
+              }}
+            />
+          ))}
         </Grid>
         <Grid item sm={6} xs={12}>
           {fapData.fapSecretaries.map((sec, index) => (
@@ -371,17 +378,22 @@ const FapMembers = ({
         </Grid>
       </Grid>
       {isUserOfficer && (
-        <Grid>
-          <div style={{ textAlign: 'right' }}>
-            <Button
-              onClick={() => setFapSecretaryModalOpen(true)}
-              aria-label="Add New FAP Secretary Button"
-              data-cy="add-secretary-button"
-            >
-              Add Secretary
-            </Button>
-          </div>
-        </Grid>
+        <Stack direction="row" display="flex" justifyContent="space-between">
+          <Button
+            onClick={() => setFapChairModalOpen(true)}
+            aria-label="Add New FAP Chair Button"
+            data-cy="add-chair-button"
+          >
+            Add Chair
+          </Button>
+          <Button
+            onClick={() => setFapSecretaryModalOpen(true)}
+            aria-label="Add New FAP Secretary Button"
+            data-cy="add-secretary-button"
+          >
+            Add Secretary
+          </Button>
+        </Stack>
       )}
       <Grid container spacing={3}>
         <Grid data-cy="fap-reviewers-table" item xs={12}>

@@ -40,9 +40,8 @@ export default class StfcInstrumentDataSource extends PostgresInstrumentDataSour
       );
 
     const userNumbers = users.map((user) => user.id.toString());
-    const stfcUsers = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
-      userNumbers
-    );
+    const stfcUsers =
+      await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(userNumbers);
 
     const usersDetails = stfcUsers
       ? stfcUsers.map((person) => toEssBasicUserDetails(person))
