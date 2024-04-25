@@ -90,6 +90,8 @@ const FapMeetingProposalViewModal = ({
     proposalData.technicalReviews?.find(
       (technicalReview) => technicalReview.instrumentId === instrumentId
     );
+  const getInstrumentDetails = () =>
+    proposalData.instruments?.find((i) => i?.id === instrumentId);
 
   return (
     <>
@@ -151,6 +153,7 @@ const FapMeetingProposalViewModal = ({
                     />
                     <ExternalReviews
                       reviews={proposalData.reviews as Review[]}
+                      faps={proposalData.faps}
                     />
                     <TechnicalReviewInfo
                       hasWriteAccess={finalHasWriteAccess}
@@ -164,6 +167,7 @@ const FapMeetingProposalViewModal = ({
                       }
                       proposal={proposalData}
                       fapId={fapId}
+                      instrument={getInstrumentDetails()}
                     />
 
                     <ProposalDetails

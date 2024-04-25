@@ -39,6 +39,10 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
         name
         shortCode
       }
+      faps {
+        id
+        code
+      }
       call {
         id
         shortCode

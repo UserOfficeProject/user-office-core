@@ -458,7 +458,10 @@ const FapInstrumentProposalsTable = ({
 
   const updateAllProposalRankings = (proposals: FapProposal[]) => {
     const proposalsWithUpdatedRanking = proposals.map((item, index) => {
-      const fapMeetingDecision = item.proposal.fapMeetingDecisions?.[0];
+      const fapMeetingDecision = item.proposal.fapMeetingDecisions?.find(
+        (fmd) => fmd.instrumentId === fapInstrument.id
+      );
+
       const fapMeetingDecisions = [
         {
           proposalPk: item.proposal.primaryKey,

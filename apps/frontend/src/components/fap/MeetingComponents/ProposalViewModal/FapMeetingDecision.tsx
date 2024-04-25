@@ -9,6 +9,8 @@ import React, { Fragment } from 'react';
 import {
   Maybe,
   FapMeetingDecision as FapMeetingDecisionType,
+  Fap,
+  Instrument,
 } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 
@@ -23,17 +25,29 @@ const useStyles = makeStyles((theme) => ({
 
 type FapMeetingDecisionProps = {
   fapMeetingDecisions: Maybe<FapMeetingDecisionType[]>;
+  faps: Pick<Fap, 'code' | 'id'>[] | null;
+  instruments: (Pick<Instrument, 'id' | 'name'> | null)[] | null;
 };
 
 const FapMeetingDecision = ({
   fapMeetingDecisions,
+  faps,
+  instruments,
 }: FapMeetingDecisionProps) => {
   const classes = useStyles();
+
+  if (!fapMeetingDecisions?.length) {
+    return null;
+  }
+
+  const getFapCodeById = (id?: number) => faps?.find((f) => f.id === id)?.code;
+  const getInstrumentNameById = (id?: number) =>
+    instruments?.find((i) => i?.id === id)?.name;
 
   return (
     <div data-cy="faps-meeting-components-decision">
       <StyledPaper margin={[2, 0]}>
-        {fapMeetingDecisions?.map((fmd) => (
+        {fapMeetingDecisions.map((fmd) => (
           <Fragment key={fmd.instrumentId}>
             <Typography
               variant="h6"
@@ -41,8 +55,8 @@ const FapMeetingDecision = ({
               className={classes.heading}
               gutterBottom
             >
-              {fmd?.fapId} - Fap Meeting decision (Instrument:{' '}
-              {fmd.instrumentId})
+              {getFapCodeById(fmd.fapId)} - Fap Meeting decision (Instrument:{' '}
+              {getInstrumentNameById(fmd.instrumentId)})
             </Typography>
             <Table>
               <TableBody>
