@@ -484,6 +484,8 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly proposal_count: number;
   readonly full_count: number;
   readonly fap_id: number;
+  readonly all_faps_instrument_time_allocation: number;
+  readonly fap_instrument_time_allocation: number;
 }
 
 export interface InstrumentWithManagementTimeRecord {
