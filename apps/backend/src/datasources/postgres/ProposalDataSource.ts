@@ -293,7 +293,27 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         return createProposalObject(records[0]);
       });
   }
+  async updateProposalTimeRequested(
+    proposalPk: number,
+    timeRequested: number
+  ): Promise<Proposal> {
+    return database
+      .update(
+        {
+          time_requested: timeRequested,
+        },
+        ['*']
+      )
+      .from('proposals')
+      .where('proposal_pk', proposalPk)
+      .then((records: ProposalRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new GraphQLError(`Proposal not found ${proposalPk}`);
+        }
 
+        return createProposalObject(records[0]);
+      });
+  }
   async get(id: number): Promise<Proposal | null> {
     return database
       .select()

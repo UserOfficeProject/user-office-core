@@ -609,6 +609,7 @@ export default class ProposalMutations {
         submitted: false,
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
+        timeRequested: 0,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
@@ -751,5 +752,14 @@ export default class ProposalMutations {
     );
 
     return submitted;
+  }
+  async updateProposalTimeRequested(
+    proposalId: number,
+    value: any
+  ): Promise<Proposal | Rejection> {
+    return await this.proposalDataSource.updateProposalTimeRequested(
+      proposalId,
+      value
+    );
   }
 }

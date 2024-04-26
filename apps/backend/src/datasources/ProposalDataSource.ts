@@ -56,6 +56,10 @@ export interface ProposalDataSource {
   updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<TechnicalReview[]>;
+  updateProposalTimeRequested(
+    proposalPk: number,
+    time_requested: number
+  ): Promise<Proposal>;
   setProposalUsers(proposalPk: number, users: number[]): Promise<void>;
   submitProposal(
     primaryKey: number,

@@ -47,6 +47,7 @@ import { sampleEsiBasisDefinition } from './SampleEsiBasis';
 import { selectionFromOptionsDefinition } from './SelectionFromOptions';
 import { shipmentBasis } from './ShipmentBasis';
 import { textInputDefinition } from './TextInput';
+import { timeRequestedDefinition } from './TimeRequested';
 import { visitBasisDefinition } from './VisitBasis';
 
 export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
@@ -174,6 +175,7 @@ const registry = [
   dynamicMultipleChoiceDefinition,
   visitBasisDefinition,
   instrumentPickerDefinition,
+  timeRequestedDefinition,
 ];
 
 Object.freeze(registry);

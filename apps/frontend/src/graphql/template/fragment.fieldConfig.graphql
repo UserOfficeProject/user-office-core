@@ -164,4 +164,10 @@ fragment fieldConfig on FieldConfig {
       name
     }
   }
+  ... on TimeRequestedConfig {
+    time
+    small_label
+    required
+    tooltip
+  }
 }

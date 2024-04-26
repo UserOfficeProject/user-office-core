@@ -36,6 +36,7 @@ import { sampleDeclarationDefinition } from './questionaryComponents/SampleDecla
 import { sampleEsiBasisDefinition } from './questionaryComponents/SampleEsiBasis/SampleEsiBasisDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
+import { timeRequestedDefinition } from './questionaryComponents/TimeRequested/TimeRequestedDefinition';
 import { visitBasisDefinition } from './questionaryComponents/VisitBasis/VisitBasisDefinition';
 
 export type FormChildren<ValueObjectType> = (
@@ -176,6 +177,7 @@ const registry = [
   textInputDefinition,
   visitBasisDefinition,
   instrumentPickerDefinition,
+  timeRequestedDefinition,
 ];
 
 Object.freeze(registry);

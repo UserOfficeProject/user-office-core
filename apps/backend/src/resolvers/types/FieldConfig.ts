@@ -289,6 +289,12 @@ export class RichTextInputConfig extends ConfigBase {
   max: number | null;
 }
 
+@ObjectType()
+export class TimeRequestedConfig extends ConfigBase {
+  @Field(() => String)
+  time: string;
+}
+
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
   types: () => [
@@ -313,5 +319,6 @@ export const FieldConfigType = createUnionType({
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
     InstrumentPickerConfig,
+    TimeRequestedConfig,
   ], // function that returns array of object types classes
 });

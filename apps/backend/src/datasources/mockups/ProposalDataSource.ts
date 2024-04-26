@@ -55,7 +55,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.notified || false,
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
-    values?.managementDecisionSubmitted || false
+    values?.managementDecisionSubmitted || false,
+    values?.timeRequested || 0
   );
 };
 
@@ -134,6 +135,19 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   proposalsUpdated: Proposal[];
   constructor() {
     this.init();
+  }
+  async updateProposalTimeRequested(
+    proposalPk: number,
+    time_requested: number
+  ): Promise<Proposal> {
+    const proposal = await this.get(proposalPk);
+
+    if (!proposal) {
+      throw new Error('Proposal does not exist');
+    }
+    proposal.timeRequested = time_requested;
+
+    return proposal;
   }
 
   async updateProposalTechnicalReviewer(

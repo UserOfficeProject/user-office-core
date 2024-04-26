@@ -126,6 +126,7 @@ export interface ProposalRecord {
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
+  readonly time_requested: number;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -764,7 +765,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.notified,
     proposal.submitted,
     proposal.reference_number_sequence,
-    proposal.management_decision_submitted
+    proposal.management_decision_submitted,
+    proposal.time_requested
   );
 };
 
