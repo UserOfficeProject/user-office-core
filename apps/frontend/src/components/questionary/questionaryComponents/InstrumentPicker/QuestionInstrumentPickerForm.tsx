@@ -8,8 +8,8 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { InstrumentPickerConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import { QuestionFormShell } from '../QuestionFormShell';
 import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
+import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
   const field = props.question;

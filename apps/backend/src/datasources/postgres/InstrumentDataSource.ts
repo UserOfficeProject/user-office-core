@@ -23,6 +23,7 @@ import {
   InstrumentWithManagementTimeRecord,
   InstitutionRecord,
   FapProposalRecord,
+  CountryRecord,
 } from './records';
 
 @injectable()
@@ -537,11 +538,15 @@ export default class PostgresInstrumentDataSource
       })
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('ihs.instrument_id', instrumentId)
-      .then((usersRecord: Array<UserRecord & InstitutionRecord>) => {
-        const users = usersRecord.map((user) => createBasicUserObject(user));
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          const users = usersRecord.map((user) => createBasicUserObject(user));
 
-        return users;
-      });
+          return users;
+        }
+      );
   }
 
   async setAvailabilityTimeOnInstrument(

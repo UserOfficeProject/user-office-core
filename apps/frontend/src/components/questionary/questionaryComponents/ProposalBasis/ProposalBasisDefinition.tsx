@@ -4,11 +4,11 @@ import React from 'react';
 import { DataType } from 'generated/sdk';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createProposalBasisValidationSchema } from './createProposalBasisValidationSchema';
 import { QuestionaryComponentProposalBasis } from './QuestionaryComponentProposalBasis';
 import { QuestionProposalBasisForm } from './QuestionProposalBasisForm';
 import { QuestionTemplateRelationProposalBasisForm } from './QuestionTemplateRelationProposalBasisForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const proposalBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.PROPOSAL_BASIS,

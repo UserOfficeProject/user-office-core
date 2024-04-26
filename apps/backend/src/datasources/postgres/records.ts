@@ -406,10 +406,14 @@ export interface FapRecord {
   readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
-  readonly fap_chair_user_id: number | null;
 }
 
 export interface FapSecretariesRecord {
+  readonly user_id: number;
+  readonly fap_id: number;
+}
+
+export interface FapChairsRecord {
   readonly user_id: number;
   readonly fap_id: number;
 }
@@ -931,7 +935,9 @@ export const createUserObject = (user: UserRecord) => {
   );
 };
 
-export const createBasicUserObject = (user: UserRecord & InstitutionRecord) => {
+export const createBasicUserObject = (
+  user: UserRecord & InstitutionRecord & CountryRecord
+) => {
   return new BasicUserDetails(
     user.user_id,
     user.firstname,
@@ -942,7 +948,8 @@ export const createBasicUserObject = (user: UserRecord & InstitutionRecord) => {
     user.position,
     user.created_at,
     user.placeholder,
-    user.email
+    user.email,
+    user.country
   );
 };
 
@@ -1090,7 +1097,7 @@ export const createFapObject = (fap: FapRecord) => {
     fap.grade_guide,
     fap.custom_grade_guide,
     fap.active,
-    fap.fap_chair_user_id,
+    [],
     []
   );
 };

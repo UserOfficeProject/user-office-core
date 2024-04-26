@@ -24,6 +24,38 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    const proposals = database
+      .select('proposal_pk')
+      .from('proposal_table_view')
+      .join(
+        'call_has_instruments',
+        'call_has_instruments.call_id',
+        '=',
+        'proposal_table_view.call_id'
+      )
+      .join(
+        'instruments',
+        'instruments.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
+      .leftJoin(
+        'instrument_has_scientists',
+        'instrument_has_scientists.instrument_id',
+        '=',
+        'call_has_instruments.instrument_id'
+      )
+      .where(function () {
+        if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
+          this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
+        } else {
+          this.where('instrument_has_scientists.user_id', user.id).orWhere(
+            'instruments.manager_user_id',
+            user.id
+          );
+        }
+      });
+
     const result = database
       .with(
         'ptw',
@@ -39,35 +71,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('ptw')
-      .join(
-        'call_has_instruments',
-        'call_has_instruments.call_id',
-        '=',
-        'ptw.call_id'
-      )
-      .join(
-        'instruments',
-        'instruments.instrument_id',
-        '=',
-        'call_has_instruments.instrument_id'
-      )
-      .join(
-        'instrument_has_scientists',
-        'instrument_has_scientists.instrument_id',
-        '=',
-        'call_has_instruments.instrument_id'
-      )
-      .where(function () {
-        if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
-          this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
-        } else {
-          this.where('instrument_has_scientists.user_id', user.id).orWhere(
-            'instruments.manager_user_id',
-            user.id
-          );
-        }
-      })
-      .distinct('proposal_pk')
+      .whereIn('proposal_pk', proposals)
       .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
