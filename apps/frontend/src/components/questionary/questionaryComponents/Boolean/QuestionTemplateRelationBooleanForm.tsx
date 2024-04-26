@@ -1,3 +1,4 @@
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel } from 'formik-mui';
 import React from 'react';
@@ -13,6 +14,15 @@ import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFo
 export const QuestionTemplateRelationBooleanForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
+
   return (
     <QuestionTemplateRelationFormShell
       {...props}
@@ -25,6 +35,9 @@ export const QuestionTemplateRelationBooleanForm = (
     >
       {(formikProps) => (
         <>
+          <label className={classes.label}>
+            You are editing the question as it appears on the current template
+          </label>
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <Field

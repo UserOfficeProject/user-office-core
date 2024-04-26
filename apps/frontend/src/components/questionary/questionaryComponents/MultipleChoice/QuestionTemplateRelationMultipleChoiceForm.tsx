@@ -3,6 +3,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { Checkbox, Select } from 'formik-mui';
 import React, { useState } from 'react';
@@ -30,6 +31,14 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
     { label: 'Radio', value: 'radio' },
     { label: 'Dropdown', value: 'dropdown' },
   ];
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
 
   return (
     <QuestionTemplateRelationFormShell
@@ -43,6 +52,9 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
     >
       {(formikProps) => (
         <>
+          <label className={classes.label}>
+            You are editing the question as it appears on the current template
+          </label>
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <FormControlLabel

@@ -1,5 +1,6 @@
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
 import React, { useContext, ChangeEvent } from 'react';
@@ -29,7 +30,14 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
     templates: sampleTemplates,
     refreshTemplates: refreshSampleTemplates,
   } = useActiveTemplates(TemplateGroupId.SAMPLE, config.templateId);
-
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
   const { templates: esiTemplates, refreshTemplates: refreshEsiTemplates } =
     useActiveTemplates(TemplateGroupId.SAMPLE_ESI, config.esiTemplateId);
 
@@ -62,6 +70,7 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
     >
       {({ values, setFieldValue }) => (
         <>
+          <label className={classes.label}>You are editing the question</label>
           <Field
             name="naturalKey"
             id="Key-Input"

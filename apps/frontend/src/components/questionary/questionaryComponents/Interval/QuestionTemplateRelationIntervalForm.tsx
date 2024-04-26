@@ -1,5 +1,6 @@
 import Autocomplete from '@mui/lab/Autocomplete';
 import MaterialTextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { useState } from 'react';
@@ -20,6 +21,14 @@ export const QuestionTemplateRelationIntervalForm = (
   const intervalConfig = props.questionRel.config as IntervalConfig;
   const { units } = useUnitsData();
   const [selectedUnits, setSelectedUnits] = useState(intervalConfig.units);
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
 
   return (
     <QuestionTemplateRelationFormShell
@@ -42,6 +51,9 @@ export const QuestionTemplateRelationIntervalForm = (
     >
       {(formikProps) => (
         <>
+          <label className={classes.label}>
+            You are editing the question as it appears on the current template
+          </label>
           <QuestionExcerpt question={props.questionRel.question} />
           <Field
             name="config.small_label"

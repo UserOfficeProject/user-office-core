@@ -1,4 +1,5 @@
 import ListItemText from '@mui/material/ListItemText';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
@@ -24,6 +25,14 @@ export const QuestionTemplateRelationFileUploadForm = (
     { label: 'video/*', value: 'video/*' },
     { label: 'image/*', value: 'image/*' },
   ];
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
 
   return (
     <QuestionTemplateRelationFormShell
@@ -50,6 +59,10 @@ export const QuestionTemplateRelationFileUploadForm = (
 
           return (
             <>
+              <label className={classes.label}>
+                You are editing the question as it appears on the current
+                template
+              </label>
               <QuestionExcerpt question={props.questionRel.question} />
               <TitledContainer label="Options">
                 <Field

@@ -1,3 +1,4 @@
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React from 'react';
@@ -16,6 +17,14 @@ export const QuestionTemplateRelationEmbellishmentForm = (
   document.addEventListener('focusin', function (e) {
     e.stopImmediatePropagation();
   });
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
 
   return (
     <QuestionTemplateRelationFormShell
@@ -29,6 +38,9 @@ export const QuestionTemplateRelationEmbellishmentForm = (
     >
       {(formikProps) => (
         <>
+          <label className={classes.label}>
+            You are editing the question as it appears on the current template
+          </label>
           <Field
             name="config.html"
             type="text"

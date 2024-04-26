@@ -1,5 +1,6 @@
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
 import { ChangeEvent, default as React, useContext } from 'react';
@@ -30,7 +31,14 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
     templates: sampleTemplates,
     refreshTemplates: refreshSampleTemplates,
   } = useActiveTemplates(TemplateGroupId.SAMPLE, config.templateId);
-
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
   const { templates: esiTemplates, refreshTemplates: refreshEsiTemplates } =
     useActiveTemplates(TemplateGroupId.SAMPLE_ESI, config.esiTemplateId);
 
@@ -63,6 +71,9 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
     >
       {(formikProps) => (
         <>
+          <label className={classes.label}>
+            You are editing the question as it appears on the current template
+          </label>
           <QuestionExcerpt question={props.questionRel.question} />
 
           <TitledContainer label="Options">

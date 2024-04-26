@@ -1,4 +1,5 @@
 import ListItemText from '@mui/material/ListItemText';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
@@ -23,6 +24,14 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
     { label: 'video/*', value: 'video/*' },
     { label: 'image/*', value: 'image/*' },
   ];
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
 
   return (
     <QuestionFormShell
@@ -50,6 +59,9 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
 
         return (
           <>
+            <label className={classes.label}>
+              You are editing the question
+            </label>
             <Field
               name="naturalKey"
               id="Key-Input"

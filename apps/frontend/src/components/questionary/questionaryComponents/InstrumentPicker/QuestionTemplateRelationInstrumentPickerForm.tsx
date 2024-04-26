@@ -1,3 +1,4 @@
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -11,6 +12,15 @@ import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFo
 export const QuestionTemplateRelationInstrumentPickerForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
+  const useStyles = makeStyles((theme) => ({
+    label: {
+      color: theme.palette.primary.main,
+      backgroundColor: theme.palette.grey[300],
+      fontSize: 'medium',
+    },
+  }));
+  const classes = useStyles();
+
   return (
     <QuestionTemplateRelationFormShell
       {...props}
@@ -23,6 +33,9 @@ export const QuestionTemplateRelationInstrumentPickerForm = (
     >
       {() => (
         <>
+          <label className={classes.label}>
+            You are editing the question as it appears on the current template
+          </label>
           <QuestionExcerpt question={props.questionRel.question} />
           <QuestionInstrumentPickerFormCommon
             config={props.questionRel.question.config as InstrumentPickerConfig}
