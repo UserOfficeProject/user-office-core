@@ -4,11 +4,11 @@ import EsiIcon from 'components/common/icons/EsiIcon';
 import { DataType } from 'generated/sdk';
 import { ProposalEsiSubmissionState } from 'models/questionary/proposalEsi/ProposalEsiSubmissionState';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createProposalEsiBasisValidationSchema } from './createProposalEsiValidationSchema';
 import QuestionaryComponentProposalEsiBasis from './QuestionaryComponentProposalEsiBasis';
 import { QuestionProposalEsiBasisForm } from './QuestionProposalEsiBasisForm';
 import { QuestionTemplateRelationProposalEsiBasisForm } from './QuestionTemplateRelationProposalEsiBasisForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const proposalEsiBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.PROPOSAL_ESI_BASIS,

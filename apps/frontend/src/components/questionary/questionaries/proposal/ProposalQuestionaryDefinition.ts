@@ -6,8 +6,8 @@ import { Sdk, TemplateGroupId } from 'generated/sdk';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
-import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { ProposalQuestionaryWizardStep } from './ProposalQuestionaryWizardStep';
+import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 
 export const proposalQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.PROPOSAL,

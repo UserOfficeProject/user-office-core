@@ -18,7 +18,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type FapMeetingInstrumentsTableProps = {
   fapId: number;
-  selectedCall?: Call;
+  selectedCall: Call;
   confirm: WithConfirmType;
   code: string;
 };
@@ -46,7 +46,7 @@ const FapMeetingInstrumentsTable = ({
   code,
 }: FapMeetingInstrumentsTableProps) => {
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
-    useInstrumentsByFapData(fapId, selectedCall?.id);
+    useInstrumentsByFapData(fapId, selectedCall.id);
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -61,7 +61,7 @@ const FapMeetingInstrumentsTable = ({
     ...column,
     title:
       column.field === 'availabilityTime'
-        ? `${column.title} (${selectedCall?.allocationTimeUnit}s)`
+        ? `${column.title} (${selectedCall.allocationTimeUnit}s)`
         : column.title,
   }));
 
@@ -180,7 +180,7 @@ const FapMeetingInstrumentsTable = ({
             tooltip: 'Export in Excel',
             disabled: !selectedCall || loadingInstruments,
             onClick: (): void => {
-              if (selectedCall?.id) {
+              if (selectedCall.id) {
                 downloadFapXLSX(
                   fapId,
                   selectedCall.id,

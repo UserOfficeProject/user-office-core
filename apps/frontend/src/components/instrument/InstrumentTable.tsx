@@ -14,14 +14,14 @@ import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
+import AssignedScientistsTable from './AssignedScientistsTable';
+import CreateUpdateInstrument from './CreateUpdateInstrument';
 import {
   BasicUserDetails,
   InstrumentFragment,
   UserRole,
 } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
-import AssignedScientistsTable from './AssignedScientistsTable';
-import CreateUpdateInstrument from './CreateUpdateInstrument';
 
 const columns = [
   {
