@@ -198,15 +198,14 @@ export const getFapChairSecretariesAndFormatOutputForEmailSending = async (
   for (const proposal of proposals) {
     const fap = await fapDataSource.getFapByProposalPk(proposal.primaryKey);
 
-    const fapChair = fap?.fapChairUserId ? [fap?.fapChairUserId] : [];
+    const fapChair = fap?.fapChairUserIds ? fap?.fapChairUserIds : [];
 
     const fapChairAndSecsIds = fap?.fapSecretariesUserIds
       ? fap.fapSecretariesUserIds.concat(fapChair)
       : fapChair;
 
-    const fapChairAndSecs = await usersDataSource.getUsersByUserNumbers(
-      fapChairAndSecsIds
-    );
+    const fapChairAndSecs =
+      await usersDataSource.getUsersByUserNumbers(fapChairAndSecsIds);
 
     await getEmailReadyArrayOfUsersAndProposals(
       FCSs,
