@@ -438,6 +438,23 @@ export interface FapAssignmentRecord {
   readonly rank: number | null;
 }
 
+export interface FapReviewsRecord {
+  readonly proposal_pk: number;
+  readonly proposal_id: number;
+  readonly title: string;
+  readonly instrument_name: string;
+  readonly availability_time: number;
+  readonly time_allocation: number;
+  readonly fap_id: number;
+  readonly rank_order: number;
+  readonly call_id: number;
+  readonly proposer_id: number;
+  readonly instrument_id: number;
+  readonly fap_time_allocation: number;
+  readonly average_grade: number;
+  readonly questionary_id: number;
+}
+
 export interface FapReviewerRecord {
   readonly user_id: number;
   readonly fap_id: number;

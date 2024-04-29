@@ -1,29 +1,26 @@
-import { FapProposal } from '../../models/Fap';
-import { FapMeetingDecision } from '../../models/FapMeetingDecision';
-import { InstrumentWithAvailabilityTime } from '../../models/Instrument';
-import { Proposal } from '../../models/Proposal';
-import { TechnicalReview } from '../../models/TechnicalReview';
 import { RowObj } from './fap';
 
 export function getDataRow(
   piName: string,
   proposalAverageScore: number,
-  instrument: InstrumentWithAvailabilityTime,
-  fapMeetingDecision: FapMeetingDecision | null,
-  proposal: Proposal | null,
-  technicalReview: TechnicalReview | null,
-  fapProposal: FapProposal | null
-) {
+  instrumentName: string,
+  instrumentAvailabilityTime: number,
+  fapTimeAllocation: number | null,
+  proposalTitle: string,
+  proposalId: number | null,
+  techReviewTimeAllocation: number | null,
+  propFapRankOrder: number | null
+): RowObj {
   return {
-    propShortCode: proposal?.proposalId,
-    propTitle: proposal?.title,
+    propShortCode: proposalId?.toString(),
+    propTitle: proposalTitle,
     principalInv: piName,
-    instrName: instrument.name,
-    instrAvailTime: instrument.availabilityTime,
-    techReviewTimeAllocation: technicalReview?.timeAllocation,
-    fapTimeAllocation: fapProposal?.fapTimeAllocation ?? null,
-    propReviewAvgScore: proposalAverageScore,
-    propFapRankOrder: fapMeetingDecision?.rankOrder ?? null,
+    instrName: instrumentName,
+    instrAvailTime: instrumentAvailabilityTime,
+    techReviewTimeAllocation: techReviewTimeAllocation,
+    fapTimeAllocation: fapTimeAllocation ?? null,
+    propReviewAvgScore: proposalAverageScore ?? 0,
+    propFapRankOrder: propFapRankOrder ?? null,
     inAvailZone: null,
   };
 }

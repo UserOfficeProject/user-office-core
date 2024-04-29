@@ -1,10 +1,11 @@
+import { groupBy } from 'lodash';
 import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
+import { FapDataSource } from '../../datasources/FapDataSource';
 import { Review } from '../../models/Review';
 import { UserWithRole } from '../../models/User';
-import { average, getGrades } from '../../utils/mathFunctions';
 import { getDataRow } from './FapDataRow';
 import { getStfcDataRow } from './stfc/StfcFapDataRow';
 
@@ -37,6 +38,8 @@ const fapDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
 const populateRow = container.resolve<(row: RowObj) => (string | number)[]>(
   Tokens.PopulateRow
 );
+
+const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
 const sortByRankOrder = (a: RowObj, b: RowObj) => {
   if (a.propFapRankOrder === b.propFapRankOrder) {
@@ -74,14 +77,13 @@ const sortByRankOrAverageScore = (data: RowObj[]) => {
     });
 };
 
-export const collectFaplXLSXData = async (
+export const collectFapXLSXData = async (
   fapId: number,
   callId: number,
   user: UserWithRole
 ): Promise<{ data: FapXLSXData; filename: string }> => {
   const fap = await baseContext.queries.fap.get(user, fapId);
   const call = await baseContext.queries.call.get(user, callId);
-
   // TODO: decide on filename
   const filename = `Fap-${fap?.code}-${call?.shortCode}.xlsx`;
 
@@ -97,160 +99,60 @@ export const collectFaplXLSXData = async (
     );
   }
 
-  const instrumentsFapProposals = await Promise.all(
-    instruments.map((instrument) => {
-      return baseContext.queries.fap.getFapProposalsByInstrument(user, {
-        fapId,
-        callId,
-        instrumentId: instrument.id,
-      });
-    })
-  );
+  const baseData = await fapDataSource.getFapReviewData(callId, fapId);
 
-  const instrumentsProposals = await Promise.all(
-    instrumentsFapProposals.map((fapProposalPks) => {
-      if (!fapProposalPks) {
-        const instrumentIds = instruments.map(({ id }) => id).join(', ');
-
-        throw new Error(
-          `Fap with ID '${fapId}'/` +
-            `Call with ID '${callId}/'` +
-            `Instruments with IDs '${instrumentIds}' not found, or the user has insufficient rights`
-        );
-      }
-
-      return Promise.all(
-        fapProposalPks.map(({ proposalPk }) =>
-          baseContext.queries.proposal.dataSource.get(proposalPk)
-        )
-      );
-    })
-  );
-
-  const proposalsReviews = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.review.reviewsForProposal(
-                user,
-                proposal.primaryKey
-              )
-            : null
-        )
-      );
-    })
-  );
-
-  const proposalsTechnicalReviews = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.review.technicalReviewsForProposal(
-                user,
-                proposal.primaryKey
-              )
-            : null
-        )
-      );
-    })
-  );
-
-  const proposalsFapMeetingDecisions = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.fap.getProposalFapMeetingDecision(
-                user,
-                proposal.primaryKey
-              )
-            : null
-        )
-      );
-    })
-  );
-
-  const proposalsPrincipalInvestigators = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.user.getBasic(user, proposal.proposerId)
-            : null
-        )
-      );
-    })
-  );
-
-  const instrumentProposalsAnswers = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.questionary.getQuestionarySteps(
-                user,
-                proposal.questionaryId
-              )
-            : null
-        )
-      );
-    })
-  );
+  const instrumentData = groupBy(baseData, 'instrument_id');
 
   const out: FapXLSXData = [];
 
-  await Promise.all(
-    instruments.map(async (instrument, indx) => {
-      const proposals = instrumentsProposals[indx];
-      const proposalReviews = proposalsReviews[indx];
-      const proposalPrincipalInvestigators =
-        proposalsPrincipalInvestigators[indx];
-      const technicalReviews = proposalsTechnicalReviews[indx];
-      const fapProposals = instrumentsFapProposals[indx];
-      const fapMeetingDecisions = proposalsFapMeetingDecisions[indx];
-      const proposalsAnswers = instrumentProposalsAnswers[indx];
+  for (const instrument in instrumentData) {
+    const records = instrumentData[instrument];
 
-      const rows = await Promise.all(
-        proposals.map(async (proposal, pIndx) => {
-          const { firstname = '<missing>', lastname = '<missing>' } =
-            proposalPrincipalInvestigators[pIndx] ?? {};
-          const technicalReview =
-            technicalReviews[pIndx]?.find(
-              (technicalReview) =>
-                technicalReview.instrumentId === instrument.id
-            ) || null;
-          const reviews = proposalReviews[pIndx];
-          const fapProposal = fapProposals?.[pIndx];
-          const fapMeetingDecision = fapMeetingDecisions[pIndx];
-          const proposalAnswers = proposalsAnswers[pIndx];
+    const sheetName = records[0].instrument_name;
 
-          const proposalAverageScore = average(getGrades(reviews)) || 0;
+    const rows = await Promise.all(
+      records.map(async (proposal) => {
+        const pi = await baseContext.queries.user.getBasic(
+          user,
+          proposal.proposer_id
+        );
 
-          return fapDataRow(
-            `${firstname} ${lastname}`,
-            proposalAverageScore,
-            instrument,
-            fapMeetingDecision,
-            proposal,
-            technicalReview,
-            fapProposal ? fapProposal : null,
-            proposalAnswers,
-            reviews
+        const proposalAnswers =
+          await baseContext.queries.questionary.getQuestionarySteps(
+            user,
+            proposal.questionary_id
           );
-        })
-      );
 
-      out.push({
-        sheetName:
-          // Sheet names can't exceed 31 characters
-          // use the short code and cut everything after 30 chars
-          instrument.shortCode.substring(0, 30),
-        rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
-      });
-    })
-  );
+        const reviews = await baseContext.queries.review.reviewsForProposal(
+          user,
+          proposal.proposal_pk
+        );
+
+        return fapDataRow(
+          `${pi?.firstname} ${pi?.lastname}`,
+          proposal.average_grade,
+          proposal.instrument_name,
+          proposal.availability_time,
+          proposal.fap_time_allocation,
+          proposal.title,
+          proposal.proposal_id,
+          proposal.time_allocation,
+          proposal.rank_order,
+          proposal.proposer_id,
+          proposalAnswers,
+          reviews
+        );
+      })
+    );
+
+    out.push({
+      sheetName:
+        // Sheet names can't exceed 31 characters
+        // use the short code and cut everything after 30 chars
+        sheetName.substring(0, 30),
+      rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
+    });
+  }
 
   return {
     data: out,
