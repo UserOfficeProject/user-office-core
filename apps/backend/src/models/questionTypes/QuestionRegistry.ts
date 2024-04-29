@@ -24,6 +24,7 @@ import {
   SelectionFromOptionsConfig,
   ShipmentBasisConfig,
   TextInputConfig,
+  TimeRequestedConfig,
   VisitBasisConfig,
 } from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -92,7 +93,9 @@ export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
                                         ? DynamicMultipleChoiceConfig
                                         : T extends DataType.INSTRUMENT_PICKER
                                           ? InstrumentPickerConfig
-                                          : never;
+                                          : T extends DataType.TIME_REQUESTED
+                                            ? TimeRequestedConfig
+                                            : never;
 
 export interface Question<T extends DataType> {
   /**
