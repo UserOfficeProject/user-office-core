@@ -61,7 +61,7 @@ BEGIN
           EXIST_WH := '';
           UPD_SQL = 'UPDATE ' || MTR_REC.TABLE_NAME || ' AS T1 SET ' || MTR_REC.COLUMN_NAME ||
                   ' = ' || P_NEW_USER_ID || ' WHERE T1.' || MTR_REC.COLUMN_NAME || ' = ' || P_OLD_USER_ID ||' ';
-          FOR MTR_PK_UN_REC IN SELECT KCU.TABLE_NAME, CCU.COLUMN_NAME, MTR_REC.COLUMN_NAME AS FK_COLUMN
+          FOR MTR_PK_UN_REC IN SELECT KCU.TABLE_NAME, CCU.COLUMN_NAME
             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC 
               JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU
                 ON TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME
@@ -76,21 +76,21 @@ BEGIN
                 AND UPPER(CCU.TABLE_SCHEMA) ='PUBLIC'
                 AND KCU.TABLE_NAME = MTR_REC.TABLE_NAME
                 AND KCU.COLUMN_NAME = MTR_REC.COLUMN_NAME
-          LOOP
+          LOOP 
             MTR_PK_UN_COL_CNT := MTR_PK_UN_COL_CNT + 1;
-            IS_NEW_USERID := 0;
-            SELECT COUNT(*) FROM MERGING_TABLE_REGIESTRY 
-              WHERE TABLE_NAME = MTR_PK_UN_REC.TABLE_NAME 
-              AND COLUMN_NAME = MTR_PK_UN_REC.COLUMN_NAME 
-              INTO IS_NEW_USERID;
             IF MTR_PK_UN_COL_CNT = 2 THEN 
-              DEL_SQL = 'DELETE FROM ' || MTR_PK_UN_REC.TABLE_NAME || 
-              ' T1 WHERE '|| MTR_PK_UN_REC.COLUMN_NAME ||
+              DEL_SQL = 'DELETE FROM ' || MTR_REC.TABLE_NAME || 
+              ' T1 WHERE '|| MTR_REC.COLUMN_NAME ||
               ' = ' ||P_OLD_USER_ID;
             END IF;
             IF LENGTH(EXIST_WH) > 0 THEN
               EXIST_WH = EXIST_WH || ' AND T2.';
             END IF;
+            IS_NEW_USERID := 0;
+            SELECT COUNT(*) FROM MERGING_TABLE_REGIESTRY 
+              WHERE TABLE_NAME = MTR_PK_UN_REC.TABLE_NAME 
+              AND COLUMN_NAME = MTR_PK_UN_REC.COLUMN_NAME 
+              INTO IS_NEW_USERID;
             IF IS_NEW_USERID = 1 THEN
               EXIST_WH = EXIST_WH || MTR_PK_UN_REC.COLUMN_NAME || ' = ' || P_NEW_USER_ID ;
             ELSE 
