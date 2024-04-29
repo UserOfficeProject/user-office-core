@@ -303,9 +303,6 @@ export default class PostgresFapDataSource implements FapDataSource {
           })
           .join('proposal_statuses as ps', {
             'p.status_id': 'ps.proposal_status_id',
-          })
-          .where(function () {
-            this.where('ps.name', 'ilike', 'FAP_%');
           });
 
         if (callId) {
@@ -325,25 +322,22 @@ export default class PostgresFapDataSource implements FapDataSource {
     callId: number
   ): Promise<BasicUserDetails[]> {
     const fapProposalReviewers: Array<
-      // eslint-disable-next-line prettier/prettier
       UserRecord & InstitutionRecord & CountryRecord
-    > =
-      // eslint-disable-next-line prettier/prettier
-      await database
-        .select(['users.*', 'institutions.*']) // Adjusted here
-        .from('fap_reviews as sr')
-        .join('fap_proposals as sp', {
-          'sr.proposal_pk': 'sp.proposal_pk',
-          'sr.fap_id': 'sp.fap_id',
-        })
-        .join('users', {
-          'users.user_id': 'sr.user_id',
-        })
-        .join('institutions', {
-          'users.institution_id': 'institutions.institution_id',
-        })
-        .where('sp.proposal_pk', proposalPk)
-        .andWhere('sp.call_id', callId);
+    > = await database
+      .select(['users.*', 'institutions.*'])
+      .from('fap_reviews as sr')
+      .join('fap_proposals as sp', {
+        'sr.proposal_pk': 'sp.proposal_pk',
+        'sr.fap_id': 'sp.fap_id',
+      })
+      .join('users', {
+        'users.user_id': 'sr.user_id',
+      })
+      .join('institutions', {
+        'users.institution_id': 'institutions.institution_id',
+      })
+      .where('sp.proposal_pk', proposalPk)
+      .andWhere('sp.call_id', callId);
 
     return fapProposalReviewers.map((fapProposalReviewer) =>
       createBasicUserObject(fapProposalReviewer)

@@ -483,11 +483,18 @@ export default class PostgresInstrumentDataSource
           );
 
         const result = instrumentsWithSubmittedFlag.map((instrument) => {
-          const calculatedInstrumentAvailabilityTimePerFap = Math.round(
-            (instrument.availability_time /
-              instrument.all_faps_instrument_time_allocation) *
-              instrument.fap_instrument_time_allocation
-          );
+          let calculatedInstrumentAvailabilityTimePerFap = null;
+          if (
+            instrument.availability_time !== null &&
+            instrument.all_faps_instrument_time_allocation > 0 &&
+            instrument.fap_instrument_time_allocation !== null
+          ) {
+            calculatedInstrumentAvailabilityTimePerFap = Math.round(
+              (instrument.availability_time /
+                instrument.all_faps_instrument_time_allocation) *
+                instrument.fap_instrument_time_allocation
+            );
+          }
 
           return this.createInstrumentWithAvailabilityTimeObject({
             ...instrument,

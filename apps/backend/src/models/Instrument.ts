@@ -15,7 +15,7 @@ export class InstrumentWithAvailabilityTime extends Instrument {
     public shortCode: string,
     public description: string,
     public managerUserId: number,
-    public availabilityTime: number,
+    public availabilityTime: number | null,
     public submitted: boolean,
     public fapId: number
   ) {

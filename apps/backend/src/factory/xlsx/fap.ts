@@ -18,7 +18,7 @@ export type RowObj = {
   propTitle?: string;
   principalInv: string;
   instrName?: string;
-  instrAvailTime?: number;
+  instrAvailTime: number | null;
   techReviewTimeAllocation?: number | null;
   fapTimeAllocation: number | null;
   propReviewAvgScore?: number;

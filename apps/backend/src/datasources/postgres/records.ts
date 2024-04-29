@@ -479,7 +479,7 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly short_code: string;
   readonly description: string;
   readonly manager_user_id: number;
-  readonly availability_time: number;
+  readonly availability_time: number | null;
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;

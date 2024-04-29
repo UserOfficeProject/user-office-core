@@ -104,8 +104,10 @@ function updateUsersRoles() {
 }
 
 const instrumentAvailabilityTime = 20;
+const instrumentNewAvailabilityTime = 50;
 const firstProposalTimeAllocation = 25;
 const secondProposalTimeAllocation = 5;
+const secondProposalNewTimeAllocation = 25;
 
 const fap1 = {
   code: faker.lorem.word(10),
@@ -141,6 +143,20 @@ const instrument = {
   shortCode: faker.random.alphaNumeric(15),
   description: faker.random.words(8),
   managerUserId: scientist.id,
+};
+
+const scientist1 = initialDBData.users.user1;
+const instrument1 = {
+  name: faker.random.words(2),
+  shortCode: faker.random.alphaNumeric(15),
+  description: faker.random.words(5),
+  managerUserId: scientist1.id,
+};
+const instrument2 = {
+  name: faker.random.words(2),
+  shortCode: faker.random.alphaNumeric(15),
+  description: faker.random.words(5),
+  managerUserId: scientist1.id,
 };
 
 let createdFapId: number;
@@ -1331,7 +1347,7 @@ context('Fap meeting components tests', () => {
         reviewerId: 0,
         instrumentId: newlyCreatedInstrumentId,
       });
-      cy.createInstrument(instrument).then((result) => {
+      cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
         if (createdInstrument) {
           createdInstrumentId = createdInstrument.id;
@@ -1439,7 +1455,7 @@ context('Fap meeting components tests', () => {
     });
 
     it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
-      cy.createInstrument(instrument).then((result) => {
+      cy.createInstrument(instrument2).then((result) => {
         const createdInstrument2Id = result.createInstrument.id;
         if (createdInstrument2Id) {
           cy.assignInstrumentToCall({
@@ -1735,7 +1751,7 @@ context('Fap meeting components tests', () => {
       cy.setInstrumentAvailabilityTime({
         callId: initialDBData.call.id,
         instrumentId: createdInstrumentId,
-        availabilityTime: 50,
+        availabilityTime: instrumentNewAvailabilityTime,
       });
       cy.createProposal({ callId: initialDBData.call.id }).then(
         (proposalResult) => {
@@ -1749,6 +1765,14 @@ context('Fap meeting components tests', () => {
             cy.assignProposalsToInstruments({
               instrumentIds: [createdInstrumentId],
               proposalPks: [createdProposal.primaryKey],
+            });
+            cy.addProposalTechnicalReview({
+              proposalPk: createdProposal.primaryKey,
+              status: TechnicalReviewStatus.FEASIBLE,
+              timeAllocation: secondProposalNewTimeAllocation,
+              submitted: true,
+              reviewerId: 0,
+              instrumentId: createdInstrumentId,
             });
             cy.createFap({
               code: fap2.code,
@@ -1780,7 +1804,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="Fap-meeting-components-table"] tbody tr:first-child td')
         .eq(5)
-        .should('have.text', firstProposalTimeAllocation);
+        .should('have.text', secondProposalNewTimeAllocation);
       cy.get('[data-cy="Fap-meeting-components-table"] thead').should(
         'include.text',
         initialDBData.call.allocationTimeUnit
@@ -2447,19 +2471,6 @@ context('Automatic Fap assignment to Proposal', () => {
   let firstAutoAssignmentInstrumentId: number;
   let firstAutoAssignProposalPk: number;
   let firstAutoAssignProposalId: string;
-  const scientist1 = initialDBData.users.user1;
-  const instrument1 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
-    managerUserId: scientist1.id,
-  };
-  const instrument2 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
-    managerUserId: scientist1.id,
-  };
 
   beforeEach(function () {
     cy.resetDB();
