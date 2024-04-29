@@ -59,7 +59,7 @@ services:
       - backend
 
   backend:
-    image: 'user-office-backend:develop'
+    image: 'ghcr.io/userofficeproject/user-office-backend:develop'
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
@@ -76,7 +76,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.services.backend.loadbalancer.server.port=4000'
-      - 'traefik.http.routers.backend.rule=(Host(`localhost`) && PathPrefix(`/api`, `/downloads`, `/files`, `/download`, `/uploads`, `/graphql`))'
+      - 'traefik.http.routers.backend.rule=(Host(`localhost`) && PathPrefix(`/api`, `/preview`, `/downloads`, `/files`, `/download`, `/uploads`, `/graphql`))'
     depends_on:
       - duo-development-authorization-server
       - db
