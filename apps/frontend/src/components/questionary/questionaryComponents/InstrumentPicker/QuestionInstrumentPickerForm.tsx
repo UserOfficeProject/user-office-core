@@ -7,10 +7,9 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { InstrumentPickerConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
+import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
 import TemplateEdit from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
-import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
-
 export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as InstrumentPickerConfig;
