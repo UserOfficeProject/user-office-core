@@ -489,10 +489,12 @@ export default class PostgresInstrumentDataSource
             instrument.all_faps_instrument_time_allocation > 0 &&
             instrument.fap_instrument_time_allocation !== null
           ) {
-            calculatedInstrumentAvailabilityTimePerFap = Math.round(
-              (instrument.availability_time /
-                instrument.all_faps_instrument_time_allocation) *
-                instrument.fap_instrument_time_allocation
+            // NOTE: Using - sign to round down in .5 cases (https://stackoverflow.com/questions/35821815/javascript-rounding-down-in-5-cases)
+            calculatedInstrumentAvailabilityTimePerFap = -Math.round(
+              -(
+                instrument.availability_time /
+                instrument.all_faps_instrument_time_allocation
+              ) * instrument.fap_instrument_time_allocation
             );
           }
 
