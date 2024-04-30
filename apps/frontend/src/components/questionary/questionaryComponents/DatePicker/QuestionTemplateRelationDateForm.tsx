@@ -1,7 +1,6 @@
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { DatePicker, DateTimePicker } from 'formik-mui-lab';
@@ -14,10 +13,10 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { DateConfig, SettingsId } from 'generated/sdk';
 import { minMaxDateTimeCalculations } from 'utils/Time';
 
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
-
 export const QuestionTemplateRelationDateForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
@@ -28,14 +27,6 @@ export const QuestionTemplateRelationDateForm = (
     SettingsId.DATE_TIME_FORMAT
   )?.settingsValue;
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
 
   return (
     <QuestionTemplateRelationFormShell
@@ -86,9 +77,7 @@ export const QuestionTemplateRelationDateForm = (
 
         return (
           <>
-            <label className={classes.label}>
-              You are editing the question as it appears on the current template
-            </label>
+            <TemplateEdit pageType="Template" />
             <QuestionExcerpt question={props.questionRel.question} />
             <Field
               name="config.includeTime"

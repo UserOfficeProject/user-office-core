@@ -1,4 +1,3 @@
-import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React from 'react';
@@ -9,17 +8,10 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 export const QuestionBooleanForm = (props: QuestionFormProps) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
 
   return (
     <QuestionFormShell
@@ -34,7 +26,7 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <label className={classes.label}>You are editing the question</label>
+          <TemplateEdit pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

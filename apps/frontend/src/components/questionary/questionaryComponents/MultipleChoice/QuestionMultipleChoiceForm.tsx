@@ -3,7 +3,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { Checkbox, Select, TextField } from 'formik-mui';
 import React, { useState } from 'react';
@@ -15,6 +14,7 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { SelectionFromOptionsConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 const columns = [{ title: 'Answer', field: 'answer' }];
@@ -31,14 +31,6 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
     { label: 'Radio', value: 'radio' },
     { label: 'Dropdown', value: 'dropdown' },
   ];
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
 
   return (
     <QuestionFormShell
@@ -54,7 +46,7 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <label className={classes.label}>You are editing the question</label>
+          <TemplateEdit pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

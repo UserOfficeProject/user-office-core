@@ -22,6 +22,8 @@ import { NumberInputConfig, NumberValueConstraint, Unit } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
+
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 const useStyles = makeStyles((theme) => ({
   iconVerticalAlign: {
     verticalAlign: 'middle',
@@ -35,11 +37,6 @@ const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     right: theme.spacing(1),
     top: theme.spacing(1),
-  },
-  label: {
-    color: theme.palette.primary.main,
-    backgroundColor: theme.palette.grey[300],
-    fontSize: 'medium',
   },
 }));
 
@@ -90,7 +87,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
     >
       {({ setFieldValue }) => (
         <>
-          <label className={classes.label}>You are editing the question</label>
+          <TemplateEdit pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

@@ -1,4 +1,3 @@
-import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { TextField } from 'formik-mui';
 import React from 'react';
@@ -8,6 +7,7 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { InstrumentPickerConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
 
@@ -15,14 +15,6 @@ export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as InstrumentPickerConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
 
   return (
     <QuestionFormShell
@@ -38,7 +30,7 @@ export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <label className={classes.label}>You are editing the question</label>
+          <TemplateEdit pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

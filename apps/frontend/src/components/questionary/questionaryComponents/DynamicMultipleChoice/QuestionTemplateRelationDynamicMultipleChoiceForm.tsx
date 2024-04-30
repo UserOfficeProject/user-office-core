@@ -3,7 +3,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { Checkbox, Select, TextField } from 'formik-mui';
 import React, { useState } from 'react';
@@ -18,9 +17,9 @@ import {
 } from 'generated/sdk';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
-
 const columns = [
   { title: 'Name', field: 'name' },
   { title: 'Value', field: 'value' },
@@ -37,14 +36,6 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
     { label: 'Radio', value: 'radio' },
     { label: 'Dropdown', value: 'dropdown' },
   ];
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
 
   const urlValidation = urlValidationSchema();
 
@@ -61,9 +52,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
     >
       {() => (
         <>
-          <label className={classes.label}>
-            You are editing the question as it appears on the current template
-          </label>
+          <TemplateEdit pageType="Template" />
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <FormControlLabel

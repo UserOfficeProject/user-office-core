@@ -1,6 +1,5 @@
 import { Collapse, FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { default as React } from 'react';
@@ -12,6 +11,7 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
 import { useTemplates } from 'hooks/template/useTemplates';
 
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -26,14 +26,6 @@ export const QuestionTemplateRelationGenericTemplateForm = (
     group: TemplateGroupId.GENERIC_TEMPLATE,
     templateIds: templateId ? [templateId] : null,
   });
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
 
   if (!templates) {
     return null;
@@ -62,9 +54,7 @@ export const QuestionTemplateRelationGenericTemplateForm = (
     >
       {(formikProps) => (
         <>
-          <label className={classes.label}>
-            You are editing the question as it appears on the current template
-          </label>
+          <TemplateEdit pageType="Template" />
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Options">
             <Field

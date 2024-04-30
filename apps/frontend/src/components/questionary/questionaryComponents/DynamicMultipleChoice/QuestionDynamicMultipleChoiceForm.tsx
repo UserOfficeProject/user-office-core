@@ -22,7 +22,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
 import { Checkbox, Select, TextField } from 'formik-mui';
 import React, { useState } from 'react';
@@ -38,6 +37,7 @@ import {
 import { urlValidationSchema } from 'utils/helperFunctions';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
+import TemplateEdit from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 const columns = [
   { title: 'Name', field: 'name' },
@@ -116,14 +116,6 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
     { label: 'Radio', value: 'radio' },
     { label: 'Dropdown', value: 'dropdown' },
   ];
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
 
   const [isJsonPathFieldDocPopupOpen, setIsJsonPathFieldDocPopupOpen] =
     useState(false);
@@ -145,7 +137,7 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <label className={classes.label}>You are editing the question</label>
+          <TemplateEdit pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"
