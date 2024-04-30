@@ -43,9 +43,8 @@ describe('Test if predefined async jobs are running correctly', () => {
 
   it('Should run callEnded job once an hour', () => {
     const functionWithMockedDataSource = async () => {
-      const callsThatAreEnded = await checkCallsEndedJob.functionToRun(
-        callDataSourceMock
-      );
+      const callsThatAreEnded =
+        await checkCallsEndedJob.functionToRun(callDataSourceMock);
 
       expect(callsThatAreEnded.length).toBeGreaterThan(0);
 
@@ -74,9 +73,8 @@ describe('Test if predefined async jobs are running correctly', () => {
 
   it('Should run callReviewEnded job once in 24 hours', (done) => {
     const functionWithMockedDataSource = async () => {
-      const callsWithEndedReview = await checkCallsReviewEndedJob.functionToRun(
-        callDataSourceMock
-      );
+      const callsWithEndedReview =
+        await checkCallsReviewEndedJob.functionToRun(callDataSourceMock);
 
       expect(callsWithEndedReview.length).toBeGreaterThan(0);
 

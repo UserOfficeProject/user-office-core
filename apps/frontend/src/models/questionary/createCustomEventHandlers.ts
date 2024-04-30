@@ -12,7 +12,7 @@ type HandlerFunction<T extends QuestionarySubmissionState> = (
 ) => void;
 
 export default function createCustomEventHandlers<
-  T extends QuestionarySubmissionState
+  T extends QuestionarySubmissionState,
 >(handler: HandlerFunction<T>) {
   const eventHandler = ({
     getState,

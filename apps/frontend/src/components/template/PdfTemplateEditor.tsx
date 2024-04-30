@@ -32,7 +32,7 @@ const TemplateEditor = <
     | 'templateHeader'
     | 'templateFooter'
     | 'templateSampleDeclaration'
-    | 'dummyData'
+    | 'dummyData',
 >({
   name,
   template,

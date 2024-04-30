@@ -46,34 +46,42 @@ export class Fap implements Partial<FapBase> {
   @Field(() => Boolean)
   public active: boolean;
 
-  public fapChairUserId: number | null;
+  public fapChairUserIds: number[] | null;
 
   public fapSecretariesUserIds: number[] | null;
 }
 
 @Resolver(() => Fap)
 export class FapResolvers {
-  @FieldResolver(() => BasicUserDetails, { nullable: true })
-  async fapChair(@Root() fap: Fap, @Ctx() context: ResolverContext) {
-    if (!fap.fapChairUserId) {
-      return null;
+  @FieldResolver(() => [BasicUserDetails])
+  async fapChairs(@Root() fap: Fap, @Ctx() context: ResolverContext) {
+    if (!fap.fapChairUserIds) {
+      return [];
     }
 
-    return context.queries.user.getBasic(context.user, fap.fapChairUserId);
+    return fap.fapChairUserIds.map((fapChairUserId) =>
+      context.queries.user.getBasic(context.user, fapChairUserId)
+    );
   }
 
-  @FieldResolver(() => Int, { nullable: true })
-  async fapChairProposalCount(
+  @FieldResolver(() => [FapProposalCount])
+  async fapChairsProposalCounts(
     @Root() fap: Fap,
     @Ctx() context: ResolverContext
   ) {
-    if (!fap.fapChairUserId) {
-      return null;
+    if (!fap.fapChairUserIds) {
+      return [];
     }
 
-    return context.queries.fap.dataSource.getFapReviewerProposalCount(
-      fap.fapChairUserId
-    );
+    return fap.fapChairUserIds.map((fapChairUserId) => {
+      return {
+        userId: fapChairUserId,
+        count:
+          context.queries.fap.dataSource.getFapReviewerProposalCount(
+            fapChairUserId
+          ),
+      };
+    });
   }
 
   @FieldResolver(() => [BasicUserDetails])

@@ -6,8 +6,8 @@ import { Sdk, TemplateGroupId } from 'generated/sdk';
 import { ProposalEsiSubmissionState } from 'models/questionary/proposalEsi/ProposalEsiSubmissionState';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
-import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { EsiWizardStep } from './EsiWizardStep';
+import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 
 export const esiQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.PROPOSAL_ESI,

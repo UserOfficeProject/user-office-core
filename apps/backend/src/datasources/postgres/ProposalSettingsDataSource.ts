@@ -282,8 +282,8 @@ export default class PostgresProposalSettingsDataSource
       !byParentGroupId && !!droppableGroupId
         ? andConditionIfDroppableGroupIdDefined
         : byParentGroupId && !!droppableGroupId
-        ? andConditionIfParentDroppableGroupIdDefined
-        : '';
+          ? andConditionIfParentDroppableGroupIdDefined
+          : '';
 
     const getUniqueOrderedProposalWorkflowConnectionsQuery = `
       SELECT * FROM (

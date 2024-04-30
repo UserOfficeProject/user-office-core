@@ -33,6 +33,7 @@ import {
   standardDeviation,
 } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 
 import FapMeetingProposalViewModal from './ProposalViewModal/FapMeetingProposalViewModal';
 
@@ -119,6 +120,7 @@ const FapInstrumentProposalsTable = ({
     setInstrumentProposalsData,
     refreshInstrumentProposalsData,
   } = useFapProposalsByInstrument(fapInstrument.id, fapId, selectedCall?.id);
+
   const classes = useStyles();
   const theme = useTheme();
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
@@ -148,7 +150,13 @@ const FapInstrumentProposalsTable = ({
       title: 'ID',
       field: 'proposal.proposalId',
     },
-    { title: 'Status', field: 'proposal.status.name' },
+    {
+      title: 'Principal Investigator',
+      render: (rowData: FapProposal) => {
+        return getFullUserName(rowData.proposal.proposer);
+      },
+    },
+    { title: 'Country', field: 'proposal.proposer.country' },
     {
       title: 'Average score',
       field: 'proposalAverageScore',

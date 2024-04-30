@@ -6,10 +6,10 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType, SubTemplateConfig } from 'generated/sdk';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import QuestionaryComponentGenericTemplate from './QuestionaryComponentGenericTemplate';
 import { QuestionGenericTemplateForm } from './QuestionGenericTemplateForm';
 import { QuestionTemplateRelationGenericTemplateForm } from './QuestionTemplateRelationGenericTemplateForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const genericTemplateDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.GENERIC_TEMPLATE,

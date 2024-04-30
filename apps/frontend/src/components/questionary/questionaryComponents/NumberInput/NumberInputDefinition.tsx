@@ -9,12 +9,12 @@ import {
   NumberValueConstraint,
 } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import NumberInputAnswerRenderer from './NumberInputAnswerRenderer';
 import NumberSearchCriteriaComponent from './NumberSearchCriteriaComponent';
 import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
 import { QuestionNumberForm } from './QuestionNumberInputForm';
 import { QuestionTemplateRelationNumberForm } from './QuestionTemplateRelationNumberInputForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const numberInputDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.NUMBER_INPUT,
