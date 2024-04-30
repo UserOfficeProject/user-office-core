@@ -41,28 +41,11 @@ const assignmentColumns = [
     field: 'lastname',
   },
   {
-    title: 'Institution',
-    field: 'institution',
+    title: 'Organisation',
+    field: 'organisation',
   },
 ];
-const instrumentContactColumns = [
-  {
-    title: 'Name',
-    field: 'firstname',
-  },
-  {
-    title: 'Surname',
-    field: 'lastname',
-  },
-  {
-    title: 'Email',
-    field: 'email',
-  },
-  {
-    title: 'Institution',
-    field: 'institution',
-  },
-];
+
 const AssignedScientistsTable = ({
   instrument,
   removeAssignedScientistFromInstrument,
@@ -90,26 +73,9 @@ const AssignedScientistsTable = ({
       data-cy="instrument-scientist-assignments-table"
     >
       <MaterialTable
-        columns={instrumentContactColumns}
-        title={`Instrument Contact`}
-        data={[
-          {
-            firstname: instrument.instrumentContact?.firstname,
-            lastname: instrument.instrumentContact?.lastname,
-            email: instrument.instrumentContact?.email,
-            institution: instrument.instrumentContact?.institution,
-          },
-        ]}
-        options={{
-          search: false,
-          paging: false,
-          headerStyle: { backgroundColor: '#fafafa' },
-        }}
-      />
-      <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={`Assigned ${i18n.format(t('Scientist'), 'plural')}`}
+        title={`Assigned ${i18n.format(t('instrument'), 'plural')}`}
         data={instrument.scientists}
         editable={
           isUserOfficer
@@ -124,6 +90,7 @@ const AssignedScientistsTable = ({
         options={{
           search: false,
           paging: false,
+          toolbar: false,
           headerStyle: { backgroundColor: '#fafafa' },
         }}
       />

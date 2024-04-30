@@ -82,8 +82,9 @@ export class QuestionaryAuthorization {
   }
 
   private async getAuthorizer(questionaryId: number) {
-    const categoryId =
-      await this.getTemplateGroupIdForQuestionary(questionaryId);
+    const categoryId = await this.getTemplateGroupIdForQuestionary(
+      questionaryId
+    );
     if (!categoryId) return null;
 
     return this.authorizers.get(categoryId);

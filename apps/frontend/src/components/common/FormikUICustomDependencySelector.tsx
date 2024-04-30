@@ -4,7 +4,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
-import { FormikProps, FormikValues } from 'formik';
+import { FormikHelpers, FormikValues } from 'formik';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
 import {
@@ -15,7 +15,6 @@ import {
   SelectionFromOptionsConfig,
   Template,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import {
   getAllFields,
   getFieldById,
@@ -45,26 +44,33 @@ const FormikUICustomDependencySelector = ({
     onChange: FunctionType;
     value: string;
   };
-  form: FormikProps<FormikValues>;
+  form: FormikHelpers<FormikValues>;
   template: Template;
   templateField: QuestionTemplateRelation;
   dependency: FieldDependency;
   currentQuestionId: string;
 }) => {
-  const [dependencyId, setDependencyId] = useState<string>(
-    dependency.dependencyId || ''
-  );
+  const [dependencyId, setDependencyId] = useState<string>('');
   const [operator, setOperator] = useState<EvaluatorOperator>(
-    dependency.condition.condition || EvaluatorOperator.EQ
+    EvaluatorOperator.EQ
   );
   const [dependencyValue, setDependencyValue] = useState<
     string | boolean | number | Date | unknown
-  >(dependency.condition.params || '');
+  >('');
 
   const [availableValues, setAvailableValues] = useState<Option[]>([]);
 
   const classes = useStyles();
-  const api = useDataApi();
+
+  useEffect(() => {
+    setDependencyId(dependency.dependencyId);
+    setOperator(dependency.condition.condition);
+    setDependencyValue(dependency.condition.params);
+  }, [
+    dependency.dependencyId,
+    dependency.condition.condition,
+    dependency.condition.params,
+  ]);
 
   const updateFormik = (): void => {
     if (dependencyId && dependencyValue && operator) {
@@ -100,26 +106,9 @@ const FormikUICustomDependencySelector = ({
             }
           )
         ); // use options
-      } else if (depField.question.dataType === DataType.INSTRUMENT_PICKER) {
-        if (form.submitCount) {
-          return;
-        }
-
-        api()
-          .getInstruments()
-          .then((data) => {
-            if (data.instruments) {
-              setAvailableValues(
-                data.instruments.instruments.map((instrument) => ({
-                  label: instrument.name,
-                  value: instrument.id,
-                }))
-              );
-            }
-          });
       }
     }
-  }, [dependencyId, template, api, form.submitCount]);
+  }, [dependencyId, template]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateFormikMemoized = useCallback(updateFormik, [
@@ -160,12 +149,9 @@ const FormikUICustomDependencySelector = ({
     return allFields
       .filter(
         (option) =>
-          [
-            DataType.BOOLEAN,
-            DataType.SELECTION_FROM_OPTIONS,
-            DataType.INSTRUMENT_PICKER,
-          ].includes(option.question.dataType) &&
-          currentQuestionId !== option.question.id
+          [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
+            option.question.dataType
+          ) && currentQuestionId !== option.question.id
       )
       .filter((option) => !hasCircularDependency(currentQuestionId, option));
   }, [steps, currentQuestionId]);
@@ -182,12 +168,7 @@ const FormikUICustomDependencySelector = ({
             value={dependencyId}
             onChange={(event: SelectChangeEvent<string>) => {
               const depFieldId = event.target.value;
-
               setDependencyId(depFieldId);
-
-              if (depFieldId !== dependencyId) {
-                setDependencyValue('');
-              }
             }}
             required
           >
@@ -235,7 +216,7 @@ const FormikUICustomDependencySelector = ({
           <Select
             fullWidth
             id="dependencyValue"
-            value={availableValues.length ? dependencyValue : ''}
+            value={dependencyValue}
             onChange={(event: SelectChangeEvent<unknown>): void => {
               setDependencyValue(event.target.value);
             }}
@@ -258,6 +239,6 @@ const FormikUICustomDependencySelector = ({
 export default FormikUICustomDependencySelector;
 
 interface Option {
-  value: string | boolean | number;
+  value: string | boolean;
   label: string;
 }

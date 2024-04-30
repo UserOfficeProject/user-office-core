@@ -87,7 +87,7 @@ export function useProposalBookingsScheduledEvents({
         if (data.me?.proposals) {
           const proposalScheduledEvent: ProposalScheduledEvent[] = [];
           data.me?.proposals.forEach((proposal) =>
-            proposal.proposalBookingsCore?.scheduledEvents.forEach(
+            proposal.proposalBookingCore?.scheduledEvents.forEach(
               (scheduledEvent) => {
                 proposalScheduledEvent.push({
                   id: scheduledEvent.id,
@@ -105,7 +105,7 @@ export function useProposalBookingsScheduledEvents({
                     managementDecisionSubmitted:
                       proposal.managementDecisionSubmitted,
                   },
-                  instrument: scheduledEvent.instrument,
+                  instrument: proposal.instrument,
                   visit: scheduledEvent.visit,
                   esi: scheduledEvent.esi,
                   feedback: scheduledEvent.feedback,

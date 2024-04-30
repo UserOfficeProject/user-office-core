@@ -12,7 +12,6 @@ export class ScheduledEventCore {
     public proposalPk: number | null,
     public proposalBookingId: number | null,
     public status: ProposalBookingStatusCore,
-    public localContactId: number | null,
-    public instrumentId: number
+    public localContactId: number | null
   ) {}
 }

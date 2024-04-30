@@ -3,6 +3,6 @@ export class Institution {
     public id: number,
     public name: string,
     public country: number,
-    public rorId?: string
+    public verified: boolean
   ) {}
 }

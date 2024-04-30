@@ -47,9 +47,6 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
 
   @Field(() => Int, { nullable: true })
   public technicalReviewAssigneeId: number | null;
-
-  @Field(() => Int)
-  public instrumentId: number;
 }
 
 @Resolver(() => TechnicalReview)

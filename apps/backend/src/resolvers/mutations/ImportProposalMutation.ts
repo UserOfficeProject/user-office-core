@@ -33,9 +33,6 @@ export class ImportProposalArgs {
 
   @Field(() => Int)
   public callId: number;
-
-  @Field(() => Date, { nullable: true })
-  public created?: Date;
 }
 
 @Resolver()

@@ -3,13 +3,9 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
-import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
+import { Box, Button, Dialog, DialogContent } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import {
-  ResourceId,
-  getTranslation,
-} from '@user-office-software/duo-localisation';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
 import React, { useContext, useState, useEffect } from 'react';
@@ -55,7 +51,6 @@ import {
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import {
   addColumns,
-  fromArrayToCommaSeparated,
   removeColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
@@ -67,10 +62,7 @@ import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
-import TableActionsDropdownMenu, {
-  DownloadMenuOption,
-  PdfDownloadMenuOption,
-} from './TableActionsDropdownMenu';
+import TableActionsDropdownMenu from './TableActionsDropdownMenu';
 
 type QueryParameters = {
   query: {
@@ -81,6 +73,11 @@ type QueryParameters = {
 };
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
+
+enum DownloadMenuOption {
+  PROPOSAL = 'Proposal(s)',
+  ATTACHMENT = 'Attachment(s)',
+}
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -105,11 +102,6 @@ let columns: Column<ProposalViewData>[] = [
     emptyValue: '-',
     render: (proposalView) => {
       if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.preferredname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
-      } else if (
         proposalView.principalInvestigator?.lastname &&
         proposalView.principalInvestigator?.firstname
       ) {
@@ -141,42 +133,30 @@ let columns: Column<ProposalViewData>[] = [
 const technicalReviewColumns: Column<ProposalViewData>[] = [
   {
     title: 'Technical status',
-    field: 'technicalStatuses',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalStatuses),
+    field: 'technicalStatus',
+    emptyValue: '-',
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocations',
-    render: (rowData: ProposalViewData) =>
-      rowData.technicalTimeAllocations
-        ? `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
-            rowData.allocationTimeUnit
-          }s)`
-        : '-',
+    field: 'technicalTimeAllocationRendered',
+    emptyValue: '-',
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssigneeNames',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
+    field: 'assignedTechnicalReviewer',
+    emptyValue: '-',
   },
 ];
 
 const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
-) => [
-  {
-    title: t('instrument'),
-    field: 'instrumentNames',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.instrumentNames),
-  },
-];
+) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const FapReviewColumns = [
+const SEPReviewColumns = (
+  t: TFunction<'translation', undefined, 'translation'>
+) => [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
-  { title: 'Fap', field: 'fapCode', emptyValue: '-', hidden: true },
+  { title: t('SEP'), field: 'sepCode', emptyValue: '-', hidden: true },
 ];
 
 const proposalStatusFilter: Record<string, number> = {
@@ -291,7 +271,6 @@ const ProposalTableInstrumentScientist = ({
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    proposalid: StringParam,
     reviewer: withDefault(StringParam, reviewerFilter),
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
@@ -299,9 +278,6 @@ const ProposalTableInstrumentScientist = ({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus,
-    referenceNumbers: urlQueryParams.proposalid
-      ? [urlQueryParams.proposalid]
-      : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
@@ -325,7 +301,6 @@ const ProposalTableInstrumentScientist = ({
         callId: proposalFilter.callId,
         questionFilter: proposalFilter.questionFilter,
         reviewer: proposalFilter.reviewer,
-        referenceNumbers: proposalFilter.referenceNumbers,
         text: queryParameters.searchText,
       },
       queryParameters.query
@@ -402,8 +377,8 @@ const ProposalTableInstrumentScientist = ({
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
 
-  const isFapEnabled = featureContext.featuresMap.get(
-    FeatureId.FAP_REVIEW
+  const isSEPEnabled = featureContext.featuresMap.get(
+    FeatureId.SEP_REVIEW
   )?.isEnabled;
 
   const instrumentScientistProposalReviewTabs = [
@@ -411,7 +386,7 @@ const ProposalTableInstrumentScientist = ({
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isFapEnabled && isInstrumentScientist
+    ...(isSEPEnabled && isInstrumentScientist
       ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN]
       : []),
   ];
@@ -423,11 +398,10 @@ const ProposalTableInstrumentScientist = ({
   const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
-      isInstrumentScientist &&
-      rowData.technicalReviewAssigneeIds?.includes(user.id);
+      isInstrumentScientist && rowData.technicalReviewAssigneeId === user.id;
 
     const showView =
-      rowData.technicalReviewsSubmitted?.every((submitted) => submitted) ||
+      rowData.technicalReviewSubmitted ||
       (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
     return (
@@ -471,21 +445,12 @@ const ProposalTableInstrumentScientist = ({
   ) => {
     if (selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
-      const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] = [];
-      selectedProposals.forEach((proposal) => {
-        if (proposal.instrumentIds) {
-          proposal.instrumentIds.forEach((instrumentId) => {
-            if (instrumentId) {
-              submittedTechnicalReviewsInput.push({
-                proposalPk: proposal.primaryKey,
-                reviewerId: user.id,
-                submitted: true,
-                instrumentId: instrumentId,
-              });
-            }
-          });
-        }
-      });
+      const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
+        selectedProposals.map((proposal) => ({
+          proposalPk: proposal.primaryKey,
+          reviewerId: proposal.technicalReviewAssigneeId || user.id,
+          submitted: true,
+        }));
 
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} technical review submitted successfully!`,
@@ -495,12 +460,12 @@ const ProposalTableInstrumentScientist = ({
 
       const newProposalsData = proposalsData.map((proposalData) => ({
         ...proposalData,
-        technicalReviewsSubmitted: selectedProposals.find(
+        technicalReviewSubmitted: selectedProposals.find(
           (selectedProposal) =>
             selectedProposal.primaryKey === proposalData.primaryKey
         )
-          ? [1]
-          : proposalData.technicalReviewsSubmitted,
+          ? 1
+          : proposalData.technicalReviewSubmitted,
       }));
       setProposalsData(newProposalsData);
     }
@@ -554,16 +519,10 @@ const ProposalTableInstrumentScientist = ({
     setActionsMenuAnchorElement(event.currentTarget);
   };
   const handleClose = (selectedOption: string) => {
-    if (selectedOption === PdfDownloadMenuOption.PDF) {
+    if (selectedOption === DownloadMenuOption.PROPOSAL) {
       downloadPDFProposal(
         selectedProposals?.map((proposal) => proposal.primaryKey),
         selectedProposals?.[0].title || ''
-      );
-    } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
-      downloadPDFProposal(
-        selectedProposals?.map((proposal) => proposal.primaryKey),
-        selectedProposals?.[0].title || '',
-        'zip'
       );
     } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
       setOpenDownloadAttachment(true);
@@ -575,27 +534,13 @@ const ProposalTableInstrumentScientist = ({
     const invalid = [];
 
     for await (const proposal of selectedProposals) {
-      if (
-        proposal.technicalStatuses?.length &&
-        proposal.technicalTimeAllocations?.length &&
-        proposal.technicalStatuses?.length ===
-          proposal.technicalTimeAllocations?.length
-      ) {
-        const isValidSchema = (
-          await Promise.all(
-            proposal.technicalStatuses.map(
-              async (technicalStatus, index) =>
-                await proposalTechnicalReviewValidationSchema.isValid({
-                  status: technicalStatus,
-                  timeAllocation: proposal.technicalTimeAllocations?.[index],
-                })
-            )
-          )
-        ).every(Boolean);
-
-        if (!isValidSchema) {
-          invalid.push(proposal);
-        }
+      const isValidSchema =
+        await proposalTechnicalReviewValidationSchema.isValid({
+          status: proposal.status,
+          timeAllocation: proposal.technicalTimeAllocation,
+        });
+      if (!isValidSchema) {
+        invalid.push(proposal);
       }
     }
 
@@ -639,10 +584,10 @@ const ProposalTableInstrumentScientist = ({
     removeColumns(columns, instrumentManagementColumns(t));
   }
 
-  if (isFapEnabled) {
-    addColumns(columns, FapReviewColumns);
+  if (isSEPEnabled) {
+    addColumns(columns, SEPReviewColumns(t));
   } else {
-    removeColumns(columns, FapReviewColumns);
+    removeColumns(columns, SEPReviewColumns(t));
   }
 
   columns = setSortDirectionOnSortColumn(
@@ -659,9 +604,7 @@ const ProposalTableInstrumentScientist = ({
   );
 
   const proposalToReview = preselectedProposalsData.find(
-    (proposal) =>
-      proposal.primaryKey === urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalid
+    (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
   /** NOTE:
@@ -672,6 +615,12 @@ const ProposalTableInstrumentScientist = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
+      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+        : '-',
+      technicalTimeAllocationRendered: proposal.technicalTimeAllocation
+        ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
+        : '-',
     })
   );
 
@@ -728,59 +677,42 @@ const ProposalTableInstrumentScientist = ({
     <>
       <ProposalReviewModal
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
-        proposalReviewModalOpen={!!proposalToReview}
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
           setProposalsData(
             proposalsData.map((proposal) => {
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...proposal,
-                  technicalReviewAssigneeIds:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) =>
-                        technicalReview.technicalReviewAssigneeId
-                    ) || null,
-                  technicalReviewAssigneeNames:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) =>
-                        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
-                    ) || null,
-                  technicalReviewsSubmitted:
-                    updatedProposal.technicalReviews?.map((technicalReview) =>
-                      technicalReview.submitted ? 1 : 0
-                    ) || null,
-                  technicalStatuses:
-                    updatedProposal.technicalReviews?.map((technicalReview) =>
-                      getTranslation(technicalReview?.status as ResourceId)
-                    ) || null,
-                  technicalTimeAllocations:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) => technicalReview.timeAllocation
-                    ) || null,
+                  technicalReviewAssigneeId:
+                    updatedProposal.technicalReview
+                      ?.technicalReviewAssigneeId || null,
+                  technicalReviewAssigneeFirstName:
+                    updatedProposal.technicalReview?.technicalReviewAssignee
+                      ?.firstname || null,
+                  technicalReviewAssigneeLastName:
+                    updatedProposal.technicalReview?.technicalReviewAssignee
+                      ?.lastname || null,
+                  technicalReviewSubmitted: updatedProposal.technicalReview
+                    ?.submitted
+                    ? 1
+                    : 0,
+                  technicalStatus:
+                    updatedProposal.technicalReview?.status || '',
+                  technicalTimeAllocation:
+                    updatedProposal.technicalReview?.timeAllocation || null,
                 };
               } else {
                 return proposal;
               }
             })
           );
-          if (urlQueryParams.proposalid) {
-            setProposalFilter({
-              ...proposalFilter,
-              referenceNumbers: undefined,
-            });
-            setUrlQueryParams({
-              proposalid: undefined,
-            });
-          }
-          setUrlQueryParams({
-            reviewModal: undefined,
-            modalTab: undefined,
-          });
+          setUrlQueryParams({ reviewModal: undefined, modalTab: undefined });
         }}
-        reviewItemId={proposalToReview?.primaryKey}
+        reviewItemId={urlQueryParams.reviewModal}
       >
         <ProposalReviewContent
-          proposalPk={proposalToReview?.primaryKey as number}
+          proposalPk={urlQueryParams.reviewModal as number}
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>
@@ -810,30 +742,27 @@ const ProposalTableInstrumentScientist = ({
       <TableActionsDropdownMenu
         event={actionsMenuAnchorElement}
         handleClose={handleClose}
+        options={Object.values(DownloadMenuOption)}
       />
       {isInstrumentScientist && (
-        <Grid container spacing={2}>
-          <Grid item sm={2} xs={12}>
-            <ReviewerFilterComponent
-              reviewer={urlQueryParams.reviewer}
-              onChange={(reviewer) =>
-                setProposalFilter({ ...proposalFilter, reviewer })
-              }
-            />
-          </Grid>
-          <Grid item sm={10} xs={12}>
-            <ProposalFilterBar
-              calls={{ data: calls, isLoading: loadingCalls }}
-              instruments={{ data: instruments, isLoading: loadingInstruments }}
-              proposalStatuses={{
-                data: proposalStatuses,
-                isLoading: loadingProposalStatuses,
-              }}
-              setProposalFilter={setProposalFilter}
-              filter={proposalFilter}
-            />
-          </Grid>
-        </Grid>
+        <>
+          <ReviewerFilterComponent
+            reviewer={urlQueryParams.reviewer}
+            onChange={(reviewer) =>
+              setProposalFilter({ ...proposalFilter, reviewer })
+            }
+          />
+          <ProposalFilterBar
+            calls={{ data: calls, isLoading: loadingCalls }}
+            instruments={{ data: instruments, isLoading: loadingInstruments }}
+            proposalStatuses={{
+              data: proposalStatuses,
+              isLoading: loadingProposalStatuses,
+            }}
+            setProposalFilter={setProposalFilter}
+            filter={proposalFilter}
+          />
+        </>
       )}
       <MaterialTable
         icons={tableIcons}
@@ -876,7 +805,7 @@ const ProposalTableInstrumentScientist = ({
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },
-          debounceInterval: 600,
+          debounceInterval: 400,
           columnsButton: true,
           selectionProps: (rowData: ProposalViewData) => ({
             inputProps: {

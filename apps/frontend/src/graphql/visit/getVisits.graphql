@@ -3,7 +3,7 @@ query getVisits($filter: VisitsFilter) {
     ...visit
     proposal {
       ...proposal
-      instruments {
+      instrument {
         name
       }
     }

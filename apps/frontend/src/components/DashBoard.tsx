@@ -12,7 +12,7 @@ import clsx from 'clsx';
 import parse from 'html-react-parser';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
-import React, { lazy, Suspense, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Route, Switch } from 'react-router-dom';
 
@@ -23,92 +23,57 @@ import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { useCallsData } from 'hooks/call/useCallsData';
 
 import AppToolbar from './AppToolbar/AppToolbar';
+import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
 import ChangeRole from './common/ChangeRole';
+import ExperimentPage from './experiment/ExperimentPage';
+import CreateFeedbackPage from './feedback/CreateFeedbackPage';
+import UpdateFeedbackPage from './feedback/UpdateFeedbackPage';
+import InstitutionPage from './institution/InstitutionPage';
+import MergeInstitutionsPage from './institution/MergeInstitutionPage';
+import InstrumentsPage from './instrument/InstrumentsPage';
 import MenuItems from './menu/MenuItems';
+import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
 import OverviewPage from './pages/OverviewPage';
+import PageEditor from './pages/PageEditor';
+import ProposalChooseCall from './proposal/ProposalChooseCall';
+import ProposalCreate from './proposal/ProposalCreate';
+import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
+import InstrSciUpcomingExperimentTimesTable from './proposalBooking/InstrSciUpcomingExperimentTimesTable';
+import UserExperimentTimesTable from './proposalBooking/UserExperimentsTable';
+import CreateProposalEsiPage from './proposalEsi/CreateProposalEsiPage';
+import UpdateProposalEsiPage from './proposalEsi/UpdateProposalEsiPage';
+import SampleSafetyPage from './sample/SampleSafetyPage';
+import SEPPage from './SEP/SEPPage';
+import SEPsPage from './SEP/SEPsPage';
+import ApiAccessTokensPage from './settings/apiAccessTokens/ApiAccessTokensPage';
+import AppSettingsPage from './settings/appSettings/AppSettingsPage';
+import FeaturesPage from './settings/features/FeaturesPage';
+import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
+import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
+import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
+import UnitTablePage from './settings/unitList/UnitTablePage';
+import DeclareShipmentsPage from './shipments/DeclareShipmentsPage';
+import ProposalEsiPage from './template/EsiPage';
+import FeedbackTemplatesPage from './template/FeedbackTemplatesPage';
+import GenericTemplatesPage from './template/GenericTemplatesPage';
+import ImportTemplatePage from './template/import/ImportTemplatePage';
+import PdfTemplateEditor from './template/PdfTemplateEditor';
+import PdfTemplatesPage from './template/PdfTemplatesPage';
+import ProposalTemplatesPage from './template/ProposalTemplatesPage';
+import QuestionsPage from './template/QuestionsPage';
+import SampleEsiPage from './template/SampleEsiPage';
+import SampleTemplatesPage from './template/SampleTemplatesPage';
+import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
+import TemplateEditor from './template/TemplateEditor';
+import VisitTemplatesPage from './template/VisitTemplatesPage';
 import TitledRoute from './TitledRoute';
-
-const CallPage = lazy(() => import('./call/CallPage'));
-const ExperimentPage = lazy(() => import('./experiment/ExperimentPage'));
-const FapPage = lazy(() => import('./fap/FapPage'));
-const FapsPage = lazy(() => import('./fap/FapsPage'));
-const CreateFeedbackPage = lazy(() => import('./feedback/CreateFeedbackPage'));
-const UpdateFeedbackPage = lazy(() => import('./feedback/UpdateFeedbackPage'));
-const InstitutionPage = lazy(() => import('./institution/InstitutionPage'));
-const MergeInstitutionsPage = lazy(
-  () => import('./institution/MergeInstitutionPage')
-);
-const InstrumentsPage = lazy(() => import('./instrument/InstrumentsPage'));
-const HelpPage = lazy(() => import('./pages/HelpPage'));
-const PageEditor = lazy(() => import('./pages/PageEditor'));
-const ProposalChooseCall = lazy(() => import('./proposal/ProposalChooseCall'));
-const ProposalCreate = lazy(() => import('./proposal/ProposalCreate'));
-const ProposalEdit = lazy(() => import('./proposal/ProposalEdit'));
-const InstrSciUpcomingExperimentTimesTable = lazy(
-  () => import('./proposalBooking/InstrSciUpcomingExperimentTimesTable')
-);
-const UserExperimentTimesTable = lazy(
-  () => import('./proposalBooking/UserExperimentsTable')
-);
-const CreateProposalEsiPage = lazy(
-  () => import('./proposalEsi/CreateProposalEsiPage')
-);
-const UpdateProposalEsiPage = lazy(
-  () => import('./proposalEsi/UpdateProposalEsiPage')
-);
-const SampleSafetyPage = lazy(() => import('./sample/SampleSafetyPage'));
-const ApiAccessTokensPage = lazy(
-  () => import('./settings/apiAccessTokens/ApiAccessTokensPage')
-);
-const AppSettingsPage = lazy(
-  () => import('./settings/appSettings/AppSettingsPage')
-);
-const FeaturesPage = lazy(() => import('./settings/features/FeaturesPage'));
-const ProposalStatusesPage = lazy(
-  () => import('./settings/proposalStatus/ProposalStatusesPage')
-);
-const ProposalWorkflowEditor = lazy(
-  () => import('./settings/proposalWorkflow/ProposalWorkflowEditor')
-);
-const ProposalWorkflowsPage = lazy(
-  () => import('./settings/proposalWorkflow/ProposalWorkflowsPage')
-);
-const UnitTablePage = lazy(() => import('./settings/unitList/UnitTablePage'));
-const DeclareShipmentsPage = lazy(
-  () => import('./shipments/DeclareShipmentsPage')
-);
-const ProposalEsiPage = lazy(() => import('./template/EsiPage'));
-const FeedbackTemplatesPage = lazy(
-  () => import('./template/FeedbackTemplatesPage')
-);
-const GenericTemplatesPage = lazy(
-  () => import('./template/GenericTemplatesPage')
-);
-const ImportTemplatePage = lazy(
-  () => import('./template/import/ImportTemplatePage')
-);
-const PdfTemplateEditor = lazy(() => import('./template/PdfTemplateEditor'));
-const PdfTemplatesPage = lazy(() => import('./template/PdfTemplatesPage'));
-const ProposalTemplatesPage = lazy(
-  () => import('./template/ProposalTemplatesPage')
-);
-const QuestionsPage = lazy(() => import('./template/QuestionsPage'));
-const SampleEsiPage = lazy(() => import('./template/SampleEsiPage'));
-const SampleTemplatesPage = lazy(
-  () => import('./template/SampleTemplatesPage')
-);
-const ShipmentTemplatesPage = lazy(
-  () => import('./template/ShipmentTemplatesPage')
-);
-const TemplateEditor = lazy(() => import('./template/TemplateEditor'));
-const VisitTemplatesPage = lazy(() => import('./template/VisitTemplatesPage'));
-const ImportUnitsPage = lazy(() => import('./unit/ImportUnitsPage'));
-const PeoplePage = lazy(() => import('./user/PeoplePage'));
-const ProfilePage = lazy(() => import('./user/ProfilePage'));
-const UserPage = lazy(() => import('./user/UserPage'));
+import ImportUnitsPage from './unit/ImportUnitsPage';
+import PeoplePage from './user/PeoplePage';
+import ProfilePage from './user/ProfilePage';
+import UserPage from './user/UserPage';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
@@ -218,8 +183,8 @@ const Dashboard = () => {
   const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-  const isFapEnabled = featureContext.featuresMap.get(
-    FeatureId.FAP_REVIEW
+  const isSEPEnabled = featureContext.featuresMap.get(
+    FeatureId.SEP_REVIEW
   )?.isEnabled;
   const isUserManagementEnabled = featureContext.featuresMap.get(
     FeatureId.USER_MANAGEMENT
@@ -245,6 +210,13 @@ const Dashboard = () => {
         };
   }
   const { calls } = useCallsData(getDashBoardCallFilter());
+  useEffect(() => {
+    if (isTabletOrMobile) {
+      setOpen(false);
+    } else if (localStorage.getItem('drawerOpen') === '1') {
+      setOpen(true);
+    }
+  }, [isTabletOrMobile]);
 
   const handleDrawerOpen = () => {
     localStorage.setItem('drawerOpen', '1');
@@ -254,17 +226,6 @@ const Dashboard = () => {
     localStorage.setItem('drawerOpen', '0');
     setOpen(false);
   };
-
-  useEffect(() => {
-    if (isTabletOrMobile) {
-      // NOTE: Closing drawer in the next event cycle fixes the bug where drawer cannot be re-opened when switching from desktop to mobile view.
-      setTimeout(() => {
-        handleDrawerClose();
-      });
-    } else if (localStorage.getItem('drawerOpen') === '1') {
-      handleDrawerOpen();
-    }
-  }, [isTabletOrMobile]);
 
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
@@ -316,376 +277,359 @@ const Dashboard = () => {
         <Divider />
       </Drawer>
       <main className={classes.content}>
-        <Suspense
-          fallback={
-            <div
-              data-cy="loading"
-              style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              Loading...
-            </div>
-          }
-        >
-          <Switch>
+        <Switch>
+          <TitledRoute
+            setHeader={setHeader}
+            title="Edit Proposal"
+            path="/ProposalEdit/:proposalPk"
+            component={ProposalEdit}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Select Proposal Type"
+            path="/ProposalSelectType"
+            component={() => <ProposalChooseCall callsData={calls} />}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Create Proposal"
+            path="/ProposalCreate/:callId/:templateId"
+            component={ProposalCreate}
+          />
+          {isUserManagementEnabled && (
             <TitledRoute
               setHeader={setHeader}
-              title="Edit Proposal"
-              path="/ProposalEdit/:proposalPk"
-              component={ProposalEdit}
+              title="Profile"
+              path="/ProfilePage/:id"
+              component={ProfilePage}
             />
+          )}
+          {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
-              title="Select Proposal Type"
-              path="/ProposalSelectType"
-              component={() => <ProposalChooseCall callsData={calls} />}
+              title="User"
+              path="/People/:id"
+              component={UserPage}
             />
+          )}
+          {isUserOfficer && <Route path="/People" component={PeoplePage} />}
+          <TitledRoute
+            setHeader={setHeader}
+            title="Proposal"
+            path="/Proposals"
+            component={ProposalPage}
+          />
+          {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
-              title="Create Proposal"
-              path="/ProposalCreate/:callId/:templateId"
-              component={ProposalCreate}
+              title="Experiments"
+              path="/ExperimentPage"
+              component={ExperimentPage}
             />
-            {isUserManagementEnabled && (
+          )}
+          <TitledRoute
+            setHeader={setHeader}
+            title="Page Editor"
+            path="/PageEditor"
+            component={PageEditor}
+          />
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Call"
+              path="/Calls"
+              component={CallPage}
+            />
+          )}
+          <TitledRoute
+            setHeader={setHeader}
+            title="Help"
+            path="/HelpPage"
+            component={HelpPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Change role"
+            path="/changeRole"
+            component={ChangeRole}
+          />
+          {isSEPEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title={t('SEP')}
+              path="/SEPPage/:id"
+              component={SEPPage}
+            />
+          )}
+          {isSEPEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title={i18n.format(t('SEP'), 'plural')}
+              path="/SEPs"
+              component={SEPsPage}
+            />
+          )}
+          {isInstrumentManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title={i18n.format(t('instrument'), 'plural')}
+              path="/Instruments"
+              component={InstrumentsPage}
+            />
+          )}
+          <TitledRoute
+            setHeader={setHeader}
+            title="Institution"
+            path="/Institutions"
+            component={InstitutionPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Merge Institution"
+            path="/MergeInstitutionsPage/:institutionId"
+            component={MergeInstitutionsPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Template Editor"
+            path="/QuestionaryEditor/:templateId"
+            component={TemplateEditor}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="PDF Template Editor"
+            path="/PdfTemplateEditor/:templateId"
+            component={PdfTemplateEditor}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="PDF Template"
+            path="/PdfTemplates"
+            component={PdfTemplatesPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Proposal Template"
+            path="/ProposalTemplates"
+            component={ProposalTemplatesPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Samples Template"
+            path="/SampleDeclarationTemplates"
+            component={SampleTemplatesPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Generic Template"
+            path="/GenericTemplates"
+            component={GenericTemplatesPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Shipment Template"
+            path="/ShipmentDeclarationTemplates"
+            component={ShipmentTemplatesPage}
+          />
+          {isVisitManagementEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Visits Template"
+              path="/VisitTemplates"
+              component={VisitTemplatesPage}
+            />
+          )}
+          <TitledRoute
+            setHeader={setHeader}
+            title="Feedback Template"
+            path="/FeedbackTemplates"
+            component={FeedbackTemplatesPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Esi Proposal"
+            path="/EsiTemplates"
+            component={ProposalEsiPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Esi Samples"
+            path="/SampleEsiTemplates"
+            component={SampleEsiPage}
+          />
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Units Table"
+              path="/Units"
+              component={UnitTablePage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Proposal Status"
+              path="/ProposalStatuses"
+              component={ProposalStatusesPage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Proposal Workflows"
+              path="/ProposalWorkflows"
+              component={ProposalWorkflowsPage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Proposal Workflow Editor"
+              path="/ProposalWorkflowEditor/:workflowId"
+              component={ProposalWorkflowEditor}
+            />
+          )}
+          {isSampleSafetyEnabled &&
+            (isSampleSafetyReviewer || isUserOfficer) && (
               <TitledRoute
                 setHeader={setHeader}
-                title="Profile"
-                path="/ProfilePage/:id"
-                component={ProfilePage}
+                title="Samples Safety"
+                path="/SampleSafety"
+                component={SampleSafetyPage}
               />
             )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="User"
-                path="/People/:id"
-                component={UserPage}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Api Access Tokens"
+              path="/ApiAccessTokens"
+              component={ApiAccessTokensPage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Features"
+              path="/Features"
+              component={FeaturesPage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="App settings"
+              path="/Settings"
+              component={AppSettingsPage}
+            />
+          )}
+          {isSchedulerEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="User Experiment TimeTable"
+              path="/ExperimentTimes"
+              component={UserExperimentTimesTable}
+            />
+          )}
+          {isSchedulerEnabled && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="InstrSci Upcoming Experiment TimeTable"
+              path="/UpcomingExperimentTimes"
+              component={InstrSciUpcomingExperimentTimesTable}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Questions"
+              path="/Questions"
+              component={QuestionsPage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Import Templates"
+              path="/ImportTemplate"
+              component={ImportTemplatePage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Import Units"
+              path="/ImportUnits"
+              component={ImportUnitsPage}
+            />
+          )}
+          <TitledRoute
+            setHeader={setHeader}
+            title="Create Esi Proposal"
+            path="/CreateEsi/:scheduledEventId"
+            component={CreateProposalEsiPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Update Esi Proposal"
+            path="/UpdateEsi/:esiId"
+            component={UpdateProposalEsiPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Create Feedback"
+            path="/CreateFeedback/:scheduledEventId"
+            component={CreateFeedbackPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Update Feedback"
+            path="/UpdateFeedback/:feedbackId"
+            component={UpdateFeedbackPage}
+          />
+          <TitledRoute
+            setHeader={setHeader}
+            title="Declare Shipments"
+            path="/DeclareShipments/:scheduledEventId"
+            component={DeclareShipmentsPage}
+          />
+          <Can
+            allowedRoles={[UserRole.USER_OFFICER]}
+            yes={() => <Route component={ProposalPage} />}
+            no={() => (
+              <Can
+                allowedRoles={[UserRole.USER]}
+                yes={() => (
+                  <Route
+                    render={(props) => (
+                      <OverviewPage {...props} userRole={UserRole.USER} />
+                    )}
+                  />
+                )}
+                no={() => (
+                  <Can
+                    allowedRoles={[
+                      UserRole.SEP_REVIEWER,
+                      UserRole.SEP_CHAIR,
+                      UserRole.SEP_SECRETARY,
+                      UserRole.INSTRUMENT_SCIENTIST,
+                      UserRole.INTERNAL_REVIEWER,
+                    ]}
+                    yes={() => (
+                      <Route
+                        render={(props) => (
+                          <OverviewPage
+                            {...props}
+                            userRole={currentRole as UserRole}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                )}
               />
             )}
-            {isUserOfficer && <Route path="/People" component={PeoplePage} />}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Proposal"
-              path="/Proposals"
-              component={ProposalPage}
-            />
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Experiments"
-                path="/ExperimentPage"
-                component={ExperimentPage}
-              />
-            )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Page Editor"
-              path="/PageEditor"
-              component={PageEditor}
-            />
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Call"
-                path="/Calls"
-                component={CallPage}
-              />
-            )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Help"
-              path="/HelpPage"
-              component={HelpPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Change role"
-              path="/changeRole"
-              component={ChangeRole}
-            />
-            {isFapEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Fap"
-                path="/FapPage/:id"
-                component={FapPage}
-              />
-            )}
-            {isFapEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Faps"
-                path="/Faps"
-                component={FapsPage}
-              />
-            )}
-            {isInstrumentManagementEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title={i18n.format(t('instrument'), 'plural')}
-                path="/Instruments"
-                component={InstrumentsPage}
-              />
-            )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Institution"
-              path="/Institutions"
-              component={InstitutionPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Merge Institution"
-              path="/MergeInstitutionsPage/:institutionId"
-              component={MergeInstitutionsPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Template Editor"
-              path="/QuestionaryEditor/:templateId"
-              component={TemplateEditor}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="PDF Template Editor"
-              path="/PdfTemplateEditor/:templateId"
-              component={PdfTemplateEditor}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="PDF Template"
-              path="/PdfTemplates"
-              component={PdfTemplatesPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Proposal Template"
-              path="/ProposalTemplates"
-              component={ProposalTemplatesPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Samples Template"
-              path="/SampleDeclarationTemplates"
-              component={SampleTemplatesPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Generic Template"
-              path="/GenericTemplates"
-              component={GenericTemplatesPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Shipment Template"
-              path="/ShipmentDeclarationTemplates"
-              component={ShipmentTemplatesPage}
-            />
-            {isVisitManagementEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Visits Template"
-                path="/VisitTemplates"
-                component={VisitTemplatesPage}
-              />
-            )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Feedback Template"
-              path="/FeedbackTemplates"
-              component={FeedbackTemplatesPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Esi Proposal"
-              path="/EsiTemplates"
-              component={ProposalEsiPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Esi Samples"
-              path="/SampleEsiTemplates"
-              component={SampleEsiPage}
-            />
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Units Table"
-                path="/Units"
-                component={UnitTablePage}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Proposal Status"
-                path="/ProposalStatuses"
-                component={ProposalStatusesPage}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Proposal Workflows"
-                path="/ProposalWorkflows"
-                component={ProposalWorkflowsPage}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Proposal Workflow Editor"
-                path="/ProposalWorkflowEditor/:workflowId"
-                component={ProposalWorkflowEditor}
-              />
-            )}
-            {isSampleSafetyEnabled &&
-              (isSampleSafetyReviewer || isUserOfficer) && (
-                <TitledRoute
-                  setHeader={setHeader}
-                  title="Samples Safety"
-                  path="/SampleSafety"
-                  component={SampleSafetyPage}
-                />
-              )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Api Access Tokens"
-                path="/ApiAccessTokens"
-                component={ApiAccessTokensPage}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Features"
-                path="/Features"
-                component={FeaturesPage}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="App settings"
-                path="/Settings"
-                component={AppSettingsPage}
-              />
-            )}
-            {isSchedulerEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="User Experiment TimeTable"
-                path="/ExperimentTimes"
-                component={UserExperimentTimesTable}
-              />
-            )}
-            {isSchedulerEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="InstrSci Upcoming Experiment TimeTable"
-                path="/UpcomingExperimentTimes"
-                component={InstrSciUpcomingExperimentTimesTable}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Questions"
-                path="/Questions"
-                component={QuestionsPage}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Import Templates"
-                path="/ImportTemplate"
-                component={ImportTemplatePage}
-              />
-            )}
-            {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Import Units"
-                path="/ImportUnits"
-                component={ImportUnitsPage}
-              />
-            )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Create Esi Proposal"
-              path="/CreateEsi/:scheduledEventId"
-              component={CreateProposalEsiPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Update Esi Proposal"
-              path="/UpdateEsi/:esiId"
-              component={UpdateProposalEsiPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Create Feedback"
-              path="/CreateFeedback/:scheduledEventId"
-              component={CreateFeedbackPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Update Feedback"
-              path="/UpdateFeedback/:feedbackId"
-              component={UpdateFeedbackPage}
-            />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Declare Shipments"
-              path="/DeclareShipments/:scheduledEventId"
-              component={DeclareShipmentsPage}
-            />
-            <Can
-              allowedRoles={[UserRole.USER_OFFICER]}
-              yes={() => <Route component={ProposalPage} />}
-              no={() => (
-                <Can
-                  allowedRoles={[UserRole.USER]}
-                  yes={() => (
-                    <Route
-                      render={(props) => (
-                        <OverviewPage {...props} userRole={UserRole.USER} />
-                      )}
-                    />
-                  )}
-                  no={() => (
-                    <Can
-                      allowedRoles={[
-                        UserRole.FAP_REVIEWER,
-                        UserRole.FAP_CHAIR,
-                        UserRole.FAP_SECRETARY,
-                        UserRole.INSTRUMENT_SCIENTIST,
-                        UserRole.INTERNAL_REVIEWER,
-                      ]}
-                      yes={() => (
-                        <Route
-                          render={(props) => (
-                            <OverviewPage
-                              {...props}
-                              userRole={currentRole as UserRole}
-                            />
-                          )}
-                        />
-                      )}
-                    />
-                  )}
-                />
-              )}
-            />
-          </Switch>
-        </Suspense>
+          />
+        </Switch>
         {parse(footerContent)}
         <BottomNavigation className={classes.bottomNavigation}>
           <BottomNavItem

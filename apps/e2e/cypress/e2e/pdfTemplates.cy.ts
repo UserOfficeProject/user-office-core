@@ -14,7 +14,7 @@ context('PDF template tests', () => {
   });
 
   describe('PDF template basic tests', () => {
-    it('User officer can create a PDF template. The template comes with default values - Body, header, Footer, Sample Declaration and Dummy Data', () => {
+    it('User officer can create a PDF template', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -36,55 +36,72 @@ context('PDF template tests', () => {
 
       cy.contains(templateName);
 
-      cy.get('[data-cy="templateData"] .cm-content').should(($element) => {
-        expect($element.children()).to.have.length.greaterThan(1);
+      cy.get('[data-cy="templateData"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-        expect(
-          $element.children().first().text().trim()
-        ).to.have.length.greaterThan(0);
-      });
+      cy.get('[data-cy=templateData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
 
       cy.contains('Header').click();
 
-      cy.get('[data-cy="templateHeader"] .cm-content').should(($element) => {
-        expect($element.children()).to.have.length.greaterThan(1);
+      cy.get('[data-cy="templateHeader"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-        expect(
-          $element.children().first().text().trim()
-        ).to.have.length.greaterThan(0);
-      });
+      cy.get('[data-cy=templateHeader-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
 
       cy.contains('Footer').click();
 
-      cy.get('[data-cy="templateFooter"] .cm-content').should(($element) => {
-        expect($element.children()).to.have.length.greaterThan(1);
+      cy.get('[data-cy="templateFooter"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-        expect(
-          $element.children().first().text().trim()
-        ).to.have.length.greaterThan(0);
-      });
+      cy.get('[data-cy=templateFooter-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
 
       cy.contains('Sample Declaration').click();
 
-      cy.get('[data-cy="templateSampleDeclaration"] .cm-content').should(
-        ($element) => {
-          expect($element.children()).to.have.length.greaterThan(1);
+      cy.get('[data-cy="templateSampleDeclaration"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-          expect(
-            $element.children().first().text().trim()
-          ).to.have.length.greaterThan(1);
-        }
-      );
+      cy.get('[data-cy=templateSampleDeclaration-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
 
       cy.contains('Dummy Data').click();
 
-      cy.get('[data-cy="dummyData"] .cm-content').should(($element) => {
-        expect($element.children()).to.have.length.greaterThan(1);
+      cy.get('[data-cy="dummyData"] .cm-content')
+        .first()
+        .type(pdfTemplateData)
+        .should(($p) => {
+          expect($p).to.contain(pdfTemplateData);
+        });
 
-        expect(
-          $element.children().first().text().trim()
-        ).to.have.length.greaterThan(0);
-      });
+      cy.get('[data-cy=dummyData-submit]').click();
+
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.navigateToTemplatesSubmenu('PDF');
+
+      cy.contains(templateName);
     });
   });
 

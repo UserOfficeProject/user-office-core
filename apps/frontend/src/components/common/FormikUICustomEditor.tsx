@@ -1,8 +1,8 @@
 import makeStyles from '@mui/styles/makeStyles';
+import { Editor } from '@tinymce/tinymce-react';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useState } from 'react';
 
-import Editor from 'components/common/TinyEditor';
 import { FunctionType } from 'utils/utilTypes';
 
 const useStyles = makeStyles((theme) => ({

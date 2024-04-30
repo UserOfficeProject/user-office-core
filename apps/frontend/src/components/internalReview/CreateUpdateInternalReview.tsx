@@ -1,19 +1,18 @@
-import { Stack } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
+import { Editor } from '@tinymce/tinymce-react';
+import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
-import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { FeatureId, InternalReview, UserRole } from 'generated/sdk';
+import { InternalReview, UserRole } from 'generated/sdk';
+import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 
@@ -43,13 +42,13 @@ const CreateUpdateInternalReview = ({
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { user } = useContext(UserContext);
-  const [usersData, setUsersData] = useState(
-    internalReview?.reviewerId ? [internalReview?.reviewer] : []
-  );
-  const featureContext = useContext(FeatureContext);
-  const isUserSurnameSearchEnabled = featureContext.featuresMap.get(
-    FeatureId.USER_SEARCH_FILTER
-  )?.isEnabled;
+  const { usersData } = useUsersData({
+    userRole: UserRole.INTERNAL_REVIEWER,
+  });
+
+  if (!usersData) {
+    return <UOLoader />;
+  }
 
   const initialValues = internalReview
     ? {
@@ -57,83 +56,17 @@ const CreateUpdateInternalReview = ({
         comment: internalReview.comment || '',
         files: internalReview.files,
         reviewerId: internalReview.reviewerId,
-        surname: '',
       }
     : {
         title: '',
         comment: '',
         files: '',
         reviewerId: null,
-        surname: '',
       };
 
   const formDisabled =
     (isInternalReviewer && user.id !== internalReview?.reviewerId) ||
     (isInternalReviewer && technicalReviewSubmitted);
-
-  useEffect(() => {
-    if (!isUserSurnameSearchEnabled) {
-      api()
-        .getUsers({ userRole: UserRole.INTERNAL_REVIEWER })
-        .then((data) => {
-          setUsersData(data.users?.users || []);
-        });
-    }
-  }, [isUserSurnameSearchEnabled, api]);
-
-  const findUserBySurname = async (
-    value: string,
-    setFieldError: (field: string, message: string | undefined) => void
-  ) => {
-    if (!value) {
-      return;
-    }
-
-    try {
-      await api()
-        .getUsers({ filter: value })
-        .then((data) => {
-          if (data.users?.totalCount == 0) {
-            setFieldError('surname', 'No users found with that surname');
-          } else {
-            setUsersData(data.users?.users || []);
-          }
-        });
-    } catch (error) {
-      close(null);
-    }
-  };
-
-  type formikProps = FormikProps<typeof initialValues> &
-    FormikHelpers<typeof initialValues>;
-
-  const SurnameSearchField = (props: formikProps) => {
-    const { values, setFieldError } = props;
-
-    return isUserSurnameSearchEnabled ? (
-      <Stack direction="row" spacing={1} alignItems="baseline">
-        <Field
-          id="surname"
-          name="surname"
-          label="Surname"
-          type="text"
-          component={TextField}
-          fullWidth
-          flex="1"
-          data-cy="internal-reviewer-surname"
-        />
-        <Button
-          data-cy="findUser"
-          type="button"
-          disabled={!values.surname}
-          onClick={() => findUserBySurname(values.surname, setFieldError)}
-          sx={{ minWidth: 'fit-content' }}
-        >
-          Find User
-        </Button>
-      </Stack>
-    ) : null;
-  };
 
   return (
     <Formik
@@ -149,9 +82,7 @@ const CreateUpdateInternalReview = ({
               toastSuccessMessage: 'Internal review  updated successfully!',
             }).updateInternalReview({
               input: {
-                comment: values.comment,
-                reviewerId: values.reviewerId,
-                title: values.title,
+                ...values,
                 id: internalReview.id,
                 technicalReviewId: technicalReviewId,
                 files: JSON.stringify(values.files),
@@ -168,9 +99,7 @@ const CreateUpdateInternalReview = ({
               toastSuccessMessage: 'Internal review created successfully!',
             }).createInternalReview({
               input: {
-                comment: values.comment,
-                reviewerId: values.reviewerId,
-                title: values.title,
+                ...values,
                 technicalReviewId: technicalReviewId,
                 files: JSON.stringify(values.files),
               },
@@ -183,7 +112,7 @@ const CreateUpdateInternalReview = ({
         }
       }}
     >
-      {(formikProps) => (
+      {({ isSubmitting, setFieldValue }) => (
         <Form>
           <Typography variant="h6" component="h1">
             {internalReview
@@ -202,7 +131,7 @@ const CreateUpdateInternalReview = ({
               component={TextField}
               fullWidth
               data-cy="title"
-              disabled={isExecutingCall || formikProps.isSubmitting}
+              disabled={isExecutingCall || isSubmitting}
               required
             />
           ) : (
@@ -220,19 +149,19 @@ const CreateUpdateInternalReview = ({
               </Typography>
             </>
           )}
-          {!isInternalReviewer ? <SurnameSearchField {...formikProps} /> : null}
+
           {!isInternalReviewer ? (
             <FormikUIAutocomplete
               name="reviewerId"
               label="Internal reviewer"
               noOptionsText="No one"
-              items={usersData.map((user) => ({
+              items={usersData.users.map((user) => ({
                 text: getFullUserName(user),
-                value: user ? user.id : '',
+                value: user.id,
               }))}
               data-cy="internal-reviewer"
               required
-              disabled={isExecutingCall || formikProps.isSubmitting}
+              disabled={isExecutingCall || isSubmitting}
             />
           ) : (
             user.id !== internalReview?.reviewerId && (
@@ -274,12 +203,10 @@ const CreateUpdateInternalReview = ({
                 editor.startContent !== editor.contentDocument.body.innerHTML;
 
               if (isStartContentDifferentThanCurrent || editor.isDirty()) {
-                formikProps.setFieldValue('comment', content);
+                setFieldValue('comment', content);
               }
             }}
-            disabled={
-              formikProps.isSubmitting || isExecutingCall || formDisabled
-            }
+            disabled={isSubmitting || isExecutingCall || formDisabled}
           />
 
           {(!isInternalReviewer || user.id === internalReview?.reviewerId) && (
@@ -288,9 +215,7 @@ const CreateUpdateInternalReview = ({
               fullWidth
               className={classes.submit}
               data-cy="submit"
-              disabled={
-                formikProps.isSubmitting || isExecutingCall || formDisabled
-              }
+              disabled={isSubmitting || isExecutingCall || formDisabled}
             >
               {isExecutingCall && <UOLoader size={14} />}
               {internalReview ? 'Update' : 'Create'}

@@ -27,7 +27,16 @@ export default class PostgresScheduledEventDataSource
           query.where('starts_at', '>', filter.startsAfter);
         }
         if (filter?.instrumentId) {
-          query.where('instrument_id', filter.instrumentId);
+          query
+            .leftJoin(
+              'instrument_has_proposals',
+              'instrument_has_proposals.proposal_pk',
+              'scheduled_events.proposal_pk'
+            )
+            .where(
+              'instrument_has_proposals.instrument_id',
+              filter.instrumentId
+            );
         }
         if (filter?.callId) {
           query

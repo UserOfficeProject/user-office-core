@@ -7,8 +7,5 @@
 !cypress
 !tsconfig.json
 !iis.conf
-!default.conf
+!nginx.conf
 !.env
-!index.html
-!vite.config.mts
-!tsconfig.node.json

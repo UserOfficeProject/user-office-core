@@ -1,7 +1,0 @@
-query getUserFaps {
-  me {
-    faps {
-      ...fap
-    }
-  }
-}

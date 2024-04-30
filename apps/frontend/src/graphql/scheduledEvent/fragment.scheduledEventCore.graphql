@@ -6,15 +6,4 @@ fragment scheduledEventCore on ScheduledEventCore {
   endsAt
   status
   localContactId
-  instrumentId
-  instrument {
-    id
-    name
-    shortCode
-    description
-    managerUserId
-    scientists {
-      ...basicUserDetails
-    }
-  }
 }

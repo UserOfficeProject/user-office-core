@@ -6,8 +6,8 @@ import { TemplateValidation } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { MergeReview } from './MergeReview';
 import { SelectImportFile } from '../../common/SelectImportFile';
+import { MergeReview } from './MergeReview';
 
 export const getFileContents = async (file: File): Promise<string> => {
   return new Promise((resolve) => {

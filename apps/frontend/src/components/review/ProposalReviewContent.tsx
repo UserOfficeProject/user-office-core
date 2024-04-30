@@ -3,39 +3,36 @@ import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
-import SimpleTabs from 'components/common/SimpleTabs';
+import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
-import ExternalReviews from 'components/fap/MeetingComponents/ProposalViewModal/ExternalReviews';
-import FapMeetingDecision from 'components/fap/MeetingComponents/ProposalViewModal/FapMeetingDecision';
 import GeneralInformation from 'components/proposal/GeneralInformation';
 import ProposalAdmin, {
   AdministrationFormData,
 } from 'components/proposal/ProposalAdmin';
+import ExternalReviews from 'components/SEP/MeetingComponents/ProposalViewModal/ExternalReviews';
+import SEPMeetingDecision from 'components/SEP/MeetingComponents/ProposalViewModal/SEPMeetingDecision';
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
-  InstrumentWithManagementTime,
   Proposal,
   Review,
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
-import {
-  ProposalDataTechnicalReview,
-  useProposalData,
-} from 'hooks/proposal/useProposalData';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
+import { StyledPaper } from 'styles/StyledComponents';
 
+import InternalReviews from '../internalReview/InternalReviews';
 import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
-import InternalReviews from '../internalReview/InternalReviews';
 
 export enum PROPOSAL_MODAL_TAB_NAMES {
   PROPOSAL_INFORMATION = 'Proposal information',
-  TECHNICAL_REVIEW = 'Technical reviews',
+  TECHNICAL_REVIEW = 'Technical review',
   REVIEWS = 'Reviews',
   ADMIN = 'Admin',
   GRADE = 'Grade',
@@ -46,7 +43,7 @@ type ProposalReviewContentProps = {
   tabNames: PROPOSAL_MODAL_TAB_NAMES[];
   proposalPk?: number | null;
   reviewId?: number | null;
-  fapId?: number | null;
+  sepId?: number | null;
   isInsideModal?: boolean;
 };
 
@@ -54,14 +51,14 @@ const ProposalReviewContent = ({
   proposalPk,
   tabNames,
   reviewId,
-  fapId,
+  sepId,
   isInsideModal,
 }: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const { reviewData, setReviewData } = useReviewData(reviewId, fapId);
+  const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
   const { proposalData, setProposalData, loading } = useProposalData(
     proposalPk || reviewData?.proposal?.primaryKey
   );
@@ -94,110 +91,59 @@ const ProposalReviewContent = ({
     />
   );
 
-  const getTechnicalReviewInstrument = (instrumentId: number) =>
-    proposalData.instruments?.find(
-      (instrument) => instrument?.id === instrumentId
-    );
-
-  const technicalReviewsContent = proposalData.technicalReviews.map(
-    (technicalReview) => {
-      const technicalReviewInstrument = getTechnicalReviewInstrument(
-        technicalReview.instrumentId
-      );
-
-      return isUserOfficer ||
-        (isInstrumentScientist &&
-          technicalReview?.technicalReviewAssigneeId === user.id) ||
-        isInternalReviewer ? (
-        <Fragment key={technicalReview.id}>
-          {!!technicalReview && (
-            <InternalReviews
-              technicalReviewId={technicalReview.id}
-              technicalReviewSubmitted={technicalReview.submitted}
-            />
-          )}
-          {!!technicalReviewInstrument && (
-            <ProposalTechnicalReviewerAssignment
-              technicalReview={technicalReview}
-              instrument={technicalReviewInstrument}
-              onTechnicalReviewUpdated={(
-                updatedTechnicalReview: ProposalDataTechnicalReview
-              ) => {
-                setProposalData({
-                  ...proposalData,
-                  technicalReviews:
-                    proposalData.technicalReviews.map((tReview) =>
-                      updatedTechnicalReview.id === tReview.id
-                        ? updatedTechnicalReview
-                        : tReview
-                    ) || [],
-                });
-              }}
-            />
-          )}
-          <ProposalTechnicalReview
-            proposal={proposalData as Proposal}
-            data={technicalReview}
-            setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
-              setProposalData({
-                ...proposalData,
-                technicalReviews:
-                  proposalData.technicalReviews.map((technicalReview) => {
-                    if (technicalReview.id === data?.id) {
-                      return { ...technicalReview, ...data };
-                    } else {
-                      return {
-                        ...technicalReview,
-                      };
-                    }
-                  }) || null,
-              })
-            }
+  const TechnicalReviewTab =
+    isUserOfficer ||
+    (isInstrumentScientist &&
+      proposalData.technicalReview?.technicalReviewAssigneeId === user.id) ||
+    isInternalReviewer ? (
+      <>
+        {!!proposalData.technicalReview && (
+          <InternalReviews
+            technicalReviewId={proposalData.technicalReview.id}
+            technicalReviewSubmitted={proposalData.technicalReview.submitted}
           />
-        </Fragment>
-      ) : (
-        <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
-      );
-    }
-  );
-
-  const TechnicalReviewTab = proposalData.technicalReviews.length ? (
-    proposalData.technicalReviews.length > 1 ? (
-      <SimpleTabs
-        orientation="vertical"
-        isInsideModal={isInsideModal}
-        tabNames={
-          proposalData.technicalReviews?.map(
-            (technicalReview) =>
-              getTechnicalReviewInstrument(technicalReview.instrumentId)
-                ?.name || 'None'
-          ) || []
-        }
-      >
-        {technicalReviewsContent as JSX.Element[]}
-      </SimpleTabs>
+        )}
+        {!!proposalData.instrument && (
+          <ProposalTechnicalReviewerAssignment
+            proposalData={proposalData}
+            setProposalData={setProposalData}
+          />
+        )}
+        <ProposalTechnicalReview
+          proposal={proposalData as Proposal}
+          data={proposalData.technicalReview}
+          setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+            setProposalData({
+              ...proposalData,
+              technicalReview: {
+                ...proposalData.technicalReview,
+                ...data,
+              } as TechnicalReview,
+            })
+          }
+        />
+      </>
     ) : (
-      technicalReviewsContent
-    )
-  ) : (
-    <div>No technical reviews found for the selected proposal</div>
-  );
+      <TechnicalReviewInformation
+        data={proposalData.technicalReview as TechnicalReview}
+      />
+    );
 
   const GradeTab = (
     <ProposalGrade
       onChange={() => {}}
       review={reviewData}
       setReview={setReviewData}
-      fapId={fapId as number} //grade is only used within Fap
+      sepId={sepId as number} //grade is only used within SEP
     />
   );
 
   const AllProposalReviewsTab = isUserOfficer && (
     <>
       <ExternalReviews reviews={proposalData.reviews as Review[]} />
-      <FapMeetingDecision
-        fapMeetingDecision={proposalData.fapMeetingDecision}
-        fap={proposalData.fap}
+      <SEPMeetingDecision
+        sepMeetingDecision={proposalData.sepMeetingDecision}
+        sep={proposalData.sep}
       />
     </>
   );
@@ -206,18 +152,7 @@ const ProposalReviewContent = ({
     <ProposalAdmin
       data={proposalData}
       setAdministration={(data: AdministrationFormData) =>
-        setProposalData({
-          ...proposalData,
-          ...data,
-          instruments:
-            proposalData.instruments?.map((instrument) => ({
-              ...(instrument as InstrumentWithManagementTime),
-              managementTimeAllocation:
-                data.managementTimeAllocations?.find(
-                  (item) => item.instrumentId === instrument?.id
-                )?.value ?? null,
-            })) || [],
-        })
+        setProposalData({ ...proposalData, ...data })
       }
     />
   );
@@ -231,17 +166,17 @@ const ProposalReviewContent = ({
 
   const tabsContent = tabNames.map((tab, index) => {
     switch (tab) {
-      case PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION:
+      case 'Proposal information':
         return <Fragment key={index}>{ProposalInformationTab}</Fragment>;
-      case PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW:
+      case 'Technical review':
         return <Fragment key={index}>{TechnicalReviewTab}</Fragment>;
-      case PROPOSAL_MODAL_TAB_NAMES.REVIEWS:
+      case 'Reviews':
         return <Fragment key={index}>{AllProposalReviewsTab}</Fragment>;
-      case PROPOSAL_MODAL_TAB_NAMES.ADMIN:
+      case 'Admin':
         return <Fragment key={index}>{ProposalAdminTab}</Fragment>;
-      case PROPOSAL_MODAL_TAB_NAMES.LOGS:
+      case 'Logs':
         return <Fragment key={index}>{EventLogsTab}</Fragment>;
-      case PROPOSAL_MODAL_TAB_NAMES.GRADE:
+      case 'Grade':
         return <Fragment key={index}>{GradeTab}</Fragment>;
       default:
         return null;
@@ -249,7 +184,7 @@ const ProposalReviewContent = ({
   });
 
   return (
-    <>
+    <StyledPaper>
       {tabNames.length > 1 ? (
         <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
           {tabsContent}
@@ -257,7 +192,7 @@ const ProposalReviewContent = ({
       ) : (
         <>{tabsContent}</>
       )}
-    </>
+    </StyledPaper>
   );
 };
 

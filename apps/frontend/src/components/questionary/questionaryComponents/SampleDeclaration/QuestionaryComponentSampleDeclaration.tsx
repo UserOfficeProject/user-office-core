@@ -23,11 +23,11 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import withPrompt, { WithPromptType } from 'utils/withPrompt';
 
-import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 import {
   QuestionnairesList,
   QuestionnairesListRow,
 } from '../QuestionnairesList';
+import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
 const useStyles = makeStyles((theme) => ({
   questionLabel: {

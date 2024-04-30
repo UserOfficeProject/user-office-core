@@ -8,12 +8,12 @@ import { container } from 'tsyringe';
 
 import AdminDataSource from '../datasources/postgres/AdminDataSource';
 import CallDataSource from '../datasources/postgres/CallDataSource';
-import FapDataSource from '../datasources/postgres/FapDataSource';
 import InstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import QuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
+import SEPDataSource from '../datasources/postgres/SEPDataSource';
 import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import UserDataSource from '../datasources/postgres/UserDataSource';
 import { AllocationTimeUnits } from '../models/Call';
@@ -34,7 +34,7 @@ const MAX_TEMPLATES = 15;
 const MAX_CALLS = 11;
 const MAX_INSTRUMENTS = 16;
 const MAX_PROPOSALS = 500;
-const MAX_FAPS = 10;
+const MAX_SEPS = 10;
 const MAX_REVIEWS = 600;
 const MAX_WORKFLOWS = 1;
 
@@ -47,7 +47,7 @@ const proposalSettingsDataSource = container.resolve(
 );
 const questionaryDataSource = container.resolve(QuestionaryDataSource);
 const reviewDataSource = container.resolve(ReviewDataSource);
-const fapDataSource = container.resolve(FapDataSource);
+const sepDataSource = container.resolve(SEPDataSource);
 const templateDataSource = container.resolve(TemplateDataSource);
 const userDataSource = container.resolve(UserDataSource);
 
@@ -77,13 +77,13 @@ const createUsers = async () => {
     if (Math.random() > 0.8) {
       userDataSource.addUserRole({
         userID: userId,
-        roleID: UserRole.FAP_REVIEWER,
+        roleID: UserRole.SEP_REVIEWER,
       });
     }
     if (Math.random() > 0.8) {
       userDataSource.addUserRole({
         userID: userId,
-        roleID: UserRole.FAP_REVIEWER,
+        roleID: UserRole.SEP_REVIEWER,
       });
     }
     if (Math.random() > 0.8) {
@@ -95,13 +95,13 @@ const createUsers = async () => {
     if (Math.random() > 0.9) {
       userDataSource.addUserRole({
         userID: userId,
-        roleID: UserRole.FAP_CHAIR,
+        roleID: UserRole.SEP_CHAIR,
       });
     }
     if (Math.random() > 0.9) {
       userDataSource.addUserRole({
         userID: userId,
-        roleID: UserRole.FAP_SECRETARY,
+        roleID: UserRole.SEP_SECRETARY,
       });
     }
     if (Math.random() > 0.95) {
@@ -132,13 +132,13 @@ const createCalls = async () => {
       startCycle: faker.date.past(1),
       startNotify: faker.date.past(1),
       startReview: faker.date.past(1),
-      startFapReview: faker.date.past(1),
+      startSEPReview: faker.date.past(1),
       endNotify: faker.date.future(1),
       endCall: faker.date.future(1),
       endCallInternal: faker.date.future(1),
       endCycle: faker.date.future(1),
       endReview: faker.date.future(1),
-      endFapReview: faker.date.future(1),
+      endSEPReview: faker.date.future(1),
       referenceNumberFormat: faker.random.words(8),
       proposalSequence: faker.datatype.number({
         min: 0,
@@ -274,8 +274,8 @@ const createProposals = async () => {
       );
     }
 
-    instrumentDataSource.assignProposalToInstrument(
-      proposal.primaryKey,
+    instrumentDataSource.assignProposalsToInstrument(
+      [proposal.primaryKey],
       dummy.positiveNumber(MAX_INSTRUMENTS)
     );
   }, MAX_PROPOSALS);
@@ -295,7 +295,6 @@ const createReviews = async () => {
         timeAllocation: dummy.positiveNumber(10),
         submitted: faker.datatype.boolean(),
         reviewerId: 1,
-        instrumentId: 1,
         files: '[]',
       },
       false
@@ -303,9 +302,9 @@ const createReviews = async () => {
   }, MAX_REVIEWS);
 };
 
-const createFaps = async () => {
+const createSeps = async () => {
   await execute(async () => {
-    const fap = await fapDataSource.create(
+    const sep = await sepDataSource.create(
       dummy.word(),
       faker.random.words(5),
       dummy.positiveNumber(5),
@@ -313,38 +312,37 @@ const createFaps = async () => {
       true,
       true
     );
-    await fapDataSource.assignChairOrSecretaryToFap({
-      fapId: fap.id,
-      roleId: UserRole.FAP_CHAIR,
+    await sepDataSource.assignChairOrSecretaryToSEP({
+      sepId: sep.id,
+      roleId: UserRole.SEP_CHAIR,
       userId: dummy.positiveNumber(MAX_USERS),
     });
-    await fapDataSource.assignChairOrSecretaryToFap({
-      fapId: fap.id,
-      roleId: UserRole.FAP_SECRETARY,
+    await sepDataSource.assignChairOrSecretaryToSEP({
+      sepId: sep.id,
+      roleId: UserRole.SEP_SECRETARY,
       userId: dummy.positiveNumber(MAX_USERS),
     });
-    await fapDataSource.assignReviewersToFap({
-      fapId: fap.id,
+    await sepDataSource.assignReviewersToSEP({
+      sepId: sep.id,
       memberIds: [dummy.positiveNumber(MAX_USERS)],
     });
     const proposalPks = createUniqueIntArray(5, MAX_PROPOSALS);
     for (const proposalPk of proposalPks) {
       const tmpUserId = dummy.positiveNumber(MAX_USERS);
-      await fapDataSource.assignProposalsToFap({
+      await sepDataSource.assignProposalsToSep({
         proposals: [{ primaryKey: proposalPk, callId: 1 }],
-        fapId: fap.id,
-        fapInstrumentId: 1,
+        sepId: sep.id,
       });
-      await fapDataSource.assignMemberToFapProposal(proposalPk, fap.id, [
+      await sepDataSource.assignMemberToSEPProposal(proposalPk, sep.id, [
         tmpUserId,
       ]);
       await reviewDataSource.addUserForReview({
         proposalPk: proposalPk,
-        fapID: fap.id,
+        sepID: sep.id,
         userID: tmpUserId,
       });
     }
-  }, MAX_FAPS);
+  }, MAX_SEPS);
 };
 
 async function run() {
@@ -356,7 +354,7 @@ async function run() {
   await createCalls();
   await createInstruments();
   await createProposals();
-  await createFaps();
+  await createSeps();
   await createReviews();
 }
 

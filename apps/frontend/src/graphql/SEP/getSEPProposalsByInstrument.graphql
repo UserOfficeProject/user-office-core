@@ -1,0 +1,38 @@
+query sepProposalsByInstrument(
+  $instrumentId: Int!
+  $sepId: Int!
+  $callId: Int!
+) {
+  sepProposalsByInstrument(
+    instrumentId: $instrumentId
+    sepId: $sepId
+    callId: $callId
+  ) {
+    sepTimeAllocation
+    proposal {
+      primaryKey
+      title
+      proposalId
+      status {
+        ...proposalStatus
+      }
+      sepMeetingDecision {
+        ...sepMeetingDecision
+      }
+      reviews {
+        id
+        comment
+        grade
+        status
+      }
+      technicalReview {
+        publicComment
+        status
+        timeAllocation
+      }
+    }
+    assignments {
+      sepMemberUserId
+    }
+  }
+}

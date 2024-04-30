@@ -17,12 +17,13 @@ import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
+import { Instrument } from '../models/Instrument';
 import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 export const EXCHANGE_NAME =
-  process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
+  process.env.CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
 
 type Member = {
   id: string;
@@ -37,14 +38,16 @@ type Member = {
 
 type ProposalMessageData = {
   abstract: string;
+  allocatedTime: number;
   callId: number;
-  instruments?: { id: number; shortCode: string; allocatedTime: number }[];
+  instrument?: Pick<Instrument, 'id' | 'shortCode'>;
   members: Member[];
   newStatus?: string;
   proposalPk: number;
   proposer?: Member;
   shortCode: string;
   title: string;
+  instrumentId?: number; // instrumentId is here for backwards compatibility.
   submitted: boolean;
 };
 
@@ -112,32 +115,35 @@ export const getProposalMessageData = async (proposal: Proposal) => {
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
-  const maybeInstruments =
-    await instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey);
+  const maybeInstrument = await instrumentDataSource.getInstrumentByProposalPk(
+    proposal.primaryKey
+  );
 
   const call = await callDataSource.getCall(proposal.callId);
   if (!call) {
     throw new Error('Call not found');
   }
 
-  const instruments = maybeInstruments?.length
-    ? maybeInstruments.map((instr) => ({
-        id: instr.id,
-        shortCode: instr.shortCode,
-        allocatedTime: getSecondsPerAllocationTimeUnit(
-          instr.managementTimeAllocation,
-          call.allocationTimeUnit
-        ),
-      }))
-    : undefined;
+  const proposalAllocatedTime = getSecondsPerAllocationTimeUnit(
+    proposal.managementTimeAllocation,
+    call.allocationTimeUnit
+  );
 
+  const instrument = maybeInstrument
+    ? {
+        id: maybeInstrument.id,
+        shortCode: maybeInstrument.shortCode,
+      }
+    : undefined;
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
-    instruments: instruments,
+    instrument: instrument,
     title: proposal.title,
     abstract: proposal.abstract,
     callId: call.id,
+    allocatedTime: proposalAllocatedTime,
+    instrumentId: instrument?.id,
     members: proposalUsersWithInstitution.map(
       (proposalUserWithInstitution) => ({
         firstName: proposalUserWithInstitution.user.firstname,
@@ -180,8 +186,6 @@ const getSecondsPerAllocationTimeUnit = (
   switch (unit) {
     case AllocationTimeUnits.Hour:
       return timeAllocation * 60 * 60;
-    case AllocationTimeUnits.Week:
-      return timeAllocation * 7 * 24 * 60 * 60;
     default:
       return timeAllocation * 24 * 60 * 60;
   }
@@ -205,13 +209,11 @@ export async function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_CREATED:
       case Event.PROPOSAL_UPDATED:
       case Event.PROPOSAL_SUBMITTED:
-      case Event.PROPOSAL_ACCEPTED:
-      case Event.PROPOSAL_DELETED:
-      case Event.PROPOSAL_STATUS_ACTION_EXECUTED: {
+      case Event.PROPOSAL_DELETED: {
         const jsonMessage = await getProposalMessageData(event.proposal);
 
         await rabbitMQ.sendMessageToExchange(
-          event.exchange || EXCHANGE_NAME,
+          EXCHANGE_NAME,
           event.type,
           jsonMessage
         );
@@ -284,8 +286,8 @@ export async function createPostToRabbitMQHandler() {
 
 export async function createListenToRabbitMQHandler() {
   const EVENT_SCHEDULING_QUEUE_NAME = process.env
-    .RABBITMQ_SCHEDULER_EXCHANGE_NAME as Queue;
-  const SCHEDULER_EXCHANGE_NAME = process.env.RABBITMQ_SCHEDULER_EXCHANGE_NAME;
+    .EVENT_SCHEDULING_QUEUE_NAME as Queue;
+  const SCHEDULER_EXCHANGE_NAME = process.env.SCHEDULER_EXCHANGE_NAME;
 
   if (!SCHEDULER_EXCHANGE_NAME) {
     throw new Error('SCHEDULER_EXCHANGE_NAME environment variable not set');
@@ -340,7 +342,6 @@ export async function createListenToRabbitMQHandler() {
             proposalPk: message.proposalPk,
             status: message.status,
             localContactId: message.localContact,
-            instrumentId: message.instrumentId,
           } as ScheduledEventCore;
 
           await proposalDataSource.addProposalBookingScheduledEvent(
@@ -376,7 +377,6 @@ export async function createListenToRabbitMQHandler() {
             proposalPk: scheduledEvent.proposalPk,
             status: scheduledEvent.status,
             localContactId: scheduledEvent.localContactId,
-            instrumentId: scheduledEvent.instrumentId,
           }));
 
           await proposalDataSource.removeProposalBookingScheduledEvents(

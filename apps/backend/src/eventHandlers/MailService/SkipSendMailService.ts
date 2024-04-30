@@ -1,8 +1,8 @@
 import { logger } from '@user-office-software/duo-logger';
+import { ResultsPromise } from 'sparkpost';
 
 import EmailSettings from './EmailSettings';
 import { MailService, SendMailResults, SparkPostTemplate } from './MailService';
-import { ResultsPromise } from './SparkPost';
 
 export class SkipSendMailService extends MailService {
   constructor() {

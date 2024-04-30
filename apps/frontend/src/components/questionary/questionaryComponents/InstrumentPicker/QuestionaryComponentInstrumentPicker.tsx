@@ -11,12 +11,10 @@ import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { InstrumentPickerConfig } from 'generated/sdk';
-import { toArray } from 'utils/helperFunctions';
 
 const useStyles = makeStyles(() => ({
   horizontalLayout: {
@@ -38,16 +36,10 @@ export function QuestionaryComponentInstrumentPicker(
   } = props;
   const {
     question: { id, question, naturalKey },
-    value,
   } = answer;
-  const [stateValue, setStateValue] = useState<Array<string> | string>(value);
   const config = answer.config as InstrumentPickerConfig;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
-
-  useEffect(() => {
-    setStateValue(answer.value);
-  }, [answer]);
 
   const label = (
     <>
@@ -62,13 +54,8 @@ export function QuestionaryComponentInstrumentPicker(
   );
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
-    const newValue = event.target.value || null;
-
-    onComplete(newValue);
+    onComplete(+event.target.value);
   };
-
-  const SelectMenuItem = config.isMultipleSelect ? MultiMenuItem : MenuItem;
-
   switch (config.variant) {
     case 'dropdown':
       return (
@@ -81,11 +68,8 @@ export function QuestionaryComponentInstrumentPicker(
           <InputLabel id={`questionary-${id}`}>{label}</InputLabel>
           <Select
             id={id}
-            value={
-              config.isMultipleSelect ? toArray(stateValue) : stateValue || '0'
-            }
+            value={answer.value ?? null}
             onChange={handleOnChange}
-            multiple={config.isMultipleSelect}
             labelId={`questionary-${id}`}
             required={config.required}
             MenuProps={{
@@ -94,12 +78,12 @@ export function QuestionaryComponentInstrumentPicker(
             data-natural-key={naturalKey}
             data-cy="dropdown-ul"
           >
-            {!config.isMultipleSelect && <MenuItem value={0}>None</MenuItem>}
+            <MenuItem value={''}>None</MenuItem>
             {config.instruments.map((instrument) => {
               return (
-                <SelectMenuItem value={instrument.id} key={instrument.id}>
+                <MenuItem value={instrument.id} key={instrument.id}>
                   {instrument.name}
-                </SelectMenuItem>
+                </MenuItem>
               );
             })}
           </Select>

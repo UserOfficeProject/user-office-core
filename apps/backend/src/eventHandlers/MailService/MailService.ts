@@ -1,5 +1,6 @@
+import { ResultsPromise } from 'sparkpost';
+
 import EmailSettings from './EmailSettings';
-import { ResultsPromise } from './SparkPost';
 
 export abstract class MailService {
   abstract sendMail(options: EmailSettings): ResultsPromise<SendMailResults>;
@@ -20,9 +21,11 @@ export type SparkPostTemplate = {
   last_update_time: string;
 };
 
+// TODO: This might need some attention from STFC and return the templates used in their email sending service.
 export type STFCEmailTemplate = {
   id: string;
   name: string;
+  description: string;
 };
 
 export type SendMailResults = {

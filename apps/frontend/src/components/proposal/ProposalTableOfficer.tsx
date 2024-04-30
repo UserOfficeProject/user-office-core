@@ -25,12 +25,12 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
-import AssignProposalsToFap from 'components/fap/Proposals/AssignProposalsToFap';
-import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
+import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
@@ -38,10 +38,9 @@ import {
   ProposalsFilter,
   ProposalStatus,
   ProposalSelectionInput,
-  Fap,
+  Sep,
   InstrumentFragment,
   FeatureId,
-  GetInstrumentsByIdsQuery,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -53,7 +52,6 @@ import {
 } from 'hooks/proposal/useProposalsCoreData';
 import {
   addColumns,
-  fromArrayToCommaSeparated,
   fromProposalToProposalView,
   removeColumns,
   setSortDirectionOnSortColumn,
@@ -66,14 +64,10 @@ import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
-import TableActionsDropdownMenu, {
-  DownloadMenuOption,
-  PdfDownloadMenuOption,
-} from './TableActionsDropdownMenu';
+import TableActionsDropdownMenu from './TableActionsDropdownMenu';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
-  setProposalFilter: (filter: ProposalsFilter) => void;
   urlQueryParams: DecodedValueMap<ProposalUrlQueryParamsType>;
   setUrlQueryParams: SetQuery<ProposalUrlQueryParamsType>;
   confirm: WithConfirmType;
@@ -82,9 +76,8 @@ type ProposalTableOfficerProps = {
 export type ProposalSelectionType = ProposalSelectionInput & {
   title: string;
   proposalId: string;
-  instrumentIds: (number | null)[] | null;
-  fapInstrumentId: number | null;
-  fapId: number | null;
+  instrumentId: number | null;
+  sepId: number | null;
   statusId: number;
 };
 
@@ -125,15 +118,9 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'Principal Investigator',
     field: 'principalInvestigator',
-    sorting: false,
     emptyValue: '-',
     render: (proposalView) => {
       if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.preferredname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
-      } else if (
         proposalView.principalInvestigator?.lastname &&
         proposalView.principalInvestigator?.firstname
       ) {
@@ -146,7 +133,6 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'PI Email',
     field: 'principalInvestigator.email',
-    sorting: false,
     emptyValue: '-',
   },
   {
@@ -170,45 +156,31 @@ let columns: Column<ProposalViewData>[] = [
 ];
 
 const technicalReviewColumns = [
-  {
-    title: 'Technical status',
-    field: 'technicalStatuses',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalStatuses),
-  },
+  { title: 'Technical status', field: 'technicalStatus', emptyValue: '-' },
   {
     title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssigneeNames',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
+    field: 'assignedTechnicalReviewer',
+    emptyValue: '-',
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocations',
-    render: (rowData: ProposalViewData) =>
-      `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
-        rowData.allocationTimeUnit
-      }s)`,
+    field: 'technicalTimeAllocationRendered',
+    emptyValue: '-',
     hidden: true,
   },
 ];
 
 const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
-) => [
-  {
-    title: t('instrument'),
-    field: 'instrumentNames',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.instrumentNames),
-  },
-];
+) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
 
-const FapReviewColumns = [
+const SEPReviewColumns = (
+  t: TFunction<'translation', undefined, 'translation'>
+) => [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
-    field: 'finalTimeAllocationsRendered',
+    field: 'finalTimeAllocationRendered',
     emptyValue: '-',
     hidden: true,
   },
@@ -220,12 +192,16 @@ const FapReviewColumns = [
     hidden: true,
   },
   { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
-  { title: 'Fap', field: 'fapCode', emptyValue: '-' },
+  { title: t('SEP'), field: 'sepCode', emptyValue: '-' },
 ];
 
 const PREFETCH_SIZE = 200;
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
 
+enum DownloadMenuOption {
+  PROPOSAL = 'Proposal(s)',
+  ATTACHMENT = 'Attachment(s)',
+}
 /**
  * NOTE: This toolbar "select all" option works only with all prefetched proposals. Currently that value is set to "PREFETCH_SIZE=200"
  * For example if we change the PREFETCH_SIZE to 100, that would mean that it can select up to 100 prefetched proposals at once.
@@ -285,7 +261,6 @@ const ToolbarWithSelectAllPrefetched = (props: {
 
 const ProposalTableOfficer = ({
   proposalFilter,
-  setProposalFilter,
   urlQueryParams,
   setUrlQueryParams,
   confirm,
@@ -339,16 +314,10 @@ const ProposalTableOfficer = ({
     setActionsMenuAnchorElement(event.currentTarget);
   };
   const handleClose = (selectedOption: string) => {
-    if (selectedOption === PdfDownloadMenuOption.PDF) {
+    if (selectedOption === DownloadMenuOption.PROPOSAL) {
       downloadPDFProposal(
         selectedProposals?.map((proposal) => proposal.primaryKey),
         selectedProposals?.[0].title
-      );
-    } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
-      downloadPDFProposal(
-        selectedProposals?.map((proposal) => proposal.primaryKey),
-        selectedProposals?.[0].title,
-        'zip'
       );
     } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
       setOpenDownloadAttachment(true);
@@ -387,9 +356,8 @@ const ProposalTableOfficer = ({
             selected.push({
               primaryKey: proposal.primaryKey,
               callId: proposal.callId,
-              instrumentIds: proposal.instrumentIds || [],
-              fapInstrumentId: proposal.fapInstrumentId,
-              fapId: proposal.fapId,
+              instrumentId: proposal.instrumentId,
+              sepId: proposal.sepId,
               statusId: proposal.statusId,
               workflowId: proposal.workflowId,
               title: proposal.title,
@@ -441,8 +409,8 @@ const ProposalTableOfficer = ({
   const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-  const isFapEnabled = featureContext.featuresMap.get(
-    FeatureId.FAP_REVIEW
+  const isSEPEnabled = featureContext.featuresMap.get(
+    FeatureId.SEP_REVIEW
   )?.isEnabled;
 
   /**
@@ -474,10 +442,10 @@ const ProposalTableOfficer = ({
     removeColumns(columns, instrumentManagementColumns(t));
   }
 
-  if (isFapEnabled) {
-    addColumns(columns, FapReviewColumns);
+  if (isSEPEnabled) {
+    addColumns(columns, SEPReviewColumns(t));
   } else {
-    removeColumns(columns, FapReviewColumns);
+    removeColumns(columns, SEPReviewColumns(t));
   }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
@@ -526,39 +494,30 @@ const ProposalTableOfficer = ({
     });
   };
 
-  const assignProposalsToFap = async (
-    fap: Fap | null,
-    fapInstrument:
-      | NonNullable<GetInstrumentsByIdsQuery['instrumentsByIds']>[0]
-      | null
-  ): Promise<void> => {
-    if (fap) {
-      if (!fapInstrument) {
-        return;
-      }
-
+  const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
+    if (sep) {
       await api({
         toastSuccessMessage:
-          'Proposal/s assigned to the selected Fap successfully!',
-      }).assignProposalsToFap({
+          'Proposal/s assigned to the selected ' + t('SEP') + ' successfully!',
+      }).assignProposalsToSep({
         proposals: selectedProposals.map((selectedProposal) => ({
           primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
         })),
-        fapId: fap.id,
-        fapInstrumentId: fapInstrument.id,
+        sepId: sep.id,
       });
 
       // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
       setTimeout(fetchProposalsData, 500);
     } else {
       await api({
-        toastSuccessMessage: 'Proposal/s removed from the Fap successfully!',
-      }).removeProposalsFromFap({
+        toastSuccessMessage:
+          'Proposal/s removed from the ' + t('SEP') + ' successfully!',
+      }).removeProposalsFromSep({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
-        fapId: selectedProposals[0].fapId as number,
+        sepId: selectedProposals[0].sepId as number,
       });
 
       setProposalsData((proposalsData) =>
@@ -569,8 +528,8 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.fapCode = null;
-            prop.fapId = null;
+            prop.sepCode = null;
+            prop.sepId = null;
           }
 
           return prop;
@@ -579,20 +538,21 @@ const ProposalTableOfficer = ({
     }
   };
 
-  const assignProposalsToInstruments = async (
-    instruments: InstrumentFragment[] | null
+  const assignProposalsToInstrument = async (
+    instrument: InstrumentFragment | null
   ): Promise<void> => {
-    if (instruments?.length) {
+    if (instrument) {
       await api({
         toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
           t('instrument'),
           'lowercase'
         )} successfully!`,
-      }).assignProposalsToInstruments({
-        proposalPks: selectedProposals.map(
-          (selectedProposal) => selectedProposal.primaryKey
-        ),
-        instrumentIds: instruments.map((instrument) => instrument.id),
+      }).assignProposalsToInstrument({
+        proposals: selectedProposals.map((selectedProposal) => ({
+          primaryKey: selectedProposal.primaryKey,
+          callId: selectedProposal.callId,
+        })),
+        instrumentId: instrument.id,
       });
 
       // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
@@ -617,8 +577,8 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.instrumentNames = null;
-            prop.instrumentIds = null;
+            prop.instrumentName = null;
+            prop.instrumentId = null;
           }
 
           return prop;
@@ -697,10 +657,9 @@ const ProposalTableOfficer = ({
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
   );
-  const proposalToReview = preselectedProposalsData.find(
-    (proposal) =>
-      proposal.primaryKey === urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalid
+
+  const proposalToReview = proposalsData.find(
+    (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
   const userOfficerProposalReviewTabs = [
@@ -708,7 +667,7 @@ const ProposalTableOfficer = ({
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isFapEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
+    ...(isSEPEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
     PROPOSAL_MODAL_TAB_NAMES.ADMIN,
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
@@ -721,9 +680,15 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      finalTimeAllocationsRendered: `${fromArrayToCommaSeparated(
-        proposal.managementTimeAllocations
-      )} (${proposal.allocationTimeUnit}s)`,
+      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
+        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
+        : '-',
+      technicalTimeAllocationRendered: proposal.technicalTimeAllocation
+        ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
+        : '-',
+      finalTimeAllocationRendered: proposal.managementTimeAllocation
+        ? `${proposal.managementTimeAllocation}(${proposal.allocationTimeUnit}s)`
+        : '-',
     })
   );
 
@@ -739,21 +704,13 @@ const ProposalTableOfficer = ({
         aria-describedby="simple-modal-description"
         open={openAssignment}
         onClose={(): void => setOpenAssignment(false)}
-        maxWidth="xs"
-        fullWidth
       >
         <DialogContent>
-          <AssignProposalsToFap
-            assignProposalsToFap={assignProposalsToFap}
+          <AssignProposalsToSEP
+            assignProposalsToSEP={assignProposalsToSEP}
             close={(): void => setOpenAssignment(false)}
-            fapIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.fapId
-            )}
-            proposalInstrumentIds={selectedProposals
-              .map((selectedProposal) => selectedProposal.instrumentIds)
-              .flat()}
-            proposalFapInstrumentIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.fapInstrumentId
+            sepIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.sepId
             )}
           />
         </DialogContent>
@@ -763,19 +720,17 @@ const ProposalTableOfficer = ({
         aria-describedby="simple-modal-description"
         open={openInstrumentAssignment}
         onClose={(): void => setOpenInstrumentAssignment(false)}
-        maxWidth="xs"
-        fullWidth
       >
         <DialogContent>
-          <AssignProposalsToInstruments
-            assignProposalsToInstruments={assignProposalsToInstruments}
+          <AssignProposalsToInstrument
+            assignProposalsToInstrument={assignProposalsToInstrument}
             close={(): void => setOpenInstrumentAssignment(false)}
             callIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.callId
             )}
-            instrumentIds={selectedProposals
-              .map((selectedProposal) => selectedProposal.instrumentIds)
-              .flat()}
+            instrumentIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.instrumentId
+            )}
           />
         </DialogContent>
       </Dialog>
@@ -783,9 +738,7 @@ const ProposalTableOfficer = ({
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={openChangeProposalStatus}
-        maxWidth="xs"
         onClose={(): void => setOpenChangeProposalStatus(false)}
-        fullWidth
       >
         <DialogContent>
           <ChangeProposalStatus
@@ -795,7 +748,7 @@ const ProposalTableOfficer = ({
               (selectedProposal) => selectedProposal.statusId
             )}
             allSelectedProposalsHaveInstrument={selectedProposals.every(
-              (selectedProposal) => selectedProposal.instrumentIds?.length
+              (selectedProposal) => selectedProposal.instrumentId
             )}
           />
         </DialogContent>
@@ -839,32 +792,21 @@ const ProposalTableOfficer = ({
       <TableActionsDropdownMenu
         event={actionsMenuAnchorElement}
         handleClose={handleClose}
+        options={Object.values(DownloadMenuOption)}
       />
       <ProposalReviewModal
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
-        proposalReviewModalOpen={!!proposalToReview}
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
           setProposalsData(
             proposalsData.map((proposal) => {
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
-                return {
-                  ...fromProposalToProposalView(updatedProposal),
-                  fapInstrumentId: proposal.fapInstrumentId,
-                };
+                return fromProposalToProposalView(updatedProposal);
               } else {
                 return proposal;
               }
             })
           );
-          if (urlQueryParams.proposalid) {
-            setUrlQueryParams({
-              proposalid: undefined,
-            });
-            setProposalFilter({
-              ...proposalFilter,
-              referenceNumbers: undefined,
-            });
-          }
           setUrlQueryParams({ reviewModal: undefined });
         }}
         reviewItemId={proposalToReview?.primaryKey}
@@ -928,7 +870,7 @@ const ProposalTableOfficer = ({
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },
-          debounceInterval: 600,
+          debounceInterval: 400,
           columnsButton: true,
           selectionProps: (rowdata: ProposalViewData) => ({
             inputProps: {
@@ -983,7 +925,7 @@ const ProposalTableOfficer = ({
           },
           {
             icon: GroupWorkIcon,
-            tooltip: 'Assign proposals to Fap',
+            tooltip: 'Assign proposals to ' + t('SEP'),
             onClick: () => {
               setOpenAssignment(true);
             },

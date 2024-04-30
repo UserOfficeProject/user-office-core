@@ -20,7 +20,7 @@ export class AddUserForReviewArgs {
   public proposalPk: number;
 
   @Field(() => Int)
-  public fapID: number;
+  public sepID: number;
 }
 
 @Resolver()

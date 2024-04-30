@@ -1,5 +1,0 @@
-query getFap($id: Int!) {
-  fap(id: $id) {
-    ...fap
-  }
-}

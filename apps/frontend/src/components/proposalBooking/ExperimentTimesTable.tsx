@@ -23,7 +23,7 @@ const columns: (
   { title: t('instrument') as string, field: 'instrument.name' },
   {
     title: 'Local contact',
-    field: 'localContactFormatted',
+    render: (rowData) => getFullUserName(rowData.localContact),
   },
   {
     title: 'Starts at',
@@ -51,7 +51,6 @@ export default function ExperimentsTable({
       ...event,
       startsAtFormatted: toFormattedDateTime(event.startsAt),
       endsAtFormatted: toFormattedDateTime(event.endsAt),
-      localContactFormatted: getFullUserName(event.localContact),
     })
   );
 

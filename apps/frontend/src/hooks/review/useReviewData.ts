@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Review } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useReviewData(reviewId?: number | null, fapId?: number | null) {
+export function useReviewData(reviewId?: number | null, sepId?: number | null) {
   const [reviewData, setReviewData] = useState<Review | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export function useReviewData(reviewId?: number | null, fapId?: number | null) {
     return () => {
       cancelled = true;
     };
-  }, [reviewId, fapId, api]);
+  }, [reviewId, sepId, api]);
 
   return { loading, reviewData, setReviewData };
 }

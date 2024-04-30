@@ -7,8 +7,8 @@ export class Call {
     public endCallInternal: Date,
     public startReview: Date,
     public endReview: Date,
-    public startFapReview: Date,
-    public endFapReview: Date,
+    public startSEPReview: Date,
+    public endSEPReview: Date,
     public startNotify: Date,
     public endNotify: Date,
     public startCycle: Date,
@@ -22,7 +22,7 @@ export class Call {
     public callEnded: boolean,
     public callEndedInternal: boolean,
     public callReviewEnded: boolean,
-    public callFapReviewEnded: boolean,
+    public callSEPReviewEnded: boolean,
     public templateId: number,
     public esiTemplateId: number | undefined,
     public allocationTimeUnit: AllocationTimeUnits,
@@ -36,5 +36,4 @@ export class Call {
 export enum AllocationTimeUnits {
   Day = 'day',
   Hour = 'hour',
-  Week = 'week',
 }

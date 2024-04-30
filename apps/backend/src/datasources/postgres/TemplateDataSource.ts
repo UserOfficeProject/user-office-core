@@ -720,15 +720,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     question: string,
     default_config: string
   ): Promise<Question> {
-    const naturalKeyExistAlready = await database
-      .select('natural_key')
-      .from('questions')
-      .where('natural_key', natural_key);
-
-    if (naturalKeyExistAlready.length != 0) {
-      natural_key = natural_key + '_' + Date.now();
-    }
-
     const resultSet: QuestionRecord[] = await database
       .insert(
         {

@@ -8,12 +8,14 @@ mutation updateUser(
   $gender: String
   $nationality: Int
   $birthdate: DateTime
-  $institutionId: Int
+  $organisation: Int
   $department: String
   $position: String
   $email: String
   $telephone: String
   $telephone_alt: String
+  $otherOrganisation: String
+  $organizationCountry: Int
 ) {
   updateUser(
     id: $id
@@ -25,12 +27,14 @@ mutation updateUser(
     gender: $gender
     nationality: $nationality
     birthdate: $birthdate
-    institutionId: $institutionId
+    organisation: $organisation
     department: $department
     position: $position
     email: $email
     telephone: $telephone
     telephone_alt: $telephone_alt
+    otherOrganisation: $otherOrganisation
+    organizationCountry: $organizationCountry
   ) {
     id
   }

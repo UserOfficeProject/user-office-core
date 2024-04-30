@@ -1,4 +1,4 @@
-export function deepEqual<T extends object>(a: T, b: T): boolean {
+export function deepEqual<T>(a: T, b: T): boolean {
   if (a === b) {
     return true;
   }
@@ -15,8 +15,8 @@ export function deepEqual<T extends object>(a: T, b: T): boolean {
 
   return props.every(function (prop) {
     return deepEqual(
-      (a as Record<string, object>)[prop],
-      (b as Record<string, object>)[prop]
+      (a as Record<string, unknown>)[prop],
+      (b as Record<string, unknown>)[prop]
     );
   });
 }

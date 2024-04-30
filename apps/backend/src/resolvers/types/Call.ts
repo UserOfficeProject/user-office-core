@@ -13,9 +13,9 @@ import {
 import { ResolverContext } from '../../context';
 import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
-import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { ProposalWorkflow } from './ProposalWorkflow';
+import { SEP } from './SEP';
 import { Template } from './Template';
 
 @ObjectType()
@@ -43,10 +43,10 @@ export class Call implements Partial<CallOrigin> {
   public endReview: Date;
 
   @Field(() => Date, { nullable: true })
-  public startFapReview: Date;
+  public startSEPReview: Date;
 
   @Field(() => Date, { nullable: true })
-  public endFapReview: Date;
+  public endSEPReview: Date;
 
   @Field(() => Date)
   public startNotify: Date;
@@ -109,9 +109,9 @@ export class CallInstrumentsResolver {
     ]);
   }
 
-  @FieldResolver(() => [Fap], { nullable: true })
-  async faps(@Root() call: Call, @Ctx() context: ResolverContext) {
-    return context.queries.fap.dataSource.getFapsByCallId(call.id);
+  @FieldResolver(() => [SEP], { nullable: true })
+  async seps(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.sep.dataSource.getSepsByCallId(call.id);
   }
 
   @FieldResolver(() => ProposalWorkflow, { nullable: true })

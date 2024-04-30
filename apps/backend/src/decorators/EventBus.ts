@@ -17,15 +17,14 @@ const EventBusDecorator = (eventType: Event) => {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args) {
-      // eslint-disable-next-line prefer-const
-      let [loggedInUser, ...restArgs] = args;
+      let [loggedInUser] = args;
 
       const result = await originalMethod?.apply(this, args);
 
-      // NOTE: Get the name of the object or class like: 'Fap', 'USER', 'Proposal' and lowercase it.
+      // NOTE: Get the name of the object or class like: 'SEP', 'USER', 'Proposal' and lowercase it.
       const resultKey = (result.constructor.name as string).toLowerCase();
 
-      // NOTE: This needs to be checked because there are mutations where we don't have loggedIn user
+      // NOTE: This needs to be checked because there are mutations where we don't have loggedIn user. Example: ResetPasswordEmailMutation.
       if (!loggedInUser) {
         loggedInUser = result.user;
       }
@@ -36,7 +35,6 @@ const EventBusDecorator = (eventType: Event) => {
         key: resultKey,
         loggedInUserId: loggedInUser ? loggedInUser.id : null,
         isRejection: isRejection(result),
-        inputArgs: JSON.stringify(restArgs),
       } as ApplicationEvent;
 
       // NOTE: Do not log the event in testing environment.

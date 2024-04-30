@@ -103,45 +103,10 @@ export default function createCustomHandler() {
           event.technicalreview.proposalPk
         );
 
-        const allProposalTechnicalReviews =
-          await reviewDataSource.getTechnicalReviews(
-            event.technicalreview.proposalPk
-          );
-
-        const allTechnicalReviewsSubmitted = allProposalTechnicalReviews?.every(
-          (technicalReview) => technicalReview.submitted
-        );
-
-        if (allTechnicalReviewsSubmitted) {
-          eventBus.publish({
-            type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED,
-            proposal: foundProposal,
-            isRejection: false,
-            key: 'proposal',
-            loggedInUserId: event.loggedInUserId,
-          });
-
-          const allTechnicalReviewsFeasible =
-            allProposalTechnicalReviews?.every(
-              (technicalReview) =>
-                technicalReview.status === TechnicalReviewStatus.FEASIBLE
-            );
-
-          if (allTechnicalReviewsFeasible) {
-            eventBus.publish({
-              type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE,
-              proposal: foundProposal,
-              isRejection: false,
-              key: 'proposal',
-              loggedInUserId: event.loggedInUserId,
-            });
-          }
-        }
-
         switch (event.technicalreview.status) {
           case TechnicalReviewStatus.FEASIBLE:
             eventBus.publish({
-              type: Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
+              type: Event.PROPOSAL_FEASIBLE,
               proposal: foundProposal,
               isRejection: false,
               key: 'proposal',
@@ -150,7 +115,7 @@ export default function createCustomHandler() {
             break;
           case TechnicalReviewStatus.UNFEASIBLE:
             eventBus.publish({
-              type: Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
+              type: Event.PROPOSAL_UNFEASIBLE,
               proposal: foundProposal,
               isRejection: false,
               key: 'proposal',
@@ -180,14 +145,14 @@ export default function createCustomHandler() {
         }
         break;
       }
-      case Event.PROPOSAL_FAP_MEETING_SAVED: {
+      case Event.PROPOSAL_SEP_MEETING_SAVED: {
         const foundProposal = await getProposalByPk(
-          event.fapmeetingdecision.proposalPk
+          event.sepmeetingdecision.proposalPk
         );
 
-        if (event.fapmeetingdecision.submitted) {
+        if (event.sepmeetingdecision.submitted) {
           eventBus.publish({
-            type: Event.PROPOSAL_FAP_MEETING_SUBMITTED,
+            type: Event.PROPOSAL_SEP_MEETING_SUBMITTED,
             proposal: foundProposal,
             isRejection: false,
             key: 'proposal',
@@ -196,10 +161,10 @@ export default function createCustomHandler() {
         }
         break;
       }
-      case Event.PROPOSAL_FAP_REVIEW_UPDATED:
+      case Event.PROPOSAL_SEP_REVIEW_UPDATED:
         if (event.review.status === ReviewStatus.SUBMITTED) {
           eventBus.publish({
-            type: Event.PROPOSAL_FAP_REVIEW_SUBMITTED,
+            type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED,
             review: event.review,
             isRejection: false,
             key: 'review',
@@ -208,7 +173,7 @@ export default function createCustomHandler() {
         }
         break;
 
-      case Event.PROPOSAL_FAP_REVIEW_SUBMITTED:
+      case Event.PROPOSAL_SEP_REVIEW_SUBMITTED:
         try {
           const allProposalReviews = await reviewDataSource.getProposalReviews(
             event.review.proposalPk
@@ -225,7 +190,7 @@ export default function createCustomHandler() {
             );
 
             eventBus.publish({
-              type: Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED,
+              type: Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED,
               proposal: foundProposal,
               isRejection: false,
               key: 'proposal',
@@ -242,7 +207,7 @@ export default function createCustomHandler() {
       case Event.CALL_ENDED:
       case Event.CALL_ENDED_INTERNAL:
       case Event.CALL_REVIEW_ENDED:
-      case Event.CALL_FAP_REVIEW_ENDED:
+      case Event.CALL_SEP_REVIEW_ENDED:
         try {
           const allProposalsOnCall =
             await proposalDataSource.getProposalsFromView({

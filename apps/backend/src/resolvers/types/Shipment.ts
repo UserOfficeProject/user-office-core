@@ -38,7 +38,7 @@ export class Shipment implements Partial<ShipmentOrigin> {
   @Field(() => Int)
   public questionaryId: number;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   public scheduledEventId: number;
 
   @Field(() => Int)

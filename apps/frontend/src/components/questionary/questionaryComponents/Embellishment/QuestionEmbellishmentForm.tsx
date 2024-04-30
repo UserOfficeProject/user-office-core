@@ -13,16 +13,12 @@ import { QuestionFormShell } from '../QuestionFormShell';
 export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  document.addEventListener('focusin', function (e) {
-    e.stopImmediatePropagation();
-  });
 
   return (
     <QuestionFormShell
       {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
         config: Yup.object({
           html: Yup.string().required('Content is required'),
           plain: Yup.string().required('Plain description is required'),
@@ -40,17 +36,6 @@ export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
-
-          <Field
-            name="question"
-            id="Question-Input"
-            label="Question"
-            type="text"
-            component={TextField}
-            fullWidth
-            inputProps={{ 'data-cy': 'question' }}
-          />
-
           <Field
             name="config.html"
             id="HTML-Input"

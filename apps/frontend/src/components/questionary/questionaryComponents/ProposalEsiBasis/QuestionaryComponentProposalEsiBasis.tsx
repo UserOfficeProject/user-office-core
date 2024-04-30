@@ -282,8 +282,8 @@ function QuestionaryComponentProposalEsiBasis(
                           isDeclarationComplete
                             ? 'green'
                             : hasDeclaredEsi
-                              ? 'red'
-                              : 'inherit'
+                            ? 'red'
+                            : 'inherit'
                         }
                       />
                     </ListItemIcon>
@@ -293,8 +293,8 @@ function QuestionaryComponentProposalEsiBasis(
                         isDeclarationComplete
                           ? 'Ready'
                           : hasDeclaredEsi
-                            ? 'Unfinished declaration'
-                            : ''
+                          ? 'Unfinished declaration'
+                          : ''
                       }
                     />
 

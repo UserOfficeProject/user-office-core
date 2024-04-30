@@ -18,9 +18,6 @@ export class UpdateTechnicalReviewAssigneeInput {
 
   @Field(() => [Int])
   public proposalPks: number[];
-
-  @Field(() => Int)
-  public instrumentId: number;
 }
 
 @Resolver()

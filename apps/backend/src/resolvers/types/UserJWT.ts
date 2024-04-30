@@ -32,5 +32,5 @@ export class UserJWT implements Partial<UserJWTOrigin> {
   public position: string;
 
   @Field()
-  public institutionId: number;
+  public organisation: number;
 }

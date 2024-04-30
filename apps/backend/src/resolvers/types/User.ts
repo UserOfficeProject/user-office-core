@@ -1,26 +1,26 @@
 import {
-  Arg,
-  ArgsType,
   Ctx,
   Directive,
   Field,
   FieldResolver,
-  InputType,
   Int,
   ObjectType,
   Resolver,
   Root,
+  Arg,
+  ArgsType,
+  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
 import { User as UserOrigin } from '../../models/User';
-import { Fap } from './Fap';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
+import { SEP } from './SEP';
 
 @InputType()
 export class UserProposalsFilter {
@@ -80,7 +80,7 @@ export class User implements Partial<UserOrigin> {
   public birthdate: Date;
 
   @Field(() => Int)
-  public institutionId: number;
+  public organisation: number;
 
   @Field()
   public department: string;
@@ -90,6 +90,9 @@ export class User implements Partial<UserOrigin> {
 
   @Field()
   public email: string;
+
+  @Field()
+  public emailVerified: boolean;
 
   @Field()
   public telephone: string;
@@ -128,8 +131,8 @@ export class UserResolver {
       return [];
     }
 
-    const fapsUserIsMemberOf =
-      await context.queries.fap.dataSource.getUserFapsByRoleAndFapId(
+    const sepsUserIsMemberOf =
+      await context.queries.sep.dataSource.getUserSepsByRoleAndSepId(
         user.id,
         context.user.currentRole
       );
@@ -137,7 +140,7 @@ export class UserResolver {
     const shouldGetOnlyUserReviews = !reviewer;
 
     return context.queries.review.dataSource.getUserReviews(
-      fapsUserIsMemberOf.map((faps) => faps.id),
+      sepsUserIsMemberOf.map((seps) => seps.id),
       shouldGetOnlyUserReviews ? user.id : undefined,
       callId,
       instrumentId,
@@ -158,13 +161,13 @@ export class UserResolver {
     );
   }
 
-  @FieldResolver(() => [Fap])
-  async faps(@Root() user: User, @Ctx() context: ResolverContext) {
+  @FieldResolver(() => [SEP])
+  async seps(@Root() user: User, @Ctx() context: ResolverContext) {
     if (!context.user || !context.user.currentRole) {
       return [];
     }
 
-    return context.queries.fap.dataSource.getUserFaps(
+    return context.queries.sep.dataSource.getUserSeps(
       user.id,
       context.user.currentRole
     );

@@ -92,8 +92,9 @@ export default class InternalReviewMutations {
       throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
     }
 
-    const deletedInternalReview =
-      await this.internalReviewDataSource.delete(input);
+    const deletedInternalReview = await this.internalReviewDataSource.delete(
+      input
+    );
 
     if (!deletedInternalReview) {
       throw rejection('Could not delete internal review');

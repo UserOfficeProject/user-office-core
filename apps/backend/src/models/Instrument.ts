@@ -17,28 +17,15 @@ export class InstrumentWithAvailabilityTime extends Instrument {
     public managerUserId: number,
     public availabilityTime: number,
     public submitted: boolean,
-    public fapId: number
+    public sepId: number
   ) {
     super(id, name, shortCode, description, managerUserId);
   }
 }
 
-export class InstrumentWithManagementTime extends Instrument {
+export class InstrumentHasProposals {
   constructor(
-    public id: number,
-    public name: string,
-    public shortCode: string,
-    public description: string,
-    public managerUserId: number,
-    public managementTimeAllocation: number
-  ) {
-    super(id, name, shortCode, description, managerUserId);
-  }
-}
-
-export class InstrumentsHasProposals {
-  constructor(
-    public instrumentIds: number[],
+    public instrumentId: number,
     public proposalPks: number[],
     public submitted: boolean
   ) {}

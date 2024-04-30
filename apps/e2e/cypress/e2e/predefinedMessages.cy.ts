@@ -50,12 +50,6 @@ context('Predefined messages tests', () => {
       .first()
       .should('have.value', message);
 
-    cy.get(
-      `[data-cy="managementTimeAllocation-${initialDBData.instrument1.id}"] input`
-    )
-      .clear()
-      .type('1');
-
     cy.get('[data-cy="save-admin-decision"]').click();
 
     cy.notification({

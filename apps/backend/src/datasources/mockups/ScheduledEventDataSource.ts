@@ -26,7 +26,6 @@ export default class ScheduledEventDataSourceMock
         1,
         1,
         ProposalBookingStatusCore.ACTIVE,
-        1,
         1
       ),
       new ScheduledEventCore(
@@ -37,7 +36,6 @@ export default class ScheduledEventDataSourceMock
         2,
         2,
         ProposalBookingStatusCore.ACTIVE,
-        1,
         1
       ),
       // old completed event
@@ -49,7 +47,6 @@ export default class ScheduledEventDataSourceMock
         3,
         3,
         ProposalBookingStatusCore.COMPLETED,
-        1,
         1
       ),
       // recent completed event
@@ -61,7 +58,6 @@ export default class ScheduledEventDataSourceMock
         4,
         4,
         ProposalBookingStatusCore.COMPLETED,
-        1,
         1
       ),
     ];

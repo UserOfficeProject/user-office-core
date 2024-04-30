@@ -1,4 +1,4 @@
-import { Authorized, Directive, Field, Int, ObjectType } from 'type-graphql';
+import { ObjectType, Field, Int, Directive, Authorized } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { Roles } from '../../models/Role';
@@ -20,19 +20,15 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   public preferredname: string | undefined;
 
   @Field()
-  public institution: string;
+  public organisation: string;
 
   @Field(() => Int)
-  public institutionId: number;
+  public organizationId: number;
 
   @Field()
   public position: string;
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.INSTRUMENT_SCIENTIST,
-    Roles.INTERNAL_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   @Field({ nullable: true })
   public email: string;
 
@@ -41,9 +37,6 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
 
   @Field(() => Date, { nullable: true })
   public created?: Date;
-
-  @Field({ nullable: true })
-  public country: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -12,13 +12,13 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { isRejection } from '../models/Rejection';
-import { AuthJwtPayload, UserRole } from '../models/User';
+import { AuthJwtPayload, BasicUserDetails, UserRole } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import UserMutations from './UserMutations';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface');
 
-const secret = process.env.JWT_SECRET as string;
+const secret = process.env.secret as string;
 
 const goodToken = jsonwebtoken.sign(
   {
@@ -101,7 +101,7 @@ test('A user officer can invite a reviewer by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
     dummyPlaceHolderUser.id,
     dummyUserOfficer.id,
-    UserRole.FAP_REVIEWER
+    UserRole.SEP_REVIEWER
   );
 
   return expect(
@@ -109,7 +109,7 @@ test('A user officer can invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyPlaceHolderUser.email,
-      userRole: UserRole.FAP_REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
 });
@@ -120,7 +120,7 @@ test('A user cannot invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'email@google.com',
-      userRole: UserRole.FAP_REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).rejects.toThrow('Can not create user for this role');
 });
@@ -205,6 +205,75 @@ test('A user should be able to update a token if valid', () => {
   ).resolves.toBe('string');
 });
 
+test('A user can reset its password by providing a valid email', () => {
+  return expect(
+    userMutations.resetPasswordEmail(null, { email: dummyUser.email })
+  ).resolves.toHaveProperty('user');
+});
+
+test('A user gets an error if providing a email not attached to a account', () => {
+  return expect(
+    userMutations.resetPasswordEmail(null, { email: 'dummyemail@ess.se' })
+  ).resolves.toHaveProperty('reason', 'Could not find user by email');
+});
+
+test('A user can update its password if it has a valid token', () => {
+  return expect(
+    userMutations.resetPassword(null, {
+      token: goodToken,
+      password: 'Test1234!',
+    })
+  ).resolves.toBeInstanceOf(BasicUserDetails);
+});
+
+test('A user can not update its password if it has a bad token', () => {
+  return expect(
+    userMutations.resetPassword(null, {
+      token: badToken,
+      password: 'Test1234!',
+    })
+  ).resolves.toHaveProperty('reason');
+});
+
+test('A user can update its password', () => {
+  return expect(
+    userMutations.updatePassword(dummyUserWithRole, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toBeInstanceOf(BasicUserDetails);
+});
+
+test('A user can not update another users password', () => {
+  return expect(
+    userMutations.updatePassword(dummyUserNotOnProposalWithRole, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update password because of insufficient permissions'
+  );
+});
+
+test('A not logged in users can not update passwords', () => {
+  return expect(
+    userMutations.updatePassword(null, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
+});
+
+test('A user officer can update any password', () => {
+  return expect(
+    userMutations.updatePassword(dummyUserOfficerWithRole, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toBeInstanceOf(BasicUserDetails);
+});
+
 test('A user must not be able to obtain token for another user', async () => {
   return expect(
     isRejection(
@@ -232,7 +301,7 @@ test('A user officer can must be able to delete another user', async () => {
 });
 
 test('externalTokenLogin supplies a new JWT', async () => {
-  const result = await userMutations.externalTokenLogin('valid', '', null);
+  const result = await userMutations.externalTokenLogin('valid', '');
 
   expect(typeof result).toBe('string');
 

@@ -19,7 +19,7 @@ import {
   UpdateCallInput,
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
-  UpdateFapToCallInstrumentInput,
+  UpdateSepToCallInstrumentInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { mergeValidationSchemas } from '../utils/helperFunctions';
 
@@ -130,20 +130,20 @@ export default class CallMutations {
   }
 
   //TODO: Add Validation in duo-validation package
-  // @ValidateArgs(updateFapToCallInstrumentValidationSchema)
+  // @ValidateArgs(updateSepToCallInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateFapToCallInstrument(
+  async updateSepToCallInstrument(
     agent: UserWithRole | null,
-    args: UpdateFapToCallInstrumentInput
+    args: UpdateSepToCallInstrumentInput
   ): Promise<Call | Rejection> {
     return this.dataSource
-      .updateFapToCallInstrument(args)
+      .updateSepToCallInstrument(args)
       .then((result) => {
         return result;
       })
       .catch((error) => {
         return rejection(
-          'Could not assign fap to call instrument',
+          'Could not assign sep to call instrument',
           { agent, args },
           error
         );

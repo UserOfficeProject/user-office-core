@@ -2,14 +2,19 @@ mutation updateInstitution(
   $id: Int!
   $name: String!
   $country: Int!
-  $rorId: String
+  $verified: Boolean!
 ) {
-  updateInstitution(id: $id, name: $name, country: $country, rorId: $rorId) {
+  updateInstitution(
+    id: $id
+    name: $name
+    country: $country
+    verified: $verified
+  ) {
     id
+    verified
     name
     country {
       ...country
     }
-    rorId
   }
 }

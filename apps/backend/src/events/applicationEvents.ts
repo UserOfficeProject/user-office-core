@@ -1,12 +1,12 @@
 import { Call } from '../models/Call';
-import { Fap } from '../models/Fap';
-import { FapMeetingDecision } from '../models/FapMeetingDecision';
-import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
+import { Instrument, InstrumentHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
+import { SEP } from '../models/SEP';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
@@ -16,9 +16,6 @@ interface GeneralEvent {
   key: string;
   loggedInUserId: number | null;
   isRejection: boolean;
-  inputArgs?: string;
-  description?: string;
-  exchange?: string;
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
@@ -32,12 +29,12 @@ interface ProposalSubmittedEvent extends GeneralEvent {
 }
 
 interface ProposalFeasibleEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE;
+  type: Event.PROPOSAL_FEASIBLE;
   proposal: Proposal;
 }
 
 interface ProposalUnfeasibleEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE;
+  type: Event.PROPOSAL_UNFEASIBLE;
   proposal: Proposal;
 }
 
@@ -102,28 +99,18 @@ interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   technicalreview: TechnicalReview;
 }
 
-interface ProposalALLFeasibilityReviewSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED;
-  proposal: Proposal;
-}
-
-interface ProposalALLFeasibilityReviewFeasibleEvent extends GeneralEvent {
-  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE;
-  proposal: Proposal;
-}
-
-interface ProposalFapReviewSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_REVIEW_SUBMITTED;
+interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED;
   review: Review;
 }
 
-interface ProposalFapReviewUpdatedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_REVIEW_UPDATED;
+interface ProposalSEPReviewUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_REVIEW_UPDATED;
   review: Review;
 }
 
-interface ProposalAllFapReviewsSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED;
+interface ProposalAllSEPReviewsSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED;
   proposal: Proposal;
 }
 
@@ -133,22 +120,22 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 }
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_INSTRUMENTS_SELECTED;
-  instrumentshasproposals: InstrumentsHasProposals;
+  type: Event.PROPOSAL_INSTRUMENT_SELECTED;
+  instrumenthasproposals: InstrumentHasProposals;
 }
 
-interface ProposalFapSelectedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_SELECTED;
+interface ProposalSEPSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_SELECTED;
   proposalpks: ProposalPks;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED;
-  instrumentshasproposals: InstrumentsHasProposals;
+  type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
+  instrumenthasproposals: InstrumentHasProposals;
 }
 
-interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_MEETING_SUBMITTED;
+interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_SUBMITTED;
   proposal: Proposal;
 }
 
@@ -157,34 +144,37 @@ interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
-interface ProposalStatusActionExecutedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_STATUS_ACTION_EXECUTED;
-  proposal: Proposal;
-}
-
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
   proposals: Proposals;
 }
 
-interface ProposalFapMeetingSavedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_MEETING_SAVED;
-  fapmeetingdecision: FapMeetingDecision;
+interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_SAVED;
+  sepmeetingdecision: SepMeetingDecision;
 }
 
-interface ProposalFapMeetingRankingOverwrittenEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN;
-  fapmeetingdecision: FapMeetingDecision;
+interface ProposalSEPMeetingRankingOverwrittenEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN;
+  sepmeetingdecision: SepMeetingDecision;
 }
 
-interface ProposalFapMeetingReorderEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_MEETING_REORDER;
-  fapmeetingdecision: FapMeetingDecision;
+interface ProposalSEPMeetingReorderEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_REORDER;
+  sepmeetingdecision: SepMeetingDecision;
 }
 
 interface ProposalTopicAnsweredEvent extends GeneralEvent {
   type: Event.TOPIC_ANSWERED;
   questionarystep: QuestionaryStep;
+}
+
+interface UserResetPasswordEmailEvent extends GeneralEvent {
+  type: Event.USER_PASSWORD_RESET_EMAIL;
+  userlinkresponse: {
+    user: User;
+    link: string;
+  };
 }
 
 interface UserUpdateEvent extends GeneralEvent {
@@ -211,39 +201,39 @@ interface EmailInvite extends GeneralEvent {
   };
 }
 
-interface FapCreatedEvent extends GeneralEvent {
-  type: Event.FAP_CREATED;
-  fap: Fap;
+interface SEPCreatedEvent extends GeneralEvent {
+  type: Event.SEP_CREATED;
+  sep: SEP;
 }
 
-interface FapUpdatedEvent extends GeneralEvent {
-  type: Event.FAP_UPDATED;
-  fap: Fap;
+interface SEPUpdatedEvent extends GeneralEvent {
+  type: Event.SEP_UPDATED;
+  sep: SEP;
 }
 
-interface FapMembersAssignedEvent extends GeneralEvent {
-  type: Event.FAP_MEMBERS_ASSIGNED;
-  fap: Fap;
+interface SEPMembersAssignedEvent extends GeneralEvent {
+  type: Event.SEP_MEMBERS_ASSIGNED;
+  sep: SEP;
 }
 
-interface FapMemberAssignedToProposalEvent extends GeneralEvent {
-  type: Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL;
-  fap: Fap;
+interface SEPMemberAssignedToProposalEvent extends GeneralEvent {
+  type: Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL;
+  sep: SEP;
 }
 
-interface FapMemberRemovedFromProposalEvent extends GeneralEvent {
-  type: Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL;
-  fap: Fap;
+interface SEPMemberRemovedFromProposalEvent extends GeneralEvent {
+  type: Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL;
+  sep: SEP;
 }
 
-interface FapProposalRemovedEvent extends GeneralEvent {
-  type: Event.FAP_PROPOSAL_REMOVED;
-  fap: Fap;
+interface SEPProposalRemovedEvent extends GeneralEvent {
+  type: Event.SEP_PROPOSAL_REMOVED;
+  sep: SEP;
 }
 
-interface FapMemberRemovedEvent extends GeneralEvent {
-  type: Event.FAP_MEMBER_REMOVED;
-  fap: Fap;
+interface SEPMemberRemovedEvent extends GeneralEvent {
+  type: Event.SEP_MEMBER_REMOVED;
+  sep: SEP;
 }
 
 interface CallCreatedEvent extends GeneralEvent {
@@ -265,8 +255,8 @@ interface CallReviewEndedEvent extends GeneralEvent {
   call: Call;
 }
 
-interface CallFapReviewEndedEvent extends GeneralEvent {
-  type: Event.CALL_FAP_REVIEW_ENDED;
+interface CallSEPReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_SEP_REVIEW_ENDED;
   call: Call;
 }
 
@@ -294,9 +284,9 @@ interface InstrumentDeletedEvent extends GeneralEvent {
   instrument: Instrument;
 }
 
-interface FapReviewerNotified extends GeneralEvent {
-  type: Event.FAP_REVIEWER_NOTIFIED;
-  fapReview: Review;
+interface SEPReviewerNotified extends GeneralEvent {
+  type: Event.SEP_REVIEWER_NOTIFIED;
+  sepReview: Review;
 }
 
 export type ApplicationEvent =
@@ -314,44 +304,42 @@ export type ApplicationEvent =
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
   | EmailInvite
+  | UserResetPasswordEmailEvent
   | UserUpdateEvent
   | UserRoleUpdateEvent
-  | FapCreatedEvent
-  | FapUpdatedEvent
-  | FapMembersAssignedEvent
-  | FapProposalRemovedEvent
-  | FapMemberRemovedEvent
-  | FapMemberAssignedToProposalEvent
-  | FapMemberRemovedFromProposalEvent
+  | SEPCreatedEvent
+  | SEPUpdatedEvent
+  | SEPMembersAssignedEvent
+  | SEPProposalRemovedEvent
+  | SEPMemberRemovedEvent
+  | SEPMemberAssignedToProposalEvent
+  | SEPMemberRemovedFromProposalEvent
   | UserDeletedEvent
   | ProposalNotifiedEvent
   | CallCreatedEvent
   | CallEndedEvent
   | CallEndedInternalEvent
   | CallReviewEndedEvent
-  | CallFapReviewEndedEvent
+  | CallSEPReviewEndedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
-  | ProposalALLFeasibilityReviewSubmittedEvent
-  | ProposalALLFeasibilityReviewFeasibleEvent
-  | ProposalFapReviewUpdatedEvent
-  | ProposalFapReviewSubmittedEvent
-  | ProposalAllFapReviewsSubmittedEvent
+  | ProposalSEPReviewUpdatedEvent
+  | ProposalSEPReviewSubmittedEvent
+  | ProposalAllSEPReviewsSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
-  | ProposalFapSelectedEvent
+  | ProposalSEPSelectedEvent
   | ProposalInstrumentSubmittedEvent
-  | ProposalFapMeetingSubmittedEvent
+  | ProposalSEPMeetingSubmittedEvent
   | ProposalStatusChangedByWorkflowEvent
   | ProposalStatusChangedByUserEvent
-  | ProposalFapMeetingSavedEvent
-  | ProposalFapMeetingRankingOverwrittenEvent
-  | ProposalFapMeetingReorderEvent
+  | ProposalSEPMeetingSavedEvent
+  | ProposalSEPMeetingRankingOverwrittenEvent
+  | ProposalSEPMeetingReorderEvent
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
   | ProposalBookingTimeSlotsRemovedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
-  | FapReviewerNotified
-  | ProposalStatusActionExecutedEvent;
+  | SEPReviewerNotified;

@@ -1,10 +1,10 @@
 mutation assignInstrumentsToCall(
-  $instrumentFapIds: [InstrumentFapMappingInput!]!
+  $instrumentSepIds: [InstrumentSepMappingInput!]!
   $callId: Int!
 ) {
   assignInstrumentsToCall(
     assignInstrumentsToCallInput: {
-      instrumentFapIds: $instrumentFapIds
+      instrumentSepIds: $instrumentSepIds
       callId: $callId
     }
   ) {

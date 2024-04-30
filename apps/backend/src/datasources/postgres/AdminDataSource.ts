@@ -7,13 +7,13 @@ import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Page } from '../../models/Admin';
-import { Country } from '../../models/Country';
 import { Feature, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
 import { Settings } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
+import { CreateInstitutionsArgs } from '../../resolvers/mutations/CreateInstitutionsMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
@@ -27,7 +27,6 @@ import database from './database';
 import {
   CountryRecord,
   createBasicUserObject,
-  createCountryObject,
   createFeatureObject,
   createInstitutionObject,
   createPageObject,
@@ -48,17 +47,6 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 export default class PostgresAdminDataSource implements AdminDataSource {
   private autoUpgradedDBReady = false;
 
-  async createCountry(countryName: string): Promise<Country> {
-    return database
-      .insert({
-        country: countryName,
-      })
-      .into('countries')
-      .returning('*')
-      .then((country: CountryRecord[]) => {
-        return createCountryObject(country[0]);
-      });
-  }
   async getCountry(id: number): Promise<Entry | null> {
     return database
       .select('*')
@@ -69,20 +57,6 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         country ? new Entry(country.country_id, country.country) : null
       );
   }
-  async getCountryByName(countryName: string): Promise<Country | null> {
-    return database
-      .select('*')
-      .from('countries')
-      .where('country', countryName)
-      .first()
-      .then((country: CountryRecord) => {
-        if (!country) {
-          return null;
-        }
-
-        return createCountryObject(country);
-      });
-  }
 
   async updateInstitution(
     institution: Institution
@@ -90,8 +64,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     const [institutionRecord]: InstitutionRecord[] = await database
       .update({
         institution: institution.name,
+        verified: institution.verified,
         country_id: institution.country,
-        ror_id: institution.rorId,
       })
       .from('institutions')
       .where('institution_id', institution.id)
@@ -105,13 +79,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async createInstitution(
-    institution: Institution
+    institution: CreateInstitutionsArgs
   ): Promise<Institution | null> {
     const [institutionRecord]: InstitutionRecord[] = await database
       .insert({
         institution: institution.name,
         country_id: institution.country,
-        ror_id: institution.rorId,
+        verified: institution.verified,
       })
       .into('institutions')
       .returning('*');
@@ -210,12 +184,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .orderByRaw('institution_id=1 desc')
       .orderBy('institution', 'asc')
       .modify((query) => {
+        if (filter?.isVerified) {
+          query.where('verified', filter.isVerified);
+        }
         if (filter?.name) {
           query.where('institution', filter.name);
         }
       })
       .then((intDB: InstitutionRecord[]) =>
-        intDB.map((inst) => createInstitutionObject(inst))
+        intDB.map((int) => createInstitutionObject(int))
       );
   }
 
@@ -225,54 +202,21 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('institutions')
       .where('institution_id', id)
       .first()
-      .then((inst?: InstitutionRecord) => {
-        if (!inst) {
+      .then((int?: InstitutionRecord) => {
+        if (!int) {
           return null;
         }
 
-        return createInstitutionObject(inst);
-      });
-  }
-
-  async getInstitutionByRorId(rorId: string): Promise<Institution | null> {
-    return database
-      .select('*')
-      .from('institutions')
-      .where('ror_id', rorId)
-      .first()
-      .then((inst?: InstitutionRecord) => {
-        if (!inst) {
-          return null;
-        }
-
-        return createInstitutionObject(inst);
-      });
-  }
-
-  async getInstitutionByName(
-    institutionName: string
-  ): Promise<Institution | null> {
-    return database
-      .select('*')
-      .from('institutions')
-      .where('institution', institutionName)
-      .first()
-      .then((inst?: InstitutionRecord) => {
-        if (!inst) {
-          return null;
-        }
-
-        return createInstitutionObject(inst);
+        return createInstitutionObject(int);
       });
   }
 
   async getInstitutionUsers(id: number): Promise<BasicUserDetails[]> {
     return database
       .select()
-      .from('users as u')
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .where('u.institution_id', id)
-      .then((users: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
+      .from('users')
+      .where('organisation', id)
+      .then((users: UserRecord[]) =>
         users.map((user) => createBasicUserObject(user))
       );
   }
@@ -450,22 +394,6 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
-  async getSettingOrDefault(
-    settingId: SettingsId,
-    defaultValue: number
-  ): Promise<number> {
-    const settingValue = await this.getSetting(settingId);
-    if (settingValue === null) {
-      return defaultValue;
-    }
-    const settingValueAsNumber = parseInt(settingValue.settingsValue, 10);
-    if (isNaN(settingValueAsNumber)) {
-      return defaultValue;
-    }
-
-    return settingValueAsNumber;
-  }
-
   async getTokenAndPermissionsById(
     accessTokenId: string
   ): Promise<Permissions> {
@@ -625,8 +553,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return await database
       .transaction(async (trx) => {
         await trx('users')
-          .update({ institution_id: args.institutionIdInto })
-          .where('institution_id', args.institutionIdFrom);
+          .update({ organisation: args.institutionIdInto })
+          .where('organisation', args.institutionIdFrom);
 
         await trx('institutions')
           .del()

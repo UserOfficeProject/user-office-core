@@ -36,11 +36,6 @@ export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
   return result;
 };
 
-export const getUniqueArray = <T,>(array: (T | null)[]) =>
-  array?.filter((value, index, self): value is T => {
-    return value !== null && self.indexOf(value) === index;
-  });
-
 export const setSortDirectionOnSortColumn = (
   columns: Column<any>[],
   sortColumn: number | null | undefined,
@@ -67,8 +62,8 @@ export const getProposalStatus = (
   }
 };
 
-export const fromProposalToProposalView = (proposal: Proposal) =>
-  ({
+export const fromProposalToProposalView = (proposal: Proposal) => {
+  return {
     primaryKey: proposal.primaryKey,
     principalInvestigator: proposal.proposer || null,
     title: proposal.title,
@@ -78,43 +73,33 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
-    rankOrder: proposal.fapMeetingDecision?.rankOrder,
+    rankOrder: proposal.sepMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-    technicalTimeAllocations:
-      proposal.technicalReviews?.map(
-        (technicalReview) => technicalReview?.timeAllocation
-      ) || null,
-    technicalReviewAssigneeIds:
-      proposal.technicalReviews?.map(
-        (technicalReview) => technicalReview.technicalReviewAssigneeId
-      ) || null,
-    technicalReviewAssigneeNames: proposal.technicalReviews?.map(
-      (technicalReview) =>
-        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
+    technicalTimeAllocation: proposal.technicalReview?.timeAllocation || null,
+    technicalReviewAssigneeId:
+      proposal.technicalReview?.technicalReviewAssigneeId || null,
+    technicalReviewAssigneeFirstName:
+      proposal.technicalReview?.technicalReviewAssignee?.firstname || null,
+    technicalReviewAssigneeLastName:
+      proposal.technicalReview?.technicalReviewAssignee?.lastname || null,
+    managementTimeAllocation: proposal.managementTimeAllocation || null,
+    technicalStatus: getTranslation(
+      proposal.technicalReview?.status as ResourceId
     ),
-    managementTimeAllocations:
-      proposal.instruments?.map(
-        (instrument) => instrument?.managementTimeAllocation
-      ) || [],
-    technicalStatuses: proposal.technicalReviews?.map((technicalReview) =>
-      getTranslation(technicalReview?.status as ResourceId)
-    ),
-    instrumentNames:
-      proposal.instruments?.map((instrument) => instrument?.name) || null,
-    instrumentIds:
-      proposal.instruments?.map((instrument) => instrument?.id) || null,
+    instrumentName: proposal.instrument?.name || null,
+    instrumentId: proposal.instrument?.id || null,
     reviewAverage:
       average(getGradesFromReviews(proposal.reviews ?? [])) || null,
     reviewDeviation:
       standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    fapId: proposal.fap?.id,
-    fapCode: proposal.fap?.code,
+    sepCode: proposal.sep?.code,
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
-  }) as ProposalViewData;
+  } as ProposalViewData;
+};
 
 export const capitalize = (s: string) =>
   s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();
@@ -191,7 +176,7 @@ export const denseTableColumn = <T extends object>(
       const columnData = getValueFromKey(rowData, column.field?.toString());
 
       // NOTE: If it is more than 50 chars then show the title tooltip
-      if (typeof columnData === 'string' && columnData.length > 45) {
+      if (typeof columnData === 'string' && columnData.length > 50) {
         return (
           <span title={columnData}>
             {column.render ? column.render(rowData, 'row') : columnData}
@@ -225,20 +210,3 @@ export const denseTableColumns = <T extends object>(columns: Column<T>[]) =>
   columns.map((column) => {
     return denseTableColumn(column);
   });
-
-export function toArray<T>(input: T | T[]): T[] {
-  if (Array.isArray(input)) {
-    return input;
-  }
-
-  return [input];
-}
-
-export function fromArrayToCommaSeparated(
-  itemsArray?: (string | number | null | undefined)[] | null
-) {
-  return (
-    itemsArray?.map((technicalStatus) => technicalStatus ?? '-').join(', ') ||
-    '-'
-  );
-}

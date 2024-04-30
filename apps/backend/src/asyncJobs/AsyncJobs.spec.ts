@@ -4,8 +4,8 @@ import sinon from 'sinon';
 
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import checkCallsEndedJob from './jobs/checkAllCallsEnded';
-import checkCallsFAPReviewEndedJob from './jobs/checkCallsFAPReviewEnded';
 import checkCallsReviewEndedJob from './jobs/checkCallsReviewEnded';
+import checkCallsSEPReviewEndedJob from './jobs/checkCallsSEPReviewEnded';
 import { runAsyncJobs } from './startAsyncJobs';
 
 describe('Test if predefined async jobs are running correctly', () => {
@@ -43,8 +43,9 @@ describe('Test if predefined async jobs are running correctly', () => {
 
   it('Should run callEnded job once an hour', () => {
     const functionWithMockedDataSource = async () => {
-      const callsThatAreEnded =
-        await checkCallsEndedJob.functionToRun(callDataSourceMock);
+      const callsThatAreEnded = await checkCallsEndedJob.functionToRun(
+        callDataSourceMock
+      );
 
       expect(callsThatAreEnded.length).toBeGreaterThan(0);
 
@@ -73,8 +74,9 @@ describe('Test if predefined async jobs are running correctly', () => {
 
   it('Should run callReviewEnded job once in 24 hours', (done) => {
     const functionWithMockedDataSource = async () => {
-      const callsWithEndedReview =
-        await checkCallsReviewEndedJob.functionToRun(callDataSourceMock);
+      const callsWithEndedReview = await checkCallsReviewEndedJob.functionToRun(
+        callDataSourceMock
+      );
 
       expect(callsWithEndedReview.length).toBeGreaterThan(0);
 
@@ -106,16 +108,16 @@ describe('Test if predefined async jobs are running correctly', () => {
     expect(mockedFunction).toHaveBeenCalledTimes(1);
   });
 
-  it('Should run callFapReviewEnded job once in 24 hours', (done) => {
+  it('Should run callSEPReviewEnded job once in 24 hours', (done) => {
     const functionWithMockedDataSource = async () => {
-      const callsWithEndedFAPReview =
-        await checkCallsFAPReviewEndedJob.functionToRun(callDataSourceMock);
+      const callsWithEndedSEPReview =
+        await checkCallsSEPReviewEndedJob.functionToRun(callDataSourceMock);
 
-      expect(callsWithEndedFAPReview.length).toBeGreaterThan(0);
+      expect(callsWithEndedSEPReview.length).toBeGreaterThan(0);
 
-      for (const callWithEndedFAPReview of callsWithEndedFAPReview) {
-        expect(callWithEndedFAPReview).toHaveProperty(
-          'callFapReviewEnded',
+      for (const callWithEndedSEPReview of callsWithEndedSEPReview) {
+        expect(callWithEndedSEPReview).toHaveProperty(
+          'callSEPReviewEnded',
           true
         );
       }
@@ -124,14 +126,14 @@ describe('Test if predefined async jobs are running correctly', () => {
     };
 
     const mockedFunction = jest.spyOn(
-      checkCallsFAPReviewEndedJob,
+      checkCallsSEPReviewEndedJob,
       'functionToRun'
     );
 
     const allJobs = [
       {
         functionToRun: functionWithMockedDataSource,
-        options: checkCallsFAPReviewEndedJob.options,
+        options: checkCallsSEPReviewEndedJob.options,
       },
     ];
 

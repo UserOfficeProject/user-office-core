@@ -1,17 +1,19 @@
 mutation administrationProposal(
   $proposalPk: Int!
-  $finalStatus: ProposalEndStatus!
+  $finalStatus: ProposalEndStatus
+  $statusId: Int
   $commentForUser: String
   $commentForManagement: String
-  $managementTimeAllocations: [ManagementTimeAllocationsInput!]!
+  $managementTimeAllocation: Int
   $managementDecisionSubmitted: Boolean
 ) {
   administrationProposal(
     proposalPk: $proposalPk
     finalStatus: $finalStatus
+    statusId: $statusId
     commentForUser: $commentForUser
     commentForManagement: $commentForManagement
-    managementTimeAllocations: $managementTimeAllocations
+    managementTimeAllocation: $managementTimeAllocation
     managementDecisionSubmitted: $managementDecisionSubmitted
   ) {
     primaryKey

@@ -2,6 +2,7 @@ import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
   deleteInstrumentValidationSchema,
+  assignProposalsToInstrumentValidationSchema,
   assignScientistsToInstrumentValidationSchema,
   removeScientistFromInstrumentValidationSchema,
   setAvailabilityTimeOnInstrumentValidationSchema,
@@ -11,19 +12,19 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
+import { Instrument, InstrumentHasProposals } from '../models/Instrument';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
-  AssignProposalsToInstrumentsArgs,
+  AssignProposalsToInstrumentArgs,
   RemoveProposalsFromInstrumentArgs,
-} from '../resolvers/mutations/AssignProposalsToInstrumentsMutation';
+} from '../resolvers/mutations/AssignProposalsToInstrumentMutation';
 import {
   RemoveScientistFromInstrumentArgs,
   AssignScientistsToInstrumentArgs,
@@ -42,9 +43,10 @@ export default class InstrumentMutations {
   constructor(
     @inject(Tokens.InstrumentDataSource)
     private dataSource: InstrumentDataSource,
-    @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource,
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
+
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource
@@ -99,148 +101,106 @@ export default class InstrumentMutations {
   }
 
   async checkIfProposalsAreOnSameCallAsInstrument(
-    inputArguments: AssignProposalsToInstrumentsArgs,
-    instrumentId: number
+    inputArguments: AssignProposalsToInstrumentArgs
   ) {
-    const fullProposals = await this.proposalDataSource.getProposalsByPks(
-      inputArguments.proposalPks
+    const proposalCallIds = inputArguments.proposals.map(
+      (proposal) => proposal.callId
     );
-
-    const proposalsUniqueCallIds = fullProposals
-      .map((fullProposal) => fullProposal.callId)
-      .filter((proposal, index, array) => array.indexOf(proposal) === index);
-
     const proposalCallsWithInstrument =
       await this.dataSource.getCallsByInstrumentId(
-        instrumentId,
-        proposalsUniqueCallIds
+        inputArguments.instrumentId,
+        proposalCallIds
       );
 
-    const proposalsOnSameCallAsInstrument = fullProposals.filter((proposal) =>
-      proposalCallsWithInstrument.some(
-        (call) => call.callId === proposal.callId
-      )
+    const proposalsOnSameCallAsInstrument = inputArguments.proposals.filter(
+      (proposal) =>
+        proposalCallsWithInstrument.some(
+          (call) => call.callId === proposal.callId
+        )
     );
 
     return (
-      proposalsOnSameCallAsInstrument.length ===
-      inputArguments.proposalPks.length
+      proposalsOnSameCallAsInstrument.length === inputArguments.proposals.length
     );
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async assignProposalsToInstruments(
+  async assignProposalsToInstrument(
     agent: UserWithRole | null,
-    args: AssignProposalsToInstrumentsArgs
-  ): Promise<InstrumentsHasProposals | Rejection> {
-    return this.assignProposalsToInstrumentsInternal(agent, args);
+    args: AssignProposalsToInstrumentArgs
+  ): Promise<InstrumentHasProposals | Rejection> {
+    return this.assignProposalsToInstrumentInternal(agent, args);
   }
 
-  @EventBus(Event.PROPOSAL_INSTRUMENTS_SELECTED)
-  async assignProposalsToInstrumentsInternal(
+  @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
+  @ValidateArgs(assignProposalsToInstrumentValidationSchema)
+  async assignProposalsToInstrumentInternal(
     agent: UserWithRole | null,
-    args: AssignProposalsToInstrumentsArgs
-  ): Promise<InstrumentsHasProposals | Rejection> {
-    let result: InstrumentsHasProposals | Rejection = rejection(
-      'Could not assign proposal/s to instrument',
-      {
-        agent,
-        args,
-      }
-    );
-    // TODO: Cleanup this part because it is quite ugly
-    for await (const instrumentId of args.instrumentIds) {
-      const allProposalsAreOnSameCallAsInstrument =
-        await this.checkIfProposalsAreOnSameCallAsInstrument(
-          args,
-          instrumentId
+    args: AssignProposalsToInstrumentArgs
+  ): Promise<InstrumentHasProposals | Rejection> {
+    const allProposalsAreOnSameCallAsInstrument =
+      await this.checkIfProposalsAreOnSameCallAsInstrument(args);
+
+    if (!allProposalsAreOnSameCallAsInstrument) {
+      return rejection(
+        'One or more proposals can not be assigned to instrument, because instrument is not in the call',
+        { args }
+      );
+    }
+
+    const instrument = await this.dataSource.getInstrument(args.instrumentId);
+
+    if (!instrument) {
+      return rejection(
+        'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
+        { agent, args }
+      );
+    }
+
+    const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
+
+    for await (const proposalPk of proposalPks) {
+      const technicalReview = await this.reviewDataSource.getTechnicalReview(
+        proposalPk
+      );
+
+      if (technicalReview) {
+        await this.proposalDataSource.updateProposalTechnicalReviewer({
+          userId: instrument.managerUserId,
+          proposalPks: [proposalPk],
+        });
+      } else {
+        await this.reviewDataSource.setTechnicalReview(
+          {
+            proposalPk: proposalPk,
+            comment: null,
+            publicComment: null,
+            reviewerId: instrument.managerUserId,
+            timeAllocation: null,
+            status: null,
+            files: null,
+            submitted: false,
+          },
+          false
         );
-
-      if (!allProposalsAreOnSameCallAsInstrument) {
-        return rejection(
-          'One or more proposals can not be assigned to instrument, because instrument is not in the call',
-          { args }
-        );
-      }
-
-      const instrument = await this.dataSource.getInstrument(instrumentId);
-
-      if (!instrument) {
-        return rejection(
-          'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
-          { agent, args }
-        );
-      }
-
-      for await (const proposalPk of args.proposalPks) {
-        const proposalInstruments =
-          await this.dataSource.getInstrumentsByProposalPk(proposalPk);
-
-        const proposalInstrumentsToRemove = proposalInstruments.filter(
-          (i) => !args.instrumentIds.includes(i.id)
-        );
-
-        if (proposalInstrumentsToRemove.length) {
-          await Promise.all(
-            proposalInstrumentsToRemove.map((i) => {
-              return this.dataSource.removeProposalsFromInstrument(
-                [proposalPk],
-                i.id
-              );
-            })
-          );
-        }
-
-        if (proposalInstruments.find((i) => i.id === instrumentId)) {
-          break;
-        }
-
-        await this.dataSource.assignProposalToInstrument(
-          proposalPk,
-          instrumentId
-        );
-
-        const technicalReview =
-          await this.reviewDataSource.getProposalInstrumentTechnicalReview(
-            proposalPk,
-            instrumentId
-          );
-
-        if (technicalReview) {
-          await this.proposalDataSource.updateProposalTechnicalReviewer({
-            userId: instrument.managerUserId,
-            proposalPks: [proposalPk],
-            instrumentId: instrument.id,
-          });
-        } else {
-          await this.reviewDataSource.setTechnicalReview(
-            {
-              proposalPk: proposalPk,
-              comment: null,
-              publicComment: null,
-              reviewerId: instrument.managerUserId,
-              timeAllocation: null,
-              status: null,
-              files: null,
-              submitted: false,
-              instrumentId: instrument.id,
-            },
-            false
-          );
-          await this.proposalDataSource.updateProposalTechnicalReviewer({
-            userId: instrument.managerUserId,
-            proposalPks: [proposalPk],
-            instrumentId: instrument.id,
-          });
-        }
+        await this.proposalDataSource.updateProposalTechnicalReviewer({
+          userId: instrument.managerUserId,
+          proposalPks: [proposalPk],
+        });
       }
     }
 
-    result = new InstrumentsHasProposals(
-      args.instrumentIds,
-      args.proposalPks,
-      false
+    const result = await this.dataSource.assignProposalsToInstrument(
+      proposalPks,
+      args.instrumentId
     );
+
+    if (result.proposalPks.length !== proposalPks.length) {
+      return rejection('Could not assign proposal/s to instrument', {
+        agent,
+        args,
+      });
+    }
 
     return result;
   }
@@ -316,16 +276,16 @@ export default class InstrumentMutations {
       });
   }
 
-  @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED)
+  @EventBus(Event.PROPOSAL_INSTRUMENT_SUBMITTED)
   @ValidateArgs(submitInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async submitInstrument(
     agent: UserWithRole | null,
     args: InstrumentSubmitArgs
-  ): Promise<InstrumentsHasProposals | Rejection> {
+  ): Promise<InstrumentHasProposals | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, args.sepId))
     ) {
       return rejection('Submitting instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
@@ -335,44 +295,44 @@ export default class InstrumentMutations {
     }
 
     const allInstrumentProposals =
-      await this.fapDataSource.getFapProposalsByInstrument(
-        args.fapId,
+      await this.sepDataSource.getSEPProposalsByInstrument(
+        args.sepId,
         args.instrumentId,
         args.callId
       );
 
     const submittedInstrumentProposalPks = allInstrumentProposals.map(
-      (fapInstrumentProposal) => fapInstrumentProposal.proposalPk
+      (sepInstrumentProposal) => sepInstrumentProposal.proposalPk
     );
 
-    const fapProposalsWithReviewsAndRanking =
-      await this.fapDataSource.getFapProposalsWithReviewGradesAndRanking(
+    const sepProposalsWithReviewsAndRanking =
+      await this.sepDataSource.getSepProposalsWithReviewGradesAndRanking(
         submittedInstrumentProposalPks
       );
 
-    const allFapMeetingsHasRankings = fapProposalsWithReviewsAndRanking.every(
-      (fapProposalWithReviewsAndRanking) =>
-        !!fapProposalWithReviewsAndRanking.rankOrder
+    const allSepMeetingsHasRankings = sepProposalsWithReviewsAndRanking.every(
+      (sepProposalWithReviewsAndRanking) =>
+        !!sepProposalWithReviewsAndRanking.rankOrder
     );
 
-    if (!allFapMeetingsHasRankings) {
-      const sortedFapProposals = sortByRankOrAverageScore(
-        fapProposalsWithReviewsAndRanking
+    if (!allSepMeetingsHasRankings) {
+      const sortedSepProposals = sortByRankOrAverageScore(
+        sepProposalsWithReviewsAndRanking
       );
 
-      const allProposalsWithRankings = sortedFapProposals.map(
-        (sortedFapProposal, index) => {
-          if (!sortedFapProposal.rankOrder) {
-            sortedFapProposal.rankOrder = index + 1;
+      const allProposalsWithRankings = sortedSepProposals.map(
+        (sortedSepProposal, index) => {
+          if (!sortedSepProposal.rankOrder) {
+            sortedSepProposal.rankOrder = index + 1;
           }
 
-          return sortedFapProposal;
+          return sortedSepProposal;
         }
       );
 
       await Promise.all(
         allProposalsWithRankings.map((proposalWithRanking) => {
-          return this.fapDataSource.saveFapMeetingDecision({
+          return this.sepDataSource.saveSepMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
             rankOrder: proposalWithRanking.rankOrder,
           });

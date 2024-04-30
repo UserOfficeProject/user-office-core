@@ -3,26 +3,17 @@ import {
   FormControlLabel,
   InputLabel,
   MenuItem,
-  SelectChangeEvent,
 } from '@mui/material';
 import { Field } from 'formik';
 import { Checkbox, Select } from 'formik-mui';
-import React, { useState } from 'react';
+import React from 'react';
 
 import TitledContainer from 'components/common/TitledContainer';
-import { InstrumentPickerConfig } from 'generated/sdk';
 const availableVariantOptions = [
   { label: 'Radio', value: 'radio' },
   { label: 'Dropdown', value: 'dropdown' },
 ];
-export const QuestionInstrumentPickerFormCommon = ({
-  config,
-}: {
-  config: InstrumentPickerConfig;
-}) => {
-  const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
-    useState(config.variant === 'dropdown');
-
+export const QuestionInstrumentPickerFormCommon = () => {
   return (
     <>
       <TitledContainer label="Constraints">
@@ -49,9 +40,6 @@ export const QuestionInstrumentPickerFormCommon = ({
             type="text"
             component={Select}
             data-cy="variant"
-            onChange={(e: SelectChangeEvent) => {
-              setShowIsMultipleSelectCheckbox(e.target.value === 'dropdown');
-            }}
           >
             {availableVariantOptions.map(({ value, label }) => {
               return (
@@ -62,20 +50,6 @@ export const QuestionInstrumentPickerFormCommon = ({
             })}
           </Field>
         </FormControl>
-
-        {showIsMultipleSelectCheckbox && (
-          <FormControlLabel
-            control={
-              <Field
-                name="config.isMultipleSelect"
-                component={Checkbox}
-                type="checkbox"
-                inputProps={{ 'data-cy': 'is-multiple-select' }}
-              />
-            }
-            label="Is multiple select"
-          />
-        )}
       </TitledContainer>
     </>
   );

@@ -8,7 +8,7 @@ import { OmitType } from './utilTypes';
 
 export const omit: OmitType = (obj, ...keys) => {
   const ret = {} as {
-    [K in keyof typeof obj]: (typeof obj)[K];
+    [K in keyof typeof obj]: typeof obj[K];
   };
   let key: keyof typeof obj;
   for (key in obj) {

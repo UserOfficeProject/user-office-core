@@ -1,0 +1,5 @@
+query getSEP($id: Int!) {
+  sep(id: $id) {
+    ...sep
+  }
+}

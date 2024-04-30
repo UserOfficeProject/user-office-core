@@ -22,7 +22,7 @@ mutation createVisit(
     }
     proposal {
       ...proposal
-      instruments {
+      instrument {
         name
       }
     }

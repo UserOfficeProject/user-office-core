@@ -7,11 +7,11 @@ import {
   ShipmentSubmissionState,
 } from 'models/questionary/shipment/ShipmentSubmissionState';
 
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createShipmentBasisValidationSchema } from './createShipmentBasisValidationSchema';
 import { QuestionaryComponentShipmentBasis } from './QuestionaryComponentShipmentBasis';
 import { QuestionShipmentBasisForm } from './QuestionShipmentBasisForm';
 import { QuestionTemplateRelationShipmentBasisForm } from './QuestionTemplateRelationShipmentBasisForm';
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const shipmentBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SHIPMENT_BASIS,

@@ -5,6 +5,9 @@ import { Institution } from '../types/Institution';
 
 @InputType()
 export class InstitutionsFilter {
+  @Field(() => Boolean, { nullable: true })
+  public isVerified?: boolean;
+
   @Field(() => String, { nullable: true })
   public name?: string;
 }

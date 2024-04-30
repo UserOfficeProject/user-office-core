@@ -25,8 +25,9 @@ export default class PostgresGenericTemplateDataSource
     genericTemplateId: number,
     reviewBeforeSubmit?: boolean
   ): Promise<GenericTemplate> {
-    const sourceGenericTemplate =
-      await this.getGenericTemplate(genericTemplateId);
+    const sourceGenericTemplate = await this.getGenericTemplate(
+      genericTemplateId
+    );
     if (!sourceGenericTemplate) {
       logger.logError(
         'Could not clone genericTemplate because source genericTemplate does not exist',

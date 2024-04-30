@@ -2,9 +2,9 @@ query getInstitutionsWithCountry($filter: InstitutionsFilter) {
   institutions(filter: $filter) {
     id
     name
+    verified
     country {
       ...country
     }
-    rorId
   }
 }

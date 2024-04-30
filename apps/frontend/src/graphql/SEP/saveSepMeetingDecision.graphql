@@ -1,0 +1,9 @@
+mutation saveSepMeetingDecision(
+  $saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput!
+) {
+  saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: $saveSepMeetingDecisionInput
+  ) {
+    proposalPk
+  }
+}

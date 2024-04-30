@@ -51,7 +51,7 @@ query getProposals($filter: ProposalsFilter) {
         comment
         status
         userID
-        fapID
+        sepID
         reviewer {
           firstname
           lastname
@@ -61,13 +61,13 @@ query getProposals($filter: ProposalsFilter) {
       users {
         ...basicUserDetails
       }
-      technicalReviews {
+      technicalReview {
         ...coreTechnicalReview
         reviewer {
           ...basicUserDetails
         }
       }
-      instruments {
+      instrument {
         id
         name
       }
@@ -75,7 +75,7 @@ query getProposals($filter: ProposalsFilter) {
         id
         shortCode
       }
-      fap {
+      sep {
         id
         code
       }

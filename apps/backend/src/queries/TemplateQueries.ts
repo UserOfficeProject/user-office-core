@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import axios, { AxiosRequestHeaders } from 'axios';
 import jp from 'jsonpath';
 import { inject, injectable } from 'tsyringe';
 
@@ -92,25 +93,15 @@ export default class TemplateQueries {
     if (config.url === '') return [];
 
     try {
-      const response = await fetch(config.url, {
+      const { data } = await axios.get(config.url, {
         headers: config.apiCallRequestHeaders?.reduce(
           (acc, header) => ({
             ...acc,
             [header.name]: header.value,
           }),
-          {}
+          {} as AxiosRequestHeaders
         ),
       });
-
-      if (!response.ok) {
-        response.text().then((text) => {
-          throw new Error(
-            `An error occurred while sending the request: ${text}`
-          );
-        });
-      }
-
-      const data = await response.json();
 
       if (Array.isArray(data) && data.every((el) => typeof el === 'string')) {
         return data;

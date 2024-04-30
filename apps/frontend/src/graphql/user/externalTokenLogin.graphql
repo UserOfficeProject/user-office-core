@@ -1,11 +1,3 @@
-mutation externalTokenLogin(
-  $externalToken: String!
-  $redirectUri: String!
-  $iss: String
-) {
-  externalTokenLogin(
-    externalToken: $externalToken
-    redirectUri: $redirectUri
-    iss: $iss
-  )
+mutation externalTokenLogin($externalToken: String!, $redirectUri: String!) {
+  externalTokenLogin(externalToken: $externalToken, redirectUri: $redirectUri)
 }

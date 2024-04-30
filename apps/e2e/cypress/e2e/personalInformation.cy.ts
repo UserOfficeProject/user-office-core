@@ -15,7 +15,6 @@ context('Personal information tests', () => {
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
   const otherOrg = faker.commerce.department();
-  const otherInstitution = 'Other';
   const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.number('0##########');
@@ -27,7 +26,7 @@ context('Personal information tests', () => {
         roles: [
           initialDBData.roles.user,
           initialDBData.roles.userOfficer,
-          initialDBData.roles.fapChair,
+          initialDBData.roles.sepChair,
         ],
       });
     }
@@ -72,13 +71,10 @@ context('Personal information tests', () => {
 
       cy.get("[name='telephone']").clear().type(newTelephone);
 
-      cy.get("[name='institutionId']").clear().type(otherInstitution);
+      cy.get("[name='otherOrganisation']").clear().type(otherOrg);
 
-      cy.get('[data-cy="institution-options"] li')
-        .contains(otherInstitution)
-        .click();
-
-      cy.get("[name='otherInstitution']").clear().type(otherOrg);
+      cy.get('[data-cy="organizationCountry"] input').click();
+      cy.get('[data-cy="organizationCountry-options"]').first().click();
 
       cy.contains('Update Profile').click();
 
@@ -126,7 +122,7 @@ context('Personal information tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="role-modal"]')
-        .contains('FAP Chair')
+        .contains('SEP Chair')
         .parent()
         .find('input[type="checkbox"]')
         .click();
@@ -152,14 +148,14 @@ context('Personal information tests', () => {
       cy.get('[data-cy="role-selection-table"]').contains('User roles');
 
       cy.get(
-        '[data-cy="role-selection-table"] [data-cy="select-role-fap_chair"]'
+        '[data-cy="role-selection-table"] [data-cy="select-role-sep_chair"]'
       ).click();
 
       cy.finishedLoading();
 
       cy.contains('Proposals to grade');
 
-      cy.get('[data-cy="FapRoles-menu-items"]')
+      cy.get('[data-cy="SEPRoles-menu-items"]')
         .find('.MuiListItem-root')
         .should('have.length', 2);
     });
@@ -170,7 +166,7 @@ context('Personal information tests', () => {
           id: initialDBData.users.officer.id,
           roles: [
             initialDBData.roles.userOfficer,
-            initialDBData.roles.fapChair,
+            initialDBData.roles.sepChair,
           ],
         });
       }
@@ -199,11 +195,11 @@ context('Personal information tests', () => {
 
       cy.contains('User roles');
 
-      cy.get('[data-cy="select-role-fap_chair"]').click();
+      cy.get('[data-cy="select-role-sep_chair"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="FapRoles-menu-items"]').should('exist');
+      cy.get('[data-cy="SEPRoles-menu-items"]').should('exist');
     });
   });
 });

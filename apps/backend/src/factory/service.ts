@@ -1,12 +1,12 @@
 import querystring from 'querystring';
-import { Readable } from 'stream';
-import { ReadableStream } from 'stream/web';
 
 import { logger } from '@user-office-software/duo-logger';
 import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
+import request from 'request';
 
 import { Role } from '../models/Role';
+import { bufferRequestBody } from './util';
 
 export enum DownloadType {
   PDF = 'pdf',
@@ -16,7 +16,7 @@ export enum DownloadType {
 
 export enum XLSXType {
   PROPOSAL = 'proposal',
-  Fap = 'fap',
+  SEP = 'sep',
 }
 
 export enum PDFType {
@@ -26,7 +26,6 @@ export enum PDFType {
 }
 export enum ZIPType {
   ATTACHMENT = 'attachment',
-  PROPOSAL = 'proposal',
 }
 
 export type MetaBase = { collectionFilename: string; singleFilename: string };
@@ -42,7 +41,7 @@ if (!ENDPOINT) {
   process.exit(1);
 }
 
-export default async function callFactoryService<TData, TMeta extends MetaBase>(
+export default function callFactoryService<TData, TMeta extends MetaBase>(
   downloadType: DownloadType,
   type: PDFType | XLSXType | ZIPType,
   properties: { data: TData[]; meta: TMeta; userRole: Role },
@@ -50,69 +49,68 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
   res: Response,
   next: NextFunction
 ) {
-  const controller = new AbortController();
+  const factoryReq = request.post(`${ENDPOINT}/${downloadType}/${type}`, {
+    json: properties,
+  });
 
-  try {
-    let gotResponse = false;
+  let gotResponse = false;
 
-    req.on('close', () => {
-      if (!gotResponse) {
-        controller.abort();
-      }
-    });
-
-    req.on('end', () => {
-      gotResponse = true;
-    });
-
-    const factoryResp = await fetch(`${ENDPOINT}/${downloadType}/${type}`, {
-      signal: controller.signal,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(properties),
-    });
-
-    if (!factoryResp.ok) {
-      throw new Error(await factoryResp.text());
+  req.once('close', () => {
+    if (!gotResponse) {
+      factoryReq.abort();
     }
+  });
 
-    const factoryRespBody = factoryResp.body;
-    if (!factoryRespBody) {
-      return;
-    }
-
-    const readableStream = Readable.fromWeb(factoryRespBody as ReadableStream, {
-      signal: controller.signal,
-    });
-
-    readableStream.on('error', (err) => {
-      next({
-        error: err.toString(),
-        message: `Could not download generated ${downloadType}/${type}`,
-      });
-    });
-
-    const filename =
-      properties.data.length > 1
-        ? properties.meta.collectionFilename
-        : properties.meta.singleFilename;
-
-    const contentTypeHeaders = factoryResp.headers.get('content-type');
-
-    res.setHeader('Content-Disposition', contentDisposition(filename));
-    res.setHeader('x-download-filename', querystring.escape(filename));
-    if (contentTypeHeaders) {
-      res.setHeader('content-type', contentTypeHeaders);
-    }
-
-    readableStream.pipe(res);
-  } catch (error) {
+  factoryReq.on('error', (err) => {
     next({
-      error,
+      error: err.toString(),
       message: `Could not download generated ${downloadType}/${type}`,
     });
-  }
+  });
+
+  factoryReq.on('response', (factoryResp) => {
+    gotResponse = true;
+
+    req.once('close', () => {
+      if (factoryResp.complete) {
+        return;
+      }
+
+      factoryReq.abort();
+    });
+
+    if (factoryResp.statusCode !== 200) {
+      // FIXME: this looks very ugly
+      bufferRequestBody(factoryReq)
+        .then((body) => {
+          logger.logError(`Failed to generate ${downloadType}/${type}`, {
+            response: body,
+            type,
+          });
+        })
+        .catch((err) => {
+          logger.logException(
+            `Failed to generate ${downloadType}/${type} and read response body`,
+            err,
+            { type }
+          );
+        });
+
+      next(`Failed to generate ${downloadType}/${type}`);
+    } else {
+      if (factoryResp.headers['content-type']) {
+        res.setHeader('content-type', factoryResp.headers['content-type']);
+      }
+
+      const filename =
+        properties.data.length > 1
+          ? properties.meta.collectionFilename
+          : properties.meta.singleFilename;
+
+      res.setHeader('Content-Disposition', contentDisposition(filename));
+      res.setHeader('x-download-filename', querystring.escape(filename));
+
+      factoryResp.pipe(res);
+    }
+  });
 }

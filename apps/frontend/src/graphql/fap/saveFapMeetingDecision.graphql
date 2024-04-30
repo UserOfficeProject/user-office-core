@@ -1,9 +1,0 @@
-mutation saveFapMeetingDecision(
-  $saveFapMeetingDecisionInput: SaveFapMeetingDecisionInput!
-) {
-  saveFapMeetingDecision(
-    saveFapMeetingDecisionInput: $saveFapMeetingDecisionInput
-  ) {
-    proposalPk
-  }
-}

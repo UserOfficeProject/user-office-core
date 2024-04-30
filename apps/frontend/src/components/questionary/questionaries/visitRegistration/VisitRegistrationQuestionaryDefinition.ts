@@ -6,8 +6,8 @@ import { Sdk, TemplateGroupId } from 'generated/sdk';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
-import { VisitRegistrationWizardStep } from './VisitRegistrationWizardStep';
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
+import { VisitRegistrationWizardStep } from './VisitRegistrationWizardStep';
 
 export const visitRegistrationQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.VISIT_REGISTRATION,
