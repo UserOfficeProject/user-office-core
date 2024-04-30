@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export class Settings {
   constructor(
     public id: SettingsId,
@@ -27,6 +28,7 @@ export enum SettingsId {
   FEEDBACK_MAX_REQUESTS = '2',
   FEEDBACK_FREQUENCY_DAYS = '14',
   FEEDBACK_EXHAUST_DAYS = '90',
+  DEFAULT_NUM_FAP_REVIEWS_REQUIRED = '2',
   TIMEZONE = 'TIMEZONE',
   DATE_FORMAT = 'DATE_FORMAT',
   DATE_TIME_FORMAT = 'DATE_TIME_FORMAT',

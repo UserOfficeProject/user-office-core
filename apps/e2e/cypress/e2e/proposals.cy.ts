@@ -25,6 +25,12 @@ context('Proposal tests', () => {
     name: faker.random.words(2),
     description: faker.random.words(5),
   };
+  const instrument1 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: initialDBData.users.user1.id,
+  };
 
   const proposalInternalWorkflow = {
     name: faker.random.words(2),
@@ -33,6 +39,7 @@ context('Proposal tests', () => {
 
   let createdWorkflowId: number;
   let createdProposalPk: number;
+  let createdProposalId: string;
   const textQuestion = faker.random.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
@@ -46,8 +53,8 @@ context('Proposal tests', () => {
     endCall: faker.date.future().toISOString(),
     startReview: currentDayStart,
     endReview: currentDayStart,
-    startSEPReview: currentDayStart,
-    endSEPReview: currentDayStart,
+    startFapReview: currentDayStart,
+    endFapReview: currentDayStart,
     startNotify: currentDayStart,
     endNotify: currentDayStart,
     startCycle: currentDayStart,
@@ -116,7 +123,7 @@ context('Proposal tests', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           createdProposalPk = result.createProposal.primaryKey;
-
+          createdProposalId = result.createProposal.proposalId;
           cy.updateProposal({
             proposalPk: result.createProposal.primaryKey,
             title: newProposalTitle,
@@ -142,8 +149,24 @@ context('Proposal tests', () => {
       });
     });
 
+    it('Principal investigator in the proposal table should not be empty', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains('td', newProposalTitle)
+        .parents('tbody tr')
+        .first()
+        .find('td')
+        .eq(4)
+        .should('not.contain.text', '-')
+        .should('contain.text', 'Carl');
+    });
+
     it('Should be able create proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
+
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -244,8 +267,25 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
+    it('Officer should be able to navigate to proposal using proposal ID', () => {
+      cy.login('officer');
+
+      cy.visit('/', {
+        qs: {
+          proposalid: createdProposalId,
+        },
+      });
+      cy.url().should('contain', `proposalid=${createdProposalId}`);
+
+      cy.contains(newProposalTitle);
+
+      cy.closeModal();
+
+      cy.url().should('not.contain', `proposalid=${createdProposalId}`);
+    });
+
     it('User officer should be able to save proposal column selection', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SEP_REVIEW)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
       cy.login('officer');
@@ -254,8 +294,16 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
 
       cy.get("[aria-label='Show Columns']").first().click();
-      cy.get('.MuiPopover-paper').contains('Call').click();
-      cy.get('.MuiPopover-paper').contains('SEP').click();
+      cy.get('.MuiPopover-paper')
+        .contains('Call')
+        .parent()
+        .find('input')
+        .uncheck();
+      cy.get('.MuiPopover-paper')
+        .contains('Fap')
+        .parent()
+        .find('input')
+        .uncheck();
 
       cy.get('body').click();
 
@@ -265,8 +313,37 @@ context('Proposal tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.contains('Call');
-      cy.contains('SEP');
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'not.contain',
+        'Call'
+      );
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'not.contain',
+        'Fap'
+      );
+
+      cy.get("[aria-label='Show Columns']").first().click();
+      cy.get('.MuiPopover-paper')
+        .contains('Call')
+        .parent()
+        .find('input')
+        .check();
+      cy.get('.MuiPopover-paper')
+        .contains('Fap')
+        .parent()
+        .find('input')
+        .check();
+
+      cy.reload();
+
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'contain',
+        'Call'
+      );
+      cy.get('[data-cy="officer-proposals-table"] table').should(
+        'contain',
+        'Fap'
+      );
     });
 
     it('User officer should be able to select all prefetched proposals in the table', function () {
@@ -349,6 +426,21 @@ context('Proposal tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
+
+      const allocationTime = '10';
+      cy.createInstrument(instrument1).then((result) => {
+        if (result.createInstrument) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [result.createInstrument.id],
+            proposalPks: [createdProposalPk],
+          });
+        }
+      });
       cy.login('officer');
       cy.visit('/');
 
@@ -367,7 +459,7 @@ context('Proposal tests', () => {
 
       cy.contains('Technical review').click();
 
-      cy.get('[data-cy="timeAllocation"] input').clear().type('10');
+      cy.get('[data-cy="timeAllocation"] input').clear().type(allocationTime);
 
       cy.get('[data-cy="technical-review-status"]').click();
       cy.get('[data-cy="technical-review-status-options"]')
@@ -378,7 +470,9 @@ context('Proposal tests', () => {
 
       cy.closeModal();
 
-      cy.contains(newProposalTitle).parent().contains('10(Days)');
+      cy.contains(newProposalTitle)
+        .parent()
+        .contains(`${allocationTime} (${AllocationTimeUnits.DAY}s)`);
 
       cy.contains('Calls').click();
 
@@ -390,10 +484,12 @@ context('Proposal tests', () => {
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="allocation-time-unit"]').click();
-      cy.contains('Hour').click();
+      cy.contains(AllocationTimeUnits.HOUR).click();
 
-      cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="listbox"] li').first().click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
+        cy.get('[data-cy="call-esi-template"]').click();
+        cy.get('[role="listbox"] li').first().click();
+      }
 
       cy.get('[data-cy="next-step"]').click();
       cy.get('[data-cy="next-step"]').click();
@@ -402,7 +498,9 @@ context('Proposal tests', () => {
       cy.notification({ variant: 'success', text: 'successfully' });
 
       cy.contains('Proposals').click();
-      cy.contains(newProposalTitle).parent().contains('10(Hours)');
+      cy.contains(newProposalTitle)
+        .parent()
+        .contains(`${allocationTime} (${AllocationTimeUnits.HOUR}s)`);
     });
 
     it('Should be able clone proposal to another call', () => {
@@ -412,7 +510,7 @@ context('Proposal tests', () => {
       });
       cy.submitProposal({ proposalPk: createdProposalPk });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle);
@@ -484,7 +582,9 @@ context('Proposal tests', () => {
 
       cy.get('@dialog').find('#selectedStatusId-input').click();
 
-      cy.get('[role="listbox"]').contains('SEP Meeting').click();
+      cy.get('[role="listbox"]')
+        .contains(initialDBData.proposalStatuses.fapMeeting.name)
+        .click();
 
       cy.get('[data-cy="submit-proposal-status-change"]').click();
 
@@ -495,10 +595,10 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .should('contain.text', 'SEP Meeting');
+        .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
       cy.contains(clonedProposalTitle)
         .parent()
-        .should('contain.text', 'SEP Meeting');
+        .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
     });
 
     it('User officer should be able to see proposal status when opening change status modal', () => {
@@ -507,7 +607,7 @@ context('Proposal tests', () => {
         proposalsToClonePk: [createdProposalPk],
       });
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.sepMeeting.id,
+        statusId: initialDBData.proposalStatuses.fapMeeting.id,
         proposals: [
           { primaryKey: createdProposalPk, callId: initialDBData.call.id },
         ],
@@ -537,21 +637,24 @@ context('Proposal tests', () => {
         .find('[type="checkbox"]')
         .uncheck();
 
-      cy.contains('SEP Meeting').parent().find('[type="checkbox"]').check();
+      cy.contains(initialDBData.proposalStatuses.fapMeeting.name)
+        .parent()
+        .find('[type="checkbox"]')
+        .check();
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.finishedLoading();
 
       cy.get('[data-cy="status-selection"] input').should(
         'have.value',
-        `${initialDBData.proposalStatuses.sepMeeting.name}`
+        `${initialDBData.proposalStatuses.fapMeeting.name}`
       );
 
       // Close the modal
       cy.get('body').trigger('keydown', { keyCode: 27 });
 
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.sepReview.id,
+        statusId: initialDBData.proposalStatuses.fapReview.id,
         proposals: [
           { primaryKey: createdProposalPk, callId: initialDBData.call.id },
         ],
@@ -574,7 +677,7 @@ context('Proposal tests', () => {
     });
 
     it('Should be able to delete proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -614,7 +717,8 @@ context('Proposal tests', () => {
       cy.contains(longProposalTitle)
         .parent()
         .invoke('outerWidth')
-        .should('eq', 400);
+        .should('be.gte', 400)
+        .should('be.lt', 410);
 
       cy.contains(longProposalTitle)
         .parent()
@@ -624,7 +728,7 @@ context('Proposal tests', () => {
 
     it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains(newProposalTitle)
@@ -667,7 +771,7 @@ context('Proposal tests', () => {
       let createdCallId: number;
       const createdCallTitle = 'Created call';
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.createCall({
@@ -698,7 +802,7 @@ context('Proposal tests', () => {
     });
 
     it('During Proposal creation, User should not lose data when refreshing the page', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -772,7 +876,7 @@ context('Proposal tests', () => {
     });
 
     it('User officer should reopen proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.get('[aria-label="View proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -787,7 +891,7 @@ context('Proposal tests', () => {
       cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.get('[aria-label="Edit proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
@@ -835,7 +939,7 @@ context('Proposal tests', () => {
         endCallInternal: faker.date.future(),
         proposalWorkflowId: createdWorkflowId,
       });
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -935,7 +1039,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1009,7 +1113,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1052,7 +1156,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('Dashboard').click();
 
@@ -1073,7 +1177,7 @@ context('Proposal tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       let createdCallId: number;
       const createdCallTitle = faker.random.alphaNumeric(15);
@@ -1123,7 +1227,7 @@ context('Proposal tests', () => {
         if (response.createCall) {
           createdCallId = response.createCall.id;
         }
-        cy.login('user2');
+        cy.login('placeholderUser', initialDBData.roles.user);
         cy.visit('/');
 
         cy.contains('New Proposal').click();
@@ -1143,8 +1247,10 @@ context('Proposal tests', () => {
         cy.reload();
 
         cy.finishedLoading();
-
-        cy.get('[data-cy=call-list]').should('not.contain', createdCallTitle);
+        cy.get('[data-cy=call-list]').should(
+          'not.contain',
+          updatedCall.shortCode
+        );
       });
     });
 
@@ -1161,7 +1267,7 @@ context('Proposal tests', () => {
               proposalPk: result.createProposal.primaryKey,
               title: title,
               abstract: abstract,
-              proposerId: initialDBData.users.user2.id,
+              proposerId: initialDBData.users.placeholderUser.id,
             });
           }
         })
@@ -1176,7 +1282,7 @@ context('Proposal tests', () => {
           });
         });
 
-      cy.login('user2');
+      cy.login('placeholderUser', initialDBData.roles.user);
       cy.visit('/');
 
       cy.contains('Dashboard').click();
@@ -1203,6 +1309,15 @@ context('Proposal tests', () => {
       description: 'Instrument 1',
       managerUserId: initialDBData.users.user1.id,
     };
+    const instrument2 = {
+      name: 'Instrument 2',
+      shortCode: 'Instrument 2',
+      description: 'Instrument 2',
+      managerUserId: initialDBData.users.user1.id,
+    };
+    let topicId: number;
+    let instrumentPickerQuestionId: string;
+
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -1226,7 +1341,13 @@ context('Proposal tests', () => {
       cy.createInstrument(instrument).then((result) => {
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentSepIds: [{ instrumentId: result.createInstrument.id }],
+          instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+        });
+      });
+      cy.createInstrument(instrument2).then((result) => {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
         });
       });
       cy.createTopic({
@@ -1234,7 +1355,7 @@ context('Proposal tests', () => {
         sortOrder: 1,
       }).then((topicResult) => {
         if (topicResult.createTopic) {
-          const topicId =
+          topicId =
             topicResult.createTopic.steps[
               topicResult.createTopic.steps.length - 1
             ].topic.id;
@@ -1242,12 +1363,14 @@ context('Proposal tests', () => {
             categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
             dataType: DataType.INSTRUMENT_PICKER,
           }).then((result) => {
+            instrumentPickerQuestionId = result.createQuestion.id;
             cy.updateQuestion({
               id: result.createQuestion.id,
               question: instrumentPickerQuestion,
+              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
             });
             cy.createQuestionTemplateRelation({
-              questionId: result.createQuestion.id,
+              questionId: instrumentPickerQuestionId,
               templateId: initialDBData.template.id,
               sortOrder: 0,
               topicId: topicId,
@@ -1257,7 +1380,7 @@ context('Proposal tests', () => {
       });
     });
     it('Instrument should be automatically assigned to the proposal', () => {
-      cy.login('user1');
+      cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -1274,7 +1397,8 @@ context('Proposal tests', () => {
         .type(abstract)
         .should('have.value', abstract);
       cy.contains('Save and continue').click();
-      cy.get('[role="button"]').first().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
       cy.get('[role="option"]').contains('Instrument 1').click();
       cy.contains('Save and continue').click();
       cy.finishedLoading();
@@ -1298,6 +1422,62 @@ context('Proposal tests', () => {
       cy.contains(title).parent().contains(instrument.name);
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('td', instrument.name).should('exist');
+    });
+
+    it('Multiple instruments should be automatically assigned to the proposal', () => {
+      cy.updateQuestionTemplateRelationSettings({
+        questionId: instrumentPickerQuestionId,
+        templateId: initialDBData.template.id,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true}`,
+        dependencies: [],
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[role="option"]').contains('Instrument 2').click();
+      cy.get('body').type('{esc}');
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().contains(instrument2.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+      cy.contains('td', instrument2.name).should('exist');
     });
   });
 });

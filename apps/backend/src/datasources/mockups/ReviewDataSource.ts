@@ -20,10 +20,16 @@ export const dummySubmittedReview = new Review(
 export const dummyReviewBad = new Review(1, 9, 1, 'bad proposal', 1, 0, 1);
 
 export class ReviewDataSourceMock implements ReviewDataSource {
-  async getTechnicalReview(
-    proposalPk: number
+  async getProposalInstrumentTechnicalReview(
+    proposalPk: number,
+    instrumentId?: number
   ): Promise<TechnicalReview | null> {
     return dummyProposalTechnicalReview;
+  }
+  async getTechnicalReviews(
+    proposalPk: number
+  ): Promise<TechnicalReview[] | null> {
+    return [dummyProposalTechnicalReview];
   }
   async getTechnicalReviewById(
     technicalReviewId: number
@@ -56,7 +62,7 @@ export class ReviewDataSourceMock implements ReviewDataSource {
     return dummyReview;
   }
 
-  async getAssignmentReview(sepId: number, proposalPk: number, userId: number) {
+  async getAssignmentReview(fapId: number, proposalPk: number, userId: number) {
     return dummyReview;
   }
 
@@ -66,7 +72,7 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   async getProposalReviews(id: number): Promise<Review[]> {
     return [dummyReview];
   }
-  async getUserReviews(sepIds: number[]): Promise<Review[]> {
+  async getUserReviews(fapIds: number[]): Promise<Review[]> {
     return [dummyReview];
   }
 }

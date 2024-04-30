@@ -1,7 +1,6 @@
 jest.mock('axios');
 
 import 'reflect-metadata';
-import axios from 'axios';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -99,9 +98,12 @@ describe('getDynamicMultipleChoiceOptions', () => {
   });
 
   it('should return the options if the response is an array of strings', async () => {
-    (axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce({
-      data: ['option1', 'option2'],
-    });
+    const fetchMock = jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(['option1', 'option2']),
+        ok: true,
+      } as Response)
+    );
 
     const options = await templateQueries.getDynamicMultipleChoiceOptions(
       dummyUserWithRole,
@@ -111,7 +113,7 @@ describe('getDynamicMultipleChoiceOptions', () => {
     expect(options).toEqual(['option1', 'option2']);
 
     // Check that the request was made with the correct url and headers
-    expect(axios.get).toHaveBeenCalledWith('api-url', {
+    expect(fetchMock).toHaveBeenCalledWith('api-url', {
       headers: {
         header1: 'value1',
         header2: 'value2',
@@ -120,9 +122,11 @@ describe('getDynamicMultipleChoiceOptions', () => {
   });
 
   it('should return empty array if the response is not an array and jsonPath is empty', async () => {
-    (axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce({
-      data: 'not an array',
-    });
+    jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        json: () => Promise.resolve('not an array'),
+      } as Response)
+    );
 
     const options = await templateQueries.getDynamicMultipleChoiceOptions(
       dummyUserWithRole,
@@ -133,9 +137,13 @@ describe('getDynamicMultipleChoiceOptions', () => {
   });
 
   it('should return the options if the response is not an array and jsonPath is set', async () => {
-    (axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce({
-      data: [{ option: 'option1' }, { option: 'option2' }],
-    });
+    jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        json: () =>
+          Promise.resolve([{ option: 'option1' }, { option: 'option2' }]),
+        ok: true,
+      } as Response)
+    );
 
     const options = await templateQueries.getDynamicMultipleChoiceOptions(
       dummyUserWithRole,

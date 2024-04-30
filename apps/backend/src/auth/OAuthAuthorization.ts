@@ -9,18 +9,18 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
-import { rejection, Rejection } from '../models/Rejection';
+import { Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { NonNullableField } from '../utils/utilTypes';
 import { UserAuthorization } from './UserAuthorization';
 
-type ValidUser = NonNullableField<
-  User,
-  'oidcSub' | 'oauthAccessToken' | 'oauthRefreshToken'
->;
+interface UserinfoResponseWithInssitution extends UserinfoResponse {
+  institution_ror_id?: string;
+  institution_name?: string;
+  institution_country?: string;
+}
 
-export abstract class OAuthAuthorization extends UserAuthorization {
+export class OAuthAuthorization extends UserAuthorization {
   private db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
 
   constructor() {
@@ -36,13 +36,16 @@ export abstract class OAuthAuthorization extends UserAuthorization {
   }
   public async externalTokenLogin(
     code: string,
-    redirectUri: string
+    redirectUri: string,
+    iss: string | null
   ): Promise<User | null> {
     try {
       const { userProfile, tokenSet } = await OpenIdClient.login(
         code,
-        redirectUri
+        redirectUri,
+        iss
       );
+
       const user = await this.upsertUser(userProfile, tokenSet);
 
       return user;
@@ -52,31 +55,12 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         stack: (error as Error)?.stack,
       });
 
-      return null;
+      throw new Error(error as string);
     }
   }
 
   async logout(uosToken: AuthJwtPayload): Promise<string | Rejection> {
-    const oidcSub = uosToken.user.oidcSub;
-
-    if (!oidcSub) {
-      return rejection('INVALID_USER');
-    }
-
-    try {
-      // get and validate user form datasource
-      const user = this.validateUser(
-        await this.userDataSource.getByOIDCSub(oidcSub)
-      );
-
-      await OpenIdClient.logout(user.oauthAccessToken);
-
-      return 'logged out';
-    } catch (error) {
-      return rejection('Error ocurred while logging out', {
-        error: (error as Error)?.message,
-      });
-    }
+    return 'logged out';
   }
 
   public async isExternalTokenValid(code: string): Promise<boolean> {
@@ -99,18 +83,41 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     });
   }
 
-  private async getUserInstitutionId(userInfo: UserinfoResponse) {
-    if (userInfo.organisation) {
-      const institutions = await this.adminDataSource.getInstitutions({
-        name: userInfo.organisation as string,
-      });
-
-      if (institutions.length === 1) {
-        return institutions[0].id;
-      }
+  private async getUserInstitutionId(
+    userInfo: UserinfoResponseWithInssitution
+  ) {
+    if (!userInfo.institution_name || !userInfo.institution_country) {
+      return undefined;
     }
 
-    return undefined;
+    let institution = userInfo.institution_ror_id
+      ? await this.adminDataSource.getInstitutionByRorId(
+          userInfo.institution_ror_id
+        )
+      : await this.adminDataSource.getInstitutionByName(
+          userInfo.institution_name
+        );
+
+    if (!institution) {
+      let institutionCountry = await this.adminDataSource.getCountryByName(
+        userInfo.institution_country
+      );
+
+      if (!institutionCountry) {
+        institutionCountry = await this.adminDataSource.createCountry(
+          userInfo.institution_country
+        );
+      }
+      const newInstitution = {
+        name: userInfo.institution_name,
+        country: institutionCountry.countryId,
+        rorId: userInfo.institution_ror_id,
+      };
+      institution =
+        await this.adminDataSource.createInstitution(newInstitution);
+    }
+
+    return institution?.id;
   }
 
   private async upsertUser(
@@ -122,6 +129,7 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
       userInfo.sub
     );
+
     const userWithEmailMatch = await this.userDataSource.getByEmail(
       userInfo.email
     );
@@ -131,17 +139,22 @@ export abstract class OAuthAuthorization extends UserAuthorization {
     if (user) {
       const updatedUser = await this.userDataSource.update({
         ...user,
-        firstname: userInfo.given_name,
-        lastname: userInfo.family_name,
+        birthdate: userInfo.birthdate
+          ? new Date(userInfo.birthdate)
+          : undefined,
+        department: userInfo.department as string,
         email: userInfo.email,
-        oauthAccessToken: tokenSet.access_token,
+        firstname: userInfo.given_name,
+        gender: userInfo.gender,
+        lastname: userInfo.family_name,
+        oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
-        oauthIssuer: client.issuer.metadata.issuer,
-        department: userInfo.department as string,
-        gender: userInfo.gender as string,
+        institutionId: institutionId ?? user.institutionId,
+        position: userInfo.position as string,
+        preferredname: userInfo.preferred_username,
+        telephone: userInfo.phone_number,
         user_title: userInfo.title as string,
-        organisation: institutionId ?? user.organisation,
       });
 
       return updatedUser;
@@ -152,10 +165,8 @@ export abstract class OAuthAuthorization extends UserAuthorization {
         undefined,
         userInfo.family_name,
         userInfo.email,
-        '',
-        userInfo.given_name,
+        userInfo.preferred_username,
         userInfo.sub,
-        tokenSet.access_token,
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
         'unspecified',
@@ -176,17 +187,5 @@ export abstract class OAuthAuthorization extends UserAuthorization {
 
       return newUser;
     }
-  }
-
-  private validateUser(user: User | null): ValidUser {
-    if (!user?.oidcSub || !user?.oauthAccessToken) {
-      logger.logError('Invalid user', {
-        authorizer: this.constructor.name,
-        user,
-      });
-      throw new GraphQLError('Invalid user');
-    }
-
-    return user as ValidUser;
   }
 }

@@ -1,4 +1,5 @@
 import { Page } from '../models/Admin';
+import { Country } from '../models/Country';
 import { Entry } from '../models/Entry';
 import { Feature, FeatureId } from '../models/Feature';
 import { Institution } from '../models/Institution';
@@ -6,7 +7,6 @@ import { Permissions } from '../models/Permissions';
 import { Settings, SettingsId } from '../models/Settings';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
-import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
@@ -14,15 +14,19 @@ import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAcces
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
+  createCountry(countryName: string): Promise<Country>;
   getCountry(id: number): Promise<Entry | null>;
+  getCountryByName(countryName: string): Promise<Country | null>;
   getInstitution(id: number): Promise<Institution | null>;
   createInstitution(
-    institutionInput: CreateInstitutionsArgs
+    institutionInput: Omit<Institution, 'id'>
   ): Promise<Institution | null>;
   updateInstitution(institution: Institution): Promise<Institution | null>;
   deleteInstitution(id: number): Promise<Institution | null>;
   mergeInstitutions(args: MergeInstitutionsInput): Promise<Institution | null>;
   getInstitutions(filter?: InstitutionsFilter): Promise<Institution[]>;
+  getInstitutionByRorId(rorId: string): Promise<Institution | null>;
+  getInstitutionByName(institutionName: string): Promise<Institution | null>;
   getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;
   getCountries(): Promise<Entry[]>;
   getNationalities(): Promise<Entry[]>;
@@ -35,6 +39,10 @@ export interface AdminDataSource {
   updateFeatures(updatedFeaturesInput: UpdateFeaturesInput): Promise<Feature[]>;
   getSettings(): Promise<Settings[]>;
   getSetting(id: SettingsId): Promise<Settings | null>;
+  getSettingOrDefault(
+    settingId: SettingsId,
+    defaultValue: number
+  ): Promise<number>;
   createApiAccessToken(
     args: CreateApiAccessTokenInput,
     accessTokenId: string,

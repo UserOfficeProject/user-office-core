@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Instrument,
-  InstrumentHasProposals,
+  InstrumentsHasProposals,
   InstrumentWithAvailabilityTime,
+  InstrumentWithManagementTime,
 } from '../../models/Instrument';
 import { BasicUserDetails } from '../../models/User';
+import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
 import { basicDummyUser } from './UserDataSource';
@@ -13,6 +15,14 @@ export const dummyInstrument = new Instrument(
   1,
   'Dummy instrument 1',
   'instrument_1',
+  'This is test instrument.',
+  1
+);
+
+export const dummyInstrument2 = new Instrument(
+  2,
+  'Dummy instrument 2',
+  'instrument_2',
   'This is test instrument.',
   1
 );
@@ -29,11 +39,21 @@ export const dummyInstrumentWithAvailabilityTime =
     1
   );
 
-const dummyInstruments = [dummyInstrument];
+export const dummyInstrumentWithManagementTime =
+  new InstrumentWithManagementTime(
+    1,
+    'Dummy instrument 1',
+    'instrument_1',
+    'This is test instrument.',
+    1,
+    10
+  );
 
-export const dummyInstrumentHasProposals = new InstrumentHasProposals(
-  1,
-  [1, 2],
+const dummyInstruments = [dummyInstrument, dummyInstrument2];
+
+export const dummyInstrumentHasProposals = new InstrumentsHasProposals(
+  [1],
+  [1],
   true
 );
 
@@ -58,9 +78,10 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return [dummyInstrument];
   }
 
-  async isProposalInstrumentSubmitted(proposalPk: number): Promise<boolean> {
-    return false;
+  async getInstrumentsByIds(instrumentids: number[]): Promise<Instrument[]> {
+    return [dummyInstrument];
   }
+
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
     return { ...dummyInstrument, ...args };
   }
@@ -106,14 +127,17 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return [{ callId: 1, instrumentId: 1 }];
   }
 
-  async assignProposalsToInstrument(
-    proposalPks: number[],
+  async assignProposalToInstrument(
+    proposalPk: number,
     instrumentId: number
-  ): Promise<InstrumentHasProposals> {
-    return new InstrumentHasProposals(instrumentId, proposalPks, false);
+  ): Promise<InstrumentsHasProposals> {
+    return new InstrumentsHasProposals([instrumentId], [proposalPk], false);
   }
 
-  async removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean> {
+  async removeProposalsFromInstrument(
+    proposalPks: number[],
+    instrumentId?: number
+  ): Promise<boolean> {
     return true;
   }
 
@@ -123,8 +147,8 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrument;
   }
 
-  async getInstrumentsBySepId(
-    sepId: number,
+  async getInstrumentsByFapId(
+    fapId: number,
     callId: number
   ): Promise<InstrumentWithAvailabilityTime[]> {
     return [dummyInstrumentWithAvailabilityTime];
@@ -148,6 +172,19 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return [basicDummyUser];
   }
 
+  async getInstrumentsByProposalPk(
+    proposalPk: number
+  ): Promise<InstrumentWithManagementTime[]> {
+    return [dummyInstrumentWithManagementTime];
+  }
+
+  async updateProposalInstrumentTimeAllocation(
+    proposalPk: number,
+    managementTimeAllocations: ManagementTimeAllocationsInput[]
+  ): Promise<boolean> {
+    return true;
+  }
+
   async setAvailabilityTimeOnInstrument(
     callId: number,
     instrumentId: number,
@@ -159,7 +196,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   async submitInstrument(
     proposalPks: number[],
     instrumentId: number
-  ): Promise<InstrumentHasProposals> {
+  ): Promise<InstrumentsHasProposals> {
     return dummyInstrumentHasProposals;
   }
 

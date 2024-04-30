@@ -1,25 +1,10 @@
-// It is important to import the Editor which accepts plugins.
-import 'tinymce/tinymce';
-import 'tinymce/themes/silver/theme';
-import 'tinymce/skins/ui/oxide/skin.min.css';
-import 'tinymce/skins/ui/oxide/content.min.css';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/preview';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/advlist';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/charmap';
-import 'tinymce/plugins/wordcount';
-import 'tinymce/icons/default/icons';
-
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import { Editor } from '@tinymce/tinymce-react';
 import React, { useState, useEffect } from 'react';
 
+import Editor from 'components/common/TinyEditor';
 import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

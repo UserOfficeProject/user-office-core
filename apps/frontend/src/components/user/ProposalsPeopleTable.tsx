@@ -63,7 +63,7 @@ const getUsersTableData = (
     query.filter
       ? user.firstname.toLowerCase().includes(query.filter?.toLowerCase()) ||
         user.lastname.toLowerCase().includes(query.filter?.toLowerCase()) ||
-        user.organisation.toLowerCase().includes(query.filter?.toLowerCase())
+        user.institution.toLowerCase().includes(query.filter?.toLowerCase())
       : true
   );
 
@@ -128,7 +128,7 @@ const columns = [
   { title: 'Firstname', field: 'firstname' },
   { title: 'Surname', field: 'lastname' },
   { title: 'Preferred name', field: 'preferredname' },
-  { title: 'Organisation', field: 'organisation' },
+  { title: 'Institution', field: 'institution' },
 ];
 
 const ProposalsPeopleTable = ({
@@ -271,7 +271,7 @@ const ProposalsPeopleTable = ({
             id: selectedItem.id,
             firstname: selectedItem.firstname,
             lastname: selectedItem.lastname,
-            organisation: selectedItem.organisation,
+            institution: selectedItem.institution,
           })) as BasicUserDetails[]),
         ]);
       }
@@ -287,7 +287,7 @@ const ProposalsPeopleTable = ({
               id: selectedItem.id,
               firstname: selectedItem.firstname,
               lastname: selectedItem.lastname,
-              organisation: selectedItem.organisation,
+              institution: selectedItem.institution,
             },
           ] as BasicUserDetails[])
         : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
@@ -417,7 +417,7 @@ const ProposalsPeopleTable = ({
                 selection,
                 selectionProps: (rowdata: any) => ({
                   inputProps: {
-                    'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
+                    'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.institution}-select`,
                   },
                 }),
                 headerSelectionProps: {

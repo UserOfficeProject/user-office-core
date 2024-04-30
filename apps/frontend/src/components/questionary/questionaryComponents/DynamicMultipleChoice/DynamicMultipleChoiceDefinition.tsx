@@ -6,11 +6,11 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import DynamicMultipleChoiceSearchCriteriaComponent from 'components/questionary/questionaryComponents/DynamicMultipleChoice/DynamicMultipleChoiceSearchCriteriaComponent';
 import { DataType } from 'generated/sdk';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import DynamicMultipleChoiceAnswerRenderer from './DynamicMultipleChoiceAnswerRenderer';
 import { QuestionaryComponentDynamicMultipleChoice } from './QuestionaryComponentDynamicMultipleChoice';
 import { QuestionDynamicMultipleChoiceForm } from './QuestionDynamicMultipleChoiceForm';
 import { QuestionTemplateRelationDynamicMultipleChoiceForm } from './QuestionTemplateRelationDynamicMultipleChoiceForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const dynamicMultipleChoiceDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,

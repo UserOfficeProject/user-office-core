@@ -4,11 +4,11 @@ import React from 'react';
 import { DataType } from 'generated/sdk';
 import { GenericTemplateSubmissionState } from 'models/questionary/genericTemplate/GenericTemplateSubmissionState';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createGenericTemplateBasisValidationSchema } from './createGenericTemplateBasisValidationSchema';
 import { QuestionaryComponentGenericTemplateBasis } from './QuestionaryComponentGenericTemplateBasis';
 import { QuestionGenericTemplateBasisForm } from './QuestionGenericTemplateBasisForm';
 import { QuestionTemplateRelationGenericTemplateBasisForm } from './QuestionTemplateRelationGenericTemplateBasisForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const genericTemplateBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.GENERIC_TEMPLATE_BASIS,

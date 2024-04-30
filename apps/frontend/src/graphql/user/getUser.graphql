@@ -9,14 +9,13 @@ query getUser($userId: Int!) {
     gender
     nationality
     birthdate
-    organisation
+    institutionId
     department
     position
     email
     telephone
     telephone_alt
     oidcSub
-    emailVerified
     placeholder
   }
 }

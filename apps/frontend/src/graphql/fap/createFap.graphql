@@ -1,0 +1,19 @@
+mutation createFap(
+  $code: String!
+  $description: String!
+  $numberRatingsRequired: Int!
+  $gradeGuide: String
+  $customGradeGuide: Boolean
+  $active: Boolean!
+) {
+  createFap(
+    code: $code
+    description: $description
+    numberRatingsRequired: $numberRatingsRequired
+    gradeGuide: $gradeGuide
+    customGradeGuide: $customGradeGuide
+    active: $active
+  ) {
+    ...fap
+  }
+}

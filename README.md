@@ -6,6 +6,16 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/UserOfficeProject/user-office-core/master/badge.svg?targetFile=package.json)](https://snyk.io/test/github/UserOfficeProject/user-office-core/master?targetFile=package.json)
 
 ---
+## Contributing
+
+If you're planning to contribute to this project by adding new functionality, we encourage you to discuss it first in the Discussions tab. This helps ensure that your proposed changes align with the project's goals and prevents duplicate efforts. Here's how you can initiate a discussion:
+
+1. Go to the [Discussions](https://github.com/UserOfficeProject/user-office-core/discussions) tab.
+2. Start a new discussion thread outlining your proposed changes.
+3. Wait for feedback and consensus before proceeding with creating a pull request.
+
+Thank you for your interest in contributing to our project!
+
 ## Getting started
 
 To be able to start both backend and frontend locally you will need to:
@@ -14,8 +24,7 @@ To be able to start both backend and frontend locally you will need to:
 2. Start the application using `npm run dev` or `npm run start`
 
 ## Check the .env file
-If .env file is not preset during startup of the project, it will be created using example.env file template
-The `example.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
+If .env file is not preset during startup of the project, it will be created using `example.development.env` file template. The `example.development.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
 
 ## Running with docker-compose
 

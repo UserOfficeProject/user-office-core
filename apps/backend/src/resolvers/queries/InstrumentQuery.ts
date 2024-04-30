@@ -40,15 +40,26 @@ export class InstrumentQuery {
   }
 
   @Query(() => [InstrumentWithAvailabilityTime], { nullable: true })
-  instrumentsBySep(
-    @Arg('sepId', () => Int) sepId: number,
+  instrumentsByFap(
+    @Arg('fapId', () => Int) fapId: number,
     @Arg('callId', () => Int) callId: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.instrument.getInstrumentsBySepId(context.user, {
-      sepId,
+    return context.queries.instrument.getInstrumentsByFapId(context.user, {
+      fapId,
       callId,
     });
+  }
+
+  @Query(() => [InstrumentWithAvailabilityTime], { nullable: true })
+  instrumentsByIds(
+    @Arg('instrumentIds', () => [Int]) instrumentIds: number[],
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.instrument.getInstrumentsByIds(
+      context.user,
+      instrumentIds
+    );
   }
 
   @Query(() => InstrumentsQueryResult, { nullable: true })

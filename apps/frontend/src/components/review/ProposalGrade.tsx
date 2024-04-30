@@ -6,7 +6,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { Editor } from '@tinymce/tinymce-react';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import { Select, TextField, CheckboxWithLabel } from 'formik-mui';
@@ -16,13 +15,14 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 
 import { useCheckAccess } from 'components/common/Can';
 import ErrorMessage from 'components/common/ErrorMessage';
+import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { ReviewStatus, Review, UserRole, SettingsId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { useSEPData } from 'hooks/SEP/useSEPData';
+import { useFapData } from 'hooks/fap/useFapData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -32,7 +32,7 @@ type ProposalGradeProps = {
   setReview: React.Dispatch<React.SetStateAction<Review | null>>;
   onChange: FunctionType;
   confirm: WithConfirmType;
-  sepId: number;
+  fapId: number;
 };
 
 type GradeFormType = {
@@ -47,9 +47,9 @@ const ProposalGrade = ({
   setReview,
   onChange,
   confirm,
-  sepId,
+  fapId,
 }: ProposalGradeProps) => {
-  const { sep } = useSEPData(sepId);
+  const { fap } = useFapData(fapId);
   const { api } = useDataApiWithFeedback();
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,7 +70,7 @@ const ProposalGrade = ({
     comment: review.comment || '',
     submitted: review.status === ReviewStatus.SUBMITTED,
     saveOnly: true,
-    gradeGuide: sep?.gradeGuide,
+    gradeGuide: fap?.gradeGuide,
   };
 
   const PromptIfDirty = () => {
@@ -99,7 +99,7 @@ const ProposalGrade = ({
         shouldSubmit || values.submitted
           ? ReviewStatus.SUBMITTED
           : ReviewStatus.DRAFT,
-      sepID: review.sepID,
+      fapID: review.fapID,
     });
 
     setReview({
@@ -174,7 +174,7 @@ const ProposalGrade = ({
             disabled={isDisabled(isSubmitting)}
           />
           <FormHelperText>
-            Characters: {numberOfChars} / {2000}
+            Characters: {numberOfChars} / {6000}
           </FormHelperText>
           <ErrorMessage name="comment" />
           <Box marginTop={1} width={150}>
@@ -222,7 +222,7 @@ const ProposalGrade = ({
               disabled={isSubmitting}
               data-cy="grade-guide"
             >
-              {sep ? <GradeGuidePage sep={sep} /> : <GradeGuidePage />}
+              {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
             </ButtonWithDialog>
             {hasAccessRights && (
               <Field
@@ -257,7 +257,7 @@ const ProposalGrade = ({
               >
                 {review.status === ReviewStatus.SUBMITTED
                   ? 'Submitted'
-                  : 'Submit'}
+                  : 'Save and Submit'}
               </Button>
             )}
           </NavigationFragment>

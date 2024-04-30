@@ -14,14 +14,7 @@ import React, { useEffect, useState } from 'react';
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
-
-const toArray = (input: string | string[]): string[] => {
-  if (typeof input === 'string') {
-    return [input];
-  }
-
-  return input;
-};
+import { toArray } from 'utils/helperFunctions';
 
 const useStyles = makeStyles(() => ({
   horizontalLayout: {
@@ -88,8 +81,8 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               config.isMultipleSelect
                 ? stateValue
                 : stateValue.length > 0
-                ? stateValue[0]
-                : ''
+                  ? stateValue[0]
+                  : ''
             }
             onChange={handleOnChange}
             multiple={config.isMultipleSelect}

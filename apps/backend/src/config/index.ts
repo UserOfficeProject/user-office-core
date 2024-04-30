@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
 switch (process.env.DEPENDENCY_CONFIG) {
@@ -14,10 +15,12 @@ switch (process.env.DEPENDENCY_CONFIG) {
     require('./dependencyConfigTest');
     break;
   default:
-    throw new Error(
-      `process.env.DEPENDENCY_CONFIG contains invalid value '${process.env.DEPENDENCY_CONFIG}'.
-       Available values are <e2e|ess|stfc|test>`
+    logger.logInfo(
+      'Invalid or no value was provided for the DEPENDENCY_CONFIG. Using the default config',
+      { DEPENDENCY_CONFIG: process.env.DEPENDENCY_CONFIG }
     );
+
+    require('./dependencyConfigDefault');
 }
 
 export {};

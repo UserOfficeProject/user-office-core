@@ -1,0 +1,11 @@
+mutation assignProposalsToFap(
+  $proposals: [ProposalSelectionInput!]!
+  $fapId: Int!
+  $fapInstrumentId: Int!
+) {
+  assignProposalsToFap(
+    proposals: $proposals
+    fapId: $fapId
+    fapInstrumentId: $fapInstrumentId
+  )
+}

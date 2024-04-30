@@ -31,8 +31,9 @@ const QuestionDependencyList = ({
   form,
 }: QuestionDependencyListProps) => {
   const field: QuestionTemplateRelation = form.values;
+  const defaultOperator = DependenciesLogicOperator.AND;
   const [logicOperator, setLogicOperator] = useState<DependenciesLogicOperator>(
-    field.dependenciesOperator || DependenciesLogicOperator.AND
+    field.dependenciesOperator || defaultOperator
   );
 
   useEffect(() => {
@@ -58,9 +59,12 @@ const QuestionDependencyList = ({
     field.dependencies.length >=
     getAllFields(template.steps).filter(
       (option) =>
-        [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
-          option.question.dataType
-        ) && currentQuestionId !== option.question.id
+        [
+          DataType.BOOLEAN,
+          DataType.SELECTION_FROM_OPTIONS,
+          DataType.INSTRUMENT_PICKER,
+        ].includes(option.question.dataType) &&
+        currentQuestionId !== option.question.id
     ).length;
 
   return (
@@ -144,6 +148,10 @@ const QuestionDependencyList = ({
                     <IconButton
                       onClick={(): void => {
                         remove(i);
+
+                        if (field.dependencies.length === 1) {
+                          setLogicOperator(defaultOperator);
+                        }
                       }}
                     >
                       <ClearIcon />

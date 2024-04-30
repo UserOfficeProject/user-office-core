@@ -53,47 +53,47 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Boolean)
   public submitted: boolean;
 
-  @Field(() => Int, { nullable: true })
-  public technicalTimeAllocation: number;
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public managementTimeAllocations?: number[];
+
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public technicalTimeAllocations?: number[];
+
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public technicalReviewAssigneeIds?: number[];
+
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  public technicalReviewAssigneeNames?: string[];
+
+  @Field(() => [TechnicalReviewStatus], { nullable: 'itemsAndList' })
+  public technicalStatuses?: TechnicalReviewStatus[];
+
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public technicalReviewsSubmitted?: boolean[];
+
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  public instrumentNames?: string[];
+
+  @Field(() => [Int], { nullable: 'itemsAndList' })
+  public instrumentIds?: number[];
 
   @Field(() => Int, { nullable: true })
-  public managementTimeAllocation: number;
-
-  @Field(() => Int, { nullable: true })
-  public technicalReviewAssigneeId: number;
-
-  @Field(() => String, { nullable: true })
-  public technicalReviewAssigneeFirstName: string;
-
-  @Field(() => String, { nullable: true })
-  public technicalReviewAssigneeLastName: string;
-
-  @Field(() => TechnicalReviewStatus, { nullable: true })
-  public technicalStatus: TechnicalReviewStatus;
-
-  @Field(() => Int, { nullable: true })
-  public technicalReviewSubmitted: boolean;
-
-  @Field(() => String, { nullable: true })
-  public instrumentName: string;
+  public fapInstrumentId?: number;
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;
 
   @Field(() => String, { nullable: true })
-  public sepCode: string;
+  public fapCode: string;
 
   @Field(() => Int, { nullable: true })
-  public sepId: number;
+  public fapId: number;
 
   @Field(() => Float, { nullable: true })
   public reviewAverage: number;
 
   @Field(() => Float, { nullable: true })
   public reviewDeviation: number;
-
-  @Field(() => Int, { nullable: true })
-  public instrumentId: number;
 
   @Field(() => Int)
   public callId: number;
@@ -112,9 +112,10 @@ export class ProposalResolver {
     @Root() proposal: ProposalView,
     @Ctx() context: ResolverContext
   ): Promise<User | null> {
-    return await context.queries.user.get(
-      context.user,
+    const user = await context.loaders.user.batchLoader.load(
       proposal.principalInvestigatorId
     );
+
+    return user ? user : null;
   }
 }

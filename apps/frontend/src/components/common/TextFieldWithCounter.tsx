@@ -35,10 +35,10 @@ const TextFieldWithCounter = (
   const counter = isCounterHidden
     ? null
     : `${textLen}`
-    ? maxLen
-      ? `${textLen}/${maxLen}`
-      : `${textLen}`
-    : '0';
+      ? maxLen
+        ? `${textLen}/${maxLen}`
+        : `${textLen}`
+      : '0';
 
   return (
     <div>

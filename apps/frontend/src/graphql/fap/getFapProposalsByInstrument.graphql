@@ -1,0 +1,45 @@
+query fapProposalsByInstrument(
+  $instrumentId: Int!
+  $fapId: Int!
+  $callId: Int!
+) {
+  fapProposalsByInstrument(
+    instrumentId: $instrumentId
+    fapId: $fapId
+    callId: $callId
+  ) {
+    fapTimeAllocation
+    proposal {
+      primaryKey
+      title
+      proposalId
+      proposer {
+        id
+        firstname
+        lastname
+        country
+      }
+      status {
+        ...proposalStatus
+      }
+      fapMeetingDecision {
+        ...fapMeetingDecision
+      }
+      reviews {
+        id
+        comment
+        grade
+        status
+      }
+      technicalReviews {
+        publicComment
+        status
+        timeAllocation
+        instrumentId
+      }
+    }
+    assignments {
+      fapMemberUserId
+    }
+  }
+}

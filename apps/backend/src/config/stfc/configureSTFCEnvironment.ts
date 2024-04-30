@@ -81,6 +81,9 @@ async function enableDefaultStfcFeatures() {
       FeatureId.EMAIL_SEARCH,
       FeatureId.INSTRUMENT_MANAGEMENT,
       FeatureId.STFC_IDLE_TIMER,
+      FeatureId.TECHNICAL_REVIEW,
+      FeatureId.FAP_REVIEW,
+      FeatureId.USER_SEARCH_FILTER,
     ],
     true
   );
@@ -125,17 +128,17 @@ async function setSTFCRoleNames() {
   });
 
   await db.updateRoleTitle({
-    shortCode: Roles.SEP_CHAIR,
+    shortCode: Roles.FAP_CHAIR,
     title: 'FAP Chair',
   });
 
   await db.updateRoleTitle({
-    shortCode: Roles.SEP_REVIEWER,
+    shortCode: Roles.FAP_REVIEWER,
     title: 'FAP Reviewer',
   });
 
   await db.updateRoleTitle({
-    shortCode: Roles.SEP_SECRETARY,
+    shortCode: Roles.FAP_SECRETARY,
     title: 'FAP Secretary',
   });
 }

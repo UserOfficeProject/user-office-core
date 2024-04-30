@@ -4,7 +4,8 @@ export enum EmailStatusActionRecipients {
   PI = 'PI',
   CO_PROPOSERS = 'CO_PROPOSERS',
   INSTRUMENT_SCIENTISTS = 'INSTRUMENT_SCIENTISTS',
-  SEP_REVIEWERS = 'SEP_REVIEWERS',
+  FAP_REVIEWERS = 'FAP_REVIEWERS',
+  FAP_CHAIR_AND_SECRETARY = 'FAP_CHAIR_AND_SECRETARY',
   OTHER = 'OTHER',
 }
 
@@ -19,8 +20,12 @@ export const EmailStatusActionRecipientsWithDescription = new Map<
     'Instrument scientists including the manager on the instrument related to the proposal',
   ],
   [
-    EmailStatusActionRecipients.SEP_REVIEWERS,
-    'SEP reviewers that are assigned to review the proposal',
+    EmailStatusActionRecipients.FAP_REVIEWERS,
+    'Fap reviewers that are assigned to review the proposal',
+  ],
+  [
+    EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
+    'The Chair and Secretaries of the FAP this proposal is associated with ',
   ],
   [
     EmailStatusActionRecipients.OTHER,

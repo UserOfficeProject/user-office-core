@@ -166,7 +166,7 @@ export abstract class QuestionarySubmissionState {
 }
 
 export function QuestionarySubmissionModel<
-  T extends QuestionarySubmissionState
+  T extends QuestionarySubmissionState,
 >(
   initialState: T,
   middlewares?: Array<ReducerMiddleware<T, Event>>,

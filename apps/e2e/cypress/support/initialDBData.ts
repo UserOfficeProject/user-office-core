@@ -39,6 +39,8 @@ export default {
     id: 1,
     shortCode: 'call 1',
     allocationTimeUnit: AllocationTimeUnits.DAY,
+    endCall: '01-01-2030',
+    callFapReviewEnded: false,
   },
   template: {
     id: 1,
@@ -101,7 +103,7 @@ export default {
     },
     instrumentPicker: {
       id: 'instrument_picker_question',
-      text: 'Instrument picker question from seeds',
+      text: 'Instrument Picker question from seeds',
       type: DataType.INSTRUMENT_PICKER,
     },
     addSamples: {
@@ -175,20 +177,25 @@ export default {
   },
   instrument1: {
     id: 1,
+    name: 'Instrument 1',
   },
   instrument2: {
     id: 2,
   },
-  sep: {
+  instrument3: {
+    id: 3,
+    name: 'Instrument 3',
+  },
+  fap: {
     id: 1,
     code: 'DEMAX',
   },
   roles: {
     user: 1,
     userOfficer: 2,
-    sepChair: 4,
-    sepSecretary: 5,
-    sepReviewer: 6,
+    fapChair: 4,
+    fapSecretary: 5,
+    fapReviewer: 6,
     instrumentScientist: 7,
     sampleSafetyReviewer: 8,
     internalReviewer: 9,
@@ -244,15 +251,16 @@ export default {
     },
     feasibilityReview: {
       id: 2,
+      name: 'FEASIBILITY_REVIEW',
     },
     notFeasible: { id: 3 },
-    sepSelection: { id: 4 },
-    sepReview: {
+    fapSelection: { id: 4 },
+    fapReview: {
       id: 5,
     },
-    sepMeeting: {
+    fapMeeting: {
       id: 12,
-      name: 'SEP Meeting',
+      name: 'FAP Meeting',
     },
     editableSubmitted: {
       id: 14,

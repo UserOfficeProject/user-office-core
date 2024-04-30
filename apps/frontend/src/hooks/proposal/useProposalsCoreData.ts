@@ -28,6 +28,7 @@ export function useProposalsCoreData(
     questionaryIds,
     text,
     questionFilter,
+    referenceNumbers,
   } = filter;
 
   const fetchProposalsData = useCallback(
@@ -47,6 +48,7 @@ export function useProposalsCoreData(
               instrumentId,
               proposalStatusId,
               questionaryIds,
+              referenceNumbers,
               questionFilter: questionFilter && {
                 ...questionFilter,
                 value:
@@ -66,8 +68,9 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatus: getTranslation(
-                      proposal.technicalStatus as ResourceId
+                    technicalStatuses: proposal.technicalStatuses?.map(
+                      (technicalStatus) =>
+                        getTranslation(technicalStatus as ResourceId)
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId
@@ -87,6 +90,7 @@ export function useProposalsCoreData(
               instrumentId,
               proposalStatusId,
               questionaryIds,
+              referenceNumbers,
               questionFilter: questionFilter && {
                 ...questionFilter,
                 value:
@@ -106,8 +110,9 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatus: getTranslation(
-                      proposal.technicalStatus as ResourceId
+                    technicalStatuses: proposal.technicalStatuses?.map(
+                      (technicalStatus) =>
+                        getTranslation(technicalStatus as ResourceId)
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId
@@ -131,6 +136,7 @@ export function useProposalsCoreData(
       questionFilter,
       api,
       currentRole,
+      referenceNumbers,
       queryParameters,
     ]
   );
@@ -154,7 +160,7 @@ export function useProposalsCoreData(
 }
 
 export interface ProposalViewData
-  extends Omit<ProposalView, 'technicalStatus'> {
+  extends Omit<ProposalView, 'technicalStatuses'> {
   status: string;
-  technicalStatus: string;
+  technicalStatuses: string[] | null;
 }
