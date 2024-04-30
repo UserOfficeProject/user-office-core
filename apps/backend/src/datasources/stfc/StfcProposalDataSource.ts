@@ -4,6 +4,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import database from '../postgres/database';
 import {
   createProposalViewObject,
@@ -11,6 +12,9 @@ import {
 } from '../postgres/records';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
+import { StfcUserDataSource } from './StfcUserDataSource';
+
+const stfcUserDataSource = new StfcUserDataSource();
 
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
@@ -20,13 +24,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    const result = database
-      .select([
-        'proposal_table_view.*',
-        'instruments.name AS call_instrument_name',
-        'instruments.instrument_id AS call_instrument_id',
-        database.raw('count(*) OVER() AS full_count'),
-      ])
+    const proposals = database
+      .select('proposal_pk')
       .from('proposal_table_view')
       .join(
         'call_has_instruments',
@@ -40,55 +39,60 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'call_has_instruments.instrument_id'
       )
-      .join(
+      .leftJoin(
         'instrument_has_scientists',
         'instrument_has_scientists.instrument_id',
         '=',
         'call_has_instruments.instrument_id'
       )
-      .leftJoin(
-        'internal_reviews',
-        'proposal_table_view.technical_review_id',
-        'internal_reviews.technical_review_id'
-      )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
-          this.where('internal_reviews.reviewer_id', user.id);
+          this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
         } else {
           this.where('instrument_has_scientists.user_id', user.id).orWhere(
             'instruments.manager_user_id',
             user.id
           );
         }
-      })
-      .distinct('proposal_table_view.proposal_pk')
-      .orderBy('proposal_table_view.proposal_pk', 'desc')
+      });
+
+    const result = database
+      .with(
+        'ptw',
+        database
+          .select([
+            '*',
+            database.raw(
+              // eslint-disable-next-line quotes
+              "array_to_string(instrument_names, ',') all_instrument_names"
+            ),
+          ])
+          .from('proposal_table_view')
+      )
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('ptw')
+      .whereIn('proposal_pk', proposals)
+      .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
           query
-            .where('proposal_table_view.title', 'ilike', `%${filter.text}%`)
+            .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
+            .orWhere('all_instrument_names', 'ilike', `%${filter.text}%`);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
-          query.where(
-            'proposal_table_view.technical_review_assignee_id',
-            user.id
-          );
+          query.whereRaw('? = ANY(technical_review_assignee_ids)', user.id);
         }
         if (filter?.callId) {
-          query.where('proposal_table_view.call_id', filter.callId);
+          query.where('call_id', filter.callId);
         }
         if (filter?.instrumentId) {
-          query.where('instruments.instrument_id', filter.instrumentId);
+          query.whereRaw('? = ANY(instrument_ids)', filter.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
-          query.where(
-            'proposal_table_view.proposal_status_id',
-            filter?.proposalStatusId
-          );
+          query.where('proposal_status_id', filter?.proposalStatusId);
         }
 
         if (filter?.shortCodes) {
@@ -97,7 +101,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
@@ -107,6 +111,10 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           this.addQuestionFilter(query, questionFilter);
         }
 
+        if (filter?.referenceNumbers) {
+          query.whereIn('proposal_id', filter.referenceNumbers);
+        }
+
         if (first) {
           query.limit(first);
         }
@@ -114,28 +122,83 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.offset(offset);
         }
       })
-      .then(
-        (
-          proposals: (ProposalViewRecord & {
-            call_instrument_id: number;
-            call_instrument_name: string;
-          })[]
-        ) => {
-          const props = proposals.map((proposal) => {
-            const prop = createProposalViewObject(proposal);
-            prop.instrumentId = proposal.call_instrument_id;
-            prop.instrumentName = proposal.call_instrument_name;
+      .then((proposals: ProposalViewRecord[]) => {
+        const props = proposals.map((proposal) =>
+          createProposalViewObject(proposal)
+        );
 
-            return prop;
-          });
-
-          return {
-            totalCount: proposals[0] ? proposals[0].full_count : 0,
-            proposals: props,
-          };
-        }
-      );
+        return {
+          totalCount: proposals[0] ? proposals[0].full_count : 0,
+          proposals: props,
+        };
+      });
 
     return result;
+  }
+
+  async getProposalsFromView(
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
+    const proposals = await super.getProposalsFromView(
+      filter,
+      first,
+      offset,
+      sortField,
+      sortDirection,
+      searchText
+    );
+
+    const technicalReviewers = removeDuplicates(
+      proposals.proposalViews
+        .filter((proposal) => !!proposal.technicalReviewAssigneeIds?.length)
+        .map((proposal) => proposal.technicalReviewAssigneeIds.map(String))
+        .flat()
+    );
+
+    const technicalReviewersDetails =
+      await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
+        technicalReviewers,
+        false
+      );
+
+    const propsWithTechReviewerDetails = proposals.proposalViews.map(
+      (proposal) => {
+        const users =
+          !!proposal.technicalReviewAssigneeIds &&
+          technicalReviewersDetails.filter((user) =>
+            proposal.technicalReviewAssigneeIds.find(
+              (id) => id?.toString() === user.userNumber
+            )
+          );
+
+        const userDetails = users?.length
+          ? {
+              technicalReviewAssigneeNames: users.map((user) => {
+                const firstName = user?.firstNameKnownAs
+                  ? user.firstNameKnownAs
+                  : user?.givenName ?? '';
+                const lastName = user?.familyName ?? '';
+
+                return `${firstName} ${lastName}`;
+              }),
+            }
+          : {};
+
+        return {
+          ...proposal,
+          ...userDetails,
+        };
+      }
+    );
+
+    return {
+      proposalViews: propsWithTechReviewerDetails,
+      totalCount: proposals.totalCount,
+    };
   }
 }

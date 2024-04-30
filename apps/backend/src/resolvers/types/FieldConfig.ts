@@ -76,6 +76,9 @@ export class EmbellishmentConfig {
 
 @ObjectType()
 export class FileUploadConfig extends ConfigBase {
+  @Field(() => Boolean)
+  omitFromPdf: boolean;
+
   @Field(() => [String])
   file_type: string[];
 
@@ -160,6 +163,9 @@ export class InstrumentPickerConfig extends ConfigBase {
 
   @Field(() => [InstrumentOption])
   instruments: InstrumentOption[];
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
 }
 
 @ObjectType()

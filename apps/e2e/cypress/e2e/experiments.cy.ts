@@ -1,4 +1,7 @@
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  ProposalEndStatus,
+} from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -14,10 +17,13 @@ context('Experiments tests', () => {
     });
 
     cy.viewport(1920, 1080);
+
     cy.updateProposalManagementDecision({
       proposalPk: initialDBData.proposal.id,
-      statusId: 1,
-      managementTimeAllocation: 5,
+      finalStatus: ProposalEndStatus.ACCEPTED,
+      managementTimeAllocations: [
+        { instrumentId: initialDBData.instrument1.id, value: 5 },
+      ],
       managementDecisionSubmitted: true,
     });
     cy.createEsi({
@@ -35,7 +41,8 @@ context('Experiments tests', () => {
       cy.login('officer');
       cy.visit('/');
       cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
-      cy.get('[value=NONE]').click();
+      cy.finishedLoading();
+      cy.get('button[value=NONE]').click();
 
       cy.get('[data-cy=call-filter]').click();
       cy.get('[role=presentation]').contains('call 1').click();
@@ -47,11 +54,11 @@ context('Experiments tests', () => {
 
       cy.get('[data-cy=instrument-filter]').click();
       cy.get('[role=presentation]').contains('Instrument 2').click();
-      cy.contains('0-0 of 0');
+      cy.contains('1-1 of 1');
 
       cy.get('[data-cy=instrument-filter]').click();
       cy.get('[role=presentation]').contains('Instrument 1').click();
-      cy.contains('1-4 of 4');
+      cy.contains('1-3 of 3');
     });
 
     it('Can filter by date', () => {

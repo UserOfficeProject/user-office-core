@@ -9,6 +9,8 @@ import {
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Country } from '../../models/Country';
+import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
+import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { FeedbackRequest } from '../../models/FeedbackRequest';
@@ -33,8 +35,6 @@ import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { SEP, SEPAssignment, SEPProposal, SEPReviewer } from '../../models/SEP';
-import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { TechnicalReview } from '../../models/TechnicalReview';
@@ -103,6 +103,7 @@ export interface ScheduledEventRecord {
   readonly proposal_pk: number;
   readonly status: ProposalBookingStatusCore;
   readonly local_contact: number | null;
+  readonly instrument_id: number;
 }
 
 export interface ProposalRecord {
@@ -124,7 +125,6 @@ export interface ProposalRecord {
   readonly notified: boolean;
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
-  readonly management_time_allocation: number;
   readonly management_decision_submitted: boolean;
 }
 export interface ProposalViewRecord {
@@ -137,24 +137,25 @@ export interface ProposalViewRecord {
   readonly proposal_id: string;
   readonly rank_order: number;
   readonly final_status: number;
-  readonly technical_time_allocation: number;
-  readonly management_time_allocation: number;
+  readonly management_time_allocations: number[];
   readonly notified: boolean;
-  readonly technical_review_status: number;
-  readonly technical_review_submitted: boolean;
-  readonly technical_review_assignee_id: number;
-  readonly technical_review_assignee_firstname: string;
-  readonly technical_review_assignee_lastname: string;
-  readonly instrument_name: string;
+  readonly submitted: boolean;
+  readonly technical_review_ids: number[];
+  readonly technical_time_allocations: number[];
+  readonly technical_review_statuses: number[];
+  readonly technical_reviews_submitted: boolean[];
+  readonly technical_review_assignee_ids: number[];
+  readonly technical_review_assignee_names: string[];
+  readonly instrument_ids: number[];
+  readonly fap_instrument_id: number;
+  readonly instrument_names: string[];
   readonly call_short_code: string;
-  readonly sep_id: number;
-  readonly sep_code: string;
+  readonly fap_id: number;
+  readonly fap_code: string;
   readonly average: number;
   readonly deviation: number;
-  readonly instrument_id: number;
   readonly call_id: number;
   readonly proposal_workflow_id: number;
-  readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
 }
@@ -238,31 +239,21 @@ export interface UserRecord {
   readonly preferredname: string;
   readonly oidc_sub: string | null;
   readonly oauth_refresh_token: string | null;
-  readonly oauth_access_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;
   readonly nationality: number;
   readonly birthdate: Date;
-  readonly organisation: number;
   readonly department: string;
-  readonly organisation_address: string;
   readonly position: string;
   readonly email: string;
-  readonly email_verified: boolean;
-  readonly password: string;
   readonly telephone: string;
   readonly telephone_alt: string;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
+  readonly institution_id: number;
   readonly institution: string;
   readonly placeholder: boolean;
-}
-
-export interface UserRecordWithInstitution {
-  user: UserRecord;
-  institution: InstitutionRecord;
-  country: CountryRecord;
 }
 
 export interface VisitRegistrationRecord {
@@ -288,7 +279,7 @@ export interface ReviewRecord {
   readonly comment: string;
   readonly grade: number;
   readonly status: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
 }
 
 export interface TechnicalReviewRecord {
@@ -302,6 +293,7 @@ export interface TechnicalReviewRecord {
   readonly reviewer_id: number;
   readonly files: string;
   readonly technical_review_assignee_id: number | null;
+  readonly instrument_id: number;
 }
 
 export interface InternalReviewRecord {
@@ -323,8 +315,8 @@ export interface CallRecord {
   readonly end_call_internal: Date;
   readonly start_review: Date;
   readonly end_review: Date;
-  readonly start_sep_review: Date;
-  readonly end_sep_review: Date;
+  readonly start_fap_review: Date;
+  readonly end_fap_review: Date;
   readonly start_notify: Date;
   readonly end_notify: Date;
   readonly start_cycle: Date;
@@ -338,7 +330,7 @@ export interface CallRecord {
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
-  readonly call_sep_review_ended: boolean;
+  readonly call_fap_review_ended: boolean;
   readonly template_id: number;
   readonly esi_template_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
@@ -362,7 +354,7 @@ export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
   readonly country_id: number;
-  readonly verified: boolean;
+  readonly ror_id: string;
 }
 
 export interface UnitRecord {
@@ -402,10 +394,11 @@ export interface EventLogRecord {
   readonly row_data: string;
   readonly event_tstamp: Date;
   readonly changed_object_id: string;
+  readonly description: string;
 }
 
-export interface SEPRecord {
-  readonly sep_id: number;
+export interface FapRecord {
+  readonly fap_id: number;
   readonly code: string;
   readonly description: string;
   readonly number_ratings_required: number;
@@ -413,31 +406,41 @@ export interface SEPRecord {
   readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
-  readonly sep_chair_user_id: number | null;
-  readonly sep_secretary_user_id: number | null;
 }
 
-export interface SEPProposalRecord {
+export interface FapSecretariesRecord {
+  readonly user_id: number;
+  readonly fap_id: number;
+}
+
+export interface FapChairsRecord {
+  readonly user_id: number;
+  readonly fap_id: number;
+}
+
+export interface FapProposalRecord {
   readonly proposal_pk: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
   readonly date_assigned: Date;
-  readonly sep_time_allocation: number | null;
-  readonly instrument_submitted?: boolean;
+  readonly fap_time_allocation: number | null;
+  readonly instrument_id: number;
+  readonly fap_meeting_instrument_submitted: boolean;
 }
 
-export interface SEPAssignmentRecord {
+export interface FapAssignmentRecord {
   readonly proposal_pk: number;
-  readonly sep_member_user_id: number;
-  readonly sep_id: number;
+  readonly fap_member_user_id: number;
+  readonly fap_id: number;
   readonly date_assigned: Date;
   readonly reassigned: boolean;
   readonly date_reassigned: Date;
   readonly email_sent: boolean;
+  readonly rank: number | null;
 }
 
-export interface SEPReviewerRecord {
+export interface FapReviewerRecord {
   readonly user_id: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
 }
 
 export interface RoleUserRecord {
@@ -455,10 +458,11 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
-export interface InstrumentHasProposalsRecord {
+export interface InstrumentHasProposalRecord {
   readonly instrument_id: number;
   readonly proposal_pk: number;
   readonly submitted: boolean;
+  readonly instrument_has_proposals_id: number;
 }
 
 export interface CallHasInstrumentRecord {
@@ -466,7 +470,7 @@ export interface CallHasInstrumentRecord {
   readonly instrument_id: number;
   availability_time: number;
   submitted: boolean;
-  sep_id: number;
+  fap_id: number;
 }
 export interface InstrumentWithAvailabilityTimeRecord {
   readonly instrument_id: number;
@@ -478,7 +482,17 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;
-  readonly sep_id: number;
+  readonly fap_id: number;
+}
+
+export interface InstrumentWithManagementTimeRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly manager_user_id: number;
+  readonly management_time_allocation: number;
+  readonly submitted: boolean;
 }
 
 export interface TemplateCategoryRecord {
@@ -545,7 +559,7 @@ export interface StatusChangingEventRecord {
   readonly status_changing_event: string;
 }
 
-export interface SepMeetingDecisionRecord {
+export interface FapMeetingDecisionRecord {
   readonly proposal_pk: number;
   readonly comment_for_management: string;
   readonly comment_for_user: string;
@@ -555,7 +569,7 @@ export interface SepMeetingDecisionRecord {
   readonly submitted_by: number | null;
 }
 
-export interface SepProposalWithReviewGradesAndRankingRecord {
+export interface FapProposalWithReviewGradesAndRankingRecord {
   readonly proposal_pk: number;
   readonly rank_order: number | null;
   readonly review_grades: number[];
@@ -565,24 +579,24 @@ export interface ProposalEventsRecord {
   readonly proposal_pk: number;
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
-  readonly proposal_feasible: boolean;
-  readonly proposal_unfeasible: boolean;
+  readonly proposal_feasibility_review_feasible: boolean;
+  readonly proposal_feasibility_review_unfeasible: boolean;
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
-  readonly proposal_sep_selected: boolean;
-  readonly proposal_instrument_selected: boolean;
+  readonly proposal_fap_selected: boolean;
+  readonly proposal_instruments_selected: boolean;
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;
-  readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_all_fap_reviewers_selected: boolean;
   readonly proposal_management_decision_updated: boolean;
   readonly proposal_management_decision_submitted: boolean;
-  readonly proposal_all_sep_reviews_submitted: boolean;
-  readonly proposal_sep_review_updated: boolean;
+  readonly proposal_all_fap_reviews_submitted: boolean;
+  readonly proposal_fap_review_updated: boolean;
   readonly proposal_feasibility_review_updated: boolean;
   readonly proposal_sample_safe: boolean;
-  readonly proposal_sep_review_submitted: boolean;
-  readonly proposal_sep_meeting_submitted: boolean;
+  readonly proposal_fap_review_submitted: boolean;
+  readonly proposal_fap_meeting_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
   readonly proposal_accepted: boolean;
   readonly proposal_reserved: boolean;
@@ -754,7 +768,6 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.notified,
     proposal.submitted,
     proposal.reference_number_sequence,
-    proposal.management_time_allocation,
     proposal.management_decision_submitted
   );
 };
@@ -767,7 +780,7 @@ export const createReviewObject = (review: ReviewRecord) => {
     review.comment,
     review.grade,
     review.status,
-    review.sep_id
+    review.fap_id
   );
 };
 
@@ -794,7 +807,8 @@ export const createTechnicalReviewObject = (
     technicalReview.submitted,
     technicalReview.reviewer_id,
     technicalReview.files ? JSON.stringify(technicalReview.files) : null,
-    technicalReview.technical_review_assignee_id
+    technicalReview.technical_review_assignee_id,
+    technicalReview.instrument_id
   );
 };
 
@@ -810,24 +824,25 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.rank_order,
     proposal.final_status,
     proposal.notified,
-    proposal.technical_time_allocation,
-    proposal.management_time_allocation,
-    proposal.technical_review_assignee_id,
-    proposal.technical_review_assignee_firstname,
-    proposal.technical_review_assignee_lastname,
-    proposal.technical_review_status,
-    proposal.technical_review_submitted,
-    proposal.instrument_name,
+    proposal.submitted,
+    proposal.management_time_allocations,
+    proposal.technical_review_ids,
+    proposal.technical_review_assignee_ids,
+    proposal.technical_time_allocations,
+    proposal.technical_review_assignee_names,
+    proposal.technical_review_statuses,
+    proposal.technical_reviews_submitted,
+    proposal.instrument_names,
+    proposal.instrument_ids,
+    proposal.fap_instrument_id,
     proposal.call_short_code,
-    proposal.sep_code,
-    proposal.sep_id,
+    proposal.fap_code,
+    proposal.fap_id,
     proposal.average,
     proposal.deviation,
-    proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.proposal_workflow_id,
-    proposal.submitted
+    proposal.proposal_workflow_id
   );
 };
 
@@ -903,16 +918,15 @@ export const createUserObject = (user: UserRecord) => {
     user.preferredname,
     user.oidc_sub,
     user.oauth_refresh_token,
-    user.oauth_access_token,
     user.oauth_issuer,
     user.gender,
     user.nationality,
     user.birthdate,
-    user.organisation,
+    user.institution_id,
+    user.institution,
     user.department,
     user.position,
     user.email,
-    user.email_verified,
     user.telephone,
     user.telephone_alt,
     user.placeholder,
@@ -921,18 +935,21 @@ export const createUserObject = (user: UserRecord) => {
   );
 };
 
-export const createBasicUserObject = (user: UserRecord) => {
+export const createBasicUserObject = (
+  user: UserRecord & InstitutionRecord & CountryRecord
+) => {
   return new BasicUserDetails(
     user.user_id,
     user.firstname,
     user.lastname,
     user.preferredname,
     user.institution,
-    user.organisation,
+    user.institution_id,
     user.position,
     user.created_at,
     user.placeholder,
-    user.email
+    user.email,
+    user.country
   );
 };
 
@@ -959,8 +976,8 @@ export const createCallObject = (call: CallRecord) => {
     call.end_call_internal,
     call.start_review,
     call.end_review,
-    call.start_sep_review,
-    call.end_sep_review,
+    call.start_fap_review,
+    call.end_fap_review,
     call.start_notify,
     call.end_notify,
     call.start_cycle,
@@ -974,7 +991,7 @@ export const createCallObject = (call: CallRecord) => {
     call.call_ended,
     call.call_ended_internal,
     call.call_review_ended,
-    call.call_sep_review_ended,
+    call.call_fap_review_ended,
     call.template_id,
     call.esi_template_id,
     call.allocation_time_unit,
@@ -993,7 +1010,7 @@ export const createCallHasInstrumentObject = (
     callHasInstrument.instrument_id,
     callHasInstrument.availability_time,
     callHasInstrument.submitted,
-    callHasInstrument.sep_id
+    callHasInstrument.fap_id
   );
 };
 
@@ -1071,59 +1088,61 @@ export const createSettingsObject = (record: SettingsRecord) => {
   );
 };
 
-export const createSEPObject = (sep: SEPRecord) => {
-  return new SEP(
-    sep.sep_id,
-    sep.code,
-    sep.description,
-    sep.number_ratings_required,
-    sep.grade_guide,
-    sep.custom_grade_guide,
-    sep.active,
-    sep.sep_chair_user_id,
-    sep.sep_secretary_user_id
+export const createFapObject = (fap: FapRecord) => {
+  return new Fap(
+    fap.fap_id,
+    fap.code,
+    fap.description,
+    fap.number_ratings_required,
+    fap.grade_guide,
+    fap.custom_grade_guide,
+    fap.active,
+    [],
+    []
   );
 };
 
-export const createSepMeetingDecisionObject = (
-  sepMeetingDecisionRecord: SepMeetingDecisionRecord
+export const createFapMeetingDecisionObject = (
+  fapMeetingDecisionRecord: FapMeetingDecisionRecord
 ) => {
-  return new SepMeetingDecision(
-    sepMeetingDecisionRecord.proposal_pk,
-    sepMeetingDecisionRecord.rank_order,
-    sepMeetingDecisionRecord.recommendation,
-    sepMeetingDecisionRecord.comment_for_user,
-    sepMeetingDecisionRecord.comment_for_management,
-    sepMeetingDecisionRecord.submitted,
-    sepMeetingDecisionRecord.submitted_by
+  return new FapMeetingDecision(
+    fapMeetingDecisionRecord.proposal_pk,
+    fapMeetingDecisionRecord.rank_order,
+    fapMeetingDecisionRecord.recommendation,
+    fapMeetingDecisionRecord.comment_for_user,
+    fapMeetingDecisionRecord.comment_for_management,
+    fapMeetingDecisionRecord.submitted,
+    fapMeetingDecisionRecord.submitted_by
   );
 };
 
-export const createSEPProposalObject = (sepAssignment: SEPProposalRecord) => {
-  return new SEPProposal(
-    sepAssignment.proposal_pk,
-    sepAssignment.sep_id,
-    sepAssignment.date_assigned,
-    sepAssignment.sep_time_allocation,
-    sepAssignment.instrument_submitted
+export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
+  return new FapProposal(
+    fapProposal.proposal_pk,
+    fapProposal.fap_id,
+    fapProposal.date_assigned,
+    fapProposal.fap_time_allocation,
+    fapProposal.instrument_id,
+    fapProposal.fap_meeting_instrument_submitted
   );
 };
-export const createSEPAssignmentObject = (
-  sepAssignment: SEPAssignmentRecord
+export const createFapAssignmentObject = (
+  fapAssignment: FapAssignmentRecord
 ) => {
-  return new SEPAssignment(
-    sepAssignment.proposal_pk,
-    sepAssignment.sep_member_user_id,
-    sepAssignment.sep_id,
-    sepAssignment.date_assigned,
-    sepAssignment.reassigned,
-    sepAssignment.date_reassigned,
-    sepAssignment.email_sent
+  return new FapAssignment(
+    fapAssignment.proposal_pk,
+    fapAssignment.fap_member_user_id,
+    fapAssignment.fap_id,
+    fapAssignment.date_assigned,
+    fapAssignment.reassigned,
+    fapAssignment.date_reassigned,
+    fapAssignment.email_sent,
+    fapAssignment.rank
   );
 };
 
-export const createSEPReviewerObject = (sepMember: SEPReviewerRecord) => {
-  return new SEPReviewer(sepMember.user_id, sepMember.sep_id);
+export const createFapReviewerObject = (fapMember: FapReviewerRecord) => {
+  return new FapReviewer(fapMember.user_id, fapMember.fap_id);
 };
 
 export const createRoleObject = (role: RoleRecord) => {
@@ -1188,7 +1207,7 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.institution_id,
     institution.institution,
     institution.country_id,
-    institution.verified
+    institution.ror_id
   );
 };
 
@@ -1207,7 +1226,8 @@ export const createScheduledEventObject = (
     scheduledEvent.proposal_pk,
     scheduledEvent.proposal_booking_id,
     scheduledEvent.status,
-    scheduledEvent.local_contact
+    scheduledEvent.local_contact,
+    scheduledEvent.instrument_id
   );
 
 export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>

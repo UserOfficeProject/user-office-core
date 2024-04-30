@@ -2,9 +2,10 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { CallDataSource } from '../../datasources/CallDataSource';
+import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
-import { SEPDataSource } from '../../datasources/SEPDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -18,12 +19,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
-  const sepDataSource = container.resolve<SEPDataSource>(Tokens.SEPDataSource);
+  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
-    Tokens.UserDataSource
+    Tokens.RedeemCodesDataSource
+  );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
   );
 
   if (event.isRejection) {
@@ -31,35 +35,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.USER_PASSWORD_RESET_EMAIL: {
-      mailService
-        .sendMail({
-          content: {
-            template_id: 'user-office-account-reset-password',
-          },
-          substitution_data: {
-            title: 'ESS User reset account password',
-            buttonText: 'Click to reset',
-            link: event.userlinkresponse.link,
-          },
-          recipients: [{ address: event.userlinkresponse.user.email }],
-        })
-        .then((res) => {
-          logger.logInfo('Email send on for password reset:', {
-            result: res,
-            event,
-          });
-        })
-        .catch((err: string) => {
-          logger.logError('Could not send email for password reset', {
-            error: err,
-            event,
-          });
-        });
-
-      return;
-    }
-
     case Event.EMAIL_INVITE: {
       const user = await userDataSource.getUser(
         event.emailinviteresponse.userId
@@ -102,7 +77,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             email: user.email,
             inviterName: inviter.firstname,
             inviterLastname: inviter.lastname,
-            inviterOrg: inviter.organisation,
+            inviterOrg: inviter.institution,
             redeemCode: redeemCode[0].code,
           },
           recipients: [{ address: user.email }],
@@ -121,12 +96,16 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
-      const participants = await userDataSource.getProposalUsersFull(
-        event.proposal.primaryKey
-      );
+
       if (!principalInvestigator) {
         return;
       }
+
+      const participants = await userDataSource.getProposalUsersFull(
+        event.proposal.primaryKey
+      );
+
+      const call = await callDataSource.getCall(event.proposal.callId);
 
       const options: EmailSettings = {
         content: {
@@ -140,7 +119,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           coProposers: participants.map(
             (partipant) => `${partipant.preferredname} ${partipant.lastname} `
           ),
-          call: '',
+          callShortCode: call?.shortCode,
         },
         recipients: [
           { address: principalInvestigator.email },
@@ -177,6 +156,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
+      const call = await callDataSource.getCall(event.proposal.callId);
       if (!principalInvestigator) {
         return;
       }
@@ -205,6 +185,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             proposalNumber: event.proposal.proposalId,
             proposalTitle: event.proposal.title,
             commentForUser: event.proposal.commentForUser,
+            callShortCode: call?.shortCode,
           },
           recipients: [
             { address: principalInvestigator.email },
@@ -231,14 +212,16 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       return;
     }
-    case Event.SEP_REVIEWER_NOTIFIED: {
-      const { id: reviewId, userID, proposalPk } = event.sepReview;
-      const sepReviewer = await userDataSource.getUser(userID);
+    case Event.FAP_REVIEWER_NOTIFIED: {
+      const { id: reviewId, userID, proposalPk } = event.fapReview;
+      const fapReviewer = await userDataSource.getUser(userID);
       const proposal = await proposalDataSource.get(proposalPk);
 
-      if (!sepReviewer || !proposal) {
+      if (!fapReviewer || !proposal) {
         return;
       }
+
+      const call = await callDataSource.getCall(proposal?.callId);
 
       mailService
         .sendMail({
@@ -246,35 +229,36 @@ export async function essEmailHandler(event: ApplicationEvent) {
             template_id: 'review-reminder',
           },
           substitution_data: {
-            sepReviewerPreferredName: sepReviewer.preferredname,
-            sepReviewerLastName: sepReviewer.lastname,
+            fapReviewerPreferredName: fapReviewer.preferredname,
+            fapReviewerLastName: fapReviewer.lastname,
             proposalNumber: proposal.proposalId,
             proposalTitle: proposal.title,
             commentForUser: proposal.commentForUser,
+            callShortCode: call?.shortCode,
           },
           recipients: [
-            { address: sepReviewer.email },
+            { address: fapReviewer.email },
             {
               address: {
                 email: 'useroffice@esss.se',
-                header_to: sepReviewer.email,
+                header_to: fapReviewer.email,
               },
             },
           ],
         })
         .then(async (res) => {
-          await sepDataSource.setSEPReviewNotificationEmailSent(
+          await fapDataSource.setFapReviewNotificationEmailSent(
             reviewId,
             userID,
             proposalPk
           );
-          logger.logInfo('Email sent on SEP reviewer notify:', {
+          logger.logInfo('Email sent on Fap reviewer notify:', {
             result: res,
             event,
           });
         })
         .catch((err: string) => {
-          logger.logError('Could not send email on SEP reviewer notify:', {
+          logger.logError('Could not send email on Fap reviewer notify:', {
             error: err,
             event,
           });

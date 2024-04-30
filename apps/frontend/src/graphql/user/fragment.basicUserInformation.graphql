@@ -3,10 +3,11 @@ fragment basicUserDetails on BasicUserDetails {
   firstname
   lastname
   preferredname
-  organisation
-  organizationId
+  institution
+  institutionId
   position
   created
   placeholder
   email
+  country
 }

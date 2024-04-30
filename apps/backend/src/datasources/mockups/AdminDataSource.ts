@@ -1,4 +1,5 @@
 import { Page } from '../../models/Admin';
+import { Country } from '../../models/Country';
 import { Entry } from '../../models/Entry';
 import { Feature, FeatureId, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
@@ -11,7 +12,8 @@ import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSe
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 
-export const dummyInstitution = new Institution(1, 'ESS', 1, true);
+export const dummyInstitution = new Institution(1, 'ESS', 1);
+export const dummyCountry = new Country(173, 'Sweden');
 export const dummyApiAccessToken = new Permissions(
   'kkmgdyzpj26uxubxoyl',
   'ESS access token',
@@ -39,6 +41,7 @@ export class AdminDataSourceMock implements AdminDataSource {
       new Settings(SettingsId.FEEDBACK_MAX_REQUESTS, '', '2'),
       new Settings(SettingsId.FEEDBACK_EXHAUST_DAYS, '', '90'),
       new Settings(SettingsId.FEEDBACK_FREQUENCY_DAYS, '', '14'),
+      new Settings(SettingsId.DEFAULT_NUM_FAP_REVIEWS_REQUIRED, '', '2'),
     ];
   }
   async setFeatures(
@@ -60,6 +63,21 @@ export class AdminDataSourceMock implements AdminDataSource {
     }));
   }
 
+  async createCountry(countryName: string): Promise<Country> {
+    return dummyCountry;
+  }
+  async getCountryByName(countryName: string): Promise<Country | null> {
+    return dummyCountry;
+  }
+
+  async getInstitutionByRorId(rorId: string): Promise<Institution | null> {
+    return dummyInstitution;
+  }
+  async getInstitutionByName(
+    institutionName: string
+  ): Promise<Institution | null> {
+    return dummyInstitution;
+  }
   async getInstitutionUsers(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails[]> {
@@ -126,6 +144,22 @@ export class AdminDataSourceMock implements AdminDataSource {
     }
 
     return setting;
+  }
+
+  async getSettingOrDefault(
+    settingId: SettingsId,
+    defaultValue: number
+  ): Promise<number> {
+    const settingValue = await this.getSetting(settingId);
+    if (settingValue === null) {
+      return defaultValue;
+    }
+    const settingValueAsNumber = parseInt(settingValue.settingsValue, 10);
+    if (isNaN(settingValueAsNumber)) {
+      return defaultValue;
+    }
+
+    return settingValueAsNumber;
   }
 
   async getTokenAndPermissionsById(

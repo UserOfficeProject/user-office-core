@@ -4,11 +4,11 @@ import React from 'react';
 import { DataType } from 'generated/sdk';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createVisitBasisValidationSchema } from './createVisitBasisValidationSchema';
 import { QuestionaryComponentVisitBasis } from './QuestionaryComponentVisitBasis';
 import { QuestionTemplateRelationVisitBasisForm } from './QuestionTemplateRelationVisitBasisForm';
 import { QuestionVisitBasisForm } from './QuestionVisitBasisForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const visitBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.VISIT_BASIS,

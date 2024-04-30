@@ -38,7 +38,7 @@ export default class ReviewMutations {
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  @EventBus(Event.PROPOSAL_SEP_REVIEW_UPDATED)
+  @EventBus(Event.PROPOSAL_FAP_REVIEW_UPDATED)
   @ValidateArgs(proposalGradeValidationSchema, ['comment'])
   @Authorized()
   async updateReview(
@@ -72,7 +72,7 @@ export default class ReviewMutations {
     });
   }
 
-  @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)
+  @EventBus(Event.PROPOSAL_FAP_REVIEW_SUBMITTED)
   @ValidateArgs(submitProposalReviewValidationSchema)
   @Authorized()
   async submitProposalReview(
@@ -135,7 +135,8 @@ export default class ReviewMutations {
   ): Promise<TechnicalReview | Rejection> {
     const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
       agent,
-      args.proposalPk
+      args.proposalPk,
+      args.instrumentId
     );
     if (!hasWriteRights) {
       return rejection(
@@ -144,9 +145,11 @@ export default class ReviewMutations {
       );
     }
 
-    const technicalReview = await this.dataSource.getTechnicalReview(
-      args.proposalPk
-    );
+    const technicalReview =
+      await this.dataSource.getProposalInstrumentTechnicalReview(
+        args.proposalPk,
+        args.instrumentId
+      );
 
     if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
       return rejection('Request is impersonating another user', {
@@ -199,7 +202,8 @@ export default class ReviewMutations {
   ): Promise<TechnicalReview | Rejection> {
     const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
       agent,
-      args.proposalPk
+      args.proposalPk,
+      args.instrumentId
     );
     if (!hasWriteRights) {
       return rejection(
@@ -208,9 +212,11 @@ export default class ReviewMutations {
       );
     }
 
-    const technicalReview = await this.dataSource.getTechnicalReview(
-      args.proposalPk
-    );
+    const technicalReview =
+      await this.dataSource.getProposalInstrumentTechnicalReview(
+        args.proposalPk,
+        args.instrumentId
+      );
     const shouldUpdateReview = technicalReview !== null;
 
     if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
@@ -232,18 +238,18 @@ export default class ReviewMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   async removeUserForReview(
     agent: UserWithRole | null,
-    { reviewId, sepId }: { reviewId: number; sepId: number }
+    { reviewId, fapId }: { reviewId: number; fapId: number }
   ): Promise<Review | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId))
     ) {
       return rejection(
         'Can not remove user for review because of insufficient permissions',
-        { agent, reviewId, sepId }
+        { agent, reviewId, fapId }
       );
     }
 
@@ -253,7 +259,7 @@ export default class ReviewMutations {
       .catch((error) => {
         return rejection(
           'Can not remove user for review because error occurred',
-          { agent, reviewId, sepId },
+          { agent, reviewId, fapId },
           error
         );
       });
@@ -261,13 +267,17 @@ export default class ReviewMutations {
 
   async isTechnicalReviewAssignee(
     proposalPks: number[],
-    assigneeUserId?: number
+    instrumentId: number,
+    loggedInUserId?: number
   ) {
     for await (const proposalPk of proposalPks) {
       const technicalReviewAssignee = (
-        await this.dataSource.getTechnicalReview(proposalPk)
+        await this.dataSource.getProposalInstrumentTechnicalReview(
+          proposalPk,
+          instrumentId
+        )
       )?.technicalReviewAssigneeId;
-      if (technicalReviewAssignee !== assigneeUserId) {
+      if (technicalReviewAssignee !== loggedInUserId) {
         return false;
       }
     }
@@ -282,7 +292,11 @@ export default class ReviewMutations {
   ): Promise<TechnicalReview[] | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !this.isTechnicalReviewAssignee(args.proposalPks, agent?.id)
+      !this.isTechnicalReviewAssignee(
+        args.proposalPks,
+        args.instrumentId,
+        agent?.id
+      )
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -291,15 +305,15 @@ export default class ReviewMutations {
   }
 
   @ValidateArgs(addUserForReviewValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   async addUserForReview(
     agent: UserWithRole | null,
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
-    const { proposalPk, userID, sepID } = args;
+    const { proposalPk, userID, fapID } = args;
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepID))
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapID))
     ) {
       return rejection(
         'Can not add user for review because of insufficient permissions',

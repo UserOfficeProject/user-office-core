@@ -1,0 +1,70 @@
+query getFapProposal($fapId: Int!, $proposalPk: Int!) {
+  fapProposal(fapId: $fapId, proposalPk: $proposalPk) {
+    proposalPk
+    fapId
+    fapTimeAllocation
+    instrumentSubmitted
+    proposal {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
+      questionary {
+        ...questionary
+      }
+      technicalReviews {
+        ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        fapID
+        reviewer {
+          firstname
+          lastname
+          id
+        }
+      }
+      instruments {
+        id
+        name
+        shortCode
+      }
+      call {
+        id
+        shortCode
+        allocationTimeUnit
+      }
+    }
+    assignments {
+      proposalPk
+      fapMemberUserId
+      dateAssigned
+      rank
+      user {
+        ...basicUserDetails
+      }
+      role {
+        id
+        shortCode
+        title
+      }
+      review {
+        id
+        status
+        comment
+        grade
+        fapID
+      }
+    }
+  }
+}

@@ -12,46 +12,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Bump version and push tag
         id: tag_version
-        uses: mathieudutour/github-tag-action@v5.5
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create a GitHub release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ steps.tag_version.outputs.new_tag }}
-          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: ./apps/backend
+          platforms: linux/amd64,linux/arm64/v8
           file: ./apps/backend/Dockerfile
           push: true
           tags: ghcr.io/userofficeproject/user-office-backend:${{ steps.tag_version.outputs.new_tag }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -65,9 +64,10 @@ jobs:
         run: npm run generate:sdk
 
       - name: Build and push frontend
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: ./apps/frontend
+          platforms: linux/amd64,linux/arm64/v8
           file: ./apps/frontend/Dockerfile
           push: true
           tags: ghcr.io/userofficeproject/user-office-frontend:${{ steps.tag_version.outputs.new_tag }}

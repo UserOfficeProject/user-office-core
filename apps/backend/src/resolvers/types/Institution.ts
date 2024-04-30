@@ -20,8 +20,8 @@ export class Institution implements Partial<InstitutionOrigin> {
   @Field()
   name: string;
 
-  @Field()
-  verified: boolean;
+  @Field(() => String, { nullable: true })
+  rorId?: string;
 }
 
 @Resolver(() => Institution)

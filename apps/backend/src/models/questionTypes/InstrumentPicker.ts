@@ -6,15 +6,18 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import FapMutations from '../../mutations/FapMutations';
 import InstrumentMutations from '../../mutations/InstrumentMutations';
-import SEPMutations from '../../mutations/SEPMutations';
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
 export class InstrumentOptionClass {
-  constructor(public id: number, public name: string) {}
+  constructor(
+    public id: number,
+    public name: string
+  ) {}
 }
 
 export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
@@ -34,10 +37,12 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       config.tooltip = '';
       config.variant = 'dropdown';
       config.instruments = [];
+      config.isMultipleSelect = false;
 
       return config;
     },
-    getDefaultAnswer: () => null,
+    getDefaultAnswer: (field) =>
+      (field.config as InstrumentPickerConfig).isMultipleSelect ? [] : null,
     filterQuery: (queryBuilder, filter) => {
       const value = JSON.parse(filter.value).value;
       switch (filter.compareOperator) {
@@ -82,30 +87,36 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         Tokens.ProposalDataSource
       );
       const instrumentMutations = container.resolve(InstrumentMutations);
-      const sepMutation = container.resolve(SEPMutations);
+      const fapMutation = container.resolve(FapMutations);
 
-      const proposal = await proposalDataSource.getByQuestionaryId(
-        questionaryId
-      );
+      const proposal =
+        await proposalDataSource.getByQuestionaryId(questionaryId);
 
       if (!proposal) {
         throw new GraphQLError('Proposal not found');
       }
 
       const { value } = JSON.parse(answer.value);
-      const instrumentId = value;
+      const instrumentIds = value
+        ? Array.isArray(value)
+          ? value
+          : [value]
+        : null;
 
-      // Assign the Proposals to Instrument
-      await instrumentMutations.assignProposalsToInstrumentInternal(null, {
-        instrumentId,
-        proposals: [
-          { primaryKey: proposal.primaryKey, callId: proposal.callId },
-        ],
+      if (!instrumentIds?.length) {
+        return;
+      }
+
+      // Assign the Proposals to Instruments
+      await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
+        instrumentIds,
+        proposalPks: [proposal.primaryKey],
       });
 
-      // Assign the Proposals to SEP using Call Instrument
-      await sepMutation.assignProposalsToSEPUsingCallInstrumentInternal(null, {
-        instrumentId: instrumentId,
+      // TODO: Check this when starting with FAP part for multi instrument. For now only the first instrument FAP is assigned just to be backwards compatible.
+      // Assign the Proposals to Fap using Call Instrument
+      await fapMutation.assignProposalsToFapUsingCallInstrumentInternal(null, {
+        instrumentId: instrumentIds[0],
         proposalPks: [proposal.primaryKey],
       });
     },

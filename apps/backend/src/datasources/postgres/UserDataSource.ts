@@ -7,26 +7,27 @@ import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
 import {
-  User,
   BasicUserDetails,
+  User,
   UserRole,
   UserRoleShortCodeMap,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
-  UserRecord,
-  createUserObject,
-  createBasicUserObject,
+  CountryRecord,
+  InstitutionRecord,
   RoleRecord,
   RoleUserRecord,
-  InstitutionRecord,
-  createInstitutionObject,
+  UserRecord,
+  createBasicUserObject,
   createCountryObject,
-  CountryRecord,
+  createInstitutionObject,
+  createUserObject,
 } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -69,25 +70,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  async getPasswordByEmail(email: string): Promise<string | null> {
-    return database
-      .select('password')
-      .from('users')
-      .where('email', 'ilike', email)
-      .first()
-      .then((user: UserRecord) => (user ? user.password : null));
-  }
-
-  async getPasswordByUsername(username: string): Promise<string | null> {
-    return database
-      .select('password')
-      .from('users')
-      .where('username', username)
-      .first()
-      .then((user: UserRecord) => (user ? user.password : null));
-  }
-
-  async update(user: User): Promise<User> {
+  async update(user: UpdateUserArgs): Promise<User> {
     const {
       firstname,
       user_title,
@@ -97,7 +80,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       gender,
       nationality,
       birthdate,
-      organisation,
+      institutionId,
       department,
       position,
       email,
@@ -106,7 +89,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       placeholder,
       oidcSub,
       oauthRefreshToken,
-      oauthAccessToken,
       oauthIssuer,
     } = user;
 
@@ -120,7 +102,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         gender,
         nationality,
         birthdate,
-        organisation,
+        institution_id: institutionId,
         department,
         position,
         email,
@@ -129,7 +111,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         placeholder,
         oidc_sub: oidcSub,
         oauth_refresh_token: oauthRefreshToken,
-        oauth_access_token: oauthAccessToken,
         oauth_issuer: oauthIssuer,
       })
       .from('users')
@@ -148,16 +129,14 @@ export default class PostgresUserDataSource implements UserDataSource {
         middlename: '',
         lastname,
         username: email,
-        password: '',
         preferredname: firstname,
         oidc_sub: '',
         oauth_refresh_token: '',
-        oauth_access_token: '',
         oauth_issuer: '',
         gender: '',
         nationality: null,
         birthdate: '2000-01-01',
-        organisation: 1,
+        institution_id: 1,
         department: '',
         position: '',
         email,
@@ -206,20 +185,6 @@ export default class PostgresUserDataSource implements UserDataSource {
     });
   }
 
-  async setUserPassword(
-    id: number,
-    password: string
-  ): Promise<BasicUserDetails> {
-    return database
-      .update({
-        password,
-      })
-      .from('users')
-      .returning('*')
-      .where('user_id', id)
-      .then((record: UserRecord[]) => createBasicUserObject(record[0]));
-  }
-
   async me(id: number): Promise<User | null> {
     return database
       .select()
@@ -232,7 +197,8 @@ export default class PostgresUserDataSource implements UserDataSource {
   async getUser(id: number): Promise<User | null> {
     return database
       .select()
-      .from('users')
+      .from('users as u')
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
@@ -246,7 +212,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select('i.*', 'c.*', 'u.*')
       .from('users as u')
-      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .join('countries as c', { 'c.country_id': 'i.country_id' })
       .where('user_id', id)
       .first()
@@ -265,10 +231,12 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
-      .then((user: UserRecord) => createBasicUserObject(user));
+      .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
+        createBasicUserObject(user)
+      );
   }
 
   async getBasicUserDetailsByEmail(
@@ -278,7 +246,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('email', 'ilike', email)
       .modify((query) => {
         if (role) {
@@ -288,7 +256,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
       })
       .first()
-      .then((user: UserRecord) =>
+      .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
         !!user ? createBasicUserObject(user) : null
       );
   }
@@ -331,16 +299,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     middlename: string | undefined,
     lastname: string,
     username: string,
-    password: string,
     preferredname: string | undefined,
     oidc_sub: string,
-    oauth_access_token: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,
     nationality: number,
     birthdate: Date,
-    organisation: number,
+    institution_id: number,
     department: string,
     position: string,
     email: string,
@@ -354,16 +320,14 @@ export default class PostgresUserDataSource implements UserDataSource {
         middlename,
         lastname,
         username,
-        password,
         preferredname,
         oidc_sub,
-        oauth_access_token,
         oauth_refresh_token,
         oauth_issuer,
         gender,
         nationality,
         birthdate,
-        organisation,
+        institution_id,
         department,
         position,
         email,
@@ -431,14 +395,13 @@ export default class PostgresUserDataSource implements UserDataSource {
       middlename: '',
       lastname: '',
       username: userId.toString(),
-      password: '',
       preferredname: '',
       oidc_sub: '',
       oauth_refresh_token: '',
       gender: '',
       nationality: 1,
       birthdate: '2000-01-01',
-      organisation: 1,
+      institution_id: 1,
       department: '',
       position: '',
       email: userId.toString(),
@@ -459,7 +422,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
-      .join('institutions as i', { organisation: 'i.institution_id' })
+      .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
       .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
@@ -481,25 +444,25 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.join('roles', 'roles.role_id', '=', 'role_user.role_id');
           query.where('roles.short_code', UserRoleShortCodeMap[userRole]);
         }
-        if (subtractUsers) {
+        if (subtractUsers && subtractUsers.length > 0) {
           query.whereNotIn('users.user_id', subtractUsers);
         }
         if (orderBy) {
-          if (orderBy === 'organisation') {
-            query.orderBy('institution', orderDirection);
-          } else {
-            query.orderBy(orderBy, orderDirection);
-          }
+          query.orderBy(orderBy, orderDirection);
         }
       })
-      .then((usersRecord: UserRecord[]) => {
-        const users = usersRecord.map((user) => createBasicUserObject(user));
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          const users = usersRecord.map((user) => createBasicUserObject(user));
 
-        return {
-          totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
-          users,
-        };
-      });
+          return {
+            totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
+            users,
+          };
+        }
+      );
   }
 
   async getPreviousCollaborators(
@@ -525,7 +488,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
-      .join('institutions as i', { organisation: 'i.institution_id' })
+      .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
       .whereIn('users.user_id', userIds)
       .modify((query) => {
         if (filter) {
@@ -551,14 +514,18 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.whereNotIn('users.user_id', subtractUsers);
         }
       })
-      .then((usersRecord: UserRecord[]) => {
-        const users = usersRecord.map((user) => createBasicUserObject(user));
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          const users = usersRecord.map((user) => createBasicUserObject(user));
 
-        return {
-          totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
-          users,
-        };
-      });
+          return {
+            totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
+            users,
+          };
+        }
+      );
   }
 
   async getMostRecentCollaborators(id: number): Promise<number[]> {
@@ -627,18 +594,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((users: { user_id: number }[]) => users.map((uid) => uid.user_id));
   }
 
-  async setUserEmailVerified(id: number): Promise<User | null> {
-    const [userRecord]: UserRecord[] = await database
-      .update({
-        email_verified: true,
-      })
-      .from('users')
-      .where('user_id', id)
-      .returning('*');
-
-    return userRecord ? createUserObject(userRecord) : null;
-  }
-
   async setUserNotPlaceholder(id: number): Promise<User | null> {
     const [userRecord]: UserRecord[] = await database
       .update({
@@ -675,7 +630,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users as u')
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
-      .leftJoin('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
       .where('p.proposal_pk', proposalPk)
       .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
@@ -693,24 +648,24 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { organisation: 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
       .where('p.proposal_pk', id)
-      .then((users: UserRecord[]) =>
+      .then((users: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
         users.map((user) => createBasicUserObject(user))
       );
   }
-  async createOrganisation(
+  async createInstitution(
     name: string,
-    verified: boolean,
-    countryId: number | null = null
+    countryId: number | null = null,
+    rorId: string | null = null
   ): Promise<number> {
     const [institution]: InstitutionRecord[] = await database
       .insert({
         institution: name,
-        verified,
         country_id: countryId,
+        ror_id: rorId,
       })
       .into('institutions')
       .returning('*');
@@ -782,5 +737,17 @@ export default class PostgresUserDataSource implements UserDataSource {
         })
         .where({ [row.columnName]: userFrom });
     }
+  }
+
+  async getUsersByUserNumbers(ids: readonly number[]): Promise<User[]> {
+    return database
+      .select()
+      .from('users')
+      .whereIn('user_id', ids)
+      .then((userRecords: UserRecord[]) => {
+        return userRecords.map((user) => {
+          return createUserObject(user);
+        });
+      });
   }
 }

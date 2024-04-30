@@ -1,3 +1,4 @@
+import { Column } from '@material-table/core';
 import { Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -19,7 +20,7 @@ type EventLogListProps = {
   eventType?: string;
 };
 
-const columns = [
+const columns: Column<EventLog>[] = [
   {
     title: 'Changed by',
     render: (rowData: EventLog): string =>
@@ -31,7 +32,15 @@ const columns = [
     title: 'Changed on',
     field: 'changedOnFormatted',
   },
-  { title: 'Event type', field: 'eventType' },
+  {
+    title: 'Event type',
+    field: 'eventType',
+    cellStyle: { fontSize: 'smaller' },
+  },
+  {
+    title: 'Description',
+    field: 'description',
+  },
 ];
 
 const EventLogList = ({

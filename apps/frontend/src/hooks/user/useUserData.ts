@@ -113,6 +113,7 @@ export function useBasicUserData(userId?: number) {
 export interface BasicUserData {
   firstname: string;
   lastname: string;
-  organisation: string;
+  institution: string;
   id: number;
+  preferredname?: string | null;
 }

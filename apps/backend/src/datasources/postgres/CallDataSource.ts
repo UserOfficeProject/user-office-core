@@ -1,5 +1,4 @@
 import { logger } from '@user-office-software/duo-logger';
-import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
@@ -9,7 +8,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
-  UpdateSepToCallInstrumentInput,
+  UpdateFapToCallInstrumentInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -83,9 +82,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('start_call', '<=', currentDate)
         .andWhere('end_call_internal', '>=', currentDate);
     } else if (filter?.isEnded === true) {
-      query
-        .where('start_call', '>=', currentDate)
-        .andWhere('end_call', '<=', currentDate);
+      query.where('end_call', '<=', currentDate);
     } else if (filter?.isEnded === false) {
       query
         .where('start_call', '<=', currentDate)
@@ -104,10 +101,10 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_review_ended', false);
     }
 
-    if (filter?.sepIds?.length) {
+    if (filter?.fapIds?.length) {
       query
-        .leftJoin('call_has_seps as chs', 'chs.call_id', 'call.call_id')
-        .whereIn('chs.sep_id', filter.sepIds)
+        .leftJoin('call_has_faps as chs', 'chs.call_id', 'call.call_id')
+        .whereIn('chs.fap_id', filter.fapIds)
         .distinctOn('call.call_id');
     }
 
@@ -118,10 +115,10 @@ export default class PostgresCallDataSource implements CallDataSource {
         .distinctOn('call.call_id');
     }
 
-    if (filter?.isSEPReviewEnded === true) {
-      query.where('call_sep_review_ended', true);
-    } else if (filter?.isSEPReviewEnded === false) {
-      query.where('call_sep_review_ended', false);
+    if (filter?.isFapReviewEnded === true) {
+      query.where('call_fap_review_ended', true);
+    } else if (filter?.isFapReviewEnded === false) {
+      query.where('call_fap_review_ended', false);
     }
 
     if (filter?.isCallEndedByEvent === true) {
@@ -160,8 +157,8 @@ export default class PostgresCallDataSource implements CallDataSource {
             end_call_internal: args.endCallInternal || args.endCall,
             start_review: args.startReview,
             end_review: args.endReview,
-            start_sep_review: args.startSEPReview,
-            end_sep_review: args.endSEPReview,
+            start_fap_review: args.startFapReview,
+            end_fap_review: args.endFapReview,
             start_notify: args.startNotify,
             end_notify: args.endNotify,
             start_cycle: args.startCycle,
@@ -183,16 +180,16 @@ export default class PostgresCallDataSource implements CallDataSource {
           .returning('*')
           .transacting(trx);
 
-        // NOTE: Attach SEPs to a call if they are provided.
-        if (createdCall[0].call_id && args.seps?.length) {
-          const valuesToInsert = args.seps.map((sepId) => ({
-            sep_id: sepId,
+        // NOTE: Attach Faps to a call if they are provided.
+        if (createdCall[0].call_id && args.faps?.length) {
+          const valuesToInsert = args.faps.map((fapId) => ({
+            fap_id: fapId,
             call_id: createdCall[0].call_id,
           }));
 
           await database
             .insert(valuesToInsert)
-            .into('call_has_seps')
+            .into('call_has_faps')
             .transacting(trx);
         }
 
@@ -238,9 +235,11 @@ export default class PostgresCallDataSource implements CallDataSource {
           .forUpdate()
           .transacting(trx);
 
+        const { referenceNumberFormat } = args;
+
         if (
-          args.referenceNumberFormat &&
-          args.referenceNumberFormat !== preUpdateCall.reference_number_format
+          referenceNumberFormat &&
+          referenceNumberFormat !== preUpdateCall.reference_number_format
         ) {
           const proposals = (await database
             .select('p.proposal_pk', 'p.reference_number_sequence')
@@ -252,32 +251,30 @@ export default class PostgresCallDataSource implements CallDataSource {
             'proposal_pk' | 'reference_number_sequence'
           >[];
 
-          await BluePromise.map(
-            proposals,
-            async (p) => {
-              await database
+          await Promise.all(
+            proposals.map(async (proposal) =>
+              database
                 .update({
                   proposal_id: await calculateReferenceNumber(
-                    args.referenceNumberFormat!,
-                    p.reference_number_sequence
+                    referenceNumberFormat,
+                    proposal.reference_number_sequence
                   ),
                 })
                 .from('proposals')
-                .where('proposal_pk', p.proposal_pk)
-                .transacting(trx);
-            },
-            { concurrency: 50 }
+                .where('proposal_pk', proposal.proposal_pk)
+                .transacting(trx)
+            )
           );
         }
 
-        // NOTE: Attach SEPs to a call if they are provided.
-        if (args.id && args.seps !== undefined) {
-          const valuesToInsert = args.seps.map((sepId) => ({
-            sep_id: sepId,
+        // NOTE: Attach Faps to a call if they are provided.
+        if (args.id && args.faps !== undefined) {
+          const valuesToInsert = args.faps.map((fapId) => ({
+            fap_id: fapId,
             call_id: args.id,
           }));
-          // NOTE: Remove all assigned SEPs from a call and then re-assign
-          await database('call_has_seps')
+          // NOTE: Remove all assigned Faps from a call and then re-assign
+          await database('call_has_faps')
             .del()
             .where('call_id', args.id)
             .transacting(trx);
@@ -285,10 +282,38 @@ export default class PostgresCallDataSource implements CallDataSource {
           if (valuesToInsert.length) {
             await database
               .insert(valuesToInsert)
-              .into('call_has_seps')
+              .into('call_has_faps')
               .transacting(trx);
           }
         }
+
+        /*
+         Work out whether the call_ended and call_ended_internal flags need updating.
+        */
+        const determineCallEndedFlag = (
+          newFlagValue: boolean | undefined,
+          previousFlagValue: boolean | undefined,
+          endCall: Date | undefined
+        ) => {
+          // Use the new value if explicitly passed in.
+          if (newFlagValue) {
+            return newFlagValue;
+          }
+
+          /*
+           If the call end date has been changed to the future, set to false.
+          */
+          if (endCall && endCall.getTime() > currentDate.getTime()) {
+            return false;
+          }
+
+          /*
+           Where the date has been changed to the past, leave the flag unchanged from
+           its previous value. If it's false, the call end event will fire for this
+           call and update the flags, and if true it indicates an old call being updated).
+          */
+          return previousFlagValue;
+        };
 
         const callUpdate = await database
           .update(
@@ -300,8 +325,8 @@ export default class PostgresCallDataSource implements CallDataSource {
               reference_number_format: args.referenceNumberFormat,
               start_review: args.startReview,
               end_review: args.endReview,
-              start_sep_review: args.startSEPReview,
-              end_sep_review: args.endSEPReview,
+              start_fap_review: args.startFapReview,
+              end_fap_review: args.endFapReview,
               start_notify: args.startNotify,
               end_notify: args.endNotify,
               start_cycle: args.startCycle,
@@ -310,16 +335,18 @@ export default class PostgresCallDataSource implements CallDataSource {
               submission_message: args.submissionMessage,
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
-              call_ended:
-                preUpdateCall.call_ended &&
-                args.endCall &&
-                args.endCall.getTime() < currentDate.getTime(),
-              call_ended_internal: args.endCallInternal
-                ? preUpdateCall.call_ended_internal &&
-                  args.endCallInternal.getTime() < currentDate.getTime()
-                : args.callEndedInternal,
+              call_ended: determineCallEndedFlag(
+                args.callEnded,
+                preUpdateCall.call_ended,
+                args.endCall
+              ),
+              call_ended_internal: determineCallEndedFlag(
+                args.callEndedInternal,
+                preUpdateCall.call_ended_internal,
+                args.endCallInternal
+              ),
               call_review_ended: args.callReviewEnded,
-              call_sep_review_ended: args.callSEPReviewEnded,
+              call_fap_review_ended: args.callFapReviewEnded,
               template_id: args.templateId,
               esi_template_id: args.esiTemplateId,
               pdf_template_id: args.pdfTemplateId,
@@ -352,9 +379,9 @@ export default class PostgresCallDataSource implements CallDataSource {
   async assignInstrumentsToCall(
     args: AssignInstrumentsToCallInput
   ): Promise<Call> {
-    const valuesToInsert = args.instrumentSepIds.map((instrumentSep) => ({
-      instrument_id: instrumentSep.instrumentId,
-      sep_id: instrumentSep.sepId,
+    const valuesToInsert = args.instrumentFapIds.map((instrumentFap) => ({
+      instrument_id: instrumentFap.instrumentId,
+      fap_id: instrumentFap.fapId,
       call_id: args.callId,
     }));
 
@@ -369,11 +396,11 @@ export default class PostgresCallDataSource implements CallDataSource {
     throw new GraphQLError(`Call not found ${args.callId}`);
   }
 
-  async updateSepToCallInstrument(
-    args: UpdateSepToCallInstrumentInput
+  async updateFapToCallInstrument(
+    args: UpdateFapToCallInstrumentInput
   ): Promise<Call> {
     await database
-      .update({ sep_id: args.sepId ?? null })
+      .update({ fap_id: args.fapId ?? null })
       .into('call_has_instruments')
       .where('instrument_id', args.instrumentId)
       .andWhere('call_id', args.callId);

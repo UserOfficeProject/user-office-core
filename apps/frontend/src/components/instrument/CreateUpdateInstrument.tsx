@@ -1,29 +1,28 @@
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
 } from '@user-office-software/duo-validation/lib/Instrument';
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikProps } from 'formik';
 import { TextField } from 'formik-mui';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UOLoader from 'components/common/UOLoader';
-import { InstrumentFragment, UserRole } from 'generated/sdk';
-import { useUsersData } from 'hooks/user/useUsersData';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import {
+  BasicUserDetailsFragment,
+  FeatureId,
+  InstrumentFragment,
+  UserRole,
+} from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName } from 'utils/user';
-
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
+import { getFullUserNameWithEmail } from 'utils/user';
 
 type CreateUpdateInstrumentProps = {
   close: (instrumentAdded: InstrumentFragment | null) => void;
@@ -34,24 +33,88 @@ const CreateUpdateInstrument = ({
   close,
   instrument,
 }: CreateUpdateInstrumentProps) => {
-  const classes = useStyles();
+  const featureContext = useContext(FeatureContext);
+  const isUserSurnameSearchEnabled = featureContext.featuresMap.get(
+    FeatureId.USER_SEARCH_FILTER
+  )?.isEnabled;
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { usersData } = useUsersData({
-    userRole: UserRole.INSTRUMENT_SCIENTIST,
-  });
+  const [usersData, setUsersData] = useState(
+    instrument?.instrumentContact ? [instrument?.instrumentContact] : []
+  );
 
-  if (!usersData) {
-    return <UOLoader />;
-  }
   const initialValues = instrument
-    ? instrument
+    ? { ...instrument, surname: '' }
     : {
         name: '',
         shortCode: '',
         description: '',
         managerUserId: null,
+        surname: '',
       };
+
+  useEffect(() => {
+    if (!isUserSurnameSearchEnabled) {
+      api()
+        .getUsers({ userRole: UserRole.INSTRUMENT_SCIENTIST })
+        .then((data) => {
+          setUsersData(data.users?.users || []);
+        });
+    }
+  }, [isUserSurnameSearchEnabled, api]);
+
+  const findUserBySurname = async (
+    value: string,
+    setFieldError: (field: string, message: string | undefined) => void
+  ) => {
+    if (!value) {
+      return;
+    }
+
+    try {
+      await api()
+        .getUsers({ filter: value })
+        .then((data) => {
+          if (data.users?.totalCount == 0) {
+            setFieldError('surname', 'No users found with that surname');
+          } else {
+            setUsersData(data.users?.users || []);
+          }
+        });
+    } catch (error) {
+      close(null);
+    }
+  };
+
+  const SurnameSearchField = (
+    formikProps: FormikProps<typeof initialValues>
+  ) => {
+    const { values, setFieldError } = formikProps;
+
+    return isUserSurnameSearchEnabled ? (
+      <Stack direction="row" spacing={1} alignItems="baseline">
+        <Field
+          id="surname"
+          name="surname"
+          label="Surname"
+          type="text"
+          component={TextField}
+          fullWidth
+          flex="1"
+          data-cy="instrument-contact-surname"
+        />
+        <Button
+          data-cy="findUser"
+          type="button"
+          disabled={!values.surname}
+          onClick={() => findUserBySurname(values.surname, setFieldError)}
+          sx={{ minWidth: 'fit-content' }}
+        >
+          Find User
+        </Button>
+      </Stack>
+    ) : null;
+  };
 
   return (
     <Formik
@@ -92,7 +155,7 @@ const CreateUpdateInstrument = ({
           : createInstrumentValidationSchema
       }
     >
-      {() => (
+      {(formikProps) => (
         <Form>
           <Typography variant="h6" component="h1">
             {(instrument ? 'Update ' : 'Create new ') +
@@ -134,25 +197,30 @@ const CreateUpdateInstrument = ({
             disabled={isExecutingCall}
             required
           />
-
+          <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
-            label="Beamline manager"
+            label="Instrument Contact"
             noOptionsText="No one"
-            items={usersData.users.map((user) => ({
-              text: getFullUserName(user),
-              value: user.id,
-            }))}
+            items={usersData
+              .sort(
+                (a: BasicUserDetailsFragment, b: BasicUserDetailsFragment) =>
+                  a.firstname > b.firstname ? 1 : -1
+              )
+              .map((user) => ({
+                text: getFullUserNameWithEmail(user),
+                value: user.id,
+              }))}
             InputProps={{
-              'data-cy': 'beamline-manager',
+              'data-cy': 'instrument-contact',
             }}
             required
           />
 
           <Button
             type="submit"
+            sx={{ marginTop: 2 }}
             fullWidth
-            className={classes.submit}
             data-cy="submit"
             disabled={isExecutingCall}
           >

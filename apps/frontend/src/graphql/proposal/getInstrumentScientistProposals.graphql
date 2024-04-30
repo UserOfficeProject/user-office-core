@@ -14,24 +14,23 @@ query getInstrumentScientistProposals(
       title
       submitted
       finalStatus
-      technicalReviewAssigneeId
-      technicalReviewAssigneeFirstName
-      technicalReviewAssigneeLastName
-      technicalStatus
-      technicalTimeAllocation
+      technicalReviewAssigneeIds
+      technicalReviewAssigneeNames
+      technicalStatuses
+      technicalTimeAllocations
       statusName
-      technicalReviewSubmitted
-      instrumentId
-      instrumentName
+      technicalReviewsSubmitted
+      instrumentIds
+      instrumentNames
       allocationTimeUnit
       callShortCode
       statusName
-      sepCode
+      fapCode
       principalInvestigator {
         firstname
         lastname
         preferredname
-        organisation
+        institutionId
         email
       }
     }

@@ -22,8 +22,7 @@ import clearSession from 'utils/clearSession';
 
 import DashBoard from './DashBoard';
 import Theme from './theme/theme';
-import EmailVerification from './user/EmailVerification';
-import ExternalAuth from './user/ExternalAuth';
+import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
 
 const PrivateRoute = ({ component, ...rest }: RouteProps) => {
   if (!component) {
@@ -39,6 +38,12 @@ const PrivateRoute = ({ component, ...rest }: RouteProps) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
+              const { queryParams, pathName } = getCurrentUrlValues();
+              const redirectPath = queryParams.size
+                ? `${pathName}?${queryParams.toString()}`
+                : pathName;
+              localStorage.redirectPath = redirectPath;
+
               return <Redirect to="/external-auth" />;
             }
 
@@ -62,7 +67,6 @@ const Routes = () => {
         <Route path="/external-auth/:token" component={ExternalAuth} />
         <Route path="/external-auth/:code" component={ExternalAuth} />
         <Route path="/external-auth/" component={ExternalAuth} />
-        <Route path="/EmailVerification/:token" component={EmailVerification} />
         <PrivateRoute path="/" component={DashBoard} />
       </Switch>
     </div>

@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { InternalReviewDataSource } from '../datasources/InternalReviewDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Rejection } from '../models/Rejection';
@@ -16,8 +16,8 @@ export abstract class UserAuthorization {
   protected userDataSource: UserDataSource = container.resolve(
     Tokens.UserDataSource
   );
-  protected sepDataSource: SEPDataSource = container.resolve(
-    Tokens.SEPDataSource
+  protected fapDataSource: FapDataSource = container.resolve(
+    Tokens.FapDataSource
   );
   protected proposalDataSource: ProposalDataSource = container.resolve(
     Tokens.ProposalDataSource
@@ -64,21 +64,21 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST;
   }
 
-  async isChairOrSecretaryOfSEP(
+  async isChairOrSecretaryOfFap(
     agent: UserWithRole | null,
-    sepId: number
+    fapId: number
   ): Promise<boolean> {
-    if (!agent || !agent.id || !sepId) {
+    if (!agent || !agent.id || !fapId) {
       return false;
     }
 
     const hasChairOrSecretaryAsCurrentRole =
-      agent.currentRole?.shortCode === Roles.SEP_CHAIR ||
-      agent.currentRole?.shortCode === Roles.SEP_SECRETARY;
+      agent.currentRole?.shortCode === Roles.FAP_CHAIR ||
+      agent.currentRole?.shortCode === Roles.FAP_SECRETARY;
 
     return (
       hasChairOrSecretaryAsCurrentRole &&
-      this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId)
+      this.fapDataSource.isChairOrSecretaryOfFap(agent.id, fapId)
     );
   }
 
@@ -108,17 +108,17 @@ export abstract class UserAuthorization {
     return !!agent.accessPermissions?.['ProposalQueries.get'];
   }
 
-  async isMemberOfSEP(
+  async isMemberOfFap(
     agent: UserWithRole | null,
-    sepId?: number
+    fapId?: number
   ): Promise<boolean> {
     if (!agent || !agent.currentRole) {
       return false;
     }
 
-    return this.sepDataSource
-      .getUserSepsByRoleAndSepId(agent.id, agent.currentRole, sepId)
-      .then((userSeps) => userSeps.length > 0);
+    return this.fapDataSource
+      .getUserFapsByRoleAndFapId(agent.id, agent.currentRole, fapId)
+      .then((userFaps) => userFaps.length > 0);
   }
 
   async listReadableUsers(
@@ -131,13 +131,13 @@ export abstract class UserAuthorization {
 
     const isUserOfficer = this.isUserOfficer(agent);
     const isInstrumentScientist = this.isInstrumentScientist(agent);
-    const isSEPMember = await this.isMemberOfSEP(agent);
+    const isFapMember = await this.isMemberOfFap(agent);
     const isApiAccessToken = this.isApiToken(agent);
     const isInternalReviewer = await this.isInternalReviewer(agent);
     if (
       isUserOfficer ||
       isInstrumentScientist ||
-      isSEPMember ||
+      isFapMember ||
       isApiAccessToken ||
       isInternalReviewer
     ) {
@@ -155,7 +155,7 @@ export abstract class UserAuthorization {
     const relatedVisitorUsers =
       await this.visitDataSource.getRelatedUsersOnVisits(agent.id);
 
-    const relatedSepUsers = await this.sepDataSource.getRelatedUsersOnSep(
+    const relatedFapUsers = await this.fapDataSource.getRelatedUsersOnFap(
       agent.id
     );
 
@@ -168,7 +168,7 @@ export abstract class UserAuthorization {
       ...self,
       ...ids.filter((id) => relatedProposalUsers.includes(id)),
       ...ids.filter((id) => relatedVisitorUsers.includes(id)),
-      ...ids.filter((id) => relatedSepUsers.includes(id)),
+      ...ids.filter((id) => relatedFapUsers.includes(id)),
       ...ids.filter((id) => allReviewersOnInternalReview.includes(id)),
     ];
 
@@ -183,7 +183,8 @@ export abstract class UserAuthorization {
 
   abstract externalTokenLogin(
     token: string,
-    redirectUri: string
+    redirectUri: string,
+    iss: string | null
   ): Promise<User | null>;
 
   abstract logout(token: AuthJwtPayload): Promise<string | Rejection>;
