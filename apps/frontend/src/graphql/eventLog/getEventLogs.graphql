@@ -11,6 +11,5 @@ query getEventLogs($eventType: String!, $changedObjectId: String!) {
     eventTStamp
     rowData
     changedObjectId
-    description
   }
 }

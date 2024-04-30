@@ -14,14 +14,14 @@ import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-import AssignedScientistsTable from './AssignedScientistsTable';
-import CreateUpdateInstrument from './CreateUpdateInstrument';
 import {
   BasicUserDetails,
   InstrumentFragment,
   UserRole,
 } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
+import AssignedScientistsTable from './AssignedScientistsTable';
+import CreateUpdateInstrument from './CreateUpdateInstrument';
 
 const columns = [
   {
@@ -84,6 +84,14 @@ const InstrumentTable = () => {
     }).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,
       scientistIds: scientists.map((scientist) => scientist.id),
+    });
+
+    scientists = scientists.map((scientist) => {
+      if (!scientist.organisation) {
+        scientist.organisation = 'Other';
+      }
+
+      return scientist;
     });
 
     setInstruments((instruments) =>
@@ -191,7 +199,7 @@ const InstrumentTable = () => {
           createModal={createModal}
           detailPanel={[
             {
-              tooltip: 'Show Manager and Scientists',
+              tooltip: 'Show Scientists',
               render: AssignedScientists,
             },
           ]}

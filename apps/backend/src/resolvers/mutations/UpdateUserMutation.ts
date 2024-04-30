@@ -45,7 +45,7 @@ export class UpdateUserArgs {
   public birthdate?: Date;
 
   @Field(() => Int, { nullable: true })
-  public institutionId?: number;
+  public organisation?: number;
 
   @Field(() => String, { nullable: true })
   public department?: string;
@@ -68,10 +68,11 @@ export class UpdateUserArgs {
   @Field(() => [Int], { nullable: true })
   public roles?: number[];
 
-  public oauthAccessToken?: string | null;
-  public oauthIssuer?: string | null;
-  public oauthRefreshToken?: string | null;
-  public oidcSub?: string | null;
+  @Field(() => String, { nullable: true })
+  public otherOrganisation?: string;
+
+  @Field(() => Int, { nullable: true })
+  public organizationCountry?: number;
 }
 
 @ArgsType()
@@ -96,6 +97,14 @@ export class UpdateUserMutation {
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.user.updateRoles(context.user, args);
+  }
+
+  @Mutation(() => User)
+  setUserEmailVerified(
+    @Arg('id', () => Int) id: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.mutations.user.setUserEmailVerified(context.user, id);
   }
 
   @Mutation(() => User)

@@ -27,7 +27,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       reviewerId,
       submitted = false,
       files,
-      instrumentId,
     } = args;
 
     if (shouldUpdateReview) {
@@ -44,7 +43,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         })
         .from('technical_review')
         .where('proposal_pk', proposalPk)
-        .andWhere('instrument_id', instrumentId)
         .returning('*')
         .then((records: TechnicalReviewRecord[]) =>
           createTechnicalReviewObject(records[0])
@@ -61,7 +59,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         submitted,
         reviewer_id: reviewerId,
         files,
-        instrument_id: instrumentId,
       })
       .returning('*')
       .into('technical_review')
@@ -70,30 +67,11 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       );
   }
 
-  async getTechnicalReviews(id: number): Promise<TechnicalReview[] | null> {
+  async getTechnicalReview(id: number): Promise<TechnicalReview | null> {
     return database
       .select()
       .from('technical_review')
       .where('proposal_pk', id)
-      .orderBy('technical_review_id')
-      .then((reviews: TechnicalReviewRecord[]) => {
-        return reviews.map((review) => createTechnicalReviewObject(review));
-      });
-  }
-
-  async getProposalInstrumentTechnicalReview(
-    proposalId: number,
-    instrumentId?: number
-  ): Promise<TechnicalReview | null> {
-    return database
-      .select()
-      .from('technical_review')
-      .where('proposal_pk', proposalId)
-      .modify((query) => {
-        if (instrumentId) {
-          query.andWhere('instrument_id', instrumentId);
-        }
-      })
       .first()
       .then((review: TechnicalReviewRecord) => {
         if (review === undefined) {
@@ -124,17 +102,17 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   async getReview(id: number): Promise<Review | null> {
     return database
       .select()
-      .from('fap_reviews')
+      .from('SEP_Reviews')
       .where('review_id', id)
       .first()
       .then((review: ReviewRecord) => createReviewObject(review));
   }
 
-  async getAssignmentReview(fapId: number, proposalPk: number, userId: number) {
+  async getAssignmentReview(sepId: number, proposalPk: number, userId: number) {
     return database
       .select()
-      .from('fap_reviews')
-      .where('fap_id', fapId)
+      .from('SEP_Reviews')
+      .where('sep_id', sepId)
       .andWhere('proposal_pk', proposalPk)
       .andWhere('user_id', userId)
       .first()
@@ -145,7 +123,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
 
   async removeUserForReview(id: number): Promise<Review> {
     const [reviewRecord]: ReviewRecord[] = await database
-      .from('fap_reviews')
+      .from('SEP_Reviews')
       .where('review_id', id)
       .returning('*')
       .del();
@@ -154,7 +132,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }
 
   async updateReview(args: UpdateReviewArgs): Promise<Review> {
-    const { reviewID, comment, grade, status, fapID } = args;
+    const { reviewID, comment, grade, status, sepID } = args;
 
     return database
       .update(
@@ -165,7 +143,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         },
         ['*']
       )
-      .from('fap_reviews')
+      .from('SEP_Reviews')
       .where('review_id', reviewID)
       .then((review: ReviewRecord[]) => {
         return new Review(
@@ -175,7 +153,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           comment,
           grade,
           status,
-          fapID
+          sepID
         );
       });
   }
@@ -183,35 +161,30 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   async getProposalReviews(id: number): Promise<Review[]> {
     return database
       .select()
-      .from('fap_reviews')
-      .join('fap_assignments', {
-        'fap_assignments.proposal_pk': 'fap_reviews.proposal_pk',
-        'fap_assignments.fap_member_user_id': 'fap_reviews.user_id',
-      })
-      .where('fap_reviews.proposal_pk', id)
-      .orderBy('fap_assignments.rank', 'asc')
+      .from('SEP_Reviews')
+      .where('proposal_pk', id)
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => createReviewObject(review));
       });
   }
 
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
-    const { userID, proposalPk, fapID } = args;
+    const { userID, proposalPk, sepID } = args;
 
     return database
       .insert({
         user_id: userID,
         proposal_pk: proposalPk,
         status: ReviewStatus.DRAFT,
-        fap_id: fapID,
+        sep_id: sepID,
       })
       .returning('*')
-      .into('fap_reviews')
+      .into('SEP_Reviews')
       .then((records: ReviewRecord[]) => createReviewObject(records[0]));
   }
 
   async getUserReviews(
-    fapIds: number[],
+    sepIds: number[],
     userId?: number,
     callId?: number,
     instrumentId?: number,
@@ -219,7 +192,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   ): Promise<Review[]> {
     return database
       .select()
-      .from('fap_reviews')
+      .from('SEP_Reviews')
       .modify((qb) => {
         if (userId) {
           qb.where('user_id', userId);
@@ -228,7 +201,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         // sometimes the ID 0 is sent as a equivalent of all
         if (callId) {
           qb.join('proposals', {
-            'proposals.proposal_pk': 'fap_reviews.proposal_pk',
+            'proposals.proposal_pk': 'SEP_Reviews.proposal_pk',
           });
           qb.where('proposals.call_id', callId);
         }
@@ -236,17 +209,17 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         // sometimes the ID 0 is sent as a equivalent of all
         if (instrumentId) {
           qb.join('instrument_has_proposals', {
-            'instrument_has_proposals.proposal_pk': 'fap_reviews.proposal_pk',
+            'instrument_has_proposals.proposal_pk': 'SEP_Reviews.proposal_pk',
           });
           qb.where('instrument_has_proposals.instrument_id', instrumentId);
         }
 
         if (status !== undefined && status !== null) {
-          qb.where('fap_reviews.status', status);
+          qb.where('SEP_Reviews.status', status);
         }
       })
-      .whereIn('fap_id', fapIds)
-      .distinctOn('fap_reviews.proposal_pk')
+      .whereIn('sep_id', sepIds)
+      .distinctOn('SEP_Reviews.proposal_pk')
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => createReviewObject(review));
       });

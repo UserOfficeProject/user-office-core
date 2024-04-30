@@ -6,7 +6,6 @@ import React, { useContext, ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import RefreshListIcon from 'components/common/RefresListIcon';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -25,19 +24,20 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
   const config = field.config as SampleDeclarationConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { featuresMap } = useContext(FeatureContext);
-  const {
-    templates: sampleTemplates,
-    refreshTemplates: refreshSampleTemplates,
-  } = useActiveTemplates(TemplateGroupId.SAMPLE, config.templateId);
+  const { templates } = useActiveTemplates(
+    TemplateGroupId.SAMPLE,
+    config.templateId
+  );
+  const { templates: esiTemplates } = useActiveTemplates(
+    TemplateGroupId.SAMPLE_ESI,
+    config.esiTemplateId
+  );
 
-  const { templates: esiTemplates, refreshTemplates: refreshEsiTemplates } =
-    useActiveTemplates(TemplateGroupId.SAMPLE_ESI, config.esiTemplateId);
-
-  if (!sampleTemplates || !esiTemplates) {
+  if (!templates || !esiTemplates) {
     return null;
   }
 
-  const templateOptions = sampleTemplates.map((template) => ({
+  const templateOptions = templates.map((template) => ({
     value: template.templateId,
     text: template.name,
   }));
@@ -101,9 +101,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
                 items={templateOptions}
                 InputProps={{ 'data-cy': 'template-id' }}
                 TextFieldProps={{ margin: 'none' }}
-                AdornmentIcon={
-                  <RefreshListIcon onClick={refreshSampleTemplates} />
-                }
                 required
               />
               <Link
@@ -116,26 +113,14 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
             </FormControl>
 
             {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
-              <FormControl fullWidth>
-                <FormikUIAutocomplete
-                  name="config.esiTemplateId"
-                  label="ESI template name"
-                  noOptionsText="No active templates"
-                  items={ESITemplateOptions}
-                  InputProps={{ 'data-cy': 'esi-template-id' }}
-                  TextFieldProps={{ margin: 'none' }}
-                  AdornmentIcon={
-                    <RefreshListIcon onClick={refreshEsiTemplates} />
-                  }
-                />
-                <Link
-                  href="/SampleEsiTemplates/"
-                  target="blank"
-                  style={{ textAlign: 'right' }}
-                >
-                  View all templates
-                </Link>
-              </FormControl>
+              <FormikUIAutocomplete
+                name="config.esiTemplateId"
+                label="ESI template name"
+                noOptionsText="No active templates"
+                items={ESITemplateOptions}
+                InputProps={{ 'data-cy': 'esi-template-id' }}
+                TextFieldProps={{ margin: 'none' }}
+              />
             )}
           </TitledContainer>
 

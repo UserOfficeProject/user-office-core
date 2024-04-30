@@ -38,7 +38,7 @@ export default class ReviewQueries {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async reviewsForProposal(
     agent: UserWithRole | null,
     proposalPk: number
@@ -53,41 +53,34 @@ export default class ReviewQueries {
   }
 
   @Authorized()
-  async technicalReviewsForProposal(
+  async technicalReviewForProposal(
     agent: UserWithRole | null,
     proposalPk: number
-  ): Promise<TechnicalReview[]> {
-    const technicalReviews =
-      await this.dataSource.getTechnicalReviews(proposalPk);
+  ): Promise<TechnicalReview | null> {
+    const technicalreview = await this.dataSource.getTechnicalReview(
+      proposalPk
+    );
 
-    if (!technicalReviews) {
-      return [];
+    if (!technicalreview) {
+      return null;
     }
 
-    // NOTE: We only return the tehcnical reviews that the user has rights to see.
-    await Promise.all(
-      technicalReviews.map(async (tehcnicalReview, index) => {
-        const hasReadRights = await this.technicalReviewAuth.hasReadRights(
-          agent,
-          tehcnicalReview
-        );
-
-        if (!hasReadRights) {
-          technicalReviews.splice(index, 1);
-        }
-      })
+    const hasReadRights = await this.technicalReviewAuth.hasReadRights(
+      agent,
+      technicalreview
     );
+    if (hasReadRights === false) {
+      return null;
+    }
 
     const isReviewerOfProposal = await this.proposalAuth.isReviewerOfProposal(
       agent,
       proposalPk
     );
     if (isReviewerOfProposal) {
-      technicalReviews.forEach((technicalReview) => {
-        technicalReview.comment = '';
-      });
+      technicalreview.comment = '';
     }
 
-    return technicalReviews;
+    return technicalreview;
   }
 }

@@ -22,8 +22,8 @@ describe('Test Call Mutations', () => {
         endCallInternal: new Date('2019-02-19'),
         startReview: new Date('2019-02-19'),
         endReview: new Date('2019-02-19'),
-        startFapReview: new Date('2019-02-19'),
-        endFapReview: new Date('2019-02-19'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
@@ -59,8 +59,8 @@ describe('Test Call Mutations', () => {
         endCallInternal: new Date('2019-02-19'),
         startReview: new Date('2019-02-19'),
         endReview: new Date('2019-02-19'),
-        startFapReview: new Date('2019-02-19'),
-        endFapReview: new Date('2019-02-19'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
@@ -87,8 +87,8 @@ describe('Test Call Mutations', () => {
       endCallInternal: new Date('2019-02-19'),
       startReview: new Date('2019-02-19'),
       endReview: new Date('2019-02-18'),
-      startFapReview: new Date('2019-02-19'),
-      endFapReview: new Date('2019-02-19'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
       startNotify: new Date('2019-02-19'),
       endNotify: new Date('2019-02-19'),
       startCycle: new Date('2019-02-19'),
@@ -118,8 +118,8 @@ describe('Test Call Mutations', () => {
       endCallInternal: new Date('2019-02-19'),
       startReview: new Date('2019-02-19'),
       endReview: new Date('2019-02-19'),
-      startFapReview: new Date('2019-02-19'),
-      endFapReview: new Date('2019-02-19'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
       startNotify: new Date('2019-02-19'),
       endNotify: new Date('2019-02-19'),
       startCycle: new Date('2019-02-19'),
@@ -146,7 +146,7 @@ describe('Test Call Mutations', () => {
       callEnded: false,
       callEndedInternal: false,
       callReviewEnded: false,
-      callFapReviewEnded: false,
+      callSEPReviewEnded: false,
       templateId: 1,
       isActive: true,
     });
@@ -162,8 +162,8 @@ describe('Test Call Mutations', () => {
         endCallInternal: new Date('2020-06-18'),
         startReview: new Date('2020-06-18'),
         endReview: new Date('2020-06-18'),
-        startFapReview: new Date('2019-02-19'),
-        endFapReview: new Date('2019-02-19'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2020-06-18'),
         endNotify: new Date('2020-06-18'),
         startCycle: new Date('2020-06-18'),
@@ -191,8 +191,8 @@ describe('Test Call Mutations', () => {
       endCallInternal: new Date('2020-06-18'),
       startReview: new Date('2020-06-18'),
       endReview: new Date('2020-06-18'),
-      startFapReview: new Date('2019-02-19'),
-      endFapReview: new Date('2019-02-19'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
       startNotify: new Date('2020-06-18'),
       endNotify: new Date('2020-06-18'),
       startCycle: new Date('2020-06-18'),
@@ -219,7 +219,7 @@ describe('Test Call Mutations', () => {
     return expect(
       callMutations.assignInstrumentsToCall(dummyUserWithRole, {
         callId: 1,
-        instrumentFapIds: [{ instrumentId: 1 }],
+        instrumentSepIds: [{ instrumentId: 1 }],
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -228,7 +228,7 @@ describe('Test Call Mutations', () => {
     return expect(
       callMutations.assignInstrumentsToCall(dummyUserOfficerWithRole, {
         callId: 1,
-        instrumentFapIds: [{ instrumentId: 1 }],
+        instrumentSepIds: [{ instrumentId: 1 }],
       })
     ).resolves.toBe(dummyCall);
   });

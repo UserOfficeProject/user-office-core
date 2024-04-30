@@ -20,15 +20,15 @@ import { isRejection } from '../../models/Rejection';
 import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
-import { Fap } from './Fap';
-import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
-import { InstrumentWithManagementTime } from './Instrument';
-import { ProposalBookingsCore, ProposalBookingFilter } from './ProposalBooking';
+import { Instrument } from './Instrument';
+import { ProposalBookingCore, ProposalBookingFilter } from './ProposalBooking';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { Sample } from './Sample';
+import { SEP } from './SEP';
+import { SepMeetingDecision } from './SepMeetingDecision';
 import { TechnicalReview } from './TechnicalReview';
 import { Visit } from './Visit';
 
@@ -81,6 +81,9 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => Boolean)
   public submitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public managementTimeAllocation: number;
 
   @Field(() => Boolean)
   public managementDecisionSubmitted: boolean;
@@ -146,36 +149,33 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => [TechnicalReview])
-  async technicalReviews(
+  @FieldResolver(() => TechnicalReview, { nullable: true })
+  async technicalReview(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<TechnicalReview[]> {
-    return await context.queries.review.technicalReviewsForProposal(
+  ): Promise<TechnicalReview | null> {
+    return await context.queries.review.technicalReviewForProposal(
       context.user,
       proposal.primaryKey
     );
   }
 
-  @FieldResolver(() => [InstrumentWithManagementTime], {
-    nullable: 'itemsAndList',
-  })
-  async instruments(
+  @FieldResolver(() => Instrument, { nullable: true })
+  async instrument(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<InstrumentWithManagementTime[]> {
-    return await context.queries.instrument.getInstrumentsByProposalPk(
-      context.user,
+  ): Promise<Instrument | null> {
+    return await context.queries.instrument.dataSource.getInstrumentByProposalPk(
       proposal.primaryKey
     );
   }
 
-  @FieldResolver(() => Fap, { nullable: true })
-  async fap(
+  @FieldResolver(() => SEP, { nullable: true })
+  async sep(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Fap | null> {
-    return await context.queries.fap.dataSource.getFapByProposalPk(
+  ): Promise<SEP | null> {
+    return await context.queries.sep.dataSource.getSEPByProposalPk(
       proposal.primaryKey
     );
   }
@@ -200,12 +200,12 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => FapMeetingDecision, { nullable: true })
-  async fapMeetingDecision(
+  @FieldResolver(() => SepMeetingDecision, { nullable: true })
+  async sepMeetingDecision(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<FapMeetingDecision | null> {
-    return await context.queries.fap.getProposalFapMeetingDecision(
+  ): Promise<SepMeetingDecision | null> {
+    return await context.queries.sep.getProposalSepMeetingDecision(
       context.user,
       proposal.primaryKey
     );
@@ -243,14 +243,14 @@ export class ProposalResolver {
       proposalPk: proposal.primaryKey,
     });
   }
-  @FieldResolver(() => ProposalBookingsCore, { nullable: true })
-  proposalBookingsCore(
+  @FieldResolver(() => ProposalBookingCore, { nullable: true })
+  proposalBookingCore(
     @Root() proposal: Proposal,
     @Ctx() ctx: ResolverContext,
     @Arg('filter', () => ProposalBookingFilter, { nullable: true })
     filter?: ProposalBookingFilter
   ) {
-    return ctx.queries.proposal.getProposalBookingsByProposalPk(ctx.user, {
+    return ctx.queries.proposal.getProposalBookingByProposalPk(ctx.user, {
       proposalPk: proposal.primaryKey,
       filter,
     });

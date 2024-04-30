@@ -2,8 +2,8 @@ import { immerable } from 'immer';
 
 import { Questionary, TemplateGroupId } from 'generated/sdk';
 
-import { FeedbackWithQuestionary } from './FeedbackWithQuestionary';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
+import { FeedbackWithQuestionary } from './FeedbackWithQuestionary';
 
 export class FeedbackSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;

@@ -7,7 +7,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import SimpleTabs from 'components/common/SimpleTabs';
+import SimpleTabs from 'components/common/TabPanel';
 import {
   Event as ProposalEvent,
   ProposalWorkflowConnection,

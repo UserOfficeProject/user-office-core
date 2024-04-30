@@ -27,9 +27,6 @@ export class UpdateProposalArgs {
 
   @Field(() => Int, { nullable: true })
   public proposerId?: number;
-
-  @Field(() => Date, { nullable: true })
-  public created?: Date;
 }
 
 @Resolver()

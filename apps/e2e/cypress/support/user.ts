@@ -5,12 +5,14 @@ import {
   FeatureId,
   GetFeaturesQuery,
   Role,
+  SetUserEmailVerifiedMutation,
+  SetUserEmailVerifiedMutationVariables,
   UpdateUserMutation,
   UpdateUserMutationVariables,
   UpdateUserRolesMutationVariables,
   User,
 } from '@user-office-software-libs/shared-types';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 import featureFlags from './featureFlags';
 import initialDBData from './initialDBData';
@@ -27,12 +29,11 @@ type DecodedTokenData = {
 
 const extTokenStoreStfc = new Map<TestUserId, string>([
   ['user1', 'user'],
-  ['user2', 'internalUser'],
-  ['user3', 'secretary'],
+  ['user2', 'externalUser'],
+  ['user3', 'user'],
   ['officer', 'officer'],
   ['placeholderUser', 'user'],
-  ['reviewer', 'reviewer'],
-  ['placeholderUser', 'externalUser'],
+  ['reviewer', 'user'],
 ]);
 
 const getAndStoreFeaturesEnabled = (): Cypress.Chainable<GetFeaturesQuery> => {
@@ -68,11 +69,10 @@ function changeActiveRole(selectedRoleId: number) {
     ) as DecodedTokenData;
 
     window.localStorage.setItem('token', resp.selectRole);
-    currentRole.shortCode &&
-      window.localStorage.setItem(
-        'currentRole',
-        currentRole.shortCode.toUpperCase()
-      );
+    window.localStorage.setItem(
+      'currentRole',
+      currentRole.shortCode.toUpperCase()
+    );
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
     window.localStorage.isInternalUser = isInternalUser;
@@ -171,7 +171,6 @@ const login = (
       .externalTokenLogin({
         externalToken: externalToken as string,
         redirectUri: 'http://localhost:3000/external-auth', // has to be set because it is a required field
-        iss: null,
       })
       .then(async (resp) => {
         let token = resp.externalTokenLogin;
@@ -188,11 +187,10 @@ const login = (
         }
         const { user, exp, currentRole } = jwtDecode(token) as DecodedTokenData;
         window.localStorage.setItem('token', token);
-        currentRole.shortCode &&
-          window.localStorage.setItem(
-            'currentRole',
-            currentRole.shortCode.toUpperCase()
-          );
+        window.localStorage.setItem(
+          'currentRole',
+          currentRole.shortCode.toUpperCase()
+        );
         window.localStorage.setItem('expToken', `${exp}`);
         window.localStorage.setItem('user', JSON.stringify(user));
 
@@ -230,6 +228,15 @@ function updateUserDetails(
   return cy.wrap(request);
 }
 
+function setUserEmailVerified(
+  setUserEmailVerifiedInput: SetUserEmailVerifiedMutationVariables
+): Cypress.Chainable<SetUserEmailVerifiedMutation> {
+  const api = getE2EApi();
+  const request = api.setUserEmailVerified(setUserEmailVerifiedInput);
+
+  return cy.wrap(request);
+}
+
 function updateUserRoles(
   updateUserRolesInput: UpdateUserRolesMutationVariables
 ) {
@@ -246,6 +253,7 @@ Cypress.Commands.add('createUserByEmailInvite', createUserByEmailInvite);
 
 Cypress.Commands.add('updateUserRoles', updateUserRoles);
 Cypress.Commands.add('updateUserDetails', updateUserDetails);
+Cypress.Commands.add('setUserEmailVerified', setUserEmailVerified);
 
 Cypress.Commands.add('changeActiveRole', changeActiveRole);
 Cypress.Commands.add('getAndStoreFeaturesEnabled', getAndStoreFeaturesEnabled);

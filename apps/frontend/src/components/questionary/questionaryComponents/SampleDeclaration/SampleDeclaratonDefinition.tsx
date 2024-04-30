@@ -6,10 +6,10 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import QuestionaryComponentSampleDeclaration from './QuestionaryComponentSampleDeclaration';
 import { QuestionSampleDeclarationForm } from './QuestionSampleDeclarationForm';
 import { QuestionTemplateRelationSampleDeclarationForm } from './QuestionTemplateRelationSampleDeclarationForm';
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SAMPLE_DECLARATION,

@@ -1,9 +1,0 @@
-mutation reorderFapMeetingDecisionProposals(
-  $reorderFapMeetingDecisionProposalsInput: ReorderFapMeetingDecisionProposalsInput!
-) {
-  reorderFapMeetingDecisionProposals(
-    reorderFapMeetingDecisionProposalsInput: $reorderFapMeetingDecisionProposalsInput
-  ) {
-    proposalPk
-  }
-}

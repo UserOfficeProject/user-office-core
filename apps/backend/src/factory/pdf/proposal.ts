@@ -39,11 +39,8 @@ export type ProposalPDFData = {
   coProposers: BasicUserDetails[];
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
-  technicalReviews: (Omit<TechnicalReview, 'status'> & {
-    status: string;
-    instrumentName?: string;
-  })[];
-  fapReviews?: Review[];
+  technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
+  sepReviews?: Review[];
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
   genericTemplates: Array<
     Pick<
@@ -75,8 +72,9 @@ const getSampleQuestionarySteps = async (
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
-  const questionarySteps =
-    await questionaryDataSource.getQuestionarySteps(questionaryId);
+  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
+    questionaryId
+  );
   if (!questionarySteps) {
     throw new Error(
       `Questionary steps for Questionary ID '${questionaryId}' not found, or the user has insufficient rights`
@@ -237,9 +235,9 @@ export const collectProposalPDFData = async (
   });
 
   notify?.(
-    `${proposal.proposalId}_${
-      principalInvestigator.lastname
-    }_${proposal.created.getUTCFullYear()}.pdf`
+    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
+      proposal.proposalId
+    }.pdf`
   );
 
   const genericTemplateAttachments: Attachment[] = [];
@@ -264,9 +262,9 @@ export const collectProposalPDFData = async (
   );
 
   notify?.(
-    `${proposal.proposalId}_${
-      principalInvestigator.lastname
-    }_${proposal.created.getUTCFullYear()}.pdf`
+    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
+      proposal.proposalId
+    }.pdf`
   );
 
   const out: ProposalPDFData = {
@@ -275,7 +273,6 @@ export const collectProposalPDFData = async (
     coProposers,
     questionarySteps: [],
     attachments: [],
-    technicalReviews: [],
     samples: samplePDFData,
     genericTemplates: genericTemplatePDFData,
     pdfTemplate,
@@ -320,17 +317,11 @@ export const collectProposalPDFData = async (
           )
           .map((genericTemplate) => genericTemplate);
       } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
-        const instrumentIds = Array.isArray(answer.value)
-          ? answer.value
-          : [answer.value];
-        const instruments =
-          await baseContext.queries.instrument.getInstrumentsByIds(
-            user,
-            instrumentIds
-          );
-        answer.value = instruments?.length
-          ? instruments.map((instrument) => instrument.name).join(', ')
-          : '';
+        const instrument = await baseContext.queries.instrument.get(
+          user,
+          answer.value as number
+        );
+        answer.value = instrument?.name ?? '';
       }
     }
 
@@ -343,26 +334,16 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
-  const technicalReviews =
-    await baseContext.queries.review.technicalReviewsForProposal(
+  const technicalReview =
+    await baseContext.queries.review.technicalReviewForProposal(
       user,
       proposal.primaryKey
     );
-
-  if (technicalReviews.length) {
-    const instruments =
-      await baseContext.queries.instrument.getInstrumentsByIds(
-        user,
-        technicalReviews.map((technicalReview) => technicalReview.instrumentId)
-      );
-
-    out.technicalReviews = technicalReviews.map((technicalReview) => ({
+  if (technicalReview) {
+    out.technicalReview = {
       ...technicalReview,
       status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-      instrumentName: instruments.find(
-        (instrument) => instrument.id === technicalReview.instrumentId
-      )?.name,
-    }));
+    };
   }
 
   // Get Reviews
@@ -371,7 +352,7 @@ export const collectProposalPDFData = async (
     proposal.primaryKey
   );
 
-  if (reviews) out.fapReviews = reviews;
+  if (reviews) out.sepReviews = reviews;
 
   return out;
 };
@@ -382,6 +363,7 @@ export const collectProposalPDFDataTokenAccess = async (
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
+  const proposalAuth = container.resolve(ProposalAuthorization);
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
@@ -479,9 +461,9 @@ export const collectProposalPDFDataTokenAccess = async (
   });
 
   notify?.(
-    `${proposal.proposalId}_${
-      principalInvestigator.lastname
-    }_${proposal.created.getUTCFullYear()}.pdf`
+    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
+      proposal.proposalId
+    }.pdf`
   );
 
   const genericTemplateAttachments: Attachment[] = [];
@@ -517,9 +499,9 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   notify?.(
-    `${proposal.proposalId}_${
-      principalInvestigator.lastname
-    }_${proposal.created.getUTCFullYear()}.pdf`
+    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
+      proposal.proposalId
+    }.pdf`
   );
 
   // Add information from each topic in proposal
@@ -530,7 +512,6 @@ export const collectProposalPDFDataTokenAccess = async (
       coProposers,
       questionarySteps: [],
       attachments: [],
-      technicalReviews: [],
       samples: samplePDFData,
       genericTemplates: genericTemplatePDFData,
       pdfTemplate,
@@ -545,25 +526,14 @@ export const collectProposalPDFDataTokenAccess = async (
   const reviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
-  const technicalReviews = await reviewDataSource.getTechnicalReviews(
+  const technicalReview = await reviewDataSource.getTechnicalReview(
     proposal.primaryKey
   );
-
-  if (technicalReviews?.length) {
-    const instruments =
-      await baseContext.queries.instrument.getInstrumentsByIds(
-        user,
-        technicalReviews.map((technicalReview) => technicalReview.instrumentId)
-      );
-    proposalPDFData.technicalReviews = technicalReviews.map(
-      (technicalReview) => ({
-        ...technicalReview,
-        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-        instrumentName: instruments.find(
-          (instrument) => instrument.id === technicalReview.instrumentId
-        )?.name,
-      })
-    );
+  if (technicalReview) {
+    proposalPDFData.technicalReview = {
+      ...technicalReview,
+      status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+    };
   }
 
   return proposalPDFData;

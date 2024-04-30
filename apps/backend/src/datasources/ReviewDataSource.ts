@@ -11,14 +11,14 @@ export interface ReviewDataSource {
 
   getProposalReviews(id: number): Promise<Review[]>;
   getUserReviews(
-    fapIds: number[],
+    sepIds: number[],
     userId?: number,
     callId?: number,
     instrumentId?: number,
     submitted?: number
   ): Promise<Review[]>;
   getAssignmentReview(
-    fapId: number,
+    sepId: number,
     proposalPk: number,
     userId: number
   ): Promise<Review | null>;
@@ -26,12 +26,7 @@ export interface ReviewDataSource {
     args: AddTechnicalReviewInput,
     shouldUpdateReview: boolean
   ): Promise<TechnicalReview>;
-  getProposalInstrumentTechnicalReview(
-    proposalPk: number,
-    instrumentId?: number
-  ): Promise<TechnicalReview | null>;
-  // TODO: Maybe this should be called getAllProposalTechnicalReviews
-  getTechnicalReviews(proposalPk: number): Promise<TechnicalReview[] | null>;
+  getTechnicalReview(proposalPk: number): Promise<TechnicalReview | null>;
   getTechnicalReviewById(
     technicalReviewId: number
   ): Promise<TechnicalReview | null>;

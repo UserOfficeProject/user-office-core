@@ -21,6 +21,10 @@ export type PasswordResetJwtPayload = SpecialActionJwtPayload & {
   type: 'passwordReset';
 };
 
+export type EmailVerificationJwtPayload = SpecialActionJwtPayload & {
+  type: 'emailVerification';
+};
+
 export class User {
   constructor(
     public id: number,
@@ -32,15 +36,16 @@ export class User {
     public preferredname: string | undefined,
     public oidcSub: string | null,
     public oauthRefreshToken: string | null,
+    public oauthAccessToken: string | null,
     public oauthIssuer: string | null,
     public gender: string,
     public nationality: number,
     public birthdate: Date,
-    public institutionId: number,
-    public institution: string,
+    public organisation: number,
     public department: string,
     public position: string,
     public email: string,
+    public emailVerified: boolean,
     public telephone: string,
     public telephone_alt: string | undefined,
     public placeholder: boolean,
@@ -62,9 +67,9 @@ export interface UserWithRole extends UserJWT {
 export enum UserRole {
   USER = 1,
   USER_OFFICER,
-  FAP_CHAIR,
-  FAP_SECRETARY,
-  FAP_REVIEWER,
+  SEP_CHAIR,
+  SEP_SECRETARY,
+  SEP_REVIEWER,
   INSTRUMENT_SCIENTIST,
   SAMPLE_SAFETY_REVIEWER,
   INTERNAL_REVIEWER,
@@ -73,9 +78,9 @@ export enum UserRole {
 export const UserRoleShortCodeMap = {
   [UserRole.USER]: Roles.USER,
   [UserRole.USER_OFFICER]: Roles.USER_OFFICER,
-  [UserRole.FAP_CHAIR]: Roles.FAP_CHAIR,
-  [UserRole.FAP_SECRETARY]: Roles.FAP_SECRETARY,
-  [UserRole.FAP_REVIEWER]: Roles.FAP_REVIEWER,
+  [UserRole.SEP_CHAIR]: Roles.SEP_CHAIR,
+  [UserRole.SEP_SECRETARY]: Roles.SEP_SECRETARY,
+  [UserRole.SEP_REVIEWER]: Roles.SEP_REVIEWER,
   [UserRole.INSTRUMENT_SCIENTIST]: Roles.INSTRUMENT_SCIENTIST,
   [UserRole.SAMPLE_SAFETY_REVIEWER]: Roles.SAMPLE_SAFETY_REVIEWER,
   [UserRole.INTERNAL_REVIEWER]: Roles.INTERNAL_REVIEWER,
@@ -87,13 +92,12 @@ export class BasicUserDetails {
     public firstname: string,
     public lastname: string,
     public preferredname: string,
-    public institution: string,
-    public institutionId: number,
+    public organisation: string,
+    public organizationId: number,
     public position: string,
     public created: Date,
     public placeholder: boolean,
-    public email: string,
-    public country: string
+    public email: string
   ) {}
 }
 
@@ -105,7 +109,7 @@ export type UserJWT = Pick<
   | 'id'
   | 'lastname'
   | 'oidcSub'
-  | 'institutionId'
+  | 'organisation'
   | 'placeholder'
   | 'position'
   | 'preferredname'

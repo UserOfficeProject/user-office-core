@@ -5,6 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
+import { Editor } from '@tinymce/tinymce-react';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
@@ -16,13 +17,13 @@ import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
-import Editor from 'components/common/TinyEditor';
 import { UserContext } from 'context/UserContextProvider';
 import {
   TechnicalReviewStatus,
   CoreTechnicalReviewFragment,
   UserRole,
   Proposal,
+  AddTechnicalReviewMutation,
 } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -46,7 +47,7 @@ type TechnicalReviewFormType = {
 };
 
 type ProposalTechnicalReviewProps = {
-  data: CoreTechnicalReviewFragment;
+  data: CoreTechnicalReviewFragment | null | undefined;
   setReview: (data: CoreTechnicalReviewFragment) => void;
   proposal: Proposal;
   confirm: WithConfirmType;
@@ -68,19 +69,18 @@ const ProposalTechnicalReview = ({
   const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
 
   useEffect(() => {
-    if (data.files) {
+    if (data?.files) {
       setFileList(JSON.parse(data.files));
     }
-  }, [data.files]);
+  }, [data?.files]);
 
   const initialValues: TechnicalReviewFormType = {
-    status: data.status || '',
-    timeAllocation:
-      typeof data.timeAllocation === 'number' ? data.timeAllocation : '',
-    comment: data.comment || '',
-    publicComment: data.publicComment || '',
-    submitted: data.submitted || false,
-    files: data.files || '',
+    status: data?.status || '',
+    timeAllocation: data?.timeAllocation || '',
+    comment: data?.comment || '',
+    publicComment: data?.publicComment || '',
+    submitted: data?.submitted || false,
+    files: data?.files || '',
   };
 
   const statusOptions: Option[] = [
@@ -119,8 +119,10 @@ const ProposalTechnicalReview = ({
           shouldSubmit ? 'submitted' : 'updated'
         } successfully!`;
 
+    let result;
+
     if (method === 'submitTechnicalReviews') {
-      await api({ toastSuccessMessage })[method]({
+      result = await api({ toastSuccessMessage })[method]({
         technicalReviews: [
           {
             proposalPk: proposal.primaryKey,
@@ -132,12 +134,11 @@ const ProposalTechnicalReview = ({
             submitted: shouldSubmit,
             reviewerId: user.id,
             files: fileList ? JSON.stringify(fileList) : null,
-            instrumentId: data.instrumentId,
           },
         ],
       });
     } else {
-      await api({ toastSuccessMessage })[method]({
+      result = await api({ toastSuccessMessage })[method]({
         proposalPk: proposal.primaryKey,
         timeAllocation: +values.timeAllocation,
         comment: values.comment,
@@ -146,33 +147,43 @@ const ProposalTechnicalReview = ({
         submitted: shouldSubmit,
         reviewerId: user.id,
         files: fileList ? JSON.stringify(fileList) : null,
-        instrumentId: data.instrumentId,
       });
     }
 
-    setReview({
-      id: data.id,
-      proposalPk: data.proposalPk,
-      timeAllocation: +values.timeAllocation,
-      comment: values.comment,
-      publicComment: values.publicComment,
-      status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
-      submitted: shouldSubmit,
-      instrumentId: data.instrumentId,
-    } as CoreTechnicalReviewFragment);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!(result as any)[method].rejection) {
+      let technicalReviewId = null;
+
+      if (method === 'addTechnicalReview') {
+        technicalReviewId = (result as AddTechnicalReviewMutation)
+          .addTechnicalReview.id;
+      }
+
+      setReview({
+        id: technicalReviewId,
+        proposalPk: data?.proposalPk,
+        timeAllocation: +values.timeAllocation,
+        comment: values.comment,
+        publicComment: values.publicComment,
+        status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
+        submitted: shouldSubmit,
+      } as CoreTechnicalReviewFragment);
+    }
   };
 
   const shouldDisableForm = (isSubmitting: boolean) =>
-    ((isSubmitting || data.submitted) && !isUserOfficer) || isInternalReviewer;
+    ((isSubmitting || data?.submitted) && !isUserOfficer) || isInternalReviewer;
 
   return (
     <>
       <Typography variant="h6" component="h2" gutterBottom>
         Technical Review
       </Typography>
-      {data.technicalReviewAssignee && (
+      {proposal.technicalReview?.technicalReviewAssignee && (
         <Typography variant="subtitle2" data-cy="reviewed-by-info">
-          {`Reviewed by ${getFullUserName(data.technicalReviewAssignee)}`}
+          {`Reviewed by ${getFullUserName(
+            proposal.technicalReview.technicalReviewAssignee
+          )}`}
         </Typography>
       )}
       <Formik
@@ -294,7 +305,6 @@ const ProposalTechnicalReview = ({
                     maxFiles={5}
                     fileType={'.pdf'}
                     pdfPageLimit={0}
-                    omitFromPdf={false}
                     onChange={(
                       fileMetaDataList: FileIdWithCaptionAndFigure[]
                     ) => {
@@ -377,14 +387,14 @@ const ProposalTechnicalReview = ({
                   {!isUserOfficer && (
                     <Button
                       disabled={
-                        isSubmitting || data.submitted || isInternalReviewer
+                        isSubmitting || data?.submitted || isInternalReviewer
                       }
                       type="submit"
                       className={classes.submitButton}
                       onClick={() => setShouldSubmit(true)}
                       data-cy="submit-technical-review"
                     >
-                      {data.submitted ? 'Submitted' : 'Save and Submit'}
+                      {data?.submitted ? 'Submitted' : 'Submit'}
                     </Button>
                   )}
                 </StyledButtonContainer>

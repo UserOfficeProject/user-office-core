@@ -8,7 +8,7 @@ query userWithReviews(
     id
     firstname
     lastname
-    institutionId
+    organisation
     reviews(
       callId: $callId
       instrumentId: $instrumentId
@@ -19,7 +19,7 @@ query userWithReviews(
       grade
       comment
       status
-      fapID
+      sepID
       proposal {
         primaryKey
         title
@@ -27,7 +27,7 @@ query userWithReviews(
         call {
           shortCode
         }
-        instruments {
+        instrument {
           shortCode
         }
       }

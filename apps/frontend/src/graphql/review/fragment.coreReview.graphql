@@ -4,5 +4,5 @@ fragment coreReview on Review {
   status
   comment
   grade
-  fapID
+  sepID
 }

@@ -3,10 +3,10 @@ import React from 'react';
 
 import { DataType } from 'generated/sdk';
 
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { QuestionaryComponentFeedbackBasis } from './QuestionaryComponentFeedbackBasis';
 import { QuestionFeedbackBasisForm } from './QuestionFeedbackBasisForm';
 import { QuestionTemplateRelationFeedbackBasisForm } from './QuestionTemplateRelationFeedbackBasisForm';
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const feedbackBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.FEEDBACK_BASIS,

@@ -1,5 +1,5 @@
-mutation addUserForReview($userID: Int!, $proposalPk: Int!, $fapID: Int!) {
-  addUserForReview(userID: $userID, proposalPk: $proposalPk, fapID: $fapID) {
+mutation addUserForReview($userID: Int!, $proposalPk: Int!, $sepID: Int!) {
+  addUserForReview(userID: $userID, proposalPk: $proposalPk, sepID: $sepID) {
     id
   }
 }

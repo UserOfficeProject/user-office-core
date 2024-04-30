@@ -13,7 +13,7 @@ import { ResolverContext } from '../../context';
 import { Instrument as InstrumentOrigin } from '../../models/Instrument';
 import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
-import { Fap } from './Fap';
+import { SEP } from './SEP';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -39,28 +39,22 @@ export class InstrumentWithAvailabilityTime extends Instrument {
   @Field(() => Int, { nullable: true })
   public availabilityTime: number;
 
-  @Field(() => Boolean, { defaultValue: false, nullable: true })
-  public submitted?: boolean;
+  @Field(() => Boolean, { defaultValue: false })
+  public submitted: boolean;
 
   @Field(() => Int, { nullable: true })
-  public fapId: number;
-}
-
-@ObjectType()
-export class InstrumentWithManagementTime extends Instrument {
-  @Field(() => Int, { nullable: true })
-  public managementTimeAllocation: number;
+  public sepId: number;
 }
 
 @Resolver(() => InstrumentWithAvailabilityTime)
 export class InstrumentWithAvailabilityTimeResolver {
-  @FieldResolver(() => Fap, { nullable: true })
-  async fap(
+  @FieldResolver(() => SEP, { nullable: true })
+  async sep(
     @Root() instrument: InstrumentWithAvailabilityTime,
     @Ctx() context: ResolverContext
-  ): Promise<Fap | null> {
-    return (await instrument.fapId)
-      ? context.queries.fap.dataSource.getFap(instrument.fapId)
+  ): Promise<SEP | null> {
+    return (await instrument.sepId)
+      ? context.queries.sep.dataSource.getSEP(instrument.sepId)
       : null;
   }
 }
@@ -81,7 +75,7 @@ export class InstrumentResolver {
   }
 
   @FieldResolver(() => BasicUserDetails, { nullable: true })
-  async instrumentContact(
+  async beamlineManager(
     @Root() instrument: Instrument,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {

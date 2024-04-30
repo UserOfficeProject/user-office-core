@@ -11,7 +11,7 @@ query getProposal($primaryKey: Int!) {
       ...questionary
       isCompleted
     }
-    technicalReviews {
+    technicalReview {
       ...coreTechnicalReview
       reviewer {
         ...basicUserDetails
@@ -23,30 +23,27 @@ query getProposal($primaryKey: Int!) {
       comment
       status
       userID
-      fapID
+      sepID
       reviewer {
         firstname
         lastname
         id
       }
     }
-    instruments {
+    instrument {
       id
       name
       shortCode
-      instrumentContact {
+      beamlineManager {
         id
         firstname
         lastname
-        preferredname
       }
       scientists {
         id
         firstname
         lastname
-        preferredname
       }
-      managementTimeAllocation
     }
     call {
       id
@@ -60,7 +57,7 @@ query getProposal($primaryKey: Int!) {
       endCallInternal
       proposalWorkflowId
     }
-    fap {
+    sep {
       id
       code
     }

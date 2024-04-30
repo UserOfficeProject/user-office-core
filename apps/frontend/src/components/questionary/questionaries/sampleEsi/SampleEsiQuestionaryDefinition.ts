@@ -5,8 +5,8 @@ import SampleEsiReview from 'components/sampleEsi/SampleEsiReview';
 import { Sdk, TemplateGroupId } from 'generated/sdk';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
-import { SampleEsiWizardStep } from './SampleEsiWizardStep';
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
+import { SampleEsiWizardStep } from './SampleEsiWizardStep';
 
 export const sampleEsiQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.SAMPLE_ESI,

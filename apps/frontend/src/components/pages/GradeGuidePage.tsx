@@ -6,15 +6,15 @@ import parse from 'html-react-parser';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { PageName, Fap } from 'generated/sdk';
+import { PageName, Sep } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer } from 'styles/StyledComponents';
 
 type GradeGuidePageProps = {
-  fap?: Fap;
+  sep?: Sep;
 };
 
-const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
+const GradeGuidePage = ({ sep }: GradeGuidePageProps) => {
   const [loadingPage, pageContent] = useGetPageContent(PageName.GRADEGUIDEPAGE);
 
   const noContents = (
@@ -39,13 +39,13 @@ const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
     );
   }
 
-  const content = fap?.customGradeGuide
-    ? fap?.gradeGuide
-      ? parse(fap.gradeGuide)
+  const content = sep?.customGradeGuide
+    ? sep?.gradeGuide
+      ? parse(sep.gradeGuide)
       : noContents
     : pageContent
-      ? parse(pageContent)
-      : noContents;
+    ? parse(pageContent)
+    : noContents;
 
   return <StyledContainer>{content}</StyledContainer>;
 };

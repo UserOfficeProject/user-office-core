@@ -1,6 +1,7 @@
 /* eslint-disable jest/valid-expect */
 /* eslint-disable quotes */
 import 'reflect-metadata';
+import BluePromise from 'bluebird';
 import { container } from 'tsyringe';
 
 import { Call } from '../../models/Call';
@@ -230,18 +231,18 @@ describe('Submit proposal', () => {
   test('In a call with a reference number format, when 1000 proposals are submitted simultaneously, all are submitted with unique reference numbers', async () => {
     const call = await createCall('211{digits:4}');
     const expectedRefNums: string[] = [];
-    const proposals = await Promise.all(
-      new Array(1000).map(async (_prop, index) => {
+    const proposals = await BluePromise.mapSeries(
+      new Array(1000),
+      async function (_prop, index) {
         expectedRefNums.push('211' + String(index).padStart(4, '0'));
 
         return await createProposal(call.id);
-      })
+      }
     );
 
-    const submissions = await Promise.all(
-      proposals.map(async (p) =>
-        proposalDataSource.submitProposal(p.primaryKey)
-      )
+    const submissions = await BluePromise.map(
+      proposals,
+      async (p) => await proposalDataSource.submitProposal(p.primaryKey)
     );
 
     const invalidSubmissions = submissions.filter(

@@ -28,7 +28,7 @@ export class UpdateReviewArgs {
   status: ReviewStatus;
 
   @Field(() => Int)
-  public fapID: number;
+  public sepID: number;
 }
 
 @Resolver()

@@ -1,9 +1,9 @@
 import { logger } from '@user-office-software/duo-logger';
+import SparkPost, { ResultsPromise } from 'sparkpost';
 
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
-import { MailService } from './MailService';
-import { SparkPost } from './SparkPost';
+import { MailService, SendMailResults, SparkPostTemplate } from './MailService';
 
 export class SparkPostMailService extends MailService {
   private client: SparkPost;
@@ -11,13 +11,7 @@ export class SparkPostMailService extends MailService {
 
   constructor() {
     super();
-    const sparkPostToken = process.env.SPARKPOST_TOKEN;
-    if (!sparkPostToken) {
-      throw new Error(
-        'Sparkpost token must be defined to be able to use the sparkpost client'
-      );
-    }
-    this.client = new SparkPost(sparkPostToken, {
+    this.client = new SparkPost(process.env.SPARKPOST_TOKEN, {
       endpoint: 'https://api.eu.sparkpost.com:443',
     });
 
@@ -31,23 +25,23 @@ export class SparkPostMailService extends MailService {
         isProduction
           ? recipient
           : typeof recipient.address === 'string'
-            ? {
-                address: {
-                  email: <string>this.sinkEmail,
-                  header_to: recipient.address,
-                },
-              }
-            : {
-                address: {
-                  email: <string>this.sinkEmail,
-                  header_to: `${recipient.address.email}; original_header_to_${recipient.address.header_to}`,
-                },
-              }
+          ? {
+              address: {
+                email: <string>this.sinkEmail,
+                header_to: recipient.address,
+              },
+            }
+          : {
+              address: {
+                email: <string>this.sinkEmail,
+                header_to: `${recipient.address.email}; original_header_to_${recipient.address.header_to}`,
+              },
+            }
       ),
     };
   }
 
-  sendMail = (options: EmailSettings) => {
+  sendMail = (options: EmailSettings): ResultsPromise<SendMailResults> => {
     // NOTE: If it is not production and there is no sinkEmail we are not sending emails.
     if (!isProduction && !this.sinkEmail) {
       logger.logInfo('Pretending to send an email', { ...options });
@@ -63,10 +57,15 @@ export class SparkPostMailService extends MailService {
 
     const envOptions = this.getEnvOptions(options);
 
-    return this.client.send(envOptions);
+    return this.client.transmissions.send(envOptions);
   };
 
-  getEmailTemplates = (includeDraft = false) => {
-    return this.client.getTemplates(includeDraft); // The returning type for get request is wrong because the package is not well maintained;
+  getEmailTemplates = (
+    includeDraft = false
+  ): ResultsPromise<SparkPostTemplate[]> => {
+    // NOTE: Maybe it is better to use this.client.templates.list() in the future. For now it doesn't include 'draft' filter and it returns all templates. If 'sparkpost' package gets updated we can change this.
+    return this.client.get({
+      uri: `/api/v1/templates?draft=${includeDraft}`,
+    }) as unknown as ResultsPromise<SparkPostTemplate[]>; // The returning type for get request is wrong because the package is not well maintained;
   };
 }

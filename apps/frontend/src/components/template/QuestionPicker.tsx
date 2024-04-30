@@ -144,7 +144,6 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     const textMatch = question.question
       .toLowerCase()
       .includes(questionFilter.searchText.toLowerCase());
-
     const dataTypeMatch =
       questionFilter.dataType === 'all'
         ? true

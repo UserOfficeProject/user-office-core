@@ -8,13 +8,11 @@ export class CheckExternalMutation {
   externalTokenLogin(
     @Arg('externalToken') externalToken: string,
     @Arg('redirectUri') redirectUri: string,
-    @Arg('iss', { nullable: true }) iss: string,
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.user.externalTokenLogin(
       externalToken,
-      redirectUri,
-      iss
+      redirectUri
     );
   }
 }

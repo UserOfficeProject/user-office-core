@@ -6,8 +6,8 @@ mutation updateCall(
   $endCallInternal: DateTime
   $startReview: DateTime
   $endReview: DateTime
-  $startFapReview: DateTime
-  $endFapReview: DateTime
+  $startSEPReview: DateTime
+  $endSEPReview: DateTime
   $startNotify: DateTime
   $endNotify: DateTime
   $startCycle: DateTime
@@ -23,7 +23,7 @@ mutation updateCall(
   $pdfTemplateId: Int
   $title: String
   $description: String
-  $faps: [Int!]
+  $seps: [Int!]
   $isActive: Boolean
 ) {
   updateCall(
@@ -35,8 +35,8 @@ mutation updateCall(
       endCallInternal: $endCallInternal
       startReview: $startReview
       endReview: $endReview
-      startFapReview: $startFapReview
-      endFapReview: $endFapReview
+      startSEPReview: $startSEPReview
+      endSEPReview: $endSEPReview
       startNotify: $startNotify
       endNotify: $endNotify
       startCycle: $startCycle
@@ -52,7 +52,7 @@ mutation updateCall(
       pdfTemplateId: $pdfTemplateId
       title: $title
       description: $description
-      faps: $faps
+      seps: $seps
       isActive: $isActive
     }
   ) {

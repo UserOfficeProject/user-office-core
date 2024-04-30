@@ -13,5 +13,4 @@ fragment coreTechnicalReview on TechnicalReview {
     firstname
     lastname
   }
-  instrumentId
 }

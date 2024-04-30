@@ -4,9 +4,6 @@ fragment instrument on Instrument {
   shortCode
   description
   managerUserId
-  instrumentContact {
-    ...basicUserDetails
-  }
   scientists {
     ...basicUserDetails
   }

@@ -5,10 +5,9 @@ export interface EventLogsDataSource {
     changedBy: number | null,
     eventType: string,
     rowData: string,
-    changedObjectId: string,
-    description?: string
+    changedObjectId: string
   ): Promise<EventLog>;
-  get(filter: EventLogFilter): Promise<EventLog[]>;
+  get(filter: EventLogFilter): Promise<EventLog[] | null>;
 }
 
 export interface EventLogFilter {

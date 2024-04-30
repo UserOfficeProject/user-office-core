@@ -7,8 +7,9 @@ export function useQuestionary(
   questionaryId: number,
   questionaryData?: Questionary
 ) {
-  const [loadingQuestionary, setLoadingQuestionary] =
-    useState<boolean>(!questionaryData);
+  const [loadingQuestionary, setLoadingQuestionary] = useState<boolean>(
+    !questionaryData
+  );
   const [questionary, setQuestionary] = useState<
     GetQuestionaryQuery['questionary']
   >(questionaryData ?? null);

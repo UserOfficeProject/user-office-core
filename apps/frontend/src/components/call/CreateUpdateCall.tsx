@@ -78,14 +78,14 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         endCall: getDateTimeFromISO(call.endCall),
         startReview: getDateTimeFromISO(call.startReview),
         endReview: getDateTimeFromISO(call.endReview),
-        startFapReview: getDateTimeFromISO(call.startFapReview),
-        endFapReview: getDateTimeFromISO(call.endFapReview),
+        startSEPReview: getDateTimeFromISO(call.startSEPReview),
+        endSEPReview: getDateTimeFromISO(call.endSEPReview),
         startNotify: getDateTimeFromISO(call.startNotify),
         endNotify: getDateTimeFromISO(call.endNotify),
         startCycle: getDateTimeFromISO(call.startCycle),
         endCycle: getDateTimeFromISO(call.endCycle),
         submissionMessage: call.submissionMessage || '',
-        faps: call.faps?.map((fap) => fap.id),
+        seps: call.seps?.map((sep) => sep.id),
       }
     : {
         shortCode: '',
@@ -94,8 +94,8 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,
-        startFapReview: currentDayStart,
-        endFapReview: currentDayEnd,
+        startSEPReview: currentDayStart,
+        endSEPReview: currentDayEnd,
         startNotify: currentDayStart,
         endNotify: currentDayEnd,
         startCycle: currentDayStart,
@@ -110,7 +110,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         title: '',
         description: '',
         submissionMessage: '',
-        faps: [],
+        seps: [],
       };
 
   return (

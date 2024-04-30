@@ -4,8 +4,8 @@ import {
   AssignInstrumentsToCallMutation,
   AssignScientistsToInstrumentMutationVariables,
   AssignScientistsToInstrumentMutation,
-  AssignProposalsToInstrumentsMutationVariables,
-  AssignProposalsToInstrumentsMutation,
+  AssignProposalsToInstrumentMutationVariables,
+  AssignProposalsToInstrumentMutation,
   AssignInstrumentsToCallMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
@@ -54,19 +54,22 @@ declare global {
       ) => Cypress.Chainable<AssignScientistsToInstrumentMutation>;
 
       /**
-       * Assigns selected proposal/s to instrument/s
+       * Assigns selected proposal/s to an instrument
        *
-       * @returns {typeof assignProposalsToInstruments}
+       * @returns {typeof assignProposalsToInstrument}
        * @memberof Chainable
        * @example
-       *    cy.assignProposalsToInstruments({
-       *      proposalPks: [1],
-       *      instrumentId: [1]
+       *    cy.assignProposalsToInstrument({
+       *      proposals: {
+       *        callId: 1,
+       *        primaryKey: 1
+       *      },
+       *      instrumentId: 1
        *    });
        */
-      assignProposalsToInstruments: (
-        assignProposalsToInstrumentsInput: AssignProposalsToInstrumentsMutationVariables
-      ) => Cypress.Chainable<AssignProposalsToInstrumentsMutation>;
+      assignProposalsToInstrument: (
+        assignProposalsToInstrumentInput: AssignProposalsToInstrumentMutationVariables
+      ) => Cypress.Chainable<AssignProposalsToInstrumentMutation>;
 
       /**
        * Assigns an instrument/s to a selected call
@@ -122,7 +125,7 @@ declare global {
       ) => Cypress.Chainable<SetInstrumentAvailabilityTimeMutation>;
 
       /**
-       * Submit instrument in Fap meeting components
+       * Submit instrument in SEP meeting components
        *
        * @returns {typeof submitInstrument}
        * @memberof Chainable

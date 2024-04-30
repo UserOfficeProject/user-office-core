@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import PropTypes from 'prop-types';
 import React, { useCallback, useContext } from 'react';
 
@@ -48,7 +48,7 @@ const initUserData: UserContextData = {
     firstname: '',
     lastname: '',
     oidcSub: '',
-    institutionId: 0,
+    organisation: 0,
     created: '',
     placeholder: false,
     preferredname: '',

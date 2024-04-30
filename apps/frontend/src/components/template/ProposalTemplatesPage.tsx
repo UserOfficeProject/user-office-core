@@ -1,6 +1,6 @@
 import React from 'react';
 
-import SimpleTabs from 'components/common/SimpleTabs';
+import SimpleTabs from 'components/common/TabPanel';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 

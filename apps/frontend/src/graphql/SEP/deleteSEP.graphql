@@ -1,0 +1,5 @@
+mutation deleteSEP($id: Int!) {
+  deleteSEP(id: $id) {
+    id
+  }
+}

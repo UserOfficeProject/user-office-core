@@ -1,4 +1,3 @@
-import { Column } from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -21,7 +20,7 @@ import { Call, FeatureId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
-import { isCallEnded } from 'utils/helperFunctions';
+import { denseTableColumns, isCallEnded } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -48,7 +47,7 @@ type ProposalTableProps = {
   confirm: WithConfirmType;
 };
 
-const columns: Column<PartialProposalsDataType>[] = [
+const columns = denseTableColumns<PartialProposalsDataType>([
   {
     title: 'Proposal ID',
     field: 'proposalId',
@@ -71,7 +70,7 @@ const columns: Column<PartialProposalsDataType>[] = [
     emptyValue: '-',
   },
   { title: 'Created', field: 'created' },
-];
+]);
 
 const ProposalTable = ({
   title,
@@ -268,8 +267,8 @@ const ProposalTable = ({
               tooltip: isSubmitted
                 ? 'Only draft proposals can be deleted'
                 : !isPI
-                  ? 'Only PI can delete proposal'
-                  : 'Delete proposal',
+                ? 'Only PI can delete proposal'
+                : 'Delete proposal',
               disabled: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(

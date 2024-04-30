@@ -1,9 +1,0 @@
-fragment fapMeetingDecision on FapMeetingDecision {
-  proposalPk
-  recommendation
-  commentForUser
-  commentForManagement
-  rankOrder
-  submitted
-  submittedBy
-}

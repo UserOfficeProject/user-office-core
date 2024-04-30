@@ -39,8 +39,8 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
       }
 
       if (data?.me) {
-        /** NOTE: We have roles that are duplicated in role_id and user_id but different only in fap_id
-         *  which is used to determine if the user with that role is member of a Fap.
+        /** NOTE: We have roles that are duplicated in role_id and user_id but different only in sep_id
+         *  which is used to determine if the user with that role is member of a SEP.
          */
         setRoles(getUniqueArrayBy(data.me?.roles, 'id'));
         setLoading(false);

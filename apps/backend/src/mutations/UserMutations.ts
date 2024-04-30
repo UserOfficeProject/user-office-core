@@ -3,8 +3,11 @@ import {
   createUserByEmailInviteValidationSchema,
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
+  resetPasswordByEmailValidationSchema,
+  updatePasswordValidationSchema,
   updateUserRolesValidationSchema,
-  updateUserValidationBackendSchema,
+  updateUserValidationSchema,
+  userPasswordFieldBEValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
@@ -20,11 +23,15 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import {
   AuthJwtPayload,
+  BasicUserDetails,
+  EmailVerificationJwtPayload,
+  PasswordResetJwtPayload,
   User,
   UserRole,
   UserRoleShortCodeMap,
   UserWithRole,
 } from '../models/User';
+import { UserLinkResponse } from '../models/UserLinkResponse';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
@@ -108,7 +115,7 @@ export default class UserMutations {
     }
 
     if (
-      args.userRole === UserRole.FAP_REVIEWER &&
+      args.userRole === UserRole.SEP_REVIEWER &&
       this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
@@ -118,7 +125,7 @@ export default class UserMutations {
       );
 
       await this.dataSource.setUserRoles(userId, [newUserRole.id]);
-      role = UserRole.FAP_REVIEWER;
+      role = UserRole.SEP_REVIEWER;
     } else if (args.userRole === UserRole.USER) {
       userId = await this.dataSource.createInviteUser(args);
 
@@ -129,18 +136,18 @@ export default class UserMutations {
       await this.dataSource.setUserRoles(userId, [newUserRole.id]);
       role = UserRole.USER;
     } else if (
-      args.userRole === UserRole.FAP_CHAIR &&
+      args.userRole === UserRole.SEP_CHAIR &&
       this.userAuth.isUserOfficer(agent)
     ) {
-      // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in separate call.
+      // NOTE: For inviting SEP_CHAIR and SEP_SECRETARY we do not setUserRoles because they are set right after in separate call.
       userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.FAP_CHAIR;
+      role = UserRole.SEP_CHAIR;
     } else if (
-      args.userRole === UserRole.FAP_SECRETARY &&
+      args.userRole === UserRole.SEP_SECRETARY &&
       this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.FAP_SECRETARY;
+      role = UserRole.SEP_SECRETARY;
     } else if (
       args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
       this.userAuth.isUserOfficer(agent)
@@ -160,7 +167,7 @@ export default class UserMutations {
     }
   }
 
-  @ValidateArgs(updateUserValidationBackendSchema)
+  @ValidateArgs(updateUserValidationSchema)
   @Authorized()
   @EventBus(Event.USER_UPDATED)
   async update(
@@ -189,9 +196,20 @@ export default class UserMutations {
       });
     }
 
+    let organisationId = args.organisation;
+    // Check if user has other as selected org and if so create it
+    if (args.otherOrganisation) {
+      organisationId = await this.dataSource.createOrganisation(
+        args.otherOrganisation,
+        false,
+        args.organizationCountry
+      );
+    }
+
     user = {
       ...user,
       ...args,
+      organisation: organisationId ?? user.organisation,
     };
 
     return this.dataSource
@@ -316,14 +334,12 @@ export default class UserMutations {
 
   async externalTokenLogin(
     externalToken: string,
-    redirecturi: string,
-    iss: string | null
+    redirecturi: string
   ): Promise<string | Rejection> {
     try {
       const user = await this.userAuth.externalTokenLogin(
         externalToken,
-        redirecturi,
-        iss
+        redirecturi
       );
 
       if (!user) {
@@ -339,13 +355,10 @@ export default class UserMutations {
         roles[0]
       );
 
-      // Set the current role to the highest possible, user officer, instrument scientist, FAP Panel member, user
+      // Set the current role to the highest possible, user officer, instrument scientist, user
       const currentRole =
         roles.find((role) => role.shortCode === Roles.USER_OFFICER) ||
         roles.find((role) => role.shortCode === Roles.INSTRUMENT_SCIENTIST) ||
-        roles.find((role) => role.shortCode === Roles.FAP_CHAIR) ||
-        roles.find((role) => role.shortCode === Roles.FAP_SECRETARY) ||
-        roles.find((role) => role.shortCode === Roles.FAP_REVIEWER) ||
         roles[0];
 
       const uosToken = signToken<AuthJwtPayload>({
@@ -356,7 +369,7 @@ export default class UserMutations {
           id: user.id,
           lastname: user.lastname,
           oidcSub: user.oidcSub,
-          institutionId: user.institutionId,
+          organisation: user.organisation,
           placeholder: user.placeholder,
           position: user.position,
           preferredname: user.preferredname,
@@ -368,12 +381,11 @@ export default class UserMutations {
       });
 
       return uosToken;
-    } catch (error) {
+    } catch (exception) {
       return rejection(
-        (error as Error).message ||
-          'Error occurred during external authentication',
+        'Error occurred during external authentication',
         {},
-        error
+        exception
       );
     }
   }
@@ -434,6 +446,60 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(resetPasswordByEmailValidationSchema)
+  @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
+  async resetPasswordEmail(
+    agent: UserWithRole | null,
+    args: { email: string }
+  ): Promise<UserLinkResponse | Rejection> {
+    const user = await this.dataSource.getByEmail(args.email);
+
+    if (!user) {
+      return rejection('Could not find user by email', {
+        args,
+        code: ApolloServerErrorCodeExtended.NOT_FOUND,
+      });
+    }
+
+    const token = signToken<PasswordResetJwtPayload>(
+      {
+        id: user.id,
+        type: 'passwordReset',
+        updated: user.updated,
+      },
+      { expiresIn: '24h' }
+    );
+
+    const link = process.env.baseURL + '/resetPassword/' + token;
+
+    const userLinkResponse = new UserLinkResponse(user, link);
+
+    // Send reset email with link
+    return userLinkResponse;
+  }
+
+  async emailVerification(token: string) {
+    // Check that token is valid
+    try {
+      const decoded = verifyToken<EmailVerificationJwtPayload>(token);
+      const user = await this.dataSource.getUser(decoded.id);
+      //Check that user exist
+      if (user && decoded.type === 'emailVerification') {
+        await this.dataSource.setUserEmailVerified(user.id);
+
+        return true;
+      } else {
+        return rejection('Can not verify user', { user, decoded });
+      }
+    } catch (error) {
+      return rejection(
+        'Can not verify email, please contact user office for help',
+        {},
+        error
+      );
+    }
+  }
+
   @ValidateArgs(addUserRoleValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: UserWithRole | null, args: AddUserRoleArgs) {
@@ -443,6 +509,89 @@ export default class UserMutations {
       .catch((err) =>
         rejection('Could not add user role', { agent, args }, err)
       );
+  }
+
+  @ValidateArgs(updatePasswordValidationSchema)
+  @Authorized()
+  async updatePassword(
+    agent: UserWithRole | null,
+    { id, password }: { id: number; password: string }
+  ): Promise<BasicUserDetails | Rejection> {
+    const isUpdatingOwnUser = agent?.id === id;
+    if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
+      return rejection(
+        'Can not update password because of insufficient permissions',
+        {
+          id,
+          agent,
+          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
+        }
+      );
+    }
+
+    try {
+      const hash = this.createHash(password);
+      const user = await this.dataSource.getUser(id);
+      if (user) {
+        return this.dataSource.setUserPassword(user.id, hash);
+      } else {
+        return rejection('Could not update password. Used does not exist', {
+          agent,
+          id,
+          code: ApolloServerErrorCodeExtended.NOT_FOUND,
+        });
+      }
+    } catch (error) {
+      return rejection(
+        'Could not update password',
+        {
+          agent,
+          id,
+        },
+        error
+      );
+    }
+  }
+
+  @ValidateArgs(userPasswordFieldBEValidationSchema)
+  async resetPassword(
+    agent: UserWithRole | null,
+    { token, password }: { token: string; password: string }
+  ): Promise<BasicUserDetails | Rejection> {
+    // Check that token is valid
+    try {
+      const hash = this.createHash(password);
+      const decoded = verifyToken<PasswordResetJwtPayload>(token);
+      const user = await this.dataSource.getUser(decoded.id);
+
+      //Check that user exist and that it has not been updated since token creation
+      if (
+        user &&
+        user.updated === decoded.updated &&
+        decoded.type === 'passwordReset'
+      ) {
+        return this.dataSource
+          .setUserPassword(user.id, hash)
+          .then((user) => user)
+          .catch((err) => rejection('Could not reset password', { user }, err));
+      }
+
+      return rejection('Could not reset password incomplete data', {
+        user,
+        decoded,
+        code: ApolloServerErrorCodeExtended.BAD_USER_INPUT,
+      });
+    } catch (error) {
+      return rejection('Could not reset password', {}, error);
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  setUserEmailVerified(
+    _: UserWithRole | null,
+    id: number
+  ): Promise<User | null> {
+    return this.dataSource.setUserEmailVerified(id);
   }
 
   @Authorized([Roles.USER_OFFICER])

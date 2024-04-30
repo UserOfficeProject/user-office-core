@@ -1,10 +1,8 @@
-import UsersLoader from '../loaders/UsersLoader';
 import PDFServices from '../middlewares/factory/factoryServices';
 import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
-import FapMutations from '../mutations/FapMutations';
 import FeedbackMutations from '../mutations/FeedbackMutations';
 import FileMutations from '../mutations/FileMutations';
 import GenericTemplateMutations from '../mutations/GenericTemplateMutations';
@@ -20,6 +18,7 @@ import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
+import SEPMutations from '../mutations/SEPMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
 import UnitMutations from '../mutations/UnitMutations';
@@ -28,7 +27,6 @@ import VisitMutations from '../mutations/VisitMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
-import FapQueries from '../queries/FapQueries';
 import FeedbackQueries from '../queries/FeedbackQueries';
 import FileQueries from '../queries/FileQueries';
 import GenericTemplateQueries from '../queries/GenericTemplateQueries';
@@ -44,6 +42,7 @@ import ReviewQueries from '../queries/ReviewQueries';
 import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
 import ScheduledEventQueries from '../queries/ScheduledEventQueries';
+import SEPQueries from '../queries/SEPQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
 import SystemQueries from '../queries/SystemQueries';
 import TemplateQueries from '../queries/TemplateQueries';
@@ -68,7 +67,7 @@ interface ResolverContextQueries {
   sample: SampleQueries;
   sampleEsi: SampleEsiQueries;
   scheduledEvent: ScheduledEventQueries;
-  fap: FapQueries;
+  sep: SEPQueries;
   shipment: ShipmentQueries;
   system: SystemQueries;
   template: TemplateQueries;
@@ -95,7 +94,7 @@ interface ResolverContextMutations {
   review: ReviewMutations;
   sample: SampleMutations;
   sampleEsi: SampleEsiMutations;
-  fap: FapMutations;
+  sep: SEPMutations;
   shipment: ShipmentMutations;
   template: TemplateMutations;
   unit: UnitMutations;
@@ -107,9 +106,6 @@ interface ResolverContextMutations {
 interface ResolverContextServices {
   pdfServices: PDFServices;
 }
-interface ResolverContextLoader {
-  user: UsersLoader;
-}
 
 export interface BasicResolverContext {
   mutations: ResolverContextMutations;
@@ -118,7 +114,6 @@ export interface BasicResolverContext {
     scheduler: () => Promise<Sdk | undefined>;
   };
   services: ResolverContextServices;
-  loaders: ResolverContextLoader;
 }
 
 export interface ResolverContext extends BasicResolverContext {

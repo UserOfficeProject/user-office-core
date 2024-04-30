@@ -44,56 +44,58 @@ context('Internal Review tests', () => {
             initialDBData.roles.internalReviewer,
           ],
         });
-      }
-      cy.createInstrument(instrument1).then((result) => {
-        if (result.createInstrument) {
-          createdInstrumentId = result.createInstrument.id;
 
-          cy.assignInstrumentToCall({
-            callId: initialDBData.call.id,
-            instrumentFapIds: [{ instrumentId: createdInstrumentId }],
-          });
-        }
-      });
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal) {
-          createdProposalPk = result.createProposal.primaryKey;
+        cy.createInstrument(instrument1).then((result) => {
+          if (result.createInstrument) {
+            createdInstrumentId = result.createInstrument.id;
 
-          cy.updateProposal({
-            proposalPk: createdProposalPk,
-            title: proposal1.title,
-            abstract: proposal1.abstract,
-          });
-        }
-      });
-
-      numberOfScientistsAndManagerAssignedToCreatedInstrument = 2;
-      cy.assignScientistsToInstrument({
-        instrumentId: createdInstrumentId,
-        scientistIds: [scientist1.id],
-      });
-      cy.assignScientistsToInstrument({
-        instrumentId: createdInstrumentId,
-        scientistIds: [scientist2.id],
-      });
-      cy.assignProposalsToInstruments({
-        proposalPks: [createdProposalPk],
-        instrumentIds: [createdInstrumentId],
-      }).then(() => {
-        // NOTE: Get the technical review id for later usage.
-        cy.updateTechnicalReviewAssignee({
-          proposalPks: [createdProposalPk],
-          userId: scientist1.id,
-          instrumentId: createdInstrumentId,
-        }).then((result) => {
-          technicalReviewId = result.updateTechnicalReviewAssignee[0].id;
+            cy.assignInstrumentToCall({
+              callId: initialDBData.call.id,
+              instrumentSepIds: [{ instrumentId: createdInstrumentId }],
+            });
+          }
         });
-      });
+        cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+          if (result.createProposal) {
+            createdProposalPk = result.createProposal.primaryKey;
+
+            cy.updateProposal({
+              proposalPk: createdProposalPk,
+              title: proposal1.title,
+              abstract: proposal1.abstract,
+            });
+          }
+        });
+
+        numberOfScientistsAndManagerAssignedToCreatedInstrument = 2;
+        cy.assignScientistsToInstrument({
+          instrumentId: createdInstrumentId,
+          scientistIds: [scientist1.id],
+        });
+        cy.assignScientistsToInstrument({
+          instrumentId: createdInstrumentId,
+          scientistIds: [scientist2.id],
+        });
+        cy.assignProposalsToInstrument({
+          proposals: [
+            { callId: initialDBData.call.id, primaryKey: createdProposalPk },
+          ],
+          instrumentId: createdInstrumentId,
+        }).then(() => {
+          // NOTE: Get the technical review id for later usage.
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposalPk],
+            userId: scientist1.id,
+          }).then((result) => {
+            technicalReviewId = result.updateTechnicalReviewAssignee[0].id;
+          });
+        });
+      }
     });
   });
 
   it('User should not be able to see internal reviews page', () => {
-    cy.login('user3', initialDBData.roles.user);
+    cy.login('user3');
     cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
@@ -129,28 +131,14 @@ context('Internal Review tests', () => {
       .find('[data-cy="title"] input')
       .clear()
       .type(title);
-
-    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-      cy.get('[data-cy="create-modal"]')
-        .find('[data-cy="internal-reviewer-surname"] input')
-        .type(scientist2.lastName);
-
-      cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
-    }
-
     cy.get('[data-cy="create-modal"]')
       .find('[data-cy="internal-reviewer"] input')
       .click();
 
-    // TODO due to how stfc manages users this check will not work in STFC for now
-    // See https://github.com/UserOfficeProject/user-office-project-issue-tracker/issues/970
-    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-      cy.get('[data-cy="internal-reviewer-options"] li').should(
-        'have.length',
-        numberOfScientistsAndManagerAssignedToCreatedInstrument
-      );
-    }
-
+    cy.get('[data-cy="internal-reviewer-options"] li').should(
+      'have.length',
+      numberOfScientistsAndManagerAssignedToCreatedInstrument
+    );
     cy.get('[data-cy="internal-reviewer-options"]')
       .contains(scientist2.firstName)
       .click();
@@ -205,14 +193,6 @@ context('Internal Review tests', () => {
       .find('[data-cy="title"] input')
       .clear()
       .type(newTitle);
-
-    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-      cy.get('[data-cy="create-modal"]')
-        .find('[data-cy="internal-reviewer-surname"] input')
-        .type(scientist2.lastName);
-
-      cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
-    }
 
     cy.get('[data-cy="create-modal"]')
       .find('[data-cy="internal-reviewer"] input')

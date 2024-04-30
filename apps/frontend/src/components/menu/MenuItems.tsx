@@ -32,12 +32,12 @@ import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, UserRole } from 'generated/sdk';
 
-import { TemplateMenuListItem } from './TemplateMenuListItem';
 import BoxIcon from '../common/icons/BoxIcon';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
+import { TemplateMenuListItem } from './TemplateMenuListItem';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
@@ -178,7 +178,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const isInstrumentManagementEnabled = context.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
-  const isFapEnabled = context.featuresMap.get(FeatureId.FAP_REVIEW)?.isEnabled;
+  const isSEPEnabled = context.featuresMap.get(FeatureId.SEP_REVIEW)?.isEnabled;
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
@@ -285,13 +285,15 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           </ListItem>
         </Tooltip>
       )}
-      {isFapEnabled && (
-        <Tooltip title="Facility access panels">
-          <ListItem component={NavLink} to="/Faps" button>
+      {isSEPEnabled && (
+        <Tooltip
+          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+        >
+          <ListItem component={NavLink} to="/SEPs" button>
             <ListItemIcon>
               <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary="FAPs" />
+            <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
           </ListItem>
         </Tooltip>
       )}
@@ -327,20 +329,22 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
     </div>
   );
 
-  const FapRoles = (
-    <div data-cy="FapRoles-menu-items">
+  const SEPRoles = (
+    <div data-cy="SEPRoles-menu-items">
       <ListItem component={NavLink} to="/" exact button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/Faps" button>
+      <ListItem component={NavLink} to="/SEPs" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <Tooltip title="Facility access panels">
-          <ListItemText primary="FAPs" />
+        <Tooltip
+          title={`${i18n.format(t('Scientific evaluation panel'), 'plural')}`}
+        >
+          <ListItemText primary={i18n.format(t('SEP'), 'plural')} />
         </Tooltip>
       </ListItem>
     </div>
@@ -392,10 +396,10 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
       return userOfficer;
     case UserRole.INSTRUMENT_SCIENTIST:
       return instrumentScientist;
-    case UserRole.FAP_CHAIR:
-    case UserRole.FAP_SECRETARY:
-    case UserRole.FAP_REVIEWER:
-      return FapRoles;
+    case UserRole.SEP_CHAIR:
+    case UserRole.SEP_SECRETARY:
+    case UserRole.SEP_REVIEWER:
+      return SEPRoles;
     case UserRole.SAMPLE_SAFETY_REVIEWER:
       return sampleSafetyReviewer;
     case UserRole.INTERNAL_REVIEWER:

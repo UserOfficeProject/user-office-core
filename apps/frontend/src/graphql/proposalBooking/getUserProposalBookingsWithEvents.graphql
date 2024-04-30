@@ -16,17 +16,13 @@ query getUserProposalBookingsWithEvents(
       users {
         ...basicUserDetails
       }
-      proposalBookingsCore(filter: { status: $status }) {
+      proposalBookingCore(filter: { status: $status }) {
         scheduledEvents(filter: { endsAfter: $endsAfter, status: $status }) {
           id
           startsAt
           endsAt
           bookingType
           status
-          instrument {
-            id
-            name
-          }
           visit {
             ...visit
             teamLead {
@@ -55,6 +51,10 @@ query getUserProposalBookingsWithEvents(
       }
       visits {
         ...visit
+      }
+      instrument {
+        id
+        name
       }
     }
   }

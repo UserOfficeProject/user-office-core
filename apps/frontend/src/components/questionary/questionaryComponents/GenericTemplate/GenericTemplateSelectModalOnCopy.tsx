@@ -206,8 +206,8 @@ const GenericTemplateSelectModalOnCopy = ({
                   isMultipleCopySelect
                     ? genericTemplateAnswer
                     : genericTemplateAnswer.length > 0
-                      ? genericTemplateAnswer[0]
-                      : ''
+                    ? genericTemplateAnswer[0]
+                    : ''
                 }
                 onChange={(event: SelectChangeEvent<string | string[]>) => {
                   if (Array.isArray(event.target.value)) {

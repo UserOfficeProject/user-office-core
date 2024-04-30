@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
-import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import {
   TechnicalReview,
   TechnicalReviewStatus,
@@ -33,8 +33,8 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends Array<infer U>
     ? Array<DeepPartial<U>>
     : T[P] extends ReadonlyArray<infer U>
-      ? ReadonlyArray<DeepPartial<U>>
-      : DeepPartial<T[P]>;
+    ? ReadonlyArray<DeepPartial<U>>
+    : DeepPartial<T[P]>;
 };
 
 const dummyProposalFactory = (values?: Partial<Proposal>) => {
@@ -55,11 +55,12 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.notified || false,
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
+    values?.managementTimeAllocation || 0,
     values?.managementDecisionSubmitted || false
   );
 };
 
-export const dummyFapMeetingDecision = new FapMeetingDecision(
+export const dummySepMeetingDecision = new SepMeetingDecision(
   1,
   1,
   ProposalEndStatus.ACCEPTED,
@@ -77,7 +78,6 @@ const dummyScheduledEventCore = new ScheduledEventCore(
   1,
   1,
   ProposalBookingStatusCore.ACTIVE,
-  1,
   1
 );
 
@@ -91,7 +91,6 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   false,
   1,
   '',
-  1,
   1
 );
 
@@ -99,24 +98,24 @@ const dummyProposalEvents = {
   proposal_pk: 1,
   proposal_created: true,
   proposal_submitted: true,
-  proposal_feasibility_review_feasible: true,
-  proposal_feasibility_review_unfeasible: false,
+  proposal_feasible: true,
+  proposal_unfeasible: false,
   call_ended: false,
   call_ended_internal: false,
   call_review_ended: false,
-  proposal_fap_selected: false,
-  proposal_instruments_selected: false,
+  proposal_sep_selected: false,
+  proposal_instrument_selected: false,
   proposal_feasibility_review_submitted: false,
   proposal_sample_review_submitted: false,
-  proposal_all_fap_reviews_submitted: false,
+  proposal_all_sep_reviews_submitted: false,
   proposal_feasibility_review_updated: false,
   proposal_management_decision_submitted: false,
   proposal_management_decision_updated: false,
   proposal_sample_safe: false,
-  proposal_fap_review_updated: false,
-  proposal_all_fap_reviewers_selected: false,
-  proposal_fap_review_submitted: false,
-  proposal_fap_meeting_submitted: false,
+  proposal_sep_review_updated: false,
+  proposal_all_sep_reviewers_selected: false,
+  proposal_sep_review_submitted: false,
+  proposal_sep_meeting_submitted: false,
   proposal_instrument_submitted: false,
   proposal_accepted: false,
   proposal_reserved: false,
@@ -181,25 +180,24 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       false,
-      false,
-      [1],
-      [1],
-      [1],
-      [1],
-      ['Carl Carlsson'],
-      [1],
-      [false],
-      ['instrument'],
-      [1],
       1,
+      1,
+      1,
+      'Carl',
+      'Carlsson',
+      1,
+      false,
+      'instrument',
       'call short code',
-      'fap code',
+      'sep code',
+      1,
       1,
       1,
       1,
       AllocationTimeUnits.Day,
       1,
-      1
+      1,
+      false
     );
 
     allProposals = [
@@ -318,9 +316,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return allProposals.filter((proposal) => proposal.proposerId === id);
   }
 
-  async getProposalsByPks(proposalPks: number[]): Promise<Proposal[]> {
+  async getProposalsByIds(proposalIds: number[]): Promise<Proposal[]> {
     return allProposals.filter((proposal) =>
-      proposalPks.includes(proposal.primaryKey)
+      proposalIds.includes(proposal.primaryKey)
     );
   }
   async getInstrumentScientistProposals(
@@ -368,15 +366,15 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return new Proposals(allProposals);
   }
 
-  async getProposalBookingsByProposalPk(
+  async getProposalBookingByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter
-  ): Promise<{ ids: number[] } | null> {
-    return { ids: [1] };
+  ): Promise<{ id: number } | null> {
+    return { id: 1 };
   }
 
-  async getAllProposalBookingsScheduledEvents(
-    proposalBookingIds: number[],
+  async proposalBookingScheduledEvents(
+    proposalBookingId: number,
     filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     return [dummyScheduledEventCore];

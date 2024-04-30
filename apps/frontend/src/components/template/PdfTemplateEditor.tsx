@@ -6,7 +6,7 @@ import { Field, FieldProps, Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import SimpleTabs from 'components/common/SimpleTabs';
+import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import { PdfTemplate, Template } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
@@ -32,7 +32,7 @@ const TemplateEditor = <
     | 'templateHeader'
     | 'templateFooter'
     | 'templateSampleDeclaration'
-    | 'dummyData',
+    | 'dummyData'
 >({
   name,
   template,

@@ -2,9 +2,9 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { SEPDataSource } from '../datasources/SEPDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { UserWithRole } from '../models/User';
@@ -23,8 +23,8 @@ export class ProposalAuthorization {
     private userDataSource: UserDataSource,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource,
-    @inject(Tokens.FapDataSource)
-    private fapDataSource: FapDataSource,
+    @inject(Tokens.SEPDataSource)
+    private sepDataSource: SEPDataSource,
     @inject(Tokens.VisitDataSource)
     private visitDataSource: VisitDataSource,
     @inject(Tokens.CallDataSource)
@@ -103,16 +103,16 @@ export class ProposalAuthorization {
       return false;
     }
 
-    const fapsUserIsMemberOf =
-      await this.fapDataSource.getUserFapsByRoleAndFapId(
+    const sepsUserIsMemberOf =
+      await this.sepDataSource.getUserSepsByRoleAndSepId(
         agent.id,
         agent.currentRole
       );
 
-    const fapIdsUserIsMemberOf = fapsUserIsMemberOf.map((fap) => fap.id);
+    const sepIdsUserIsMemberOf = sepsUserIsMemberOf.map((sep) => sep.id);
 
     return this.reviewDataSource
-      .getUserReviews(fapIdsUserIsMemberOf, agent.id)
+      .getUserReviews(sepIdsUserIsMemberOf, agent.id)
       .then((reviews) => {
         return reviews.some((review) => review.proposalPk === proposalPk);
       });
@@ -160,7 +160,7 @@ export class ProposalAuthorization {
       return false;
     }
 
-    return this.fapDataSource.isChairOrSecretaryOfProposal(
+    return this.sepDataSource.isChairOrSecretaryOfProposal(
       agent.id,
       proposalPk
     );
@@ -188,23 +188,9 @@ export class ProposalAuthorization {
       return false;
     }
 
-    const technicalReviews = await this.reviewDataSource.getTechnicalReviews(
+    const technicalReview = await this.reviewDataSource.getTechnicalReview(
       proposal?.primaryKey
     );
-
-    const isInternalReviewerOnSomeTechnicalReview = technicalReviews
-      ? (
-          await Promise.all(
-            technicalReviews.map(
-              async (technicalReview) =>
-                await this.userAuth.isInternalReviewerOnTechnicalReview(
-                  agent,
-                  technicalReview.id
-                )
-            )
-          )
-        ).some((value) => value)
-      : false;
 
     return (
       this.userAuth.isUserOfficer(agent) ||
@@ -214,7 +200,10 @@ export class ProposalAuthorization {
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
       (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
-      isInternalReviewerOnSomeTechnicalReview ||
+      (await this.userAuth.isInternalReviewerOnTechnicalReview(
+        agent,
+        technicalReview?.id
+      )) ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
       (await this.isVisitorOfProposal(agent, proposal.primaryKey))
     );

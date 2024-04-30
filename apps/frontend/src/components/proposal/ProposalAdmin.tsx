@@ -1,24 +1,20 @@
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
-import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { Formik, Form, Field, useFormikContext, FieldArray } from 'formik';
+import { administrationProposalValidationSchema } from '@user-office-software/duo-validation/lib/Proposal';
+import { Formik, Form, Field, useFormikContext } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
 import FormikUIPredefinedMessagesTextField, {
   PredefinedMessageKey,
 } from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
-import {
-  InstrumentWithManagementTime,
-  ProposalEndStatus,
-  UserRole,
-} from 'generated/sdk';
+import { ProposalEndStatus, UserRole } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -29,10 +25,7 @@ export type AdministrationFormData = {
   commentForUser: string;
   commentForManagement: string;
   finalStatus: ProposalEndStatus;
-  managementTimeAllocations: {
-    instrumentId: number;
-    value: number;
-  }[];
+  managementTimeAllocation?: number;
   managementDecisionSubmitted?: boolean;
 };
 
@@ -50,14 +43,8 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
     finalStatus: data.finalStatus || ProposalEndStatus.UNSET,
     commentForUser: data.commentForUser || '',
     commentForManagement: data.commentForManagement || '',
+    managementTimeAllocation: data.managementTimeAllocation || '',
     managementDecisionSubmitted: data.managementDecisionSubmitted,
-    managementTimeAllocations:
-      data.instruments?.map((instrument) => ({
-        instrumentId: (instrument as InstrumentWithManagementTime).id,
-        value:
-          (instrument as InstrumentWithManagementTime)
-            .managementTimeAllocation ?? '',
-      })) || [],
   };
 
   const statusOptions: Option[] = [
@@ -95,31 +82,26 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
       </Typography>
       <Formik
         initialValues={initialValues}
+        validationSchema={administrationProposalValidationSchema}
         onSubmit={async (values): Promise<void> => {
-          if (!values.managementTimeAllocations) {
-            return;
-          }
-
           const administrationValues = {
             proposalPk: data.primaryKey,
             finalStatus:
               ProposalEndStatus[values.finalStatus as ProposalEndStatus],
             commentForUser: values.commentForUser,
             commentForManagement: values.commentForManagement,
-            managementTimeAllocations: values.managementTimeAllocations,
+            managementTimeAllocation: +values.managementTimeAllocation,
             managementDecisionSubmitted: values.managementDecisionSubmitted,
           };
 
-          await handleProposalAdministration(
-            administrationValues as AdministrationFormData
-          );
+          await handleProposalAdministration(administrationValues);
         }}
       >
         {({ isSubmitting, values }) => (
           <Form>
             <PromptIfDirty />
-            <Grid container spacing={2} alignItems="center">
-              <Grid item sm={6} xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel
                     htmlFor="finalStatus"
@@ -144,43 +126,17 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   </Field>
                 </FormControl>
               </Grid>
-              <Grid item sm={6} xs={12}>
-                <FieldArray
-                  name="managementTimeAllocations"
-                  render={(arrayHelpers) =>
-                    data.instruments?.map((instrument, index) => (
-                      <Field
-                        key={index}
-                        name={`managementTimeAllocations[${index}]`}
-                        label={`Management time allocation(${data.call?.allocationTimeUnit}s)`}
-                        id="time-managemment-input"
-                        type="number"
-                        component={TextField}
-                        value={values.managementTimeAllocations[index].value}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                          if (instrument) {
-                            arrayHelpers.replace(index, {
-                              value: e.target.value ? +e.target.value : '',
-                              instrumentId: instrument.id,
-                            });
-                          }
-                        }}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              {instrument?.name}:
-                            </InputAdornment>
-                          ),
-                          inputProps: { min: 0, max: 1e5 },
-                        }}
-                        fullWidth
-                        autoComplete="off"
-                        data-cy={`managementTimeAllocation-${instrument?.id}`}
-                        disabled={!isUserOfficer || isSubmitting}
-                        required
-                      />
-                    ))
-                  }
+              <Grid item xs={6}>
+                <Field
+                  name="managementTimeAllocation"
+                  label={`Management time allocation(${data.call?.allocationTimeUnit}s)`}
+                  id="time-managemment-input"
+                  type="number"
+                  component={TextField}
+                  fullWidth
+                  autoComplete="off"
+                  data-cy="managementTimeAllocation"
+                  disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
               <Grid item xs={12}>

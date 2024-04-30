@@ -1,23 +1,12 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
-import { useInstrumentsByIdsData } from 'hooks/instrument/useInstrumentsByIdsData';
-import { toArray } from 'utils/helperFunctions';
+import { useInstrumentData } from 'hooks/instrument/useInstrumentData';
 
 const InstrumentPickerAnswerRenderer: AnswerRenderer = ({ value }) => {
-  const instrumentIds = useMemo(
-    () => (value ? toArray<number>(value) : null),
-    [value]
-  );
-  const { instruments } = useInstrumentsByIdsData(instrumentIds);
+  const { instrument } = useInstrumentData(value);
 
-  return (
-    <span>
-      {instruments?.length
-        ? instruments.map((instrument) => instrument.name).join(', ')
-        : 'NA'}
-    </span>
-  );
+  return <span>{instrument?.name || 'NA'}</span>;
 };
 
 export default InstrumentPickerAnswerRenderer;

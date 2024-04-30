@@ -30,7 +30,7 @@ services:
     depends_on:
       - db
     environment:
-      JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
       EXTERNAL_AUTH_TOKEN: abc
       NODE_ENV: development
       DATABASE_CONNECTION_STRING: postgres://duouser:duopassword@db:5432/duo

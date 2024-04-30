@@ -361,7 +361,7 @@ context('Template tests', () => {
           });
         }
       });
-      cy.login('user1', initialDBData.roles.user);
+      cy.login('user1');
       cy.visit('/');
       cy.finishedLoading();
       cy.contains(proposal.title)
@@ -463,7 +463,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user1', initialDBData.roles.user);
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains('New Proposal').click();
@@ -475,7 +475,9 @@ context('Template tests', () => {
 
       cy.contains(fileQuestion);
       cy.contains('Save and continue').click();
-      cy.contains(fileQuestion).parent().contains('Please upload a file');
+      cy.contains(fileQuestion)
+        .parent()
+        .contains('field must have at least 1 items');
 
       cy.intercept({
         method: 'POST',
@@ -620,7 +622,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user1', initialDBData.roles.user);
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposal.title)
@@ -705,7 +707,7 @@ context('Template tests', () => {
 
       cy.logout();
 
-      cy.login('user1', initialDBData.roles.user);
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposal.title)
@@ -774,7 +776,7 @@ context('Template tests', () => {
         }
       });
 
-      cy.login('user1', initialDBData.roles.user);
+      cy.login('user1');
       cy.visit('/');
 
       cy.contains(proposal.title)

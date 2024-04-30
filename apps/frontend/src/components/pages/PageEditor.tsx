@@ -1,6 +1,6 @@
 import React from 'react';
 
-import SimpleTabs from 'components/common/SimpleTabs';
+import SimpleTabs from 'components/common/TabPanel';
 import { PageName } from 'generated/sdk';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 

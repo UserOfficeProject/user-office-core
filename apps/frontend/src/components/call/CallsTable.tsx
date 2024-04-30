@@ -92,14 +92,10 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     {
       title: `Start Date (${timezone})`,
       field: 'formattedStartCall',
-      customSort: (a: Call, b: Call) =>
-        new Date(a.startCall).getTime() - new Date(b.startCall).getTime(),
     },
     {
       title: `End Date (${timezone})`,
       field: 'formattedEndCall',
-      customSort: (a: Call, b: Call) =>
-        new Date(a.endCall).getTime() - new Date(b.endCall).getTime(),
     },
     {
       title: 'Reference number format',
@@ -126,8 +122,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       field: 'proposalCount',
     },
     {
-      title: '#faps',
-      field: 'faps.length',
+      title: '#' + i18n.format(i18n.format(t('SEP'), 'plural'), 'lowercase'),
+      field: 'seps.length',
       emptyValue: '-',
     },
   ];

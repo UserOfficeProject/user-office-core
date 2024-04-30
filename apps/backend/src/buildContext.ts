@@ -1,11 +1,9 @@
 import { container } from 'tsyringe';
 
 import { BasicResolverContext } from './context';
-import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
-import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
@@ -21,6 +19,7 @@ import RedeemCodesMutations from './mutations/RedeemCodesMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SampleEsiMutations from './mutations/SampleEsiMutations';
 import SampleMutations from './mutations/SampleMutations';
+import SEPMutations from './mutations/SEPMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UnitMutations from './mutations/UnitMutations';
@@ -29,7 +28,6 @@ import VisitMutations from './mutations/VisitMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
-import FapQueries from './queries/FapQueries';
 import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
 import GenericTemplateQueries from './queries/GenericTemplateQueries';
@@ -45,6 +43,7 @@ import ReviewQueries from './queries/ReviewQueries';
 import SampleEsiQueries from './queries/SampleEsiQueries';
 import SampleQueries from './queries/SampleQueries';
 import ScheduledEventQueries from './queries/ScheduledEventQueries';
+import SEPQueries from './queries/SEPQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import SystemQueries from './queries/SystemQueries';
 import TemplateQueries from './queries/TemplateQueries';
@@ -70,7 +69,7 @@ const context: BasicResolverContext = {
     sample: container.resolve(SampleQueries),
     sampleEsi: container.resolve(SampleEsiQueries),
     scheduledEvent: container.resolve(ScheduledEventQueries),
-    fap: container.resolve(FapQueries),
+    sep: container.resolve(SEPQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
     template: container.resolve(TemplateQueries),
@@ -96,7 +95,7 @@ const context: BasicResolverContext = {
     review: container.resolve(ReviewMutations),
     sample: container.resolve(SampleMutations),
     sampleEsi: container.resolve(SampleEsiMutations),
-    fap: container.resolve(FapMutations),
+    sep: container.resolve(SEPMutations),
     shipment: container.resolve(ShipmentMutations),
     template: container.resolve(TemplateMutations),
     unit: container.resolve(UnitMutations),
@@ -112,9 +111,6 @@ const context: BasicResolverContext = {
   },
   services: {
     pdfServices: container.resolve(PDFServices),
-  },
-  loaders: {
-    user: container.resolve(UsersLoader),
   },
 };
 

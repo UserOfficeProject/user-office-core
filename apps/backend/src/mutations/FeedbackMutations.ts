@@ -191,17 +191,29 @@ export default class FeedbackMutations {
     return this.dataSource.deleteFeedback(feedbackId);
   }
 
+  getSettingOrDefault = async (settingId: SettingsId, defaultValue: number) => {
+    const settingValue = await this.adminDataSource.getSetting(settingId);
+    if (settingValue === null) {
+      return defaultValue;
+    }
+    const settingValueAsNumber = parseInt(settingValue.settingsValue, 10);
+    if (isNaN(settingValueAsNumber)) {
+      return defaultValue;
+    }
+
+    return settingValueAsNumber;
+  };
+
   /**
    * Checks if the scheduled event is too old to have feedback
    * @param scheduledEvent event
    * @returns true if event is too old
    */
   async isEventTooOld(scheduledEvent: ScheduledEventCore) {
-    const FEEDBACK_EXHAUST_DAYS =
-      await this.adminDataSource.getSettingOrDefault(
-        SettingsId.FEEDBACK_EXHAUST_DAYS,
-        30
-      );
+    const FEEDBACK_EXHAUST_DAYS = await this.getSettingOrDefault(
+      SettingsId.FEEDBACK_EXHAUST_DAYS,
+      30
+    );
 
     return moment(scheduledEvent.endsAt).isBefore(
       moment().subtract(FEEDBACK_EXHAUST_DAYS, 'days')
@@ -209,11 +221,10 @@ export default class FeedbackMutations {
   }
 
   async hasAlreadyRequested(scheduledEvent: ScheduledEventCore) {
-    const FEEDBACK_MAX_REQUESTS =
-      await this.adminDataSource.getSettingOrDefault(
-        SettingsId.FEEDBACK_MAX_REQUESTS,
-        2
-      );
+    const FEEDBACK_MAX_REQUESTS = await this.getSettingOrDefault(
+      SettingsId.FEEDBACK_MAX_REQUESTS,
+      2
+    );
 
     const feedbackRequests = await this.dataSource.getFeedbackRequests(
       scheduledEvent.id
@@ -223,11 +234,10 @@ export default class FeedbackMutations {
       return true;
     }
 
-    const FEEDBACK_FREQUENCY_DAYS =
-      await this.adminDataSource.getSettingOrDefault(
-        SettingsId.FEEDBACK_FREQUENCY_DAYS,
-        14
-      );
+    const FEEDBACK_FREQUENCY_DAYS = await this.getSettingOrDefault(
+      SettingsId.FEEDBACK_FREQUENCY_DAYS,
+      14
+    );
     const mostRecentRequest = feedbackRequests.sort((a, b) => {
       return moment(a.requestedAt).isBefore(b.requestedAt) ? 1 : -1;
     })[0];

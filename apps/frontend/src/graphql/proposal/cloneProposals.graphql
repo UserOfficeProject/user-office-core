@@ -16,7 +16,7 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
       ...questionary
       isCompleted
     }
-    technicalReviews {
+    technicalReview {
       ...coreTechnicalReview
     }
     reviews {
@@ -25,14 +25,14 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
       comment
       status
       userID
-      fapID
+      sepID
       reviewer {
         firstname
         lastname
         id
       }
     }
-    instruments {
+    instrument {
       id
       name
       shortCode

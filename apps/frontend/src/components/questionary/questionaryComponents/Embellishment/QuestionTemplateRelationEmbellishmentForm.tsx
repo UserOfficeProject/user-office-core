@@ -13,10 +13,6 @@ import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFo
 export const QuestionTemplateRelationEmbellishmentForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
-  document.addEventListener('focusin', function (e) {
-    e.stopImmediatePropagation();
-  });
-
   return (
     <QuestionTemplateRelationFormShell
       {...props}

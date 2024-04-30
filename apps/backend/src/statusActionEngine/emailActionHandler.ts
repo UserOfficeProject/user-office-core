@@ -14,9 +14,7 @@ import {
   getCoProposersAndFormatOutputForEmailSending,
   getInstrumentScientistsAndFormatOutputForEmailSending,
   getPIAndFormatOutputForEmailSending,
-  getFapReviewersAndFormatOutputForEmailSending,
-  publishMessageToTheEventBus,
-  getFapChairSecretariesAndFormatOutputForEmailSending,
+  getSEPReviewersAndFormatOutputForEmailSending,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -37,7 +35,7 @@ export const emailActionHandler = async (
             recipientWithTemplate
           );
 
-          await sendMail(PIs);
+          sendMail(PIs);
 
           break;
         }
@@ -48,7 +46,7 @@ export const emailActionHandler = async (
             recipientWithTemplate
           );
 
-          await sendMail(CPs);
+          sendMail(CPs);
 
           break;
         }
@@ -60,30 +58,18 @@ export const emailActionHandler = async (
               recipientWithTemplate
             );
 
-          await sendMail(ISs);
+          sendMail(ISs);
 
           break;
         }
 
-        case EmailStatusActionRecipients.FAP_REVIEWERS: {
-          const FRs = await getFapReviewersAndFormatOutputForEmailSending(
+        case EmailStatusActionRecipients.SEP_REVIEWERS: {
+          const SRs = await getSEPReviewersAndFormatOutputForEmailSending(
             proposals,
             recipientWithTemplate
           );
 
-          sendMail(FRs);
-
-          break;
-        }
-
-        case EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY: {
-          const FCSs =
-            await getFapChairSecretariesAndFormatOutputForEmailSending(
-              proposals,
-              recipientWithTemplate
-            );
-
-          sendMail(FCSs);
+          sendMail(SRs);
 
           break;
         }
@@ -97,11 +83,14 @@ export const emailActionHandler = async (
             recipientWithTemplate.otherRecipientEmails.map((email) => ({
               id: recipientWithTemplate.recipient.name,
               email: email,
-              proposals: proposals,
+              proposals: proposals.map((proposal) => ({
+                proposalId: proposal.proposalId,
+                proposalTitle: proposal.title,
+              })),
               template: recipientWithTemplate.emailTemplate.id,
             }));
 
-          await sendMail(otherRecipients);
+          sendMail(otherRecipients);
 
           break;
         }
@@ -113,10 +102,10 @@ export const emailActionHandler = async (
   );
 };
 
-const sendMail = async (recipientsWithData: EmailReadyType[]) => {
+const sendMail = (recipientsWithData: EmailReadyType[]) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
 
-  await Promise.all(
+  Promise.all(
     recipientsWithData.map(async (recipientWithData) => {
       return mailService
         .sendMail({
@@ -125,25 +114,13 @@ const sendMail = async (recipientsWithData: EmailReadyType[]) => {
           },
           substitution_data: {
             proposals: recipientWithData.proposals,
-            pi: recipientWithData.pi,
-            coProposers: recipientWithData.coProposers,
-            // The firstName, lastName, preferredName of the main recipient
-            firstName: recipientWithData.firstName,
-            lastName: recipientWithData.lastName,
-            preferredName: recipientWithData.preferredName,
           },
           recipients: [{ address: recipientWithData.email }],
         })
-        .then(async (res) => {
+        .then((res) => {
           logger.logInfo('Email sent:', {
             result: res,
           });
-
-          const messageDescription = `Email successfully sent to: ${recipientWithData.email}`;
-          await publishMessageToTheEventBus(
-            recipientWithData.proposals,
-            messageDescription
-          );
         })
         .catch((err) => {
           logger.logError('Could not send email', {

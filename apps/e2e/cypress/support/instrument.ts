@@ -3,8 +3,8 @@ import {
   AddTechnicalReviewMutationVariables,
   AssignInstrumentsToCallMutation,
   AssignInstrumentsToCallMutationVariables,
-  AssignProposalsToInstrumentsMutation,
-  AssignProposalsToInstrumentsMutationVariables,
+  AssignProposalsToInstrumentMutation,
+  AssignProposalsToInstrumentMutationVariables,
   AssignScientistsToInstrumentMutation,
   AssignScientistsToInstrumentMutationVariables,
   CreateInstrumentMutation,
@@ -48,12 +48,12 @@ const assignInstrumentToCall = (
   return cy.wrap(request);
 };
 
-const assignProposalsToInstruments = (
-  assignProposalsToInstrumentsInput: AssignProposalsToInstrumentsMutationVariables
-): Cypress.Chainable<AssignProposalsToInstrumentsMutation> => {
+const assignProposalsToInstrument = (
+  assignProposalsToInstrumentInput: AssignProposalsToInstrumentMutationVariables
+): Cypress.Chainable<AssignProposalsToInstrumentMutation> => {
   const api = getE2EApi();
-  const request = api.assignProposalsToInstruments(
-    assignProposalsToInstrumentsInput
+  const request = api.assignProposalsToInstrument(
+    assignProposalsToInstrumentInput
   );
 
   return cy.wrap(request);
@@ -107,8 +107,8 @@ Cypress.Commands.add(
   assignScientistsToInstrument
 );
 Cypress.Commands.add(
-  'assignProposalsToInstruments',
-  assignProposalsToInstruments
+  'assignProposalsToInstrument',
+  assignProposalsToInstrument
 );
 
 Cypress.Commands.add('assignInstrumentToCall', assignInstrumentToCall);

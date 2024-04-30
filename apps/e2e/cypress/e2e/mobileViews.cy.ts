@@ -15,7 +15,7 @@ context('Mobile views tests', () => {
 
     cy.get('[data-cy="officer-proposals-table"]').should('exist');
 
-    cy.get('[data-cy="officer-menu-items"]').should('not.exist');
+    cy.get('[data-cy="officer-menu-items"]').should('not.be.visible');
 
     cy.get('[data-cy="open-drawer"]').click({ force: true });
 
@@ -24,7 +24,7 @@ context('Mobile views tests', () => {
 
   it('Action buttons on a modal should be visible on smaller screens', () => {
     cy.viewport('macbook-11');
-    cy.login('user1', initialDBData.roles.user);
+    cy.login('user1');
     cy.visit('/');
 
     cy.contains('New Proposal').click();

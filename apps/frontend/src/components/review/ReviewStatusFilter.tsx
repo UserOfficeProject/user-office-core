@@ -2,10 +2,18 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { StringParam, withDefault, QueryParamConfig } from 'use-query-params';
 
 import { ReviewStatus } from 'generated/sdk';
+
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+}));
 
 export type ReviewStatusQueryFilter = {
   reviewStatus: QueryParamConfig<string>;
@@ -24,8 +32,10 @@ const ReviewStatusFilter = ({
   reviewStatus,
   onChange,
 }: ReviewStatusFilterProps) => {
+  const classes = useStyles();
+
   return (
-    <FormControl fullWidth>
+    <FormControl className={classes.formControl}>
       <InputLabel shrink>Review status</InputLabel>
       <Select
         onChange={(e) => onChange(e.target.value as ReviewStatus)}

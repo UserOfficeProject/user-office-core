@@ -114,8 +114,7 @@ export class StfcUserAuthorization extends UserAuthorization {
   async autoAssignRemoveInstruments(
     userId: number,
     requiredInstrumentNames: string[],
-    currentInstruments: Instrument[],
-    removeInstruments: boolean
+    currentInstruments: Instrument[]
   ) {
     // Assign any instruments which aren't currently assigned
     const instrumentsToAdd = await this.getInstrumentsToAdd(
@@ -137,26 +136,24 @@ export class StfcUserAuthorization extends UserAuthorization {
       );
     }
 
-    if (removeInstruments) {
-      // Remove any instruments which are currently assigned, but not required
-      const instrumentsToRemove = await this.getInstrumentsToRemove(
-        requiredInstrumentNames,
-        currentInstruments
+    // Remove any instruments which are currently assigned, but not required
+    const instrumentsToRemove = await this.getInstrumentsToRemove(
+      requiredInstrumentNames,
+      currentInstruments
+    );
+
+    if (instrumentsToRemove.length > 0) {
+      logger.logInfo(
+        'Auto-removing STFC instrument scientist from instruments',
+        {
+          instruments: instrumentsToRemove,
+        }
       );
 
-      if (instrumentsToRemove.length > 0) {
-        logger.logInfo(
-          'Auto-removing STFC instrument scientist from instruments',
-          {
-            instruments: instrumentsToRemove,
-          }
-        );
-
-        this.instrumentDataSource.removeScientistFromInstruments(
-          userId,
-          instrumentsToRemove
-        );
-      }
+      this.instrumentDataSource.removeScientistFromInstruments(
+        userId,
+        instrumentsToRemove
+      );
     }
   }
 
@@ -190,8 +187,9 @@ export class StfcUserAuthorization extends UserAuthorization {
     // This is needed to satisfy the FOREIGN_KEY constraints
     // in tables that link to a user (such as proposals)
     const userNumber = parseInt(stfcUser.userNumber);
-    const dummyUser =
-      await this.userDataSource.ensureDummyUserExists(userNumber);
+    const dummyUser = await this.userDataSource.ensureDummyUserExists(
+      userNumber
+    );
 
     // With dummyUser created and written (ensureDummyUserExists), info can now
     // be added to it without persisting it to the database, which is not wanted.
@@ -213,23 +211,14 @@ export class StfcUserAuthorization extends UserAuthorization {
         (role, index) =>
           stfcRoles.findIndex((r) => r.name == role.name) === index
       );
-
       const requiredInstruments =
         this.getRequiredInstrumentForRole(uniqueRoles);
-
       const currentUserInstruments =
         await this.instrumentDataSource.getUserInstruments(userNumber);
-
-      // Don't remove instruments from ISIS Staff and User officers as these will be manually assigned
       this.autoAssignRemoveInstruments(
         userNumber,
         requiredInstruments,
-        currentUserInstruments,
-        !uniqueRoles.find(
-          (role) =>
-            role.name === 'ISIS Instrument Scientist' ||
-            role.name === 'User Officer'
-        )
+        currentUserInstruments
       );
     }
 

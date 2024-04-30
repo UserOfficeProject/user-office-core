@@ -44,6 +44,15 @@ describe('Test Admin Mutations', () => {
     ).resolves.toBe(dummyInstitution);
   });
 
+  test('A user officer can create a institution', () => {
+    return expect(
+      adminMutations.createInstitutions(
+        dummyUserOfficerWithRole,
+        dummyInstitution
+      )
+    ).resolves.toBe(dummyInstitution);
+  });
+
   test('A user officer can update a institution', () => {
     return expect(
       adminMutations.updateInstitutions(
@@ -59,6 +68,7 @@ describe('Test Admin Mutations', () => {
         id: 1,
         name: 'something',
         country: 1,
+        verified: true,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });

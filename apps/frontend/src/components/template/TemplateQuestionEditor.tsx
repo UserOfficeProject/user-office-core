@@ -101,8 +101,8 @@ export default function TemplateQuestionEditor(props: {
     backgroundColor: isDragging
       ? theme.palette.grey[200]
       : isHover
-        ? theme.palette.grey[100]
-        : 'white',
+      ? theme.palette.grey[100]
+      : 'white',
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
     boxShadow: '0px 1px 2px 0px rgba(163,163,163,0.66)',
     maxWidth: '100%',

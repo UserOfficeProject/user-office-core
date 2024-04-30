@@ -24,6 +24,41 @@ context('Institution tests', () => {
     cy.get('@userMenuItems').should('not.contain', 'Institutions');
   });
 
+  it('User Officer should be able to create Institution', () => {
+    const name = faker.random.words(2);
+
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.contains('Institutions').click();
+    cy.contains('Create').click();
+    cy.get('#name').type(name);
+    cy.get('#country-input').click();
+    cy.contains('Sweden').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'successfully' });
+
+    cy.get('[data-cy="institutions-table"]').as('institutionsTable');
+
+    cy.get('@institutionsTable')
+      .find('span[aria-label="Last Page"] > button')
+      .as('lastPageButtonElement');
+
+    cy.get('@lastPageButtonElement').click({ force: true });
+
+    // NOTE: Need to re-query for the element because it gets detached from the DOM. This is because of how MaterialTable pagination works.
+    cy.get('[data-cy="institutions-table"]').as('newInstitutionsTable');
+    cy.get('@newInstitutionsTable')
+      .find('tr[level="0"]')
+      .last()
+      .as('institutionsTableLastRow');
+
+    cy.get('@institutionsTableLastRow').invoke('text').as('lastRowText');
+
+    cy.get('@lastRowText').should('contain', name);
+  });
+
   it('User Officer should be able to update Institution', () => {
     const name = faker.random.words(2);
 

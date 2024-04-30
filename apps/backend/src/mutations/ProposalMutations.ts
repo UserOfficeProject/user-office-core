@@ -11,7 +11,6 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -52,8 +51,6 @@ export default class ProposalMutations {
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
     @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
-    @inject(Tokens.FapDataSource)
-    private fapDataSource: FapDataSource,
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.GenericTemplateDataSource)
@@ -146,7 +143,7 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     { proposal, args }: { proposal: Proposal; args: UpdateProposalArgs }
   ): Promise<Proposal | Rejection> {
-    const { proposalPk, title, abstract, users, proposerId, created } = args;
+    const { proposalPk, title, abstract, users, proposerId } = args;
 
     if (title !== undefined) {
       proposal.title = title;
@@ -154,10 +151,6 @@ export default class ProposalMutations {
 
     if (abstract !== undefined) {
       proposal.abstract = abstract;
-    }
-
-    if (created !== undefined) {
-      proposal.created = created;
     }
 
     if (users !== undefined) {
@@ -381,7 +374,7 @@ export default class ProposalMutations {
     'commentForUser',
     'commentForManagement',
   ])
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
     args: AdministrationProposalArgs
@@ -391,7 +384,7 @@ export default class ProposalMutations {
       finalStatus,
       commentForManagement,
       commentForUser,
-      managementTimeAllocations,
+      managementTimeAllocation,
       managementDecisionSubmitted,
     } = args;
     const isChairOrSecretaryOfProposal =
@@ -414,10 +407,10 @@ export default class ProposalMutations {
       );
     }
 
-    const isFapProposalInstrumentSubmitted =
-      await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
+    const isProposalInstrumentSubmitted =
+      await this.instrumentDataSource.isProposalInstrumentSubmitted(primaryKey);
 
-    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
+    if (isProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
         'Can not administer proposal because instrument is submitted',
         { args, agent }
@@ -436,11 +429,8 @@ export default class ProposalMutations {
       proposal.commentForManagement = commentForManagement;
     }
 
-    if (managementTimeAllocations?.length) {
-      await this.instrumentDataSource.updateProposalInstrumentTimeAllocation(
-        proposal.primaryKey,
-        managementTimeAllocations
-      );
+    if (managementTimeAllocation !== undefined) {
+      proposal.managementTimeAllocation = managementTimeAllocation;
     }
 
     if (managementDecisionSubmitted !== undefined) {
@@ -458,7 +448,6 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
-    // TODO: It is better to collect the data here on the backend then sending callId and workflowId as arguments.
     const { statusId, proposals } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(
@@ -608,6 +597,7 @@ export default class ProposalMutations {
         notified: false,
         submitted: false,
         referenceNumberSequence: 0,
+        managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
       });
 
@@ -671,7 +661,6 @@ export default class ProposalMutations {
       proposerId,
       referenceNumber,
       users: coiIds,
-      created,
     } = args;
 
     const submitter = await this.userDataSource.getUser(submitterId);

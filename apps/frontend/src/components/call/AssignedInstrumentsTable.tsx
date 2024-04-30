@@ -12,10 +12,10 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   Call,
   InstrumentWithAvailabilityTime,
-  UpdateFapToCallInstrumentMutation,
+  UpdateSepToCallInstrumentMutation,
   UserRole,
 } from 'generated/sdk';
-import { useFapsData } from 'hooks/fap/useFapsData';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -50,34 +50,32 @@ type AssignedInstrumentsTableProps = {
   ) => void;
 };
 
-const FapSelectionEditComponent = (
+const SepSelectionEditComponent = (
   props: EditComponentProps<InstrumentWithAvailabilityTime> & {
     helperText?: string;
   }
 ) => {
   const { currentRole } = useContext(UserContext);
-  const { faps: allActiveFaps, loadingFaps } = useFapsData({
+  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
   });
 
-  const fapOptions =
-    allActiveFaps?.map((fap) => ({
-      label: fap.code,
-      value: fap.id,
+  const sepOptions =
+    allActiveSeps?.map((sep) => ({
+      label: sep.code,
+      value: sep.id,
     })) || [];
 
-  const value = fapOptions.find((item) => item.value === props.value) || null;
+  const value = sepOptions.find((item) => item.value === props.value) || null;
 
   return (
     <Autocomplete
-      loading={loadingFaps}
-      id="fapSelection"
-      options={fapOptions}
-      renderInput={(params) => (
-        <TextField {...params} placeholder="Fap" margin="none" />
-      )}
+      loading={loadingSEPs}
+      id="sepSelection"
+      options={sepOptions}
+      renderInput={(params) => <TextField {...params} placeholder="Sep" />}
       onChange={(_event, newValue) => {
         props.onChange(newValue?.value ?? null);
       }}
@@ -104,7 +102,6 @@ const AvailabilityTimeEditComponent = (
     fullWidth
     error={props.error}
     helperText={props.helperText}
-    margin="none"
   />
 );
 
@@ -135,13 +132,13 @@ const AssignedInstrumentsTable = ({
       editable: 'never',
     },
     {
-      title: 'Fap',
-      field: 'fapId',
+      title: 'Sep',
+      field: 'sepId',
       editable: 'onUpdate',
       emptyValue: '-',
-      editComponent: FapSelectionEditComponent,
+      editComponent: SepSelectionEditComponent,
       render: (rowData: InstrumentWithAvailabilityTime) => {
-        return <span>{rowData.fap?.code}</span>;
+        return <span>{rowData.sep?.code}</span>;
       },
     },
     {
@@ -224,19 +221,19 @@ const AssignedInstrumentsTable = ({
     setInstrumentAvailabilityTime(newUpdatedData, call.id);
   };
 
-  const updateFapToCallInstrument = async (
+  const updateSepToCallInstrument = async (
     instrumentUpdatedData: InstrumentWithAvailabilityTime
   ) => {
     const response = await api({
-      toastSuccessMessage: 'Fap updated successfully!',
-    }).updateFapToCallInstrument({
+      toastSuccessMessage: 'Sep updated successfully!',
+    }).updateSepToCallInstrument({
       callId: call.id,
       instrumentId: instrumentUpdatedData.id,
-      fapId: instrumentUpdatedData.fapId,
+      sepId: instrumentUpdatedData.sepId,
     });
 
     assignInstrumentsToCall(
-      response.updateFapToCallInstrument
+      response.updateSepToCallInstrument
         .instruments as InstrumentWithAvailabilityTime[]
     );
 
@@ -281,14 +278,14 @@ const AssignedInstrumentsTable = ({
                 }
               );
 
-              const fapUpdatePromise =
-                new Promise<UpdateFapToCallInstrumentMutation>(
+              const sepUpdatePromise =
+                new Promise<UpdateSepToCallInstrumentMutation>(
                   async (resolve, reject) => {
                     if (
                       instrumentUpdatedData &&
-                      selectedInstrument?.fapId !== instrumentUpdatedData.fapId
+                      selectedInstrument?.sepId !== instrumentUpdatedData.sepId
                     ) {
-                      const response = await updateFapToCallInstrument({
+                      const response = await updateSepToCallInstrument({
                         ...instrumentUpdatedData,
                       });
                       resolve(response);
@@ -300,10 +297,11 @@ const AssignedInstrumentsTable = ({
 
               return Promise.all([
                 instrumentUpdatePromise,
-                fapUpdatePromise,
+                sepUpdatePromise,
               ]).then((values) => {
+                console.log(values[1].updateSepToCallInstrument.instruments);
                 assignInstrumentsToCall(
-                  values[1].updateFapToCallInstrument
+                  values[1].updateSepToCallInstrument
                     .instruments as InstrumentWithAvailabilityTime[]
                 );
               });

@@ -6,7 +6,7 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
 import { Tokens } from '../config/Tokens';
 import { DownloadType } from '../factory/service';
-import { AuthJwtPayload, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
 import pdfDownload from './factory/pdf/download';
 import pdfPreview from './factory/pdf/preview';
 import xlsxDownload from './factory/xlsx';
@@ -14,28 +14,23 @@ import zipDownload from './factory/zip';
 
 const defaultErrorMessage = 'Failed to generate the requested file(s)';
 
-const getUserWithRoleFromExpressUser = async ({
-  user,
-  roles,
-  currentRole,
-  externalToken,
-  impersonatingUserId,
-  isInternalUser,
-}: AuthJwtPayload): Promise<UserWithRole> => {
+const getUserWithRoleFromExpressUser = async (
+  user: Express.User
+): Promise<UserWithRole> => {
   const userAuthorization = container.resolve<UserAuthorization>(
     Tokens.UserAuthorization
   );
 
   return {
-    ...(await baseContext.queries.user.getAgent(user.id)),
-    currentRole: currentRole || (roles ? roles[0] : null),
-    externalToken: externalToken,
+    ...(await baseContext.queries.user.getAgent(user.user.id)),
+    currentRole: user.currentRole || (user.roles ? user.roles[0] : null),
+    externalToken: user.externalToken,
     externalTokenValid:
-      externalToken !== undefined
-        ? await userAuthorization.isExternalTokenValid(externalToken)
+      user.externalToken !== undefined
+        ? await userAuthorization.isExternalTokenValid(user.externalToken)
         : false,
-    isInternalUser: isInternalUser,
-    impersonatingUserId: impersonatingUserId,
+    isInternalUser: user.isInternalUser,
+    impersonatingUserId: user.impersonatingUserId,
   } as UserWithRole;
 };
 
@@ -157,8 +152,9 @@ export default function factory() {
               isInternalUser: decodedUser.isInternalUser,
               roles: [],
             };
-            res.locals.agent =
-              await getUserWithRoleFromExpressUser(decodedUser);
+            res.locals.agent = await getUserWithRoleFromExpressUser(
+              decodedUser
+            );
             next();
           })
           .catch((e) => {

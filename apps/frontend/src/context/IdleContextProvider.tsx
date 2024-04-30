@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import PropTypes from 'prop-types';
 import React, { useContext, useRef } from 'react';
 
@@ -45,7 +45,7 @@ export const EmptyIdleContextProvider = (props: {
 
 export const IdleContextProvider = (props: { children: React.ReactNode }) => {
   const [state, setState] = React.useState(initIdleData);
-  // Separate state to avoid weirdness so timeouts use the state of when they are started
+  // Separate state to avoid weirdness  s timeouts use the state of when they are started
 
   const unauthorizedApi = useUnauthorizedApi();
   const { token } = useContext(UserContext);

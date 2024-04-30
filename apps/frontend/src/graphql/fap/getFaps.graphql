@@ -1,8 +1,0 @@
-query getFaps($filter: FapsFilter) {
-  faps(filter: $filter) {
-    faps {
-      ...fap
-    }
-    totalCount
-  }
-}

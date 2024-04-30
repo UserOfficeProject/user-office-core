@@ -5,7 +5,6 @@ import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
-import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
@@ -22,6 +21,7 @@ import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
+import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
@@ -36,8 +36,8 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
-import { getDataRow, populateRow } from '../factory/xlsx/FapDataRow';
+import { SEPDataColumns } from '../factory/xlsx/SEPDataColumns';
+import { getDataRow, populateRow } from '../factory/xlsx/SEPDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
@@ -59,7 +59,7 @@ mapClass(Tokens.StatusActionsDataSource, PostgresStatusActionsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
-mapClass(Tokens.FapDataSource, PostgresFapDataSource);
+mapClass(Tokens.SEPDataSource, PostgresSEPDataSource);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
 mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
 mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
@@ -80,8 +80,8 @@ mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SkipSendMailService);
 
-mapValue(Tokens.FapDataColumns, FapDataColumns);
-mapValue(Tokens.FapDataRow, getDataRow);
+mapValue(Tokens.SEPDataColumns, SEPDataColumns);
+mapValue(Tokens.SEPDataRow, getDataRow);
 mapValue(Tokens.PopulateRow, populateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);

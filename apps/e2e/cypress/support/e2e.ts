@@ -24,6 +24,5 @@ import './user';
 import './utils';
 import './visits';
 import './workflow';
-import './fap';
+import './sep';
 import './predefinedMessages';
-import './settings';

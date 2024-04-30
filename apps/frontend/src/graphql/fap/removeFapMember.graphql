@@ -1,9 +1,0 @@
-mutation removeMemberFromFap(
-  $memberId: Int!
-  $fapId: Int!
-  $roleId: UserRole!
-) {
-  removeMemberFromFap(memberId: $memberId, fapId: $fapId, roleId: $roleId) {
-    id
-  }
-}

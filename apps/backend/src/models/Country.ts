@@ -1,6 +1,3 @@
 export class Country {
-  constructor(
-    public countryId: number,
-    public country: string
-  ) {}
+  constructor(public countryId: number, public country: string) {}
 }

@@ -6,7 +6,6 @@ import { ChangeEvent, default as React, useContext } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import RefreshListIcon from 'components/common/RefresListIcon';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -26,21 +25,21 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
 ) => {
   const config = props.questionRel.config as SampleDeclarationConfig;
 
-  const {
-    templates: sampleTemplates,
-    refreshTemplates: refreshSampleTemplates,
-  } = useActiveTemplates(TemplateGroupId.SAMPLE, config.templateId);
-
-  const { templates: esiTemplates, refreshTemplates: refreshEsiTemplates } =
-    useActiveTemplates(TemplateGroupId.SAMPLE_ESI, config.esiTemplateId);
-
+  const { templates } = useActiveTemplates(
+    TemplateGroupId.SAMPLE,
+    config.templateId
+  );
+  const { templates: esiTemplates } = useActiveTemplates(
+    TemplateGroupId.SAMPLE_ESI,
+    config.esiTemplateId
+  );
   const { featuresMap } = useContext(FeatureContext);
 
-  if (!sampleTemplates || !esiTemplates) {
+  if (!templates || !esiTemplates) {
     return null;
   }
 
-  const templateOptions = sampleTemplates.map((template) => ({
+  const templateOptions = templates.map((template) => ({
     value: template.templateId,
     text: template.name,
   }));
@@ -84,9 +83,6 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
                 items={templateOptions}
                 InputProps={{ 'data-cy': 'template-id' }}
                 TextFieldProps={{ margin: 'none' }}
-                AdornmentIcon={
-                  <RefreshListIcon onClick={refreshSampleTemplates} />
-                }
                 required
               />
               <Link
@@ -99,26 +95,14 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
             </FormControl>
 
             {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
-              <FormControl fullWidth>
-                <FormikUIAutocomplete
-                  name="config.esiTemplateId"
-                  label="ESI template name"
-                  noOptionsText="No active templates"
-                  items={ESITemplateOptions}
-                  InputProps={{ 'data-cy': 'esi-template-id' }}
-                  AdornmentIcon={
-                    <RefreshListIcon onClick={refreshEsiTemplates} />
-                  }
-                  TextFieldProps={{ margin: 'none' }}
-                />
-                <Link
-                  href="/SampleEsiTemplates/"
-                  target="blank"
-                  style={{ textAlign: 'right' }}
-                >
-                  View all templates
-                </Link>
-              </FormControl>
+              <FormikUIAutocomplete
+                name="config.esiTemplateId"
+                label="ESI template name"
+                noOptionsText="No active templates"
+                items={ESITemplateOptions}
+                InputProps={{ 'data-cy': 'esi-template-id' }}
+                TextFieldProps={{ margin: 'none' }}
+              />
             )}
           </TitledContainer>
 

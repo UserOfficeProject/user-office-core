@@ -47,10 +47,7 @@ export abstract class QuestionaryWizardStep implements WizardStep {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public payload?: any;
 
-  constructor(
-    private step: QuestionaryStep,
-    private index: number
-  ) {
+  constructor(private step: QuestionaryStep, private index: number) {
     this.payload = {
       topicId: this.step.topic.id,
       questionaryStepIndex: this.index,

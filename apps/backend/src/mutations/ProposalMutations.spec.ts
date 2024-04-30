@@ -296,7 +296,6 @@ test('User officer can set final status of a proposal', () => {
     proposalMutations.admin(dummyUserOfficerWithRole, {
       proposalPk: 1,
       finalStatus: 1,
-      managementTimeAllocations: [{ instrumentId: 1, value: 1 }],
     })
   ).resolves.toBeInstanceOf(Proposal);
 });
@@ -306,7 +305,6 @@ test('User cannot set final status of a proposal', () => {
     proposalMutations.admin(dummyUserNotOnProposalWithRole, {
       proposalPk: 1,
       finalStatus: 1,
-      managementTimeAllocations: [{ instrumentId: 1, value: 1 }],
     })
   ).resolves.not.toBeInstanceOf(Proposal);
 });

@@ -71,11 +71,12 @@ context('Event log tests', () => {
         gender: 'male',
         nationality: 1,
         birthdate: new Date('2000/01/01'),
-        institutionId: 1,
+        organisation: 1,
         department: 'IT',
         position: 'Dirrector',
         email: faker.internet.email(),
         telephone: '555-123-4567',
+        organizationCountry: 1,
       });
 
       cy.login('officer');

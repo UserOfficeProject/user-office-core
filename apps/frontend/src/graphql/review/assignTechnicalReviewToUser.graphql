@@ -1,13 +1,5 @@
-mutation updateTechnicalReviewAssignee(
-  $proposalPks: [Int!]!
-  $userId: Int!
-  $instrumentId: Int!
-) {
-  updateTechnicalReviewAssignee(
-    proposalPks: $proposalPks
-    userId: $userId
-    instrumentId: $instrumentId
-  ) {
+mutation updateTechnicalReviewAssignee($proposalPks: [Int!]!, $userId: Int!) {
+  updateTechnicalReviewAssignee(proposalPks: $proposalPks, userId: $userId) {
     ...coreTechnicalReview
   }
 }

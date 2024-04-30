@@ -5,7 +5,6 @@ const db = Knex({
   client: 'postgresql',
   connection: process.env.DATABASE_URL,
   pool: {
-    min: 0, // Knex recommended minimum
     afterCreate: function (connection: any, done: any) {
       const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       connection.query(

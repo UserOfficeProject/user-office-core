@@ -180,7 +180,6 @@ const shipmentBasisPreSubmit =
         });
       }
     } else {
-      if (!shipment.scheduledEventId) return returnValue;
       const { createShipment } = await api.createShipment({
         title: title,
         proposalPk: shipment.proposalPk,

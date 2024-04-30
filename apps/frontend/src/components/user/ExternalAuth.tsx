@@ -11,7 +11,6 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
-import clearSession from 'utils/clearSession';
 
 const ExternalAuthQueryParams = {
   sessionid: StringParam,
@@ -20,19 +19,10 @@ const ExternalAuthQueryParams = {
   error_description: StringParam,
 };
 
-export const getCurrentUrlValues = () => {
-  const { protocol, host, pathname: pathName, search } = window.location;
-  const currentUrlWithoutParams = [protocol, '//', host, pathName].join('');
-  const queryParams = new URLSearchParams(search);
-  Object.keys(ExternalAuthQueryParams).map((value) => {
-    queryParams.delete(value);
-  });
+const getCurrentUrlWithoutQueryParams = () => {
+  const { protocol, host, pathname } = window.location;
 
-  return {
-    currentUrlWithoutParams,
-    queryParams,
-    pathName,
-  };
+  return [protocol, '//', host, pathname].join('');
 };
 
 function ExternalAuth() {
@@ -64,7 +54,7 @@ function ExternalAuth() {
             size="small"
             variant="outlined"
             onClick={() => {
-              clearSession();
+              localStorage.clear();
               window.location.assign('/');
             }}
           >
@@ -116,24 +106,18 @@ function ExternalAuth() {
     );
 
     const handleAuthorizationCode = (authorizationCode: string) => {
-      const { currentUrlWithoutParams, queryParams } = getCurrentUrlValues();
-      const redirectURL = queryParams.size
-        ? `/?${queryParams.toString()}`
-        : '/';
-      const iss = queryParams.get('iss');
+      const currentUrlWithoutParams = getCurrentUrlWithoutQueryParams();
+
       setView(<ContactingAuthorizationServerMessage />);
 
       unauthorizedApi()
         .externalTokenLogin({
           externalToken: authorizationCode,
           redirectUri: currentUrlWithoutParams,
-          iss: iss,
         })
         .then(({ externalTokenLogin }) => {
           handleLogin(externalTokenLogin);
-          const previousPath = localStorage.getItem('redirectPath');
-          clearSession('redirectPath');
-          window.location.href = previousPath ?? redirectURL;
+          window.location.href = '/';
         })
         .catch((error) => {
           setView(<ErrorMessage message={error.message} />);
@@ -149,8 +133,8 @@ function ExternalAuth() {
 
         return;
       }
-      const { currentUrlWithoutParams } = getCurrentUrlValues();
       const url = new URL(externalAuthLoginUrl);
+      const currentUrlWithoutParams = getCurrentUrlWithoutQueryParams();
       url.searchParams.set('redirect_uri', currentUrlWithoutParams);
       window.location.href = url.toString();
     };

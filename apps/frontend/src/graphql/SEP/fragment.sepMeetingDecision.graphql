@@ -1,0 +1,9 @@
+fragment sepMeetingDecision on SepMeetingDecision {
+  proposalPk
+  recommendation
+  commentForUser
+  commentForManagement
+  rankOrder
+  submitted
+  submittedBy
+}

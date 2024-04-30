@@ -5,12 +5,12 @@ import jsonwebtoken, {
   VerifyOptions,
 } from 'jsonwebtoken';
 
-const secret = process.env.JWT_SECRET as string;
-const expiresIn = process.env.JWT_TOKEN_LIFE as string;
+const secret = process.env.secret as string;
+const expiresIn = process.env.tokenLife as string;
 
 if (!secret) {
   logger.logError(
-    'Could not start application: the `JWT_SECRET` environment variable is missing. Exiting.',
+    'Could not start application: the `secret` environment variable is missing. Exiting.',
     {}
   );
   process.exit(1);
@@ -18,7 +18,7 @@ if (!secret) {
 
 if (!expiresIn) {
   logger.logError(
-    'Could not start application: the `JWT_TOKEN_LIFE` environment variable is missing. Exiting.',
+    'Could not start application: the `tokenLike` environment variable is missing. Exiting.',
     {}
   );
   process.exit(1);

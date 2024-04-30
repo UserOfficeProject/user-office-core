@@ -4,7 +4,9 @@ import useTheme from '@mui/material/styles/useTheme';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
 import { DatePicker } from 'formik-mui-lab';
+import i18n from 'i18n';
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -15,12 +17,12 @@ import {
   UpdateCallMutationVariables,
   UserRole,
 } from 'generated/sdk';
-import { useFapsData } from 'hooks/fap/useFapsData';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
 
 const CallReviewAndNotification = () => {
   const theme = useTheme();
   const { currentRole } = useContext(UserContext);
-  const { faps: allActiveFaps, loadingFaps } = useFapsData({
+  const { SEPs: allActiveSeps, loadingSEPs } = useSEPsData({
     filter: '',
     active: true,
     role: currentRole as UserRole,
@@ -31,12 +33,13 @@ const CallReviewAndNotification = () => {
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
-  const { startReview, startFapReview } = formik.values;
+  const { startReview, startSEPReview } = formik.values;
+  const { t } = useTranslation();
 
-  const fapOptions =
-    allActiveFaps?.map((fap) => ({
-      text: fap.code,
-      value: fap.id,
+  const sepOptions =
+    allActiveSeps?.map((sep) => ({
+      text: sep.code,
+      value: sep.id,
     })) || [];
 
   return (
@@ -79,9 +82,9 @@ const CallReviewAndNotification = () => {
           required
         />
         <Field
-          name="startFapReview"
-          label="Start of Fap review"
-          id="start-fap-review-input"
+          name="startSEPReview"
+          label={'Start of ' + t('SEP') + ' review'}
+          id="start-sep-review-input"
           inputFormat={dateFormat}
           mask={mask}
           ampm={false}
@@ -94,14 +97,14 @@ const CallReviewAndNotification = () => {
           desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
         <Field
-          name="endFapReview"
-          label="End of Fap review"
-          id="end-fap-review-input"
+          name="endSEPReview"
+          label={'End of ' + t('SEP') + ' review'}
+          id="end-sep-review-input"
           inputFormat={dateFormat}
           mask={mask}
           ampm={false}
           allowSameDateSelection
-          minDate={startFapReview}
+          minDate={startSEPReview}
           component={DatePicker}
           inputProps={{ placeholder: dateFormat }}
           textField={{
@@ -111,13 +114,13 @@ const CallReviewAndNotification = () => {
         />
       </LocalizationProvider>
       <FormikUIAutocomplete
-        name="faps"
-        label="Call Faps"
+        name="seps"
+        label={'Call ' + i18n.format(t('SEP'), 'plural')}
         multiple
-        loading={loadingFaps}
-        noOptionsText="No Faps"
-        data-cy="call-faps"
-        items={fapOptions}
+        loading={loadingSEPs}
+        noOptionsText="No SEPs"
+        data-cy="call-seps"
+        items={sepOptions}
       />
       <Field
         name="surveyComment"

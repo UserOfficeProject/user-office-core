@@ -6,8 +6,8 @@ import { FeedbackStatus, Sdk, TemplateGroupId } from 'generated/sdk';
 import { FeedbackSubmissionState } from 'models/questionary/feedback/FeedbackSubmissionState';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
-import { FeedbackWizardStep } from './FeedbackWizardStep';
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
+import { FeedbackWizardStep } from './FeedbackWizardStep';
 
 export const feedbackQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.FEEDBACK,
