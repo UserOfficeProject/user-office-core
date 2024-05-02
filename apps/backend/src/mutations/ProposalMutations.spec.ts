@@ -6,6 +6,7 @@ import {
   ProposalDataSourceMock,
   dummyProposalWithNotActiveCall,
   dummyProposalSubmitted,
+  dummyProposal,
 } from '../datasources/mockups/ProposalDataSource';
 import {
   dummyPrincipalInvestigatorWithRole,
@@ -14,6 +15,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { isRejection, Rejection } from '../models/Rejection';
 import ProposalMutations from './ProposalMutations';
@@ -372,4 +374,13 @@ test('Proposal cannot be submitted without a call', () => {
       callId: -1,
     })
   ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test('User officer should not be able to send proposal submitted email to a proposal not submitted', () => {
+  return expect(
+    proposalMutations.sendEventEmail(dummyUserOfficerWithRole, {
+      proposalId: dummyProposal.proposalId,
+      event: Event.PROPOSAL_SUBMITTED,
+    })
+  ).resolves.not.toEqual(Event.PROPOSAL_SUBMITTED);
 });
