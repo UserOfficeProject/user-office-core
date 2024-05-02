@@ -20,6 +20,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
@@ -31,6 +32,7 @@ import { AdministrationProposalArgs } from '../resolvers/mutations/Administratio
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
+import { SendProposalEventEmailArgs } from '../resolvers/mutations/SendProposalEventEmailMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { statusActionEngine } from '../statusActionEngine';
 import { WorkflowEngineProposalType } from '../workflowEngine';
@@ -60,7 +62,10 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization,
+    @inject(Tokens.EmailEventHandler)
+    private emailHandler: (event: ApplicationEvent) => Promise<void>
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -751,5 +756,35 @@ export default class ProposalMutations {
     );
 
     return submitted;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async sendEventEmail(
+    agent: UserWithRole | null,
+    args: SendProposalEventEmailArgs
+  ) {
+    if (args.event !== Event.PROPOSAL_SUBMITTED) {
+      return rejection('Proposal send email event requested not supported');
+    }
+
+    const proposal = await this.proposalDataSource.getProposalById(
+      args.proposalId
+    );
+
+    if (!proposal) {
+      return rejection('Proposal not found', { args });
+    }
+
+    if (!proposal.submitted) {
+      return rejection('Proposal has not been submitted', { args });
+    }
+
+    return this.emailHandler({
+      type: Event.PROPOSAL_SUBMITTED,
+      proposal: proposal,
+      isRejection: false,
+      key: 'proposal',
+      loggedInUserId: agent?.id || 0,
+    }).then(() => args.event);
   }
 }
