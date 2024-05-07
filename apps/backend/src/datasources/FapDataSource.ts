@@ -95,19 +95,10 @@ export interface FapDataSource {
     memberId: number
   ): Promise<Fap>;
   removeProposalsFromFap(proposalPks: number[], fapId: number): Promise<Fap>;
-  assignMemberToFapProposal(
-    proposalPk: number,
-    fapId: number,
-    memberIds: number[]
-  ): Promise<Fap>;
-  assignMemberToFapProposals(
-    proposalPks: number[],
-    fapId: number,
-    memberId: number
-  ): Promise<Fap>;
-  getFapProposalToNumReviewsNeededMap(
+  assignMembersToFapProposals(
+    assignments: { proposalPk: number; memberId: number }[],
     fapId: number
-  ): Promise<Map<FapProposal, number>>;
+  ): Promise<Fap>;
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,

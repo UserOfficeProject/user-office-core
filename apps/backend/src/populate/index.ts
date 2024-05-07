@@ -335,9 +335,10 @@ const createFaps = async () => {
         fapId: fap.id,
         fapInstrumentId: 1,
       });
-      await fapDataSource.assignMemberToFapProposal(proposalPk, fap.id, [
-        tmpUserId,
-      ]);
+      await fapDataSource.assignMembersToFapProposals(
+        [{ proposalPk, memberId: tmpUserId }],
+        fap.id
+      );
       await reviewDataSource.addUserForReview({
         proposalPk: proposalPk,
         fapID: fap.id,

@@ -35,21 +35,15 @@ export class AssignReviewersToFapArgs {
 }
 
 @ArgsType()
-export class AssignFapReviewersToProposalArgs {
+export class AssignFapReviewersToProposalsArgs {
   @Field(() => [Int])
   public memberIds: number[];
 
   @Field(() => Int)
   public fapId: number;
 
-  @Field(() => Int)
-  public proposalPk: number;
-}
-
-@ArgsType()
-export class MassAssignReviewsArgs {
-  @Field(() => Int)
-  public fapId: number;
+  @Field(() => [Int])
+  public proposalPks: number[];
 }
 
 @ArgsType()
@@ -121,22 +115,14 @@ export class AssignMembersToFapMutation {
   }
 
   @Mutation(() => Fap)
-  async assignFapReviewersToProposal(
-    @Args() args: AssignFapReviewersToProposalArgs,
+  async assignFapReviewersToProposals(
+    @Args() args: AssignFapReviewersToProposalsArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.fap.assignFapReviewersToProposal(
+    return context.mutations.fap.assignFapReviewersToProposals(
       context.user,
       args
     );
-  }
-
-  @Mutation(() => Fap)
-  async massAssignFapReviews(
-    @Args() args: MassAssignReviewsArgs,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.fap.massAssignFapReviews(context.user, args);
   }
 
   @Mutation(() => Fap)

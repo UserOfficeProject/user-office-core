@@ -19,6 +19,15 @@
             "protocol": "inspector",
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "C:\\app"
-        }
+        },
+        {
+            "name": "Attach to Docker container",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "protocol": "inspector",
+            "localRoot": "${workspaceFolder}/apps/backend",
+            "remoteRoot": "/app"
+          }
     ]
 }

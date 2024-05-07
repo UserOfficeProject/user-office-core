@@ -28,11 +28,10 @@ import { Roles } from '../models/Role';
 import { UserWithRole, UserRole } from '../models/User';
 import {
   UpdateMemberFapArgs,
-  AssignFapReviewersToProposalArgs,
   AssignReviewersToFapArgs,
   RemoveFapReviewerFromProposalArgs,
   AssignChairOrSecretaryToFapArgs,
-  MassAssignReviewsArgs,
+  AssignFapReviewersToProposalsArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
   AssignProposalsToFapArgs,
@@ -357,43 +356,9 @@ export default class FapMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async assignFapReviewersToProposal(
+  async assignFapReviewersToProposals(
     agent: UserWithRole | null,
-    args: AssignFapReviewersToProposalArgs
-  ): Promise<Fap | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
-      return rejection(
-        'Can not assign Fap reviewers to proposal because of insufficient permissions',
-        { agent, args }
-      );
-    }
-
-    return this.dataSource
-      .assignMemberToFapProposal(args.proposalPk, args.fapId, args.memberIds)
-      .catch((err) => {
-        return rejection(
-          'Can not assign proposal to facility access panel',
-          { agent },
-          err
-        );
-      });
-  }
-
-  /**
-   * Assigns all remaining reviews needed for a FAP among its members. Attempts to distribute reviews as evenly as possible.
-   * Assumes there is ony one call in the review phase for a FAP at a time.
-   * @param agent User
-   * @param args ID of the FAP to mass assign reviews for
-   * @returns Updated FAP
-   */
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
-  @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async massAssignFapReviews(
-    agent: UserWithRole | null,
-    args: MassAssignReviewsArgs
+    args: AssignFapReviewersToProposalsArgs
   ): Promise<Fap | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -405,61 +370,23 @@ export default class FapMutations {
       );
     }
 
-    const reviewsToAssign = new Map<FapReviewer, FapProposal[]>();
-    const reviewersAssignedReviewsMap = new Map<FapReviewer, number>();
-    const reviewers = await this.dataSource.getReviewers(args.fapId);
-    const reviewsNeededMap =
-      await this.dataSource.getFapProposalToNumReviewsNeededMap(args.fapId);
+    const assignments: { proposalPk: number; memberId: number }[] = [];
 
-    for (const reviewer of reviewers) {
-      reviewersAssignedReviewsMap.set(
-        reviewer,
-        await this.dataSource.getFapReviewerProposalCountCurrentRound(
-          reviewer.userId
-        )
-      );
+    for (const memberId of args.memberIds) {
+      for (const proposalPk of args.proposalPks) {
+        assignments.push({ proposalPk, memberId });
+      }
     }
 
-    for (const fapProposal of [...reviewsNeededMap.keys()]) {
-      while ((reviewsNeededMap.get(fapProposal) ?? 0) > 0) {
-        const numReviewsNeeded = reviewsNeededMap.get(fapProposal) ?? 0;
-
-        const fapReviewer = await this.getReviewerWithMinNumReviews(
-          reviewersAssignedReviewsMap,
-          reviewsToAssign,
-          fapProposal.proposalPk,
-          args.fapId
+    return this.dataSource
+      .assignMembersToFapProposals(assignments, args.fapId)
+      .catch((err) => {
+        return rejection(
+          'Can not assign proposal to facility access panel',
+          { agent },
+          err
         );
-
-        const reviewersPendingAssignments =
-          reviewsToAssign.get(fapReviewer) ?? [];
-        reviewersPendingAssignments.push(fapProposal);
-        reviewsToAssign.set(fapReviewer, reviewersPendingAssignments);
-        reviewsNeededMap.set(fapProposal, numReviewsNeeded - 1);
-      }
-    }
-
-    for (const reviewer of [...reviewsToAssign.keys()]) {
-      const reviews =
-        reviewsToAssign.get(reviewer)?.map((review) => review.proposalPk) ?? [];
-      if (reviews.length > 0) {
-        this.dataSource
-          .assignMemberToFapProposals(reviews, args.fapId, reviewer.userId)
-          .catch((err) => {
-            return rejection(
-              'Can not assign proposal to facility access panel',
-              { agent },
-              err
-            );
-          });
-      }
-    }
-
-    const updatedFap = await this.dataSource.getFap(args.fapId);
-
-    return updatedFap
-      ? updatedFap
-      : rejection('Can not fetch updated Fap', { agent });
+      });
   }
 
   async getReviewerWithMinNumReviews(
