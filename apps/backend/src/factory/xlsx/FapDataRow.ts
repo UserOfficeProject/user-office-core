@@ -1,6 +1,7 @@
 import { RowObj } from './fap';
 
 export function getDataRow(
+  proposalPk: number,
   piName: string,
   proposalAverageScore: number,
   instrumentName: string,
@@ -12,6 +13,7 @@ export function getDataRow(
   propFapRankOrder: number | null
 ): RowObj {
   return {
+    proposalPk: proposalPk,
     propShortCode: proposalId?.toString(),
     propTitle: proposalTitle,
     principalInv: piName,

@@ -9,6 +9,10 @@ import callFactoryService, {
   XLSXMetaBase,
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
+import {
+  CallFapDataColumns,
+  collectCallFapXLSXData,
+} from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
 import {
   collectProposalXLSXData,
@@ -110,6 +114,48 @@ router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
     callFactoryService(
       DownloadType.XLSX,
       XLSXType.FAP,
+      { data, meta, userRole },
+      req,
+      res,
+      next
+    );
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
+    const userWithRole = {
+      ...req.user.user,
+      currentRole: req.user.currentRole,
+    };
+
+    const callId = parseInt(req.params.call_id);
+
+    if (isNaN(+callId)) {
+      throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
+    }
+
+    const { data, filename } = await collectCallFapXLSXData(
+      callId,
+      userWithRole
+    );
+
+    const meta: XLSXMetaBase = {
+      singleFilename: filename,
+      collectionFilename: filename,
+      columns: CallFapDataColumns,
+    };
+
+    const userRole = req.user.currentRole;
+    callFactoryService(
+      DownloadType.XLSX,
+      XLSXType.CALL_FAP,
       { data, meta, userRole },
       req,
       res,

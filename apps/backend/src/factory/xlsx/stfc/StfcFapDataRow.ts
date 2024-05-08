@@ -9,6 +9,7 @@ import { getDataRow } from '../FapDataRow';
 const stfcUserDataSource = new StfcUserDataSource();
 
 export async function getStfcDataRow(
+  proposalPk: number,
   piName: string,
   proposalAverageScore: number,
   instrument: string,
@@ -31,12 +32,16 @@ export async function getStfcDataRow(
     proposer_id?.toString() ?? '',
   ]);
 
+  // eslint-disable-next-line no-console
+  console.log('HERE');
+
   const piCountry = piDetails.find(
     (user) => user.userNumber === proposer_id?.toString()
   )?.country;
 
   return {
     ...getDataRow(
+      proposalPk,
       piName,
       proposalAverageScore,
       instrument,

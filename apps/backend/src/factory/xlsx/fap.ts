@@ -6,6 +6,7 @@ import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { Review } from '../../models/Review';
 import { UserWithRole } from '../../models/User';
+import { collectCallFapXLSXData } from './callFaps';
 import { getDataRow } from './FapDataRow';
 import { getStfcDataRow } from './stfc/StfcFapDataRow';
 
@@ -15,6 +16,7 @@ type FapXLSXData = Array<{
 }>;
 
 export type RowObj = {
+  proposalPk: number;
   propShortCode?: string;
   propTitle?: string;
   principalInv: string;
@@ -77,33 +79,16 @@ const sortByRankOrAverageScore = (data: RowObj[]) => {
     });
 };
 
-export const collectFapXLSXData = async (
+export const collectFapXLSXRowData = async (
   fapId: number,
   callId: number,
   user: UserWithRole
-): Promise<{ data: FapXLSXData; filename: string }> => {
-  const fap = await baseContext.queries.fap.get(user, fapId);
-  const call = await baseContext.queries.call.get(user, callId);
-  // TODO: decide on filename
-  const filename = `Fap-${fap?.code}-${call?.shortCode}.xlsx`;
-
-  const instruments =
-    await baseContext.queries.instrument.getInstrumentsByFapId(user, {
-      fapId,
-      callId,
-    });
-
-  if (!instruments) {
-    throw new Error(
-      `Fap with ID '${fapId}'/Call with ID '${callId}' not found, or the user has insufficient rights`
-    );
-  }
-
+): Promise<{ sheetName: string; rows: RowObj[] }[]> => {
   const baseData = await fapDataSource.getFapReviewData(callId, fapId);
 
   const instrumentData = groupBy(baseData, 'instrument_id');
 
-  const out: FapXLSXData = [];
+  const out: { sheetName: string; rows: RowObj[] }[] = [];
 
   for (const instrument in instrumentData) {
     const records = instrumentData[instrument];
@@ -129,6 +114,7 @@ export const collectFapXLSXData = async (
         );
 
         return fapDataRow(
+          proposal.proposal_pk,
           `${pi?.firstname} ${pi?.lastname}`,
           proposal.average_grade,
           proposal.instrument_name,
@@ -150,12 +136,35 @@ export const collectFapXLSXData = async (
         // Sheet names can't exceed 31 characters
         // use the short code and cut everything after 30 chars
         sheetName.substring(0, 30),
-      rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
+      rows,
     });
   }
 
+  return out;
+};
+
+export const collectFapXLSXData = async (
+  fapId: number,
+  callId: number,
+  user: UserWithRole
+): Promise<{ data: FapXLSXData; filename: string }> => {
+  collectCallFapXLSXData(fapId, user);
+
+  const fap = await baseContext.queries.fap.get(user, fapId);
+  const call = await baseContext.queries.call.get(user, callId);
+  const filename = `Fap-${fap?.code}-${call?.shortCode}.xlsx`;
+
+  const data = await collectFapXLSXRowData(fapId, callId, user);
+
+  const transformedData: FapXLSXData = data.map((sheet) => {
+    return {
+      sheetName: sheet.sheetName,
+      rows: sortByRankOrAverageScore(sheet.rows).map((row) => populateRow(row)),
+    };
+  });
+
   return {
-    data: out,
     filename: filename.replace(/\s+/g, '_'),
+    data: transformedData,
   };
 };
