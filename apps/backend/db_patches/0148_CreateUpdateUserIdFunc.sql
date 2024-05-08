@@ -1,9 +1,25 @@
 DO
 $$
 BEGIN
+  --The business logic of the REPLACE_OLD_USER_ID_WITH_NEW function.
+  --  Discover the target column in tables with a foreign key constraint on the USER_ID field of the USERS table, 
+  --    then save the findings into the MERGING_TABLE_REGISTRY table.
+  --  Retrieve the MERGING_TABLE_REGISTRY table and perform the following checks:
+  --    Determine if the target column is part of the primary or unique key constraint of the table.
+  --      1. If the key constraint is composite, generate two SQL statements:
+  --          a. Update the target column of the table to the new user ID 
+  --               where the target column equals the old user ID and doesn't overlap with the new user ID, 
+  --               considering the other part of the composite key is identical.
+  --          b. Delete from the target table 
+  --               where the target column equals the old user ID and overlaps with the new user ID, 
+  --               while the other part of the composite key is identical.
+  --      2. If the key constraint is NOT composite, generate a SQL statement to 
+  --           update the target column of the target table to the new user ID 
+  --           where the target column equals the old user ID.
+  --  Delete from USERS table where USER_ID field equals old user id.
   IF REGISTER_PATCH('CreateOrReplaceOldUserIdWithNewFunc.SQL', 'CHI KAI LAM', 'UPDATE USER ID FOR MERGING', '2024-03-22') THEN
     BEGIN
-      CREATE TABLE IF NOT EXISTS MERGING_TABLE_REGIESTRY (
+      CREATE TABLE IF NOT EXISTS MERGING_TABLE_REGISTRY (
         TABLE_NAME  VARCHAR(100) NOT NULL, 
         COLUMN_NAME  VARCHAR(100) NOT NULL, 
         CREATED_AT  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -33,8 +49,8 @@ BEGIN
         IF OLD_USER_CNT = 0 THEN 
             RETURN;
         END IF; 
-        TRUNCATE TABLE MERGING_TABLE_REGIESTRY;
-        INSERT INTO MERGING_TABLE_REGIESTRY (TABLE_NAME, COLUMN_NAME) 
+        TRUNCATE TABLE MERGING_TABLE_REGISTRY;
+        INSERT INTO MERGING_TABLE_REGISTRY (TABLE_NAME, COLUMN_NAME) 
         SELECT KCU.TABLE_NAME, KCU.column_name FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC 
           JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU
             ON TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME
@@ -52,7 +68,7 @@ BEGIN
               VALUES (P_NEW_USER_ID, '', '', P_NEW_USER_ID, '', NOW(), '', '', P_NEW_USER_ID, '');
         END IF;
         FOR MTR_REC IN SELECT TABLE_NAME, COLUMN_NAME 
-          FROM MERGING_TABLE_REGIESTRY ORDER BY TABLE_NAME, COLUMN_NAME 
+          FROM MERGING_TABLE_REGISTRY ORDER BY TABLE_NAME, COLUMN_NAME 
         LOOP
           MTR_PK_UN_COL_CNT := 0;
           UPD_SQL := '';
@@ -87,7 +103,7 @@ BEGIN
               EXIST_WH = EXIST_WH || ' AND T2.';
             END IF;
             IS_NEW_USERID := 0;
-            SELECT COUNT(*) FROM MERGING_TABLE_REGIESTRY 
+            SELECT COUNT(*) FROM MERGING_TABLE_REGISTRY 
               WHERE TABLE_NAME = MTR_PK_UN_REC.TABLE_NAME 
               AND COLUMN_NAME = MTR_PK_UN_REC.COLUMN_NAME 
               INTO IS_NEW_USERID;
