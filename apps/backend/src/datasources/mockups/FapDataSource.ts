@@ -391,7 +391,11 @@ export class FapDataSourceMock implements FapDataSource {
     fapId: number,
     proposalPk: number
   ): Promise<FapProposal | null> {
-    throw new Error('Method not implemented.');
+    return (
+      dummyFapProposals.find(
+        (fp) => fp.fapId === fapId && fp.proposalPk === proposalPk
+      ) || null
+    );
   }
 
   updateTimeAllocation(

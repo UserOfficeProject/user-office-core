@@ -1328,11 +1328,6 @@ context('Fap meeting components tests', () => {
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer.id],
       });
-      cy.assignFapReviewersToProposal({
-        fapId: createdFapId,
-        memberIds: [fapMembers.reviewer.id],
-        proposalPk: firstCreatedProposalPk,
-      });
       cy.updateUserRoles({
         id: scientist.id,
         roles: [initialDBData.roles.instrumentScientist],
@@ -1382,6 +1377,12 @@ context('Fap meeting components tests', () => {
             callId: initialDBData.call.id,
             instrumentId: createdInstrumentId,
             availabilityTime: instrumentAvailabilityTime,
+          });
+
+          cy.assignFapReviewersToProposal({
+            fapId: createdFapId,
+            memberIds: [fapMembers.reviewer.id],
+            proposalPk: firstCreatedProposalPk,
           });
         }
       });
