@@ -6,6 +6,7 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
@@ -99,7 +100,7 @@ const getQuestionary = async (questionaryId: number) => {
   return questionary;
 };
 
-const addTopicInformation = (
+const addTopicInformation = async (
   proposalPDFData: ProposalPDFData,
   questionarySteps: QuestionaryStep[],
   samples: Sample[],
@@ -145,6 +146,18 @@ const addTopicInformation = (
               genericTemplate.questionId === answer.question.id
           )
           .map((genericTemplate) => genericTemplate);
+      } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+        const instrumentIds = Array.isArray(answer.value)
+          ? answer.value
+          : [answer.value];
+        const instrumentDataSource = container.resolve<InstrumentDataSource>(
+          Tokens.InstrumentDataSource
+        );
+        const instruments =
+          await instrumentDataSource.getInstrumentsByIds(instrumentIds);
+        answer.value = instruments?.length
+          ? instruments.map((instrument) => instrument.name).join(', ')
+          : '';
       }
     }
 
@@ -523,7 +536,7 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   // Add information from each topic in proposal
-  const proposalPDFData: ProposalPDFData = addTopicInformation(
+  const proposalPDFData: ProposalPDFData = await addTopicInformation(
     {
       proposal,
       principalInvestigator,
@@ -550,11 +563,12 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   if (technicalReviews?.length) {
-    const instruments =
-      await baseContext.queries.instrument.getInstrumentsByIds(
-        user,
-        technicalReviews.map((technicalReview) => technicalReview.instrumentId)
-      );
+    const instrumentDataSource = container.resolve<InstrumentDataSource>(
+      Tokens.InstrumentDataSource
+    );
+    const instruments = await instrumentDataSource.getInstrumentsByIds(
+      technicalReviews.map((technicalReview) => technicalReview.instrumentId)
+    );
     proposalPDFData.technicalReviews = technicalReviews.map(
       (technicalReview) => ({
         ...technicalReview,
