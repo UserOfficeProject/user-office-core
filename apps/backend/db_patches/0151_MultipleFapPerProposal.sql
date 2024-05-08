@@ -4,11 +4,23 @@ BEGIN
 	IF register_patch('0151_MultipleFapPerProposal.sql', 'martintrajanovski', 'Mutliple FAP per proposal', '2024-04-03') THEN
 	BEGIN
 
-			ALTER TABLE fap_proposals ADD COLUMN fap_proposals_id SERIAL NOT NULL UNIQUE;
+			ALTER TABLE fap_proposals ADD COLUMN fap_proposal_id SERIAL NOT NULL UNIQUE;
 			ALTER TABLE fap_proposals DROP CONSTRAINT fap_proposals_pkey;
-			ALTER TABLE fap_proposals ADD PRIMARY KEY (fap_proposals_id);
+			ALTER TABLE fap_proposals ADD PRIMARY KEY (fap_proposal_id);
 			ALTER TABLE fap_proposals ALTER COLUMN fap_id DROP NOT NULL;
 
+			ALTER TABLE fap_assignments 
+			ADD COLUMN fap_proposal_id INT REFERENCES fap_proposals (fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			UPDATE fap_assignments
+			SET fap_proposal_id = (SELECT fap_proposal_id FROM fap_proposals WHERE fap_proposals.proposal_pk = fap_assignments.proposal_pk AND fap_proposals.fap_id = fap_assignments.fap_id);
+			ALTER TABLE fap_assignments ALTER COLUMN fap_proposal_id SET NOT NULL;
+
+			ALTER TABLE fap_reviews 
+			ADD COLUMN fap_proposal_id INT REFERENCES fap_proposals (fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			UPDATE fap_reviews
+			SET fap_proposal_id = (SELECT fap_proposal_id FROM fap_proposals WHERE fap_proposals.proposal_pk = fap_reviews.proposal_pk AND fap_proposals.fap_id = fap_reviews.fap_id);
+			ALTER TABLE fap_reviews ALTER COLUMN fap_proposal_id SET NOT NULL;
+	
 			-- drop view to allow recreating it
     	DROP VIEW proposal_table_view;
 
@@ -44,7 +56,7 @@ BEGIN
 						jsonb_build_object(
 							'id', f.fap_id,
 							'code', f.code
-						) ORDER BY fp_1.fap_proposals_id ASC
+						) ORDER BY fp_1.fap_proposal_id ASC
 					) AS faps,
 					jsonb_agg(
 						jsonb_build_object(

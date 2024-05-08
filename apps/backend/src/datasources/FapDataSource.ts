@@ -101,15 +101,21 @@ export interface FapDataSource {
   removeProposalsFromFaps(
     args: RemoveProposalsFromFapsArgs
   ): Promise<FapProposal[]>;
+  removeProposalsFromFapsByInstrument(
+    proposalPk: number,
+    instrumentIds: number[]
+  ): Promise<FapProposal[]>;
   assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,
-    memberIds: number[]
+    memberIds: number[],
+    fapProposalId: number
   ): Promise<Fap>;
   assignMemberToFapProposals(
     proposalPks: number[],
     fapId: number,
-    memberId: number
+    memberId: number,
+    fapProposalId: number
   ): Promise<Fap>;
   getFapProposalToNumReviewsNeededMap(
     fapId: number

@@ -181,11 +181,11 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const propsWithTechReviewerDetails = proposals.proposalViews.map(
       (proposal) => {
-        let proposalTecnicalReviews: ProposalViewTechnicalReview[] = [];
+        let proposalTechnicalReviews: ProposalViewTechnicalReview[] = [];
         const { technicalReviews } = proposal;
 
         if (technicalReviews?.length) {
-          proposalTecnicalReviews = technicalReviews.map((technicalReview) => {
+          proposalTechnicalReviews = technicalReviews.map((technicalReview) => {
             const userDetails = technicalReviewersDetails.find(
               (trd) =>
                 trd.userNumber ===
@@ -210,7 +210,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
         return {
           ...proposal,
-          technicalReviews: proposalTecnicalReviews,
+          technicalReviews: proposalTechnicalReviews,
         };
       }
     );

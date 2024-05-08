@@ -246,10 +246,10 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToFapsUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
-    return this.assignProposalsToFapUsingCallInstrumentInternal(agent, args);
+    return this.assignProposalsToFapsUsingCallInstrumentsInternal(agent, args);
   }
 
-  async assignProposalsToFapUsingCallInstrumentInternal(
+  async assignProposalsToFapsUsingCallInstrumentsInternal(
     agent: UserWithRole | null,
     args: AssignProposalsToFapsUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
@@ -263,22 +263,21 @@ export default class FapMutations {
       );
 
     const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
+    const fapInstruments = callHasInstruments
+      .filter((callHasInstrument) => callHasInstrument.fapId)
+      .map((callHasInstrument) => ({
+        fapId: callHasInstrument.fapId,
+        instrumentId: callHasInstrument.instrumentId,
+      }));
+
     for (const callId of callIds) {
-      if (callHasInstruments.length) {
-        const fapInstruments = callHasInstruments
-          .filter((callHasInstrument) => callHasInstrument.fapId)
-          .map((callHasInstrument) => ({
-            fapId: callHasInstrument.fapId,
-            instrumentId: callHasInstrument.instrumentId,
-          }));
-        if (fapInstruments.length) {
-          await this.assignProposalsToFapsInternal(agent, {
-            proposalPks: proposals
-              .filter((proposal) => proposal.callId === callId)
-              .map((proposal) => proposal.primaryKey),
-            fapInstruments: fapInstruments,
-          });
-        }
+      if (fapInstruments.length) {
+        await this.assignProposalsToFapsInternal(agent, {
+          proposalPks: proposals
+            .filter((proposal) => proposal.callId === callId)
+            .map((proposal) => proposal.primaryKey),
+          fapInstruments: fapInstruments,
+        });
       }
     }
 
@@ -310,20 +309,18 @@ export default class FapMutations {
     const dataToInsert: AssignProposalsToFapsInput[] = [];
 
     for (const proposalPk of args.proposalPks) {
+      const proposalAssignedInstruments =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(proposalPk);
+
+      const fullProposal = await this.proposalDataSource.get(proposalPk);
+
+      if (!fullProposal) {
+        return rejection(`Proposal not found with id: ${proposalPk}`, {
+          args,
+        });
+      }
+
       for (const fapInstrument of args.fapInstruments) {
-        const proposalAssignedInstruments =
-          await this.instrumentDataSource.getInstrumentsByProposalPk(
-            proposalPk
-          );
-
-        const fullProposal = await this.proposalDataSource.get(proposalPk);
-
-        if (!fullProposal) {
-          return rejection(`Proposal not found with id: ${proposalPk}`, {
-            args,
-          });
-        }
-
         // NOTE: This doublechecks if the proposal is assigned to the instrument at all or have FAP selected.
         if (
           !proposalAssignedInstruments.find(
@@ -423,11 +420,28 @@ export default class FapMutations {
       );
     }
 
+    const fapProposal = await this.dataSource.getFapProposal(
+      args.fapId,
+      args.proposalPk
+    );
+
+    if (!fapProposal) {
+      return rejection(
+        'Can not assign FAP reviewers to non-existing FAP proposal',
+        { agent }
+      );
+    }
+
     return this.dataSource
-      .assignMemberToFapProposal(args.proposalPk, args.fapId, args.memberIds)
+      .assignMemberToFapProposal(
+        args.proposalPk,
+        args.fapId,
+        args.memberIds,
+        fapProposal.fapProposalId
+      )
       .catch((err) => {
         return rejection(
-          'Can not assign proposal to facility access panel',
+          'Can not assign FAP reviewers to proposal',
           { agent },
           err
         );
@@ -494,9 +508,18 @@ export default class FapMutations {
     for (const reviewer of [...reviewsToAssign.keys()]) {
       const reviews =
         reviewsToAssign.get(reviewer)?.map((review) => review.proposalPk) ?? [];
-      if (reviews.length > 0) {
+      const fapProposalId = reviewsToAssign
+        .get(reviewer)
+        ?.find((rta) => rta.fapId === args.fapId)?.fapProposalId;
+
+      if (reviews.length > 0 && fapProposalId) {
         this.dataSource
-          .assignMemberToFapProposals(reviews, args.fapId, reviewer.userId)
+          .assignMemberToFapProposals(
+            reviews,
+            args.fapId,
+            reviewer.userId,
+            fapProposalId
+          )
           .catch((err) => {
             return rejection(
               'Can not assign proposal to facility access panel',

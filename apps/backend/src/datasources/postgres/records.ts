@@ -414,6 +414,7 @@ export interface FapChairsRecord {
 }
 
 export interface FapProposalRecord {
+  readonly fap_proposal_id: number;
   readonly proposal_pk: number;
   readonly fap_id: number;
   readonly date_assigned: Date;
@@ -1108,6 +1109,7 @@ export const createFapMeetingDecisionObject = (
 
 export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
   return new FapProposal(
+    fapProposal.fap_proposal_id,
     fapProposal.proposal_pk,
     fapProposal.fap_id,
     fapProposal.date_assigned,
