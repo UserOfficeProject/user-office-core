@@ -12,8 +12,8 @@ import { useFapMembersData } from 'hooks/fap/useFapMembersData';
 export type FapAssignedMember = BasicUserDetails & { role?: Maybe<Role> };
 
 type AssignFapMemberToProposalModalProps = {
-  proposalPk: number | null;
-  setProposalPk: React.Dispatch<React.SetStateAction<number | null>>;
+  proposalPks: number[];
+  setProposalPks: React.Dispatch<React.SetStateAction<number[]>>;
   fapId: number;
   assignMemberToFapProposal: (assignedMembers: FapAssignedMember[]) => void;
   assignedMembers?: Array<BasicUserDetails | null>;
@@ -41,8 +41,8 @@ const AssignFapMemberToProposalModal = ({
   assignMemberToFapProposal,
   fapId,
   assignedMembers,
-  proposalPk,
-  setProposalPk,
+  proposalPks,
+  setProposalPks,
 }: AssignFapMemberToProposalModalProps) => {
   const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
@@ -51,10 +51,10 @@ const AssignFapMemberToProposalModal = ({
   const { loadingMembers, FapMembersData } = useFapMembersData(fapId, false);
 
   useEffect(() => {
-    if (!proposalPk) {
+    if (!proposalPks) {
       setSelectedParticipants([]);
     }
-  }, [proposalPk]);
+  }, [proposalPks]);
 
   const members: FapAssignedMember[] = FapMembersData
     ? FapMembersData.filter(
@@ -74,8 +74,8 @@ const AssignFapMemberToProposalModal = ({
       fullWidth
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"
-      open={!!proposalPk}
-      onClose={(): void => setProposalPk(null)}
+      open={proposalPks.length > 0}
+      onClose={(): void => setProposalPks([])}
     >
       <DialogContent>
         <PeopleTable
