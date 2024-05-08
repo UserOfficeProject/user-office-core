@@ -1225,6 +1225,20 @@ context('Fap reviews tests', () => {
       });
     });
 
+    it('FAP review should be removed if proposal is removed from instrument', () => {
+      cy.contains(proposal1.title);
+
+      cy.removeProposalsFromInstrument({
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.reload();
+
+      cy.finishedLoading();
+
+      cy.get('table tbody').should('not.contain.text', proposal1.title);
+    });
+
     it('Fap Reviewer should be able to see Faps he is part of', () => {
       cy.get('[data-cy="FapRoles-menu-items"]').contains('FAPs').click();
 
