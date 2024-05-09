@@ -1,8 +1,7 @@
 // import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
+import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React, { ChangeEvent, useState } from 'react';
@@ -11,10 +10,6 @@ import { InstrumentWithAvailabilityTime } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
@@ -63,34 +58,28 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Formik
-        initialValues={{}}
-        onSubmit={() => {
-          updateTimeAvailable();
-          props.close(+(newTime as string), props.instrument.id);
-        }}
-      >
-        <Form>
-          <Typography
-            variant="h6"
-            component="h1"
-            className={classes.cardHeader}
-          >
-            Update {props.instrument.name} Avalibabity Time
-          </Typography>
-          {AvailabilityTimeEditComponent(newTime, SetNewTime)}
-          <Button
-            type="submit"
-            className={classes.submit}
-            data-cy="submit-update-time"
-            fullWidth={true}
-          >
-            Update
-          </Button>
-        </Form>
-      </Formik>
-    </Container>
+    <Formik
+      initialValues={{}}
+      onSubmit={() => {
+        updateTimeAvailable();
+        props.close(+(newTime as string), props.instrument.id);
+      }}
+    >
+      <Form style={{ padding: '10px' }}>
+        <DialogTitle variant="h6" component="h1">
+          Update {props.instrument.name} Avalibabity Time
+        </DialogTitle>
+        {AvailabilityTimeEditComponent(newTime, SetNewTime)}
+        <Button
+          type="submit"
+          className={classes.submit}
+          data-cy="submit-update-time"
+          fullWidth={true}
+        >
+          Update
+        </Button>
+      </Form>
+    </Formik>
   );
 };
 
