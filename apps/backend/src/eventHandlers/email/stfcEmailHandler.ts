@@ -116,7 +116,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           instrumentRequested = '';
         }
 
-        const uoAddress = process.env.ISIS_UO_EMAIL;
+        const uoAddress = process.env.USER_OFFICE_EMAIL;
 
         if (uoAddress) {
           const uoRapidEmail = uoRapidSubmissionEmail(
@@ -130,7 +130,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           emailsToSend.push(uoRapidEmail);
         } else {
           logger.logError(
-            'Could not send UO Rapid submission email, environment variable (ISIS_UO_EMAIL) not found.',
+            'Could not send UO Rapid submission email, environment variable (USER_OFFICE_EMAIL) not found.',
             { event }
           );
         }

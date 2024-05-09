@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import {
@@ -84,6 +85,55 @@ export const emailActionHandler = async (
             );
 
           sendMail(FCSs);
+
+          break;
+        }
+
+        case EmailStatusActionRecipients.USER_OFFICE: {
+          const userOfficeEmail = process.env.USER_OFFICE_EMAIL;
+
+          if (userOfficeEmail == null) {
+            logger.logError(
+              'Could not send email(s) to the User Office, environment variable (USER_OFFICE_EMAIL) not found.',
+              { proposalEmailsSkipped: proposals }
+            );
+
+            break;
+          }
+
+          let uoRecipient: EmailReadyType[];
+
+          if (recipientWithTemplate.combineEmails) {
+            uoRecipient = [
+              {
+                id: recipientWithTemplate.recipient.name,
+                email: userOfficeEmail,
+                proposals: proposals,
+                template: recipientWithTemplate.emailTemplate.id,
+              },
+            ];
+          } else {
+            const usersDataSource: UserDataSource = container.resolve(
+              Tokens.UserDataSource
+            );
+
+            const recipientPromises = proposals.map(async (proposal) => ({
+              id: recipientWithTemplate.recipient.name,
+              email: userOfficeEmail,
+              proposals: [proposal],
+              template: recipientWithTemplate.emailTemplate.id,
+              pi:
+                (await usersDataSource.getBasicUserInfo(proposal.proposerId)) ||
+                null,
+              coProposers:
+                (await usersDataSource.getProposalUsers(proposal.primaryKey)) ||
+                null,
+            }));
+
+            uoRecipient = await Promise.all(recipientPromises);
+          }
+
+          sendMail(uoRecipient);
 
           break;
         }
