@@ -48,6 +48,58 @@ type ProposalReview = {
   proposalPk?: number;
 };
 
+type FapProposal = {
+  proposalPk: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dateAssigned: any;
+  fapId: number;
+  fapTimeAllocation: number | null;
+  instrumentSubmitted: boolean;
+  proposal: {
+    title: string;
+    primaryKey: number;
+    proposalId: string;
+    proposer: { id: number; institutionId: number } | null;
+    status: {
+      id: number;
+      shortCode: string;
+      name: string;
+      description: string;
+      isDefault: boolean;
+    } | null;
+    users: Array<{ id: number; institutionId: number }>;
+  };
+  assignments: Array<{
+    proposalPk: number;
+    fapMemberUserId: number | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dateAssigned: any;
+    rank: number | null;
+    user: {
+      id: number;
+      firstname: string;
+      lastname: string;
+      preferredname: string | null;
+      institution: string;
+      institutionId: number;
+      position: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      created: any | null;
+      placeholder: boolean | null;
+      email: string | null;
+      country: string | null;
+    } | null;
+    role: { id: number; shortCode: string; title: string } | null;
+    review: {
+      id: number;
+      status: ReviewStatus;
+      comment: string | null;
+      grade: number | null;
+      fapID: number;
+    } | null;
+  }> | null;
+};
+
 type FapProposalsAndAssignmentsTableProps = {
   /** Fap we are assigning members to */
   data: Fap;
@@ -249,6 +301,20 @@ const FapProposalsAndAssignmentsTable = ({
     );
   };
 
+  const handleAssMembersToFapProposals = async (
+    _: React.MouseEventHandler<HTMLButtonElement>,
+    proposalsToAssign: FapProposalType | FapProposalType[]
+  ): Promise<void> => {
+    if (!Array.isArray(proposalsToAssign)) {
+      return;
+    }
+
+    const proposalPksToAssign = proposalsToAssign.map(
+      (proposalToAssign) => proposalToAssign.proposalPk
+    );
+    setProposalPks(proposalPksToAssign);
+  };
+
   const handleBulkRemoveProposalsFromFap = async (
     _: React.MouseEventHandler<HTMLButtonElement>,
     proposalsToRemove: FapProposalType | FapProposalType[]
@@ -263,7 +329,7 @@ const FapProposalsAndAssignmentsTable = ({
     })();
   };
 
-  const assignMemberToFapProposals = async (
+  const assignMembersToFapProposals = async (
     assignedMembers: FapAssignedMember[]
   ) => {
     if (proposalPks.length === 0) {
@@ -295,7 +361,7 @@ const FapProposalsAndAssignmentsTable = ({
       allProposalReviews.push(...proposalReviews);
     }
 
-    if (!allProposalReviews) {
+    if (allProposalReviews.length === 0) {
       return;
     }
 
@@ -357,10 +423,14 @@ const FapProposalsAndAssignmentsTable = ({
     });
   };
 
-  const handleMemberAssignmentToFapProposal = (
+  const handleMemberAssignmentToFapProposals = (
     memberUsers: FapAssignedMember[]
   ) => {
     const selectedProposal = FapProposalsData.find((fapProposal) =>
+      proposalPks.includes(fapProposal.proposalPk)
+    );
+
+    const selectedProposals = FapProposalsData.filter((fapProposal) =>
       proposalPks.includes(fapProposal.proposalPk)
     );
 
@@ -368,83 +438,143 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
 
-    const selectedPI = memberUsers.find(
-      (member) => member.id === selectedProposal.proposal.proposer?.id
-    );
-    const selectedCoProposers = memberUsers.filter((member) =>
-      selectedProposal.proposal.users.find((user) => user.id === member.id)
-    );
+    const proposalPIsMap = new Map<FapProposal, FapAssignedMember>();
+    const proposalCoIsMap = new Map<FapProposal, FapAssignedMember[]>();
+    const pIInstitutionConflictMap = new Map<FapProposal, FapAssignedMember>();
+    const coIInstitutionConflictMap = new Map<
+      FapProposal,
+      FapAssignedMember[]
+    >();
 
-    const selectedReviewerWithSameInstitutionAsPI = memberUsers.find(
-      (member) =>
-        member.institutionId ===
-        selectedProposal.proposal.proposer?.institutionId
-    );
+    for (const fapProposal of selectedProposals) {
+      const selectedPI = memberUsers.find(
+        (member) => member.id === fapProposal.proposal.proposer?.id
+      );
 
-    const selectedReviewerWithSameInstitutionAsCoProposers = memberUsers.filter(
-      (member) =>
-        selectedProposal.proposal.users.find(
-          (user) => user.institutionId === member.institutionId
-        )
-    );
+      if (selectedPI) {
+        proposalPIsMap.set(fapProposal, selectedPI);
+      }
+
+      const selectedCoProposers = memberUsers.filter((member) =>
+        fapProposal.proposal.users.find((user) => user.id === member.id)
+      );
+
+      if (selectedCoProposers.length > 0) {
+        proposalCoIsMap.set(fapProposal, selectedCoProposers);
+      }
+
+      const selectedReviewerWithSameInstitutionAsPI = memberUsers.find(
+        (member) =>
+          member.institutionId === fapProposal.proposal.proposer?.institutionId
+      );
+
+      if (selectedReviewerWithSameInstitutionAsPI) {
+        pIInstitutionConflictMap.set(
+          fapProposal,
+          selectedReviewerWithSameInstitutionAsPI
+        );
+      }
+
+      const selectedReviewerWithSameInstitutionAsCoProposers =
+        memberUsers.filter((member) =>
+          fapProposal.proposal.users.find(
+            (user) => user.institutionId === member.institutionId
+          )
+        );
+
+      if (selectedReviewerWithSameInstitutionAsCoProposers.length > 0) {
+        coIInstitutionConflictMap.set(
+          fapProposal,
+          selectedReviewerWithSameInstitutionAsCoProposers
+        );
+      }
+    }
 
     const shouldShowWarning =
-      !!selectedPI ||
-      !!selectedCoProposers.length ||
-      selectedReviewerWithSameInstitutionAsPI ||
-      selectedReviewerWithSameInstitutionAsCoProposers;
+      proposalPIsMap.size > 0 ||
+      proposalCoIsMap.size > 0 ||
+      pIInstitutionConflictMap.size > 0 ||
+      coIInstitutionConflictMap.size > 0;
+
+    const alertText: React.DetailedHTMLProps<
+      React.HTMLAttributes<HTMLUListElement>,
+      HTMLUListElement
+    >[] = [];
+
+    for (const fapProposal of selectedProposals) {
+      alertText.push(
+        <>
+          <ul>
+            {(!!proposalPIsMap.get(fapProposal) ||
+              !!proposalCoIsMap.get(fapProposal) ||
+              !!pIInstitutionConflictMap.get(fapProposal) ||
+              !!coIInstitutionConflictMap.get(fapProposal)) && (
+              <li>Proposal: {fapProposal.proposalPk}</li>
+            )}
+            {!!proposalPIsMap.get(fapProposal) && (
+              <li>PI: {getFullUserName(proposalPIsMap.get(fapProposal))}</li>
+            )}
+            {!!proposalCoIsMap.get(fapProposal) && (
+              <li>
+                Co-proposers:{' '}
+                {proposalCoIsMap
+                  .get(fapProposal)
+                  ?.map((selectedCoProposer) =>
+                    getFullUserName(selectedCoProposer)
+                  )
+                  .join(', ')}
+              </li>
+            )}
+            {!!pIInstitutionConflictMap.get(fapProposal) && (
+              <li>
+                Same institution as PI:{' '}
+                {getFullUserName(pIInstitutionConflictMap.get(fapProposal))}
+              </li>
+            )}
+            {!!coIInstitutionConflictMap.get(fapProposal) && (
+              <li>
+                Same institution as co-proposers:{' '}
+                {coIInstitutionConflictMap
+                  .get(fapProposal)
+                  ?.map((selectedCoProposer) =>
+                    getFullUserName(selectedCoProposer)
+                  )
+                  .join(', ')}
+              </li>
+            )}
+          </ul>
+        </>
+      );
+    }
 
     if (shouldShowWarning) {
-      confirm(() => assignMemberToFapProposals(memberUsers), {
+      confirm(() => assignMembersToFapProposals(memberUsers), {
         title: 'Fap reviewers assignment',
         description: ' ',
         shouldEnableOKWithAlert: true,
         alertText: (
           <>
-            Some of the selected reviewers are already part of the proposal as a
-            PI/Co-proposer or belong to the same institution{' '}
-            <strong>
-              <ul>
-                {!!selectedPI && <li>PI: {getFullUserName(selectedPI)}</li>}
-                {!!selectedCoProposers.length && (
-                  <li>
-                    Co-proposers:{' '}
-                    {selectedCoProposers
-                      .map((selectedCoProposer) =>
-                        getFullUserName(selectedCoProposer)
-                      )
-                      .join(', ')}
-                  </li>
-                )}
-                {!!selectedReviewerWithSameInstitutionAsPI && (
-                  <li>
-                    Same institution as PI:{' '}
-                    {getFullUserName(selectedReviewerWithSameInstitutionAsPI)}
-                  </li>
-                )}
-                {!!selectedReviewerWithSameInstitutionAsCoProposers.length && (
-                  <li>
-                    Same institution as co-proposers:{' '}
-                    {selectedReviewerWithSameInstitutionAsCoProposers
-                      .map((selectedCoProposer) =>
-                        getFullUserName(selectedCoProposer)
-                      )
-                      .join(', ')}
-                  </li>
-                )}
-              </ul>
-            </strong>
-            {`. Are you sure you want to assign all selected users to the Fap proposal?`}
+            Some of the selected reviewers are already part of the proposal(s)
+            as a PI/Co-proposer or belong to the same institution{' '}
+            <strong>{alertText}</strong>
+            {`Are you sure you want to assign all selected users to the Fap proposal(s)?`}
           </>
         ),
       })();
     } else {
-      assignMemberToFapProposals(memberUsers);
+      assignMembersToFapProposals(memberUsers);
     }
   };
 
   const initialValues: FapProposalType[] = FapProposalsData;
   const tableActions: Action<FapProposalType>[] = [];
+  hasRightToAssignReviewers &&
+    tableActions.push({
+      icon: () => <AssignmentInd data-cy="assign-fap-members" />,
+      tooltip: 'Assign Fap members',
+      onClick: handleAssMembersToFapProposals,
+      position: 'toolbarOnSelect',
+    });
   hasRightToAssignReviewers &&
     tableActions.push({
       icon: () => <GetAppIcon data-cy="download-fap-proposals" />,
@@ -459,10 +589,6 @@ const FapProposalsAndAssignmentsTable = ({
       onClick: handleBulkRemoveProposalsFromFap,
       position: 'toolbarOnSelect',
     });
-
-  const proposalAssignments = initialValues.find((assignment) =>
-    proposalPks.includes(assignment.proposalPk)
-  )?.assignments;
 
   const ReviewersTable = React.useCallback(
     ({ rowData }: Record<'rowData', FapProposalType>) => {
@@ -604,10 +730,7 @@ const FapProposalsAndAssignmentsTable = ({
         proposalPks={proposalPks}
         setProposalPks={setProposalPks}
         fapId={data.id}
-        assignedMembers={
-          proposalAssignments?.map((assignment) => assignment.user) ?? []
-        }
-        assignMemberToFapProposal={handleMemberAssignmentToFapProposal}
+        assignMembersToFapProposals={handleMemberAssignmentToFapProposals}
       />
       <div data-cy="fap-assignments-table">
         <MaterialTable
