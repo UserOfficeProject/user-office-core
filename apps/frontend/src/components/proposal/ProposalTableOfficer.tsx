@@ -55,6 +55,7 @@ import {
   addColumns,
   fromArrayToCommaSeparated,
   fromProposalToProposalView,
+  getUniqueArray,
   removeColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
@@ -567,14 +568,16 @@ const ProposalTableOfficer = ({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
-        fapIds: (selectedProposals
-          .map(
-            (selectedProposal) =>
-              selectedProposal.fapInstruments
-                ?.filter((fapInstrument) => !!fapInstrument.fapId)
-                .map((fapInstrument) => fapInstrument.fapId) || []
-          )
-          .flat() || []) as number[],
+        fapIds: getUniqueArray(
+          selectedProposals
+            .map(
+              (selectedProposal) =>
+                selectedProposal.fapInstruments
+                  ?.filter((fapInstrument) => !!fapInstrument.fapId)
+                  .map((fapInstrument) => fapInstrument.fapId) || []
+            )
+            .flat() || []
+        ),
       });
 
       setProposalsData((proposalsData) =>
@@ -586,6 +589,7 @@ const ProposalTableOfficer = ({
             )
           ) {
             prop.faps = null;
+            prop.fapInstruments = null;
           }
 
           return prop;

@@ -114,9 +114,12 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       });
 
       // Assign the Proposals to FAPs using Call Instrument
-      await fapMutation.assignProposalsToFapUsingCallInstrumentInternal(null, {
-        instrumentIds: instrumentIds,
-        proposalPks: [proposal.primaryKey],
-      });
+      await fapMutation.assignProposalsToFapsUsingCallInstrumentsInternal(
+        null,
+        {
+          instrumentIds: instrumentIds,
+          proposalPks: [proposal.primaryKey],
+        }
+      );
     },
   };

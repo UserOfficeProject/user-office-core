@@ -1,6 +1,5 @@
 import {
   Field,
-  // Float,
   Int,
   ObjectType,
   Ctx,

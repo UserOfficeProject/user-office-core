@@ -33,6 +33,7 @@ const AssignProposalsToFaps = ({
   proposalInstruments,
   proposalFapInstruments,
 }: AssignProposalToFapsProps) => {
+  const proposalInstrumentsCopy = [...proposalInstruments];
   const { currentRole } = useContext(UserContext);
   const { faps, loadingFaps } = useFapsData({
     filter: '',
@@ -41,21 +42,19 @@ const AssignProposalsToFaps = ({
   });
 
   const proposalsUniqueInstruments: ProposalViewInstrument[] = getUniqueArrayBy(
-    proposalInstruments.flat(),
+    proposalInstrumentsCopy.flat(),
     'id'
   );
 
-  const allSelectedProposalsHaveSameInstruments = [
-    ...proposalInstruments,
-  ].every(
+  const allSelectedProposalsHaveSameInstruments = proposalInstrumentsCopy.every(
     (item) =>
       item?.sort((a, b) => (a && b ? a.id - b.id : 0)).toString() ===
-      proposalInstruments[0]
+      proposalInstrumentsCopy[0]
         ?.sort((a, b) => (a && b ? a.id - b.id : 0))
         .toString()
   );
 
-  const initialValues: Record<string, number | undefined | null> = {};
+  const initialValues: Record<string, number | null> = {};
 
   proposalsUniqueInstruments.forEach((instrument) => {
     initialValues[`selectedFapIds_${instrument.id}`] =

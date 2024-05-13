@@ -127,6 +127,7 @@ export const dummyFapReview = new Review(1, 1, 1, 'Dummy Fap review', 7, 0, 1);
 export const dummyFapProposal = new FapProposal(
   1,
   1,
+  1,
   new Date('2020-04-20 08:25:12.23043+00'),
   null,
   1,
@@ -137,6 +138,7 @@ export const dummyFapProposal = new FapProposal(
 export const anotherDummyFapProposal = new FapProposal(
   2,
   2,
+  2,
   new Date('2020-04-20 08:25:12.23043+00'),
   null,
   2,
@@ -145,6 +147,7 @@ export const anotherDummyFapProposal = new FapProposal(
 );
 
 export const dummyFapProposalForMassAssignment = new FapProposal(
+  3,
   1,
   3,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -155,6 +158,7 @@ export const dummyFapProposalForMassAssignment = new FapProposal(
 );
 
 export const anotherDummyFapProposalForMassAssignment = new FapProposal(
+  4,
   2,
   3,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -165,6 +169,7 @@ export const anotherDummyFapProposalForMassAssignment = new FapProposal(
 );
 
 export const firstDummyFapProposalForUnevenMassAssignment = new FapProposal(
+  5,
   1,
   5,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -175,6 +180,7 @@ export const firstDummyFapProposalForUnevenMassAssignment = new FapProposal(
 );
 
 export const secondDummyFapProposalForUnevenMassAssignment = new FapProposal(
+  6,
   2,
   5,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -185,6 +191,7 @@ export const secondDummyFapProposalForUnevenMassAssignment = new FapProposal(
 );
 
 export const thirdDummyFapProposalForUnevenMassAssignment = new FapProposal(
+  7,
   3,
   5,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -195,6 +202,7 @@ export const thirdDummyFapProposalForUnevenMassAssignment = new FapProposal(
 );
 
 export const firstDummyFapProposalForAlreadyAssigned = new FapProposal(
+  8,
   1,
   6,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -205,6 +213,7 @@ export const firstDummyFapProposalForAlreadyAssigned = new FapProposal(
 );
 
 export const secondDummyFapProposalForAlreadyAssigned = new FapProposal(
+  9,
   2,
   6,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -215,6 +224,7 @@ export const secondDummyFapProposalForAlreadyAssigned = new FapProposal(
 );
 
 export const thirdDummyFapProposalForAlreadyAssigned = new FapProposal(
+  10,
   3,
   6,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -225,6 +235,7 @@ export const thirdDummyFapProposalForAlreadyAssigned = new FapProposal(
 );
 
 export const dummyFapProposalForMassAssignmentNeedsTwoReviews = new FapProposal(
+  11,
   1,
   7,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -383,7 +394,11 @@ export class FapDataSourceMock implements FapDataSource {
     proposalPk: number,
     instrumentId?: number
   ): Promise<FapProposal | null> {
-    throw new Error('Method not implemented.');
+    return (
+      dummyFapProposals.find(
+        (fp) => fp.fapId === fapId && fp.proposalPk === proposalPk
+      ) || null
+    );
   }
 
   updateTimeAllocation(
@@ -587,10 +602,32 @@ export class FapDataSourceMock implements FapDataSource {
     throw new Error(`FAPs not found ${fapIds}`);
   }
 
+  async removeProposalsFromFapsByInstrument(
+    proposalPk: number,
+    instrumentIds: number[]
+  ) {
+    const fap = dummyFapProposals.find(
+      (element) =>
+        element.fapId &&
+        element.instrumentId &&
+        instrumentIds.includes(element.instrumentId) &&
+        element.proposalPk === proposalPk
+    );
+
+    if (fap) {
+      return [fap];
+    }
+
+    throw new Error(
+      `FAPs not found with proposalPk ${proposalPk} and instrumentId ${instrumentIds}`
+    );
+  }
+
   async assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,
-    memberIds: number[]
+    memberIds: number[],
+    fapProposalId: number
   ) {
     const fap = dummyFaps.find((element) => element.id === fapId);
 
@@ -604,7 +641,8 @@ export class FapDataSourceMock implements FapDataSource {
   async assignMemberToFapProposals(
     proposalPk: number[],
     fapId: number,
-    memberIds: number
+    memberIds: number,
+    fapProposalId: number
   ) {
     const fap = dummyFaps.find((element) => element.id === fapId);
 

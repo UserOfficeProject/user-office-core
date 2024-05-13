@@ -309,6 +309,16 @@ export default class PostgresInstrumentDataSource
           }
         });
 
+      await trx('fap_proposals')
+        .del()
+        .whereIn('proposal_pk', proposalPks)
+        .modify((query) => {
+          if (instrumentId) {
+            query.andWhere('instrument_id', instrumentId);
+          }
+        })
+        .returning('*');
+
       return await trx.commit(ihp);
     });
 
