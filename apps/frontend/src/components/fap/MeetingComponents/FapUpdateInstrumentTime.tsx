@@ -1,5 +1,5 @@
-// import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
@@ -18,7 +18,9 @@ const useStyles = makeStyles((theme) => ({
 const MAX_32_BIT_INTEGER = Math.pow(2, 31);
 
 type FapUpdateInstrumentTimeProps = {
-  close: (newTime: number, instrumentId: number) => void;
+  open: boolean;
+  close: () => void;
+  updateTime: (newTime: number, instrumentId: number) => void;
   callId: number;
   instrument: InstrumentWithAvailabilityTime;
 };
@@ -58,28 +60,30 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
   };
 
   return (
-    <Formik
-      initialValues={{}}
-      onSubmit={() => {
-        updateTimeAvailable();
-        props.close(+(newTime as string), props.instrument.id);
-      }}
-    >
-      <Form style={{ padding: '10px' }}>
-        <DialogTitle variant="h6" component="h1">
-          Update {props.instrument.name} Avalibabity Time
-        </DialogTitle>
-        {AvailabilityTimeEditComponent(newTime, SetNewTime)}
-        <Button
-          type="submit"
-          className={classes.submit}
-          data-cy="submit-update-time"
-          fullWidth={true}
-        >
-          Update
-        </Button>
-      </Form>
-    </Formik>
+    <Dialog open={props.open} onClose={props.close}>
+      <Formik
+        initialValues={{}}
+        onSubmit={() => {
+          updateTimeAvailable();
+          props.updateTime(+(newTime as string), props.instrument.id);
+        }}
+      >
+        <Form style={{ padding: '10px' }}>
+          <DialogTitle variant="h6" component="h1">
+            Update {props.instrument.name} Avalibabity Time
+          </DialogTitle>
+          {AvailabilityTimeEditComponent(newTime, SetNewTime)}
+          <Button
+            type="submit"
+            className={classes.submit}
+            data-cy="submit-update-time"
+            fullWidth={true}
+          >
+            Update
+          </Button>
+        </Form>
+      </Formik>
+    </Dialog>
   );
 };
 

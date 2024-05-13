@@ -1,7 +1,7 @@
 import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import { Dialog, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import i18n from 'i18n';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
@@ -224,18 +224,16 @@ const FapMeetingInstrumentsTable = ({
           debounceInterval: 400,
         }}
       />
-      <Dialog
-        open={!!updateInstrumentTime}
-        onClose={(): void => setUpdateInstrumentTime(null)}
-      >
-        {updateInstrumentTime && selectedCall && (
-          <FapUpdateInstrumentTime
-            close={updatedInstrumentTime}
-            callId={selectedCall.id}
-            instrument={updateInstrumentTime}
-          ></FapUpdateInstrumentTime>
-        )}
-      </Dialog>
+
+      {updateInstrumentTime && selectedCall && (
+        <FapUpdateInstrumentTime
+          open={!!updateInstrumentTime}
+          close={(): void => setUpdateInstrumentTime(null)}
+          updateTime={updatedInstrumentTime}
+          callId={selectedCall.id}
+          instrument={updateInstrumentTime}
+        ></FapUpdateInstrumentTime>
+      )}
     </div>
   );
 };
