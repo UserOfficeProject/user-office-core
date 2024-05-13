@@ -63,6 +63,23 @@ export class OAuthAuthorization extends UserAuthorization {
     return 'logged out';
   }
 
+  private logoutWithRedirectParam(logoutUrl: string) {
+    const reLoginParam = process.env.AUTH_RELOGIN_PARAMS?.trim();
+    if (!reLoginParam) return logoutUrl;
+    if (!reLoginParam.startsWith('from=', 0)) {
+      logger.logError(
+        'Invalid AUTH_RELOGIN_PARAMS. The variable must be from=REDRIRECT_URL',
+        {
+          logoutUrl,
+        }
+      );
+
+      return logoutUrl;
+    }
+
+    return `${logoutUrl}?${reLoginParam}`;
+  }
+
   public async isExternalTokenValid(code: string): Promise<boolean> {
     // No need to check external token validity, because we check UOS JWT token
     return true;
@@ -71,6 +88,7 @@ export class OAuthAuthorization extends UserAuthorization {
   async initialize() {
     const loginUrl = await OpenIdClient.loginUrl();
     const logoutUrl = await OpenIdClient.logoutUrl();
+    const logoutUrlWithParam = this.logoutWithRedirectParam(logoutUrl);
 
     await this.db.updateSettings({
       settingsId: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
@@ -79,7 +97,7 @@ export class OAuthAuthorization extends UserAuthorization {
 
     await this.db.updateSettings({
       settingsId: SettingsId.EXTERNAL_AUTH_LOGOUT_URL,
-      settingsValue: logoutUrl,
+      settingsValue: logoutUrlWithParam,
     });
   }
 
