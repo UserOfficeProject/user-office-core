@@ -19,7 +19,7 @@ BEGIN
 				SELECT fap_id
 				FROM fap_proposals
 				WHERE fap_meeting_decisions.proposal_pk = fap_proposals.proposal_pk
-				ORDER BY fap_proposals_id ASC
+				ORDER BY fap_proposal_id ASC
 				LIMIT 1
 			);
 			ALTER TABLE fap_meeting_decisions DROP CONSTRAINT fap_meeting_decisions_pkey;
