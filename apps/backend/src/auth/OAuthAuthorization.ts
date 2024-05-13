@@ -63,6 +63,9 @@ export class OAuthAuthorization extends UserAuthorization {
     return 'logged out';
   }
 
+  // NOTE: This is pingFederate idp/startSLO.ping logout template specific feature.
+  // If AUTH_RELOGIN_PARAMS is set, it will be added to the logout URL as a query parameter.
+  // The query parameter must be from=REDIRECT_URL
   private logoutWithRedirectParam(logoutUrl: string) {
     const reLoginParam = process.env.AUTH_RELOGIN_PARAMS?.trim();
     if (!reLoginParam) return logoutUrl;
