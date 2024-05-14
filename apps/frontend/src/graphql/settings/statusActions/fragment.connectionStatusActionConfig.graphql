@@ -10,6 +10,7 @@ fragment connectionStatusActionConfig on ProposalStatusActionConfig {
         name
       }
       otherRecipientEmails
+      combineEmails
     }
   }
   ... on RabbitMQActionConfig {

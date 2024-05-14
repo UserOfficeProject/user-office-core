@@ -72,7 +72,10 @@ export default function ProposalContainer(props: ProposalContainerProps) {
       case GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED:
         if (action.newItems) {
           if (state.proposal.genericTemplates) {
-            const questionIds = action.newItems.map((value) => value.id);
+            const modifiedTemplates = action.newItems.filter(
+              (value) => !state.deletedTemplates.includes(value.id)
+            );
+            const questionIds = modifiedTemplates.map((value) => value.id);
             draftState.proposal.genericTemplates = [
               ...state.proposal.genericTemplates.filter(
                 (value) =>
@@ -81,17 +84,17 @@ export default function ProposalContainer(props: ProposalContainerProps) {
                       id === value.id || state.deletedTemplates.includes(id)
                   )
               ),
-              ...action.newItems,
+              ...modifiedTemplates,
             ];
             //if new templates have been created add them to the list of created templates
             if (
-              action.newItems.length > state.proposal.genericTemplates.length
+              modifiedTemplates.length > state.proposal.genericTemplates.length
             ) {
               draftState.createdTemplates = [
                 ...state.createdTemplates,
                 ...questionIds.slice(
                   -(
-                    action.newItems.length -
+                    modifiedTemplates.length -
                     state.proposal.genericTemplates.length
                   )
                 ),
