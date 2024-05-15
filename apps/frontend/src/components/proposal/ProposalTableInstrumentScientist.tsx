@@ -285,7 +285,7 @@ const ProposalTableInstrumentScientist = ({
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
-    instrument: NumberParam,
+    instrument: StringParam,
     proposalStatus: withDefault(NumberParam, statusFilter),
     questionId: StringParam,
     compareOperator: StringParam,

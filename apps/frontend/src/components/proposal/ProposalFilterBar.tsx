@@ -89,7 +89,7 @@ const ProposalFilterBar = ({
 
       <Grid item sm={3} xs={12}>
         <InstrumentFilter
-          instrumentId={filter.instrumentId as number}
+          instrumentId={filter.instrumentId}
           instruments={instruments?.data}
           isLoading={instruments?.isLoading}
           shouldShowAll={true}
