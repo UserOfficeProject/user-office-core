@@ -175,7 +175,7 @@ let columns: Column<ProposalViewData>[] = [
 const technicalReviewColumns = [
   {
     title: 'Technical status',
-    field: 'technicalStatuses',
+    field: 'technicalReviews.status',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(
         rowData.technicalReviews?.map(
@@ -185,17 +185,11 @@ const technicalReviewColumns = [
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssignees',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(
-        rowData.technicalReviews?.map((technicalReview) =>
-          getFullUserName(technicalReview.technicalReviewAssignee)
-        )
-      ),
+    field: 'technicalReviewAssigneesFullName',
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocations',
+    field: 'technicalReviews.timeAllocation',
     render: (rowData: ProposalViewData) =>
       `${fromArrayToCommaSeparated(
         rowData.technicalReviews?.map(
@@ -211,7 +205,7 @@ const instrumentManagementColumns = (
 ) => [
   {
     title: t('instrument'),
-    field: 'instrumentNames',
+    field: 'instruments.name',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(
         rowData.instruments?.map((instrument) => instrument.name)
@@ -224,13 +218,13 @@ const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
-    field: 'finalTimeAllocations',
+    field: 'instruments.managementTimeAllocation',
     emptyValue: '-',
     hidden: true,
   },
   {
     title: 'Fap',
-    field: 'fapCodes',
+    field: 'faps.code',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
   },
@@ -737,6 +731,11 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
+      technicalReviewAssigneesFullName: fromArrayToCommaSeparated(
+        proposal.technicalReviews?.map((technicalReview) =>
+          getFullUserName(technicalReview.technicalReviewAssignee)
+        )
+      ),
       finalTimeAllocations: `${fromArrayToCommaSeparated(
         proposal.instruments?.map(
           (instrument) => instrument.managementTimeAllocation

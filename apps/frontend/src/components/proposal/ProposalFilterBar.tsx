@@ -93,6 +93,7 @@ const ProposalFilterBar = ({
           instruments={instruments?.data}
           isLoading={instruments?.isLoading}
           shouldShowAll={true}
+          shouldShowMultiple={true}
           onChange={(instrumentId) => {
             setProposalFilter({
               ...filter,
