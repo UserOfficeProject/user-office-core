@@ -92,9 +92,9 @@ export const emailActionHandler = async (
         case EmailStatusActionRecipients.USER_OFFICE: {
           const userOfficeEmail = process.env.USER_OFFICE_EMAIL;
 
-          if (userOfficeEmail == null) {
+          if (!userOfficeEmail) {
             logger.logError(
-              'Could not send email(s) to the User Office, environment variable (USER_OFFICE_EMAIL) not found.',
+              'Could not send email(s) to the User Office, environment variable (USER_OFFICE_EMAIL) not set.',
               { proposalEmailsSkipped: proposals }
             );
 

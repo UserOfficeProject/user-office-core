@@ -130,7 +130,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           emailsToSend.push(uoRapidEmail);
         } else {
           logger.logError(
-            'Could not send UO Rapid submission email, environment variable (USER_OFFICE_EMAIL) not found.',
+            'Could not send UO Rapid submission email, environment variable (USER_OFFICE_EMAIL) not set.',
             { event }
           );
         }
