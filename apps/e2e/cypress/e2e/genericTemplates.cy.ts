@@ -727,11 +727,12 @@ context('GenericTemplates tests', () => {
       cy.contains(genericTemplateTitle);
     });
 
-    it('Should be a character limit to the template proposal question for office user', () => {
+    it('Should be a character limit of 256 to the template proposal question for office user', () => {
       cy.createTemplate({
         name: proposalTemplateName,
         groupId: TemplateGroupId.PROPOSAL,
       });
+      const question = faker.string.alpha(258);
       cy.login('officer');
       cy.visit('/');
 
@@ -751,10 +752,16 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy=natural-key]').click();
 
+      cy.get('[data-cy="question"').click().clear().type(question);
+
+      cy.get('[data-cy="submit"').should('be.disabled');
+
       cy.get('[data-cy="question"')
         .click()
         .clear()
-        .type(faker.lorem.words(256), { parseSpecialCharSequences: false });
+        .type(question.slice(0, 255).trim());
+
+      cy.get('[data-cy="submit"').should('not.be.disabled');
 
       cy.get('[data-cy="submit"').click();
     });
