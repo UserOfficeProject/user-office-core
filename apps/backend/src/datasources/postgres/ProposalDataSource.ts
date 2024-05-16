@@ -586,12 +586,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             { userId: user.id }
           );
         }
-        if (filter?.instrumentId) {
-          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
-          query.whereRaw(
-            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-            { instrumentId: filter?.instrumentId }
-          );
+        if (
+          filter?.instrumentId &&
+          filter.instrumentId !== InstrumentFilter.ALL
+        ) {
+          if (filter.instrumentId === InstrumentFilter.MULTI) {
+            query.whereRaw('jsonb_array_length(instruments) > 1');
+          } else {
+            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+            query.whereRaw(
+              'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+              { instrumentId: filter?.instrumentId }
+            );
+          }
         }
 
         if (filter?.proposalStatusId) {
