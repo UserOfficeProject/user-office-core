@@ -393,4 +393,39 @@ export default class InstrumentMutations {
         return rejection('Could not submit instrument', { agent, args }, error);
       });
   }
+
+  @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED)
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async unsubmitInstrument(
+    agent: UserWithRole | null,
+    args: InstrumentSubmitArgs
+  ): Promise<InstrumentsHasProposals | Rejection> {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
+    ) {
+      return rejection('Submitting instrument is not permitted', {
+        code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
+        agent,
+        args,
+      });
+    }
+
+    const allInstrumentProposals =
+      await this.fapDataSource.getFapProposalsByInstrument(
+        args.fapId,
+        args.instrumentId,
+        args.callId
+      );
+
+    const proposalPksToUnsubmit = allInstrumentProposals.map(
+      (fapInstrumentProposal) => fapInstrumentProposal.proposalPk
+    );
+
+    return this.dataSource
+      .unsubmitInstrument(proposalPksToUnsubmit, args.instrumentId)
+      .catch((error) => {
+        return rejection('Could not submit instrument', { agent, args }, error);
+      });
+  }
 }

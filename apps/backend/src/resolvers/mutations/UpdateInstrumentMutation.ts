@@ -87,4 +87,17 @@ export class UpdateInstrumentMutation {
 
     return isRejection(res) ? res : true;
   }
+
+  @Mutation(() => Boolean)
+  async unsubmitInstrument(
+    @Args() args: InstrumentSubmitArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    const res = await context.mutations.instrument.unsubmitInstrument(
+      context.user,
+      args
+    );
+
+    return isRejection(res) ? res : true;
+  }
 }

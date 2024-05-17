@@ -147,6 +147,11 @@ interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   instrumentshasproposals: InstrumentsHasProposals;
 }
 
+interface ProposalInstrumentUnsubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED;
+  instrumentshasproposals: InstrumentsHasProposals;
+}
+
 interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FAP_MEETING_SUBMITTED;
   proposal: Proposal;
@@ -341,6 +346,7 @@ export type ApplicationEvent =
   | ProposalInstrumentSelectedEvent
   | ProposalFapsSelectedEvent
   | ProposalInstrumentSubmittedEvent
+  | ProposalInstrumentUnsubmittedEvent
   | ProposalFapMeetingSubmittedEvent
   | ProposalStatusChangedByWorkflowEvent
   | ProposalStatusChangedByUserEvent

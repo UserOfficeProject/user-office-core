@@ -644,6 +644,29 @@ export default class PostgresInstrumentDataSource
     return new InstrumentsHasProposals([instrumentId], proposalPks, true);
   }
 
+  async unsubmitInstrument(
+    proposalPks: number[],
+    instrumentId: number
+  ): Promise<InstrumentsHasProposals> {
+    const records: FapProposalRecord[] = await database('fap_proposals')
+      .update(
+        {
+          fap_meeting_instrument_submitted: false,
+        },
+        ['*']
+      )
+      .whereIn('proposal_pk', proposalPks)
+      .andWhere('instrument_id', instrumentId);
+
+    if (!records?.length) {
+      throw new GraphQLError(
+        `Some record from fap_proposals not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+      );
+    }
+
+    return new InstrumentsHasProposals([instrumentId], proposalPks, false);
+  }
+
   async hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number

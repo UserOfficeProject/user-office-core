@@ -72,6 +72,10 @@ export interface InstrumentDataSource {
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals>;
+  unsubmitInstrument(
+    proposalPks: number[],
+    instrumentId: number
+  ): Promise<InstrumentsHasProposals>;
   hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number

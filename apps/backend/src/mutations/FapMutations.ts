@@ -713,6 +713,25 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: ReorderFapMeetingDecisionProposalsInput
   ): Promise<FapMeetingDecision | Rejection> {
+    const [{ instrumentId, fapId, proposalPk }] = args.proposals;
+    const proposal = await this.proposalDataSource.get(proposalPk);
+    if (!proposal) {
+      return rejection('Proposal not found', { args });
+    }
+
+    const fapProposals = await this.dataSource.getFapProposalsByInstrument(
+      fapId,
+      instrumentId,
+      proposal.callId
+    );
+
+    if (fapProposals.every((fp) => fp.fapInstrumentMeetingSubmitted)) {
+      return rejection(
+        'FAP instrument for selected proposals is submitted and reordering is not allowed',
+        { args }
+      );
+    }
+
     try {
       const allFapDecisions = await Promise.all(
         args.proposals.map(async (proposal) => {

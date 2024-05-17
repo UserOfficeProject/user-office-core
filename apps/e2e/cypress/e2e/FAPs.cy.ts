@@ -2181,6 +2181,9 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
+      cy.get('[aria-label="Drag proposals to reorder"]')
+        .should('exist')
+        .and('not.be.disabled');
       cy.get('[aria-label="View proposal details"]').first().click();
 
       cy.get('[role="dialog"] > header + div').scrollTo('top');
@@ -2220,7 +2223,45 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Detail panel visibility toggle"]').should('exist');
+
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('button[aria-label="Unsubmit instrument"]')
+        .should('exist')
+        .and('not.be.disabled');
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+
+      cy.get('[aria-label="Drag proposals to reorder"]').should('not.exist');
+
+      // NOTE: Trying to catch the failure of cy.reorderFapMeetingDecisionProposals because instrument is submitted
+      cy.on('fail', (err) => {
+        if (
+          err.name === 'Error' &&
+          err.message.includes('reorderFapMeetingDecisionProposals')
+        ) {
+          expect(err.message).to.include(
+            'FAP instrument for selected proposals is submitted and reordering is not allowed'
+          );
+
+          return true;
+        }
+
+        throw err;
+      });
+
+      cy.reorderFapMeetingDecisionProposals({
+        reorderFapMeetingDecisionProposalsInput: {
+          proposals: [
+            {
+              fapId: createdFapId,
+              instrumentId: createdInstrumentId,
+              proposalPk: firstCreatedProposalPk,
+              rankOrder: 1,
+            },
+          ],
+        },
+      });
     });
 
     it('Officer should be able to edit Fap Meeting form after instrument is submitted', () => {

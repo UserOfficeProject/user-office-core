@@ -200,6 +200,18 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrumentHasProposals;
   }
 
+  async unsubmitInstrument(
+    proposalPks: number[],
+    instrumentId: number
+  ): Promise<InstrumentsHasProposals> {
+    const dummyInstrumentHasProposalsUnsbmitted = {
+      ...dummyInstrumentHasProposals,
+      submitted: false,
+    };
+
+    return dummyInstrumentHasProposalsUnsbmitted;
+  }
+
   hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number
