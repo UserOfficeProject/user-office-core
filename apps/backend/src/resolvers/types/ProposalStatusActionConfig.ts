@@ -60,6 +60,9 @@ export class EmailStatusActionRecipientsWithTemplate {
 
   @Field(() => [String], { nullable: true })
   otherRecipientEmails?: string[];
+
+  @Field(() => Boolean, { nullable: true })
+  combineEmails?: boolean;
 }
 
 @ObjectType()
