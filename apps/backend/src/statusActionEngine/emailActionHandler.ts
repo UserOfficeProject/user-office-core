@@ -2,9 +2,11 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
+import { SettingsId } from '../models/Settings';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
@@ -90,11 +92,17 @@ export const emailActionHandler = async (
         }
 
         case EmailStatusActionRecipients.USER_OFFICE: {
-          const userOfficeEmail = process.env.USER_OFFICE_EMAIL;
+          const adminDataSource = container.resolve<AdminDataSource>(
+            Tokens.AdminDataSource
+          );
+
+          const userOfficeEmail = (
+            await adminDataSource.getSetting(SettingsId.USER_OFFICE_EMAIL)
+          )?.settingsValue;
 
           if (!userOfficeEmail) {
             logger.logError(
-              'Could not send email(s) to the User Office, environment variable (USER_OFFICE_EMAIL) not set.',
+              'Could not send email(s) to the User Office as the setting (USER_OFFICE_EMAIL) is not set.',
               { proposalEmailsSkipped: proposals }
             );
 
