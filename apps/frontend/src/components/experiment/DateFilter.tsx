@@ -1,5 +1,6 @@
-import { DatePicker, LocalizationProvider } from '@mui/lab';
-import DateAdapter from '@mui/lab/AdapterLuxon';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import '@mui/lab';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import Grid from '@mui/material/Grid';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';

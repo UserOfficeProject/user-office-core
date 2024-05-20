@@ -325,7 +325,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
                 };
               }
             }),
-          }) as UserWithReviewsQuery['me']
+          } as UserWithReviewsQuery['me'])
       );
     }
   };

@@ -1,5 +1,5 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import FormControl from '@mui/material/FormControl';
 import useTheme from '@mui/material/styles/useTheme';
 import { Field } from 'formik';

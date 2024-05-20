@@ -1,6 +1,6 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import DatePicker from '@mui/lab/DatePicker';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
   FormControl,
   Grid,

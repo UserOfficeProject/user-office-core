@@ -1,7 +1,7 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';

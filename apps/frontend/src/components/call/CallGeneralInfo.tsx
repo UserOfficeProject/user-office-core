@@ -1,7 +1,7 @@
 import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
   Button,
   createStyles,
