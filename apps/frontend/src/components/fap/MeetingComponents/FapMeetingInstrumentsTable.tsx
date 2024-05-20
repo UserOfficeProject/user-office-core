@@ -227,7 +227,6 @@ const FapMeetingInstrumentsTable = ({
 
       {updateInstrumentTime && selectedCall && (
         <FapUpdateInstrumentTime
-          open={!!updateInstrumentTime}
           close={(): void => setUpdateInstrumentTime(null)}
           updateTime={updatedInstrumentTime}
           callId={selectedCall.id}

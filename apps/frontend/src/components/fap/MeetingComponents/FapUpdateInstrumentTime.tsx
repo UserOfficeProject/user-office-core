@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
 const MAX_32_BIT_INTEGER = Math.pow(2, 31);
 
 type FapUpdateInstrumentTimeProps = {
-  open: boolean;
   close: () => void;
   updateTime: (newTime: number, instrumentId: number) => void;
   callId: number;
@@ -60,7 +59,10 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
   };
 
   return (
-    <Dialog open={props.open} onClose={props.close}>
+    <Dialog open={true} onClose={props.close}>
+      <DialogTitle variant="h6" component="h1">
+        Update {props.instrument.name} Avalibabity Time
+      </DialogTitle>
       <Formik
         initialValues={{}}
         onSubmit={() => {
@@ -69,9 +71,6 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
         }}
       >
         <Form style={{ padding: '10px' }}>
-          <DialogTitle variant="h6" component="h1">
-            Update {props.instrument.name} Avalibabity Time
-          </DialogTitle>
           {AvailabilityTimeEditComponent(newTime, SetNewTime)}
           <Button
             type="submit"
