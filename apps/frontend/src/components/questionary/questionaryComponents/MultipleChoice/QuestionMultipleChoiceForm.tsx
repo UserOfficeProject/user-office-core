@@ -14,7 +14,7 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { SelectionFromOptionsConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 const columns = [{ title: 'Answer', field: 'answer' }];
@@ -46,7 +46,7 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <TemplateEdit pageType="Question" />
+          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

@@ -7,7 +7,7 @@ import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
@@ -30,7 +30,7 @@ export const QuestionTemplateRelationEmbellishmentForm = (
     >
       {(formikProps) => (
         <>
-          <TemplateEdit pageType="Template" />
+          <TemplateEditLabel pageType="Template" />
           <Field
             name="config.html"
             type="text"

@@ -11,7 +11,7 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
 import { useTemplates } from 'hooks/template/useTemplates';
 
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -54,7 +54,7 @@ export const QuestionTemplateRelationGenericTemplateForm = (
     >
       {(formikProps) => (
         <>
-          <TemplateEdit pageType="Template" />
+          <TemplateEditLabel pageType="Template" />
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Options">
             <Field

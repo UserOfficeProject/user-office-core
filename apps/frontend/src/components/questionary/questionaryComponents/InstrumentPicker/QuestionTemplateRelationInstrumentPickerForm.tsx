@@ -5,7 +5,7 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 import { InstrumentPickerConfig } from 'generated/sdk';
 
 import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 export const QuestionTemplateRelationInstrumentPickerForm = (
@@ -23,7 +23,7 @@ export const QuestionTemplateRelationInstrumentPickerForm = (
     >
       {() => (
         <>
-          <TemplateEdit pageType="Template" />
+          <TemplateEditLabel pageType="Template" />
           <QuestionExcerpt question={props.questionRel.question} />
           <QuestionInstrumentPickerFormCommon
             config={props.questionRel.question.config as InstrumentPickerConfig}

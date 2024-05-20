@@ -14,7 +14,7 @@ import { DateConfig, SettingsId } from 'generated/sdk';
 import { minMaxDateTimeCalculations } from 'utils/Time';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionDateForm = (props: QuestionFormProps) => {
@@ -81,7 +81,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
 
         return (
           <>
-            <TemplateEdit pageType="Question" />
+            <TemplateEditLabel pageType="Question" />
             <Field
               name="naturalKey"
               label="Key"

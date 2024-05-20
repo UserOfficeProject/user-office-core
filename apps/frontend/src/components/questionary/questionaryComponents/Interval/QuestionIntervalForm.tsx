@@ -12,7 +12,7 @@ import { IntervalConfig } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 export const QuestionIntervalForm = (props: QuestionFormProps) => {
   const field = props.question;
   const intervalConfig = props.question.config as IntervalConfig;
@@ -42,7 +42,7 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
     >
       {({ setFieldValue }) => (
         <>
-          <TemplateEdit pageType="Question" />
+          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

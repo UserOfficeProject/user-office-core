@@ -11,7 +11,7 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { TextInputConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionTextInputForm = (props: QuestionFormProps) => {
@@ -37,7 +37,7 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
     >
       {(formikProps) => (
         <>
-          <TemplateEdit pageType="Question" />
+          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             id="Key-Input"

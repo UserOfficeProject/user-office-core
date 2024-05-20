@@ -7,7 +7,7 @@ import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
 
-import TemplateEdit from '../../../template/QuestionTemplateLabel';
+import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 export const QuestionTemplateRelationBooleanForm = (
@@ -25,7 +25,7 @@ export const QuestionTemplateRelationBooleanForm = (
     >
       {(formikProps) => (
         <>
-          <TemplateEdit pageType="Template" />
+          <TemplateEditLabel pageType="Template" />
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <Field
