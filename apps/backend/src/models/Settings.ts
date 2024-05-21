@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export class Settings {
   constructor(
     public id: SettingsId,
@@ -35,4 +36,5 @@ export enum SettingsId {
   DEFAULT_INST_SCI_REVIEWER_FILTER = 'DEFAULT_INST_SCI_REVIEWER_FILTER',
   IDLE_TIMEOUT = 'IDLE_TIMEOUT',
   GRADE_PRECISION = 'GRADE_PRECISION',
+  USER_OFFICE_EMAIL = 'USER_OFFICE_EMAIL',
 }

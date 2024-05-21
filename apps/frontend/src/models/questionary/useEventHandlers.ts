@@ -63,6 +63,7 @@ export default function useEventHandlers(templateGroupId: TemplateGroupId) {
           if (state.isDirty) {
             if (confirmNavigation()) {
               await handleReset();
+              dispatch({ type: 'CLEAR_DELETE_LIST' });
               dispatch({ type: 'GO_STEP_BACK' });
             } else {
               // do nothing

@@ -6,8 +6,8 @@ import { Sdk, ShipmentStatus, TemplateGroupId } from 'generated/sdk';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 import { ShipmentSubmissionState } from 'models/questionary/shipment/ShipmentSubmissionState';
 
-import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { ShipmentQuestionaryWizardStep } from './ShipmentQuestionaryWizardStep';
+import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 
 export const shipmentQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.SHIPMENT,

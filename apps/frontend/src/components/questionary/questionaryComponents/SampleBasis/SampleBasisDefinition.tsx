@@ -4,11 +4,11 @@ import React from 'react';
 import { DataType } from 'generated/sdk';
 import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
 
-import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createSampleBasisValidationSchema } from './createSampleBasisValidationSchema';
 import { QuestionaryComponentSampleBasis } from './QuestionaryComponentSampleBasis';
 import { QuestionSampleBasisForm } from './QuestionSampleBasisForm';
 import { QuestionTemplateRelationSampleBasisForm } from './QuestionTemplateRelationSampleBasisForm';
+import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const sampleBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SAMPLE_BASIS,
