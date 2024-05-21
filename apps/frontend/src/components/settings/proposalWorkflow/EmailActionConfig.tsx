@@ -1,3 +1,5 @@
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { Tooltip } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
@@ -81,6 +83,22 @@ const EmailActionConfig = ({
     return true;
   };
 
+  const handleCombineEmail = (
+    recipientName: EmailStatusActionRecipients,
+    arrayHelpers: FieldArrayRenderProps
+  ) => {
+    const foundRecipientIndex = getRecipientIndexByName(recipientName);
+    if (foundRecipientIndex !== -1) {
+      const updatedRecipient = {
+        ...recipientsWithEmailTemplate[foundRecipientIndex],
+        combineEmails:
+          !recipientsWithEmailTemplate[foundRecipientIndex].combineEmails ??
+          true,
+      };
+      arrayHelpers.replace(foundRecipientIndex, updatedRecipient);
+    }
+  };
+
   const handleKeyDown = (
     event: KeyboardEvent<HTMLDivElement>,
     arrayHelpers: FieldArrayRenderProps
@@ -145,6 +163,24 @@ const EmailActionConfig = ({
     }
   };
 
+  const combineTooltipText = `Sends recipients a single email instead of separate emails, in cases
+    where the status event includes multiple proposals and a recipient appears more than once.
+    Note that the email template must support this.`;
+
+  const getEmailTemplateColumnWidth = (
+    foundRecipientWithEmailTemplateIndex: number
+  ) => {
+    if (
+      foundRecipientWithEmailTemplateIndex !== -1 &&
+      recipientsWithEmailTemplate[foundRecipientWithEmailTemplateIndex]
+        .recipient.name !== EmailStatusActionRecipients.OTHER
+    ) {
+      return 4;
+    } else {
+      return 7;
+    }
+  };
+
   return (
     <>
       <Typography variant="h6" color="black">
@@ -158,8 +194,8 @@ const EmailActionConfig = ({
               getRecipientIndexByName(recipient.name);
 
             return (
-              <Grid key={index} container paddingX={1}>
-                <Grid item sm={6}>
+              <Grid key={index} container paddingX={1} columnSpacing={2}>
+                <Grid item sm={5}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -193,7 +229,12 @@ const EmailActionConfig = ({
                     {recipient.description}
                   </p>
                 </Grid>
-                <Grid item sm={6}>
+                <Grid
+                  item
+                  sm={getEmailTemplateColumnWidth(
+                    foundRecipientWithEmailTemplateIndex
+                  )}
+                >
                   {foundRecipientWithEmailTemplateIndex !== -1 && (
                     <>
                       <Autocomplete
@@ -280,6 +321,46 @@ const EmailActionConfig = ({
                     </>
                   )}
                 </Grid>
+                {foundRecipientWithEmailTemplateIndex !== -1 &&
+                  recipientsWithEmailTemplate[
+                    foundRecipientWithEmailTemplateIndex
+                  ].recipient.name !== EmailStatusActionRecipients.OTHER && (
+                    <Grid item sm={3}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            id={`${recipient.name}-combine-emails`}
+                            name={`${recipient.name}-combine-emails`}
+                            data-cy={`${recipient.name}-combine-emails`}
+                            value={
+                              !!recipientsWithEmailTemplate[
+                                foundRecipientWithEmailTemplateIndex
+                              ]?.combineEmails
+                            }
+                            checked={
+                              !!recipientsWithEmailTemplate[
+                                foundRecipientWithEmailTemplateIndex
+                              ]?.combineEmails
+                            }
+                            onChange={() => {
+                              handleCombineEmail(recipient.name, arrayHelpers);
+                            }}
+                          />
+                        }
+                        label={
+                          <>
+                            Combine recipient emails
+                            <Tooltip
+                              title={combineTooltipText}
+                              sx={{ padding: '2px' }}
+                            >
+                              <HelpOutlineIcon fontSize="small" />
+                            </Tooltip>
+                          </>
+                        }
+                      />
+                    </Grid>
+                  )}
               </Grid>
             );
           })
