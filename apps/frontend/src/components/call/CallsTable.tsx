@@ -19,6 +19,7 @@ import {
   InstrumentWithAvailabilityTime,
   UserRole,
   UpdateCallInput,
+  AssignInstrumentsToCallMutation,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -133,7 +134,10 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   ];
 
   const assignInstrumentsToCall = useCallback(
-    (callId: number, instruments: InstrumentWithAvailabilityTime[]) => {
+    (
+      callId: number,
+      instruments: AssignInstrumentsToCallMutation['assignInstrumentsToCall']['instruments']
+    ) => {
       if (calls) {
         const callsWithInstruments = calls.map((callItem) => {
           if (callItem.id === callId) {
@@ -145,7 +149,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             return callItem;
           }
         });
-        setCalls(callsWithInstruments);
+        setCalls(callsWithInstruments as Call[]);
         setAssigningInstrumentsCallId(null);
       }
     },
@@ -299,13 +303,9 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           fullWidth
         >
           <AssignInstrumentsToCall
-            assignedInstruments={
-              callAssignments?.instruments as InstrumentWithAvailabilityTime[]
-            }
+            assignedInstruments={callAssignments?.instruments}
             callId={assigningInstrumentsCallId}
-            assignInstrumentsToCall={(
-              instruments: InstrumentWithAvailabilityTime[]
-            ) =>
+            assignInstrumentsToCall={(instruments) =>
               assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
             }
           />

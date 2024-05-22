@@ -1,8 +1,8 @@
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
-import { DatePicker } from 'formik-mui-lab';
 import { useContext } from 'react';
 import React from 'react';
 

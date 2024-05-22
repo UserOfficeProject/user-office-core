@@ -9,6 +9,7 @@ import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
+import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
@@ -17,7 +18,6 @@ import {
   updateApiAccessTokenValidationSchema,
 } from '@user-office-software/duo-validation/lib/Admin';
 import { Field, FieldArray, FieldArrayRenderProps, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import React from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';

@@ -1,9 +1,11 @@
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import Checkbox from '@mui/material/Checkbox';
 import useTheme from '@mui/material/styles/useTheme';
+import TextField from '@mui/material/TextField';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
-import { DatePicker, DateTimePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
@@ -78,9 +80,18 @@ export const QuestionTemplateRelationDateForm = (
         return (
           <>
             <QuestionExcerpt question={props.questionRel.question} />
-            <Field
+            {/* <Field
               name="config.includeTime"
               component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Include time',
+              }}
+              inputProps={{ 'data-cy': 'includeTime' }}
+            /> */}
+            <Field
+              name="config.includeTime"
+              component={Checkbox}
               type="checkbox"
               Label={{
                 label: 'Include time',
@@ -97,9 +108,18 @@ export const QuestionTemplateRelationDateForm = (
               data-cy="tooltip"
             />
             <TitledContainer label="Constraints">
-              <Field
+              {/* <Field
                 name="config.required"
                 component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Is required',
+                }}
+                data-cy="required"
+              /> */}
+              <Field
+                name="config.required"
+                component={Checkbox}
                 type="checkbox"
                 Label={{
                   label: 'Is required',

@@ -6,10 +6,10 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 

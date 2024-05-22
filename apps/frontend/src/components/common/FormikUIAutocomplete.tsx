@@ -1,10 +1,9 @@
-import { InputAdornment } from '@mui/material';
+import { Autocomplete, InputAdornment } from '@mui/material';
 import { InputProps } from '@mui/material/Input';
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
 import { Field } from 'formik';
-import { Autocomplete } from 'formik-mui';
 import React, { useState } from 'react';
 
 import { Option } from 'utils/utilTypes';

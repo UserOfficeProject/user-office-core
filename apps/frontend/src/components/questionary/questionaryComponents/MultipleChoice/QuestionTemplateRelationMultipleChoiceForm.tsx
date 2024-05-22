@@ -1,10 +1,10 @@
+import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { SelectChangeEvent } from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
-import { Checkbox, Select } from 'formik-mui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 

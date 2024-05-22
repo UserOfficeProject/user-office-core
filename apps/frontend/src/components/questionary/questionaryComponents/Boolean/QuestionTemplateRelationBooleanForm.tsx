@@ -1,5 +1,5 @@
+import Checkbox from '@mui/material/Checkbox';
 import { Field } from 'formik';
-import { CheckboxWithLabel } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -27,9 +27,18 @@ export const QuestionTemplateRelationBooleanForm = (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
-            <Field
+            {/* <Field
               name="config.required"
               component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'User must check it to continue',
+              }}
+              data-cy="required"
+            /> */}
+            <Field
+              name="config.required"
+              component={Checkbox}
               type="checkbox"
               Label={{
                 label: 'User must check it to continue',

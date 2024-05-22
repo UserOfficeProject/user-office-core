@@ -1,7 +1,8 @@
 import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
+import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
@@ -56,9 +57,18 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            <Field
+            {/* <Field
               name="config.required"
               component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
+              data-cy="required"
+            /> */}
+            <Field
+              name="config.required"
+              component={Checkbox}
               type="checkbox"
               Label={{
                 label: 'Is required',
@@ -116,7 +126,7 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
             />
 
             <Box component="div">
-              <Field
+              {/* <Field
                 name="config.multiline"
                 checked={
                   (formikProps.values.config as TextInputConfig).multiline
@@ -127,11 +137,23 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
                   label: 'Multiple lines',
                 }}
                 data-cy="multiline"
+              /> */}
+              <Field
+                name="config.multiline"
+                checked={
+                  (formikProps.values.config as TextInputConfig).multiline
+                }
+                component={Checkbox}
+                type="checkbox"
+                Label={{
+                  label: 'Multiple lines',
+                }}
+                data-cy="multiline"
               />
             </Box>
 
             <Box component="div">
-              <Field
+              {/* <Field
                 name="config.isCounterHidden"
                 checked={
                   (formikProps.values.config as TextInputConfig).isCounterHidden
@@ -142,11 +164,31 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
                   label: 'Hide counter',
                 }}
                 data-cy="multiline"
+              /> */}
+              <Field
+                name="config.isCounterHidden"
+                checked={
+                  (formikProps.values.config as TextInputConfig).isCounterHidden
+                }
+                component={Checkbox}
+                type="checkbox"
+                Label={{
+                  label: 'Hide counter',
+                }}
+                data-cy="multiline"
               />
             </Box>
 
-            <Field
+            {/* <Field
               component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Enable rich text question',
+              }}
+              name="config.isHtmlQuestion"
+            /> */}
+            <Field
+              component={Checkbox}
               type="checkbox"
               Label={{
                 label: 'Enable rich text question',

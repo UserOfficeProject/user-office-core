@@ -1,8 +1,8 @@
 import { MTableToolbar, Options } from '@material-table/core';
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Field } from 'formik';
-import { TextField } from 'formik-mui';
 import React from 'react';
 
 // This component is used to retrieve a user from the database using an email.

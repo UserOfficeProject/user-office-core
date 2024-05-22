@@ -1,7 +1,6 @@
-import { Collapse, FormControl } from '@mui/material';
+import { Checkbox, Collapse, FormControl, TextField } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { default as React } from 'react';
 import * as Yup from 'yup';
 
@@ -65,8 +64,17 @@ export const QuestionTemplateRelationGenericTemplateForm = (
               fullWidth
               data-cy="addEntryButtonLabel"
             />
-            <Field
+            {/* <Field
               component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Can copy',
+              }}
+              name="config.canCopy"
+              checked={(formikProps.values.config as SubTemplateConfig).canCopy}
+            /> */}
+            <Field
+              component={Checkbox}
               type="checkbox"
               Label={{
                 label: 'Can copy',
@@ -87,16 +95,32 @@ export const QuestionTemplateRelationGenericTemplateForm = (
                 fullWidth
                 data-cy="copyButtonLabel"
               />
-              <Field
+              {/* <Field
                 component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Multiple copy selection',
                 }}
                 name="config.isMultipleCopySelect"
-              />
+              /> */}
               <Field
+                component={Checkbox}
+                type="checkbox"
+                Label={{
+                  label: 'Multiple copy selection',
+                }}
+                name="config.isMultipleCopySelect"
+              />
+              {/* <Field
                 component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Copy is complete',
+                }}
+                name="config.isCompleteOnCopy"
+              /> */}
+              <Field
+                component={Checkbox}
                 type="checkbox"
                 Label={{
                   label: 'Copy is complete',

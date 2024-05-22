@@ -1,7 +1,8 @@
-import Autocomplete from '@mui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
+import Checkbox from '@mui/material/Checkbox';
 import MaterialTextField from '@mui/material/TextField';
+import TextField from '@mui/material/TextField';
 import { Field, getIn } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
@@ -61,9 +62,18 @@ export const QuestionTemplateRelationNumberForm = (
               inputProps={{ 'data-cy': 'small-label' }}
             />
             <TitledContainer label="Constraints">
-              <Field
+              {/* <Field
                 name="config.required"
                 component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Is required',
+                }}
+                InputProps={{ 'data-cy': 'required' }}
+              /> */}
+              <Field
+                name="config.required"
+                component={Checkbox}
                 type="checkbox"
                 Label={{
                   label: 'Is required',

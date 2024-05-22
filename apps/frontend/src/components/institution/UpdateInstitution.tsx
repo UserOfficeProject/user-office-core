@@ -1,9 +1,8 @@
 import { Check, MergeType } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
+import { TextField, Tooltip } from '@mui/material';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useHistory } from 'react-router';

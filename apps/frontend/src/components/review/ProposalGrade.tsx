@@ -2,13 +2,15 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import Save from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
-import { Select, TextField, CheckboxWithLabel } from 'formik-mui';
 import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';
 import { Editor as TinyMCEEditor } from 'tinymce';
@@ -225,10 +227,21 @@ const ProposalGrade = ({
               {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
             </ButtonWithDialog>
             {hasAccessRights && (
+              // <Field
+              //   id="submitted"
+              //   name="submitted"
+              //   component={CheckboxWithLabel}
+              //   type="checkbox"
+              //   Label={{
+              //     label: 'Submitted',
+              //   }}
+              //   disabled={isSubmitting}
+              //   data-cy="is-grade-submitted"
+              // />
               <Field
                 id="submitted"
                 name="submitted"
-                component={CheckboxWithLabel}
+                component={Checkbox}
                 type="checkbox"
                 Label={{
                   label: 'Submitted',

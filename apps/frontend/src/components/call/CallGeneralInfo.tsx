@@ -1,7 +1,5 @@
 import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
   Button,
   createStyles,
@@ -19,14 +17,16 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Theme,
   Typography,
   useTheme,
 } from '@mui/material';
 import { withStyles, makeStyles } from '@mui/styles';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-mui';
-import { DateTimePicker } from 'formik-mui-lab';
 import React, { useContext, useEffect, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';

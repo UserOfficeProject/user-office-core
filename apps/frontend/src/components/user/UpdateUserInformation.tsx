@@ -1,7 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -10,14 +8,17 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import useTheme from '@mui/material/styles/useTheme';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
-import { Field, Form, Formik } from 'formik';
-import { Select, TextField } from 'formik-mui';
-import { DatePicker } from 'formik-mui-lab';
+import { Field, Form, Formik, useFormik } from 'formik';
 import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
@@ -81,36 +82,44 @@ export default function UpdateUserInformation(
   const [countriesList, setCountriesList] = useState<Option[]>([]);
   const classes = useStyles();
 
+  const initialValues = {
+    username: userData?.username,
+    firstname: userData?.firstname,
+    middlename: userData?.middlename || '',
+    lastname: userData?.lastname,
+    preferredname: userData?.preferredname || '',
+    gender:
+      userData?.gender !== 'male' && userData?.gender !== 'female'
+        ? 'other'
+        : userData?.gender,
+    othergender: userData?.gender,
+    nationality: userData?.nationality,
+    birthdate: DateTime.fromJSDate(new Date(userData?.birthdate)),
+    institutionId: userData?.institutionId,
+    department: userData?.department,
+    position: userData?.position,
+    oldEmail: userData?.email,
+    email: userData?.email,
+    telephone: userData?.telephone,
+    telephone_alt: userData?.telephone_alt || '',
+    user_title: userData?.user_title,
+    oidcSub: userData?.oidcSub,
+  };
+
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: updateUserValidationSchema,
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
+
   // NOTE: User should be older than 18 years.
   const userMaxBirthDate = DateTime.now().minus({ years: 18 });
 
   if (!userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
-
-  const initialValues = {
-    username: userData.username,
-    firstname: userData.firstname,
-    middlename: userData.middlename || '',
-    lastname: userData.lastname,
-    preferredname: userData.preferredname || '',
-    gender:
-      userData.gender !== 'male' && userData.gender !== 'female'
-        ? 'other'
-        : userData.gender,
-    othergender: userData.gender,
-    nationality: userData.nationality,
-    birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
-    institutionId: userData.institutionId,
-    department: userData.department,
-    position: userData.position,
-    oldEmail: userData.email,
-    email: userData.email,
-    telephone: userData.telephone,
-    telephone_alt: userData.telephone_alt || '',
-    user_title: userData.user_title,
-    oidcSub: userData.oidcSub,
-  };
 
   const userTitleOptions: Option[] = [
     { text: 'Ms.', value: 'Ms.' },
@@ -165,7 +174,7 @@ export default function UpdateUserInformation(
           id: props.id,
           ...values,
           nationality: +(values.nationality as number),
-          institutionId: +values.institutionId,
+          institutionId: values.institutionId ? +values.institutionId : null,
           gender:
             values.gender === 'other' ? values.othergender : values.gender,
         } as UpdateUserMutationVariables;
@@ -203,10 +212,16 @@ export default function UpdateUserInformation(
                   >
                     Title
                   </InputLabel>
-                  <Field
+                  <Select
                     name="user_title"
-                    component={Select}
                     data-cy="title"
+                    value={formik.values.user_title}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.user_title &&
+                      Boolean(formik.errors.user_title)
+                    }
                     required
                   >
                     {userTitleOptions.map(({ value, text }) => (
@@ -214,41 +229,73 @@ export default function UpdateUserInformation(
                         {text}
                       </MenuItem>
                     ))}
-                  </Field>
+                  </Select>
                 </FormControl>
-                <Field
+                <TextField
                   name="firstname"
                   label="Firstname"
                   id="firstname-input"
+                  value={formik.values.firstname}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.firstname && Boolean(formik.errors.firstname)
+                  }
+                  helperText={
+                    formik.touched.firstname && formik.errors.firstname
+                  }
                   type="text"
-                  component={TextField}
                   fullWidth
                   data-cy="firstname"
                 />
-                <Field
+                <TextField
                   name="middlename"
                   label="Middle name"
                   id="middlename-input"
+                  value={formik.values.middlename}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.middlename &&
+                    Boolean(formik.errors.middlename)
+                  }
+                  helperText={
+                    formik.touched.middlename && formik.errors.middlename
+                  }
                   type="text"
-                  component={TextField}
                   fullWidth
                   data-cy="middlename"
                 />
-                <Field
+                <TextField
                   name="lastname"
                   label="Lastname"
                   id="lastname-input"
+                  value={formik.values.lastname}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.lastname && Boolean(formik.errors.lastname)
+                  }
+                  helperText={formik.touched.lastname && formik.errors.lastname}
                   type="text"
-                  component={TextField}
                   fullWidth
                   data-cy="lastname"
                 />
-                <Field
+                <TextField
                   name="preferredname"
                   label="Preferred name"
                   id="preferredname-input"
+                  value={formik.values.preferredname}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.preferredname &&
+                    Boolean(formik.errors.preferredname)
+                  }
+                  helperText={
+                    formik.touched.preferredname && formik.errors.preferredname
+                  }
                   type="text"
-                  component={TextField}
                   fullWidth
                   data-cy="preferredname"
                 />
@@ -260,12 +307,16 @@ export default function UpdateUserInformation(
                   >
                     Gender
                   </InputLabel>
-                  <Field
+                  <Select
                     id="gender"
                     name="gender"
-                    type="text"
-                    component={Select}
                     data-cy="gender"
+                    value={formik.values.gender}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.gender && Boolean(formik.errors.gender)
+                    }
                     required
                   >
                     {genderOptions.map(({ value, text }) => {
@@ -275,18 +326,26 @@ export default function UpdateUserInformation(
                         </MenuItem>
                       );
                     })}
-                  </Field>
+                  </Select>
                 </FormControl>
                 {values.gender === 'other' && (
-                  <Field
+                  <TextField
                     name="othergender"
                     label="Please specify gender"
                     id="othergender-input"
+                    value={formik.values.othergender}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.othergender &&
+                      Boolean(formik.errors.othergender)
+                    }
+                    helperText={
+                      formik.touched.othergender && formik.errors.othergender
+                    }
                     type="text"
-                    component={TextField}
                     fullWidth
                     data-cy="othergender"
-                    required
                   />
                 )}
                 <FormikUIAutocomplete
@@ -354,7 +413,7 @@ export default function UpdateUserInformation(
                 loading={loadingInstitutions}
                 noOptionsText="No institutions"
               />
-              {+values.institutionId === 1 && (
+              {values.institutionId && +values.institutionId === 1 && (
                 <>
                   <Field
                     name="otherInstitution"

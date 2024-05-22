@@ -1,12 +1,14 @@
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Formik, Form, Field, useFormikContext, FieldArray } from 'formik';
-import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React, { ChangeEvent } from 'react';
 import { Prompt } from 'react-router';
 
@@ -217,10 +219,21 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
               </Grid>
               <Grid item xs={12}>
                 <StyledButtonContainer>
-                  <Field
+                  {/* <Field
                     id="managementDecisionSubmitted"
                     name="managementDecisionSubmitted"
                     component={CheckboxWithLabel}
+                    type="checkbox"
+                    Label={{
+                      label: 'Submitted',
+                    }}
+                    data-cy="is-management-decision-submitted"
+                    disabled={!isUserOfficer || isSubmitting}
+                  /> */}
+                  <Field
+                    id="managementDecisionSubmitted"
+                    name="managementDecisionSubmitted"
+                    component={Checkbox}
                     type="checkbox"
                     Label={{
                       label: 'Submitted',

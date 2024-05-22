@@ -1,5 +1,6 @@
+import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -53,10 +54,19 @@ export const QuestionTemplateRelationEmbellishmentForm = (
             fullWidth
             data-cy="plain"
           />
-
+          {/* 
           <Field
             name="config.omitFromPdf"
             component={CheckboxWithLabel}
+            type="checkbox"
+            Label={{
+              label: 'Omit from PDF',
+            }}
+            data-cy="omit"
+          /> */}
+          <Field
+            name="config.omitFromPdf"
+            component={Checkbox}
             type="checkbox"
             Label={{
               label: 'Omit from PDF',

@@ -1,12 +1,13 @@
 import {
+  Checkbox,
   FormControl,
   FormControlLabel,
   InputLabel,
   MenuItem,
+  Select,
   SelectChangeEvent,
 } from '@mui/material';
 import { Field } from 'formik';
-import { Checkbox, Select } from 'formik-mui';
 import React, { useState } from 'react';
 
 import TitledContainer from 'components/common/TitledContainer';

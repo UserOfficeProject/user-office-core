@@ -1,12 +1,12 @@
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
 } from '@user-office-software/duo-validation/lib/Instrument';
 import { Field, Form, Formik, FormikProps } from 'formik';
-import { TextField } from 'formik-mui';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';

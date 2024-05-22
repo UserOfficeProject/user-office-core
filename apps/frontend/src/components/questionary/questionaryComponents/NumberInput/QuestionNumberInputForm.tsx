@@ -1,14 +1,18 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import LaunchIcon from '@mui/icons-material/Launch';
-import Autocomplete from '@mui/lab/Autocomplete';
-import { Button, IconButton } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  Checkbox,
+  IconButton,
+  TextField,
+} from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import MaterialTextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
@@ -116,9 +120,18 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            <Field
+            {/* <Field
               name="config.required"
               component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
+              InputProps={{ 'data-cy': 'required' }}
+            /> */}
+            <Field
+              name="config.required"
+              component={Checkbox}
               type="checkbox"
               Label={{
                 label: 'Is required',

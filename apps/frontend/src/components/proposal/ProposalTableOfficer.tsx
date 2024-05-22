@@ -890,9 +890,9 @@ const ProposalTableOfficer = ({
             nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
           },
         }}
-        components={{
-          Toolbar: ToolbarWithSelectAllPrefetched,
-        }}
+        // components={{
+        //   Toolbar: ToolbarWithSelectAllPrefetched,
+        // }}
         onPageChange={(page, pageSize) => {
           const newOffset =
             Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;

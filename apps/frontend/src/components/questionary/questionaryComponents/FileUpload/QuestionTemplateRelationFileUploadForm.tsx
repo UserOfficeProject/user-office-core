@@ -1,6 +1,8 @@
+import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -65,7 +67,7 @@ export const QuestionTemplateRelationFileUploadForm = (
               </TitledContainer>
 
               <TitledContainer label="Constraints">
-                <Field
+                {/* <Field
                   name="config.required"
                   component={CheckboxWithLabel}
                   type="checkbox"
@@ -73,10 +75,31 @@ export const QuestionTemplateRelationFileUploadForm = (
                     label: 'Is required',
                   }}
                   data-cy="required"
-                />
+                /> */}
                 <Field
+                  name="config.required"
+                  component={Checkbox}
+                  type="checkbox"
+                  Label={{
+                    label: 'Is required',
+                  }}
+                  data-cy="required"
+                />
+                {/* <Field
                   name="config.omitFromPdf"
                   component={CheckboxWithLabel}
+                  type="checkbox"
+                  checked={
+                    (formikProps.values.config as FileUploadConfig).omitFromPdf
+                  }
+                  Label={{
+                    label: 'Omit from PDF',
+                  }}
+                  data-cy="omitFromPdf"
+                /> */}
+                <Field
+                  name="config.omitFromPdf"
+                  component={Checkbox}
                   type="checkbox"
                   checked={
                     (formikProps.values.config as FileUploadConfig).omitFromPdf

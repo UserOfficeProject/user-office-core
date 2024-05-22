@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  TextField,
 } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -18,7 +19,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import { updateTimeAllocationValidationSchema } from '@user-office-software/duo-validation';
 import clsx from 'clsx';
 import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 

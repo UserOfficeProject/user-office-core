@@ -1,5 +1,6 @@
+import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
@@ -47,9 +48,18 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            <Field
+            {/* <Field
               name="config.required"
               component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
+              data-cy="required"
+            /> */}
+            <Field
+              name="config.required"
+              component={Checkbox}
               type="checkbox"
               Label={{
                 label: 'Is required',

@@ -1,9 +1,9 @@
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
+import TextField from '@mui/material/TextField';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-mui';
-import { DatePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 
 import { SettingsContext } from 'context/SettingsContextProvider';

@@ -1,10 +1,11 @@
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { createFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Field, Form, Formik } from 'formik';
-import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 

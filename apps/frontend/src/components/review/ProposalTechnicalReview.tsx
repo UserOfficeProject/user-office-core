@@ -1,13 +1,15 @@
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React, { useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
@@ -350,10 +352,21 @@ const ProposalTechnicalReview = ({
               <Grid item xs={12}>
                 <StyledButtonContainer>
                   {isUserOfficer && (
+                    // <Field
+                    //   id="submitted"
+                    //   name="submitted"
+                    //   component={CheckboxWithLabel}
+                    //   type="checkbox"
+                    //   Label={{
+                    //     label: 'Submitted',
+                    //   }}
+                    //   disabled={isSubmitting}
+                    //   data-cy="is-review-submitted"
+                    // />
                     <Field
                       id="submitted"
                       name="submitted"
-                      component={CheckboxWithLabel}
+                      component={Checkbox}
                       type="checkbox"
                       Label={{
                         label: 'Submitted',
