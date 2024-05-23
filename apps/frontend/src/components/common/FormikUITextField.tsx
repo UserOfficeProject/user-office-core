@@ -1,35 +1,30 @@
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
-import React, { useState } from 'react';
+import { useField } from 'formik';
+import React from 'react';
 
-// type FormikUITextFieldProps = {
-//   items: Option[];
-//   name: string;
-//   label: string;
-//   loading?: boolean;
-//   noOptionsText?: string;
-//   required?: boolean;
-//   disabled?: boolean;
-//   TextFieldProps?: MUITextFieldProps;
-//   InputProps?: Partial<InputProps> & { 'data-cy': string };
-//   multiple?: boolean;
-//   'data-cy'?: string;
-//   AdornmentIcon?: MUITextFieldProps;
-// };
+const FormikUITextField = ({ name, ...otherProps }: MUITextFieldProps) => {
+  if (!name) {
+    throw new Error(
+      'FormikUITextField cannot be used without a required name property'
+    );
+  }
 
-const FormikUITextField = ({
-  name,
-  label,
-  required,
-  disabled,
-  InputProps,
-  ...props
-}: MUITextFieldProps) => {
+  const [field, meta] = useField(name);
 
-  return (
-    
-  );
+  const configTextField: MUITextFieldProps = {
+    ...field,
+    ...otherProps,
+    fullWidth: true,
+  };
+
+  if (meta && meta.touched && meta.error) {
+    configTextField.error = true;
+    configTextField.helperText = meta.error;
+  }
+
+  return <MuiTextField {...configTextField} />;
 };
 
 export default FormikUITextField;

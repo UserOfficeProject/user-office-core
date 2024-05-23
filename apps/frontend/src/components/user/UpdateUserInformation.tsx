@@ -7,22 +7,21 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import useTheme from '@mui/material/styles/useTheme';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
-import { Field, Form, Formik, useFormik } from 'formik';
+import { Form, Formik } from 'formik';
 import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import FormikUIDatePicker from 'components/common/FormikUIDatePicker';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import ImpersonateButton from 'components/common/ImpersonateButton';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
@@ -67,10 +66,9 @@ interface UpdateUserInformationProps {
 export default function UpdateUserInformation(
   props: UpdateUserInformationProps
 ) {
-  const theme = useTheme();
   const { user } = useContext(UserContext);
   const { userData } = useUserData({ userId: props.id });
-  const { format, mask } = useFormattedDateTime({
+  const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { api } = useDataApiWithFeedback();
@@ -105,14 +103,6 @@ export default function UpdateUserInformation(
     user_title: userData?.user_title,
     oidcSub: userData?.oidcSub,
   };
-
-  const formik = useFormik({
-    initialValues: initialValues,
-    validationSchema: updateUserValidationSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
 
   // NOTE: User should be older than 18 years.
   const userMaxBirthDate = DateTime.now().minus({ years: 18 });
@@ -204,147 +194,56 @@ export default function UpdateUserInformation(
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={DateAdapter}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="user_title"
-                    shrink={!!values.user_title}
-                    required
-                  >
-                    Title
-                  </InputLabel>
-                  <Select
-                    name="user_title"
-                    data-cy="title"
-                    value={formik.values.user_title}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.user_title &&
-                      Boolean(formik.errors.user_title)
-                    }
-                    required
-                  >
-                    {userTitleOptions.map(({ value, text }) => (
-                      <MenuItem value={value} key={value}>
-                        {text}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Select
+                  name="user_title"
+                  options={userTitleOptions}
+                  inputLabel={{ htmlFor: 'user_title', required: true }}
+                  label="Title"
+                  data-cy="title"
+                  required
+                />
                 <TextField
                   name="firstname"
                   label="Firstname"
                   id="firstname-input"
-                  value={formik.values.firstname}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.firstname && Boolean(formik.errors.firstname)
-                  }
-                  helperText={
-                    formik.touched.firstname && formik.errors.firstname
-                  }
                   type="text"
-                  fullWidth
                   data-cy="firstname"
                 />
                 <TextField
                   name="middlename"
                   label="Middle name"
                   id="middlename-input"
-                  value={formik.values.middlename}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.middlename &&
-                    Boolean(formik.errors.middlename)
-                  }
-                  helperText={
-                    formik.touched.middlename && formik.errors.middlename
-                  }
                   type="text"
-                  fullWidth
                   data-cy="middlename"
                 />
                 <TextField
                   name="lastname"
                   label="Lastname"
                   id="lastname-input"
-                  value={formik.values.lastname}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.lastname && Boolean(formik.errors.lastname)
-                  }
-                  helperText={formik.touched.lastname && formik.errors.lastname}
                   type="text"
-                  fullWidth
                   data-cy="lastname"
                 />
                 <TextField
                   name="preferredname"
                   label="Preferred name"
                   id="preferredname-input"
-                  value={formik.values.preferredname}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.preferredname &&
-                    Boolean(formik.errors.preferredname)
-                  }
-                  helperText={
-                    formik.touched.preferredname && formik.errors.preferredname
-                  }
                   type="text"
-                  fullWidth
                   data-cy="preferredname"
                 />
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="gender"
-                    shrink={!!values.gender}
-                    required
-                  >
-                    Gender
-                  </InputLabel>
-                  <Select
-                    id="gender"
-                    name="gender"
-                    data-cy="gender"
-                    value={formik.values.gender}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.gender && Boolean(formik.errors.gender)
-                    }
-                    required
-                  >
-                    {genderOptions.map(({ value, text }) => {
-                      return (
-                        <MenuItem value={value} key={value}>
-                          {text}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
+                <Select
+                  name="gender"
+                  options={genderOptions}
+                  inputLabel={{ htmlFor: 'gender', required: true }}
+                  label="Gender"
+                  data-cy="gender"
+                  required
+                />
                 {values.gender === 'other' && (
                   <TextField
                     name="othergender"
                     label="Please specify gender"
                     id="othergender-input"
-                    value={formik.values.othergender}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.othergender &&
-                      Boolean(formik.errors.othergender)
-                    }
-                    helperText={
-                      formik.touched.othergender && formik.errors.othergender
-                    }
                     type="text"
-                    fullWidth
                     data-cy="othergender"
                   />
                 )}
@@ -358,20 +257,16 @@ export default function UpdateUserInformation(
                   noOptionsText="No nationalities"
                 />
 
-                <Field
+                <FormikUIDatePicker
                   name="birthdate"
                   label="Birthdate"
-                  id="birthdate-input"
-                  inputFormat={format}
-                  mask={mask}
-                  inputProps={{ placeholder: format }}
-                  component={DatePicker}
-                  textField={{
-                    fullWidth: true,
-                    'data-cy': 'birthdate',
+                  format={format || undefined}
+                  data-cy="birthdate"
+                  closeOnSelect
+                  slotProps={{
+                    textField: { fullWidth: true, name: 'birthdate' },
                   }}
                   maxDate={userMaxBirthDate}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
                 />
               </LocalizationProvider>
             </Grid>
@@ -394,16 +289,14 @@ export default function UpdateUserInformation(
                   https://orcid.org/{values.oidcSub}
                 </Link>
               </FormControl>
-              <Field
+              <TextField
                 name="username"
                 label="Username"
                 id="username-input"
                 type="text"
-                component={TextField}
-                fullWidth
                 autoComplete="off"
                 data-cy="username"
-                disabled={true}
+                disabled
               />
               <FormikUIAutocomplete
                 name="institutionId"
@@ -415,65 +308,53 @@ export default function UpdateUserInformation(
               />
               {values.institutionId && +values.institutionId === 1 && (
                 <>
-                  <Field
+                  <TextField
                     name="otherInstitution"
                     label="Please specify institution"
                     id="institution-input"
                     type="text"
-                    component={TextField}
                     margin="normal"
-                    fullWidth
                     data-cy="otherInstitution"
                     required
                   />
                 </>
               )}
-              <Field
+              <TextField
                 name="department"
                 label="Department"
                 id="department-input"
                 type="text"
-                component={TextField}
-                fullWidth
                 data-cy="department"
                 required
               />
-              <Field
+              <TextField
                 name="position"
                 label="Position"
                 id="position-input"
                 type="text"
-                component={TextField}
-                fullWidth
                 data-cy="position"
                 required
               />
-              <Field
+              <TextField
                 name="email"
                 label="E-mail"
                 id="email-input"
                 type="email"
-                component={TextField}
-                fullWidth
                 data-cy="email"
               />
-              <Field
+              <TextField
                 name="telephone"
                 label="Telephone"
                 id="telephone-input"
                 type="text"
-                component={TextField}
-                fullWidth
                 data-cy="telephone"
                 required
               />
-              <Field
+              <TextField
                 name="telephone_alt"
                 label="Telephone Alt."
                 id="telephone-alt-input"
                 type="text"
-                component={TextField}
-                fullWidth
                 data-cy="telephone-alt"
               />
             </Grid>
