@@ -6,6 +6,7 @@ import {
   FapDataSourceMock,
   anotherDummyFap,
   dummyFap,
+  dummyFapProposal,
   dummyFapWithoutCode,
 } from '../datasources/mockups/FapDataSource';
 import {
@@ -199,20 +200,19 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can assign proposal to Fap', () => {
     return expect(
-      FapMutationsInstance.assignProposalsToFap(dummyUserOfficerWithRole, {
-        proposals: [{ primaryKey: 1, callId: 1 }],
-        fapId: 1,
-        fapInstrumentId: 1,
+      FapMutationsInstance.assignProposalsToFaps(dummyUserOfficerWithRole, {
+        proposalPks: [1],
+        fapInstruments: [{ fapId: 1, instrumentId: 1 }],
       })
     ).resolves.toStrictEqual(new ProposalPks([1]));
   });
 
   test('A user can not remove proposal from Fap', async () => {
-    const result = (await FapMutationsInstance.removeProposalsFromFap(
+    const result = (await FapMutationsInstance.removeProposalsFromFaps(
       dummyUserWithRole,
       {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       }
     )) as Rejection;
 
@@ -221,11 +221,11 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can remove proposal from Fap', () => {
     return expect(
-      FapMutationsInstance.removeProposalsFromFap(dummyUserOfficerWithRole, {
+      FapMutationsInstance.removeProposalsFromFaps(dummyUserOfficerWithRole, {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       })
-    ).resolves.toStrictEqual(dummyFap);
+    ).resolves.toStrictEqual([dummyFapProposal]);
   });
 
   test('A user can not assign Fap member to proposal', async () => {
@@ -284,8 +284,18 @@ describe('Test FapMutations', () => {
     });
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
 
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 3, 1]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[2], 3, 4]);
+    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([
+      [1],
+      3,
+      1,
+      3,
+    ]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([
+      [2],
+      3,
+      4,
+      4,
+    ]);
   });
 
   test('No proposals are assigned to Fap members when there are none to assign', async () => {
@@ -312,8 +322,18 @@ describe('Test FapMutations', () => {
     });
     expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
 
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 7, 9]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[1], 7, 10]);
+    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([
+      [1],
+      7,
+      9,
+      11,
+    ]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([
+      [1],
+      7,
+      10,
+      11,
+    ]);
   });
 
   test('Proposals are evenly assigned to Fap members who aready have assignments', async () => {
@@ -331,8 +351,14 @@ describe('Test FapMutations', () => {
       [1, 3],
       5,
       6,
+      5,
     ]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[2], 5, 5]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([
+      [2],
+      5,
+      5,
+      6,
+    ]);
   });
 
   test('Proposals are not assigned to Fap members they are already assigned to', async () => {
@@ -350,7 +376,13 @@ describe('Test FapMutations', () => {
       [1, 2],
       6,
       8,
+      8,
     ]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[3], 6, 7]);
+    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([
+      [3],
+      6,
+      7,
+      10,
+    ]);
   });
 });

@@ -21,23 +21,35 @@ query getProposalsCore(
       statusName
       statusDescription
       proposalId
-      rankOrder
       finalStatus
       notified
       submitted
-      managementTimeAllocations
-      technicalTimeAllocations
-      technicalReviewAssigneeIds
-      technicalReviewAssigneeNames
-      technicalStatuses
-      instrumentNames
-      instrumentIds
-      fapInstrumentId
+      instruments {
+        id
+        name
+        managerUserId
+        managementTimeAllocation
+      }
+      technicalReviews {
+        id
+        technicalReviewAssignee {
+          id
+          firstname
+          lastname
+        }
+        timeAllocation
+        status
+        submitted
+      }
+      faps {
+        id
+        code
+      }
+      fapInstruments {
+        fapId
+        instrumentId
+      }
       callShortCode
-      fapCode
-      fapId
-      reviewAverage
-      reviewDeviation
       callId
       workflowId
       allocationTimeUnit

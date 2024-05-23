@@ -15,10 +15,13 @@ import {
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
-import { AssignProposalsToFapArgs } from '../resolvers/mutations/AssignProposalsToFapMutation';
+import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
-import { FapReviewsRecord } from './postgres/records';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from './postgres/records';
 
 export interface FapDataSource {
   create(
@@ -49,6 +52,7 @@ export interface FapDataSource {
   getFapsByCallId(callId: number): Promise<Fap[]>;
   getFapByProposalPk(proposalPk: number): Promise<Fap | null>;
   getFapsByProposalPks(proposalPks: number[]): Promise<FapProposal[]>;
+  getFapsByProposalPk(proposalPk: number): Promise<Fap[]>;
   getFaps(filter?: FapsFilter): Promise<{ totalCount: number; faps: Fap[] }>;
   getFapProposalAssignments(
     fapId: number,
@@ -89,22 +93,32 @@ export interface FapDataSource {
   ): Promise<Fap>;
   assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap>;
   removeMemberFromFap(args: UpdateMemberFapArgs): Promise<Fap>;
-  assignProposalsToFap(args: AssignProposalsToFapArgs): Promise<ProposalPks>;
+  assignProposalsToFaps(
+    args: AssignProposalsToFapsInput[]
+  ): Promise<ProposalPks>;
   removeMemberFromFapProposal(
     proposalPk: number,
     fapId: number,
     memberId: number
   ): Promise<Fap>;
-  removeProposalsFromFap(proposalPks: number[], fapId: number): Promise<Fap>;
+  removeProposalsFromFaps(
+    args: RemoveProposalsFromFapsArgs
+  ): Promise<FapProposal[]>;
+  removeProposalsFromFapsByInstrument(
+    proposalPk: number,
+    instrumentIds: number[]
+  ): Promise<FapProposal[]>;
   assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,
-    memberIds: number[]
+    memberIds: number[],
+    fapProposalId: number
   ): Promise<Fap>;
   assignMemberToFapProposals(
     proposalPks: number[],
     fapId: number,
-    memberId: number
+    memberId: number,
+    fapProposalId: number
   ): Promise<Fap>;
   getFapProposalToNumReviewsNeededMap(
     fapId: number
@@ -132,7 +146,7 @@ export interface FapDataSource {
   getRelatedUsersOnFap(id: number): Promise<number[]>;
   isFapProposalInstrumentSubmitted(
     proposalPk: number,
-    instrumentId?: number
+    instrumentId?: number | null
   ): Promise<boolean>;
   setReviewerRank(
     proposalPk: number,

@@ -204,7 +204,7 @@ context('Settings tests', () => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
             proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_FAP_SELECTED],
+            statusChangingEvents: [Event.PROPOSAL_FAPS_SELECTED],
           });
         }
       });
@@ -841,7 +841,7 @@ context('Settings tests', () => {
             timeAllocation: 1,
             submitted: true,
             reviewerId: 0,
-            instrumentId: initialDBData.instrument1.id,
+            instrumentId: createdInstrumentId,
           });
         }
       });
@@ -854,15 +854,14 @@ context('Settings tests', () => {
 
       cy.get("[aria-label='Assign proposals to Fap']").first().click();
 
-      cy.get('#selectedFapId-input').should('not.have.class', 'Mui-disabled');
+      cy.get('[data-cy="fap-selection"] input').should(
+        'not.have.class',
+        'Mui-disabled'
+      );
 
-      cy.get('#selectedFapId-input').first().click();
+      cy.get('[data-cy="fap-selection"]').click();
 
       cy.get('[data-cy="fap-selection-options"] li').first().click();
-
-      cy.get('[data-cy="fap-instrument-selection"]').click();
-
-      cy.get('[data-cy="fap-instrument-selection-options"] li').first().click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -905,13 +904,14 @@ context('Settings tests', () => {
             instrumentId: initialDBData.instrument1.id,
           });
 
-          cy.assignProposalsToFap({
-            proposals: {
-              callId: initialDBData.call.id,
-              primaryKey: proposal.primaryKey,
-            },
-            fapId: initialDBData.fap.id,
-            fapInstrumentId: initialDBData.instrument1.id,
+          cy.assignProposalsToFaps({
+            proposalPks: [proposal.primaryKey],
+            fapInstruments: [
+              {
+                instrumentId: initialDBData.instrument1.id,
+                fapId: initialDBData.fap.id,
+              },
+            ],
           });
           if (
             featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)
@@ -1010,13 +1010,14 @@ context('Settings tests', () => {
             instrumentId: initialDBData.instrument1.id,
           });
 
-          cy.assignProposalsToFap({
-            proposals: {
-              callId: initialDBData.call.id,
-              primaryKey: proposal.primaryKey,
-            },
-            fapId: initialDBData.fap.id,
-            fapInstrumentId: initialDBData.instrument1.id,
+          cy.assignProposalsToFaps({
+            proposalPks: [proposal.primaryKey],
+            fapInstruments: [
+              {
+                instrumentId: initialDBData.instrument1.id,
+                fapId: initialDBData.fap.id,
+              },
+            ],
           });
         }
       });
