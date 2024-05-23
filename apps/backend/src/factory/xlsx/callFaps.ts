@@ -92,28 +92,28 @@ const collectFAPRowData = async (
 
   //   console.log(extraData);
 
-  extraData.map((inst) => console.log(inst));
+  // extraData.map((inst) => console.log(inst));
 
-  const allRowData = extraData
-    .map((inst) => {
-      const instName: (string | number)[][] = [[inst.sheetName]];
+  const allRowData = extraData.map((inst) => {
+    const instName: (string | number)[][] = [[inst.sheetName]];
 
-      const sortedData = sortByRankOrAverageScore(inst.rows).map(
-        (row: CallRowRowObj) => populateRow(row)
-      );
+    const sortedData = sortByRankOrAverageScore(inst.rows).map(
+      (row: CallRowRowObj) => populateRow(row)
+    );
 
-      instName.concat(instName);
+    instName.concat(instName);
 
-      return instName.concat(sortedData);
-    })
-    .reduce((arr, inst) => {
-      return arr.concat(inst);
-    });
+    return instName.concat(sortedData);
+  });
 
-  return allRowData;
+  return allRowData.length
+    ? allRowData.reduce((arr, inst) => {
+        return arr.concat(inst);
+      })
+    : allRowData;
 };
 
-function populateRow(row: CallRowRowObj) {
+function populateRow(row: CallRowRowObj): (string | number)[] {
   const individualReviews = row.reviews?.flatMap((rev) => [
     rev.grade,
     rev.comment && stripHtml(rev.comment).result,
@@ -127,7 +127,7 @@ function populateRow(row: CallRowRowObj) {
     row.daysRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
-    row.fapTimeAllocation ?? row.daysRequested,
+    row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
     row.fapMeetingDecision ?? '<missing>',
     row.fapMeetingInComment ?? '<missing>',
     row.fapMeetingExComment ?? '<missing>',
