@@ -48,58 +48,6 @@ type ProposalReview = {
   proposalPk?: number;
 };
 
-type FapProposal = {
-  proposalPk: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dateAssigned: any;
-  fapId: number;
-  fapTimeAllocation: number | null;
-  instrumentSubmitted: boolean;
-  proposal: {
-    title: string;
-    primaryKey: number;
-    proposalId: string;
-    proposer: { id: number; institutionId: number } | null;
-    status: {
-      id: number;
-      shortCode: string;
-      name: string;
-      description: string;
-      isDefault: boolean;
-    } | null;
-    users: Array<{ id: number; institutionId: number }>;
-  };
-  assignments: Array<{
-    proposalPk: number;
-    fapMemberUserId: number | null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dateAssigned: any;
-    rank: number | null;
-    user: {
-      id: number;
-      firstname: string;
-      lastname: string;
-      preferredname: string | null;
-      institution: string;
-      institutionId: number;
-      position: string;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      created: any | null;
-      placeholder: boolean | null;
-      email: string | null;
-      country: string | null;
-    } | null;
-    role: { id: number; shortCode: string; title: string } | null;
-    review: {
-      id: number;
-      status: ReviewStatus;
-      comment: string | null;
-      grade: number | null;
-      fapID: number;
-    } | null;
-  }> | null;
-};
-
 type FapProposalsAndAssignmentsTableProps = {
   /** Fap we are assigning members to */
   data: Fap;
@@ -335,12 +283,39 @@ const FapProposalsAndAssignmentsTable = ({
     if (proposalPks.length === 0) {
       return;
     }
+    //may need to update this
+    const existingProposalAssignments = FapProposalsData.flatMap(
+      (assignment) => assignment.assignments
+    );
+
+    const proposalAssignments: { memberId: number; proposalPk: number }[] = [];
+    const updatedMembers = new Set<FapAssignedMember>();
+
+    for (const proposalPk of proposalPks) {
+      for (const assignedMember of assignedMembers) {
+        const isExistingAssignment = !!existingProposalAssignments.find(
+          (existingProposalAssignment) =>
+            assignedMember.id === existingProposalAssignment?.user?.id &&
+            proposalPk === existingProposalAssignment.proposalPk
+        );
+        if (!isExistingAssignment) {
+          proposalAssignments.push({ memberId: assignedMember.id, proposalPk });
+          updatedMembers.add(assignedMember);
+        }
+      }
+    }
+
+    if (proposalAssignments.length === 0) {
+      return;
+    }
 
     await api({
-      toastSuccessMessage: 'Members assigned',
+      toastSuccessMessage:
+        Array.from(updatedMembers).length === 1
+          ? 'Member assigned'
+          : 'Members assigned',
     }).assignFapReviewersToProposals({
-      memberIds: assignedMembers.map(({ id }) => id),
-      proposalPks: proposalPks,
+      assignments: proposalAssignments,
       fapId: data.id,
     });
 
@@ -365,12 +340,28 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
 
-    setFapProposalsData((fapProposalData) =>
-      fapProposalData.map((proposalItem) => {
-        if (proposalPks.includes(proposalItem.proposalPk)) {
+    setFapProposalsData((fapProposalData) => {
+      const proposalAssignmentsPks = proposalAssignments.map(
+        (proposalAssignment) => proposalAssignment.proposalPk
+      );
+      const updatedMembersValues = Array.from(updatedMembers);
+
+      return fapProposalData.map((proposalItem) => {
+        if (proposalAssignmentsPks.includes(proposalItem.proposalPk)) {
+          const newlyAssignedFapMemberIds = proposalAssignments
+            .filter(
+              (proposalAssignment) =>
+                proposalAssignment.proposalPk === proposalItem.proposalPk
+            )
+            .map((proposalAssignment) => proposalAssignment.memberId);
+          const newlyAssignedFapMembers = updatedMembersValues.filter(
+            (updatedMember) =>
+              newlyAssignedFapMemberIds.includes(updatedMember.id)
+          );
+
           const newAssignments: FapProposalAssignmentType[] = [
             ...(proposalItem.assignments ?? []),
-            ...assignedMembers.map(({ role = null, ...user }) => ({
+            ...newlyAssignedFapMembers.map(({ role = null, ...user }) => ({
               proposalPk: proposalItem.proposalPk,
               fapMemberUserId: user.id,
               dateAssigned: DateTime.now(),
@@ -393,8 +384,8 @@ const FapProposalsAndAssignmentsTable = ({
         } else {
           return proposalItem;
         }
-      })
-    );
+      });
+    });
 
     onAssignmentsUpdate({
       ...data,
@@ -426,25 +417,18 @@ const FapProposalsAndAssignmentsTable = ({
   const handleMemberAssignmentToFapProposals = (
     memberUsers: FapAssignedMember[]
   ) => {
-    const selectedProposal = FapProposalsData.find((fapProposal) =>
-      proposalPks.includes(fapProposal.proposalPk)
-    );
-
     const selectedProposals = FapProposalsData.filter((fapProposal) =>
       proposalPks.includes(fapProposal.proposalPk)
     );
 
-    if (!selectedProposal) {
+    if (selectedProposals.length === 0) {
       return;
     }
 
-    const proposalPIsMap = new Map<FapProposal, FapAssignedMember>();
-    const proposalCoIsMap = new Map<FapProposal, FapAssignedMember[]>();
-    const pIInstitutionConflictMap = new Map<FapProposal, FapAssignedMember>();
-    const coIInstitutionConflictMap = new Map<
-      FapProposal,
-      FapAssignedMember[]
-    >();
+    const proposalPIsMap = new Map<number, FapAssignedMember>();
+    const proposalCoIsMap = new Map<number, FapAssignedMember[]>();
+    const pIInstitutionConflictMap = new Map<number, FapAssignedMember>();
+    const coIInstitutionConflictMap = new Map<number, FapAssignedMember[]>();
 
     for (const fapProposal of selectedProposals) {
       const selectedPI = memberUsers.find(
@@ -452,7 +436,7 @@ const FapProposalsAndAssignmentsTable = ({
       );
 
       if (selectedPI) {
-        proposalPIsMap.set(fapProposal, selectedPI);
+        proposalPIsMap.set(fapProposal.proposalPk, selectedPI);
       }
 
       const selectedCoProposers = memberUsers.filter((member) =>
@@ -460,7 +444,7 @@ const FapProposalsAndAssignmentsTable = ({
       );
 
       if (selectedCoProposers.length > 0) {
-        proposalCoIsMap.set(fapProposal, selectedCoProposers);
+        proposalCoIsMap.set(fapProposal.proposalPk, selectedCoProposers);
       }
 
       const selectedReviewerWithSameInstitutionAsPI = memberUsers.find(
@@ -470,7 +454,7 @@ const FapProposalsAndAssignmentsTable = ({
 
       if (selectedReviewerWithSameInstitutionAsPI) {
         pIInstitutionConflictMap.set(
-          fapProposal,
+          fapProposal.proposalPk,
           selectedReviewerWithSameInstitutionAsPI
         );
       }
@@ -484,7 +468,7 @@ const FapProposalsAndAssignmentsTable = ({
 
       if (selectedReviewerWithSameInstitutionAsCoProposers.length > 0) {
         coIInstitutionConflictMap.set(
-          fapProposal,
+          fapProposal.proposalPk,
           selectedReviewerWithSameInstitutionAsCoProposers
         );
       }
@@ -501,41 +485,49 @@ const FapProposalsAndAssignmentsTable = ({
       HTMLUListElement
     >[] = [];
 
-    for (const fapProposal of selectedProposals) {
+    const selectedProposalPks = selectedProposals.map(
+      (selectedProposal) => selectedProposal.proposalPk
+    );
+
+    for (const selectedProposalPk of selectedProposalPks) {
       alertText.push(
         <>
           <ul>
-            {(!!proposalPIsMap.get(fapProposal) ||
-              !!proposalCoIsMap.get(fapProposal) ||
-              !!pIInstitutionConflictMap.get(fapProposal) ||
-              !!coIInstitutionConflictMap.get(fapProposal)) && (
-              <li>Proposal: {fapProposal.proposalPk}</li>
+            {(!!proposalPIsMap.get(selectedProposalPk) ||
+              !!proposalCoIsMap.get(selectedProposalPk) ||
+              !!pIInstitutionConflictMap.get(selectedProposalPk) ||
+              !!coIInstitutionConflictMap.get(selectedProposalPk)) && (
+              <li>Proposal: {selectedProposalPk}</li>
             )}
-            {!!proposalPIsMap.get(fapProposal) && (
-              <li>PI: {getFullUserName(proposalPIsMap.get(fapProposal))}</li>
+            {!!proposalPIsMap.get(selectedProposalPk) && (
+              <li>
+                PI: {getFullUserName(proposalPIsMap.get(selectedProposalPk))}
+              </li>
             )}
-            {!!proposalCoIsMap.get(fapProposal) && (
+            {!!proposalCoIsMap.get(selectedProposalPk) && (
               <li>
                 Co-proposers:{' '}
                 {proposalCoIsMap
-                  .get(fapProposal)
+                  .get(selectedProposalPk)
                   ?.map((selectedCoProposer) =>
                     getFullUserName(selectedCoProposer)
                   )
                   .join(', ')}
               </li>
             )}
-            {!!pIInstitutionConflictMap.get(fapProposal) && (
+            {!!pIInstitutionConflictMap.get(selectedProposalPk) && (
               <li>
                 Same institution as PI:{' '}
-                {getFullUserName(pIInstitutionConflictMap.get(fapProposal))}
+                {getFullUserName(
+                  pIInstitutionConflictMap.get(selectedProposalPk)
+                )}
               </li>
             )}
-            {!!coIInstitutionConflictMap.get(fapProposal) && (
+            {!!coIInstitutionConflictMap.get(selectedProposalPk) && (
               <li>
                 Same institution as co-proposers:{' '}
                 {coIInstitutionConflictMap
-                  .get(fapProposal)
+                  .get(selectedProposalPk)
                   ?.map((selectedCoProposer) =>
                     getFullUserName(selectedCoProposer)
                   )

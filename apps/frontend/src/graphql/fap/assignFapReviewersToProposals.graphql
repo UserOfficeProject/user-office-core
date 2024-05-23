@@ -1,12 +1,10 @@
 mutation assignFapReviewersToProposals(
-  $memberIds: [Int!]!
+  $assignments: [FapReviewAssignmentInput!]!
   $fapId: Int!
-  $proposalPks: [Int!]!
 ) {
   assignFapReviewersToProposals(
-    memberIds: $memberIds
+    assignments: $assignments
     fapId: $fapId
-    proposalPks: $proposalPks
   ) {
     id
   }

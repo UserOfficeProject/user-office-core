@@ -228,9 +228,8 @@ describe('Test FapMutations', () => {
     const result = (await FapMutationsInstance.assignFapReviewersToProposals(
       dummyUserWithRole,
       {
-        proposalPks: [1],
+        assignments: [{ proposalPk: 1, memberId: 1 }],
         fapId: 1,
-        memberIds: [1],
       }
     )) as Rejection;
 
@@ -242,9 +241,8 @@ describe('Test FapMutations', () => {
       FapMutationsInstance.assignFapReviewersToProposals(
         dummyUserOfficerWithRole,
         {
-          proposalPks: [1],
+          assignments: [{ proposalPk: 1, memberId: 1 }],
           fapId: 1,
-          memberIds: [1],
         }
       )
     ).resolves.toStrictEqual(dummyFap);

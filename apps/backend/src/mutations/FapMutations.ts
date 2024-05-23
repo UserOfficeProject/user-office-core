@@ -370,19 +370,11 @@ export default class FapMutations {
       );
     }
 
-    const assignments: { proposalPk: number; memberId: number }[] = [];
-
-    for (const memberId of args.memberIds) {
-      for (const proposalPk of args.proposalPks) {
-        assignments.push({ proposalPk, memberId });
-      }
-    }
-
     return this.dataSource
-      .assignMembersToFapProposals(assignments, args.fapId)
+      .assignMembersToFapProposals(args.assignments, args.fapId)
       .catch((err) => {
         return rejection(
-          'Can not assign proposal to facility access panel',
+          'Can not assign proposal(s) to facility access panel',
           { agent },
           err
         );

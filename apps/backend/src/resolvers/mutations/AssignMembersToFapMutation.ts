@@ -13,6 +13,15 @@ import { ResolverContext } from '../../context';
 import { UserRole } from '../../models/User';
 import { Fap } from '../types/Fap';
 
+@InputType()
+export class FapReviewAssignmentInput {
+  @Field(() => Int)
+  public memberId: number;
+
+  @Field(() => Int)
+  public proposalPk: number;
+}
+
 @ArgsType()
 export class UpdateMemberFapArgs {
   @Field(() => Int)
@@ -36,14 +45,11 @@ export class AssignReviewersToFapArgs {
 
 @ArgsType()
 export class AssignFapReviewersToProposalsArgs {
-  @Field(() => [Int])
-  public memberIds: number[];
+  @Field(() => [FapReviewAssignmentInput])
+  public assignments: FapReviewAssignmentInput[];
 
   @Field(() => Int)
   public fapId: number;
-
-  @Field(() => [Int])
-  public proposalPks: number[];
 }
 
 @ArgsType()
