@@ -61,7 +61,7 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
   return (
     <Dialog open={true} onClose={props.close}>
       <DialogTitle variant="h6" component="h1">
-        Update {props.instrument.name} Avalibabity Time
+        Update {props.instrument.name} Availability Time
       </DialogTitle>
       <Formik
         initialValues={{}}
