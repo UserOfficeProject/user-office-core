@@ -1,6 +1,7 @@
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
@@ -16,6 +17,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MAX_32_BIT_INTEGER = Math.pow(2, 31);
+
+const width = '95%';
 
 type FapUpdateInstrumentTimeProps = {
   close: () => void;
@@ -33,9 +36,15 @@ const AvailabilityTimeEditComponent = (
     data-cy="availability-time"
     value={instTime}
     onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-    InputProps={{ inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 0 } }}
+    InputProps={{
+      inputProps: {
+        max: MAX_32_BIT_INTEGER - 1,
+        min: 0,
+        style: { textAlign: 'center' },
+      },
+    }}
     required
-    fullWidth
+    sx={{ width }}
     margin="none"
   />
 );
@@ -60,7 +69,7 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
 
   return (
     <Dialog open={true} onClose={props.close}>
-      <DialogTitle variant="h6" component="h1">
+      <DialogTitle variant="h6" component="h2">
         Update {props.instrument.name} Availability Time
       </DialogTitle>
       <Formik
@@ -70,16 +79,25 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
           props.updateTime(+(newTime as string), props.instrument.id);
         }}
       >
-        <Form style={{ padding: '10px' }}>
-          {AvailabilityTimeEditComponent(newTime, SetNewTime)}
-          <Button
-            type="submit"
-            className={classes.submit}
-            data-cy="submit-update-time"
-            fullWidth={true}
+        <Form style={{ padding: '10px', alignContent: 'center' }}>
+          <Grid
+            direction="column"
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
           >
-            Update
-          </Button>
+            {AvailabilityTimeEditComponent(newTime, SetNewTime)}
+            <Button
+              type="submit"
+              className={classes.submit}
+              data-cy="submit-update-time"
+              sx={{ width }}
+            >
+              Update
+            </Button>
+          </Grid>
         </Form>
       </Formik>
     </Dialog>

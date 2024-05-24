@@ -185,7 +185,7 @@ const FapMeetingInstrumentsTable = ({
       <MaterialTable
         icons={tableIcons}
         title={
-          <Typography variant="h6" component="h2">
+          <Typography variant="h6" component="h1">
             {`${code} - ${i18n.format(
               t('instrument'),
               'plural'
