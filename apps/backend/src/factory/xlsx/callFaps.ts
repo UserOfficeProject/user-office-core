@@ -5,15 +5,18 @@ import { container } from 'tsyringe';
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
+import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 import { RowObj, collectFapXLSXRowData } from './fap';
 
 const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
-type CallProposalXLSXData = Array<{
-  sheetName: string;
-  rows: Array<Array<string | number>>;
-}>;
+const ProposalEndStatusStringValue = {
+  [ProposalEndStatus.UNSET]: 'Unset',
+  [ProposalEndStatus.ACCEPTED]: 'Accepted',
+  [ProposalEndStatus.RESERVED]: 'Reserved',
+  [ProposalEndStatus.REJECTED]: 'Rejected',
+};
 
 export type CallRowRowObj = RowObj & {
   fapMeetingDecision?: string | null;
@@ -24,12 +27,10 @@ export type CallRowRowObj = RowObj & {
 export const collectCallFapXLSXData = async (
   callId: number,
   user: UserWithRole
-  // }): Promise<{ data: any; filename: string }> => {
 ) => {
   const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
   const call = await baseContext.queries.call.get(user, callId);
-  // TODO: decide on filename
-  const filename = `${call?.shortCode}-FAP-Results.xlsx`;
+  const filename = `${call?.shortCode}_FAP_Results.xlsx`;
 
   const baseData = await Promise.all(
     faps.map(async (fap) => {
@@ -40,18 +41,7 @@ export const collectCallFapXLSXData = async (
     })
   );
 
-  //   const combineSheets = extraData.map((fap) => {
-  //     return fap.reduce((arr, inst) => {
-  //       return arr.concat({ sheetName: 'temp', rows: inst.rows });
-  //     });
-  //   });
-
-  //   // eslint-disable-next-line no-console
-  //   extraData.map((d) => d.map((r) => console.log(r)));
-
-  //   console.log(baseData[0].rows);
-
-  return { data: baseData, filename: 'temp' };
+  return { data: baseData, filename: filename.replace(/\s+/g, '_') };
 };
 
 const collectFAPRowData = async (
@@ -75,7 +65,9 @@ const collectFAPRowData = async (
             return {
               ...proposal,
               fapMeetingDecision: fapMeetingDecision[0]
-                ? fapMeetingDecision[0].recommendation
+                ? ProposalEndStatusStringValue[
+                    fapMeetingDecision[0].recommendation
+                  ]
                 : null,
               fapMeetingExComment: fapMeetingDecision[0]
                 ? stripHtml(fapMeetingDecision[0].commentForUser).result
@@ -89,10 +81,6 @@ const collectFAPRowData = async (
       };
     })
   );
-
-  //   console.log(extraData);
-
-  // extraData.map((inst) => console.log(inst));
 
   const allRowData = extraData.map((inst) => {
     const instName: (string | number)[][] = [[inst.sheetName]];

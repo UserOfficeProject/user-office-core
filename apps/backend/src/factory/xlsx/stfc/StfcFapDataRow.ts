@@ -32,9 +32,6 @@ export async function getStfcDataRow(
     proposer_id?.toString() ?? '',
   ]);
 
-  // eslint-disable-next-line no-console
-  console.log('HERE');
-
   const piCountry = piDetails.find(
     (user) => user.userNumber === proposer_id?.toString()
   )?.country;
