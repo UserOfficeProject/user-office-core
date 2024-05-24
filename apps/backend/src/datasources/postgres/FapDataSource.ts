@@ -801,7 +801,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .whereIn('proposal_pk', proposalPks)
       .whereIn('fap_id', fapIds)
       .del()
-      .returning('*');
+      .returning<FapProposalRecord[]>('*');
 
     return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
   }

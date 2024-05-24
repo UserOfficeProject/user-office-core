@@ -148,6 +148,8 @@ export default class InstrumentMutations {
         args,
       }
     );
+    const instrumentHasProposalIds: number[] = [];
+
     // TODO: Cleanup this part because it is quite ugly
     for await (const instrumentId of args.instrumentIds) {
       const allProposalsAreOnSameCallAsInstrument =
@@ -189,21 +191,19 @@ export default class InstrumentMutations {
               );
             })
           );
-          // NOTE: Remove all FAP proposals that are related with the removing instruments
-          await this.fapDataSource.removeProposalsFromFapsByInstrument(
-            proposalPk,
-            proposalInstrumentsToRemove.map((i) => i.id)
-          );
         }
 
         if (proposalInstruments.find((i) => i.id === instrumentId)) {
           continue;
         }
 
-        await this.dataSource.assignProposalToInstrument(
+        const {
+          instrumentHasProposalIds: [instrumentHasProposalId],
+        } = await this.dataSource.assignProposalToInstrument(
           proposalPk,
           instrumentId
         );
+        instrumentHasProposalIds.push(instrumentHasProposalId);
 
         const technicalReview =
           await this.reviewDataSource.getProposalInstrumentTechnicalReview(
@@ -242,6 +242,7 @@ export default class InstrumentMutations {
     }
 
     result = new InstrumentsHasProposals(
+      instrumentHasProposalIds,
       args.instrumentIds,
       args.proposalPks,
       false

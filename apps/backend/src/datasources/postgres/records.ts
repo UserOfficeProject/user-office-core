@@ -427,7 +427,7 @@ export interface FapProposalRecord {
 export type AssignProposalsToFapsInput = Pick<
   FapProposalRecord,
   'call_id' | 'fap_id' | 'instrument_id' | 'proposal_pk'
->;
+> & { instrument_has_proposals_id: number };
 
 export interface FapAssignmentRecord {
   readonly proposal_pk: number;
