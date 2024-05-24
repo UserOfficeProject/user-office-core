@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
@@ -9,6 +10,7 @@ import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Proposal } from '../../models/Proposal';
+import { SettingsId } from '../../models/Settings';
 import { User } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
@@ -116,7 +118,13 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           instrumentRequested = '';
         }
 
-        const uoAddress = process.env.ISIS_UO_EMAIL;
+        const adminDataSource = container.resolve<AdminDataSource>(
+          Tokens.AdminDataSource
+        );
+
+        const uoAddress = (
+          await adminDataSource.getSetting(SettingsId.USER_OFFICE_EMAIL)
+        )?.settingsValue;
 
         if (uoAddress) {
           const uoRapidEmail = uoRapidSubmissionEmail(
@@ -130,7 +138,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           emailsToSend.push(uoRapidEmail);
         } else {
           logger.logError(
-            'Could not send UO Rapid submission email, environment variable (ISIS_UO_EMAIL) not found.',
+            'Could not send UO Rapid submission email as the setting (USER_OFFICE_EMAIL) is not set.',
             { event }
           );
         }
