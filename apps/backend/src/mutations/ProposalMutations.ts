@@ -11,6 +11,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -23,7 +24,12 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalPks,
+  Proposals,
+} from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
@@ -31,8 +37,8 @@ import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
+import { ProposalEmailEventArgs } from '../resolvers/mutations/EventEmailMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
-import { SendProposalEventEmailArgs } from '../resolvers/mutations/SendProposalEventEmailMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { statusActionEngine } from '../statusActionEngine';
 import { WorkflowEngineProposalType } from '../workflowEngine';
@@ -65,7 +71,9 @@ export default class ProposalMutations {
     @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
     @inject(Tokens.EmailEventHandler)
-    private emailHandler: (event: ApplicationEvent) => Promise<void>
+    private emailHandler: (event: ApplicationEvent) => Promise<void>,
+    @inject(Tokens.EventLogsDataSource)
+    private eventLogsDataSource: EventLogsDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -761,12 +769,8 @@ export default class ProposalMutations {
   @Authorized([Roles.USER_OFFICER])
   async sendEventEmail(
     agent: UserWithRole | null,
-    args: SendProposalEventEmailArgs
-  ) {
-    if (args.event !== Event.PROPOSAL_SUBMITTED) {
-      return rejection('Proposal send email event requested not supported');
-    }
-
+    args: ProposalEmailEventArgs
+  ): Promise<Event | Rejection> {
     const proposal = await this.proposalDataSource.getProposalById(
       args.proposalId
     );
@@ -775,16 +779,85 @@ export default class ProposalMutations {
       return rejection('Proposal not found', { args });
     }
 
-    if (!proposal.submitted) {
-      return rejection('Proposal has not been submitted', { args });
+    const proposalEvents = await this.eventLogsDataSource.get({
+      eventType: 'PROPOSAL',
+      changedObjectId: proposal.primaryKey.toString(),
+    });
+
+    if (!proposalEvents || proposalEvents.length <= 0) {
+      return rejection('Proposal has no event logs', { args });
     }
 
-    return this.emailHandler({
-      type: Event.PROPOSAL_SUBMITTED,
-      proposal: proposal,
-      isRejection: false,
-      key: 'proposal',
-      loggedInUserId: agent?.id || 0,
-    }).then(() => args.event);
+    if (!proposalEvents.map((event) => event.eventType).includes(args.event)) {
+      return rejection('Proposal event not in event logs', { args });
+    }
+
+    const applicationEvent = this.generateApplicationEvent(
+      args.event,
+      proposal,
+      agent?.id
+    );
+
+    if (!applicationEvent) {
+      return rejection('Proposal application event could not be generated', {
+        args,
+      });
+    }
+
+    return this.emailHandler(applicationEvent).then(() => args.event);
+  }
+
+  private generateApplicationEvent(
+    event: Event,
+    proposal: Proposal,
+    loggedInUserId = 0
+  ): ApplicationEvent | null {
+    switch (event) {
+      case Event.PROPOSAL_ACCEPTED:
+      case Event.PROPOSAL_SUBMITTED:
+      case Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE:
+      case Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE:
+      case Event.PROPOSAL_SAMPLE_SAFE:
+      case Event.PROPOSAL_NOTIFIED:
+      case Event.PROPOSAL_CLONED:
+      case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
+      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
+      case Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED:
+      case Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE:
+      case Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED:
+      case Event.PROPOSAL_FAP_MEETING_SUBMITTED:
+      case Event.PROPOSAL_CREATED:
+      case Event.PROPOSAL_UPDATED:
+      case Event.PROPOSAL_DELETED:
+      case Event.PROPOSAL_RESERVED:
+        return {
+          type: event,
+          proposal: proposal,
+          isRejection: false,
+          key: 'proposal',
+          loggedInUserId,
+        };
+      case Event.PROPOSAL_REJECTED:
+        return {
+          type: event,
+          proposal: proposal,
+          isRejection: false,
+          reason: proposal.commentForUser || '',
+          key: 'proposal',
+          loggedInUserId,
+        };
+      case Event.PROPOSAL_FAP_SELECTED:
+        const proposalpks = new ProposalPks([proposal.primaryKey]);
+
+        return {
+          type: event,
+          proposalpks,
+          isRejection: false,
+          key: 'proposal',
+          loggedInUserId,
+        };
+      default:
+        return null;
+    }
   }
 }

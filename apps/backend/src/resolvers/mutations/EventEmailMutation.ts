@@ -4,7 +4,7 @@ import { ResolverContext } from '../../context';
 import { Event } from '../../events/event.enum';
 
 @ArgsType()
-export class SendProposalEventEmailArgs {
+export class ProposalEmailEventArgs {
   @Field(() => String)
   public proposalId: string;
 
@@ -13,11 +13,11 @@ export class SendProposalEventEmailArgs {
 }
 
 @Resolver()
-export class SendProposalEventEmailMutation {
+export class EventEmailMutation {
   @Mutation(() => Event)
   sendProposalEventEmail(
     @Args()
-    args: SendProposalEventEmailArgs,
+    args: ProposalEmailEventArgs,
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.proposal.sendEventEmail(context.user, args);
