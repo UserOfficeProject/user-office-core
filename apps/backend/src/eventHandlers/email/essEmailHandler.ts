@@ -266,5 +266,13 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       return;
     }
+    default: {
+      logger.logWarn('Could not send email(s):', {
+        error: 'Email send request not implemented by email handler',
+        event,
+      });
+
+      return;
+    }
   }
 }
