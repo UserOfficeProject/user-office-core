@@ -1,13 +1,17 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
-import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
+import {
+  WorkflowEngineProposalType,
+  markProposalsEventAsDoneAndCallWorkflowEngine,
+} from '../workflowEngine';
 
 enum ProposalInformationKeys {
   Proposal = 'proposal',
@@ -15,15 +19,79 @@ enum ProposalInformationKeys {
   ProposalPKs = 'proposalPks',
 }
 
-export const handleWorkflowEngineChange = async (
-  event: ApplicationEvent,
-  proposalPks: number[] | number
+const publishProposalStatusChange = async (
+  updatedProposals: (void | WorkflowEngineProposalType)[]
 ) => {
+  if (!updatedProposals) {
+    return;
+  }
+  const eventBus = resolveApplicationEventBus();
   const proposalSettingsDataSource =
     container.resolve<ProposalSettingsDataSource>(
       Tokens.ProposalSettingsDataSource
     );
+  updatedProposals.map(async (updatedProposal) => {
+    if (updatedProposal) {
+      const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
+        updatedProposal.statusId
+      );
+      const previousProposalStatus =
+        await proposalSettingsDataSource.getProposalStatus(
+          updatedProposal.prevProposalStatusId
+        );
 
+      return eventBus.publish({
+        type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+        proposal: updatedProposal,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: null,
+        description: `From "${previousProposalStatus?.name}" to "${proposalStatus?.name}"`,
+      });
+    }
+  });
+};
+
+const handleSubmittedProposalsAfterCallEnded = async (
+  updatedProposals: (void | WorkflowEngineProposalType)[]
+) => {
+  if (!updatedProposals) {
+    return;
+  }
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
+  const notEndedInternalCalls = await callDataSource
+    .getCalls({
+      isEnded: true,
+      isEndedInternal: false,
+    })
+    .then((calls) => calls.map((call) => call.id));
+
+  const proposalPks = updatedProposals
+    .filter(
+      (proposal) => proposal && notEndedInternalCalls.includes(proposal.callId)
+    )
+    .map((proposal) => proposal && proposal.primaryKey) as number[];
+
+  if (proposalPks.length <= 0) {
+    return;
+  }
+
+  const updatedSubmittedProposals =
+    await markProposalsEventAsDoneAndCallWorkflowEngine(
+      Event.CALL_ENDED,
+      proposalPks
+    );
+  if (updatedSubmittedProposals) {
+    await publishProposalStatusChange(updatedSubmittedProposals);
+  }
+};
+
+export const handleWorkflowEngineChange = async (
+  event: ApplicationEvent,
+  proposalPks: number[] | number
+) => {
   const isArray = Array.isArray(proposalPks);
 
   const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
@@ -31,35 +99,14 @@ export const handleWorkflowEngineChange = async (
     isArray ? proposalPks : [proposalPks]
   );
 
-  const eventBus = resolveApplicationEventBus();
-
   if (
     event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&
     updatedProposals?.length
   ) {
-    await Promise.all(
-      updatedProposals.map(async (updatedProposal) => {
-        if (updatedProposal) {
-          const proposalStatus =
-            await proposalSettingsDataSource.getProposalStatus(
-              updatedProposal.statusId
-            );
-          const previousProposalStatus =
-            await proposalSettingsDataSource.getProposalStatus(
-              updatedProposal.prevProposalStatusId
-            );
-
-          return eventBus.publish({
-            type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-            proposal: updatedProposal,
-            isRejection: false,
-            key: 'proposal',
-            loggedInUserId: null,
-            description: `From "${previousProposalStatus?.name}" to "${proposalStatus?.name}"`,
-          });
-        }
-      })
-    );
+    await publishProposalStatusChange(updatedProposals);
+    if (event.type === Event.PROPOSAL_SUBMITTED) {
+      await handleSubmittedProposalsAfterCallEnded(updatedProposals);
+    }
   }
 };
 
