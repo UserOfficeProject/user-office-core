@@ -1525,6 +1525,10 @@ context('Fap meeting components tests', () => {
             abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
 
           cy.addProposalTechnicalReview({
             proposalPk: createdProposal.primaryKey,
@@ -1533,11 +1537,6 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-          });
-
-          cy.assignProposalsToInstruments({
-            instrumentIds: [createdInstrumentId],
-            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFaps({
@@ -1618,6 +1617,11 @@ context('Fap meeting components tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
 
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
+
           cy.addProposalTechnicalReview({
             proposalPk: createdProposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
@@ -1625,11 +1629,6 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-          });
-
-          cy.assignProposalsToInstruments({
-            instrumentIds: [createdInstrumentId],
-            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFaps({
