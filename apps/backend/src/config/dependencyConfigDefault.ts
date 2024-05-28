@@ -6,7 +6,7 @@ import {
 
 import 'reflect-metadata';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
-import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
+import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
@@ -51,7 +51,7 @@ async function skipEmailHandler(event: ApplicationEvent) {
   logger.logInfo('Skip email sending', { event });
 }
 
-mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
+mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);
