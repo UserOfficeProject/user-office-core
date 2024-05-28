@@ -393,11 +393,6 @@ test('User officer should not be able to send proposal email event to a proposal
   ).resolves.not.toEqual(Event.PROPOSAL_SUBMITTED);
 });
 test('User officer should be able to send proposal email event to a proposal when event is in event logs', () => {
-  proposalMutations.sendEventEmail(dummyUserOfficerWithRole, {
-    proposalId: dummyProposalSubmitted.proposalId,
-    event: Event.PROPOSAL_SUBMITTED,
-  });
-
   return expect(
     proposalMutations.sendEventEmail(dummyUserOfficerWithRole, {
       proposalId: dummyProposalSubmitted.proposalId,
@@ -409,7 +404,7 @@ test('User officer should be able to send proposal email event to a proposal whe
 test('User should not be able to send proposal email events', () => {
   return expect(
     proposalMutations.sendEventEmail(dummyUserWithRole, {
-      proposalId: dummyProposal.proposalId,
+      proposalId: dummyProposalSubmitted.proposalId,
       event: Event.PROPOSAL_SUBMITTED,
     })
   ).resolves.not.toEqual(Event.PROPOSAL_SUBMITTED);
