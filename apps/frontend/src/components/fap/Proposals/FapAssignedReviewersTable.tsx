@@ -2,7 +2,7 @@ import MaterialTable from '@material-table/core';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
-import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
 import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
@@ -21,19 +21,6 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import RankInputModal from './RankInputModal';
-
-// NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(() => ({
-  root: {
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      padding: '0 40px',
-      backgroundColor: '#fafafa',
-    },
-  },
-}));
 
 type FapAssignedReviewersTableProps = {
   fapProposal: FapProposalType;
@@ -81,7 +68,6 @@ const FapAssignedReviewersTable = ({
     reviewerModal: NumberParam,
     modalTab: NumberParam,
   });
-  const classes = useStyles();
   const [openProposalPk, setOpenProposalPk] = useState<number | null>(null);
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -145,7 +131,18 @@ const FapAssignedReviewersTable = ({
     : {};
 
   return (
-    <div className={classes.root} data-cy="fap-reviewer-assignments-table">
+    <Box
+      sx={{
+        '& tr:last-child td': {
+          border: 'none',
+        },
+        '& .MuiPaper-root': {
+          padding: '0 40px',
+          backgroundColor: '#fafafa',
+        },
+      }}
+      data-cy="fap-reviewer-assignments-table"
+    >
       <ProposalReviewModal
         title={`Proposal: ${fapProposal.proposal.title} (${fapProposal.proposal.proposalId})`}
         proposalReviewModalOpen={proposalReviewModalShouldOpen}
@@ -221,7 +218,7 @@ const FapAssignedReviewersTable = ({
           headerStyle: { backgroundColor: '#fafafa' },
         }}
       />
-    </div>
+    </Box>
   );
 };
 

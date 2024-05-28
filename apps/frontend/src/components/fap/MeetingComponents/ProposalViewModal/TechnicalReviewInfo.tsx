@@ -8,6 +8,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  Box,
 } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,11 +16,8 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { updateTimeAllocationValidationSchema } from '@user-office-software/duo-validation';
-import clsx from 'clsx';
 import { Formik, Form, Field } from 'formik';
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -39,27 +37,6 @@ type TechnicalReviewInfoProps = {
   hasWriteAccess: boolean;
   onFapTimeAllocationEdit: (fapTimeAllocation: number | null) => void;
 } & FapProposalProps;
-
-const useStyles = makeStyles((theme) => ({
-  heading: {
-    marginTop: theme.spacing(2),
-  },
-  textBold: {
-    fontWeight: 'bold',
-  },
-  disabled: {
-    color: theme.palette.text.disabled,
-  },
-  overwritten: {
-    fontWeight: 'bold',
-  },
-  spacingLeft: {
-    marginLeft: theme.spacing(1),
-  },
-  table: {
-    minWidth: 500,
-  },
-}));
 
 const OverwriteTimeAllocationDialog = ({
   timeAllocation,
@@ -154,7 +131,6 @@ const TechnicalReviewInfo = ({
   onFapTimeAllocationEdit,
   ...fapProposalArgs
 }: TechnicalReviewInfoProps) => {
-  const classes = useStyles();
   const [open, setOpen] = useState(false);
 
   const handleClose = (newValue?: number | null) => {
@@ -179,24 +155,33 @@ const TechnicalReviewInfo = ({
         />
       )}
       <StyledPaper margin={[2, 0]}>
-        <Typography variant="h6" className={classes.heading} gutterBottom>
+        <Typography
+          variant="h6"
+          sx={(theme) => ({
+            marginTop: theme.spacing(2),
+          })}
+          gutterBottom
+        >
           Technical review info
         </Typography>
         <TableContainer>
-          <Table className={classes.table}>
+          <Table sx={{ minWidth: 500 }}>
             <TableBody>
               <TableRow key="statusAndTime">
-                <TableCell width="25%" className={classes.textBold}>
+                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
                   Status
                 </TableCell>
                 <TableCell width="25%">
                   {technicalReview?.status || '-'}
                 </TableCell>
-                <TableCell width="25%" className={classes.textBold}>
+                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
                   Time allocation(
                   {fapProposalArgs.proposal.call?.allocationTimeUnit}s)
                   {hasWriteAccess && (
-                    <Tooltip title="Edit" className={classes.spacingLeft}>
+                    <Tooltip
+                      title="Edit"
+                      sx={(theme) => ({ marginLeft: theme.spacing(1) })}
+                    >
                       <IconButton
                         size="medium"
                         onClick={() => setOpen(true)}
@@ -208,24 +193,31 @@ const TechnicalReviewInfo = ({
                   )}
                 </TableCell>
                 <TableCell>
-                  <span
-                    className={clsx({
-                      [classes.disabled]: fapTimeAllocation !== null,
+                  <Box
+                    component="span"
+                    sx={(theme) => ({
+                      ...(fapTimeAllocation !== null && {
+                        color: theme.palette.text.disabled,
+                      }),
                     })}
                   >
                     {technicalReview?.timeAllocation || '-'}
-                  </span>
+                  </Box>
                   {fapTimeAllocation !== null && (
-                    <span
-                      className={clsx(classes.overwritten, classes.spacingLeft)}
+                    <Box
+                      component="span"
+                      sx={(theme) => ({
+                        fontWeight: 'bold',
+                        marginLeft: theme.spacing(1),
+                      })}
                     >
                       {fapTimeAllocation} (Overwritten)
-                    </span>
+                    </Box>
                   )}
                 </TableCell>
               </TableRow>
               <TableRow key="comments">
-                <TableCell className={classes.textBold}>
+                <TableCell sx={{ fontWeight: 'bold' }}>
                   Comments for the review panel
                 </TableCell>
                 <TableCell
@@ -233,7 +225,7 @@ const TechnicalReviewInfo = ({
                     __html: technicalReview?.publicComment || '-',
                   }}
                 />
-                <TableCell className={classes.textBold}>Reviewer</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Reviewer</TableCell>
                 <TableCell>
                   {getFullUserName(technicalReview?.reviewer)}
                 </TableCell>
@@ -244,15 +236,6 @@ const TechnicalReviewInfo = ({
       </StyledPaper>
     </div>
   );
-};
-
-TechnicalReviewInfo.propTypes = {
-  technicalReview: PropTypes.any,
-  fapTimeAllocation: PropTypes.number,
-  onFapTimeAllocationEdit: PropTypes.func.isRequired,
-  fapId: PropTypes.number.isRequired,
-  proposal: PropTypes.any.isRequired,
-  hasWriteAccess: PropTypes.bool.isRequired,
 };
 
 export default TechnicalReviewInfo;

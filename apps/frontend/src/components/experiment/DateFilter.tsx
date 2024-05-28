@@ -1,6 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Grid from '@mui/material/Grid';
-// import TextField, { TextFieldProps } from '@mui/material/TextField';
-import { makeStyles } from '@mui/styles';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
@@ -11,18 +10,6 @@ import { SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 import PresetDateSelector, { TimeSpan } from './PresetDateSelector';
-
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-    flexDirection: 'row',
-    display: 'flex',
-  },
-  datePicker: {
-    marginRight: theme.spacing(1),
-  },
-}));
 
 export function getRelativeDatesFromToday(period: TimeSpan): {
   from?: Date;
@@ -68,7 +55,6 @@ interface DateFilterProps {
 }
 
 function DateFilter(props: DateFilterProps) {
-  const classes = useStyles();
   const [presetValue, setPresetValue] = React.useState<TimeSpan | null>(null);
   const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
@@ -96,7 +82,7 @@ function DateFilter(props: DateFilterProps) {
               });
               setPresetValue(null);
             }}
-            className={classes.datePicker}
+            sx={(theme) => ({ marginRight: theme.spacing(1) })}
             // renderInput={(tfProps: TextFieldProps) => (
             //   <TextField
             //     {...tfProps}
@@ -120,7 +106,7 @@ function DateFilter(props: DateFilterProps) {
               });
               setPresetValue(null);
             }}
-            className={classes.datePicker}
+            sx={(theme) => ({ marginRight: theme.spacing(1) })}
             // renderInput={(tfProps: TextFieldProps) => (
             //   <TextField
             //     {...tfProps}

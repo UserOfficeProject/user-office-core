@@ -4,7 +4,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { updateFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
@@ -23,16 +22,8 @@ type FapPageProps = {
   onFapUpdate: (fap: Fap) => void;
 };
 
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
-
 const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const fap = { ...data };
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
@@ -178,9 +169,9 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                     type="checkbox"
                     component={Checkbox}
                     checked={values.active}
-                    onChange={(): void =>
-                      setFieldValue('active', !values.active)
-                    }
+                    onChange={(): void => {
+                      setFieldValue('active', !values.active);
+                    }}
                     inputProps={{ 'aria-label': 'primary checkbox' }}
                     disabled={!hasAccessRights || isExecutingCall}
                   />
@@ -194,7 +185,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
               <Button
                 disabled={isExecutingCall}
                 type="submit"
-                className={classes.button}
+                sx={{ marginTop: '25px', marginLeft: '10px' }}
                 data-cy="submit"
               >
                 {isExecutingCall && <UOLoader size={14} />}

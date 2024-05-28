@@ -8,8 +8,6 @@ import Slide from '@mui/material/Slide';
 import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions/transition';
 import Typography from '@mui/material/Typography';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -21,19 +19,6 @@ import ExternalReviews from './ExternalReviews';
 import FinalRankingForm from './FinalRankingForm';
 import ProposalDetails from './ProposalDetails';
 import TechnicalReviewInfo from './TechnicalReviewInfo';
-
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    appBar: {
-      position: 'relative',
-    },
-    title: {
-      marginLeft: theme.spacing(2),
-      flex: 1,
-      color: 'white',
-    },
-  })
-);
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -61,7 +46,6 @@ const FapMeetingProposalViewModal = ({
   setProposalViewModalOpen,
   instrumentId,
 }: FapMeetingProposalViewModalProps) => {
-  const classes = useStyles();
   const hasWriteAccess = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.FAP_CHAIR,
@@ -100,7 +84,11 @@ const FapMeetingProposalViewModal = ({
         TransitionComponent={Transition}
         data-cy="Fap-meeting-modal"
       >
-        <AppBar className={classes.appBar}>
+        <AppBar
+          sx={{
+            position: 'relative',
+          }}
+        >
           <Toolbar>
             <IconButton
               edge="start"
@@ -111,7 +99,14 @@ const FapMeetingProposalViewModal = ({
             >
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" className={classes.title}>
+            <Typography
+              variant="h6"
+              sx={(theme) => ({
+                marginLeft: theme.spacing(2),
+                flex: 1,
+                color: 'white',
+              })}
+            >
               Fap Meeting Components - Proposal View: {proposalData?.title} (
               {proposalData?.proposalId})
             </Typography>

@@ -5,7 +5,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -19,87 +18,78 @@ type ProposalDetailsProps = {
   proposal: Proposal;
 };
 
-const useStyles = makeStyles((theme) => ({
-  heading: {
-    marginTop: theme.spacing(2),
-  },
-  textBold: {
-    fontWeight: 'bold',
-  },
-  table: {
-    minWidth: 500,
-  },
-}));
-
 const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
   const downloadPDFProposal = useDownloadPDFProposal();
-  const classes = useStyles();
 
   return (
     <div data-cy="Fap-meeting-components-proposal-details">
       <StyledPaper>
-        <Typography variant="h6" className={classes.heading} gutterBottom>
+        <Typography
+          variant="h6"
+          sx={(theme) => ({
+            marginTop: theme.spacing(2),
+          })}
+          gutterBottom
+        >
           Proposal details
         </Typography>
         <TableContainer>
-          <Table className={classes.table}>
+          <Table sx={{ minWidth: 500 }}>
             <TableBody>
               <TableRow key="titleAndShortCode">
-                <TableCell width="25%" className={classes.textBold}>
+                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
                   ID
                 </TableCell>
                 <TableCell width="25%">{proposal.proposalId}</TableCell>
-                <TableCell width="25%" className={classes.textBold}>
+                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
                   Title
                 </TableCell>
                 <TableCell>{proposal.title}</TableCell>
               </TableRow>
               <TableRow key="abstractAndScore">
-                <TableCell className={classes.textBold}>Abstract</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Abstract</TableCell>
                 <TableCell>{proposal.abstract}</TableCell>
-                <TableCell className={classes.textBold}>
-                  Average score
-                </TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Average score</TableCell>
                 <TableCell>
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
               </TableRow>
               <TableRow key="principalInvestigatorAndStatus">
-                <TableCell className={classes.textBold}>
+                <TableCell sx={{ fontWeight: 'bold' }}>
                   Principal Investigator
                 </TableCell>
                 <TableCell>{getFullUserName(proposal.proposer)}</TableCell>
-                <TableCell className={classes.textBold}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                 <TableCell>{proposal.status?.name}</TableCell>
               </TableRow>
               <TableRow key="coProposersAndCall">
-                <TableCell className={classes.textBold}>Co-Proposers</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Co-Proposers</TableCell>
                 <TableCell>
                   {proposal.users
                     .map((user) => getFullUserName(user))
                     .join(', ')}
                 </TableCell>
-                <TableCell className={classes.textBold}>Call</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Call</TableCell>
                 <TableCell>{proposal.call?.shortCode}</TableCell>
               </TableRow>
               <TableRow key="ranking">
-                <TableCell className={classes.textBold}>
+                <TableCell sx={{ fontWeight: 'bold' }}>
                   Initial Rank (by average score)
                 </TableCell>
                 <TableCell>
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
-                <TableCell className={classes.textBold}>Current Rank</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Current Rank</TableCell>
                 <TableCell>{proposal.fapMeetingDecision?.rankOrder}</TableCell>
               </TableRow>
               <TableRow key="instrumentAndPdf">
-                <TableCell className={classes.textBold}>Instrument</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Instrument</TableCell>
                 <TableCell>
                   {proposal.instruments
                     ?.map((instrument) => instrument?.name)
                     .join(', ')}
                 </TableCell>
-                <TableCell className={classes.textBold}>PDF</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>PDF</TableCell>
                 <TableCell>
                   <Button
                     onClick={() =>

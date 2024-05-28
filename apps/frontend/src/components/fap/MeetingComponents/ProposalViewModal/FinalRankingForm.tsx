@@ -7,7 +7,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import PropTypes from 'prop-types';
@@ -29,12 +28,6 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-const useStyles = makeStyles((theme) => ({
-  button: {
-    margin: theme.spacing(0, 0, 0, 1),
-  },
-}));
-
 type FinalRankingFormProps = {
   proposalData: Proposal;
   hasWriteAccess: boolean;
@@ -50,7 +43,6 @@ const FinalRankingForm = ({
   meetingSubmitted,
   confirm,
 }: FinalRankingFormProps) => {
-  const classes = useStyles();
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -275,7 +267,9 @@ const FinalRankingForm = ({
                           <Box
                             display="flex"
                             alignItems="center"
-                            className={classes.button}
+                            sx={(theme) => ({
+                              margin: theme.spacing(0, 0, 0, 1),
+                            })}
                           >
                             <UOLoader buttonSized />
                           </Box>
@@ -311,7 +305,9 @@ const FinalRankingForm = ({
                             setShouldSubmit(false);
                           }}
                           color={isUserOfficer ? 'primary' : 'secondary'}
-                          className={classes.button}
+                          sx={(theme) => ({
+                            margin: theme.spacing(0, 0, 0, 1),
+                          })}
                           data-cy="save"
                           disabled={shouldDisableForm(isSubmitting)}
                         >
@@ -324,7 +320,9 @@ const FinalRankingForm = ({
                             setShouldSubmit(false);
                           }}
                           color={isUserOfficer ? 'primary' : 'secondary'}
-                          className={classes.button}
+                          sx={(theme) => ({
+                            margin: theme.spacing(0, 0, 0, 1),
+                          })}
                           data-cy="saveAndContinue"
                           disabled={shouldDisableForm(isSubmitting)}
                         >
@@ -337,7 +335,9 @@ const FinalRankingForm = ({
                               setShouldClose(false);
                               setShouldSubmit(true);
                             }}
-                            className={classes.button}
+                            sx={(theme) => ({
+                              margin: theme.spacing(0, 0, 0, 1),
+                            })}
                             data-cy="submitFapMeeting"
                             disabled={shouldDisableForm(isSubmitting)}
                           >

@@ -5,12 +5,11 @@ import MaterialTable, {
 import DragHandle from '@mui/icons-material/DragHandle';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Visibility from '@mui/icons-material/Visibility';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
+import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
-import clsx from 'clsx';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
@@ -45,60 +44,49 @@ type FapProposalWithAverageScoreAndAvailabilityZone = FapProposal & {
 };
 
 // NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& table': {
-      backgroundColor: '#ddd',
-    },
-    '& .lastRowInAvailabilityZone:not(.draggingRow)': {
-      position: 'relative',
-      borderBottom: '23px solid white',
+const rootStyles = {
+  '& table': {
+    backgroundColor: '#ddd',
+  },
+  '& .lastRowInAvailabilityZone:not(.draggingRow)': {
+    position: 'relative',
+    borderBottom: '23px solid white',
 
-      '&::after': {
-        content: 'attr(unallocated-time-information)',
-        position: 'absolute',
-        bottom: -34,
-        left: 0,
-        zIndex: 2,
-        background: 'rgba(0,0,0, .2)',
-        width: '100%',
-        padding: '2px 12px',
-        fontSize: 'small',
-      },
-    },
-    '& tr': {
-      transition: 'all 200ms ease-out',
-      backgroundColor: '#fafafa',
-    },
-    '& tr td': {
-      whiteSpace: 'nowrap',
-    },
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      backgroundColor: '#fafafa',
-    },
-    '& .draggingRow': {
-      visibility: 'hidden',
-    },
-    '& .shiftUp': {
-      transform: 'translateY(-50px)',
-    },
-    '& .shiftDown': {
-      transform: 'translateY(50px)',
+    '&::after': {
+      content: 'attr(unallocated-time-information)',
+      position: 'absolute',
+      bottom: -34,
+      left: 0,
+      zIndex: 2,
+      background: 'rgba(0,0,0, .2)',
+      width: '100%',
+      padding: '2px 12px',
+      fontSize: 'small',
     },
   },
-  disabled: {
-    color: theme.palette.text.disabled,
+  '& tr': {
+    transition: 'all 200ms ease-out',
+    backgroundColor: '#fafafa',
   },
-  proposalTitle: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+  '& tr td': {
     whiteSpace: 'nowrap',
-    maxWidth: '200px',
   },
-}));
+  '& tr:last-child td': {
+    border: 'none',
+  },
+  '& .MuiPaper-root': {
+    backgroundColor: '#fafafa',
+  },
+  '& .draggingRow': {
+    visibility: 'hidden',
+  },
+  '& .shiftUp': {
+    transform: 'translateY(-50px)',
+  },
+  '& .shiftDown': {
+    transform: 'translateY(50px)',
+  },
+};
 
 type FapInstrumentProposalsTableProps = {
   fapInstrument: InstrumentWithAvailabilityTime;
@@ -121,7 +109,6 @@ const FapInstrumentProposalsTable = ({
     refreshInstrumentProposalsData,
   } = useFapProposalsByInstrument(fapInstrument.id, fapId, selectedCall?.id);
 
-  const classes = useStyles();
   const theme = useTheme();
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { user } = useContext(UserContext);
@@ -353,13 +340,16 @@ const FapInstrumentProposalsTable = ({
 
     return (
       <>
-        <span
-          className={clsx({
-            [classes.disabled]: fapTimeAllocation !== null,
-          })}
+        <Box
+          component="span"
+          sx={{
+            ...(fapTimeAllocation !== null && {
+              color: theme.palette.text.disabled,
+            }),
+          }}
         >
           {timeAllocation}
-        </span>
+        </Box>
         {fapTimeAllocation && (
           <>
             <br />
@@ -596,7 +586,12 @@ const FapInstrumentProposalsTable = ({
       timeAllocation: ProposalTimeAllocationColumn(proposal),
       proposalTitle: (
         <Tooltip
-          className={classes.proposalTitle}
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            maxWidth: '200px',
+          }}
           title={proposal.proposal.title}
           enterDelay={1000}
           enterNextDelay={1000}
@@ -677,7 +672,7 @@ const FapInstrumentProposalsTable = ({
   };
 
   return (
-    <div className={classes.root} data-cy="fap-instrument-proposals-table">
+    <Box sx={rootStyles} data-cy="fap-instrument-proposals-table">
       <FapMeetingProposalViewModal
         proposalViewModalOpen={
           !!urlQueryParams.fapMeetingModal &&
@@ -713,7 +708,7 @@ const FapInstrumentProposalsTable = ({
             ),
         }}
       />
-    </div>
+    </Box>
   );
 };
 

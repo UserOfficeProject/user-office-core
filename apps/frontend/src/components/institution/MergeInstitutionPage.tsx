@@ -2,7 +2,6 @@ import MergeType from '@mui/icons-material/MergeType';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router';
 
@@ -19,20 +18,6 @@ import InstitutionSelect from './InstitutionSelect';
 type MergeInstitutionPageProps = {
   confirm: WithConfirmType;
 };
-const useStyles = makeStyles(() => ({
-  mergeIcon: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -30%)  rotate(90deg)',
-    fontSize: '5em',
-    color: '#999999',
-  },
-  mergeGridIcon: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
 
 function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
   const { institutionId: institutionIdQueryParam } = useParams<{
@@ -50,7 +35,6 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
   const [mergedInstitutionName, setMergedInstitutionName] = React.useState('');
 
   const { api } = useDataApiWithFeedback();
-  const classes = useStyles();
 
   useEffect(() => {
     if (institutionFrom === null && institutionId) {
@@ -104,9 +88,18 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
             />
           </Grid>
           <Grid item xs={1} style={{ position: 'relative' }}>
-            <MergeType className={classes.mergeIcon} />
+            <MergeType
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -30%)  rotate(90deg)',
+                fontSize: '5em',
+                color: '#999999',
+              }}
+            />
           </Grid>
-          <Grid item xs={6} className={classes.mergeGridIcon}>
+          <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
             <TextField
               fullWidth
               label="Merged Institution Name"
