@@ -17,7 +17,7 @@ import {
   DraggingStyle,
   Droppable,
   NotDraggingStyle,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 
 import {
   ProposalWorkflowConnection,

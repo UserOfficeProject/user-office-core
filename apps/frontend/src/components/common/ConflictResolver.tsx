@@ -14,36 +14,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  useTheme,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import React, { useEffect } from 'react';
 
 import {
   ConflictResolutionStrategy,
   QuestionComparisonStatus,
 } from 'generated/sdk';
-
-const useStyles = makeStyles((theme) => ({
-  heading: {
-    fontWeight: 'bold',
-  },
-  icon: {
-    marginRight: theme.spacing(2),
-  },
-  error: {
-    color: theme.palette.error.main,
-  },
-  resolved: {
-    color: '#ffbb00',
-  },
-  check: {
-    color: theme.palette.success.main,
-  },
-  highlight: {
-    backgroundColor: '#faed27',
-  },
-}));
 
 export interface DiffInfo {
   heading: string;
@@ -63,6 +41,7 @@ export function ConflictResolver<T>(props: {
   getItemTitle: (comparison: T) => string;
   getDiffInfo: (comparison: T) => DiffInfo[];
 }) {
+  const theme = useTheme();
   const { comparison, onConflictResolved } = props;
   const { getStatus, getItemId, getItemTitle, getDiffInfo } = props;
 
@@ -73,34 +52,44 @@ export function ConflictResolver<T>(props: {
     getStatus(comparison) === QuestionComparisonStatus.NEW
   );
 
-  const classes = useStyles();
-
   const getStatusIcon = (status: QuestionComparisonStatus) => {
     const isResolved = existingItemCheck || newItemCheck;
     switch (status) {
       case QuestionComparisonStatus.DIFFERENT:
         return isResolved ? (
           <Check
-            className={clsx(classes.icon, classes.resolved)}
+            sx={{
+              marginRight: theme.spacing(2),
+              color: '#ffbb00',
+            }}
             data-cy="resolved-icon"
           />
         ) : (
           <Error
-            className={clsx(classes.icon, classes.error)}
+            sx={{
+              marginRight: theme.spacing(2),
+              color: theme.palette.error.main,
+            }}
             data-cy="conflict-icon"
           />
         );
       case QuestionComparisonStatus.NEW:
         return (
           <Check
-            className={clsx(classes.icon, classes.check)}
+            sx={{
+              marginRight: theme.spacing(2),
+              color: theme.palette.success.main,
+            }}
             data-cy="new-icon"
           />
         );
       case QuestionComparisonStatus.SAME:
         return (
           <DoneAllIcon
-            className={clsx(classes.icon, classes.check)}
+            sx={{
+              marginRight: theme.spacing(2),
+              color: theme.palette.success.main,
+            }}
             data-cy="same-icon"
           />
         );
@@ -133,7 +122,7 @@ export function ConflictResolver<T>(props: {
             <TableHead>
               <TableRow>
                 <TableCell>{getItemId(comparison)}</TableCell>
-                <TableCell className={classes.heading}>
+                <TableCell sx={{ fontWeight: 'bold' }}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -152,7 +141,7 @@ export function ConflictResolver<T>(props: {
                     label="Existing Question"
                   />
                 </TableCell>
-                <TableCell className={classes.heading}>
+                <TableCell sx={{ fontWeight: 'bold' }}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -176,10 +165,12 @@ export function ConflictResolver<T>(props: {
             <TableBody>
               {getDiffInfo(comparison).map((diffInfo) => (
                 <TableRow
-                  className={clsx(diffInfo.isDifferent && classes.highlight)}
+                  sx={{
+                    ...(diffInfo.isDifferent && { backgroundColor: '#faed27' }),
+                  }}
                   key={diffInfo.heading}
                 >
-                  <TableCell className={classes.heading}>
+                  <TableCell sx={{ fontWeight: 'bold' }}>
                     {diffInfo.heading}
                   </TableCell>
                   <TableCell>{diffInfo.existingVal}</TableCell>

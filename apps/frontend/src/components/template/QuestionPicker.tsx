@@ -17,7 +17,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/styles/useTheme';
 import clsx from 'clsx';
 import React, { useState } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable } from '@hello-pangea/dnd';
 
 import {
   getQuestionaryComponentDefinition,

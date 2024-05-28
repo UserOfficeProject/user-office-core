@@ -7,7 +7,7 @@ import {
   Draggable,
   DraggingStyle,
   NotDraggingStyle,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import {

@@ -1,14 +1,14 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BottomNavigation from '@mui/material/BottomNavigation';
+import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import parse from 'html-react-parser';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
@@ -138,67 +138,10 @@ BottomNavItem.propTypes = {
 
 const drawerWidth = 250;
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-    ...theme.mixins.toolbar,
-
-    '& .closeDrawer': {
-      marginLeft: 'auto',
-    },
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-  },
-  drawerOpen: {
-    width: drawerWidth,
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
-    },
-  },
-  content: {
-    flexGrow: 1,
-    height: 'calc(100vh - 64px)',
-    marginTop: '64px',
-    width: `calc(100% - ${drawerWidth}px)`,
-  },
-  bottomNavigation: {
-    display: 'flex',
-    marginTop: 'auto',
-    marginBottom: theme.spacing(2),
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'transparent',
-  },
-}));
-
 const Dashboard = () => {
+  const theme = useTheme();
   const [header, setHeader] = useState('User Office');
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
-  const classes = useStyles();
   const [open, setOpen] = React.useState(
     localStorage.drawerOpen
       ? localStorage.drawerOpen === '1'
@@ -246,6 +189,31 @@ const Dashboard = () => {
   }
   const { calls } = useCallsData(getDashBoardCallFilter());
 
+  const drawer = {
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+  };
+  const drawerOpen = () => ({
+    width: drawerWidth,
+    overflowX: 'hidden',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  });
+  const drawerClose = () => ({
+    overflowX: 'hidden',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    width: theme.spacing(7),
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9),
+    },
+  });
+
   const handleDrawerOpen = () => {
     localStorage.setItem('drawerOpen', '1');
     setOpen(true);
@@ -272,7 +240,7 @@ const Dashboard = () => {
 
   // TODO: Check who can see what and modify the access control here.
   return (
-    <div className={classes.root}>
+    <Box component="div" sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppToolbar
         open={open}
@@ -281,20 +249,28 @@ const Dashboard = () => {
       />
       <Drawer
         variant={isTabletOrMobile ? 'temporary' : 'permanent'}
-        className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open,
-        })}
-        classes={{
-          paper: clsx({
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open,
-          }),
+        sx={{
+          ...drawer,
+          ...(open && drawerOpen()),
+          ...(!open && drawerClose()),
         }}
         open={open}
         onClose={handleDrawerClose}
       >
-        <div className={classes.toolbarIcon}>
+        <Box
+          component="div"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingLeft: theme.spacing(2),
+            paddingRight: theme.spacing(1),
+            ...theme.mixins.toolbar,
+            '& .closeDrawer': {
+              marginLeft: 'auto',
+            },
+          }}
+        >
           {isTabletOrMobile && (
             <Typography component="h1" variant="h6" color="inherit" noWrap>
               {header}
@@ -308,14 +284,22 @@ const Dashboard = () => {
           >
             <ChevronLeftIcon />
           </IconButton>
-        </div>
+        </Box>
         <Divider />
         <List disablePadding>
           <MenuItems callsData={calls} currentRole={currentRole} />
         </List>
         <Divider />
       </Drawer>
-      <main className={classes.content}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          height: 'calc(100vh - 64px)',
+          marginTop: '64px',
+          width: `calc(100% - ${drawerWidth}px)`,
+        }}
+      >
         <Suspense
           fallback={
             <div
@@ -687,7 +671,17 @@ const Dashboard = () => {
           </Switch>
         </Suspense>
         {parse(footerContent)}
-        <BottomNavigation className={classes.bottomNavigation}>
+        <BottomNavigation
+          sx={{
+            display: 'flex',
+            marginTop: 'auto',
+            marginBottom: theme.spacing(2),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+          }}
+        >
           <BottomNavItem
             text={privacyPageContent}
             linkText={'Privacy Statement'}
@@ -695,8 +689,8 @@ const Dashboard = () => {
           <BottomNavItem text={faqPageContent} linkText={'FAQ'} />
           <BottomNavItem />
         </BottomNavigation>
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

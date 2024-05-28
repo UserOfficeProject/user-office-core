@@ -6,7 +6,7 @@ import {
   DragDropContext,
   DraggableLocation,
   DropResult,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 
 import {
   ProposalStatus,

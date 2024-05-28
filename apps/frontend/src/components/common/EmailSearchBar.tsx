@@ -1,37 +1,23 @@
 import { MTableToolbar, Options } from '@material-table/core';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Field } from 'formik';
 import React from 'react';
 
 // This component is used to retrieve a user from the database using an email.
-
-const useStyles = makeStyles({
-  titleStyle: {
-    display: 'inline',
-  },
-  inviteButton: {
-    marginLeft: '10px',
-    whiteSpace: 'nowrap',
-  },
-  email: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'baseline',
-  },
-});
-
-const EmailSearchBar = (props: Options<JSX.Element>) => {
-  const classes = useStyles();
-
-  return (
-    <>
-      <div className={classes.titleStyle}>
-        <MTableToolbar {...props} />
-      </div>
-      <div>
-        <Form className={useStyles().email}>
+const EmailSearchBar = (props: Options<JSX.Element>) => (
+  <>
+    <Box
+      sx={{
+        display: 'inline',
+      }}
+    >
+      <MTableToolbar {...props} />
+    </Box>
+    <div>
+      <Form>
+        <Box display="flex" justifyContent="flex-end" alignItems="baseline">
           <Field
             name="email"
             label="E-mail"
@@ -45,14 +31,14 @@ const EmailSearchBar = (props: Options<JSX.Element>) => {
           <Button
             data-cy="findUser"
             type="submit"
-            className={useStyles().inviteButton}
+            sx={{ marginLeft: '10px', whiteSpace: 'nowrap' }}
           >
             Find User
           </Button>
-        </Form>
-      </div>
-    </>
-  );
-};
+        </Box>
+      </Form>
+    </div>
+  </>
+);
 
 export default EmailSearchBar;

@@ -3,7 +3,6 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { FormikProps, FormikValues } from 'formik';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
@@ -23,15 +22,6 @@ import {
 } from 'models/questionary/QuestionaryFunctions';
 import { FunctionType } from 'utils/utilTypes';
 
-const useStyles = makeStyles((theme) => ({
-  menuItem: {
-    display: 'flex',
-    alignItems: 'center',
-    '& SVG': {
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
 const FormikUICustomDependencySelector = ({
   field,
   template,
@@ -62,8 +52,6 @@ const FormikUICustomDependencySelector = ({
   >(dependency.condition.params || '');
 
   const [availableValues, setAvailableValues] = useState<Option[]>([]);
-
-  const classes = useStyles();
   const api = useDataApi();
 
   const updateFormik = (): void => {
@@ -195,7 +183,13 @@ const FormikUICustomDependencySelector = ({
               return (
                 <MenuItem
                   value={option.question.id}
-                  className={classes.menuItem}
+                  sx={(theme) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    '& SVG': {
+                      marginRight: theme.spacing(1),
+                    },
+                  })}
                   key={option.question.id}
                 >
                   {option.question.question}
