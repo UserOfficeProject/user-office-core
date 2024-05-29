@@ -9,7 +9,7 @@ export class TechnicalReview {
     public submitted: boolean,
     public reviewerId: number,
     public files: string | null,
-    public technicalReviewAssigneeId: number | null,
+    public technicalReviewAssigneeId: number,
     public instrumentId: number
   ) {}
 }

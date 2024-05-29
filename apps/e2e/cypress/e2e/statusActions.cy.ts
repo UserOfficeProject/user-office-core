@@ -62,6 +62,8 @@ context('Status actions tests', () => {
       );
     });
 
+    cy.get('[data-cy="PI-combine-emails"]').should('not.be.checked');
+
     cy.get('[data-cy="PI-email-template"] input').click();
     cy.get('.MuiAutocomplete-listbox li').first().click();
 
@@ -87,6 +89,7 @@ context('Status actions tests', () => {
         {
           recipient: { name: EmailStatusActionRecipients.PI, description: '' },
           emailTemplate: { id: 'pi-template', name: 'PI template' },
+          combineEmails: true,
         },
       ],
     };
@@ -139,6 +142,7 @@ context('Status actions tests', () => {
     cy.get('[data-cy="PI-email-template"] input')
       .invoke('val')
       .should('not.be.empty');
+    cy.get('[data-cy="PI-combine-emails"] input').should('be.checked');
 
     cy.get('[data-cy="action-recipient-CO_PROPOSERS"] input').click();
 
@@ -155,6 +159,9 @@ context('Status actions tests', () => {
         'Please fill out this field.'
       );
     });
+    cy.get('[data-cy="CO_PROPOSERS-combine-emails"] input').should(
+      'not.be.checked'
+    );
 
     cy.get('[data-cy="CO_PROPOSERS-email-template"] input').click();
     cy.get('.MuiAutocomplete-listbox li').last().click();
@@ -273,6 +280,7 @@ context('Status actions tests', () => {
     cy.get('[data-cy="PI-email-template"] input')
       .invoke('val')
       .should('not.be.empty');
+    cy.get('[data-cy="PI-combine-emails"]').should('not.be.checked');
 
     cy.get('[data-cy="action-recipient-OTHER"] input').click();
 
@@ -289,6 +297,7 @@ context('Status actions tests', () => {
     });
 
     cy.get('[data-cy="OTHER-email-template"] input').click();
+    cy.get('[data-cy="OTHER-combine-emails"]').should('not.exist');
     cy.get('.MuiAutocomplete-listbox li').first().click();
 
     cy.get('[data-cy="submit"]').contains('Add status actions').click();

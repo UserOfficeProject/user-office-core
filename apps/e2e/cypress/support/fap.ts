@@ -1,8 +1,8 @@
 import {
   AssignChairOrSecretaryMutation,
   AssignChairOrSecretaryMutationVariables,
-  AssignProposalsToFapMutation,
-  AssignProposalsToFapMutationVariables,
+  AssignProposalsToFapsMutation,
+  AssignProposalsToFapsMutationVariables,
   AssignReviewersToFapMutation,
   AssignReviewersToFapMutationVariables,
   AssignFapReviewersToProposalMutation,
@@ -28,11 +28,11 @@ const createFap = (
   return cy.wrap(request);
 };
 
-const assignProposalsToFap = (
-  assignProposalsToFapInput: AssignProposalsToFapMutationVariables
-): Cypress.Chainable<AssignProposalsToFapMutation> => {
+const assignProposalsToFaps = (
+  assignProposalsToFapInput: AssignProposalsToFapsMutationVariables
+): Cypress.Chainable<AssignProposalsToFapsMutation> => {
   const api = getE2EApi();
-  const request = api.assignProposalsToFap(assignProposalsToFapInput);
+  const request = api.assignProposalsToFaps(assignProposalsToFapInput);
 
   return cy.wrap(request);
 };
@@ -96,7 +96,7 @@ const saveFapMeetingDecision = (
 Cypress.Commands.add('createFap', createFap);
 Cypress.Commands.add('assignChairOrSecretary', assignChairOrSecretary);
 Cypress.Commands.add('assignReviewersToFap', assignReviewersToFap);
-Cypress.Commands.add('assignProposalsToFap', assignProposalsToFap);
+Cypress.Commands.add('assignProposalsToFaps', assignProposalsToFaps);
 Cypress.Commands.add(
   'assignFapReviewersToProposal',
   assignFapReviewersToProposal

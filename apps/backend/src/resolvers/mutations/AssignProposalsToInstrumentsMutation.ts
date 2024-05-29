@@ -38,7 +38,6 @@ export class AssignProposalsToInstrumentsMutation {
       args
     );
 
-    // TODO: Review this when starting with FAP part for multi instrument. For now only the first instrument FAP is assigned just to be backwards compatible.
     const proposalsFaps = await context.queries.fap.getProposalsFaps(
       context.user,
       args.proposalPks
@@ -47,14 +46,13 @@ export class AssignProposalsToInstrumentsMutation {
     await context.mutations.fap.assignProposalsToFapUsingCallInstrument(
       context.user,
       {
-        instrumentId: args.instrumentIds[0],
+        instrumentIds: args.instrumentIds,
         proposalPks: args.proposalPks.filter(
           (proposalPk) =>
             !proposalsFaps.find((ps) => ps.proposalPk === proposalPk)
         ),
       }
     );
-    // ----------------------
 
     return isRejection(res) ? res : true;
   }

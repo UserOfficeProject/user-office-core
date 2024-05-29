@@ -223,11 +223,11 @@ const FapProposalsAndAssignmentsTable = ({
   ): Promise<void> => {
     await api({
       toastSuccessMessage: 'Assignment/s removed',
-    }).removeProposalsFromFap({
+    }).removeProposalsFromFaps({
       proposalPks: proposalsToRemove.map(
         (proposalToRemove) => proposalToRemove.proposalPk
       ),
-      fapId: data.id,
+      fapIds: [data.id],
     });
 
     setFapProposalsData((fapProposalData) =>
