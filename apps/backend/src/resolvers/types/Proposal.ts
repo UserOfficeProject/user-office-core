@@ -170,12 +170,12 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => Fap, { nullable: true })
-  async fap(
+  @FieldResolver(() => [Fap], { nullable: true })
+  async faps(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Fap | null> {
-    return await context.queries.fap.dataSource.getFapByProposalPk(
+  ): Promise<Fap[] | null> {
+    return await context.queries.fap.dataSource.getFapsByProposalPk(
       proposal.primaryKey
     );
   }

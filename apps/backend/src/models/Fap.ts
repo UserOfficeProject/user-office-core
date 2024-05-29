@@ -28,11 +28,13 @@ export class FapReviewer {
 
 export class FapProposal {
   constructor(
+    public fapProposalId: number,
     public proposalPk: number,
     public fapId: number,
     public dateAssigned: Date,
     public fapTimeAllocation: number | null,
-    public instrumentId: number,
+    public instrumentId: number | null,
+    public callId: number,
     public fapInstrumentMeetingSubmitted: boolean
   ) {}
 }

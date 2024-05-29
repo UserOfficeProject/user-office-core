@@ -21,6 +21,8 @@ export function useInstrumentsByIdsData(instrumentIds: number[] | null): {
     let unmounted = false;
 
     if (!instrumentIds?.length) {
+      setLoadingInstruments(false);
+
       return;
     }
 

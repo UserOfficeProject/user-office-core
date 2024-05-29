@@ -458,35 +458,47 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
-    // TODO: It is better to collect the data here on the backend then sending callId and workflowId as arguments.
-    const { statusId, proposals } = args;
+    const { statusId, proposalPks } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(
       statusId,
-      proposals.map((proposal) => proposal.primaryKey)
+      proposalPks.map((proposalPk) => proposalPk)
     );
 
-    if (result.proposals.length === proposals.length) {
+    if (result.proposals.length === proposalPks.length) {
       const fullProposals = await Promise.all(
-        proposals.map(async (proposal) => {
-          await this.proposalDataSource.resetProposalEvents(
-            proposal.primaryKey,
-            proposal.callId,
-            statusId
-          );
-
+        proposalPks.map(async (proposalPk) => {
           const fullProposal = result.proposals.find(
-            (updatedProposal) =>
-              updatedProposal.primaryKey === proposal.primaryKey
+            (updatedProposal) => updatedProposal.primaryKey === proposalPk
           );
 
           if (!fullProposal) {
             return null;
           }
 
+          await this.proposalDataSource.resetProposalEvents(
+            proposalPk,
+            fullProposal.callId,
+            statusId
+          );
+
+          const proposalWorkflow =
+            await this.proposalSettingsDataSource.getProposalWorkflowByCall(
+              fullProposal.callId
+            );
+
+          if (!proposalWorkflow) {
+            return rejection(
+              `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
+              {
+                args,
+              }
+            );
+          }
+
           return {
             ...fullProposal,
-            workflowId: proposal.workflowId,
+            workflowId: proposalWorkflow.id,
           };
         })
       );
