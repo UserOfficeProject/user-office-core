@@ -25,6 +25,10 @@ export interface InstrumentDataSource {
     instrumentId: number,
     callIds: number[]
   ): Promise<{ callId: number; instrumentId: number }[]>;
+  getInstrumentHasProposals(
+    instrumentId: number,
+    proposalPks: number[]
+  ): Promise<InstrumentsHasProposals>;
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
   assignProposalToInstrument(

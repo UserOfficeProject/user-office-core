@@ -631,9 +631,7 @@ context('Proposal tests', () => {
       });
       cy.changeProposalsStatus({
         statusId: initialDBData.proposalStatuses.fapMeeting.id,
-        proposals: [
-          { primaryKey: createdProposalPk, callId: initialDBData.call.id },
-        ],
+        proposalPks: [createdProposalPk],
       });
       cy.login('officer');
       cy.visit('/');
@@ -678,9 +676,7 @@ context('Proposal tests', () => {
 
       cy.changeProposalsStatus({
         statusId: initialDBData.proposalStatuses.fapReview.id,
-        proposals: [
-          { primaryKey: createdProposalPk, callId: initialDBData.call.id },
-        ],
+        proposalPks: [createdProposalPk],
       });
 
       cy.contains(clonedProposalTitle)
