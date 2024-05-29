@@ -21,9 +21,10 @@ import {
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
 } from '../../resolvers/mutations/AssignMembersToFapMutation';
-import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
+import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import { AdminDataSource } from '../AdminDataSource';
 import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
@@ -50,6 +51,7 @@ import {
   FapSecretariesRecord,
   FapChairsRecord,
   InstitutionRecord,
+  AssignProposalsToFapsInput,
   CountryRecord,
 } from './records';
 
@@ -292,12 +294,12 @@ export default class PostgresFapDataSource implements FapDataSource {
     callId: number | null
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
-      .select(['sp.*'])
-      .from('fap_proposals as sp')
+      .select(['fp.*'])
+      .from('fap_proposals as fp')
       .modify((query) => {
         query
           .join('proposals as p', {
-            'p.proposal_pk': 'sp.proposal_pk',
+            'p.proposal_pk': 'fp.proposal_pk',
           })
           .join('proposal_statuses as ps', {
             'p.status_id': 'ps.proposal_status_id',
@@ -307,10 +309,10 @@ export default class PostgresFapDataSource implements FapDataSource {
           });
 
         if (callId) {
-          query.andWhere('p.call_id', callId);
+          query.andWhere('fp.call_id', callId);
         }
       })
-      .where('sp.fap_id', fapId);
+      .where('fp.fap_id', fapId);
 
     return fapProposals.map((fapProposal) =>
       createFapProposalObject(fapProposal)
@@ -630,6 +632,16 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
+  async getFapsByProposalPk(proposalPk: number): Promise<Fap[]> {
+    const faps: FapRecord[] = await database
+      .select('*')
+      .from('faps')
+      .join('fap_proposals', 'fap_proposals.fap_id', '=', 'faps.fap_id')
+      .where('proposal_pk', proposalPk);
+
+    return faps.map((fap) => createFapObject(fap));
+  }
+
   async assignChairOrSecretaryToFap(
     args: AssignChairOrSecretaryToFapInput
   ): Promise<Fap> {
@@ -729,34 +741,17 @@ export default class PostgresFapDataSource implements FapDataSource {
     throw new GraphQLError(`Fap not found ${args.fapId}`);
   }
 
-  async assignProposalsToFap({
-    proposals,
-    fapId,
-    fapInstrumentId,
-  }: AssignProposalsToFapArgs) {
-    const dataToInsert = proposals.map((proposal) => ({
-      fap_id: fapId,
-      instrument_id: fapInstrumentId,
-      proposal_pk: proposal.primaryKey,
-      call_id: proposal.callId,
-    }));
-
+  async assignProposalsToFaps(dataToInsert: AssignProposalsToFapsInput[]) {
     const proposalFapPairs: {
       proposal_pk: number;
       fap_id: number;
     }[] = await database.transaction(async (trx) => {
       try {
-        /**
-         * NOTE: First delete all connections that should be changed,
-         * because currently we only support one proposal to be assigned on one Fap.
-         * So we don't end up in a situation that one proposal is assigned to multiple Faps
-         * which is not supported scenario by the frontend because it only shows one Fap per proposal.
-         */
         await database('fap_proposals')
           .del()
           .whereIn(
             'proposal_pk',
-            proposals.map((proposal) => proposal.primaryKey)
+            dataToInsert.map((data) => data.proposal_pk)
           )
           .transacting(trx);
 
@@ -768,13 +763,17 @@ export default class PostgresFapDataSource implements FapDataSource {
         return await trx.commit(result);
       } catch (error) {
         throw new GraphQLError(
-          `Could not assign proposals ${proposals} to Fap with id: ${fapId}`
+          `Could not assign proposals ${dataToInsert
+            .map((data) => data.proposal_pk)
+            .toString()} to FAPs with ids: ${dataToInsert
+            .map((data) => data.fap_id)
+            .toString()}`
         );
       }
     });
 
-    const returnedProposalPks = proposalFapPairs.map(
-      (proposalFapPair) => proposalFapPair.proposal_pk
+    const returnedProposalPks = removeDuplicates(
+      proposalFapPairs.map((proposalFapPair) => proposalFapPair.proposal_pk)
     );
 
     if (proposalFapPairs?.length) {
@@ -786,41 +785,45 @@ export default class PostgresFapDataSource implements FapDataSource {
     }
 
     throw new GraphQLError(
-      `Could not assign proposals ${proposals} to Fap with id: ${fapId}`
+      `Could not assign proposals ${dataToInsert
+        .map((data) => data.proposal_pk)
+        .toString()} to FAPs with ids: ${dataToInsert
+        .map((data) => data.fap_id)
+        .toString()}`
     );
   }
 
-  async removeProposalsFromFap(proposalPks: number[], fapId: number) {
-    await database.transaction(async (trx) => {
-      await trx('fap_proposals')
-        .whereIn('proposal_pk', proposalPks)
-        .andWhere('fap_id', fapId)
-        .del();
+  async removeProposalsFromFaps({
+    proposalPks,
+    fapIds,
+  }: RemoveProposalsFromFapsArgs) {
+    const fapProposalRecords = await database('fap_proposals')
+      .whereIn('proposal_pk', proposalPks)
+      .whereIn('fap_id', fapIds)
+      .del()
+      .returning<FapProposalRecord[]>('*');
 
-      await trx('fap_assignments')
-        .whereIn('proposal_pk', proposalPks)
-        .andWhere('fap_id', fapId)
-        .del();
+    return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
+  }
 
-      await trx('fap_reviews')
-        .whereIn('proposal_pk', proposalPks)
-        .andWhere('fap_id', fapId)
-        .del();
-    });
+  async removeProposalsFromFapsByInstrument(
+    proposalPk: number,
+    instrumentIds: number[]
+  ): Promise<FapProposal[]> {
+    const fapProposalRecords = await database('fap_proposals')
+      .where('proposal_pk', proposalPk)
+      .whereIn('instrument_id', instrumentIds)
+      .del()
+      .returning('*');
 
-    const fapUpdated = await this.getFap(fapId);
-
-    if (!fapUpdated) {
-      throw new GraphQLError(`Fap not found ${fapId}`);
-    }
-
-    return fapUpdated;
+    return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
   }
 
   async assignMemberToFapProposals(
     proposalPks: number[],
     fapId: number,
-    memberId: number
+    memberId: number,
+    fapProposalId: number
   ) {
     await database.transaction(async (trx) => {
       await trx<FapAssignmentRecord>('fap_assignments')
@@ -829,6 +832,7 @@ export default class PostgresFapDataSource implements FapDataSource {
             proposal_pk: proposalPk,
             fap_member_user_id: memberId,
             fap_id: fapId,
+            fap_proposal_id: fapProposalId,
           }))
         )
         .returning<FapAssignmentRecord[]>(['*']);
@@ -840,6 +844,7 @@ export default class PostgresFapDataSource implements FapDataSource {
             proposal_pk: proposalPk,
             status: ReviewStatus.DRAFT,
             fap_id: fapId,
+            fap_proposal_id: fapProposalId,
           }))
         )
         .returning<ReviewRecord[]>(['*']);
@@ -905,7 +910,8 @@ export default class PostgresFapDataSource implements FapDataSource {
   async assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,
-    memberIds: number[]
+    memberIds: number[],
+    fapProposalId: number
   ) {
     await database.transaction(async (trx) => {
       await trx<FapAssignmentRecord>('fap_assignments')
@@ -914,6 +920,7 @@ export default class PostgresFapDataSource implements FapDataSource {
             proposal_pk: proposalPk,
             fap_member_user_id: memberId,
             fap_id: fapId,
+            fap_proposal_id: fapProposalId,
           }))
         )
         .returning<FapAssignmentRecord[]>(['*']);
@@ -925,6 +932,7 @@ export default class PostgresFapDataSource implements FapDataSource {
             proposal_pk: proposalPk,
             status: ReviewStatus.DRAFT,
             fap_id: fapId,
+            fap_proposal_id: fapProposalId,
           }))
         )
         .returning<ReviewRecord[]>(['*']);
@@ -1210,7 +1218,7 @@ export default class PostgresFapDataSource implements FapDataSource {
 
   async isFapProposalInstrumentSubmitted(
     proposalPk: number,
-    instrumentId?: number
+    instrumentId?: number | null
   ): Promise<boolean> {
     return database('fap_proposals')
       .select()

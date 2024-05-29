@@ -141,8 +141,8 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCalls;
   }
 
-  async getCallHasInstrumentsByInstrumentId(
-    instrumentId: number
+  async getCallHasInstrumentsByInstrumentIds(
+    instrumentIds: number[]
   ): Promise<CallHasInstrument[]> {
     throw new Error('Method not implemented.');
   }

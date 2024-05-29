@@ -231,7 +231,7 @@ export default class ReviewMutations {
       .then((review) => review)
       .catch((err) => {
         return rejection(
-          'An error occurred while trying to submit a technical review',
+          'An error occurred while trying to create a technical review',
           { agent, args },
           err
         );
