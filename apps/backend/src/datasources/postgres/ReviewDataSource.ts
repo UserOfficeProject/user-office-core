@@ -1,3 +1,5 @@
+import { GraphQLError } from 'graphql';
+
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
@@ -9,6 +11,7 @@ import database from './database';
 import {
   createReviewObject,
   createTechnicalReviewObject,
+  InstrumentHasProposalRecord,
   ReviewRecord,
   TechnicalReviewRecord,
 } from './records';
@@ -51,6 +54,19 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         );
     }
 
+    const instrumentHasProposalRecord = await database
+      .select<InstrumentHasProposalRecord>('*')
+      .from('instrument_has_proposals')
+      .where('instrument_id', instrumentId)
+      .andWhere('proposal_pk', proposalPk)
+      .first();
+
+    if (!instrumentHasProposalRecord) {
+      throw new GraphQLError(
+        `Could not create technical review for proposal ${proposalPk} with instrument: ${instrumentId}`
+      );
+    }
+
     return database
       .insert({
         proposal_pk: proposalPk,
@@ -62,6 +78,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         reviewer_id: reviewerId,
         files,
         instrument_id: instrumentId,
+        instrument_has_proposals_id:
+          instrumentHasProposalRecord.instrument_has_proposals_id,
       })
       .returning('*')
       .into('technical_review')

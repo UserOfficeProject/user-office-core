@@ -1541,6 +1541,10 @@ context('Fap meeting components tests', () => {
             abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
 
           cy.addProposalTechnicalReview({
             proposalPk: createdProposal.primaryKey,
@@ -1549,11 +1553,6 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-          });
-
-          cy.assignProposalsToInstruments({
-            instrumentIds: [createdInstrumentId],
-            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFaps({
@@ -1634,6 +1633,11 @@ context('Fap meeting components tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
 
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
+
           cy.addProposalTechnicalReview({
             proposalPk: createdProposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
@@ -1641,11 +1645,6 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-          });
-
-          cy.assignProposalsToInstruments({
-            instrumentIds: [createdInstrumentId],
-            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFaps({
@@ -2729,6 +2728,19 @@ context('Automatic Fap assignment to Proposal', () => {
   let firstAutoAssignmentInstrumentId: number;
   let firstAutoAssignProposalPk: number;
   let firstAutoAssignProposalId: string;
+  const scientist1 = initialDBData.users.user1;
+  const instrument1 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+  };
+  const instrument2 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+  };
 
   beforeEach(function () {
     cy.resetDB();

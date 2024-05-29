@@ -8,6 +8,12 @@ BEGIN
 			ALTER TABLE fap_proposals DROP CONSTRAINT fap_proposals_pkey;
 			ALTER TABLE fap_proposals ADD PRIMARY KEY (fap_proposal_id);
 			ALTER TABLE fap_proposals ALTER COLUMN fap_id DROP NOT NULL;
+			ALTER TABLE fap_proposals ADD COLUMN instrument_has_proposals_id INT REFERENCES instrument_has_proposals(instrument_has_proposals_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			UPDATE fap_proposals
+			SET instrument_has_proposals_id = (SELECT instrument_has_proposals_id FROM instrument_has_proposals WHERE instrument_has_proposals.proposal_pk = fap_proposals.proposal_pk AND instrument_has_proposals.instrument_id = fap_proposals.instrument_id);
+			ALTER TABLE technical_review ADD COLUMN instrument_has_proposals_id INT REFERENCES instrument_has_proposals(instrument_has_proposals_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			UPDATE technical_review
+			SET instrument_has_proposals_id = (SELECT instrument_has_proposals_id FROM instrument_has_proposals WHERE instrument_has_proposals.proposal_pk = technical_review.proposal_pk AND instrument_has_proposals.instrument_id = technical_review.instrument_id);
 
 			ALTER TABLE fap_assignments 
 			ADD COLUMN fap_proposal_id INT REFERENCES fap_proposals (fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
