@@ -1,5 +1,0 @@
-mutation removeProposalsFromFap($proposalPks: [Int!]!, $fapId: Int!) {
-  removeProposalsFromFap(proposalPks: $proposalPks, fapId: $fapId) {
-    id
-  }
-}
