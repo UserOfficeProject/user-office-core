@@ -44,6 +44,11 @@ export default class PostgresCallDataSource implements CallDataSource {
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
     const query = database('call').select(['*']);
+
+    if (filter?.shortCode) {
+      query.where('call_short_code', 'like', `%${filter.shortCode}%`);
+    }
+
     if (filter?.templateIds) {
       query.whereIn('template_id', filter.templateIds);
     }

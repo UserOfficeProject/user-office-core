@@ -24,7 +24,7 @@ export class FapInstrument {
   @Field(() => Int, { nullable: true })
   fapId: number | null;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   instrumentId: number;
 }
 
@@ -78,7 +78,7 @@ export class ProposalViewTechnicalReview {
   @Field(() => Int, { nullable: true })
   timeAllocation: number;
 
-  @Field(() => ProposalViewTechnicalReviewAssignee)
+  @Field(() => ProposalViewTechnicalReviewAssignee, { nullable: true })
   technicalReviewAssignee: ProposalViewTechnicalReviewAssignee;
 }
 

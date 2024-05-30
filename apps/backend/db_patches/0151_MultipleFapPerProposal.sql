@@ -19,12 +19,14 @@ BEGIN
 			ADD COLUMN fap_proposal_id INT REFERENCES fap_proposals (fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 			UPDATE fap_assignments
 			SET fap_proposal_id = (SELECT fap_proposal_id FROM fap_proposals WHERE fap_proposals.proposal_pk = fap_assignments.proposal_pk AND fap_proposals.fap_id = fap_assignments.fap_id);
+			DELETE FROM fap_assignments WHERE fap_proposal_id is null;
 			ALTER TABLE fap_assignments ALTER COLUMN fap_proposal_id SET NOT NULL;
 
 			ALTER TABLE fap_reviews 
 			ADD COLUMN fap_proposal_id INT REFERENCES fap_proposals (fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 			UPDATE fap_reviews
 			SET fap_proposal_id = (SELECT fap_proposal_id FROM fap_proposals WHERE fap_proposals.proposal_pk = fap_reviews.proposal_pk AND fap_proposals.fap_id = fap_reviews.fap_id);
+			DELETE FROM fap_reviews WHERE fap_proposal_id is null;
 			ALTER TABLE fap_reviews ALTER COLUMN fap_proposal_id SET NOT NULL;
 	
 			-- drop view to allow recreating it
