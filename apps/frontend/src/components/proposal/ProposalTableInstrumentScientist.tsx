@@ -6,10 +6,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import {
-  ResourceId,
-  getTranslation,
-} from '@user-office-software/duo-localisation';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
 import React, { useContext, useState, useEffect } from 'react';
@@ -42,6 +38,7 @@ import {
   SubmitTechnicalReviewInput,
   SettingsId,
   UserRole,
+  ProposalViewTechnicalReviewAssignee,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -61,6 +58,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
@@ -143,23 +141,27 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
     title: 'Technical status',
     field: 'technicalStatuses',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalStatuses),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) => tr.status)
+      ),
   },
   {
     title: 'Technical time allocation',
     field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
-      rowData.technicalTimeAllocations
-        ? `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
-            rowData.allocationTimeUnit
-          }s)`
-        : '-',
+      `${fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) => tr.timeAllocation)
+      )} (${rowData.allocationTimeUnit}s)`,
   },
   {
     title: 'Assigned technical reviewer',
     field: 'technicalReviewAssigneeNames',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) =>
+          getFullUserName(tr.technicalReviewAssignee)
+        )
+      ),
   },
 ];
 
@@ -170,7 +172,7 @@ const instrumentManagementColumns = (
     title: t('instrument'),
     field: 'instrumentNames',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.instrumentNames),
+      fromArrayToCommaSeparated(rowData.instruments?.map((i) => i.name)),
   },
 ];
 
@@ -424,10 +426,12 @@ const ProposalTableInstrumentScientist = ({
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
       isInstrumentScientist &&
-      rowData.technicalReviewAssigneeIds?.includes(user.id);
+      rowData.technicalReviews
+        ?.map((tr) => tr.technicalReviewAssignee?.id)
+        .includes(user.id);
 
     const showView =
-      rowData.technicalReviewsSubmitted?.every((submitted) => submitted) ||
+      rowData.technicalReviews?.every((tr) => tr.submitted) ||
       (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
     return (
@@ -473,14 +477,14 @@ const ProposalTableInstrumentScientist = ({
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
       const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] = [];
       selectedProposals.forEach((proposal) => {
-        if (proposal.instrumentIds) {
-          proposal.instrumentIds.forEach((instrumentId) => {
-            if (instrumentId) {
+        if (proposal.instruments) {
+          proposal.instruments.forEach((i) => {
+            if (i.id) {
               submittedTechnicalReviewsInput.push({
                 proposalPk: proposal.primaryKey,
                 reviewerId: user.id,
                 submitted: true,
-                instrumentId: instrumentId,
+                instrumentId: i.id,
               });
             }
           });
@@ -495,12 +499,16 @@ const ProposalTableInstrumentScientist = ({
 
       const newProposalsData = proposalsData.map((proposalData) => ({
         ...proposalData,
-        technicalReviewsSubmitted: selectedProposals.find(
-          (selectedProposal) =>
-            selectedProposal.primaryKey === proposalData.primaryKey
-        )
-          ? [1]
-          : proposalData.technicalReviewsSubmitted,
+        technicalReviews:
+          proposalData.technicalReviews?.map((tr) => ({
+            ...tr,
+            submitted: selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === proposalData.primaryKey
+            )
+              ? true
+              : tr.submitted,
+          })) || [],
       }));
       setProposalsData(newProposalsData);
     }
@@ -575,19 +583,15 @@ const ProposalTableInstrumentScientist = ({
     const invalid = [];
 
     for await (const proposal of selectedProposals) {
-      if (
-        proposal.technicalStatuses?.length &&
-        proposal.technicalTimeAllocations?.length &&
-        proposal.technicalStatuses?.length ===
-          proposal.technicalTimeAllocations?.length
-      ) {
+      const { technicalReviews } = proposal;
+      if (technicalReviews?.length) {
         const isValidSchema = (
           await Promise.all(
-            proposal.technicalStatuses.map(
-              async (technicalStatus, index) =>
+            technicalReviews.map(
+              async (tr) =>
                 await proposalTechnicalReviewValidationSchema.isValid({
-                  status: technicalStatus,
-                  timeAllocation: proposal.technicalTimeAllocations?.[index],
+                  status: tr.status,
+                  timeAllocation: tr.timeAllocation,
                 })
             )
           )
@@ -735,28 +739,20 @@ const ProposalTableInstrumentScientist = ({
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...proposal,
-                  technicalReviewAssigneeIds:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) =>
-                        technicalReview.technicalReviewAssigneeId
-                    ) || null,
-                  technicalReviewAssigneeNames:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) =>
-                        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
-                    ) || null,
-                  technicalReviewsSubmitted:
-                    updatedProposal.technicalReviews?.map((technicalReview) =>
-                      technicalReview.submitted ? 1 : 0
-                    ) || null,
-                  technicalStatuses:
-                    updatedProposal.technicalReviews?.map((technicalReview) =>
-                      getTranslation(technicalReview?.status as ResourceId)
-                    ) || null,
-                  technicalTimeAllocations:
-                    updatedProposal.technicalReviews?.map(
-                      (technicalReview) => technicalReview.timeAllocation
-                    ) || null,
+                  technicalReviews: updatedProposal.technicalReviews.map(
+                    (technicalReview) => {
+                      const technicalReviewAssignee =
+                        technicalReview.technicalReviewAssignee as ProposalViewTechnicalReviewAssignee;
+
+                      return {
+                        id: technicalReview.id,
+                        status: technicalReview.status,
+                        submitted: technicalReview.submitted,
+                        timeAllocation: technicalReview.timeAllocation,
+                        technicalReviewAssignee: technicalReviewAssignee,
+                      };
+                    }
+                  ),
                 };
               } else {
                 return proposal;

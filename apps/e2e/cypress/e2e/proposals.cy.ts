@@ -206,12 +206,35 @@ context('Proposal tests', () => {
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
+      cy.get('[data-cy=save-button]').should('be.disabled');
+
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
+
+      cy.get('[data-cy=abstract] textarea').first().focus();
+      cy.get('[data-cy=save-button]').should('not.be.disabled');
+
+      // Save button should be enabled after validation error
+      cy.get('[data-cy=save-button]').click();
+      cy.get('[data-cy=save-button]').should('not.be.disabled');
 
       cy.get('[data-cy=abstract] textarea')
         .first()
         .type(abstract)
         .should('have.value', abstract);
+
+      // Save button should be disabled after successful save
+      cy.get('[data-cy=save-button]').click();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.get('[data-cy=save-button]').should('be.disabled');
+
+      // Save button should be enabled after modifying form again
+      const modifiedAbstract = abstract + '.';
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .clear()
+        .type(modifiedAbstract)
+        .should('have.value', modifiedAbstract);
+      cy.get('[data-cy=save-button]').focus().should('not.be.disabled');
 
       cy.contains('Save and continue').click();
 
@@ -608,9 +631,7 @@ context('Proposal tests', () => {
       });
       cy.changeProposalsStatus({
         statusId: initialDBData.proposalStatuses.fapMeeting.id,
-        proposals: [
-          { primaryKey: createdProposalPk, callId: initialDBData.call.id },
-        ],
+        proposalPks: [createdProposalPk],
       });
       cy.login('officer');
       cy.visit('/');
@@ -655,9 +676,7 @@ context('Proposal tests', () => {
 
       cy.changeProposalsStatus({
         statusId: initialDBData.proposalStatuses.fapReview.id,
-        proposals: [
-          { primaryKey: createdProposalPk, callId: initialDBData.call.id },
-        ],
+        proposalPks: [createdProposalPk],
       });
 
       cy.contains(clonedProposalTitle)

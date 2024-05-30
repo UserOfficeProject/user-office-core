@@ -5,6 +5,9 @@ import { Call } from '../types/Call';
 
 @InputType()
 export class CallsFilter {
+  @Field(() => String, { nullable: true })
+  public shortCode?: string;
+
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
 

@@ -264,9 +264,11 @@ export default {
     },
     editableSubmitted: {
       id: 14,
+      name: 'EDITABLE_SUBMITTED',
     },
     editableSubmittedInternal: {
       id: 15,
+      name: 'EDITABLE_SUBMITTED_INTERNAL',
     },
   },
   scheduledEvents: {

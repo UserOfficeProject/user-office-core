@@ -25,7 +25,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
-import AssignProposalsToFap from 'components/fap/Proposals/AssignProposalsToFap';
+import AssignProposalsToFaps from 'components/fap/Proposals/AssignProposalsToFaps';
 import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -37,11 +37,11 @@ import {
   Proposal,
   ProposalsFilter,
   ProposalStatus,
-  ProposalSelectionInput,
-  Fap,
   InstrumentFragment,
   FeatureId,
-  GetInstrumentsByIdsQuery,
+  FapInstrumentInput,
+  FapInstrument,
+  ProposalViewInstrument,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -55,11 +55,13 @@ import {
   addColumns,
   fromArrayToCommaSeparated,
   fromProposalToProposalView,
+  getUniqueArray,
   removeColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
@@ -79,12 +81,13 @@ type ProposalTableOfficerProps = {
   confirm: WithConfirmType;
 };
 
-export type ProposalSelectionType = ProposalSelectionInput & {
+export type ProposalSelectionType = {
   title: string;
   proposalId: string;
-  instrumentIds: (number | null)[] | null;
-  fapInstrumentId: number | null;
-  fapId: number | null;
+  primaryKey: number;
+  callId: number;
+  instruments: ProposalViewInstrument[] | null;
+  fapInstruments: FapInstrument[] | null;
   statusId: number;
 };
 
@@ -174,21 +177,31 @@ const technicalReviewColumns = [
     title: 'Technical status',
     field: 'technicalStatuses',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalStatuses),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map(
+          (technicalReview) => technicalReview.status
+        )
+      ),
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssigneeNames',
+    field: 'technicalReviewAssignees',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.technicalReviewAssigneeNames),
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((technicalReview) =>
+          getFullUserName(technicalReview.technicalReviewAssignee)
+        )
+      ),
   },
   {
     title: 'Technical time allocation',
     field: 'technicalTimeAllocations',
     render: (rowData: ProposalViewData) =>
-      `${fromArrayToCommaSeparated(rowData.technicalTimeAllocations)} (${
-        rowData.allocationTimeUnit
-      }s)`,
+      `${fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map(
+          (technicalReview) => technicalReview.timeAllocation
+        )
+      )} (${rowData.allocationTimeUnit}s)`,
     hidden: true,
   },
 ];
@@ -200,7 +213,10 @@ const instrumentManagementColumns = (
     title: t('instrument'),
     field: 'instrumentNames',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.instrumentNames),
+      fromArrayToCommaSeparated(
+        rowData.instruments?.map((instrument) => instrument.name)
+      ),
+    customFilterAndSearch: () => true,
   },
 ];
 
@@ -212,15 +228,12 @@ const FapReviewColumns = [
     emptyValue: '-',
     hidden: true,
   },
-  { title: 'Deviation', field: 'reviewDeviation', emptyValue: '-' },
   {
-    title: 'Average Score',
-    field: 'reviewAverage',
-    emptyValue: '-',
-    hidden: true,
+    title: 'Fap',
+    field: 'fapCodes',
+    render: (rowData: ProposalViewData) =>
+      fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
   },
-  { title: 'Ranking', field: 'rankOrder', emptyValue: '-' },
-  { title: 'Fap', field: 'fapCode', emptyValue: '-' },
 ];
 
 const PREFETCH_SIZE = 200;
@@ -387,11 +400,9 @@ const ProposalTableOfficer = ({
             selected.push({
               primaryKey: proposal.primaryKey,
               callId: proposal.callId,
-              instrumentIds: proposal.instrumentIds || [],
-              fapInstrumentId: proposal.fapInstrumentId,
-              fapId: proposal.fapId,
+              instruments: proposal.instruments || [],
+              fapInstruments: proposal.fapInstruments,
               statusId: proposal.statusId,
-              workflowId: proposal.workflowId,
               title: proposal.title,
               proposalId: proposal.proposalId,
             });
@@ -526,27 +537,26 @@ const ProposalTableOfficer = ({
     });
   };
 
-  const assignProposalsToFap = async (
-    fap: Fap | null,
-    fapInstrument:
-      | NonNullable<GetInstrumentsByIdsQuery['instrumentsByIds']>[0]
-      | null
+  const assignProposalsToFaps = async (
+    fapInstsruments: FapInstrumentInput[]
   ): Promise<void> => {
-    if (fap) {
-      if (!fapInstrument) {
+    const shouldRemoveAssignments = fapInstsruments.every(
+      (fapInstrument) => !fapInstrument.fapId
+    );
+
+    if (!shouldRemoveAssignments) {
+      if (!fapInstsruments.length) {
         return;
       }
 
       await api({
         toastSuccessMessage:
           'Proposal/s assigned to the selected Fap successfully!',
-      }).assignProposalsToFap({
-        proposals: selectedProposals.map((selectedProposal) => ({
-          primaryKey: selectedProposal.primaryKey,
-          callId: selectedProposal.callId,
-        })),
-        fapId: fap.id,
-        fapInstrumentId: fapInstrument.id,
+      }).assignProposalsToFaps({
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
+        ),
+        fapInstruments: fapInstsruments,
       });
 
       // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
@@ -554,11 +564,20 @@ const ProposalTableOfficer = ({
     } else {
       await api({
         toastSuccessMessage: 'Proposal/s removed from the Fap successfully!',
-      }).removeProposalsFromFap({
+      }).removeProposalsFromFaps({
         proposalPks: selectedProposals.map(
           (selectedProposal) => selectedProposal.primaryKey
         ),
-        fapId: selectedProposals[0].fapId as number,
+        fapIds: getUniqueArray(
+          selectedProposals
+            .map(
+              (selectedProposal) =>
+                selectedProposal.fapInstruments
+                  ?.filter((fapInstrument) => !!fapInstrument.fapId)
+                  .map((fapInstrument) => fapInstrument.fapId) || []
+            )
+            .flat() || []
+        ),
       });
 
       setProposalsData((proposalsData) =>
@@ -569,8 +588,8 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.fapCode = null;
-            prop.fapId = null;
+            prop.faps = null;
+            prop.fapInstruments = null;
           }
 
           return prop;
@@ -617,8 +636,7 @@ const ProposalTableOfficer = ({
                 selectedProposal.primaryKey === prop.primaryKey
             )
           ) {
-            prop.instrumentNames = null;
-            prop.instrumentIds = null;
+            prop.instruments = null;
           }
 
           return prop;
@@ -660,11 +678,9 @@ const ProposalTableOfficer = ({
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
       }).changeProposalsStatus({
-        proposals: selectedProposals.map((selectedProposal) => ({
-          primaryKey: selectedProposal.primaryKey,
-          callId: selectedProposal.callId,
-          workflowId: selectedProposal.workflowId,
-        })),
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
+        ),
         statusId: status.id,
       });
       const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
@@ -722,7 +738,9 @@ const ProposalTableOfficer = ({
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
       finalTimeAllocationsRendered: `${fromArrayToCommaSeparated(
-        proposal.managementTimeAllocations
+        proposal.instruments?.map(
+          (instrument) => instrument.managementTimeAllocation
+        )
       )} (${proposal.allocationTimeUnit}s)`,
     })
   );
@@ -743,17 +761,14 @@ const ProposalTableOfficer = ({
         fullWidth
       >
         <DialogContent>
-          <AssignProposalsToFap
-            assignProposalsToFap={assignProposalsToFap}
+          <AssignProposalsToFaps
+            assignProposalsToFaps={assignProposalsToFaps}
             close={(): void => setOpenAssignment(false)}
-            fapIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.fapId
-            )}
-            proposalInstrumentIds={selectedProposals
-              .map((selectedProposal) => selectedProposal.instrumentIds)
+            proposalFapInstruments={selectedProposals
+              .map((selectedProposal) => selectedProposal.fapInstruments)
               .flat()}
-            proposalFapInstrumentIds={selectedProposals.map(
-              (selectedProposal) => selectedProposal.fapInstrumentId
+            proposalInstruments={selectedProposals.map(
+              (selectedProposal) => selectedProposal.instruments
             )}
           />
         </DialogContent>
@@ -774,7 +789,11 @@ const ProposalTableOfficer = ({
               (selectedProposal) => selectedProposal.callId
             )}
             instrumentIds={selectedProposals
-              .map((selectedProposal) => selectedProposal.instrumentIds)
+              .map((selectedProposal) =>
+                (selectedProposal.instruments || []).map(
+                  (instrument) => instrument.id
+                )
+              )
               .flat()}
           />
         </DialogContent>
@@ -795,7 +814,7 @@ const ProposalTableOfficer = ({
               (selectedProposal) => selectedProposal.statusId
             )}
             allSelectedProposalsHaveInstrument={selectedProposals.every(
-              (selectedProposal) => selectedProposal.instrumentIds?.length
+              (selectedProposal) => selectedProposal.instruments?.length
             )}
           />
         </DialogContent>
@@ -849,7 +868,7 @@ const ProposalTableOfficer = ({
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...fromProposalToProposalView(updatedProposal),
-                  fapInstrumentId: proposal.fapInstrumentId,
+                  fapInstruments: proposal.fapInstruments,
                 };
               } else {
                 return proposal;

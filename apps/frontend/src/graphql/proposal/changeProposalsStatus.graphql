@@ -1,8 +1,8 @@
 mutation changeProposalsStatus(
-  $proposals: [ProposalSelectionInput!]!
+  $proposalPks: [Int!]!
   $statusId: Int!
 ) {
   changeProposalsStatus(
-    changeProposalsStatusInput: { proposals: $proposals, statusId: $statusId }
+    changeProposalsStatusInput: { proposalPks: $proposalPks, statusId: $statusId }
   )
 }

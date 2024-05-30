@@ -18,10 +18,15 @@ type FormikUIAutocompleteProps = {
   required?: boolean;
   disabled?: boolean;
   TextFieldProps?: MUITextFieldProps;
-  InputProps?: Partial<InputProps> & { 'data-cy': string };
+  InputProps?: Partial<InputProps> & {
+    'data-cy'?: string;
+    startAdornment?: React.ReactNode;
+    endAdornment?: React.ReactNode;
+  };
   multiple?: boolean;
   'data-cy'?: string;
   AdornmentIcon?: MUITextFieldProps;
+  isOptionEqualToValue?: () => boolean;
 };
 
 const FormikUIAutocomplete = ({
@@ -102,10 +107,12 @@ const FormikUIAutocomplete = ({
           onBlur={() => {
             setAdornmentVisible(false);
           }}
+          inputProps={{ 'data-cy': 'test' }}
         />
       )}
-      ListboxProps={{ 'data-cy': otherProps['data-cy'] + '-options' }}
+      ListboxProps={{ id: otherProps['data-cy'] + '-options' }}
       data-cy={otherProps['data-cy']}
+      isOptionEqualToValue={otherProps.isOptionEqualToValue}
     />
   );
 
