@@ -213,29 +213,31 @@ export const collectFaplXLSXData = async (
       const proposalsAnswers = instrumentProposalsAnswers[indx];
 
       const rows = await Promise.all(
-        proposals.map(async (proposal, pIndx) => {
-          const { firstname = '<missing>', lastname = '<missing>' } =
-            proposalPrincipalInvestigators[pIndx] ?? {};
-          const technicalReview = technicalReviews[pIndx];
-          const reviews = proposalReviews[pIndx];
-          const fapProposal = fapProposals?.[pIndx];
-          const fapMeetingDecision = fapMeetingDecisions[pIndx];
-          const proposalAnswers = proposalsAnswers[pIndx];
+        proposals
+          .filter((proposal) => proposal?.submitted)
+          .map(async (proposal, pIndx) => {
+            const { firstname = '<missing>', lastname = '<missing>' } =
+              proposalPrincipalInvestigators[pIndx] ?? {};
+            const technicalReview = technicalReviews[pIndx];
+            const reviews = proposalReviews[pIndx];
+            const fapProposal = fapProposals?.[pIndx];
+            const fapMeetingDecision = fapMeetingDecisions[pIndx];
+            const proposalAnswers = proposalsAnswers[pIndx];
 
-          const proposalAverageScore = average(getGrades(reviews)) || 0;
+            const proposalAverageScore = average(getGrades(reviews)) || 0;
 
-          return fapDataRow(
-            `${firstname} ${lastname}`,
-            proposalAverageScore,
-            instrument,
-            fapMeetingDecision,
-            proposal,
-            technicalReview,
-            fapProposal ? fapProposal : null,
-            proposalAnswers,
-            reviews
-          );
-        })
+            return fapDataRow(
+              `${firstname} ${lastname}`,
+              proposalAverageScore,
+              instrument,
+              fapMeetingDecision,
+              proposal,
+              technicalReview,
+              fapProposal ? fapProposal : null,
+              proposalAnswers,
+              reviews
+            );
+          })
       );
 
       out.push({
