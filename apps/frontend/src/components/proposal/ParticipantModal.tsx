@@ -1,28 +1,19 @@
 import AddBox from '@mui/icons-material/AddBox';
 import CloseIcon from '@mui/icons-material/Close';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import makeStyles from '@mui/styles/makeStyles';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import PeopleTable from 'components/user/PeopleTable';
 import ProposalPeopleTable from 'components/user/ProposalsPeopleTable';
 import { UserRole, BasicUserDetails } from 'generated/sdk';
-
-const useStyles = makeStyles((theme) => ({
-  dialogTitle: {
-    padding: theme.spacing(0.5),
-    textAlign: 'right',
-  },
-  selectedUsersText: {
-    paddingRight: theme.spacing(1),
-  },
-}));
 
 type ParticipantModalProps = {
   title: string;
@@ -49,7 +40,7 @@ const ParticipantModal = ({
   userRole,
   setPrincipalInvestigator,
 }: ParticipantModalProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
   >([]);
@@ -103,7 +94,12 @@ const ParticipantModal = ({
       maxWidth="sm"
       fullWidth
     >
-      <DialogTitle className={classes.dialogTitle}>
+      <DialogTitle
+        sx={{
+          padding: theme.spacing(0.5),
+          textAlign: 'right',
+        }}
+      >
         <IconButton data-cy="close-modal-btn" onClick={close}>
           <CloseIcon />
         </IconButton>
@@ -113,9 +109,13 @@ const ParticipantModal = ({
       </DialogContent>
       {selection && (
         <DialogActions>
-          <div className={classes.selectedUsersText}>
+          <Box
+            sx={{
+              paddingRight: theme.spacing(1),
+            }}
+          >
             {selectedParticipants.length} user(s) selected
-          </div>
+          </Box>
           <Button
             type="button"
             onClick={onClickHandlerUpdateBtn}

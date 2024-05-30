@@ -100,7 +100,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     callId: proposal.callId,
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
-  } as ProposalViewData);
+  }) as ProposalViewData;
 
 export const capitalize = (s: string) =>
   s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();
@@ -180,7 +180,7 @@ export const denseTableColumn = <T extends object>(
       if (typeof columnData === 'string' && columnData.length > 45) {
         return (
           <span title={columnData}>
-            {column.render ? column.render(rowData, 'row') : columnData}
+            {column.render ? column.render(rowData) : columnData}
           </span>
         );
       } else {
@@ -188,9 +188,7 @@ export const denseTableColumn = <T extends object>(
           return column.lookup[columnData as keyof object];
         }
 
-        return (
-          <>{column.render ? column.render(rowData, 'row') : columnData}</>
-        );
+        return <>{column.render ? column.render(rowData) : columnData}</>;
       }
     },
     cellStyle: {
@@ -225,3 +223,5 @@ export function fromArrayToCommaSeparated(
 ) {
   return itemsArray?.map((item) => item ?? '-').join(', ') || '-';
 }
+
+export const getMax32BitInteger = () => Math.pow(2, 31);

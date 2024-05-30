@@ -3,7 +3,6 @@ import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import { BasicUserDetails, UserRole } from 'generated/sdk';
@@ -12,17 +11,6 @@ import { getFullUserNameWithInstitution } from 'utils/user';
 
 import ParticipantModal from './ParticipantModal';
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  addButton: {
-    padding: '5px',
-    marginLeft: theme.spacing(1),
-  },
-}));
-
 export default function ProposalParticipant(props: {
   principalInvestigator: BasicUserData | null | undefined;
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
@@ -30,8 +18,6 @@ export default function ProposalParticipant(props: {
   loadingPrincipalInvestigator?: boolean;
 }) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-
-  const classes = useStyles();
 
   return (
     <div className={props.className}>
@@ -51,7 +37,14 @@ export default function ProposalParticipant(props: {
         }}
         participant={true}
       />
-      <FormControl className={classes.container} margin="dense" fullWidth>
+      <FormControl
+        sx={{
+          flexDirection: 'row',
+          alignItems: 'flex-end',
+        }}
+        margin="dense"
+        fullWidth
+      >
         <TextField
           label="Principal Investigator"
           value={getFullUserNameWithInstitution(props.principalInvestigator)}
@@ -68,7 +61,10 @@ export default function ProposalParticipant(props: {
           <span>
             <IconButton
               onClick={() => setIsPickerOpen(true)}
-              className={classes.addButton}
+              sx={(theme) => ({
+                padding: '5px',
+                marginLeft: theme.spacing(1),
+              })}
               disabled={props.loadingPrincipalInvestigator}
             >
               <EditIcon data-cy="edit-proposer-button" fontSize="small" />

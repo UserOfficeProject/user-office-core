@@ -1,7 +1,7 @@
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -11,16 +11,6 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 
 import ProposalContainer from './ProposalContainer';
-
-const useStyles = makeStyles(() => ({
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  button: {
-    marginTop: '20px',
-  },
-}));
 
 type GeneralInformationProps = {
   data: ProposalWithQuestionary;
@@ -33,7 +23,6 @@ const GeneralInformation = ({
 }: GeneralInformationProps) => {
   const [isEditable, setIsEditable] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const classes = useStyles();
   const downloadPDFProposal = useDownloadPDFProposal();
 
   const getReadonlyView = () => <ProposalQuestionaryReview data={data} />;
@@ -60,14 +49,21 @@ const GeneralInformation = ({
       )}
       {isEditable ? getEditableView() : getReadonlyView()}
       {!isEditable && (
-        <div className={classes.buttons}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
           <Button
-            className={classes.button}
+            sx={{
+              marginTop: '20px',
+            }}
             onClick={() => downloadPDFProposal([data.primaryKey], data.title)}
           >
             Download PDF
           </Button>
-        </div>
+        </Box>
       )}
     </div>
   );

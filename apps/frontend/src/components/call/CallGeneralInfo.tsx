@@ -2,7 +2,6 @@ import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
 import {
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,6 +10,7 @@ import {
   InputAdornment,
   Link,
   Paper,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -18,11 +18,9 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Theme,
   Typography,
   useTheme,
 } from '@mui/material';
-import { withStyles, makeStyles } from '@mui/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -43,16 +41,24 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
-const useStyles = makeStyles((theme) => ({
-  iconVerticalAlign: {
-    verticalAlign: 'middle',
-    marginLeft: theme.spacing(0.5),
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  head: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
   },
-  textRightAlign: {
-    marginLeft: 'auto',
-    marginRight: 0,
+  body: {
+    fontSize: 14,
   },
 }));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  root: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}));
+
 const CallGeneralInfo = ({
   loadingProposalWorkflows,
   proposalWorkflows,
@@ -84,7 +90,6 @@ const CallGeneralInfo = ({
   });
 
   const theme = useTheme();
-  const classes = useStyles();
 
   const templateOptions =
     templates?.map((template) => ({
@@ -181,28 +186,6 @@ const CallGeneralInfo = ({
   const handleClose = () => {
     setOpen(false);
   };
-
-  const StyledTableCell = withStyles((theme: Theme) =>
-    createStyles({
-      head: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-      },
-      body: {
-        fontSize: 14,
-      },
-    })
-  )(TableCell);
-
-  const StyledTableRow = withStyles((theme: Theme) =>
-    createStyles({
-      root: {
-        '&:nth-of-type(odd)': {
-          backgroundColor: theme.palette.action.hover,
-        },
-      },
-    })
-  )(TableRow);
 
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
@@ -362,10 +345,19 @@ const CallGeneralInfo = ({
             templateId ? `QuestionaryEditor/${templateId}` : 'ProposalTemplates'
           }
           target="_blank"
-          className={classes.textRightAlign}
+          sx={{
+            marginLeft: 'auto',
+            marginRight: 0,
+          }}
         >
           Edit selected template
-          <LaunchIcon fontSize="small" className={classes.iconVerticalAlign} />
+          <LaunchIcon
+            fontSize="small"
+            sx={{
+              verticalAlign: 'middle',
+              marginLeft: theme.spacing(0.5),
+            }}
+          />
         </Link>
       </FormControl>
       {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
@@ -387,12 +379,18 @@ const CallGeneralInfo = ({
                 : 'EsiTemplates'
             }
             target="_blank"
-            className={classes.textRightAlign}
+            sx={{
+              marginLeft: 'auto',
+              marginRight: 0,
+            }}
           >
             Edit selected template
             <LaunchIcon
+              sx={{
+                verticalAlign: 'middle',
+                marginLeft: theme.spacing(0.5),
+              }}
               fontSize="small"
-              className={classes.iconVerticalAlign}
             />
           </Link>
         </FormControl>

@@ -2,8 +2,6 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -13,15 +11,6 @@ import { BasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
-const useStyles = makeStyles((theme) => ({
-  label: {
-    fontSize: '12px',
-    color: 'grey',
-  },
-  StyledButtonContainer: {
-    marginTop: theme.spacing(1),
-  },
-}));
 type ParticipantsProps = {
   /** Basic user details array to be shown in the modal. */
   users: BasicUserDetails[];
@@ -46,8 +35,6 @@ const Participants = ({
   loadingPrincipalInvestigator,
 }: ParticipantsProps) => {
   const [modalOpen, setOpen] = useState(false);
-
-  const classes = useStyles();
 
   const addUsers = (addedUsers: BasicUserDetails[]) => {
     setUsers([...users, ...addedUsers]);
@@ -82,7 +69,14 @@ const Participants = ({
       />
 
       <FormControl margin="dense" fullWidth>
-        <Typography className={classes.label}>{title}</Typography>
+        <Typography
+          sx={{
+            fontSize: '12px',
+            color: 'grey',
+          }}
+        >
+          {title}
+        </Typography>
         <PeopleTable
           selection={false}
           mtOptions={{
@@ -102,7 +96,11 @@ const Participants = ({
           preserveSelf={preserveSelf}
           setPrincipalInvestigator={setPrincipalInvestigator}
         />
-        <ActionButtonContainer className={classes.StyledButtonContainer}>
+        <ActionButtonContainer
+          sx={(theme) => ({
+            marginTop: theme.spacing(1),
+          })}
+        >
           <Button
             variant="outlined"
             onClick={openModal}
@@ -117,12 +115,6 @@ const Participants = ({
       </FormControl>
     </div>
   );
-};
-
-Participants.propTypes = {
-  users: PropTypes.array.isRequired,
-  setUsers: PropTypes.func.isRequired,
-  className: PropTypes.string,
 };
 
 export default Participants;

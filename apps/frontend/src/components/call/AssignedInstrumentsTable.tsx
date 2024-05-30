@@ -15,10 +15,11 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { useFapsData } from 'hooks/fap/useFapsData';
+import { getMax32BitInteger } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const MAX_32_BIT_INTEGER = Math.pow(2, 31);
+const MAX_32_BIT_INTEGER = getMax32BitInteger();
 
 type AssignedInstrumentsTableProps = {
   call: Call;
