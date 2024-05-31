@@ -431,6 +431,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async getSettings(): Promise<Settings[]> {
+    await this.waitForDBUpgrade();
+
     return database
       .select()
       .from('settings')
@@ -440,6 +442,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async getSetting(id: SettingsId): Promise<Settings | null> {
+    await this.waitForDBUpgrade();
+
     return database
       .select()
       .from('settings')
