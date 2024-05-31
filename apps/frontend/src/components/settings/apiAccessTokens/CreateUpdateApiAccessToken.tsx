@@ -12,7 +12,6 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import {
   createApiAccessTokenValidationSchema,
   updateApiAccessTokenValidationSchema,
@@ -32,44 +31,6 @@ import { useQueriesMutationsAndServicesData } from 'hooks/admin/useQueriesMutati
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles((theme) => ({
-  formControlGroup: {
-    border: `1px solid ${theme.palette.grey[200]}`,
-    padding: theme.spacing(0, 1),
-    width: '100%',
-
-    '& legend': {
-      textTransform: 'capitalize',
-    },
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  submitContainer: {
-    margin: theme.spacing(2, 0, 2),
-  },
-  darkerDisabledTextField: {
-    '& input': {
-      paddingRight: theme.spacing(0.5),
-      color: 'rgba(0, 0, 0, 0.7)',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-  },
-  checkBoxLabelText: {
-    '& label': {
-      width: '100%',
-
-      '& .MuiFormControlLabel-label': {
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      },
-    },
-  },
-}));
-
 type FormPermissionsWithAccessToken = {
   name: string;
   accessPermissions: string[];
@@ -88,7 +49,6 @@ const CreateUpdateApiAccessToken = ({
   close,
   apiAccessToken,
 }: CreateUpdateApiAccessTokenProps) => {
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { queriesMutationsAndServices, loadingQueriesMutationsAndServices } =
     useQueriesMutationsAndServicesData();
@@ -158,7 +118,15 @@ const CreateUpdateApiAccessToken = ({
             component="fieldset"
             variant="standard"
             key={index}
-            className={classes.formControlGroup}
+            sx={(theme) => ({
+              border: `1px solid ${theme.palette.grey[200]}`,
+              padding: theme.spacing(0, 1),
+              width: '100%',
+
+              '& legend': {
+                textTransform: 'capitalize',
+              },
+            })}
           >
             <FormLabel component="legend">
               {group.groupName} {title} (
@@ -182,7 +150,17 @@ const CreateUpdateApiAccessToken = ({
                     md={6}
                     xs={12}
                     key={index}
-                    className={classes.checkBoxLabelText}
+                    sx={{
+                      '& label': {
+                        width: '100%',
+
+                        '& .MuiFormControlLabel-label': {
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        },
+                      },
+                    }}
                   >
                     <FormControlLabel
                       control={
@@ -325,9 +303,20 @@ const CreateUpdateApiAccessToken = ({
             id="accessToken"
             label="Access token"
             type="text"
-            component={TextField}
+            component={
+              <TextField
+                sx={(theme) => ({
+                  '& input': {
+                    paddingRight: theme.spacing(0.5),
+                    color: 'rgba(0, 0, 0, 0.7)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                })}
+              />
+            }
             fullWidth
-            className={classes.darkerDisabledTextField}
             InputProps={{
               endAdornment: values.accessToken && (
                 <>
@@ -350,7 +339,7 @@ const CreateUpdateApiAccessToken = ({
           <Grid
             container
             justifyContent="flex-end"
-            className={classes.submitContainer}
+            sx={(theme) => ({ margin: theme.spacing(2, 0, 2) })}
           >
             <Grid item>
               <ErrorMessage name="accessPermissions" />

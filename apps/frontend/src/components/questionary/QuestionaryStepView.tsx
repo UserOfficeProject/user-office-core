@@ -1,4 +1,4 @@
-import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
 import { Formik, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
@@ -27,16 +27,6 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from './QuestionaryContext';
-
-const useStyles = makeStyles((theme) => ({
-  componentWrapper: {
-    margin: theme.spacing(2, 0, 0, 0),
-  },
-  disabled: {
-    pointerEvents: 'none',
-    opacity: 0.7,
-  },
-}));
 
 export const createFormikConfigObjects = (
   answers: Answer[],
@@ -86,7 +76,6 @@ export default function QuestionaryStepView(props: {
   onStepComplete?: (topicId: number) => void;
 }) {
   const { topicId } = props;
-  const classes = useStyles();
 
   const preSubmitActions = usePreSubmitActions();
   const { api } = useDataApiWithFeedback();
@@ -284,12 +273,16 @@ export default function QuestionaryStepView(props: {
         const { submitForm, setFieldValue, isSubmitting } = formikProps;
 
         return (
-          <form className={props.readonly ? classes.disabled : undefined}>
+          <form
+            style={{
+              ...(props.readonly && { pointerEvents: 'none', opacity: 0.7 }),
+            }}
+          >
             <PromptIfDirty isDirty={state.isDirty} />
             {activeFields.map((field) => {
               return (
-                <div
-                  className={classes.componentWrapper}
+                <Box
+                  sx={(theme) => ({ margin: theme.spacing(2, 0, 0, 0) })}
                   key={field.question.id}
                 >
                   {createQuestionaryComponent({
@@ -306,7 +299,7 @@ export default function QuestionaryStepView(props: {
                       }
                     },
                   })}
-                </div>
+                </Box>
               );
             })}
             <NavigationFragment

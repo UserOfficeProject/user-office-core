@@ -9,7 +9,6 @@ import {
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -18,19 +17,9 @@ import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { InstrumentPickerConfig } from 'generated/sdk';
 import { toArray } from 'utils/helperFunctions';
 
-const useStyles = makeStyles(() => ({
-  horizontalLayout: {
-    flexDirection: 'row',
-  },
-  verticalLayout: {
-    flexDirection: 'column',
-  },
-}));
-
 export function QuestionaryComponentInstrumentPicker(
   props: BasicComponentProps
 ) {
-  const classes = useStyles();
   const {
     answer,
     onComplete,
@@ -115,11 +104,9 @@ export function QuestionaryComponentInstrumentPicker(
             name={id}
             value={answer.value ?? null}
             onChange={handleOnChange}
-            className={
-              config.instruments.length < 3
-                ? classes.horizontalLayout
-                : classes.verticalLayout
-            }
+            sx={{
+              flexDirection: config.instruments.length < 3 ? 'row' : 'column',
+            }}
             data-cy="radio-ul"
           >
             {config.instruments.map((instrument) => {

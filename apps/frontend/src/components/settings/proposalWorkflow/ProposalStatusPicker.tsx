@@ -1,15 +1,14 @@
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
-import React from 'react';
 import {
   Draggable,
   DraggingStyle,
   Droppable,
   NotDraggingStyle,
 } from '@hello-pangea/dnd';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import React from 'react';
 
 import { ProposalStatus } from 'generated/sdk';
 
@@ -20,35 +19,6 @@ const ProposalStatusPicker = ({
 }) => {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
-  const classes = makeStyles({
-    container: {
-      alignItems: 'flex-start',
-      alignContent: 'flex-start',
-      flexBasis: '100%',
-      height: '100%',
-      maxHeight: isExtraLargeScreen ? '1400px' : '850px',
-      overflowY: 'auto',
-      overflowX: 'hidden',
-      backgroundColor: theme.palette.grey[200],
-      marginLeft: theme.spacing(1),
-      boxShadow: theme.shadows[3],
-    },
-    itemContainer: {
-      minHeight: '180px',
-      overflow: 'auto !important',
-    },
-    item: {
-      '&:hover': {
-        backgroundColor: `${theme.palette.grey[100]} !important`,
-      },
-    },
-    title: {
-      flexGrow: 1,
-      color: theme.palette.grey[900],
-      fontWeight: 'bold',
-      padding: theme.spacing(1),
-    },
-  })();
 
   const getItemStyle = (
     isDragging: boolean,
@@ -83,7 +53,11 @@ const ProposalStatusPicker = ({
               snapshot.isDragging,
               provided.draggableProps.style
             )}
-            className={classes.item}
+            sx={{
+              '&:hover': {
+                backgroundColor: `${theme.palette.grey[100]} !important`,
+              },
+            }}
           >
             <Box fontSize="1rem">{proposalStatus.name}</Box>
             <Box fontSize="small" mt={1} color={theme.palette.grey[800]}>
@@ -103,10 +77,31 @@ const ProposalStatusPicker = ({
   return (
     <Grid
       container
-      className={`${classes.container} tinyScroll`}
+      sx={{
+        alignItems: 'flex-start',
+        alignContent: 'flex-start',
+        flexBasis: '100%',
+        height: '100%',
+        maxHeight: isExtraLargeScreen ? '1400px' : '850px',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        backgroundColor: theme.palette.grey[200],
+        marginLeft: theme.spacing(1),
+        boxShadow: theme.shadows[3],
+      }}
+      className="tinyScroll"
       data-cy="proposal-status-picker"
     >
-      <Grid item xs={12} className={classes.title}>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          flexGrow: 1,
+          color: theme.palette.grey[900],
+          fontWeight: 'bold',
+          padding: theme.spacing(1),
+        }}
+      >
         Proposal statuses
       </Grid>
       {proposalStatuses && !!proposalStatuses.length && (
@@ -117,7 +112,8 @@ const ProposalStatusPicker = ({
               xs={12}
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
-              className={`${classes.itemContainer} tinyScroll`}
+              sx={{ minHeight: '180px', overflow: 'auto !important' }}
+              className="tinyScroll"
             >
               {getItems()}
               {provided.placeholder}

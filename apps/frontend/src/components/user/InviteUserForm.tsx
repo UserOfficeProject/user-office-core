@@ -1,7 +1,7 @@
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { createUserByEmailInviteValidationSchema } from '@user-office-software/duo-validation/lib/User';
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
@@ -17,17 +17,6 @@ type InviteUserFormProps = {
   close: FunctionType;
 };
 
-const useStyles = makeStyles({
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
-
 const InviteUserForm = ({
   action,
   title,
@@ -35,7 +24,6 @@ const InviteUserForm = ({
   close,
 }: InviteUserFormProps) => {
   const { api } = useDataApiWithFeedback();
-  const classes = useStyles();
 
   return (
     <Formik
@@ -99,22 +87,22 @@ const InviteUserForm = ({
             data-cy="email"
           />
 
-          <div className={classes.buttons}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               onClick={() => close()}
               color="secondary"
-              className={classes.button}
+              sx={{ marginTop: '25px', marginLeft: '10px' }}
             >
               Cancel
             </Button>
             <Button
-              className={classes.button}
+              sx={{ marginTop: '25px', marginLeft: '10px' }}
               type="submit"
               data-cy="invitation-submit"
             >
               {title}
             </Button>
-          </div>
+          </Box>
         </Form>
       )}
     </Formik>

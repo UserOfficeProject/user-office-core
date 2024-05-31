@@ -3,7 +3,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { getTranslation } from '@user-office-software/duo-localisation';
 import React, { Fragment } from 'react';
 
@@ -15,13 +14,7 @@ type TechnicalReviewInformationProps = {
   data: TechnicalReview | null | undefined;
 };
 
-const useStyles = makeStyles((theme) => ({
-  heading: {
-    marginTop: theme.spacing(2),
-  },
-}));
 const TechnicalReviewInformation = (props: TechnicalReviewInformationProps) => {
-  const classes = useStyles();
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
 
   if (!props.data) {
@@ -30,7 +23,11 @@ const TechnicalReviewInformation = (props: TechnicalReviewInformationProps) => {
 
   return (
     <Fragment>
-      <Typography variant="h6" className={classes.heading} gutterBottom>
+      <Typography
+        variant="h6"
+        sx={(theme) => ({ marginTop: theme.spacing(2) })}
+        gutterBottom
+      >
         Technical Review
       </Typography>
       <Table>

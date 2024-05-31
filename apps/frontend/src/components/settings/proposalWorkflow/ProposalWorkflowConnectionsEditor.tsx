@@ -1,3 +1,9 @@
+import {
+  Draggable,
+  DraggingStyle,
+  Droppable,
+  NotDraggingStyle,
+} from '@hello-pangea/dnd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import Box from '@mui/material/Box';
@@ -7,17 +13,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import {
-  Draggable,
-  DraggingStyle,
-  Droppable,
-  NotDraggingStyle,
-} from '@hello-pangea/dnd';
 
 import {
   ProposalWorkflowConnection,
@@ -51,60 +50,6 @@ const ProposalWorkflowConnectionsEditor = ({
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
   const [workflowConnection, setWorkflowConnection] =
     useState<ProposalWorkflowConnection | null>(null);
-  const classes = makeStyles({
-    container: {
-      alignItems: 'flex-start',
-      alignContent: 'flex-start',
-      flexBasis: '100%',
-      height: '100%',
-      maxHeight: theme.breakpoints.up('xl') ? '1400px' : '850px',
-      overflowY: 'auto',
-      backgroundColor: theme.palette.grey[200],
-      boxShadow: theme.shadows[3],
-    },
-    dialogActions: {
-      padding: 0,
-    },
-    removeButton: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-    },
-    actionsIcon: {
-      position: 'absolute',
-      right: 0,
-      bottom: 0,
-      margin: '5px',
-    },
-    itemContainer: {
-      minHeight: '70px',
-    },
-    item: {
-      position: 'relative',
-      '&:hover': {
-        backgroundColor: `${theme.palette.grey[100]} !important`,
-      },
-    },
-    title: {
-      flexGrow: 1,
-      color: theme.palette.grey[900],
-      fontWeight: 'bold',
-      padding: theme.spacing(1),
-    },
-    addRowButton: {
-      float: 'right',
-    },
-    groupTitle: {
-      padding: theme.spacing(1),
-      color: theme.palette.grey[500],
-    },
-    statusChangingEvents: {
-      textAlign: 'center',
-      display: 'block',
-      padding: '2px 0',
-      color: theme.palette.grey[500],
-    },
-  })();
 
   const getItemStyle = (
     isDragging: boolean,
@@ -222,14 +167,22 @@ const ProposalWorkflowConnectionsEditor = ({
           {(provided, snapshot) => (
             <>
               {!!proposalWorkflowConnection.statusChangingEvents?.length && (
-                <small className={classes.statusChangingEvents}>
+                <Box
+                  component="small"
+                  sx={{
+                    textAlign: 'center',
+                    display: 'block',
+                    padding: '2px 0',
+                    color: theme.palette.grey[500],
+                  }}
+                >
                   {proposalWorkflowConnection.statusChangingEvents
                     .map(
                       (statusChangingEvent) =>
                         statusChangingEvent.statusChangingEvent
                     )
                     .join(' & ')}
-                </small>
+                </Box>
               )}
               <Grid
                 item
@@ -244,7 +197,12 @@ const ProposalWorkflowConnectionsEditor = ({
                   snapshot.isDragging,
                   provided.draggableProps.style
                 )}
-                className={classes.item}
+                sx={{
+                  position: 'relative',
+                  '&:hover': {
+                    backgroundColor: `${theme.palette.grey[100]} !important`,
+                  },
+                }}
                 onClick={() => {
                   if (proposalWorkflowConnection.prevProposalStatusId) {
                     setWorkflowConnection(proposalWorkflowConnection);
@@ -252,11 +210,11 @@ const ProposalWorkflowConnectionsEditor = ({
                 }}
               >
                 {!isVeryFirstDraftStatus(proposalWorkflowConnection) && (
-                  <DialogActions className={classes.dialogActions}>
+                  <DialogActions sx={{ padding: 0 }}>
                     <Tooltip title="Remove workflow connection">
                       <IconButton
                         size="small"
-                        className={classes.removeButton}
+                        sx={{ position: 'absolute', top: 0, right: 0 }}
                         data-cy="remove-workflow-status-button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -299,7 +257,12 @@ const ProposalWorkflowConnectionsEditor = ({
                         title={`Status actions: ${proposalWorkflowConnection.statusActions?.map(
                           (item) => item.action.name
                         )}`}
-                        className={classes.actionsIcon}
+                        sx={{
+                          position: 'absolute',
+                          right: 0,
+                          bottom: 0,
+                          margin: '5px',
+                        }}
                       >
                         <PendingActionsIcon fontSize="small" color="action" />
                       </Tooltip>
@@ -332,12 +295,18 @@ const ProposalWorkflowConnectionsEditor = ({
               xs={12}
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
-              className={classes.itemContainer}
+              sx={{ minHeight: '70px' }}
               data-cy="droppable-group"
             >
-              <small className={classes.groupTitle}>
+              <Box
+                component="small"
+                sx={{
+                  padding: theme.spacing(1),
+                  color: theme.palette.grey[500],
+                }}
+              >
                 Workflow droppable group {subGroup.groupId.split('_')[1]}
-              </small>
+              </Box>
               {getConnectionGroupItems(subGroup.connections)}
               {provided.placeholder}
             </Grid>
@@ -367,13 +336,19 @@ const ProposalWorkflowConnectionsEditor = ({
               xs={12}
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
-              className={classes.itemContainer}
+              sx={{ minHeight: '70px' }}
               data-cy="droppable-group"
             >
               {connectionGroup.subGroups.length > 0 && (
-                <small className={classes.groupTitle}>
+                <Box
+                  component="small"
+                  sx={{
+                    padding: theme.spacing(1),
+                    color: theme.palette.grey[500],
+                  }}
+                >
                   Default droppable group
-                </small>
+                </Box>
               )}
               {getConnectionGroupItems(connectionGroup.connections)}
               {provided.placeholder}
@@ -392,7 +367,17 @@ const ProposalWorkflowConnectionsEditor = ({
   return (
     <Grid
       container
-      className={`${classes.container} tinyScroll`}
+      className="tinyScroll"
+      sx={{
+        alignItems: 'flex-start',
+        alignContent: 'flex-start',
+        flexBasis: '100%',
+        height: '100%',
+        maxHeight: theme.breakpoints.up('xl') ? '1400px' : '850px',
+        overflowY: 'auto',
+        backgroundColor: theme.palette.grey[200],
+        boxShadow: theme.shadows[3],
+      }}
       data-cy="proposal-workflow-connections"
     >
       <Dialog
@@ -423,10 +408,19 @@ const ProposalWorkflowConnectionsEditor = ({
         dispatch={dispatch}
         isLoading={isLoading}
       />
-      <Grid item xs={12} className={classes.title}>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          flexGrow: 1,
+          color: theme.palette.grey[900],
+          fontWeight: 'bold',
+          padding: theme.spacing(1),
+        }}
+      >
         Proposal workflow
         <Button
-          className={classes.addRowButton}
+          sx={{ float: 'right' }}
           onClick={() => setOpenNewRowDialog(true)}
           variant="text"
         >

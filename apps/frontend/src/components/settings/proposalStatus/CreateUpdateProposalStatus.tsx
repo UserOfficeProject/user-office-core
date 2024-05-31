@@ -1,7 +1,6 @@
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
@@ -14,17 +13,6 @@ import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  darkerDisabledTextField: {
-    '& .MuiInputBase-root.Mui-disabled': {
-      color: 'rgba(0, 0, 0, 0.7) !important',
-    },
-  },
-}));
-
 type CreateUpdateProposalStatusProps = {
   close: (proposalStatusAdded: ProposalStatus | null) => void;
   proposalStatus: ProposalStatus | null;
@@ -34,7 +22,6 @@ const CreateUpdateProposalStatus = ({
   close,
   proposalStatus,
 }: CreateUpdateProposalStatusProps) => {
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = proposalStatus
@@ -90,9 +77,16 @@ const CreateUpdateProposalStatus = ({
             id="shortCode"
             label="Short code"
             type="text"
-            component={TextField}
-            className={
-              !!initialValues.shortCode ? classes.darkerDisabledTextField : ''
+            component={
+              <TextField
+                sx={{
+                  ...(!!initialValues.shortCode && {
+                    '& .MuiInputBase-root.Mui-disabled': {
+                      color: 'rgba(0, 0, 0, 0.7) !important',
+                    },
+                  }),
+                }}
+              />
             }
             fullWidth
             data-cy="shortCode"
@@ -128,7 +122,7 @@ const CreateUpdateProposalStatus = ({
           <Button
             type="submit"
             fullWidth
-            className={classes.submit}
+            sx={(theme) => ({ margin: theme.spacing(3, 0, 2) })}
             data-cy="submit"
             disabled={isExecutingCall}
           >

@@ -1,6 +1,8 @@
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
+import { SxProps, Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
@@ -18,7 +20,7 @@ type ParticipantsProps = {
   setUsers: (users: BasicUserDetails[]) => void;
   principalInvestigator?: BasicUserData | null;
   setPrincipalInvestigator?: (user: BasicUserDetails) => void;
-  className?: string;
+  sx?: SxProps<Theme>;
   title: string;
   preserveSelf?: boolean;
   loadingPrincipalInvestigator?: boolean;
@@ -29,7 +31,7 @@ const Participants = ({
   setUsers,
   principalInvestigator,
   setPrincipalInvestigator,
-  className,
+  sx,
   title,
   preserveSelf,
   loadingPrincipalInvestigator,
@@ -51,7 +53,7 @@ const Participants = ({
   };
 
   return (
-    <div className={className}>
+    <Box sx={sx}>
       <ParticipantModal
         show={modalOpen}
         close={() => setOpen(false)}
@@ -113,7 +115,7 @@ const Participants = ({
           </Button>
         </ActionButtonContainer>
       </FormControl>
-    </div>
+    </Box>
   );
 };
 

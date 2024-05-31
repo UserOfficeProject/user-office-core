@@ -1,10 +1,10 @@
 import { Options, Column, MTableToolbar } from '@material-table/core';
 import Email from '@mui/icons-material/Email';
-import { Typography } from '@mui/material';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
 import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
@@ -73,21 +73,6 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   >;
 };
 
-const useStyles = makeStyles({
-  tableWrapper: {
-    '& .MuiToolbar-gutters': {
-      paddingLeft: '0',
-    },
-  },
-  verticalCentered: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  mobileUpdateButton: {
-    paddingBottom: '10px',
-  },
-});
-
 const localColumns = [
   { title: 'Firstname', field: 'firstname' },
   { title: 'Lastname', field: 'lastname' },
@@ -99,7 +84,7 @@ const getTitle = ({
   t,
   invitationUserRole,
 }: {
-  t: TFunction<'translation', undefined, 'translation'>;
+  t: TFunction<'translation', undefined>;
   invitationUserRole?: UserRole;
 }): string => {
   switch (invitationUserRole) {
@@ -217,8 +202,6 @@ const PeopleTable = ({
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
-
-  const classes = useStyles();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -472,7 +455,14 @@ const PeopleTable = ({
         }
       }}
     >
-      <div data-cy="co-proposers" className={classes.tableWrapper}>
+      <Box
+        data-cy="co-proposers"
+        sx={{
+          '& .MuiToolbar-gutters': {
+            paddingLeft: '0',
+          },
+        }}
+      >
         <Dialog
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
@@ -589,7 +579,7 @@ const PeopleTable = ({
             ))}
           </ActionButtonContainer>
         )}
-      </div>
+      </Box>
     </Formik>
   );
 };

@@ -7,7 +7,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
@@ -31,12 +30,6 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
-
-const useStyles = makeStyles((theme) => ({
-  submitButton: {
-    marginLeft: theme.spacing(1),
-  },
-}));
 
 type TechnicalReviewFormType = {
   status: string;
@@ -62,7 +55,6 @@ const ProposalTechnicalReview = ({
 }: ProposalTechnicalReviewProps) => {
   const { api } = useDataApiWithFeedback();
   const [shouldSubmit, setShouldSubmit] = useState(false);
-  const classes = useStyles();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
@@ -393,7 +385,7 @@ const ProposalTechnicalReview = ({
                         isSubmitting || data.submitted || isInternalReviewer
                       }
                       type="submit"
-                      className={classes.submitButton}
+                      sx={(theme) => ({ marginLeft: theme.spacing(1) })}
                       onClick={() => setShouldSubmit(true)}
                       data-cy="submit-technical-review"
                     >

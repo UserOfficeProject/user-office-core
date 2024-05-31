@@ -1,9 +1,10 @@
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, Form, Formik } from 'formik';
 import React from 'react';
 import * as yup from 'yup';
@@ -21,34 +22,6 @@ const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
     .required('You must select at least one event'),
 });
 
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '20px',
-    padding: '22px 0 0',
-    '& .statusName': {
-      fontWeight: 'bold',
-    },
-  },
-  container: {
-    minHeight: 'auto',
-    maxHeight: 'calc(100vh - 315px)',
-    [theme.breakpoints.only('sm')]: {
-      maxHeight: 'calc(100vh - 345px)',
-    },
-    [theme.breakpoints.only('xs')]: {
-      maxHeight: 'calc(100vh - 475px)',
-    },
-    overflowY: 'auto',
-    overflowX: 'hidden',
-    marginTop: '10px',
-  },
-  eventDescription: {
-    margin: '-5px 0',
-    fontSize: 'small',
-    color: theme.palette.grey[400],
-  },
-}));
-
 type AddStatusChangingEventsToConnectionProps = {
   addStatusChangingEventsToConnection: (statusChangingEvents: string[]) => void;
   statusChangingEvents?: Event[];
@@ -62,8 +35,7 @@ const AddStatusChangingEventsToConnection = ({
   statusName,
   isLoading,
 }: AddStatusChangingEventsToConnectionProps) => {
-  const classes = useStyles();
-
+  const theme = useTheme();
   const { proposalEvents, loadingProposalEvents } = useProposalEventsData();
 
   const initialValues: {
@@ -84,12 +56,36 @@ const AddStatusChangingEventsToConnection = ({
     >
       {({ isSubmitting, values }): JSX.Element => (
         <Form>
-          <Typography className={classes.cardHeader}>
+          <Typography
+            sx={{
+              fontSize: '20px',
+              padding: '22px 0 0',
+              '& .statusName': {
+                fontWeight: 'bold',
+              },
+            }}
+          >
             Events that will trigger the change to{' '}
             <span className="statusName">{statusName}</span> status
           </Typography>
 
-          <Grid container spacing={1} className={classes.container}>
+          <Grid
+            container
+            spacing={1}
+            sx={{
+              minHeight: 'auto',
+              maxHeight: 'calc(100vh - 315px)',
+              [theme.breakpoints.only('sm')]: {
+                maxHeight: 'calc(100vh - 345px)',
+              },
+              [theme.breakpoints.only('xs')]: {
+                maxHeight: 'calc(100vh - 475px)',
+              },
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              marginTop: '10px',
+            }}
+          >
             {loadingProposalEvents ? (
               <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
             ) : (
@@ -127,9 +123,16 @@ const AddStatusChangingEventsToConnection = ({
                           }
                           label={proposalEvent.name}
                         />
-                        <p className={classes.eventDescription}>
+                        <Box
+                          component="p"
+                          sx={{
+                            margin: '-5px 0',
+                            fontSize: 'small',
+                            color: theme.palette.grey[400],
+                          }}
+                        >
                           {proposalEvent.description}
-                        </p>
+                        </Box>
                       </Grid>
                     ))}
                   </>

@@ -1,8 +1,6 @@
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -22,24 +20,11 @@ type ProposalTechnicalReviewerAssignmentProps = {
   ) => void;
 };
 
-const useStyles = makeStyles((theme) => ({
-  reassignContainer: {
-    padding: theme.spacing(2),
-    marginTop: 0,
-    marginBottom: theme.spacing(2),
-  },
-  reassignContainerDisabled: {
-    pointerEvents: 'none',
-    opacity: '0.5',
-  },
-}));
-
 const ProposalTechnicalReviewerAssignment = ({
   technicalReview,
   instrument,
   onTechnicalReviewUpdated,
 }: ProposalTechnicalReviewerAssignmentProps) => {
-  const classes = useStyles();
   const [showReassign, setShowReassign] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
@@ -47,12 +32,16 @@ const ProposalTechnicalReviewerAssignment = ({
   return (
     <Paper
       elevation={1}
-      className={clsx(
-        classes.reassignContainer,
-        !isUserOfficer &&
-          technicalReview?.submitted &&
-          classes.reassignContainerDisabled
-      )}
+      sx={(theme) => ({
+        padding: theme.spacing(2),
+        marginTop: 0,
+        marginBottom: theme.spacing(2),
+        ...(!isUserOfficer &&
+          technicalReview?.submitted && {
+            pointerEvents: 'none',
+            opacity: '0.5',
+          }),
+      })}
     >
       <Typography variant="h6" component="h2" gutterBottom>
         Assign to someone else?

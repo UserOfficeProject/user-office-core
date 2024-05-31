@@ -1,3 +1,4 @@
+import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import Preview from '@mui/icons-material/Preview';
 import Button from '@mui/material/Button';
@@ -5,13 +6,11 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
+import { useTheme } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
 import React, { useState } from 'react';
-import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 
 import {
   Question,
@@ -41,15 +40,6 @@ import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 import QuestionaryEditorTopic from './TemplateTopicEditor';
 
-const useStyles = makeStyles(() => ({
-  modalContainer: {
-    backgroundColor: 'white',
-  },
-  centeredButton: {
-    display: 'flex',
-    margin: '10px auto',
-  },
-}));
 export default function TemplateEditor() {
   const { api } = useDataApiWithFeedback();
   const [
@@ -119,7 +109,6 @@ export default function TemplateEditor() {
 
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
-  const classes = useStyles();
 
   const getTopicListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver
@@ -229,7 +218,7 @@ export default function TemplateEditor() {
     state.steps.length === 0 ? (
       <Button
         variant="outlined"
-        className={classes.centeredButton}
+        sx={{ display: 'flex', margin: '10px auto' }}
         onClick={(): void =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,

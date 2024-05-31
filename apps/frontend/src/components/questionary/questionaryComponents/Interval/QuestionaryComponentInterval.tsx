@@ -5,25 +5,14 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field, getIn } from 'formik';
 import React, { useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { IntervalConfig, Unit } from 'generated/sdk';
 import expressionToFunction from 'utils/expressionToFunction';
-
-const useStyles = makeStyles((theme) => ({
-  unitField: {
-    paddingRight: theme.spacing(1),
-  },
-  singleUnit: {
-    alignItems: 'flex-end',
-    fontSize: '1rem',
-    padding: '0px 5px',
-  },
-}));
 
 type AcceptableUserInput = number | '';
 
@@ -36,6 +25,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
   const {
     question: { id, question },
   } = answer;
+  const theme = useTheme();
   const config = answer.config as IntervalConfig;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
@@ -46,8 +36,6 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
     siMin: AcceptableUserInput;
     siMax: AcceptableUserInput;
   }>(answer.value);
-
-  const classes = useStyles();
 
   const minFieldId = `${id}.min`;
   const maxFieldId = `${id}.max`;
@@ -67,7 +55,14 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
       return <Field type="hidden" value="" name={unitFieldId} />;
     } else if (config.units?.length === 1) {
       return (
-        <FormControl className={`${classes.singleUnit}`} margin="dense">
+        <FormControl
+          sx={{
+            alignItems: 'flex-end',
+            fontSize: '1rem',
+            padding: '0px 5px',
+          }}
+          margin="dense"
+        >
           {stateValue.unit?.symbol}
         </FormControl>
       );
@@ -132,7 +127,13 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             </>
           </FormLabel>
         </Grid>
-        <Grid item xs={3} className={classes.unitField}>
+        <Grid
+          item
+          xs={3}
+          sx={{
+            paddingRight: theme.spacing(1),
+          }}
+        >
           <TextField
             label="Min"
             id={`${id}-Min`}
@@ -160,7 +161,13 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           />
         </Grid>
 
-        <Grid item xs={3} className={classes.unitField}>
+        <Grid
+          item
+          xs={3}
+          sx={{
+            paddingRight: theme.spacing(1),
+          }}
+        >
           <TextField
             label="Max"
             id={`${id}-Max`}
@@ -187,7 +194,13 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             error={isError}
           />
         </Grid>
-        <Grid item xs={6} className={classes.unitField}>
+        <Grid
+          item
+          xs={6}
+          sx={{
+            paddingRight: theme.spacing(1),
+          }}
+        >
           {getUnits()}
         </Grid>
 

@@ -6,7 +6,6 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 type IdleTimeoutPromptProps = {
@@ -14,23 +13,14 @@ type IdleTimeoutPromptProps = {
   onConfirm: () => void;
 };
 
-const useStyles = makeStyles((theme) => ({
-  title: {
-    marginTop: '12px',
-    color: theme.palette.error.main,
-  },
-  body: {
-    display: 'grid',
-    placeItems: 'center',
-  },
-}));
-
 function IdleTimeoutPrompt(props: IdleTimeoutPromptProps): JSX.Element {
-  const classes = useStyles();
-
   return (
     <Dialog fullWidth data-cy="timeout-dialog" open={props.isIdle}>
-      <DialogTitle className={classes.title}>{'Warning'}</DialogTitle>
+      <DialogTitle
+        sx={(theme) => ({ marginTop: '12px', color: theme.palette.error.main })}
+      >
+        {'Warning'}
+      </DialogTitle>
       <DialogContent>
         <DialogContentText>
           {

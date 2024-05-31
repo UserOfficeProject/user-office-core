@@ -8,9 +8,8 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import useTheme from '@mui/material/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
@@ -34,38 +33,13 @@ import { useUserData } from 'hooks/user/useUserData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';
 
-const useStyles = makeStyles((theme) => ({
-  orcIdLabel: {
-    marginBottom: theme.spacing(1),
-  },
-  orcIdLink: {
-    marginTop: theme.spacing(3),
-  },
-  orcidIconSmall: {
-    verticalAlign: 'middle',
-    marginLeft: theme.spacing(0.5),
-    width: '16px',
-    height: '16px',
-    border: '0px',
-  },
-  orcIdContainer: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-    overflow: 'hidden',
-  },
-  chipSpace: {
-    '& > * + *': {
-      margin: theme.spacing(0.5),
-    },
-  },
-}));
-
 interface UpdateUserInformationProps {
   id: number;
 }
 export default function UpdateUserInformation(
   props: UpdateUserInformationProps
 ) {
+  const theme = useTheme();
   const { user } = useContext(UserContext);
   const { userData } = useUserData({ userId: props.id });
   const { format } = useFormattedDateTime({
@@ -78,7 +52,6 @@ export default function UpdateUserInformation(
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const [countriesList, setCountriesList] = useState<Option[]>([]);
-  const classes = useStyles();
 
   const initialValues = {
     username: userData?.username,
@@ -180,7 +153,13 @@ export default function UpdateUserInformation(
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
             User Information
-            <Box className={classes.chipSpace}>
+            <Box
+              sx={{
+                '& > * + *': {
+                  margin: theme.spacing(0.5),
+                },
+              }}
+            >
               {userData.placeholder && (
                 <Chip
                   color="primary"
@@ -274,8 +253,15 @@ export default function UpdateUserInformation(
               <FormControl fullWidth margin="normal">
                 <InputLabel shrink>
                   ORCID iD{' '}
-                  <img
-                    className={classes.orcidIconSmall}
+                  <Box
+                    component="img"
+                    sx={{
+                      verticalAlign: 'middle',
+                      marginLeft: theme.spacing(0.5),
+                      width: '16px',
+                      height: '16px',
+                      border: '0px',
+                    }}
                     src="/images/orcid.png"
                     alt="ORCID iD icon"
                   />
@@ -284,7 +270,7 @@ export default function UpdateUserInformation(
                   href={'https://orcid.org/' + values.oidcSub}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className={classes.orcIdLink}
+                  sx={{ marginTop: theme.spacing(3) }}
                 >
                   https://orcid.org/{values.oidcSub}
                 </Link>

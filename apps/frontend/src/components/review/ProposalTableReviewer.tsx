@@ -61,7 +61,7 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
       : undefined; // if the selected status is not a valid status assume we want to see everything
 
 const columns: (
-  t: TFunction<'translation', undefined, 'translation'>
+  t: TFunction<'translation', undefined>
 ) => Column<UserWithReview>[] = (t) => [
   {
     title: 'Actions',
@@ -325,7 +325,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
                 };
               }
             }),
-          } as UserWithReviewsQuery['me'])
+          }) as UserWithReviewsQuery['me']
       );
     }
   };

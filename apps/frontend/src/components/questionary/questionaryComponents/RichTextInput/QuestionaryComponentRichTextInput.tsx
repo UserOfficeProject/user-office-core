@@ -1,7 +1,8 @@
+import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
-import makeStyles from '@mui/styles/makeStyles';
+import { useTheme } from '@mui/material/styles';
 import { getIn } from 'formik';
 import React, { useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
@@ -9,17 +10,6 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 import Editor from 'components/common/TinyEditor';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { RichTextInputConfig } from 'generated/sdk';
-
-const useStyles = makeStyles((theme) => ({
-  label: {
-    marginBottom: theme.spacing(2),
-  },
-  charactersInfo: {
-    position: 'absolute',
-    right: 0,
-    color: theme.palette.grey[600],
-  },
-}));
 
 export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   const {
@@ -36,7 +26,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   const [stateValue, setStateValue] = useState(value);
   const isError = getIn(touched, id) && !!fieldError;
   const config = answer.config as RichTextInputConfig;
-  const classes = useStyles();
+  const theme = useTheme();
   const [numberOfChars, setNumberOfChars] = useState(0);
 
   const handleCharacterCount = (editor: TinyMCEEditor) => {
@@ -51,7 +41,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
       margin="dense"
       fullWidth
     >
-      <FormLabel className={classes.label}>{question}</FormLabel>
+      <FormLabel sx={{ marginBottom: theme.spacing(2) }}>{question}</FormLabel>
       <Editor
         id={id}
         initialValue={value}
@@ -83,9 +73,16 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
         }}
       />
       {config.max && (
-        <div className={classes.charactersInfo} data-cy="rich-text-char-count">
+        <Box
+          sx={{
+            position: 'absolute',
+            right: 0,
+            color: theme.palette.grey[600],
+          }}
+          data-cy="rich-text-char-count"
+        >
           Characters: {numberOfChars} / {config.max}
-        </div>
+        </Box>
       )}
       {isError && <FormHelperText>{fieldError}</FormHelperText>}
     </FormControl>

@@ -1,17 +1,15 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import LaunchIcon from '@mui/icons-material/Launch';
-import {
-  Autocomplete,
-  Button,
-  Checkbox,
-  IconButton,
-  TextField,
-} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
+import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
+import { useTheme } from '@mui/material/styles';
 import MaterialTextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
+import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
@@ -27,22 +25,6 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-const useStyles = makeStyles((theme) => ({
-  iconVerticalAlign: {
-    verticalAlign: 'middle',
-    marginLeft: theme.spacing(0.5),
-  },
-  textRightAlign: {
-    marginLeft: 'auto',
-    marginRight: 0,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-  },
-}));
-
 export const QuestionNumberForm = (props: QuestionFormProps) => {
   const [show, setShow] = useState(false);
   const field = props.question;
@@ -50,7 +32,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { units, setUnitsWithLoading } = useUnitsData();
   const { api } = useDataApiWithFeedback();
-  const classes = useStyles();
+  const theme = useTheme();
   const [selectedUnits, setSelectedUnits] = useState(numberConfig.units);
 
   const onCreated = (unitAdded: Unit | null): void => {
@@ -181,12 +163,15 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               <Link
                 href="/Units/"
                 target="_blank"
-                className={classes.textRightAlign}
+                sx={{ marginLeft: 'auto', marginRight: 0 }}
               >
                 View/Edit all units
                 <LaunchIcon
                   fontSize="small"
-                  className={classes.iconVerticalAlign}
+                  sx={{
+                    verticalAlign: 'middle',
+                    marginLeft: theme.spacing(0.5),
+                  }}
                 />
               </Link>
             </FormControl>
@@ -230,7 +215,11 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
             }}
           >
             <IconButton
-              className={classes.closeButton}
+              sx={{
+                position: 'absolute',
+                right: theme.spacing(1),
+                top: theme.spacing(1),
+              }}
               data-cy="close-modal-btn"
               onClick={() => {
                 setShow(false);
