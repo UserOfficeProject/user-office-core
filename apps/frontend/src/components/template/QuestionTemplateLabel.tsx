@@ -16,9 +16,7 @@ export default function TemplateEditLabel(props: { pageType: string }) {
         You are editing the question as it appears on the current template
       </label>
     );
-  } else {
-    return (
-      <label className={classes.label}>You are editing the question</label>
-    );
   }
+
+  return <label className={classes.label}>You are editing the question</label>;
 }
