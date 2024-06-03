@@ -207,7 +207,7 @@ const technicalReviewColumns = [
 ];
 
 const instrumentManagementColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
+  t: TFunction<'translation', undefined>
 ) => [
   {
     title: t('instrument'),

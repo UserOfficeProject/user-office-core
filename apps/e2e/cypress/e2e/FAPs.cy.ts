@@ -2187,7 +2187,7 @@ context('Fap meeting components tests', () => {
       cy.finishedLoading();
 
       cy.get(
-        '[data-cy="fap-assignments-table"] [data-cy="select-all-table-rows"]'
+        '[data-cy="fap-assignments-table"] #select-all-table-rows'
       ).click();
 
       cy.get('[data-cy="download-fap-proposals"]').click();

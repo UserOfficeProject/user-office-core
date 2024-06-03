@@ -25,7 +25,7 @@ type FormikUIAutocompleteProps = {
   };
   multiple?: boolean;
   'data-cy'?: string;
-  AdornmentIcon?: MUITextFieldProps;
+  AdornmentIcon?: JSX.Element;
   isOptionEqualToValue?: () => boolean;
 };
 

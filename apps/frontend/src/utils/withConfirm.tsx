@@ -45,7 +45,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
       handleClose();
     }, [onCancel, handleClose]);
     const handleConfirm = useCallback(
-      (...args) => {
+      (...args: [event: React.MouseEvent<HTMLButtonElement, MouseEvent>]) => {
         if (onConfirm) {
           onConfirm(...args);
         }
@@ -55,7 +55,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
     );
     /* Returns function opening the dialog, passed to the wrapped component. */
     const confirm = useCallback(
-      (onConfirm, options: Options) => (): void => {
+      (onConfirm: FunctionType, options: Options) => (): void => {
         setOnConfirm(() => onConfirm);
 
         setOptions({

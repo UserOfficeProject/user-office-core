@@ -29,6 +29,9 @@ export type PartialProposalsDataType = {
       | 'isActive'
       | 'isActiveInternal'
       | 'referenceNumberFormat'
+      | 'startCall'
+      | 'endCall'
+      | 'endCallInternal'
     >
   >;
   proposerId?: number;

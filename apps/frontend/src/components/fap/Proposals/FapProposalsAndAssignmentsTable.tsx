@@ -633,7 +633,7 @@ const FapProposalsAndAssignmentsTable = ({
             headerSelectionProps: {
               inputProps: {
                 'aria-label': 'Select all rows',
-                'data-cy': 'select-all-table-rows',
+                id: 'select-all-table-rows',
               },
             },
           }}

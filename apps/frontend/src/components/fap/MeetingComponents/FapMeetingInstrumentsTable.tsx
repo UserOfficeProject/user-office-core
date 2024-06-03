@@ -71,7 +71,7 @@ const FapMeetingInstrumentsTable = ({
   }));
 
   const FapInstrumentProposalsTableComponent = React.useCallback(
-    ({ rowData }) => {
+    ({ rowData }: { rowData: InstrumentWithAvailabilityTime }) => {
       return (
         <FapInstrumentProposalsTable
           fapId={fapId}

@@ -166,7 +166,7 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
 ];
 
 const instrumentManagementColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
+  t: TFunction<'translation', undefined>
 ) => [
   {
     title: t('instrument'),

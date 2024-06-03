@@ -19,37 +19,6 @@ import ExperimentVisitsTable from './ExperimentVisitsTable';
 
 type RowType = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
 
-const columns = (t: TFunction<'translation', undefined, 'translation'>) => [
-  {
-    title: 'Proposal ID',
-    field: 'proposal.proposalId',
-  },
-  {
-    title: 'Principal investigator',
-    render: (rowData: RowType) => getFullUserName(rowData.proposal.proposer),
-  },
-  {
-    title: 'Proposal',
-    field: 'proposal.title',
-  },
-  {
-    title: 'Experiment start',
-    field: 'startsAtFormatted',
-  },
-  {
-    title: 'Experiment end',
-    field: 'endsAtFormatted',
-  },
-  {
-    title: 'ESI',
-    field: 'esiFormatted',
-  },
-  {
-    title: t('instrument'),
-    field: 'instrument.name',
-  },
-];
-
 function ExperimentTable() {
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<ExperimentUrlQueryParamsType>({
@@ -66,6 +35,44 @@ function ExperimentTable() {
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
+
+  const columns = (t: TFunction<'translation', undefined>) => [
+    {
+      title: 'Proposal ID',
+      field: 'proposal.proposalId',
+    },
+    {
+      title: 'Principal investigator',
+      render: (rowData: RowType) => getFullUserName(rowData.proposal.proposer),
+    },
+    {
+      title: 'Proposal',
+      field: 'proposal.title',
+    },
+    {
+      title: 'Experiment start',
+      field: 'startsAt',
+      render: (rowData: RowType) => toFormattedDateTime(rowData.startsAt),
+    },
+    {
+      title: 'Experiment end',
+      field: 'endsAt',
+      render: (rowData: RowType) => toFormattedDateTime(rowData.endsAt),
+    },
+    {
+      title: 'ESI',
+      render: (rowData: RowType) =>
+        rowData.esi ? (
+          <ProposalEsiDetailsButton esiId={rowData.esi?.id} />
+        ) : (
+          'No ESI'
+        ),
+    },
+    {
+      title: t('instrument'),
+      field: 'instrument.name',
+    },
+  ];
 
   const { t } = useTranslation();
 
@@ -95,20 +102,9 @@ function ExperimentTable() {
     []
   );
 
-  const scheduledEventsFormatted = scheduledEvents.map((evt) => ({
-    ...evt,
-    startsAtFormatted: toFormattedDateTime(evt.startsAt),
-    endsAtFormatted: toFormattedDateTime(evt.endsAt),
-    esiFormatted: evt.esi ? (
-      <ProposalEsiDetailsButton esiId={evt.esi?.id} />
-    ) : (
-      'No ESI'
-    ),
-  }));
-
   return (
     <SuperMaterialTable
-      data={scheduledEventsFormatted}
+      data={scheduledEvents}
       setData={setScheduledEvents}
       icons={tableIcons}
       title={

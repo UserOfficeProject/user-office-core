@@ -242,7 +242,9 @@ const ProposalTable = ({
             tooltip: 'Clone proposal',
             onClick: (_event, rowData) => {
               api()
-                .getProposal({ primaryKey: rowData.primaryKey })
+                .getProposal({
+                  primaryKey: (rowData as PartialProposalsDataType).primaryKey,
+                })
                 .then((result) => {
                   setProposalToClone(result.proposal);
                   setOpenCallSelection(true);

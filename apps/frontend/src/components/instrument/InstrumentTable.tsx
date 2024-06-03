@@ -105,7 +105,7 @@ const InstrumentTable = () => {
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
   const AssignedScientists = React.useCallback(
-    ({ rowData }) => {
+    ({ rowData }: { rowData: InstrumentFragment }) => {
       const removeAssignedScientistFromInstrument = (
         scientistToRemoveId: number,
         instrumentToRemoveFromId: number

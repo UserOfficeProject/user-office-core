@@ -20,7 +20,7 @@ export default function UserExperimentTimesTable() {
           title="Experiment Times"
           options={{
             search: true,
-            padding: 'normal',
+            padding: 'default',
             emptyRowsWhenPaging: true,
             paging: true,
           }}

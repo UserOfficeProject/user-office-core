@@ -93,7 +93,7 @@ class App extends React.Component {
     try {
       errorMessage = JSON.stringify({
         error: error.toString(),
-        errorInfo: errorInfo.componentStack.toString(),
+        errorInfo: errorInfo.componentStack?.toString(),
         user: this.state.errorUserInformation,
       });
     } catch (e) {
