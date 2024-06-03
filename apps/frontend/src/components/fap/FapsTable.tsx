@@ -3,7 +3,7 @@ import Edit from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
-import { Redirect, useHistory } from 'react-router';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -57,7 +57,7 @@ const FapsTable = () => {
   const [isActiveFilter, setIsActiveFilter] = useState<undefined | boolean>(
     true
   );
-  const history = useHistory();
+  const navigate = useNavigate();
   const {
     loadingFaps,
     faps,
@@ -87,7 +87,7 @@ const FapsTable = () => {
   };
 
   if (editFapID) {
-    return <Redirect push to={`/FapPage/${editFapID}`} />;
+    return <Navigate to={`/FapPage/${editFapID}`} />;
   }
 
   const EditIcon = (): JSX.Element => <Edit />;
@@ -123,7 +123,7 @@ const FapsTable = () => {
         <AddFap
           close={(fapAdded: Fap | null | undefined) => {
             setTimeout(() => {
-              history.push(`/FapPage/${fapAdded?.id}`);
+              navigate(`/FapPage/${fapAdded?.id}`);
             });
           }}
         />

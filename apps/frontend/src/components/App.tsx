@@ -5,10 +5,10 @@ import { SnackbarProvider } from 'notistack';
 import React, { ErrorInfo, Suspense } from 'react';
 import {
   BrowserRouter as Router,
-  Redirect,
+  Routes,
   Route,
-  RouteProps,
-  Switch,
+  Navigate,
+  Outlet,
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
@@ -24,51 +24,40 @@ import DashBoard from './DashBoard';
 import Theme from './theme/theme';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
 
-const PrivateRoute = ({ component, ...rest }: RouteProps) => {
-  if (!component) {
-    throw Error('component is undefined');
-  }
+const PrivateOutlet = () => (
+  <UserContext.Consumer>
+    {({ roles, token, currentRole, handleRole }): JSX.Element => {
+      if (!token) {
+        const { queryParams, pathName } = getCurrentUrlValues();
+        const redirectPath = queryParams.size
+          ? `${pathName}?${queryParams.toString()}`
+          : pathName;
+        localStorage.redirectPath = redirectPath;
 
-  const Component = component; // JSX Elements have to be uppercase.
+        return <Navigate to="/external-auth" />;
+      }
 
-  return (
-    <UserContext.Consumer>
-      {({ roles, token, currentRole, handleRole }): JSX.Element => (
-        <Route
-          {...rest}
-          render={(props): JSX.Element => {
-            if (!token) {
-              const { queryParams, pathName } = getCurrentUrlValues();
-              const redirectPath = queryParams.size
-                ? `${pathName}?${queryParams.toString()}`
-                : pathName;
-              localStorage.redirectPath = redirectPath;
+      if (!currentRole) {
+        handleRole(roles[0].shortCode);
+      }
 
-              return <Redirect to="/external-auth" />;
-            }
+      return <Outlet />;
+    }}
+  </UserContext.Consumer>
+);
 
-            if (!currentRole) {
-              handleRole(roles[0].shortCode);
-            }
-
-            return <Component {...props} />;
-          }}
-        />
-      )}
-    </UserContext.Consumer>
-  );
-};
-
-const Routes = () => {
+const DefaultRoutes = () => {
   return (
     <div className="App">
-      <Switch>
-        <Route path="/external-auth/:sessionId" component={ExternalAuth} />
-        <Route path="/external-auth/:token" component={ExternalAuth} />
-        <Route path="/external-auth/:code" component={ExternalAuth} />
-        <Route path="/external-auth/" component={ExternalAuth} />
-        <PrivateRoute path="/" component={DashBoard} />
-      </Switch>
+      <Routes>
+        <Route path="/external-auth/:sessionId" element={<ExternalAuth />} />
+        <Route path="/external-auth/:token" element={<ExternalAuth />} />
+        <Route path="/external-auth/:code" element={<ExternalAuth />} />
+        <Route path="/external-auth/" element={<ExternalAuth />} />
+        <Route path="/" element={<PrivateOutlet />}>
+          <Route path="" element={<DashBoard />} />
+        </Route>
+      </Routes>
     </div>
   );
 };
@@ -146,7 +135,7 @@ class App extends React.Component {
                       <IdleContextPicker>
                         <Router>
                           <QueryParamProvider ReactRouterRoute={Route}>
-                            <Routes />
+                            <DefaultRoutes />
                           </QueryParamProvider>
                         </Router>
                       </IdleContextPicker>

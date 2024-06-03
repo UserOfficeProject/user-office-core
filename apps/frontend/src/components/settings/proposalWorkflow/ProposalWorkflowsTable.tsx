@@ -1,7 +1,7 @@
 import Edit from '@mui/icons-material/Edit';
 import { Typography } from '@mui/material';
 import React from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -32,7 +32,7 @@ const ProposalWorkflowsTable = () => {
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const createModal = (
     onUpdate: FunctionType<void, [ProposalWorkflow | null]>,
@@ -42,7 +42,7 @@ const ProposalWorkflowsTable = () => {
       close={(proposalWorkflow: ProposalWorkflow | null) => {
         onCreate(proposalWorkflow);
 
-        history.push(
+        navigate(
           `/ProposalWorkflowEditor/${(proposalWorkflow as ProposalWorkflow).id}`
         );
       }}
@@ -94,7 +94,7 @@ const ProposalWorkflowsTable = () => {
             icon: EditIcon,
             tooltip: 'Edit',
             onClick: (event, rowData): void =>
-              history.push(
+              navigate(
                 `/ProposalWorkflowEditor/${(rowData as ProposalWorkflow).id}`
               ),
             position: 'row',

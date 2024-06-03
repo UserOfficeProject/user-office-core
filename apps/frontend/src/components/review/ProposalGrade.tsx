@@ -12,7 +12,7 @@ import TextField from '@mui/material/TextField';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import React, { useState, useContext } from 'react';
-import { Prompt } from 'react-router';
+import { unstable_usePrompt } from 'react-router-dom';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -58,6 +58,17 @@ const ProposalGrade = ({
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { settingsMap } = useContext(SettingsContext);
+  const formik = useFormikContext();
+
+  // TODO: Test this prompt
+  unstable_usePrompt({
+    message:
+      'Changes you recently made in this tab will be lost! Are you sure?',
+    when: ({ currentLocation, nextLocation }) =>
+      formik.dirty &&
+      formik.submitCount === 0 &&
+      currentLocation.pathname !== nextLocation.pathname,
+  });
 
   const gradeDecimalPoints = parseFloat(
     settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
@@ -73,17 +84,6 @@ const ProposalGrade = ({
     submitted: review.status === ReviewStatus.SUBMITTED,
     saveOnly: true,
     gradeGuide: fap?.gradeGuide,
-  };
-
-  const PromptIfDirty = () => {
-    const formik = useFormikContext();
-
-    return (
-      <Prompt
-        when={formik.dirty && formik.submitCount === 0}
-        message="Changes you recently made in this tab will be lost! Are you sure?"
-      />
-    );
   };
 
   const isDisabled = (isSubmitting: boolean) =>
@@ -146,7 +146,6 @@ const ProposalGrade = ({
     >
       {({ setFieldValue }) => (
         <Form>
-          <PromptIfDirty />
           <CssBaseline />
           <InputLabel htmlFor="comment" shrink margin="dense" required>
             Comment

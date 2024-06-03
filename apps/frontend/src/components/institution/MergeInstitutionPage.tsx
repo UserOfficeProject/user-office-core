@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import UOLoader from 'components/common/UOLoader';
@@ -20,10 +20,9 @@ type MergeInstitutionPageProps = {
 };
 
 function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
-  const { institutionId: institutionIdQueryParam } = useParams<{
+  const { institutionId } = useParams<{
     institutionId: string;
   }>();
-  const institutionId = parseInt(institutionIdQueryParam); // param is string
 
   const { institutions, loadingInstitutions, setInstitutions } =
     useInstitutionsData();
@@ -39,7 +38,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
   useEffect(() => {
     if (institutionFrom === null && institutionId) {
       setInstitutionFrom(
-        institutions.find((i) => i.id === institutionId) || null
+        institutions.find((i) => i.id === +institutionId) || null
       );
     }
   }, [institutions, institutionId, institutionFrom]);

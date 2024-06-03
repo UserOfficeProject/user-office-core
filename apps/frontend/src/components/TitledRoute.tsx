@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 
-interface PageProps extends RouteProps {
+type PageProps = RouteProps & {
   title: string;
   setHeader: React.Dispatch<React.SetStateAction<string>>;
-}
+};
 
 const TitledRoute = (props: PageProps) => {
   document.title = props.title;

@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -22,7 +22,7 @@ type UpdateInstitutionProps = {
 
 const UpdateInstitution = ({ close, institution }: UpdateInstitutionProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const history = useHistory();
+  const navigate = useNavigate();
   const countries = useCountries();
   const initialValues = institution
     ? {
@@ -107,7 +107,7 @@ const UpdateInstitution = ({ close, institution }: UpdateInstitutionProps) => {
                   data-cy="merge"
                   disabled={isExecutingCall}
                   onClick={() =>
-                    history.push(`/MergeInstitutionsPage/${institution.id}`)
+                    navigate(`/MergeInstitutionsPage/${institution.id}`)
                   }
                 >
                   {isExecutingCall && <UOLoader size={14} />}

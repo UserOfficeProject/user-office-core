@@ -1,7 +1,7 @@
 import MaterialTable, { Column } from '@material-table/core';
 import Button from '@mui/material/Button';
 import React, { useContext, useState, useEffect } from 'react';
-import { Redirect, useHistory } from 'react-router';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { Role } from 'generated/sdk';
@@ -25,7 +25,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
   const { currentRole, token } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
   }, []);
 
   if (!roles) {
-    return <Redirect to="/SignIn" />;
+    return <Navigate to="/SignIn" />;
   }
 
   const selectUserRole = async (role: Role) => {
@@ -67,7 +67,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
       selectedRoleId: role.id,
     });
 
-    history.push('/changeRole', { newToken });
+    navigate('/changeRole', { state: { newToken } });
     onClose();
   };
 

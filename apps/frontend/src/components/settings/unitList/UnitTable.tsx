@@ -3,7 +3,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import React from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -32,7 +32,7 @@ const UnitTable = () => {
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
-  const history = useHistory();
+  const navigate = useNavigate();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] =
@@ -90,7 +90,7 @@ const UnitTable = () => {
               startIcon={<PublishIcon />}
               type="button"
               onClick={() => {
-                history.push('/ImportUnits');
+                navigate('/ImportUnits');
               }}
               data-cy="import-units-button"
             >

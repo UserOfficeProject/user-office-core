@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
 import React, { Fragment, useContext } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
@@ -20,13 +20,13 @@ type ProposalChooseCallProps = {
 };
 
 const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { toFormattedDateTime } = useFormattedDateTime();
   const { isInternalUser } = useContext(UserContext);
 
   const handleSelect = (callId: number, templateId: number | null) => {
     const url = `/ProposalCreate/${callId}/${templateId}`;
-    history.push(url);
+    navigate(url);
   };
 
   return (

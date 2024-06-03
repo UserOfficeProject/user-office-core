@@ -11,7 +11,7 @@ import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/du
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { Prompt } from 'react-router';
+import { unstable_usePrompt } from 'react-router-dom';
 
 import { useCheckAccess } from 'components/common/Can';
 import Editor from 'components/common/TinyEditor';
@@ -47,6 +47,17 @@ const FinalRankingForm = ({
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
+  const formik = useFormikContext();
+
+  // TODO: Test this prompt
+  unstable_usePrompt({
+    message:
+      'Changes you recently made in this tab will be lost! Are you sure?',
+    when: ({ currentLocation, nextLocation }) =>
+      formik.dirty &&
+      formik.submitCount === 0 &&
+      currentLocation.pathname !== nextLocation.pathname,
+  });
 
   const initialData = {
     proposalPk: proposalData.primaryKey,
@@ -65,17 +76,6 @@ const FinalRankingForm = ({
     { text: 'Reserved', value: ProposalEndStatus.RESERVED },
     { text: 'Rejected', value: ProposalEndStatus.REJECTED },
   ];
-
-  const PromptIfDirty = () => {
-    const formik = useFormikContext();
-
-    return (
-      <Prompt
-        when={formik.dirty && formik.submitCount === 0}
-        message="Changes you recently made in this tab will be lost! Are you sure?"
-      />
-    );
-  };
 
   const handleSubmit = async (values: SaveFapMeetingDecisionInput) => {
     const shouldSubmitMeetingDecision =
@@ -151,7 +151,6 @@ const FinalRankingForm = ({
         >
           {({ isSubmitting, setFieldValue, values }): JSX.Element => (
             <Form>
-              <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
                 Fap Meeting form
               </Typography>

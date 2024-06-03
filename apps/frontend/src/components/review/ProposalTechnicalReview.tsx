@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import { Prompt } from 'react-router';
+import { unstable_usePrompt } from 'react-router-dom';
 
 import { useCheckAccess } from 'components/common/Can';
 import {
@@ -60,6 +60,17 @@ const ProposalTechnicalReview = ({
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { user } = useContext(UserContext);
   const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
+  const formik = useFormikContext();
+
+  // TODO: Test this prompt
+  unstable_usePrompt({
+    message:
+      'Changes you recently made in this tab will be lost! Are you sure?',
+    when: ({ currentLocation, nextLocation }) =>
+      formik.dirty &&
+      formik.submitCount === 0 &&
+      currentLocation.pathname !== nextLocation.pathname,
+  });
 
   useEffect(() => {
     if (data.files) {
@@ -88,17 +99,6 @@ const ProposalTechnicalReview = ({
       value: TechnicalReviewStatus.UNFEASIBLE,
     },
   ];
-
-  const PromptIfDirty = () => {
-    const formik = useFormikContext();
-
-    return (
-      <Prompt
-        when={formik.dirty && formik.submitCount === 0}
-        message="Changes you recently made in this tab will be lost! Are you sure?"
-      />
-    );
-  };
 
   const handleUpdateOrSubmit = async (
     values: TechnicalReviewFormType,
@@ -195,7 +195,6 @@ const ProposalTechnicalReview = ({
       >
         {({ isSubmitting, setFieldValue, values }) => (
           <Form>
-            <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
                 <FormControl fullWidth margin="normal">

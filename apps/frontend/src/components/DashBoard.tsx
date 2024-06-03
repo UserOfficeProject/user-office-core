@@ -14,7 +14,7 @@ import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { lazy, Suspense, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -316,31 +316,31 @@ const Dashboard = () => {
             </div>
           }
         >
-          <Switch>
+          <Routes>
             <TitledRoute
               setHeader={setHeader}
               title="Edit Proposal"
               path="/ProposalEdit/:proposalPk"
-              component={ProposalEdit}
+              element={<ProposalEdit />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Select Proposal Type"
               path="/ProposalSelectType"
-              component={() => <ProposalChooseCall callsData={calls} />}
+              element={<ProposalChooseCall callsData={calls} />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Create Proposal"
               path="/ProposalCreate/:callId/:templateId"
-              component={ProposalCreate}
+              element={<ProposalCreate />}
             />
             {isUserManagementEnabled && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Profile"
                 path="/ProfilePage/:id"
-                component={ProfilePage}
+                element={<ProfilePage />}
               />
             )}
             {isUserOfficer && (
@@ -348,56 +348,56 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="User"
                 path="/People/:id"
-                component={UserPage}
+                element={<UserPage />}
               />
             )}
-            {isUserOfficer && <Route path="/People" component={PeoplePage} />}
+            {isUserOfficer && <Route path="/People" element={<PeoplePage />} />}
             <TitledRoute
               setHeader={setHeader}
               title="Proposal"
               path="/Proposals"
-              component={ProposalPage}
+              element={<ProposalPage />}
             />
             {isUserOfficer && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Experiments"
                 path="/ExperimentPage"
-                component={ExperimentPage}
+                element={<ExperimentPage />}
               />
             )}
             <TitledRoute
               setHeader={setHeader}
               title="Page Editor"
               path="/PageEditor"
-              component={PageEditor}
+              element={<PageEditor />}
             />
             {isUserOfficer && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Call"
                 path="/Calls"
-                component={CallPage}
+                element={<CallPage />}
               />
             )}
             <TitledRoute
               setHeader={setHeader}
               title="Help"
               path="/HelpPage"
-              component={HelpPage}
+              element={<HelpPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Change role"
               path="/changeRole"
-              component={ChangeRole}
+              element={<ChangeRole />}
             />
             {isFapEnabled && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Fap"
                 path="/FapPage/:id"
-                component={FapPage}
+                element={<FapPage />}
               />
             )}
             {isFapEnabled && (
@@ -405,7 +405,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Faps"
                 path="/Faps"
-                component={FapsPage}
+                element={<FapsPage />}
               />
             )}
             {isInstrumentManagementEnabled && (
@@ -413,95 +413,95 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title={i18n.format(t('instrument'), 'plural')}
                 path="/Instruments"
-                component={InstrumentsPage}
+                element={<InstrumentsPage />}
               />
             )}
             <TitledRoute
               setHeader={setHeader}
               title="Institution"
               path="/Institutions"
-              component={InstitutionPage}
+              element={<InstitutionPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Merge Institution"
               path="/MergeInstitutionsPage/:institutionId"
-              component={MergeInstitutionsPage}
+              element={<MergeInstitutionsPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Template Editor"
               path="/QuestionaryEditor/:templateId"
-              component={TemplateEditor}
+              element={<TemplateEditor />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="PDF Template Editor"
               path="/PdfTemplateEditor/:templateId"
-              component={PdfTemplateEditor}
+              element={<PdfTemplateEditor />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="PDF Template"
               path="/PdfTemplates"
-              component={PdfTemplatesPage}
+              element={<PdfTemplatesPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Proposal Template"
               path="/ProposalTemplates"
-              component={ProposalTemplatesPage}
+              element={<ProposalTemplatesPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Samples Template"
               path="/SampleDeclarationTemplates"
-              component={SampleTemplatesPage}
+              element={<SampleTemplatesPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Generic Template"
               path="/GenericTemplates"
-              component={GenericTemplatesPage}
+              element={<GenericTemplatesPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Shipment Template"
               path="/ShipmentDeclarationTemplates"
-              component={ShipmentTemplatesPage}
+              element={<ShipmentTemplatesPage />}
             />
             {isVisitManagementEnabled && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Visits Template"
                 path="/VisitTemplates"
-                component={VisitTemplatesPage}
+                element={<VisitTemplatesPage />}
               />
             )}
             <TitledRoute
               setHeader={setHeader}
               title="Feedback Template"
               path="/FeedbackTemplates"
-              component={FeedbackTemplatesPage}
+              element={<FeedbackTemplatesPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Esi Proposal"
               path="/EsiTemplates"
-              component={ProposalEsiPage}
+              element={<ProposalEsiPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Esi Samples"
               path="/SampleEsiTemplates"
-              component={SampleEsiPage}
+              element={<SampleEsiPage />}
             />
             {isUserOfficer && (
               <TitledRoute
                 setHeader={setHeader}
                 title="Units Table"
                 path="/Units"
-                component={UnitTablePage}
+                element={<UnitTablePage />}
               />
             )}
             {isUserOfficer && (
@@ -509,7 +509,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Proposal Status"
                 path="/ProposalStatuses"
-                component={ProposalStatusesPage}
+                element={<ProposalStatusesPage />}
               />
             )}
             {isUserOfficer && (
@@ -517,7 +517,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Proposal Workflows"
                 path="/ProposalWorkflows"
-                component={ProposalWorkflowsPage}
+                element={<ProposalWorkflowsPage />}
               />
             )}
             {isUserOfficer && (
@@ -525,7 +525,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Proposal Workflow Editor"
                 path="/ProposalWorkflowEditor/:workflowId"
-                component={ProposalWorkflowEditor}
+                element={<ProposalWorkflowEditor />}
               />
             )}
             {isSampleSafetyEnabled &&
@@ -534,7 +534,7 @@ const Dashboard = () => {
                   setHeader={setHeader}
                   title="Samples Safety"
                   path="/SampleSafety"
-                  component={SampleSafetyPage}
+                  element={<SampleSafetyPage />}
                 />
               )}
             {isUserOfficer && (
@@ -542,7 +542,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Api Access Tokens"
                 path="/ApiAccessTokens"
-                component={ApiAccessTokensPage}
+                element={<ApiAccessTokensPage />}
               />
             )}
             {isUserOfficer && (
@@ -550,7 +550,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Features"
                 path="/Features"
-                component={FeaturesPage}
+                element={<FeaturesPage />}
               />
             )}
             {isUserOfficer && (
@@ -558,7 +558,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="App settings"
                 path="/Settings"
-                component={AppSettingsPage}
+                element={<AppSettingsPage />}
               />
             )}
             {isSchedulerEnabled && (
@@ -566,7 +566,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="User Experiment TimeTable"
                 path="/ExperimentTimes"
-                component={UserExperimentTimesTable}
+                element={<UserExperimentTimesTable />}
               />
             )}
             {isSchedulerEnabled && (
@@ -574,7 +574,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="InstrSci Upcoming Experiment TimeTable"
                 path="/UpcomingExperimentTimes"
-                component={InstrSciUpcomingExperimentTimesTable}
+                element={<InstrSciUpcomingExperimentTimesTable />}
               />
             )}
             {isUserOfficer && (
@@ -582,7 +582,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Questions"
                 path="/Questions"
-                component={QuestionsPage}
+                element={<QuestionsPage />}
               />
             )}
             {isUserOfficer && (
@@ -590,7 +590,7 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Import Templates"
                 path="/ImportTemplate"
-                component={ImportTemplatePage}
+                element={<ImportTemplatePage />}
               />
             )}
             {isUserOfficer && (
@@ -598,50 +598,48 @@ const Dashboard = () => {
                 setHeader={setHeader}
                 title="Import Units"
                 path="/ImportUnits"
-                component={ImportUnitsPage}
+                element={<ImportUnitsPage />}
               />
             )}
             <TitledRoute
               setHeader={setHeader}
               title="Create Esi Proposal"
               path="/CreateEsi/:scheduledEventId"
-              component={CreateProposalEsiPage}
+              element={<CreateProposalEsiPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Update Esi Proposal"
               path="/UpdateEsi/:esiId"
-              component={UpdateProposalEsiPage}
+              element={<UpdateProposalEsiPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Create Feedback"
               path="/CreateFeedback/:scheduledEventId"
-              component={CreateFeedbackPage}
+              element={<CreateFeedbackPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Update Feedback"
               path="/UpdateFeedback/:feedbackId"
-              component={UpdateFeedbackPage}
+              element={<UpdateFeedbackPage />}
             />
             <TitledRoute
               setHeader={setHeader}
               title="Declare Shipments"
               path="/DeclareShipments/:scheduledEventId"
-              component={DeclareShipmentsPage}
+              element={<DeclareShipmentsPage />}
             />
             <Can
               allowedRoles={[UserRole.USER_OFFICER]}
-              yes={() => <Route component={ProposalPage} />}
+              yes={() => <Route element={<ProposalPage />} />}
               no={() => (
                 <Can
                   allowedRoles={[UserRole.USER]}
                   yes={() => (
                     <Route
-                      render={(props) => (
-                        <OverviewPage {...props} userRole={UserRole.USER} />
-                      )}
+                      element={<OverviewPage userRole={UserRole.USER} />}
                     />
                   )}
                   no={() => (
@@ -655,12 +653,9 @@ const Dashboard = () => {
                       ]}
                       yes={() => (
                         <Route
-                          render={(props) => (
-                            <OverviewPage
-                              {...props}
-                              userRole={currentRole as UserRole}
-                            />
-                          )}
+                          element={
+                            <OverviewPage userRole={currentRole as UserRole} />
+                          }
                         />
                       )}
                     />
@@ -668,7 +663,7 @@ const Dashboard = () => {
                 />
               )}
             />
-          </Switch>
+          </Routes>
         </Suspense>
         {parse(footerContent)}
         <BottomNavigation
