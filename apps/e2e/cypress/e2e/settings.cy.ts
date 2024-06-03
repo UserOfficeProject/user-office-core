@@ -932,10 +932,12 @@ context('Settings tests', () => {
             fapId: 1,
             memberIds: [initialDBData.users.reviewer.id],
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: initialDBData.users.reviewer.id,
+              proposalPk: proposal.primaryKey,
+            },
             fapId: 1,
-            memberIds: [initialDBData.users.reviewer.id],
-            proposalPk: proposal.primaryKey,
           });
         }
       });

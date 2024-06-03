@@ -5,8 +5,8 @@ import {
   AssignProposalsToFapMutationVariables,
   AssignReviewersToFapMutation,
   AssignReviewersToFapMutationVariables,
-  AssignFapReviewersToProposalMutation,
-  AssignFapReviewersToProposalMutationVariables,
+  AssignFapReviewersToProposalsMutation,
+  AssignFapReviewersToProposalsMutationVariables,
   CreateFapMutation,
   CreateFapMutationVariables,
   GetProposalReviewsQuery,
@@ -55,11 +55,11 @@ const assignReviewersToFap = (
   return cy.wrap(request);
 };
 
-const assignFapReviewersToProposal = (
-  assignFapReviewersToProposalInput: AssignFapReviewersToProposalMutationVariables
-): Cypress.Chainable<AssignFapReviewersToProposalMutation> => {
+const assignFapReviewersToProposals = (
+  assignFapReviewersToProposalInput: AssignFapReviewersToProposalsMutationVariables
+): Cypress.Chainable<AssignFapReviewersToProposalsMutation> => {
   const api = getE2EApi();
-  const request = api.assignFapReviewersToProposal(
+  const request = api.assignFapReviewersToProposals(
     assignFapReviewersToProposalInput
   );
 
@@ -98,8 +98,8 @@ Cypress.Commands.add('assignChairOrSecretary', assignChairOrSecretary);
 Cypress.Commands.add('assignReviewersToFap', assignReviewersToFap);
 Cypress.Commands.add('assignProposalsToFap', assignProposalsToFap);
 Cypress.Commands.add(
-  'assignFapReviewersToProposal',
-  assignFapReviewersToProposal
+  'assignFapReviewersToProposals',
+  assignFapReviewersToProposals
 );
 Cypress.Commands.add('getProposalReviews', getProposalReviews);
 Cypress.Commands.add('updateReview', updateReview);
