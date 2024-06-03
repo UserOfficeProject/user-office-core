@@ -471,7 +471,8 @@ export default class PostgresFapDataSource implements FapDataSource {
         'p.status_id': 'ps.proposal_status_id',
       })
       .where('sp.fap_id', fapId)
-      .andWhere('ihp.instrument_id', instrumentId);
+      .andWhere('ihp.instrument_id', instrumentId)
+      .andWhere('p.submitted', true);
 
     return fapProposals.map((fapProposal) =>
       createFapProposalObject(fapProposal)
