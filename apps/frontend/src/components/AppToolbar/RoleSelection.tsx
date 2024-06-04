@@ -67,7 +67,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
       selectedRoleId: role.id,
     });
 
-    navigate('/changeRole', { state: { newToken } });
+    navigate('/ChangeRole', { state: { newToken } });
     onClose();
   };
 

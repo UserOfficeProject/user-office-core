@@ -11,6 +11,7 @@ import {
   Outlet,
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
@@ -134,7 +135,7 @@ class App extends React.Component {
                     <DownloadContextProvider>
                       <IdleContextPicker>
                         <Router>
-                          <QueryParamProvider ReactRouterRoute={Route}>
+                          <QueryParamProvider adapter={ReactRouter6Adapter}>
                             <DefaultRoutes />
                           </QueryParamProvider>
                         </Router>

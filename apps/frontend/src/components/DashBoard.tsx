@@ -317,321 +317,512 @@ const Dashboard = () => {
           }
         >
           <Routes>
-            <TitledRoute
-              setHeader={setHeader}
-              title="Edit Proposal"
+            <Route
               path="/ProposalEdit/:proposalPk"
-              element={<ProposalEdit />}
+              element={
+                <TitledRoute
+                  title="Edit Proposal"
+                  setHeader={setHeader}
+                  element={<ProposalEdit />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Select Proposal Type"
+            <Route
               path="/ProposalSelectType"
-              element={<ProposalChooseCall callsData={calls} />}
+              element={
+                <TitledRoute
+                  title="Select Proposal Type"
+                  setHeader={setHeader}
+                  element={<ProposalChooseCall callsData={calls} />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Create Proposal"
+            <Route
               path="/ProposalCreate/:callId/:templateId"
-              element={<ProposalCreate />}
+              element={
+                <TitledRoute
+                  title="Create Proposal"
+                  setHeader={setHeader}
+                  element={<ProposalCreate />}
+                />
+              }
             />
             {isUserManagementEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Profile"
+              <Route
                 path="/ProfilePage/:id"
-                element={<ProfilePage />}
+                element={
+                  <TitledRoute
+                    title="Profile"
+                    setHeader={setHeader}
+                    element={<ProfilePage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="User"
+              <Route
                 path="/People/:id"
-                element={<UserPage />}
+                element={
+                  <TitledRoute
+                    title="User"
+                    setHeader={setHeader}
+                    element={<UserPage />}
+                  />
+                }
               />
             )}
-            {isUserOfficer && <Route path="/People" element={<PeoplePage />} />}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Proposal"
+            {isUserOfficer && (
+              <Route
+                path="/People"
+                element={
+                  <TitledRoute
+                    title="People"
+                    setHeader={setHeader}
+                    element={<PeoplePage />}
+                  />
+                }
+              />
+            )}
+            <Route
               path="/Proposals"
-              element={<ProposalPage />}
+              element={
+                <TitledRoute
+                  title="Proposals"
+                  setHeader={setHeader}
+                  element={<ProposalPage />}
+                />
+              }
             />
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Experiments"
+              <Route
                 path="/ExperimentPage"
-                element={<ExperimentPage />}
+                element={
+                  <TitledRoute
+                    title="Experiments"
+                    setHeader={setHeader}
+                    element={<ExperimentPage />}
+                  />
+                }
               />
             )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Page Editor"
+            <Route
               path="/PageEditor"
-              element={<PageEditor />}
+              element={
+                <TitledRoute
+                  title="Page Editor"
+                  setHeader={setHeader}
+                  element={<PageEditor />}
+                />
+              }
             />
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Call"
+              <Route
                 path="/Calls"
-                element={<CallPage />}
+                element={
+                  <TitledRoute
+                    title="Calls"
+                    setHeader={setHeader}
+                    element={<CallPage />}
+                  />
+                }
               />
             )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Help"
+            <Route
               path="/HelpPage"
-              element={<HelpPage />}
+              element={
+                <TitledRoute
+                  title="Help"
+                  setHeader={setHeader}
+                  element={<HelpPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Change role"
-              path="/changeRole"
-              element={<ChangeRole />}
+            <Route
+              path="/ChangeRole"
+              element={
+                <TitledRoute
+                  title="Change role"
+                  setHeader={setHeader}
+                  element={<ChangeRole />}
+                />
+              }
             />
             {isFapEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Fap"
+              <Route
                 path="/FapPage/:id"
-                element={<FapPage />}
+                element={
+                  <TitledRoute
+                    title="Fap"
+                    setHeader={setHeader}
+                    element={<FapPage />}
+                  />
+                }
               />
             )}
             {isFapEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Faps"
+              <Route
                 path="/Faps"
-                element={<FapsPage />}
+                element={
+                  <TitledRoute
+                    title="Faps"
+                    setHeader={setHeader}
+                    element={<FapsPage />}
+                  />
+                }
               />
             )}
             {isInstrumentManagementEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title={i18n.format(t('instrument'), 'plural')}
+              <Route
                 path="/Instruments"
-                element={<InstrumentsPage />}
+                element={
+                  <TitledRoute
+                    title={i18n.format(t('instrument'), 'plural')}
+                    setHeader={setHeader}
+                    element={<InstrumentsPage />}
+                  />
+                }
               />
             )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Institution"
+            <Route
               path="/Institutions"
-              element={<InstitutionPage />}
+              element={
+                <TitledRoute
+                  title="Institutions"
+                  setHeader={setHeader}
+                  element={<InstitutionPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Merge Institution"
+            <Route
               path="/MergeInstitutionsPage/:institutionId"
-              element={<MergeInstitutionsPage />}
+              element={
+                <TitledRoute
+                  title="Merge Institutions"
+                  setHeader={setHeader}
+                  element={<MergeInstitutionsPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Template Editor"
+            <Route
               path="/QuestionaryEditor/:templateId"
-              element={<TemplateEditor />}
+              element={
+                <TitledRoute
+                  title="Template Editor"
+                  setHeader={setHeader}
+                  element={<TemplateEditor />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="PDF Template Editor"
+            <Route
               path="/PdfTemplateEditor/:templateId"
-              element={<PdfTemplateEditor />}
+              element={
+                <TitledRoute
+                  title="PDF Template Editor"
+                  setHeader={setHeader}
+                  element={<PdfTemplateEditor />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="PDF Template"
+            <Route
               path="/PdfTemplates"
-              element={<PdfTemplatesPage />}
+              element={
+                <TitledRoute
+                  title="PDF Templates"
+                  setHeader={setHeader}
+                  element={<PdfTemplatesPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Proposal Template"
+            <Route
               path="/ProposalTemplates"
-              element={<ProposalTemplatesPage />}
+              element={
+                <TitledRoute
+                  title="Proposal Templates"
+                  setHeader={setHeader}
+                  element={<ProposalTemplatesPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Samples Template"
+            <Route
               path="/SampleDeclarationTemplates"
-              element={<SampleTemplatesPage />}
+              element={
+                <TitledRoute
+                  title="Sample Templates"
+                  setHeader={setHeader}
+                  element={<SampleTemplatesPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Generic Template"
+            <Route
               path="/GenericTemplates"
-              element={<GenericTemplatesPage />}
+              element={
+                <TitledRoute
+                  title="Generic Templates"
+                  setHeader={setHeader}
+                  element={<GenericTemplatesPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Shipment Template"
+            <Route
               path="/ShipmentDeclarationTemplates"
-              element={<ShipmentTemplatesPage />}
+              element={
+                <TitledRoute
+                  title="Shipment Templates"
+                  setHeader={setHeader}
+                  element={<ShipmentTemplatesPage />}
+                />
+              }
             />
             {isVisitManagementEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Visits Template"
+              <Route
                 path="/VisitTemplates"
-                element={<VisitTemplatesPage />}
+                element={
+                  <TitledRoute
+                    title="Visit Templates"
+                    setHeader={setHeader}
+                    element={<VisitTemplatesPage />}
+                  />
+                }
               />
             )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Feedback Template"
+            <Route
               path="/FeedbackTemplates"
-              element={<FeedbackTemplatesPage />}
+              element={
+                <TitledRoute
+                  title="Feedback Templates"
+                  setHeader={setHeader}
+                  element={<FeedbackTemplatesPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Esi Proposal"
+            <Route
               path="/EsiTemplates"
-              element={<ProposalEsiPage />}
+              element={
+                <TitledRoute
+                  title="Proposal ESI Templates"
+                  setHeader={setHeader}
+                  element={<ProposalEsiPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Esi Samples"
+            <Route
               path="/SampleEsiTemplates"
-              element={<SampleEsiPage />}
+              element={
+                <TitledRoute
+                  title="Sample ESI Templates"
+                  setHeader={setHeader}
+                  element={<SampleEsiPage />}
+                />
+              }
             />
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Units Table"
+              <Route
                 path="/Units"
-                element={<UnitTablePage />}
+                element={
+                  <TitledRoute
+                    title="Units"
+                    setHeader={setHeader}
+                    element={<UnitTablePage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Proposal Status"
+              <Route
                 path="/ProposalStatuses"
-                element={<ProposalStatusesPage />}
+                element={
+                  <TitledRoute
+                    title="Proposal Statuses"
+                    setHeader={setHeader}
+                    element={<ProposalStatusesPage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Proposal Workflows"
+              <Route
                 path="/ProposalWorkflows"
-                element={<ProposalWorkflowsPage />}
+                element={
+                  <TitledRoute
+                    title="Proposal Workflows"
+                    setHeader={setHeader}
+                    element={<ProposalWorkflowsPage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Proposal Workflow Editor"
+              <Route
                 path="/ProposalWorkflowEditor/:workflowId"
-                element={<ProposalWorkflowEditor />}
+                element={
+                  <TitledRoute
+                    title="Proposal Workflow Editor"
+                    setHeader={setHeader}
+                    element={<ProposalWorkflowEditor />}
+                  />
+                }
               />
             )}
             {isSampleSafetyEnabled &&
               (isSampleSafetyReviewer || isUserOfficer) && (
-                <TitledRoute
-                  setHeader={setHeader}
-                  title="Samples Safety"
+                <Route
                   path="/SampleSafety"
-                  element={<SampleSafetyPage />}
+                  element={
+                    <TitledRoute
+                      title="Samples Safety"
+                      setHeader={setHeader}
+                      element={<SampleSafetyPage />}
+                    />
+                  }
                 />
               )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Api Access Tokens"
+              <Route
                 path="/ApiAccessTokens"
-                element={<ApiAccessTokensPage />}
+                element={
+                  <TitledRoute
+                    title="Api Access Tokens"
+                    setHeader={setHeader}
+                    element={<ApiAccessTokensPage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Features"
+              <Route
                 path="/Features"
-                element={<FeaturesPage />}
+                element={
+                  <TitledRoute
+                    title="Features"
+                    setHeader={setHeader}
+                    element={<FeaturesPage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="App settings"
+              <Route
                 path="/Settings"
-                element={<AppSettingsPage />}
+                element={
+                  <TitledRoute
+                    title="App Settings"
+                    setHeader={setHeader}
+                    element={<AppSettingsPage />}
+                  />
+                }
               />
             )}
             {isSchedulerEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="User Experiment TimeTable"
+              <Route
                 path="/ExperimentTimes"
-                element={<UserExperimentTimesTable />}
+                element={
+                  <TitledRoute
+                    title="User Experiment Times"
+                    setHeader={setHeader}
+                    element={<UserExperimentTimesTable />}
+                  />
+                }
               />
             )}
             {isSchedulerEnabled && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="InstrSci Upcoming Experiment TimeTable"
+              <Route
                 path="/UpcomingExperimentTimes"
-                element={<InstrSciUpcomingExperimentTimesTable />}
+                element={
+                  <TitledRoute
+                    title="Upcoming Experiment Times"
+                    setHeader={setHeader}
+                    element={<InstrSciUpcomingExperimentTimesTable />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Questions"
+              <Route
                 path="/Questions"
-                element={<QuestionsPage />}
+                element={
+                  <TitledRoute
+                    title="Questions"
+                    setHeader={setHeader}
+                    element={<QuestionsPage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Import Templates"
+              <Route
                 path="/ImportTemplate"
-                element={<ImportTemplatePage />}
+                element={
+                  <TitledRoute
+                    title="Import Templates"
+                    setHeader={setHeader}
+                    element={<ImportTemplatePage />}
+                  />
+                }
               />
             )}
             {isUserOfficer && (
-              <TitledRoute
-                setHeader={setHeader}
-                title="Import Units"
+              <Route
                 path="/ImportUnits"
-                element={<ImportUnitsPage />}
+                element={
+                  <TitledRoute
+                    title="Import Units"
+                    setHeader={setHeader}
+                    element={<ImportUnitsPage />}
+                  />
+                }
               />
             )}
-            <TitledRoute
-              setHeader={setHeader}
-              title="Create Esi Proposal"
+            <Route
               path="/CreateEsi/:scheduledEventId"
-              element={<CreateProposalEsiPage />}
+              element={
+                <TitledRoute
+                  title="Create ESI Proposal"
+                  setHeader={setHeader}
+                  element={<CreateProposalEsiPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Update Esi Proposal"
+            <Route
               path="/UpdateEsi/:esiId"
-              element={<UpdateProposalEsiPage />}
+              element={
+                <TitledRoute
+                  title="Update ESI Proposal"
+                  setHeader={setHeader}
+                  element={<UpdateProposalEsiPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Create Feedback"
+            <Route
               path="/CreateFeedback/:scheduledEventId"
-              element={<CreateFeedbackPage />}
+              element={
+                <TitledRoute
+                  title="Create Feedback"
+                  setHeader={setHeader}
+                  element={<CreateFeedbackPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Update Feedback"
+            <Route
               path="/UpdateFeedback/:feedbackId"
-              element={<UpdateFeedbackPage />}
+              element={
+                <TitledRoute
+                  title="Update Feedback"
+                  setHeader={setHeader}
+                  element={<UpdateFeedbackPage />}
+                />
+              }
             />
-            <TitledRoute
-              setHeader={setHeader}
-              title="Declare Shipments"
+            <Route
               path="/DeclareShipments/:scheduledEventId"
-              element={<DeclareShipmentsPage />}
+              element={
+                <TitledRoute
+                  title="Declare Shipments"
+                  setHeader={setHeader}
+                  element={<DeclareShipmentsPage />}
+                />
+              }
             />
-            <Can
+            {/* <Can
               allowedRoles={[UserRole.USER_OFFICER]}
               yes={() => <Route element={<ProposalPage />} />}
               no={() => (
@@ -662,7 +853,7 @@ const Dashboard = () => {
                   )}
                 />
               )}
-            />
+            /> */}
           </Routes>
         </Suspense>
         {parse(footerContent)}
