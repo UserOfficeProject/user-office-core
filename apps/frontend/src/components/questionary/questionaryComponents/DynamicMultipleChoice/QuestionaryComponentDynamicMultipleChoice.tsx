@@ -16,14 +16,7 @@ import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { DynamicMultipleChoiceConfig } from 'generated/sdk';
 import { useGetDynamicMultipleChoiceOptions } from 'hooks/template/useGetDynamicMultipleChoiceOptions';
-
-const toArray = (input: string | string[]): string[] => {
-  if (typeof input === 'string') {
-    return [input];
-  }
-
-  return input;
-};
+import { toArray } from 'utils/helperFunctions';
 
 const useStyles = makeStyles(() => ({
   horizontalLayout: {
@@ -109,8 +102,8 @@ export function QuestionaryComponentDynamicMultipleChoice(
               config.isMultipleSelect
                 ? stateValue
                 : stateValue.length > 0
-                ? stateValue[0]
-                : ''
+                  ? stateValue[0]
+                  : ''
             }
             onChange={handleOnChange}
             multiple={config.isMultipleSelect}

@@ -3,11 +3,12 @@ import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
-import { IconButton, Tooltip, Typography } from '@mui/material';
+import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import React, { useContext, useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { useCheckAccess } from 'components/common/Can';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -222,11 +223,11 @@ const FapProposalsAndAssignmentsTable = ({
   ): Promise<void> => {
     await api({
       toastSuccessMessage: 'Assignment/s removed',
-    }).removeProposalsFromFap({
+    }).removeProposalsFromFaps({
       proposalPks: proposalsToRemove.map(
         (proposalToRemove) => proposalToRemove.proposalPk
       ),
-      fapId: data.id,
+      fapIds: [data.id],
     });
 
     setFapProposalsData((fapProposalData) =>
@@ -251,6 +252,24 @@ const FapProposalsAndAssignmentsTable = ({
       description:
         'Are you sure you want to remove the selected proposal/s from this Fap?',
     })();
+  };
+
+  const massAssignFapProposalsToMembers = async () => {
+    const updatedFap = (
+      await api({
+        toastSuccessMessage: 'Members assigned',
+      }).massAssignFapReviews({
+        fapId: data.id,
+      })
+    ).massAssignFapReviews;
+
+    const updatedFapProposals =
+      (await api().getFapProposals({ fapId: data.id, callId: selectedCallId }))
+        .fapProposals || [];
+
+    setFapProposalsData(updatedFapProposals);
+
+    onAssignmentsUpdate(updatedFap);
   };
 
   const assignMemberToFapProposal = async (
@@ -289,6 +308,7 @@ const FapProposalsAndAssignmentsTable = ({
               dateAssigned: DateTime.now(),
               user,
               role,
+              rank: null,
               review:
                 proposalReviews.find(({ userID }) => userID === user.id) ??
                 null,
@@ -618,6 +638,18 @@ const FapProposalsAndAssignmentsTable = ({
             },
           }}
         />
+        {hasRightToAssignReviewers ? (
+          <ActionButtonContainer>
+            <Button
+              type="button"
+              onClick={() => massAssignFapProposalsToMembers()}
+              data-cy="mass-assign-reviews"
+              disabled={!FapProposalsData.length}
+            >
+              Assign all reviews
+            </Button>
+          </ActionButtonContainer>
+        ) : null}
       </div>
     </>
   );

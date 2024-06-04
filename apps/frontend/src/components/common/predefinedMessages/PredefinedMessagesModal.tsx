@@ -13,8 +13,8 @@ import { usePredefinedMessagesData } from 'hooks/predefinedMessage/usePredefined
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import UOLoader from '../UOLoader';
 import { PredefinedMessageKey } from './FormikUIPredefinedMessagesTextField';
+import UOLoader from '../UOLoader';
 
 type PredefinedMessagesModalProps = {
   open: boolean;
@@ -203,7 +203,6 @@ const PredefinedMessagesModal = ({
       ) : (
         <Formik
           initialValues={initialValues}
-          // validationSchema={administrationProposalValidationSchema}
           onSubmit={async (values): Promise<void> => {
             if (!values.message || !values?.title) {
               return;

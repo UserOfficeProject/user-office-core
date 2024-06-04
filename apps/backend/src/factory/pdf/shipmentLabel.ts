@@ -27,7 +27,7 @@ export type ShipmentPDFData = {
   shipment: Shipment & {
     proposalId: string;
     callShortCode: string;
-    instrumentShortCode: string;
+    instrumentShortCodes: string;
     weight: number;
     width: number;
     height: number;
@@ -136,13 +136,15 @@ const getInstrumentData = async (proposalPk: number) => {
     Tokens.InstrumentDataSource
   );
 
-  const instrument = await dataSource.getInstrumentByProposalPk(proposalPk);
-  if (!instrument) {
-    throw new Error(`Instrument not found for proposalPk: ${proposalPk}`);
+  const instruments = await dataSource.getInstrumentsByProposalPk(proposalPk);
+  if (!instruments?.length) {
+    throw new Error(`Instruments not found for proposalPk: ${proposalPk}`);
   }
 
   return {
-    instrumentShortCode: instrument.shortCode,
+    instrumentShortCodes: instruments
+      .map((instrument) => instrument.shortCode)
+      .join(', '),
   };
 };
 
@@ -162,9 +164,8 @@ const getScheduledEvent = async (scheduledEventId: number) => {
     Tokens.ScheduledEventDataSource
   );
 
-  const scheduledEvent = await dataSource.getScheduledEventCore(
-    scheduledEventId
-  );
+  const scheduledEvent =
+    await dataSource.getScheduledEventCore(scheduledEventId);
   if (!scheduledEvent) {
     throw new Error(`User not found for userId: ${scheduledEventId}`);
   }

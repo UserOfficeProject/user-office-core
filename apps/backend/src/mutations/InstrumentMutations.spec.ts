@@ -71,21 +71,36 @@ describe('Test Instrument Mutations', () => {
     ).resolves.toBe(dummyInstrument);
   });
 
-  test('A logged in user officer can assign proposal/s to instrument', () => {
+  test('A logged in user officer can assign proposal/s to instrument', async () => {
     return expect(
-      instrumentMutations.assignProposalsToInstrument(
+      instrumentMutations.assignProposalsToInstruments(
         dummyUserOfficerWithRole,
         {
-          proposals: [
-            { primaryKey: 1, callId: 1 },
-            { primaryKey: 2, callId: 1 },
-          ],
-          instrumentId: 1,
+          proposalPks: [1, 2],
+          instrumentIds: [1],
         }
       )
     ).resolves.toEqual({
+      instrumentHasProposalIds: [1, 2],
       proposalPks: [1, 2],
-      instrumentId: 1,
+      instrumentIds: [1],
+      submitted: false,
+    });
+  });
+
+  test('A logged in user officer can assign proposal/s to multiple instruments', async () => {
+    return expect(
+      instrumentMutations.assignProposalsToInstruments(
+        dummyUserOfficerWithRole,
+        {
+          proposalPks: [1, 2],
+          instrumentIds: [1, 2],
+        }
+      )
+    ).resolves.toEqual({
+      instrumentHasProposalIds: [1, 2, 3, 4],
+      proposalPks: [1, 2],
+      instrumentIds: [1, 2],
       submitted: false,
     });
   });

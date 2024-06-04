@@ -42,9 +42,8 @@ async function getAnswer(
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
-  const question = await templateDataSource.getQuestionByNaturalKey(
-    questionKey
-  );
+  const question =
+    await templateDataSource.getQuestionByNaturalKey(questionKey);
   if (!question) {
     throw createAndLogError(
       `Template is not properly configured. Question ${questionKey} not found`,
@@ -125,10 +124,11 @@ export async function createContainer(shipmentId: number) {
   const senderName = await getAnswer(qid, SHIPMENT_SENDER_NAME_KEY);
   const senderEmail = await getAnswer(qid, SHIPMENT_SENDER_EMAIL_KEY);
   const senderPhone = await getAnswer(qid, SHIPMENT_SENDER_PHONE_KEY);
-  const instrument = await instrumentDataSource.getInstrumentByProposalPk(
+  const instruments = await instrumentDataSource.getInstrumentsByProposalPk(
     proposal.primaryKey
   );
 
+  // TODO: Review the instruments code representation
   const request = getRequest(
     partCode,
     proposal.proposalId,
@@ -149,7 +149,7 @@ export async function createContainer(shipmentId: number) {
     senderName ?? 'No value',
     senderEmail ?? 'No value',
     senderPhone ?? 'No value',
-    instrument?.shortCode ?? 'No value'
+    instruments?.map((instrument) => instrument.shortCode) ?? ['No value']
   );
 
   const response = await performApiRequest(request);

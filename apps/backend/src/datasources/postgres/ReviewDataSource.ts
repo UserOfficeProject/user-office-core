@@ -1,3 +1,5 @@
+import { GraphQLError } from 'graphql';
+
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
@@ -9,6 +11,7 @@ import database from './database';
 import {
   createReviewObject,
   createTechnicalReviewObject,
+  InstrumentHasProposalRecord,
   ReviewRecord,
   TechnicalReviewRecord,
 } from './records';
@@ -27,6 +30,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       reviewerId,
       submitted = false,
       files,
+      instrumentId,
     } = args;
 
     if (shouldUpdateReview) {
@@ -43,10 +47,24 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         })
         .from('technical_review')
         .where('proposal_pk', proposalPk)
+        .andWhere('instrument_id', instrumentId)
         .returning('*')
         .then((records: TechnicalReviewRecord[]) =>
           createTechnicalReviewObject(records[0])
         );
+    }
+
+    const instrumentHasProposalRecord = await database
+      .select<InstrumentHasProposalRecord>('*')
+      .from('instrument_has_proposals')
+      .where('instrument_id', instrumentId)
+      .andWhere('proposal_pk', proposalPk)
+      .first();
+
+    if (!instrumentHasProposalRecord) {
+      throw new GraphQLError(
+        `Could not create technical review for proposal ${proposalPk} with instrument: ${instrumentId}`
+      );
     }
 
     return database
@@ -59,6 +77,9 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         submitted,
         reviewer_id: reviewerId,
         files,
+        instrument_id: instrumentId,
+        instrument_has_proposals_id:
+          instrumentHasProposalRecord.instrument_has_proposals_id,
       })
       .returning('*')
       .into('technical_review')
@@ -67,11 +88,30 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       );
   }
 
-  async getTechnicalReview(id: number): Promise<TechnicalReview | null> {
+  async getTechnicalReviews(id: number): Promise<TechnicalReview[] | null> {
     return database
       .select()
       .from('technical_review')
       .where('proposal_pk', id)
+      .orderBy('technical_review_id')
+      .then((reviews: TechnicalReviewRecord[]) => {
+        return reviews.map((review) => createTechnicalReviewObject(review));
+      });
+  }
+
+  async getProposalInstrumentTechnicalReview(
+    proposalId: number,
+    instrumentId?: number
+  ): Promise<TechnicalReview | null> {
+    return database
+      .select()
+      .from('technical_review')
+      .where('proposal_pk', proposalId)
+      .modify((query) => {
+        if (instrumentId) {
+          query.andWhere('instrument_id', instrumentId);
+        }
+      })
       .first()
       .then((review: TechnicalReviewRecord) => {
         if (review === undefined) {
@@ -162,7 +202,12 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return database
       .select()
       .from('fap_reviews')
-      .where('proposal_pk', id)
+      .join('fap_assignments', {
+        'fap_assignments.proposal_pk': 'fap_reviews.proposal_pk',
+        'fap_assignments.fap_member_user_id': 'fap_reviews.user_id',
+      })
+      .where('fap_reviews.proposal_pk', id)
+      .orderBy('fap_assignments.rank', 'asc')
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => createReviewObject(review));
       });

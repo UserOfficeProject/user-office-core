@@ -28,9 +28,7 @@ const FapMeetingComponentsView = ({
     }
   }, [calls, query.call, setQuery]);
 
-  const getSelectedCall = () => {
-    return calls.find((call) => call.id === query.call);
-  };
+  const selectedCall = calls.find((call) => call.id === query.call);
 
   return (
     <>
@@ -43,11 +41,13 @@ const FapMeetingComponentsView = ({
           />
         </Grid>
       </Grid>
-      <FapMeetingInstrumentsTable
-        fapId={fapId}
-        selectedCall={getSelectedCall()}
-        code={code}
-      />
+      {selectedCall ? (
+        <FapMeetingInstrumentsTable
+          fapId={fapId}
+          selectedCall={selectedCall}
+          code={code}
+        />
+      ) : null}
     </>
   );
 };

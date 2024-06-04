@@ -24,63 +24,65 @@ const useStyles = makeStyles((theme) => ({
 
 type FapMeetingDecisionProps = {
   fapMeetingDecision: Maybe<FapMeetingDecisionType>;
-  fap: Maybe<Pick<Fap, 'id' | 'code'>>;
+  faps: Maybe<Pick<Fap, 'id' | 'code'>[]>;
 };
 
 const FapMeetingDecision = ({
   fapMeetingDecision,
-  fap,
+  faps,
 }: FapMeetingDecisionProps) => {
   const classes = useStyles();
 
   return (
-    <div data-cy="Fap-meeting-components-decision">
-      <StyledPaper margin={[2, 0]}>
-        <Typography
-          variant="h6"
-          component="h2"
-          className={classes.heading}
-          gutterBottom
-        >
-          {fap?.code} - Fap Meeting decision
-        </Typography>
-        <Table>
-          <TableBody>
-            <TableRow key="statusAndTime">
-              <TableCell width="25%" className={classes.textBold}>
-                Rank
-              </TableCell>
-              <TableCell width="25%">
-                {fapMeetingDecision?.rankOrder || '-'}
-              </TableCell>
-              <TableCell width="25%" className={classes.textBold}>
-                Fap meeting recommendation
-              </TableCell>
-              <TableCell width="25%">
-                {fapMeetingDecision?.recommendation || '-'}
-              </TableCell>
-            </TableRow>
-            <TableRow key="comments">
-              <TableCell className={classes.textBold}>
-                Comment for management
-              </TableCell>
-              <TableCell
-                dangerouslySetInnerHTML={{
-                  __html: fapMeetingDecision?.commentForManagement || '-',
-                }}
-              />
-              <TableCell className={classes.textBold}>
-                Comment for user
-              </TableCell>
-              <TableCell
-                dangerouslySetInnerHTML={{
-                  __html: fapMeetingDecision?.commentForUser || '-',
-                }}
-              />
-            </TableRow>
-          </TableBody>
-        </Table>
-      </StyledPaper>
+    <div data-cy="faps-meeting-components-decision">
+      {faps?.map((fap) => (
+        <StyledPaper key={fap.id} margin={[2, 0]}>
+          <Typography
+            variant="h6"
+            component="h2"
+            className={classes.heading}
+            gutterBottom
+          >
+            {fap?.code} - Fap Meeting decision
+          </Typography>
+          <Table>
+            <TableBody>
+              <TableRow key="statusAndTime">
+                <TableCell width="25%" className={classes.textBold}>
+                  Rank
+                </TableCell>
+                <TableCell width="25%">
+                  {fapMeetingDecision?.rankOrder || '-'}
+                </TableCell>
+                <TableCell width="25%" className={classes.textBold}>
+                  Fap meeting recommendation
+                </TableCell>
+                <TableCell width="25%">
+                  {fapMeetingDecision?.recommendation || '-'}
+                </TableCell>
+              </TableRow>
+              <TableRow key="comments">
+                <TableCell className={classes.textBold}>
+                  Comment for management
+                </TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: fapMeetingDecision?.commentForManagement || '-',
+                  }}
+                />
+                <TableCell className={classes.textBold}>
+                  Comment for user
+                </TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: fapMeetingDecision?.commentForUser || '-',
+                  }}
+                />
+              </TableRow>
+            </TableBody>
+          </Table>
+        </StyledPaper>
+      ))}
     </div>
   );
 };

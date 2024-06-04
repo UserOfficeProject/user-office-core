@@ -31,20 +31,6 @@ context('Scheduler tests', () => {
       scientistIds: [scientist.id],
     });
 
-    cy.assignInstrumentToCall({
-      callId: initialDBData.call.id,
-      instrumentFapIds: [{ instrumentId: initialDBData.instrument2.id }],
-    });
-    cy.assignProposalsToInstrument({
-      instrumentId: initialDBData.instrument2.id,
-      proposals: [
-        {
-          callId: initialDBData.call.id,
-          primaryKey: initialDBData.proposal.id,
-        },
-      ],
-    });
-
     cy.login('user1');
     cy.visit('/');
   });

@@ -39,6 +39,8 @@ export default {
     id: 1,
     shortCode: 'call 1',
     allocationTimeUnit: AllocationTimeUnits.DAY,
+    endCall: '01-01-2030',
+    callFapReviewEnded: false,
   },
   template: {
     id: 1,
@@ -262,9 +264,11 @@ export default {
     },
     editableSubmitted: {
       id: 14,
+      name: 'EDITABLE_SUBMITTED',
     },
     editableSubmittedInternal: {
       id: 15,
+      name: 'EDITABLE_SUBMITTED_INTERNAL',
     },
   },
   scheduledEvents: {

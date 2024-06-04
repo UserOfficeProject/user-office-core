@@ -1,5 +1,8 @@
 export class FapProposalCount {
-  constructor(public userId: number, public count: number) {}
+  constructor(
+    public userId: number,
+    public count: number
+  ) {}
 }
 
 export class Fap {
@@ -17,16 +20,22 @@ export class Fap {
 }
 
 export class FapReviewer {
-  constructor(public userId: number, public fapId: number) {}
+  constructor(
+    public userId: number,
+    public fapId: number
+  ) {}
 }
 
 export class FapProposal {
   constructor(
+    public fapProposalId: number,
     public proposalPk: number,
     public fapId: number,
     public dateAssigned: Date,
     public fapTimeAllocation: number | null,
-    public instrumentSubmitted?: boolean
+    public instrumentId: number | null,
+    public callId: number,
+    public fapInstrumentMeetingSubmitted: boolean
   ) {}
 }
 
@@ -46,6 +55,7 @@ export class FapAssignment {
     public dateAssigned: Date,
     public reassigned: boolean,
     public dateReassigned: Date | null,
-    public emailSent: boolean
+    public emailSent: boolean,
+    public rank: number | null
   ) {}
 }

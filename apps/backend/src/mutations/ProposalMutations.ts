@@ -11,6 +11,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -51,6 +52,8 @@ export default class ProposalMutations {
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
     @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
+    @inject(Tokens.FapDataSource)
+    private fapDataSource: FapDataSource,
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.GenericTemplateDataSource)
@@ -388,7 +391,7 @@ export default class ProposalMutations {
       finalStatus,
       commentForManagement,
       commentForUser,
-      managementTimeAllocation,
+      managementTimeAllocations,
       managementDecisionSubmitted,
     } = args;
     const isChairOrSecretaryOfProposal =
@@ -411,10 +414,10 @@ export default class ProposalMutations {
       );
     }
 
-    const isProposalInstrumentSubmitted =
-      await this.instrumentDataSource.isProposalInstrumentSubmitted(primaryKey);
+    const isFapProposalInstrumentSubmitted =
+      await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
-    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
         'Can not administer proposal because instrument is submitted',
         { args, agent }
@@ -433,8 +436,11 @@ export default class ProposalMutations {
       proposal.commentForManagement = commentForManagement;
     }
 
-    if (managementTimeAllocation !== undefined) {
-      proposal.managementTimeAllocation = managementTimeAllocation;
+    if (managementTimeAllocations?.length) {
+      await this.instrumentDataSource.updateProposalInstrumentTimeAllocation(
+        proposal.primaryKey,
+        managementTimeAllocations
+      );
     }
 
     if (managementDecisionSubmitted !== undefined) {
@@ -452,34 +458,47 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
-    const { statusId, proposals } = args;
+    const { statusId, proposalPks } = args;
 
     const result = await this.proposalDataSource.changeProposalsStatus(
       statusId,
-      proposals.map((proposal) => proposal.primaryKey)
+      proposalPks.map((proposalPk) => proposalPk)
     );
 
-    if (result.proposals.length === proposals.length) {
+    if (result.proposals.length === proposalPks.length) {
       const fullProposals = await Promise.all(
-        proposals.map(async (proposal) => {
-          await this.proposalDataSource.resetProposalEvents(
-            proposal.primaryKey,
-            proposal.callId,
-            statusId
-          );
-
+        proposalPks.map(async (proposalPk) => {
           const fullProposal = result.proposals.find(
-            (updatedProposal) =>
-              updatedProposal.primaryKey === proposal.primaryKey
+            (updatedProposal) => updatedProposal.primaryKey === proposalPk
           );
 
           if (!fullProposal) {
             return null;
           }
 
+          await this.proposalDataSource.resetProposalEvents(
+            proposalPk,
+            fullProposal.callId,
+            statusId
+          );
+
+          const proposalWorkflow =
+            await this.proposalSettingsDataSource.getProposalWorkflowByCall(
+              fullProposal.callId
+            );
+
+          if (!proposalWorkflow) {
+            return rejection(
+              `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
+              {
+                args,
+              }
+            );
+          }
+
           return {
             ...fullProposal,
-            workflowId: proposal.workflowId,
+            workflowId: proposalWorkflow.id,
           };
         })
       );
@@ -601,7 +620,6 @@ export default class ProposalMutations {
         notified: false,
         submitted: false,
         referenceNumberSequence: 0,
-        managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
       });
 

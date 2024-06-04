@@ -70,7 +70,8 @@ export function toEssBasicUserDetails(
     '',
     new Date(),
     false,
-    stfcUser.email ?? ''
+    stfcUser.email ?? '',
+    stfcUser.country ?? ''
   );
 }
 
@@ -83,7 +84,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     stfcUser.familyName ?? '',
     stfcUser.email ?? '',
     stfcUser.firstNameKnownAs ?? stfcUser.givenName,
-    '',
     '',
     '',
     '',
@@ -226,9 +226,8 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
-    const users: User[] = await postgresUserDataSource.getProposalUsersFull(
-      proposalPk
-    );
+    const users: User[] =
+      await postgresUserDataSource.getProposalUsersFull(proposalPk);
     const userNumbers: string[] = users.map((user) => String(user.id));
 
     return this.getStfcBasicPeopleByUserNumbers(userNumbers).then((stfcUsers) =>
@@ -404,9 +403,8 @@ export class StfcUserDataSource implements UserDataSource {
 
       if (users[0]) {
         const userNumbers: string[] = users.map((record) => String(record.id));
-        const stfcBasicPeople = await this.getStfcBasicPeopleByUserNumbers(
-          userNumbers
-        );
+        const stfcBasicPeople =
+          await this.getStfcBasicPeopleByUserNumbers(userNumbers);
 
         userDetails = stfcBasicPeople.map((person) =>
           toEssBasicUserDetails(person)
@@ -505,7 +503,6 @@ export class StfcUserDataSource implements UserDataSource {
     username: string,
     preferredname: string | undefined,
     oidc_sub: string,
-    oauth_access_token: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,

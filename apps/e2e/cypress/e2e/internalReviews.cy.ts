@@ -76,16 +76,15 @@ context('Internal Review tests', () => {
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
-      cy.assignProposalsToInstrument({
-        proposals: [
-          { callId: initialDBData.call.id, primaryKey: createdProposalPk },
-        ],
-        instrumentId: createdInstrumentId,
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
       }).then(() => {
         // NOTE: Get the technical review id for later usage.
         cy.updateTechnicalReviewAssignee({
           proposalPks: [createdProposalPk],
           userId: scientist1.id,
+          instrumentId: createdInstrumentId,
         }).then((result) => {
           technicalReviewId = result.updateTechnicalReviewAssignee[0].id;
         });
@@ -130,6 +129,15 @@ context('Internal Review tests', () => {
       .find('[data-cy="title"] input')
       .clear()
       .type(title);
+
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+      cy.get('[data-cy="create-modal"]')
+        .find('[data-cy="internal-reviewer-surname"] input')
+        .type(scientist2.lastName);
+
+      cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
+    }
+
     cy.get('[data-cy="create-modal"]')
       .find('[data-cy="internal-reviewer"] input')
       .click();
@@ -197,6 +205,14 @@ context('Internal Review tests', () => {
       .find('[data-cy="title"] input')
       .clear()
       .type(newTitle);
+
+    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+      cy.get('[data-cy="create-modal"]')
+        .find('[data-cy="internal-reviewer-surname"] input')
+        .type(scientist2.lastName);
+
+      cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
+    }
 
     cy.get('[data-cy="create-modal"]')
       .find('[data-cy="internal-reviewer"] input')

@@ -12,24 +12,12 @@ import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 
 @InputType()
-export class ProposalSelectionInput {
-  @Field(() => Int)
-  public primaryKey: number;
-
-  @Field(() => Int)
-  public callId: number;
-
-  @Field(() => Int, { nullable: true })
-  public workflowId?: number;
-}
-
-@InputType()
 export class ChangeProposalsStatusInput {
   @Field(() => Int)
   public statusId: number;
 
-  @Field(() => [ProposalSelectionInput])
-  public proposals: ProposalSelectionInput[];
+  @Field(() => [Int])
+  public proposalPks: number[];
 }
 
 @Resolver()

@@ -23,6 +23,7 @@ import {
   FapMeetingDecision,
   Call,
   Proposal,
+  TechnicalReview,
 } from 'generated/sdk';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
@@ -32,6 +33,7 @@ import {
   standardDeviation,
 } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 
 import FapMeetingProposalViewModal from './ProposalViewModal/FapMeetingProposalViewModal';
 
@@ -118,12 +120,20 @@ const FapInstrumentProposalsTable = ({
     setInstrumentProposalsData,
     refreshInstrumentProposalsData,
   } = useFapProposalsByInstrument(fapInstrument.id, fapId, selectedCall?.id);
+
   const classes = useStyles();
   const theme = useTheme();
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
+
+  const getInstrumentTechnicalReview = (
+    technicalReviews: TechnicalReview[] | null
+  ) =>
+    technicalReviews?.find(
+      (technicalReview) => technicalReview.instrumentId === fapInstrument.id
+    );
 
   const assignmentColumns = [
     {
@@ -140,7 +150,13 @@ const FapInstrumentProposalsTable = ({
       title: 'ID',
       field: 'proposal.proposalId',
     },
-    { title: 'Status', field: 'proposal.status.name' },
+    {
+      title: 'Principal Investigator',
+      render: (rowData: FapProposal) => {
+        return getFullUserName(rowData.proposal.proposer);
+      },
+    },
+    { title: 'Country', field: 'proposal.proposer.country' },
     {
       title: 'Average score',
       field: 'proposalAverageScore',
@@ -174,14 +190,15 @@ const FapInstrumentProposalsTable = ({
           return a.fapTimeAllocation - b.fapTimeAllocation;
         }
 
-        if (
-          a.proposal.technicalReview?.timeAllocation &&
-          b.proposal.technicalReview?.timeAllocation
-        ) {
-          return (
-            a.proposal.technicalReview.timeAllocation -
-            b.proposal.technicalReview.timeAllocation
-          );
+        const aReview = getInstrumentTechnicalReview(
+          a.proposal.technicalReviews
+        );
+        const bReview = getInstrumentTechnicalReview(
+          b.proposal.technicalReviews
+        );
+
+        if (aReview?.timeAllocation && bReview?.timeAllocation) {
+          return aReview.timeAllocation - bReview.timeAllocation;
         } else {
           return -1;
         }
@@ -292,7 +309,10 @@ const FapInstrumentProposalsTable = ({
           const proposalAllocationTime =
             proposalData.fapTimeAllocation !== null
               ? proposalData.fapTimeAllocation
-              : proposalData.proposal.technicalReview?.timeAllocation || 0;
+              : proposalData.proposal.technicalReviews?.find(
+                  (technicalReview) =>
+                    technicalReview.instrumentId === fapInstrument.id
+                )?.timeAllocation || 0;
 
           if (
             allocationTimeSum + proposalAllocationTime >
@@ -322,11 +342,12 @@ const FapInstrumentProposalsTable = ({
   const ProposalTimeAllocationColumn = (
     rowData: FapProposalWithAverageScoreAndAvailabilityZone
   ) => {
-    const timeAllocation =
-      rowData.proposal.technicalReview &&
-      rowData.proposal.technicalReview.timeAllocation
-        ? rowData.proposal.technicalReview.timeAllocation
-        : '-';
+    const instrumentTechnicalReview = rowData.proposal.technicalReviews?.find(
+      (technicalReview) => technicalReview.instrumentId === fapInstrument.id
+    );
+    const timeAllocation = instrumentTechnicalReview
+      ? instrumentTechnicalReview.timeAllocation
+      : '-';
 
     const fapTimeAllocation = rowData.fapTimeAllocation;
 
@@ -545,6 +566,7 @@ const FapInstrumentProposalsTable = ({
     if (
       tableBodyElement &&
       DragState.dropIndex !== tableDataId &&
+      DragState.row !== -1 &&
       DragState.row !== tableDataId
     ) {
       DragState.dropIndex = tableDataId;
@@ -592,7 +614,10 @@ const FapInstrumentProposalsTable = ({
       const proposalTimeAllocation =
         typeof element.fapTimeAllocation === 'number'
           ? element.fapTimeAllocation
-          : element.proposal.technicalReview?.timeAllocation || 0;
+          : element.proposal.technicalReviews?.find(
+              (technicalReview) =>
+                technicalReview.instrumentId === fapInstrument.id
+            )?.timeAllocation || 0;
 
       allocatedTimeSum = allocatedTimeSum + proposalTimeAllocation;
     }
@@ -666,6 +691,7 @@ const FapInstrumentProposalsTable = ({
         proposalPk={urlQueryParams.fapMeetingModal}
         meetingSubmitted={onMeetingSubmitted}
         fapId={fapId}
+        instrumentId={fapInstrument.id}
       />
       <MaterialTable
         icons={tableIcons}

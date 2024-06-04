@@ -44,9 +44,9 @@ export enum EquipmentAssignmentStatus {
 }
 
 @ObjectType()
-export class ProposalBookingCore {
-  @Field(() => Int)
-  id: number;
+export class ProposalBookingsCore {
+  @Field(() => [Int])
+  ids: number[];
 }
 
 @InputType()
@@ -70,21 +70,24 @@ export class ProposalBookingFilter {
   status?: ProposalBookingStatusCore[] | null;
 }
 
-@Resolver(() => ProposalBookingCore)
+@Resolver(() => ProposalBookingsCore)
 export class ProposalBookingResolvers {
   @FieldResolver(() => [ScheduledEventCore])
   scheduledEvents(
     @Ctx() ctx: ResolverContext,
-    @Root() proposalBooking: ProposalBookingCore,
+    @Root() proposalBookings: ProposalBookingsCore,
     @Arg('filter') filter: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
-    return ctx.queries.proposal.proposalBookingScheduledEvents(ctx.user, {
-      proposalBookingId: proposalBooking.id,
-      filter: {
-        ...filter,
-        bookingType:
-          filter.bookingType ?? ScheduledEventBookingType.USER_OPERATIONS,
-      },
-    });
+    return ctx.queries.proposal.getAllProposalBookingsScheduledEvents(
+      ctx.user,
+      {
+        proposalBookingIds: proposalBookings.ids,
+        filter: {
+          ...filter,
+          bookingType:
+            filter.bookingType ?? ScheduledEventBookingType.USER_OPERATIONS,
+        },
+      }
+    );
   }
 }

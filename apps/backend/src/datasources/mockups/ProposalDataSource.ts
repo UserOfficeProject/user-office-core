@@ -33,8 +33,8 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends Array<infer U>
     ? Array<DeepPartial<U>>
     : T[P] extends ReadonlyArray<infer U>
-    ? ReadonlyArray<DeepPartial<U>>
-    : DeepPartial<T[P]>;
+      ? ReadonlyArray<DeepPartial<U>>
+      : DeepPartial<T[P]>;
 };
 
 const dummyProposalFactory = (values?: Partial<Proposal>) => {
@@ -55,7 +55,6 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.notified || false,
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
-    values?.managementTimeAllocation || 0,
     values?.managementDecisionSubmitted || false
   );
 };
@@ -78,6 +77,7 @@ const dummyScheduledEventCore = new ScheduledEventCore(
   1,
   1,
   ProposalBookingStatusCore.ACTIVE,
+  1,
   1
 );
 
@@ -91,6 +91,7 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   false,
   1,
   '',
+  1,
   1
 );
 
@@ -98,13 +99,13 @@ const dummyProposalEvents = {
   proposal_pk: 1,
   proposal_created: true,
   proposal_submitted: true,
-  proposal_feasible: true,
-  proposal_unfeasible: false,
+  proposal_feasibility_review_feasible: true,
+  proposal_feasibility_review_unfeasible: false,
   call_ended: false,
   call_ended_internal: false,
   call_review_ended: false,
-  proposal_fap_selected: false,
-  proposal_instrument_selected: false,
+  proposal_faps_selected: false,
+  proposal_instruments_selected: false,
   proposal_feasibility_review_submitted: false,
   proposal_sample_review_submitted: false,
   proposal_all_fap_reviews_submitted: false,
@@ -178,26 +179,35 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       '',
       'shortCode',
       1,
-      1,
       false,
-      1,
-      1,
-      1,
-      'Carl',
-      'Carlsson',
-      1,
       false,
-      'instrument',
+      [
+        {
+          id: 1,
+          name: 'instrument',
+          managerUserId: 1,
+          managementTimeAllocation: 1,
+        },
+      ],
+      [
+        {
+          id: 1,
+          status: TechnicalReviewStatus.FEASIBLE,
+          submitted: false,
+          timeAllocation: 1,
+          technicalReviewAssignee: {
+            id: 1,
+            firstname: 'Carl',
+            lastname: 'Carlsson',
+          },
+        },
+      ],
+      [{ id: 1, code: 'fap code' }],
+      [{ instrumentId: 1, fapId: 1 }],
       'call short code',
-      'fap code',
-      1,
-      1,
-      1,
-      1,
       AllocationTimeUnits.Day,
       1,
-      1,
-      false
+      1
     );
 
     allProposals = [
@@ -316,9 +326,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return allProposals.filter((proposal) => proposal.proposerId === id);
   }
 
-  async getProposalsByIds(proposalIds: number[]): Promise<Proposal[]> {
+  async getProposalsByPks(proposalPks: number[]): Promise<Proposal[]> {
     return allProposals.filter((proposal) =>
-      proposalIds.includes(proposal.primaryKey)
+      proposalPks.includes(proposal.primaryKey)
     );
   }
   async getInstrumentScientistProposals(
@@ -366,15 +376,15 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return new Proposals(allProposals);
   }
 
-  async getProposalBookingByProposalPk(
+  async getProposalBookingsByProposalPk(
     proposalPk: number,
     filter?: ProposalBookingFilter
-  ): Promise<{ id: number } | null> {
-    return { id: 1 };
+  ): Promise<{ ids: number[] } | null> {
+    return { ids: [1] };
   }
 
-  async proposalBookingScheduledEvents(
-    proposalBookingId: number,
+  async getAllProposalBookingsScheduledEvents(
+    proposalBookingIds: number[],
     filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     return [dummyScheduledEventCore];

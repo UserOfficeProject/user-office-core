@@ -4,14 +4,20 @@ import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
-import { ProposalData } from 'hooks/proposal/useProposalData';
+import {
+  ProposalDataInstrument,
+  ProposalDataTechnicalReview,
+} from 'hooks/proposal/useProposalData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type AssignTechnicalReviewProps = {
-  proposal: ProposalData;
-  onProposalUpdated: (proposal: ProposalData) => void;
+  technicalReview: ProposalDataTechnicalReview;
+  instrument: ProposalDataInstrument;
+  onTechnicalReviewUpdated: (
+    updatedTechnicalReview: ProposalDataTechnicalReview
+  ) => void;
   confirm: WithConfirmType;
 };
 
@@ -21,8 +27,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 function AssignTechnicalReview({
-  proposal,
-  onProposalUpdated,
+  technicalReview,
+  instrument,
+  onTechnicalReviewUpdated,
   confirm,
 }: AssignTechnicalReviewProps) {
   const classes = useStyles();
@@ -31,16 +38,16 @@ function AssignTechnicalReview({
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
 
   const [selectedUser, setSelectedUser] = useState(
-    proposal.technicalReview?.technicalReviewAssigneeId
+    technicalReview?.technicalReviewAssigneeId
   );
 
-  const usersData = proposal.instrument?.scientists || [];
-  const beamlineManagerAlreadyExists = proposal.instrument?.scientists.find(
-    (scientist) => scientist.id === proposal.instrument?.beamlineManager?.id
+  const usersData = instrument?.scientists || [];
+  const instrumentContactAlreadyExists = instrument?.scientists.find(
+    (scientist) => scientist.id === instrument?.instrumentContact?.id
   );
 
-  if (proposal.instrument?.beamlineManager && !beamlineManagerAlreadyExists) {
-    usersData.push(proposal.instrument?.beamlineManager);
+  if (instrument?.instrumentContact && !instrumentContactAlreadyExists) {
+    usersData.push(instrument?.instrumentContact);
   }
 
   const userIdToUser = (userId?: number | null) =>
@@ -65,8 +72,7 @@ function AssignTechnicalReview({
           disableClearable
           data-cy="user-list"
           disabled={
-            (!isUserOfficer && proposal.technicalReview?.submitted) ||
-            isInternalReviewer
+            (!isUserOfficer && technicalReview?.submitted) || isInternalReviewer
           }
           ListboxProps={{ title: 'user-list-options' }}
         />
@@ -84,17 +90,13 @@ function AssignTechnicalReview({
                   })
                     .updateTechnicalReviewAssignee({
                       userId: selectedUser,
-                      proposalPks: [proposal.primaryKey],
+                      proposalPks: [technicalReview.proposalPk],
+                      instrumentId: technicalReview.instrumentId,
                     })
                     .then(({ updateTechnicalReviewAssignee }) => {
-                      onProposalUpdated({
-                        ...proposal,
-                        technicalReview: proposal.technicalReview
-                          ? {
-                              ...proposal.technicalReview,
-                              ...updateTechnicalReviewAssignee[0],
-                            }
-                          : null,
+                      onTechnicalReviewUpdated({
+                        ...technicalReview,
+                        ...updateTechnicalReviewAssignee[0],
                       });
                     }),
                 {
@@ -102,7 +104,7 @@ function AssignTechnicalReview({
                   description: `You are about to set ${getFullUserName(
                     userIdToUser(selectedUser)
                   )} as a technical reviewer for this proposal. Are you sure?`,
-                  alertText: proposal.technicalReview?.submitted
+                  alertText: technicalReview?.submitted
                     ? "The technical review is already submitted and re-assigning it to another person won't change anything. Better option is to un-submit first and then re-assign."
                     : '',
                 }
@@ -115,8 +117,7 @@ function AssignTechnicalReview({
           color="primary"
           className={classes.submitButton}
           disabled={
-            (!isUserOfficer && proposal.technicalReview?.submitted) ||
-            isInternalReviewer
+            (!isUserOfficer && technicalReview?.submitted) || isInternalReviewer
           }
         >
           Assign

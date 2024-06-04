@@ -4,7 +4,7 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { Authorized } from '../decorators';
-import { Instrument } from '../models/Instrument';
+import { Instrument, InstrumentWithManagementTime } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
@@ -32,6 +32,14 @@ export default class InstrumentQueries {
     return instrument;
   }
 
+  @Authorized()
+  async getInstrumentsByIds(
+    agent: UserWithRole | null,
+    instrumentIds: number[]
+  ) {
+    return await this.dataSource.getInstrumentsByIds(instrumentIds);
+  }
+
   @Authorized([
     Roles.USER_OFFICER,
     Roles.FAP_REVIEWER,
@@ -42,9 +50,8 @@ export default class InstrumentQueries {
     if (!callIds || callIds.length === 0) {
       return await this.dataSource.getInstruments();
     } else {
-      const instrumentsByCallIds = await this.dataSource.getInstrumentsByCallId(
-        callIds
-      );
+      const instrumentsByCallIds =
+        await this.dataSource.getInstrumentsByCallId(callIds);
 
       return {
         totalCount: instrumentsByCallIds.length,
@@ -64,6 +71,17 @@ export default class InstrumentQueries {
     const instruments = await this.dataSource.getUserInstruments(agent!.id);
 
     return { totalCount: instruments.length, instruments };
+  }
+
+  @Authorized()
+  async getInstrumentsByProposalPk(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ): Promise<InstrumentWithManagementTime[]> {
+    const instruments =
+      await this.dataSource.getInstrumentsByProposalPk(proposalPk);
+
+    return instruments;
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])

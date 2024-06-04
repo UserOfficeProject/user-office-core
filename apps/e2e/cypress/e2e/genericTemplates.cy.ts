@@ -255,7 +255,7 @@ context('GenericTemplates tests', () => {
   };
 
   beforeEach(() => {
-    // NOTE: Stop the web application and clearly faparate the end-to-end tests by visiting the blank about page before each test.
+    // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page before each test.
     // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
     cy.window().then((win) => {
       win.location.href = 'about:blank';
@@ -725,6 +725,45 @@ context('GenericTemplates tests', () => {
       });
 
       cy.contains(genericTemplateTitle);
+    });
+
+    it('Should be a character limit of 256 to the template proposal question for office user', () => {
+      cy.createTemplate({
+        name: proposalTemplateName,
+        groupId: TemplateGroupId.PROPOSAL,
+      });
+      const question = faker.string.alpha(258);
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.get('[data-cy=create-new-button]').click();
+
+      cy.get('[data-cy=name] input').type(genericTemplateName[0]);
+
+      cy.get('[data-cy=description]').type(genericTemplateDescription[0]);
+
+      cy.get('[data-cy=submit]').click();
+
+      cy.get('[data-cy="proposal-question-id"').click();
+
+      cy.get('[data-cy=natural-key]').click();
+
+      cy.get('[data-cy="question"').click().clear().type(question);
+
+      cy.get('[data-cy="submit"').should('be.disabled');
+
+      cy.get('[data-cy="question"')
+        .click()
+        .clear()
+        .type(question.slice(0, 255).trim());
+
+      cy.get('[data-cy="submit"').should('not.be.disabled');
+
+      cy.get('[data-cy="submit"').click();
     });
   });
 

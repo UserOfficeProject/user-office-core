@@ -6,6 +6,7 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
@@ -39,7 +40,10 @@ export type ProposalPDFData = {
   coProposers: BasicUserDetails[];
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
-  technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
+  technicalReviews: (Omit<TechnicalReview, 'status'> & {
+    status: string;
+    instrumentName?: string;
+  })[];
   fapReviews?: Review[];
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
   genericTemplates: Array<
@@ -72,9 +76,8 @@ const getSampleQuestionarySteps = async (
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
-  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
-    questionaryId
-  );
+  const questionarySteps =
+    await questionaryDataSource.getQuestionarySteps(questionaryId);
   if (!questionarySteps) {
     throw new Error(
       `Questionary steps for Questionary ID '${questionaryId}' not found, or the user has insufficient rights`
@@ -97,7 +100,7 @@ const getQuestionary = async (questionaryId: number) => {
   return questionary;
 };
 
-const addTopicInformation = (
+const addTopicInformation = async (
   proposalPDFData: ProposalPDFData,
   questionarySteps: QuestionaryStep[],
   samples: Sample[],
@@ -143,6 +146,18 @@ const addTopicInformation = (
               genericTemplate.questionId === answer.question.id
           )
           .map((genericTemplate) => genericTemplate);
+      } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+        const instrumentIds = Array.isArray(answer.value)
+          ? answer.value
+          : [answer.value];
+        const instrumentDataSource = container.resolve<InstrumentDataSource>(
+          Tokens.InstrumentDataSource
+        );
+        const instruments =
+          await instrumentDataSource.getInstrumentsByIds(instrumentIds);
+        answer.value = instruments?.length
+          ? instruments.map((instrument) => instrument.name).join(', ')
+          : '';
       }
     }
 
@@ -273,6 +288,7 @@ export const collectProposalPDFData = async (
     coProposers,
     questionarySteps: [],
     attachments: [],
+    technicalReviews: [],
     samples: samplePDFData,
     genericTemplates: genericTemplatePDFData,
     pdfTemplate,
@@ -317,11 +333,17 @@ export const collectProposalPDFData = async (
           )
           .map((genericTemplate) => genericTemplate);
       } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
-        const instrument = await baseContext.queries.instrument.get(
-          user,
-          answer.value as number
-        );
-        answer.value = instrument?.name ?? '';
+        const instrumentIds = Array.isArray(answer.value)
+          ? answer.value
+          : [answer.value];
+        const instruments =
+          await baseContext.queries.instrument.getInstrumentsByIds(
+            user,
+            instrumentIds
+          );
+        answer.value = instruments?.length
+          ? instruments.map((instrument) => instrument.name).join(', ')
+          : '';
       }
     }
 
@@ -334,16 +356,26 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
-  const technicalReview =
-    await baseContext.queries.review.technicalReviewForProposal(
+  const technicalReviews =
+    await baseContext.queries.review.technicalReviewsForProposal(
       user,
       proposal.primaryKey
     );
-  if (technicalReview) {
-    out.technicalReview = {
+
+  if (technicalReviews.length) {
+    const instruments =
+      await baseContext.queries.instrument.getInstrumentsByIds(
+        user,
+        technicalReviews.map((technicalReview) => technicalReview.instrumentId)
+      );
+
+    out.technicalReviews = technicalReviews.map((technicalReview) => ({
       ...technicalReview,
       status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-    };
+      instrumentName: instruments.find(
+        (instrument) => instrument.id === technicalReview.instrumentId
+      )?.name,
+    }));
   }
 
   // Get Reviews
@@ -363,7 +395,6 @@ export const collectProposalPDFDataTokenAccess = async (
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
-  const proposalAuth = container.resolve(ProposalAuthorization);
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
@@ -505,13 +536,14 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   // Add information from each topic in proposal
-  const proposalPDFData: ProposalPDFData = addTopicInformation(
+  const proposalPDFData: ProposalPDFData = await addTopicInformation(
     {
       proposal,
       principalInvestigator,
       coProposers,
       questionarySteps: [],
       attachments: [],
+      technicalReviews: [],
       samples: samplePDFData,
       genericTemplates: genericTemplatePDFData,
       pdfTemplate,
@@ -526,14 +558,26 @@ export const collectProposalPDFDataTokenAccess = async (
   const reviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
-  const technicalReview = await reviewDataSource.getTechnicalReview(
+  const technicalReviews = await reviewDataSource.getTechnicalReviews(
     proposal.primaryKey
   );
-  if (technicalReview) {
-    proposalPDFData.technicalReview = {
-      ...technicalReview,
-      status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
-    };
+
+  if (technicalReviews?.length) {
+    const instrumentDataSource = container.resolve<InstrumentDataSource>(
+      Tokens.InstrumentDataSource
+    );
+    const instruments = await instrumentDataSource.getInstrumentsByIds(
+      technicalReviews.map((technicalReview) => technicalReview.instrumentId)
+    );
+    proposalPDFData.technicalReviews = technicalReviews.map(
+      (technicalReview) => ({
+        ...technicalReview,
+        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+        instrumentName: instruments.find(
+          (instrument) => instrument.id === technicalReview.instrumentId
+        )?.name,
+      })
+    );
   }
 
   return proposalPDFData;

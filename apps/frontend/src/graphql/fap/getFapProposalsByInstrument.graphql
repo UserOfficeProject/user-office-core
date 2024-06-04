@@ -13,6 +13,12 @@ query fapProposalsByInstrument(
       primaryKey
       title
       proposalId
+      proposer {
+        id
+        firstname
+        lastname
+        country
+      }
       status {
         ...proposalStatus
       }
@@ -25,10 +31,11 @@ query fapProposalsByInstrument(
         grade
         status
       }
-      technicalReview {
+      technicalReviews {
         publicComment
         status
         timeAllocation
+        instrumentId
       }
     }
     assignments {

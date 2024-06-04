@@ -57,8 +57,8 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
   selected === ReviewStatus.SUBMITTED
     ? ReviewStatus.SUBMITTED
     : selected === ReviewStatus.DRAFT
-    ? ReviewStatus.DRAFT
-    : undefined; // if the selected status is not a valid status assume we want to see everything
+      ? ReviewStatus.DRAFT
+      : undefined; // if the selected status is not a valid status assume we want to see everything
 
 const columns: (
   t: TFunction<'translation', undefined, 'translation'>
@@ -128,7 +128,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         comment: review.comment,
         status: review.status,
         callShortCode: review.proposal!.call?.shortCode,
-        instrumentShortCode: review.proposal!.instrument?.shortCode,
+        instrumentShortCodes: review.proposal!.instruments?.map(
+          (instrument) => instrument?.shortCode
+        ),
         tableData: {
           checked:
             selection?.has(review.proposal!.primaryKey.toString() || null) ||
@@ -323,7 +325,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
                 };
               }
             }),
-          } as UserWithReviewsQuery['me'])
+          }) as UserWithReviewsQuery['me']
       );
     }
   };
@@ -339,9 +341,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     const invalid = [];
 
     for await (const proposal of selectedProposals) {
-      const isValidSchema = await proposalGradeValidationSchema.isValid(
-        proposal
-      );
+      const isValidSchema =
+        await proposalGradeValidationSchema.isValid(proposal);
       if (!isValidSchema) {
         invalid.push(proposal);
       }
