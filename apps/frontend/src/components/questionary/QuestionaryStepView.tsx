@@ -122,6 +122,7 @@ export default function QuestionaryStepView(props: {
   );
 
   const [lastSavedFormValues, setLastSavedFormValues] = useState(initialValues);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setLastSavedFormValues(initialValues);
@@ -176,19 +177,30 @@ export default function QuestionaryStepView(props: {
   };
 
   const performSave = async (isPartialSave: boolean): Promise<boolean> => {
+    setIsSaving(true);
+
     actionsTemplateChanges();
 
-    const questionaryId =
-      (
-        await Promise.all(
-          preSubmitActions(activeFields).map(
-            async (f) => await f({ state, dispatch, api: api() })
+    let questionaryId;
+    try {
+      questionaryId =
+        (
+          await Promise.all(
+            preSubmitActions(activeFields).map(
+              async (f) => await f({ state, dispatch, api: api() })
+            )
           )
-        )
-      ).pop() || state.questionary.questionaryId; // TODO obtain newly created questionary ID some other way
+        ).pop() || state.questionary.questionaryId; // TODO obtain newly created questionary ID some other way
 
-    if (!questionaryId) {
-      return false;
+      if (!questionaryId) {
+        setIsSaving(false);
+
+        return false;
+      }
+    } catch (error) {
+      setIsSaving(false);
+
+      throw error;
     }
 
     try {
@@ -211,6 +223,8 @@ export default function QuestionaryStepView(props: {
       setLastSavedFormValues(initialValues);
     } catch (error) {
       return false;
+    } finally {
+      setIsSaving(false);
     }
 
     return true;
@@ -311,8 +325,8 @@ export default function QuestionaryStepView(props: {
               {!questionaryStep.isCompleted && (
                 <NavigButton
                   onClick={saveHandler}
-                  disabled={!state.isDirty}
-                  isBusy={isSubmitting}
+                  disabled={!state.isDirty || isSaving}
+                  isBusy={isSaving}
                   data-cy="save-button"
                 >
                   Save

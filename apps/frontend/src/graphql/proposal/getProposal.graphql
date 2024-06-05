@@ -60,7 +60,7 @@ query getProposal($primaryKey: Int!) {
       endCallInternal
       proposalWorkflowId
     }
-    fap {
+    faps {
       id
       code
     }

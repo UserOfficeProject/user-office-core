@@ -44,6 +44,11 @@ export default class PostgresCallDataSource implements CallDataSource {
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
     const query = database('call').select(['*']);
+
+    if (filter?.shortCode) {
+      query.where('call_short_code', 'like', `%${filter.shortCode}%`);
+    }
+
     if (filter?.templateIds) {
       query.whereIn('template_id', filter.templateIds);
     }
@@ -132,13 +137,13 @@ export default class PostgresCallDataSource implements CallDataSource {
     );
   }
 
-  async getCallHasInstrumentsByInstrumentId(
-    instrumentId: number
+  async getCallHasInstrumentsByInstrumentIds(
+    instrumentIds: number[]
   ): Promise<CallHasInstrument[]> {
     return database
       .select()
       .from('call_has_instruments')
-      .where('instrument_id', instrumentId)
+      .whereIn('instrument_id', instrumentIds)
       .then((callHasInstrument: CallHasInstrumentRecord[]) =>
         callHasInstrument.map((callHasInstrument) =>
           createCallHasInstrumentObject(callHasInstrument)

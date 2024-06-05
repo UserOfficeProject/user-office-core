@@ -5,6 +5,7 @@ import { container } from 'tsyringe';
 import {
   anotherDummyFap,
   dummyFap,
+  dummyFapProposal,
   dummyFapWithoutCode,
 } from '../datasources/mockups/FapDataSource';
 import {
@@ -195,20 +196,19 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can assign proposal to Fap', () => {
     return expect(
-      FapMutationsInstance.assignProposalsToFap(dummyUserOfficerWithRole, {
-        proposals: [{ primaryKey: 1, callId: 1 }],
-        fapId: 1,
-        fapInstrumentId: 1,
+      FapMutationsInstance.assignProposalsToFaps(dummyUserOfficerWithRole, {
+        proposalPks: [1],
+        fapInstruments: [{ fapId: 1, instrumentId: 3 }],
       })
     ).resolves.toStrictEqual(new ProposalPks([1]));
   });
 
   test('A user can not remove proposal from Fap', async () => {
-    const result = (await FapMutationsInstance.removeProposalsFromFap(
+    const result = (await FapMutationsInstance.removeProposalsFromFaps(
       dummyUserWithRole,
       {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       }
     )) as Rejection;
 
@@ -217,11 +217,11 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can remove proposal from Fap', () => {
     return expect(
-      FapMutationsInstance.removeProposalsFromFap(dummyUserOfficerWithRole, {
+      FapMutationsInstance.removeProposalsFromFaps(dummyUserOfficerWithRole, {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       })
-    ).resolves.toStrictEqual(dummyFap);
+    ).resolves.toStrictEqual([dummyFapProposal]);
   });
 
   test('A user can not assign Fap members to proposals', async () => {
@@ -236,7 +236,7 @@ describe('Test FapMutations', () => {
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
 
-  test('A userofficer can assign Fap members to proposals', () => {
+  test('A user officer can assign Fap members to proposals', () => {
     return expect(
       FapMutationsInstance.assignFapReviewersToProposals(
         dummyUserOfficerWithRole,

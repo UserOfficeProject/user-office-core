@@ -47,7 +47,7 @@ const CallSelectModalOnProposalsClone = ({
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
-          selectedCallId: undefined,
+          selectedCallId: null,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedCall = calls.find(

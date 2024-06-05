@@ -15,10 +15,11 @@ import {
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
 } from '../../resolvers/mutations/AssignMembersToFapMutation';
-import { AssignProposalsToFapArgs } from '../../resolvers/mutations/AssignProposalsToFapMutation';
+import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { FapDataSource } from '../FapDataSource';
+import { AssignProposalsToFapsInput } from '../postgres/records';
 import { basicDummyUser } from './UserDataSource';
 
 export const dummyFap = new Fap(
@@ -89,8 +90,10 @@ export const dummyFapReview = new Review(1, 1, 1, 'Dummy Fap review', 7, 0, 1);
 export const dummyFapProposal = new FapProposal(
   1,
   1,
+  1,
   new Date('2020-04-20 08:25:12.23043+00'),
   null,
+  1,
   1,
   false
 );
@@ -98,9 +101,11 @@ export const dummyFapProposal = new FapProposal(
 export const anotherDummyFapProposal = new FapProposal(
   2,
   2,
+  2,
   new Date('2020-04-20 08:25:12.23043+00'),
   null,
   2,
+  1,
   true
 );
 
@@ -197,7 +202,11 @@ export class FapDataSourceMock implements FapDataSource {
     fapId: number,
     proposalPk: number
   ): Promise<FapProposal | null> {
-    throw new Error('Method not implemented.');
+    return (
+      dummyFapProposals.find(
+        (fp) => fp.fapId === fapId && fp.proposalPk === proposalPk
+      ) || null
+    );
   }
 
   updateTimeAllocation(
@@ -339,6 +348,10 @@ export class FapDataSourceMock implements FapDataSource {
     return [dummyFapProposal];
   }
 
+  async getFapsByProposalPk(proposalPk: number) {
+    return dummyFaps;
+  }
+
   async getFapsByCallId(callId: number): Promise<Fap[]> {
     return [dummyFap];
   }
@@ -372,24 +385,48 @@ export class FapDataSourceMock implements FapDataSource {
     return { id: 4, shortCode: 'fap_chair', title: 'Fap Chair' };
   }
 
-  async assignProposalsToFap({ proposals, fapId }: AssignProposalsToFapArgs) {
-    const fap = dummyFaps.find((element) => element.id === fapId);
+  async assignProposalsToFaps(data: AssignProposalsToFapsInput[]) {
+    const fapIds = data.map((item) => item.fap_id);
+    const fap = dummyFaps.find((element) => fapIds.includes(element.id));
 
     if (fap) {
       return new ProposalPks([1]);
     }
 
-    throw new Error(`Fap not found ${fapId}`);
+    throw new Error(`FAPs not found ${fapIds}`);
   }
 
-  async removeProposalsFromFap(proposalPks: number[], fapId: number) {
-    const fap = dummyFaps.find((element) => element.id === fapId);
+  async removeProposalsFromFaps({ fapIds }: RemoveProposalsFromFapsArgs) {
+    const fap = dummyFapProposals.find(
+      (element) => element.fapId && fapIds.includes(element.fapId)
+    );
 
     if (fap) {
-      return fap;
+      return [fap];
     }
 
-    throw new Error(`Fap not found ${fapId}`);
+    throw new Error(`FAPs not found ${fapIds}`);
+  }
+
+  async removeProposalsFromFapsByInstrument(
+    proposalPk: number,
+    instrumentIds: number[]
+  ) {
+    const fap = dummyFapProposals.find(
+      (element) =>
+        element.fapId &&
+        element.instrumentId &&
+        instrumentIds.includes(element.instrumentId) &&
+        element.proposalPk === proposalPk
+    );
+
+    if (fap) {
+      return [fap];
+    }
+
+    throw new Error(
+      `FAPs not found with proposalPk ${proposalPk} and instrumentId ${instrumentIds}`
+    );
   }
 
   async assignMembersToFapProposals(

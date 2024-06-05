@@ -148,6 +148,8 @@ export default class InstrumentMutations {
         args,
       }
     );
+    const instrumentHasProposalIds: number[] = [];
+
     // TODO: Cleanup this part because it is quite ugly
     for await (const instrumentId of args.instrumentIds) {
       const allProposalsAreOnSameCallAsInstrument =
@@ -192,13 +194,16 @@ export default class InstrumentMutations {
         }
 
         if (proposalInstruments.find((i) => i.id === instrumentId)) {
-          break;
+          continue;
         }
 
-        await this.dataSource.assignProposalToInstrument(
+        const {
+          instrumentHasProposalIds: [instrumentHasProposalId],
+        } = await this.dataSource.assignProposalToInstrument(
           proposalPk,
           instrumentId
         );
+        instrumentHasProposalIds.push(instrumentHasProposalId);
 
         const technicalReview =
           await this.reviewDataSource.getProposalInstrumentTechnicalReview(
@@ -237,6 +242,7 @@ export default class InstrumentMutations {
     }
 
     result = new InstrumentsHasProposals(
+      instrumentHasProposalIds,
       args.instrumentIds,
       args.proposalPks,
       false
