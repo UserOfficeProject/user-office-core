@@ -46,6 +46,7 @@ import SampleQueries from '../queries/SampleQueries';
 import ScheduledEventQueries from '../queries/ScheduledEventQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
 import SystemQueries from '../queries/SystemQueries';
+import TechniqueQueries from '../queries/TechniqueQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UnitQueries from '../queries/UnitQueries';
 import UserQueries from '../queries/UserQueries';
@@ -59,6 +60,7 @@ interface ResolverContextQueries {
   file: FileQueries;
   genericTemplate: GenericTemplateQueries;
   instrument: InstrumentQueries;
+  technique: TechniqueQueries;
   pdfTemplate: PdfTemplateQueries;
   proposal: ProposalQueries;
   proposalEsi: ProposalEsiQueries;
