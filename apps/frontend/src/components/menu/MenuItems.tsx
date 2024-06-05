@@ -1,3 +1,4 @@
+import { Science } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -285,6 +286,14 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           </ListItem>
         </Tooltip>
       )}
+      <Tooltip title="Techniques">
+        <ListItem component={NavLink} to="/Techniques" button>
+          <ListItemIcon>
+            <Science />
+          </ListItemIcon>
+          <ListItemText primary="Techniques" />
+        </ListItem>
+      </Tooltip>
       {isFapEnabled && (
         <Tooltip title="Facility access panels">
           <ListItem component={NavLink} to="/Faps" button>

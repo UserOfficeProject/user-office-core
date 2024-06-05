@@ -434,6 +434,12 @@ const Dashboard = () => {
             )}
             <TitledRoute
               setHeader={setHeader}
+              title="Techniques"
+              path="/Techniques"
+              component={InstrumentsPage}
+            />
+            <TitledRoute
+              setHeader={setHeader}
               title="Institution"
               path="/Institutions"
               component={InstitutionPage}
