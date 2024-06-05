@@ -273,7 +273,7 @@ const FapProposalsAndAssignmentsTable = ({
     if (proposalPks.length === 0) {
       return;
     }
-    //may need to update this
+
     const existingProposalAssignments = FapProposalsData.flatMap(
       (assignment) => assignment.assignments
     );

@@ -38,7 +38,7 @@ const columns = [
 ];
 
 const AssignFapMemberToProposalModal = ({
-  assignMembersToFapProposals: assignMembersToFapProposals,
+  assignMembersToFapProposals,
   fapId,
   proposalPks,
   setProposalPks,

@@ -129,11 +129,6 @@ const proposal2 = {
   abstract: faker.random.words(5),
 };
 
-const proposal3 = {
-  title: faker.random.words(3),
-  abstract: faker.random.words(5),
-};
-
 const scientist = initialDBData.users.user1;
 
 const instrument = {
@@ -148,7 +143,6 @@ let createdCallId: number;
 let firstCreatedProposalPk: number;
 let firstCreatedProposalId: string;
 let secondCreatedProposalPk: number;
-let thirdCreatedProposalPk: number;
 let createdWorkflowId: number;
 let createdEsiTemplateId: number;
 let newlyCreatedInstrumentId: number;
@@ -261,31 +255,6 @@ function initializationBeforeTests() {
               cy.assignProposalsToInstruments({
                 instrumentIds: [newlyCreatedInstrumentId],
                 proposalPks: [secondCreatedProposalPk],
-              });
-            }
-          });
-
-          cy.createProposal({ callId: createdCallId }).then((result) => {
-            const createdProposal = result.createProposal;
-            if (createdProposal) {
-              thirdCreatedProposalPk = createdProposal.primaryKey;
-
-              cy.updateProposal({
-                proposalPk: createdProposal.primaryKey,
-                title: proposal3.title,
-                abstract: proposal3.abstract,
-                proposerId: initialDBData.users.user2.id,
-              });
-
-              // Manually changing the proposal status to be shown in the Faps. -------->
-              cy.changeProposalsStatus({
-                statusId: initialDBData.proposalStatuses.fapReview.id,
-                proposalPks: [thirdCreatedProposalPk],
-              });
-
-              cy.assignProposalsToInstruments({
-                instrumentIds: [newlyCreatedInstrumentId],
-                proposalPks: [thirdCreatedProposalPk],
               });
             }
           });
