@@ -315,6 +315,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async applyPatches(): Promise<string[]> {
+    this.autoUpgradedDBReady = false;
+
     logger.logInfo('Applying patches started', { timestamp: new Date() });
 
     const files = await fs.readdir(dbPatchesFolderPath);
@@ -348,6 +350,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
 
     logger.logInfo('Applying patches finished', { timestamp: new Date() });
+
+    this.autoUpgradedDBReady = true;
 
     return patches.map(([file]) => file);
   }
@@ -392,7 +396,6 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         .select('state')
         .groupBy(2)
         .then(() => this.applyPatches())
-        .then(() => (this.autoUpgradedDBReady = true))
         .catch((e) => {
           initDbFailed++;
 
