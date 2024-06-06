@@ -1,5 +1,5 @@
-query getTechnique($id: Int!) {
-  technique(id: $id) {
+query getTechnique($techniqueId: Int!) {
+  technique(techniqueId: $techniqueId) {
     ...technique
   }
 }

@@ -1,7 +1,6 @@
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
-import i18n from 'i18n';
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
@@ -10,18 +9,10 @@ import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { FunctionType } from 'utils/utilTypes';
 
-import AssignedScientistsTable from './AssignedScientistsTable';
-import CreateUpdateInstrument from './CreateUpdateTechniques';
-import {
-  BasicUserDetails,
-  InstrumentFragment,
-  UserRole,
-} from '../../generated/sdk';
-import ParticipantModal from '../proposal/ParticipantModal';
+import { InstrumentFragment, UserRole } from '../../generated/sdk';
 
 const columns = [
   {
@@ -45,16 +36,13 @@ const columns = [
 
 const TechniqueTable = () => {
   const {
-    loadingInstruments,
-    instruments,
-    setInstrumentsWithLoading: setInstruments,
-  } = useInstrumentsData();
+    loadingTechniques,
+    techniques,
+    setTechniquesWithLoading: setTechniques,
+  } = useTechniquesData();
 
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
-  const [assigningInstrumentId, setAssigningInstrumentId] = useState<
-    number | null
-  >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
@@ -73,108 +61,19 @@ const TechniqueTable = () => {
     }
   };
 
-  const assignScientistsToInstrument = async (
-    scientists: BasicUserDetails[]
-  ) => {
-    await api({
-      toastSuccessMessage: `Scientist assigned to ${i18n.format(
-        t('instrument'),
-        'lowercase'
-      )} successfully!`,
-    }).assignScientistsToInstrument({
-      instrumentId: assigningInstrumentId as number,
-      scientistIds: scientists.map((scientist) => scientist.id),
-    });
-
-    setInstruments((instruments) =>
-      instruments.map((instrumentItem) => {
-        if (instrumentItem.id === assigningInstrumentId) {
-          return {
-            ...instrumentItem,
-            scientists: [...instrumentItem.scientists, ...scientists],
-          };
-        } else {
-          return instrumentItem;
-        }
-      })
-    );
-
-    setAssigningInstrumentId(null);
-  };
-
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
-  const AssignedScientists = React.useCallback(
-    ({ rowData }) => {
-      const removeAssignedScientistFromInstrument = (
-        scientistToRemoveId: number,
-        instrumentToRemoveFromId: number
-      ) => {
-        setInstruments((instruments) =>
-          instruments.map((instrumentItem) => {
-            if (instrumentItem.id === instrumentToRemoveFromId) {
-              const newScientists = instrumentItem.scientists.filter(
-                (scientistItem) => scientistItem.id !== scientistToRemoveId
-              );
-
-              return {
-                ...instrumentItem,
-                scientists: newScientists,
-              };
-            } else {
-              return instrumentItem;
-            }
-          })
-        );
-        setAssigningInstrumentId(null);
-      };
-
-      return (
-        <AssignedScientistsTable
-          instrument={rowData}
-          removeAssignedScientistFromInstrument={
-            removeAssignedScientistFromInstrument
-          }
-        />
-      );
-    },
-    [setInstruments, setAssigningInstrumentId]
-  );
-
-  const createModal = (
-    onUpdate: FunctionType<void, [InstrumentFragment | null]>,
-    onCreate: FunctionType<void, [InstrumentFragment | null]>,
-    editInstrument: InstrumentFragment | null
-  ) => (
-    <CreateUpdateInstrument
-      instrument={editInstrument}
-      close={(instrument: InstrumentFragment | null) =>
-        !!editInstrument ? onUpdate(instrument) : onCreate(instrument)
-      }
-    />
-  );
-  const instrumentAssignments = instruments?.find(
-    (instrumentItem) => instrumentItem.id === assigningInstrumentId
-  );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function setAssigningTechniqueId(id: number): void {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <>
-      <ParticipantModal
-        show={!!assigningInstrumentId}
-        close={(): void => setAssigningInstrumentId(null)}
-        addParticipants={assignScientistsToInstrument}
-        selectedUsers={instrumentAssignments?.scientists.map(
-          (scientist) => scientist.id
-        )}
-        selection={true}
-        userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={t('instrumentSci')}
-        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
-      />
       <div data-cy="techniques-table">
         <SuperMaterialTable
           delete={onTechniqueDelete}
-          setData={setInstruments}
+          setData={setTechniques}
           hasAccess={{
             create: isUserOfficer,
             update: isUserOfficer,
@@ -186,15 +85,8 @@ const TechniqueTable = () => {
             </Typography>
           }
           columns={columns}
-          data={instruments}
-          isLoading={loadingInstruments}
-          createModal={createModal}
-          detailPanel={[
-            {
-              tooltip: 'Show instruments and permissions',
-              render: AssignedScientists,
-            },
-          ]}
+          data={techniques}
+          isLoading={loadingTechniques}
           options={{
             search: true,
             debounceInterval: 400,
@@ -204,9 +96,9 @@ const TechniqueTable = () => {
               ? [
                   {
                     icon: AssignmentIndIcon,
-                    tooltip: 'Assign scientist',
+                    tooltip: 'Assign instrument',
                     onClick: (_event: unknown, rowData: unknown): void =>
-                      setAssigningInstrumentId(
+                      setAssigningTechniqueId(
                         (rowData as InstrumentFragment).id
                       ),
                   },

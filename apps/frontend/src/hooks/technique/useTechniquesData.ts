@@ -7,22 +7,22 @@ import {
 } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { InstrumentFragment, UserRole } from 'generated/sdk';
+import { TechniqueFragment, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useTechniquesData(callIds?: number[]): {
   loadingTechniques: boolean;
-  techniques: InstrumentFragment[];
-  setTechniquesWithLoading: Dispatch<SetStateAction<InstrumentFragment[]>>;
+  techniques: TechniqueFragment[];
+  setTechniquesWithLoading: Dispatch<SetStateAction<TechniqueFragment[]>>;
 } {
-  const [techniques, setTechniques] = useState<InstrumentFragment[]>([]);
+  const [techniques, setTechniques] = useState<TechniqueFragment[]>([]);
   const [loadingTechniques, setLoadingTechniques] = useState(true);
   const { currentRole } = useContext(UserContext);
 
   const api = useDataApi();
 
   const setTechniquesWithLoading = (
-    data: SetStateAction<InstrumentFragment[]>
+    data: SetStateAction<TechniqueFragment[]>
   ) => {
     setLoadingTechniques(true);
     setTechniques(data);
@@ -35,27 +35,14 @@ export function useTechniquesData(callIds?: number[]): {
     setLoadingTechniques(true);
     if (currentRole && [UserRole.USER_OFFICER].includes(currentRole)) {
       api()
-        .getInstruments({ callIds })
+        .getTechniques()
         .then((data) => {
           if (unmounted) {
             return;
           }
 
-          if (data.instruments) {
-            setTechniques(data.instruments.instruments);
-          }
-          setLoadingTechniques(false);
-        });
-    } else {
-      api()
-        .getMyInstruments()
-        .then((data) => {
-          if (unmounted) {
-            return;
-          }
-
-          if (data.me?.instruments) {
-            setTechniques(data.me.instruments);
+          if (data.techniques) {
+            setTechniques(data.techniques.techniques);
           }
           setLoadingTechniques(false);
         });

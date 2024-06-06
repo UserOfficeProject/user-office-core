@@ -1,5 +1,5 @@
-query getTechniques($callIds: [Int!]) {
-  techniques(callIds: $callIds) {
+query getTechniques {
+  techniques {
     techniques {
       ...technique
     }

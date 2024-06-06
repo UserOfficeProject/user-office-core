@@ -3,7 +3,7 @@ import { Technique } from '../models/Technique';
 
 export interface TechniqueDataSource {
   // create(args: CreateTechniqueArgs): Promise<Technique>;
-  getTechnique(instrumentId: number): Promise<Technique | null>;
+  getTechnique(techniqueId: number): Promise<Technique | null>;
   getTechniques(
     first?: number,
     offset?: number

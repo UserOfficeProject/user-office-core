@@ -1295,3 +1295,11 @@ export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
     invite.claimed_by,
     invite.claimed_at
   );
+
+export interface TechniqueRecord {
+  readonly technique_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly full_count: number;
+}
