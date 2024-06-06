@@ -1,0 +1,15 @@
+mutation updateTechnique(
+  $id: Int!
+  $name: String!
+  $shortCode: String!
+  $description: String!
+) {
+  updateTechnique(
+    id: $id
+    name: $name
+    shortCode: $shortCode
+    description: $description
+  ) {
+    ...technique
+  }
+}

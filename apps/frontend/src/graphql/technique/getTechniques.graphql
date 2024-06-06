@@ -1,0 +1,8 @@
+query getTechniques($callIds: [Int!]) {
+  techniques(callIds: $callIds) {
+    techniques {
+      ...technique
+    }
+    totalCount
+  }
+}

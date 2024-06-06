@@ -37,8 +37,8 @@ const columns = [
     field: 'description',
   },
   {
-    title: 'Scientists',
-    field: 'scientists.length',
+    title: 'Instruments',
+    field: 'Instruments.length',
     emptyValue: '-',
   },
 ];
