@@ -6,7 +6,11 @@ import { Technique } from '../../models/Technique';
 import { CreateTechniqueArgs } from '../../resolvers/mutations/CreateTechniqueMutation';
 import { TechniqueDataSource } from '../TechniqueDataSource';
 import database from './database';
-import { TechniqueHasInstrumentsRecord, TechniqueRecord } from './records';
+import {
+  InstrumentRecord,
+  TechniqueHasInstrumentsRecord,
+  TechniqueRecord,
+} from './records';
 
 @injectable()
 export default class PostgresTechniqueDataSource
@@ -18,6 +22,16 @@ export default class PostgresTechniqueDataSource
       technique.name,
       technique.short_code,
       technique.description
+    );
+  }
+
+  private createInstrumentObject(instrument: InstrumentRecord) {
+    return new Instrument(
+      instrument.instrument_id,
+      instrument.name,
+      instrument.short_code,
+      instrument.description,
+      instrument.manager_user_id
     );
   }
 
@@ -68,12 +82,10 @@ export default class PostgresTechniqueDataSource
       });
   }
 
-  getInstrumentsByTechniqueId(techniqueId: number): Promise<Instrument[]> {
-    throw new Error('Method not implemented.');
-  }
-
-  getInstrumentIdsByTechniqueId(techniqueId: number): Promise<number[]> {
-    const result = database
+  async getInstrumentsByTechniqueId(
+    techniqueId: number
+  ): Promise<Instrument[]> {
+    const instrumentIds = await database
       .select()
       .from('technique_has_instruments')
       .where('technique_id', techniqueId)
@@ -83,7 +95,13 @@ export default class PostgresTechniqueDataSource
         })
       );
 
-    return result;
+    return database
+      .select()
+      .from('instruments')
+      .whereIn('instrument_id', instrumentIds)
+      .then((results: InstrumentRecord[]) =>
+        results.map(this.createInstrumentObject)
+      );
   }
 
   async update(technique: Technique): Promise<Technique> {

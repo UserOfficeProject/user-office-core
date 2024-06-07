@@ -20,5 +20,4 @@ export interface TechniqueDataSource {
     instrumentId: number,
     techniqueId: number
   ): Promise<boolean>;
-  getInstrumentIdsByTechniqueId(techniqueId: number): Promise<number[]>;
 }

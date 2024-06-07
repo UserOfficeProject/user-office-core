@@ -37,17 +37,10 @@ export class TechniqueResolver {
     @Root() technique: Technique,
     @Ctx() context: ResolverContext
   ): Promise<Instrument[] | null> {
-    const instrumentIds =
-      await context.queries.technique.dataSource.getInstrumentIdsByTechniqueId(
+    const instruments =
+      context.queries.technique.dataSource.getInstrumentsByTechniqueId(
         technique.id
       );
-
-    if (isRejection(instrumentIds)) {
-      return [];
-    }
-
-    const instruments =
-      context.queries.instrument.dataSource.getInstrumentsByIds(instrumentIds);
 
     return isRejection(instruments) ? [] : instruments;
   }
