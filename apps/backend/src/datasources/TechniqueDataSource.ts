@@ -11,7 +11,7 @@ export interface TechniqueDataSource {
   ): Promise<{ totalCount: number; techniques: Technique[] }>;
   getInstrumentsByTechniqueId(techniqueId: number): Promise<Instrument[]>;
   update(technique: Technique): Promise<Technique>;
-  delete(technique: number): Promise<Technique>;
+  delete(techniqueId: number): Promise<Technique>;
   assignInstrumentsToTechnique(
     instrumentIds: number[],
     techniqueId: number
