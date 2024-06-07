@@ -10,6 +10,7 @@ import {
   InstrumentRecord,
   TechniqueHasInstrumentsRecord,
   TechniqueRecord,
+  createInstrumentObject,
 } from './records';
 
 @injectable()
@@ -22,16 +23,6 @@ export default class PostgresTechniqueDataSource
       technique.name,
       technique.short_code,
       technique.description
-    );
-  }
-
-  private createInstrumentObject(instrument: InstrumentRecord) {
-    return new Instrument(
-      instrument.instrument_id,
-      instrument.name,
-      instrument.short_code,
-      instrument.description,
-      instrument.manager_user_id
     );
   }
 
@@ -100,7 +91,7 @@ export default class PostgresTechniqueDataSource
       .from('instruments')
       .whereIn('instrument_id', instrumentIds)
       .then((results: InstrumentRecord[]) =>
-        results.map(this.createInstrumentObject)
+        results.map(createInstrumentObject)
       );
   }
 
