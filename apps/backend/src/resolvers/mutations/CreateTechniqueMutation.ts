@@ -18,7 +18,7 @@ export class CreateTechniqueArgs {
 @Resolver()
 export class CreateTechniqueMutation {
   @Mutation(() => Technique)
-  async createInstrument(
+  async createTechnique(
     @Args() args: CreateTechniqueArgs,
     @Ctx() context: ResolverContext
   ) {

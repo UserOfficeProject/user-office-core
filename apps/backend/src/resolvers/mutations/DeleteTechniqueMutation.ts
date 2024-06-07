@@ -6,7 +6,7 @@ import { Technique } from '../types/Technique';
 @Resolver()
 export class DeleteTechniqueMutation {
   @Mutation(() => Technique)
-  async deleteInstrument(
+  async deleteTechnique(
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {

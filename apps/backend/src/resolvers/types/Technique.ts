@@ -28,9 +28,6 @@ export class Technique implements Partial<TechniqueOrigin> {
 
   @Field()
   public description: string;
-
-  @Field(() => Int)
-  public managerUserId: number;
 }
 
 @Resolver(() => Technique)
