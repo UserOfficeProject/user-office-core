@@ -83,6 +83,8 @@ declare module 'knex/types/tables' {
 
   interface Tables {
     pdf_templates: PdfTemplateRecord;
+    techniques: TechniqueRecord;
+    technique_has_instruments: TechniqueHasInstrumentsRecord;
   }
 }
 
@@ -1302,4 +1304,9 @@ export interface TechniqueRecord {
   readonly short_code: string;
   readonly description: string;
   readonly full_count: number;
+}
+
+export interface TechniqueHasInstrumentsRecord {
+  readonly technique_id: number;
+  readonly instrument_id: number;
 }
