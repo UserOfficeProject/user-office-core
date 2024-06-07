@@ -11,7 +11,7 @@ export interface TechniqueDataSource {
   ): Promise<{ totalCount: number; techniques: Technique[] }>;
   getInstrumentsByTechniqueId(techniqueId: number): Promise<Instrument[]>;
   update(technique: Technique): Promise<Technique>;
-  delete(techniqueId: number): Promise<Technique>;
+  delete(technique: number): Promise<Technique>;
   assignInstrumentsToTechnique(
     instrumentIds: number[],
     techniqueId: number
@@ -20,4 +20,5 @@ export interface TechniqueDataSource {
     instrumentId: number,
     techniqueId: number
   ): Promise<boolean>;
+  getInstrumentIdsByTechniqueId(techniqueId: number): Promise<number[]>;
 }

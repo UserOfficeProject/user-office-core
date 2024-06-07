@@ -3,4 +3,7 @@ fragment technique on Technique {
   name
   shortCode
   description
+  instruments {
+    ...instrument
+  }
 }

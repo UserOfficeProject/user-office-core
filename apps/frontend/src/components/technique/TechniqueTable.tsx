@@ -12,7 +12,8 @@ import SuperMaterialTable, {
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { InstrumentFragment, UserRole } from '../../generated/sdk';
+import AssignedInstrumentsTable from './AssignedInstrumentsTable';
+import { TechniqueFragment, UserRole } from '../../generated/sdk';
 
 const columns = [
   {
@@ -29,7 +30,7 @@ const columns = [
   },
   {
     title: 'Instruments',
-    field: 'Instruments.length',
+    field: 'instruments.length',
     emptyValue: '-',
   },
 ];
@@ -68,6 +69,13 @@ const TechniqueTable = () => {
     throw new Error('Function not implemented.');
   }
 
+  const AssignedInstruments = React.useCallback(
+    ({ rowData }) => {
+      return <AssignedInstrumentsTable technique={rowData} />;
+    },
+    [setTechniques]
+  );
+
   return (
     <>
       <div data-cy="techniques-table">
@@ -87,6 +95,12 @@ const TechniqueTable = () => {
           columns={columns}
           data={techniques}
           isLoading={loadingTechniques}
+          detailPanel={[
+            {
+              tooltip: 'Show Instruments and Permissions',
+              render: AssignedInstruments,
+            },
+          ]}
           options={{
             search: true,
             debounceInterval: 400,
@@ -99,7 +113,7 @@ const TechniqueTable = () => {
                     tooltip: 'Assign instrument',
                     onClick: (_event: unknown, rowData: unknown): void =>
                       setAssigningTechniqueId(
-                        (rowData as InstrumentFragment).id
+                        (rowData as TechniqueFragment).id
                       ),
                   },
                 ]

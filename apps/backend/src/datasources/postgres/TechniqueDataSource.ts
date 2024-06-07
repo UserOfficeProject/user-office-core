@@ -1,11 +1,12 @@
 import { injectable } from 'tsyringe';
+import { Int } from 'type-graphql';
 
 import { Instrument } from '../../models/Instrument';
 import { Technique } from '../../models/Technique';
 import { CreateTechniqueArgs } from '../../resolvers/mutations/CreateTechniqueMutation';
 import { TechniqueDataSource } from '../TechniqueDataSource';
 import database from './database';
-import { TechniqueRecord } from './records';
+import { TechniqueHasInstrumentsRecord, TechniqueRecord } from './records';
 
 @injectable()
 export default class PostgresTechniqueDataSource
@@ -69,6 +70,20 @@ export default class PostgresTechniqueDataSource
 
   getInstrumentsByTechniqueId(techniqueId: number): Promise<Instrument[]> {
     throw new Error('Method not implemented.');
+  }
+
+  getInstrumentIdsByTechniqueId(techniqueId: number): Promise<number[]> {
+    const result = database
+      .select()
+      .from('technique_has_instruments')
+      .where('technique_id', techniqueId)
+      .then((results: TechniqueHasInstrumentsRecord[]) =>
+        results.map((result) => {
+          return Int.parseValue(result.instrument_id);
+        })
+      );
+
+    return result;
   }
 
   async update(technique: Technique): Promise<Technique> {
