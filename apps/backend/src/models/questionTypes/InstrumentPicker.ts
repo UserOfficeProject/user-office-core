@@ -101,7 +101,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       const instrumentIds = value
         ? Array.isArray(value)
           ? value.map((i) => i.instrumentId)
-          : [value]
+          : [value.instrumentId]
         : null;
 
       if (!instrumentIds?.length) {
