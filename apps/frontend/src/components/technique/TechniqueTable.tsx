@@ -14,17 +14,13 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
-<<<<<<< Updated upstream
 import AssignInstrumentsToTechniques from './AssignInstrumentsToTechniques';
+import CreateUpdateTechnique from './CreateUpdateTechnique';
 import {
   InstrumentFragment,
   TechniqueFragment,
   UserRole,
 } from '../../generated/sdk';
-=======
-import CreateUpdateTechnique from './CreateUpdateTechnique';
-import { TechniqueFragment, UserRole } from '../../generated/sdk';
->>>>>>> Stashed changes
 
 const columns = [
   {
@@ -122,7 +118,6 @@ const TechniqueTable = () => {
     [setTechniques]
   );
 
-<<<<<<< Updated upstream
   const removeIntrumentsFromTechnique = async (
     instrumentIds: number[]
   ): Promise<void> => {
@@ -152,7 +147,7 @@ const TechniqueTable = () => {
       })
     );
   };
-=======
+
   const createModal = (
     onUpdate: FunctionType<void, [TechniqueFragment | null]>,
     onCreate: FunctionType<void, [TechniqueFragment | null]>,
@@ -165,7 +160,6 @@ const TechniqueTable = () => {
       }
     />
   );
->>>>>>> Stashed changes
 
   return (
     <>
