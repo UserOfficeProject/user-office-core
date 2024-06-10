@@ -1,6 +1,6 @@
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
-import { Typography } from '@mui/material';
-import React from 'react';
+import { Dialog, DialogContent, Typography } from '@mui/material';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
@@ -13,7 +13,12 @@ import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
-import { TechniqueFragment, UserRole } from '../../generated/sdk';
+import AssignInstrumentsToTechniques from './AssignInstrumentsToTechniques';
+import {
+  InstrumentFragment,
+  TechniqueFragment,
+  UserRole,
+} from '../../generated/sdk';
 
 const columns = [
   {
@@ -48,6 +53,12 @@ const TechniqueTable = () => {
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
+  const [openInstrumentAssignment, setOpenInstrumentAssignment] =
+    useState(false);
+  const [selectedTechniques, setSelectedTechniques] = useState<
+    TechniqueFragment[]
+  >([]);
+
   const onTechniqueDelete = async (techniqueDeletedId: number | string) => {
     try {
       await api({
@@ -65,9 +76,38 @@ const TechniqueTable = () => {
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function setAssigningTechniqueId(id: number): void {
-    throw new Error('Function not implemented.');
+  function setAssigningTechniqueId(technique: TechniqueFragment): void {
+    const techniqueList: TechniqueFragment[] = [];
+    techniqueList.push(technique);
+    setSelectedTechniques(techniqueList);
+    setOpenInstrumentAssignment(true);
   }
+
+  const assignInstrumentsToTechniques = async (
+    instruments: InstrumentFragment[]
+  ): Promise<void> => {
+    const techniqueId = selectedTechniques[0].id;
+    if (instruments?.length) {
+      await api({
+        toastSuccessMessage: `Instrument/s assigned to the selected technique successfully!`,
+      }).assignInstrumentsToTechnique({
+        instrumentIds: instruments.map((instrument) => instrument.id),
+        techniqueId,
+      });
+    }
+    setTechniques((techniques) =>
+      techniques.map((techniqueItem) => {
+        if (techniqueItem.id === techniqueId) {
+          return {
+            ...techniqueItem,
+            instruments: [...techniqueItem.instruments, ...instruments],
+          };
+        } else {
+          return techniqueItem;
+        }
+      })
+    );
+  };
 
   const AssignedInstruments = React.useCallback(
     ({ rowData }) => {
@@ -76,8 +116,61 @@ const TechniqueTable = () => {
     [setTechniques]
   );
 
+  const removeIntrumentsFromTechnique = async (
+    instrumentIds: number[]
+  ): Promise<void> => {
+    const techniqueId = selectedTechniques[0].id;
+    if (instrumentIds?.length) {
+      instrumentIds.forEach(async (instrumentId) => {
+        await api({
+          toastSuccessMessage: `Instrument/s unassigned from selected technique successfully!`,
+        }).removeInstrumentFromTechnique({
+          instrumentId,
+          techniqueId,
+        });
+      });
+    }
+    setTechniques((techniques) =>
+      techniques.map((techniqueItem) => {
+        if (techniqueItem.id === techniqueId) {
+          return {
+            ...techniqueItem,
+            instruments: techniqueItem.instruments.filter(
+              (instrument) => !instrumentIds.find((id) => id === instrument.id)
+            ),
+          };
+        } else {
+          return techniqueItem;
+        }
+      })
+    );
+  };
+
   return (
     <>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openInstrumentAssignment}
+        onClose={(): void => setOpenInstrumentAssignment(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogContent>
+          <AssignInstrumentsToTechniques
+            assignInstrumentsToTechniques={assignInstrumentsToTechniques}
+            close={(): void => setOpenInstrumentAssignment(false)}
+            instrumentIds={selectedTechniques
+              .map((selecteTechnique) =>
+                (selecteTechnique.instruments || []).map(
+                  (instrument) => instrument.id
+                )
+              )
+              .flat()}
+            removeIntrumentsFromTechnique={removeIntrumentsFromTechnique}
+          />
+        </DialogContent>
+      </Dialog>
       <div data-cy="techniques-table">
         <SuperMaterialTable
           delete={onTechniqueDelete}
@@ -112,9 +205,7 @@ const TechniqueTable = () => {
                     icon: AssignmentIndIcon,
                     tooltip: 'Assign instrument',
                     onClick: (_event: unknown, rowData: unknown): void =>
-                      setAssigningTechniqueId(
-                        (rowData as TechniqueFragment).id
-                      ),
+                      setAssigningTechniqueId(rowData as TechniqueFragment),
                   },
                 ]
               : []
