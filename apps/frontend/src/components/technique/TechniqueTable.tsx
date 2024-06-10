@@ -50,13 +50,11 @@ const TechniqueTable = () => {
   } = useTechniquesData();
 
   const { api } = useDataApiWithFeedback();
-  const { t } = useTranslation();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
-  const [openInstrumentAssignment, setOpenInstrumentAssignment] =
-    useState(false);
+  const [openTechniqueAssignment, setOpenTechniqueAssignment] = useState(false);
   const [selectedTechniques, setSelectedTechniques] = useState<
     TechniqueFragment[]
   >([]);
@@ -64,8 +62,8 @@ const TechniqueTable = () => {
   const onTechniqueDelete = async (techniqueDeletedId: number | string) => {
     try {
       await api({
-        toastSuccessMessage: t('instrument') + ' removed successfully!',
-      }).deleteInstrument({
+        toastSuccessMessage: 'Technique removed successfully!',
+      }).deleteTechnique({
         id: techniqueDeletedId as number,
       });
 
@@ -82,7 +80,7 @@ const TechniqueTable = () => {
     const techniqueList: TechniqueFragment[] = [];
     techniqueList.push(technique);
     setSelectedTechniques(techniqueList);
-    setOpenInstrumentAssignment(true);
+    setOpenTechniqueAssignment(true);
   }
 
   const assignInstrumentsToTechniques = async (
@@ -166,15 +164,15 @@ const TechniqueTable = () => {
       <Dialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
-        open={openInstrumentAssignment}
-        onClose={(): void => setOpenInstrumentAssignment(false)}
+        open={openTechniqueAssignment}
+        onClose={(): void => setOpenTechniqueAssignment(false)}
         maxWidth="xs"
         fullWidth
       >
         <DialogContent>
           <AssignInstrumentsToTechniques
             assignInstrumentsToTechniques={assignInstrumentsToTechniques}
-            close={(): void => setOpenInstrumentAssignment(false)}
+            close={(): void => setOpenTechniqueAssignment(false)}
             instrumentIds={selectedTechniques
               .map((selecteTechnique) =>
                 (selecteTechnique.instruments || []).map(
