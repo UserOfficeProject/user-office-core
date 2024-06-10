@@ -4,9 +4,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
-import i18n from 'i18n';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
@@ -28,8 +26,6 @@ const AssignInstrumentsToTechniques = ({
   removeIntrumentsFromTechnique,
   instrumentIds,
 }: AssignInstrumentsToTechniquesProps) => {
-  const { t } = useTranslation();
-
   const { instruments, loadingInstruments } = useInstruments();
 
   const uniqueInstrumentIds = getUniqueArray(instrumentIds);
@@ -38,7 +34,7 @@ const AssignInstrumentsToTechniques = ({
     <Container
       component="main"
       maxWidth="xs"
-      data-cy="proposals-instrument-assignment"
+      data-cy="technique-instruments-assignment"
     >
       <Formik
         initialValues={{
@@ -85,10 +81,7 @@ const AssignInstrumentsToTechniques = ({
         {({ isSubmitting, values }): JSX.Element => (
           <Form>
             <Typography variant="h6" component="h1">
-              {`Assign technique/s to ${i18n.format(
-                t('instrument'),
-                'lowercase'
-              )}`}
+              {`Assign technique/s to instrument`}
             </Typography>
 
             <Grid container spacing={3}>
@@ -103,24 +96,15 @@ const AssignInstrumentsToTechniques = ({
                     text: instrument.name,
                   }))}
                   disabled={isSubmitting}
-                  noOptionsText={
-                    'No ' +
-                    i18n.format(
-                      i18n.format(t('instrument'), 'plural'),
-                      'lowercase'
-                    )
-                  }
+                  noOptionsText={'No Instruments'}
                   data-cy="instrument-selection"
                 />
               </Grid>
             </Grid>
             {!values.selectedInstrumentIds.length && (
               <Alert severity="warning" data-cy="remove-instrument-alert">
-                {`Be aware that leaving ${i18n.format(
-                  t('instrument'),
-                  'lowercase'
-                )} selection empty will remove
-                assigned instrument from proposal/s.`}
+                {`Be aware that leaving instrument selection empty will remove
+                assigned instrument from technique.`}
               </Alert>
             )}
             <Button
@@ -141,5 +125,4 @@ const AssignInstrumentsToTechniques = ({
   );
 };
 
-// NOTE: This comparison is done to prevent component re-rendering on modal close
 export default React.memo(AssignInstrumentsToTechniques);
