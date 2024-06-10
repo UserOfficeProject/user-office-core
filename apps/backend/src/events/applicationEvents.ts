@@ -8,6 +8,7 @@ import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
+import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -299,6 +300,33 @@ interface FapReviewerNotified extends GeneralEvent {
   fapReview: Review;
 }
 
+interface TechniqueCreatedEvent extends GeneralEvent {
+  type: Event.TECHNIQUE_CREATED;
+  instrument: Technique;
+}
+
+interface TechniqueUpdatedEvent extends GeneralEvent {
+  type: Event.TECHNIQUE_UPDATED;
+  instrument: Instrument;
+}
+
+interface TechniqueDeletedEvent extends GeneralEvent {
+  type: Event.TECHNIQUE_DELETED;
+  instrument: Instrument;
+}
+
+interface InstrumentAssignedToTechniqueEvent extends GeneralEvent {
+  type: Event.INSTRUMENT_ASSIGNED_TO_TECHNIQUE;
+  instrument: Instrument;
+  technique: Technique;
+}
+
+interface InstrumentRemovedFromTechniqueEvent extends GeneralEvent {
+  type: Event.INSTRUMENT_REMOVED_FROM_TECHNIQUE;
+  instrument: Instrument;
+  technique: Technique;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -354,4 +382,9 @@ export type ApplicationEvent =
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
   | FapReviewerNotified
-  | ProposalStatusActionExecutedEvent;
+  | ProposalStatusActionExecutedEvent
+  | TechniqueCreatedEvent
+  | TechniqueUpdatedEvent
+  | TechniqueDeletedEvent
+  | InstrumentAssignedToTechniqueEvent
+  | InstrumentRemovedFromTechniqueEvent;

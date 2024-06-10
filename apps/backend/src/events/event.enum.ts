@@ -68,6 +68,11 @@ export enum Event {
   INTERNAL_REVIEW_CREATED = 'INTERNAL_REVIEW_CREATED',
   INTERNAL_REVIEW_UPDATED = 'INTERNAL_REVIEW_UPDATED',
   INTERNAL_REVIEW_DELETED = 'INTERNAL_REVIEW_DELETED',
+  TECHNIQUE_CREATED = 'TECHNIQUE_CREATED',
+  TECHNIQUE_UPDATED = 'TECHNIQUE_UPDATED',
+  TECHNIQUE_DELETED = 'TECHNIQUE_DELETED',
+  INSTRUMENT_ASSIGNED_TO_TECHNIQUE = 'INSTRUMENT_ASSIGNED_TO_TECHNIQUE',
+  INSTRUMENT_REMOVED_FROM_TECHNIQUE = 'INSTRUMENT_REMOVED_FROM_TECHNIQUE',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -279,5 +284,16 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.INTERNAL_REVIEW_DELETED,
     'Event occurs when internal (technical) review is removed',
+  ],
+  [Event.TECHNIQUE_CREATED, 'Event occurs when the technique is created'],
+  [Event.TECHNIQUE_UPDATED, 'Event occurs when the technique is updated'],
+  [Event.TECHNIQUE_DELETED, 'Event occurs when the technique is removed'],
+  [
+    Event.INSTRUMENT_ASSIGNED_TO_TECHNIQUE,
+    'Event occurs when an instrument is assigned to a technique',
+  ],
+  [
+    Event.INSTRUMENT_REMOVED_FROM_TECHNIQUE,
+    'Event occurs when an assigned instrument is removed from the technique',
   ],
 ]);

@@ -28,7 +28,11 @@ export default class PostgresTechniqueDataSource
 
   async create(args: CreateTechniqueArgs): Promise<Technique> {
     const [technique]: TechniqueRecord[] = await database('techniques')
-      .insert(args)
+      .insert({
+        short_code: args.shortCode,
+        name: args.name,
+        description: args.description,
+      })
       .returning('*');
 
     return technique ? this.createTechniqueObject(technique) : Promise.reject();

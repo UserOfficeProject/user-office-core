@@ -11,14 +11,20 @@ import SuperMaterialTable, {
 } from 'components/common/SuperMaterialTable';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
+<<<<<<< Updated upstream
 import AssignInstrumentsToTechniques from './AssignInstrumentsToTechniques';
 import {
   InstrumentFragment,
   TechniqueFragment,
   UserRole,
 } from '../../generated/sdk';
+=======
+import CreateUpdateTechnique from './CreateUpdateTechnique';
+import { TechniqueFragment, UserRole } from '../../generated/sdk';
+>>>>>>> Stashed changes
 
 const columns = [
   {
@@ -116,6 +122,7 @@ const TechniqueTable = () => {
     [setTechniques]
   );
 
+<<<<<<< Updated upstream
   const removeIntrumentsFromTechnique = async (
     instrumentIds: number[]
   ): Promise<void> => {
@@ -145,6 +152,20 @@ const TechniqueTable = () => {
       })
     );
   };
+=======
+  const createModal = (
+    onUpdate: FunctionType<void, [TechniqueFragment | null]>,
+    onCreate: FunctionType<void, [TechniqueFragment | null]>,
+    editTechnique: TechniqueFragment | null
+  ) => (
+    <CreateUpdateTechnique
+      technique={editTechnique}
+      close={(technique: TechniqueFragment | null) =>
+        !!editTechnique ? onUpdate(technique) : onCreate(technique)
+      }
+    />
+  );
+>>>>>>> Stashed changes
 
   return (
     <>
@@ -212,6 +233,7 @@ const TechniqueTable = () => {
           }
           urlQueryParams={urlQueryParams}
           setUrlQueryParams={setUrlQueryParams}
+          createModal={createModal}
         />
       </div>
     </>

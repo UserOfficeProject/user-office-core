@@ -5,16 +5,15 @@ BEGIN
     BEGIN
 
       CREATE TABLE techniques (
-        technique_id  integer NOT NULL,
-        name character varying(200) NOT NULL,
-        short_code character varying(20) NOT NULL,
-        description text,
-        PRIMARY KEY (technique_id)
+        technique_id SERIAL PRIMARY KEY,
+        name VARCHAR(200) NOT NULL,
+        short_code VARCHAR(20) NOT NULL,
+        description TEXT NOT NULL
       );
 
       CREATE TABLE technique_has_instruments (
-        technique_id integer NOT NULL,
-        instrument_id integer NOT NULL,
+        technique_id integer NOT NULL REFERENCES techniques (technique_id) ON UPDATE CASCADE,
+        instrument_id integer NOT NULL REFERENCES instruments (instrument_id) ON UPDATE CASCADE,
         PRIMARY KEY (technique_id, instrument_id)
       );
 
