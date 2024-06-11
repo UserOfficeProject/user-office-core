@@ -16,22 +16,14 @@ export default class TechniqueQueries {
     private userAuth: UserAuthorization
   ) {}
 
-  private isUserOfficer(agent: UserWithRole | null) {
-    if (agent == null) {
-      return false;
-    }
-
-    return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
-  }
-
-  @Authorized()
+  @Authorized([Roles.USER_OFFICER])
   async get(agent: UserWithRole | null, techniqueId: number) {
     const technique = await this.dataSource.getTechnique(techniqueId);
 
     return technique;
   }
 
-  @Authorized()
+  @Authorized([Roles.USER_OFFICER])
   async getInstrumentsByTechniqueId(
     agent: UserWithRole | null,
     techniqueId: number
@@ -39,18 +31,8 @@ export default class TechniqueQueries {
     return await this.dataSource.getInstrumentsByTechniqueId(techniqueId);
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.FAP_REVIEWER,
-    Roles.FAP_CHAIR,
-    Roles.FAP_SECRETARY,
-  ])
+  @Authorized([Roles.USER_OFFICER])
   async getAll(agent: UserWithRole | null) {
     return await this.dataSource.getTechniques();
-  }
-
-  @Authorized()
-  async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.getTechnique(id);
   }
 }
