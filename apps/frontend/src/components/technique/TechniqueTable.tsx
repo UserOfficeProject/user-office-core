@@ -1,7 +1,6 @@
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Dialog, DialogContent, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';

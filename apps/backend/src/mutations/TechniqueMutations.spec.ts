@@ -73,19 +73,45 @@ describe('Test technique Mutations', () => {
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
 
-  // test('A logged in user officer can assign instruments to a technique', async () => {
-  //   return true;
-  // });
+  test('A logged in user officer can assign instruments to a technique', async () => {
+    return expect(
+      techniqueMutations.assignInstrumentsToTechnique(
+        dummyUserOfficerWithRole,
+        {
+          instrumentIds: [1, 2],
+          techniqueId: 1,
+        }
+      )
+    ).resolves.toBe(true);
+  });
 
-  // test('A logged in user officer can remove an assigned instrument from a technique', async () => {
-  //   return true;
-  // });
+  test('A user cannot assign instruments to a technique', async () => {
+    return expect(
+      techniqueMutations.assignInstrumentsToTechnique(dummyUserWithRole, {
+        instrumentIds: [1, 2],
+        techniqueId: 1,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
 
-  // test('A user cannot assign instruments to a technique', async () => {
-  //   return true;
-  // });
+  test('A logged in user officer can remove an assigned instrument from a technique', async () => {
+    return expect(
+      techniqueMutations.removeInstrumentFromTechnique(
+        dummyUserOfficerWithRole,
+        {
+          instrumentId: 1,
+          techniqueId: 1,
+        }
+      )
+    ).resolves.toBe(true);
+  });
 
-  // test('A user cannot remove an assigned instrument from a technique', async () => {
-  //   return true;
-  // });
+  test('A user cannot remove an assigned instrument from a technique', async () => {
+    return expect(
+      techniqueMutations.removeInstrumentFromTechnique(dummyUserWithRole, {
+        instrumentId: 1,
+        techniqueId: 1,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
 });

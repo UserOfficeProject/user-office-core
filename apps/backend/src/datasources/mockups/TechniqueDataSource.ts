@@ -60,13 +60,13 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
     instrumentIds: number[],
     techniqueId: number
   ): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    return true;
   }
 
   async removeInstrumentFromTechnique(
     instrumentId: number,
     techniqueId: number
   ): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    return true;
   }
 }

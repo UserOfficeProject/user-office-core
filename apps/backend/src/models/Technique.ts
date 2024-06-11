@@ -9,8 +9,7 @@ export class Technique {
 
 export class TechniqueHasInstruments {
   constructor(
-    public techniqueHasInstrumentIds: number[],
-    public techniqueIds: number[],
-    public instrumentIds: number[]
+    public techniqueId: number,
+    public instrumentId: number
   ) {}
 }
