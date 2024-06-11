@@ -4,12 +4,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import { UserRole, ProposalWorkflow } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

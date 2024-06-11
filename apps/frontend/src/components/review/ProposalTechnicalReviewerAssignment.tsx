@@ -3,8 +3,8 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   ProposalDataInstrument,
   ProposalDataTechnicalReview,

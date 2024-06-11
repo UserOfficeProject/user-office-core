@@ -17,7 +17,6 @@ import {
   withDefault,
 } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
@@ -41,6 +40,7 @@ import {
   ProposalViewTechnicalReviewAssignee,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';

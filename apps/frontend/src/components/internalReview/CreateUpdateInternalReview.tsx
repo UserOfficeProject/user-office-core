@@ -7,13 +7,13 @@ import Typography from '@mui/material/Typography';
 import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, InternalReview, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 

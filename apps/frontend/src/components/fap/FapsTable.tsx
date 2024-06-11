@@ -6,7 +6,6 @@ import React, { useContext, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import SuperMaterialTable, {
   DefaultQueryParams,
@@ -20,6 +19,7 @@ import FapStatusFilter, {
 import AddFap from 'components/fap/General/AddFap';
 import { UserContext } from 'context/UserContextProvider';
 import { Fap, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapsData } from 'hooks/fap/useFapsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

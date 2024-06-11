@@ -12,7 +12,6 @@ import { Formik, Form, Field, useFormikContext, FieldArray } from 'formik';
 import React, { ChangeEvent } from 'react';
 import { unstable_usePrompt } from 'react-router-dom';
 
-import { useCheckAccess } from 'components/common/Can';
 import FormikUIPredefinedMessagesTextField, {
   PredefinedMessageKey,
 } from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
@@ -21,6 +20,7 @@ import {
   ProposalEndStatus,
   UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

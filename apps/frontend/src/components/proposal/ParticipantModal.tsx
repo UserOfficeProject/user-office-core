@@ -10,10 +10,10 @@ import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import PeopleTable from 'components/user/PeopleTable';
 import ProposalPeopleTable from 'components/user/ProposalsPeopleTable';
 import { UserRole, BasicUserDetails } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 
 type ParticipantModalProps = {
   title: string;

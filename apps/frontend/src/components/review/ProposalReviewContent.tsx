@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
@@ -21,6 +20,7 @@ import {
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   ProposalDataTechnicalReview,
   useProposalData,

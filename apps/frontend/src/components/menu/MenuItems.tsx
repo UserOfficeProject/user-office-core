@@ -87,7 +87,11 @@ const SettingsMenuListItem = () => {
         </Tooltip>
 
         <Tooltip title="Proposal statuses">
-          <ListItemButton component={NavLink} to="/ProposalStatuses">
+          <ListItemButton
+            component={NavLink}
+            to="/ProposalStatuses"
+            selected={location.pathname.includes('/ProposalStatuses')}
+          >
             <ListItemIcon>
               <ProposalSettingsIcon />
             </ListItemIcon>

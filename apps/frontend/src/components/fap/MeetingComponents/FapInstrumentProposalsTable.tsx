@@ -13,7 +13,6 @@ import Tooltip from '@mui/material/Tooltip';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FapProposal,
@@ -24,6 +23,7 @@ import {
   Proposal,
   TechnicalReview,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import {

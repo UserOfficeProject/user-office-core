@@ -6,8 +6,8 @@ import Typography from '@mui/material/Typography';
 import { getTranslation } from '@user-office-software/duo-localisation';
 import React, { Fragment } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import { TechnicalReview, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { getFullUserName } from 'utils/user';
 
 type TechnicalReviewInformationProps = {

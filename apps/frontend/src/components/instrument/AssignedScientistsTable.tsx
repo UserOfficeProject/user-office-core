@@ -4,8 +4,8 @@ import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useCheckAccess } from 'components/common/Can';
 import { Instrument, BasicUserDetails, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 

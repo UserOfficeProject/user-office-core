@@ -7,7 +7,7 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import InputDialog from 'components/common/InputDialog';
 import SuperMaterialTable, {

@@ -12,7 +12,6 @@ import { Formik, Form, Field, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { unstable_usePrompt } from 'react-router-dom';
 
-import { useCheckAccess } from 'components/common/Can';
 import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
@@ -25,6 +24,7 @@ import {
   UserRole,
   Proposal,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';

@@ -4,8 +4,8 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   ProposalDataInstrument,
   ProposalDataTechnicalReview,

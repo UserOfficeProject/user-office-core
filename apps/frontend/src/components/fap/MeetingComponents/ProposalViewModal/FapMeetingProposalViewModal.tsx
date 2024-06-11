@@ -10,9 +10,9 @@ import { TransitionProps } from '@mui/material/transitions/transition';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import { Review, UserRole, FapMeetingDecision, Proposal } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapProposalData } from 'hooks/fap/useFapProposalData';
 
 import ExternalReviews from './ExternalReviews';

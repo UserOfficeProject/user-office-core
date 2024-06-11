@@ -7,10 +7,10 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useCheckAccess } from 'components/common/Can';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import FapInstrumentProposalsTable from 'components/fap/MeetingComponents/FapInstrumentProposalsTable';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXFap } from 'hooks/fap/useDownloadXLSXFap';
 import { useInstrumentsByFapData } from 'hooks/instrument/useInstrumentsByFapData';
 import { tableIcons } from 'utils/materialIcons';

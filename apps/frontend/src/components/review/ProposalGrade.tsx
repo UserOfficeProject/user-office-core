@@ -15,7 +15,6 @@ import React, { useState, useContext } from 'react';
 import { unstable_usePrompt } from 'react-router-dom';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
-import { useCheckAccess } from 'components/common/Can';
 import ErrorMessage from 'components/common/ErrorMessage';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -24,6 +23,7 @@ import NavigationFragment from 'components/questionary/NavigationFragment';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { ReviewStatus, Review, UserRole, SettingsId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';

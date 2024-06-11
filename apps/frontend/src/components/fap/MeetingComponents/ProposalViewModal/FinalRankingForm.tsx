@@ -13,7 +13,6 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { unstable_usePrompt } from 'react-router-dom';
 
-import { useCheckAccess } from 'components/common/Can';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import {
@@ -23,6 +22,7 @@ import {
   FapMeetingDecision,
   UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledPaper, StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';

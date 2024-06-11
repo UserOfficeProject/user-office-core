@@ -6,8 +6,8 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import React, { useContext, useRef, useEffect } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 
 import {
   createMissingContextErrorMessage,

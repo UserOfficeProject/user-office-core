@@ -8,10 +8,10 @@ import { updateFapValidationSchema } from '@user-office-software/duo-validation/
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
 import { Fap, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
