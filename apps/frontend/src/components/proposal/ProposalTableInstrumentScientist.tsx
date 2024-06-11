@@ -195,15 +195,15 @@ const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
  */
 const ToolbarWithSelectAllPrefetched = (props: {
   actions: Action<ProposalViewData>[];
-  selectedRows: ProposalViewData[];
-  data: ProposalViewData[];
+  selectedCount: number;
+  dataManager: { data: ProposalViewData[] };
 }) => {
   const selectAllAction = props.actions.find(
     (action) => action.hidden && action.tooltip === SELECT_ALL_ACTION_TOOLTIP
   );
-  const tableHasData = !!props.data.length;
+  const tableHasData = !!props.dataManager.data.length;
   const allItemsSelectedOnThePage =
-    props.selectedRows.length === props.data.length;
+    props.selectedCount === props.dataManager.data.length;
 
   return (
     <div data-cy="select-all-toolbar">
@@ -220,7 +220,9 @@ const ToolbarWithSelectAllPrefetched = (props: {
               All proposals are selected.
               <Button
                 variant="text"
-                onClick={() => selectAllAction.onClick(null, props.data)}
+                onClick={() =>
+                  selectAllAction.onClick(null, props.dataManager.data)
+                }
                 data-cy="clear-all-selection"
               >
                 Clear selection
@@ -228,11 +230,12 @@ const ToolbarWithSelectAllPrefetched = (props: {
             </>
           ) : (
             <>
-              All {props.selectedRows.length} proposals on this page are
-              selected.
+              All {props.selectedCount} proposals on this page are selected.
               <Button
                 variant="text"
-                onClick={() => selectAllAction.onClick(null, props.data)}
+                onClick={() =>
+                  selectAllAction.onClick(null, props.dataManager.data)
+                }
                 data-cy="select-all-prefetched-proposals"
               >
                 Select all {selectAllAction.iconProps?.defaultValue} proposals

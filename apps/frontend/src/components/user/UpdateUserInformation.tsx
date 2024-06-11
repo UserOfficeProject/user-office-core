@@ -17,7 +17,7 @@ import { Form, Formik } from 'formik';
 import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
-import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import Autocomplete from 'components/common/FormikUIAutocomplete';
 import FormikUIDatePicker from 'components/common/FormikUIDatePicker';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
@@ -226,7 +226,7 @@ export default function UpdateUserInformation(
                     data-cy="othergender"
                   />
                 )}
-                <FormikUIAutocomplete
+                <Autocomplete
                   name="nationality"
                   label="Nationality"
                   items={nationalitiesList}
@@ -284,7 +284,7 @@ export default function UpdateUserInformation(
                 data-cy="username"
                 disabled
               />
-              <FormikUIAutocomplete
+              <Autocomplete
                 name="institutionId"
                 label="Institution"
                 items={institutionsList}

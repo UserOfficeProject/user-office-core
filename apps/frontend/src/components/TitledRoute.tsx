@@ -14,7 +14,7 @@ const TitledRoute = (props: PageProps) => {
     props.setHeader(props.title);
   }, [location, props]);
 
-  return props.element;
+  return <>{props.element}</>;
 };
 
 export default TitledRoute;

@@ -7,7 +7,6 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import InputDialog from 'components/common/InputDialog';
 import SuperMaterialTable, {
@@ -23,6 +22,7 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';

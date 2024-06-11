@@ -89,6 +89,10 @@ const FormikUIAutocomplete = ({
         <MuiTextField
           {...params}
           {...configTextField}
+          inputProps={{
+            ...params.inputProps,
+            'data-cy': otherProps['data-cy'],
+          }}
           InputProps={{
             ...params.InputProps,
             ...otherProps.InputProps,
@@ -107,7 +111,6 @@ const FormikUIAutocomplete = ({
           onBlur={() => {
             setAdornmentVisible(false);
           }}
-          inputProps={{ 'data-cy': 'test' }}
         />
       )}
       ListboxProps={{ id: otherProps['data-cy'] + '-options' }}
