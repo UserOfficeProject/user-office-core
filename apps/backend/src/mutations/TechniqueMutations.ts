@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { Authorized, EventBus } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -13,6 +13,13 @@ import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutat
 import { RemoveInstrumentFromTechniqueArgs } from '../resolvers/mutations/RemoveInstrumentFromTechnique';
 import { UpdateTechniqueArgs } from '../resolvers/mutations/UpdateTechniqueMutations';
 import { TechniqueDataSource } from './../datasources/TechniqueDataSource';
+import {
+  assignInstrumentsToTechniqueValidationSchema,
+  createTechniqueValidationSchema,
+  deleteTechniqueValidationSchema,
+  removeInstrumentsFromTechniqueValidationSchema,
+  updateTechniqueValidationSchema,
+} from './Technique';
 
 @injectable()
 export default class TechniqueMutations {
@@ -23,7 +30,7 @@ export default class TechniqueMutations {
   ) {}
 
   @EventBus(Event.TECHNIQUE_CREATED)
-  // @ValidateArgs(createTechniqueValidationSchema)
+  @ValidateArgs(createTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async create(
     agent: UserWithRole | null,
@@ -41,7 +48,7 @@ export default class TechniqueMutations {
   }
 
   @EventBus(Event.TECHNIQUE_UPDATED)
-  // @ValidateArgs(updateTechniqueValidationSchema)
+  @ValidateArgs(updateTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async update(
     agent: UserWithRole | null,
@@ -61,7 +68,7 @@ export default class TechniqueMutations {
   }
 
   @EventBus(Event.TECHNIQUE_DELETED)
-  // @ValidateArgs(deleteTechniqueValidationSchema)
+  @ValidateArgs(deleteTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async delete(
     agent: UserWithRole | null,
@@ -81,7 +88,7 @@ export default class TechniqueMutations {
   }
 
   @EventBus(Event.INSTRUMENT_ASSIGNED_TO_TECHNIQUE)
-  // @ValidateArgs(assignInstrumentsToTechniqueValidationSchema)
+  @ValidateArgs(assignInstrumentsToTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignInstrumentsToTechnique(
     agent: UserWithRole | null,
@@ -99,7 +106,7 @@ export default class TechniqueMutations {
   }
 
   @EventBus(Event.INSTRUMENT_REMOVED_FROM_TECHNIQUE)
-  // @ValidateArgs(removeInstrumentsFromTechniqueValidationSchema)
+  @ValidateArgs(removeInstrumentsFromTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async removeInstrumentFromTechnique(
     agent: UserWithRole | null,
