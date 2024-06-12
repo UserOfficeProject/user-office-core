@@ -215,7 +215,7 @@ const TechniqueTable = () => {
               ? [
                   {
                     icon: AssignmentIndIcon,
-                    tooltip: 'Assign instrument',
+                    tooltip: 'Assign/remove instruments',
                     onClick: (_event: unknown, rowData: unknown): void =>
                       setAssigningTechniqueId(rowData as TechniqueFragment),
                   },

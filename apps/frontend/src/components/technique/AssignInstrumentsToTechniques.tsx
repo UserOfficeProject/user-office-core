@@ -81,7 +81,7 @@ const AssignInstrumentsToTechniques = ({
         {({ isSubmitting, values }): JSX.Element => (
           <Form>
             <Typography variant="h6" component="h1">
-              {`Assign technique/s to instrument`}
+              {`Assign instruments to technique`}
             </Typography>
 
             <Grid container spacing={3}>
