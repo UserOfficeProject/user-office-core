@@ -1,10 +1,3 @@
-import {
-  assignInstrumentsToTechniqueValidationSchema,
-  createTechniqueValidationSchema,
-  deleteTechniqueValidationSchema,
-  removeInstrumentsFromTechniqueValidationSchema,
-  updateTechniqueValidationSchema,
-} from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -20,6 +13,13 @@ import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutat
 import { RemoveInstrumentFromTechniqueArgs } from '../resolvers/mutations/RemoveInstrumentFromTechnique';
 import { UpdateTechniqueArgs } from '../resolvers/mutations/UpdateTechniqueMutations';
 import { TechniqueDataSource } from './../datasources/TechniqueDataSource';
+import {
+  assignInstrumentsToTechniqueValidationSchema,
+  createTechniqueValidationSchema,
+  deleteTechniqueValidationSchema,
+  removeInstrumentsFromTechniqueValidationSchema,
+  updateTechniqueValidationSchema,
+} from './Technique';
 
 @injectable()
 export default class TechniqueMutations {
