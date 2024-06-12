@@ -66,7 +66,7 @@ context('Technique tests', () => {
       const newName = faker.random.words(2);
       const newShortCode = faker.random.alphaNumeric(15);
       const newDescription = faker.random.words(5);
-      //cy.createTechnique(technique1);
+      cy.createTechnique(technique1);
 
       cy.contains('Techniques').click();
       cy.contains(technique1.name).parent().find('[aria-label="Edit"]').click();
@@ -87,7 +87,7 @@ context('Technique tests', () => {
     });
 
     it('User officer should be able to delete technique', function () {
-      //cy.createTechnique(technique1);
+      cy.createTechnique(technique1);
 
       cy.contains('Techniques').click();
 
@@ -115,7 +115,7 @@ context('Technique tests', () => {
     it('User officer should be able to assign and unassign instruments to technique without page refresh', function () {
       cy.createInstrument(instrument1);
       cy.createInstrument(instrument2);
-      //cy.createTechnique(technique1);
+      cy.createTechnique(technique1);
 
       cy.contains(technique1.name)
         .parent()
