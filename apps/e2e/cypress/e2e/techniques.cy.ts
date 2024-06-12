@@ -113,7 +113,7 @@ context('Technique tests', () => {
       cy.createInstrument(instrument2);
     });
 
-    it.only('User officer should be able to assign and unassign instruments to technique without page refresh', function () {
+    it('User officer should be able to assign and unassign instruments to technique without page refresh', function () {
       cy.contains('Techniques').click();
 
       cy.finishedLoading();
