@@ -202,28 +202,30 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     proposalPk: number,
     fapId?: number
   ): Promise<Review[]> {
-    return (
-      database
-        .select()
-        .from('fap_reviews as fr')
-        .join('fap_assignments', {
-          'fap_assignments.proposal_pk': 'fr.proposal_pk',
-          'fap_assignments.fap_member_user_id': 'fr.user_id',
-        })
-        .distinctOn('fr.review_id')
-        .where('fr.proposal_pk', proposalPk)
-        .modify((query) => {
-          if (fapId) {
-            query.andWhere('fr.fap_id', fapId);
-          }
-        })
-        // TODO: Check this because the orderby doesn't work as it should
-        .orderBy('fr.review_id', 'asc')
-        .orderBy('fap_assignments.rank', 'asc')
-        .then((reviews: ReviewRecord[]) => {
-          return reviews.map((review) => createReviewObject(review));
-        })
-    );
+    const subQuery = database
+      .select('*')
+      .from('fap_reviews as fr')
+      .join('fap_assignments', {
+        'fap_assignments.proposal_pk': 'fr.proposal_pk',
+        'fap_assignments.fap_member_user_id': 'fr.user_id',
+      })
+      .distinctOn('fr.review_id')
+      .where('fr.proposal_pk', proposalPk)
+      .modify((query) => {
+        if (fapId) {
+          query.andWhere('fr.fap_id', fapId);
+        }
+      })
+      .orderBy('fr.review_id', 'asc')
+      .as('fa');
+
+    return database
+      .select('*')
+      .from(subQuery)
+      .orderBy('fa.rank', 'asc')
+      .then((reviews: ReviewRecord[]) => {
+        return reviews.map((review) => createReviewObject(review));
+      });
   }
 
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
