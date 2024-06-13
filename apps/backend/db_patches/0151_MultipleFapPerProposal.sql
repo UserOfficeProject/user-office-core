@@ -8,17 +8,25 @@ BEGIN
 			ALTER TABLE fap_proposals DROP CONSTRAINT fap_proposals_pkey;
 			ALTER TABLE fap_proposals ADD PRIMARY KEY (fap_proposal_id);
 			ALTER TABLE fap_proposals ALTER COLUMN fap_id DROP NOT NULL;
+			ALTER TABLE fap_proposals ADD COLUMN instrument_has_proposals_id INT REFERENCES instrument_has_proposals(instrument_has_proposals_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			UPDATE fap_proposals
+			SET instrument_has_proposals_id = (SELECT instrument_has_proposals_id FROM instrument_has_proposals WHERE instrument_has_proposals.proposal_pk = fap_proposals.proposal_pk AND instrument_has_proposals.instrument_id = fap_proposals.instrument_id);
+			ALTER TABLE technical_review ADD COLUMN instrument_has_proposals_id INT REFERENCES instrument_has_proposals(instrument_has_proposals_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			UPDATE technical_review
+			SET instrument_has_proposals_id = (SELECT instrument_has_proposals_id FROM instrument_has_proposals WHERE instrument_has_proposals.proposal_pk = technical_review.proposal_pk AND instrument_has_proposals.instrument_id = technical_review.instrument_id);
 
 			ALTER TABLE fap_assignments 
 			ADD COLUMN fap_proposal_id INT REFERENCES fap_proposals (fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 			UPDATE fap_assignments
 			SET fap_proposal_id = (SELECT fap_proposal_id FROM fap_proposals WHERE fap_proposals.proposal_pk = fap_assignments.proposal_pk AND fap_proposals.fap_id = fap_assignments.fap_id);
+			DELETE FROM fap_assignments WHERE fap_proposal_id is null;
 			ALTER TABLE fap_assignments ALTER COLUMN fap_proposal_id SET NOT NULL;
 
 			ALTER TABLE fap_reviews 
 			ADD COLUMN fap_proposal_id INT REFERENCES fap_proposals (fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 			UPDATE fap_reviews
 			SET fap_proposal_id = (SELECT fap_proposal_id FROM fap_proposals WHERE fap_proposals.proposal_pk = fap_reviews.proposal_pk AND fap_proposals.fap_id = fap_reviews.fap_id);
+			DELETE FROM fap_reviews WHERE fap_proposal_id is null;
 			ALTER TABLE fap_reviews ALTER COLUMN fap_proposal_id SET NOT NULL;
 	
 			-- drop view to allow recreating it

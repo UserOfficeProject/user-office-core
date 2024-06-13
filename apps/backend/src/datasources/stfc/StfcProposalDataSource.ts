@@ -200,7 +200,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             return {
               ...technicalReview,
               technicalReviewAssignee: {
-                id: technicalReview.id,
+                id: technicalReview.technicalReviewAssignee.id,
                 firstname: firstName,
                 lastname: lastName,
               },
