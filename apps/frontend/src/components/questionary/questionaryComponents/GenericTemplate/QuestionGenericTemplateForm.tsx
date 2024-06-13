@@ -19,6 +19,7 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   const { templates } = useActiveTemplates(TemplateGroupId.GENERIC_TEMPLATE);
+
   if (!templates) {
     return null;
   }

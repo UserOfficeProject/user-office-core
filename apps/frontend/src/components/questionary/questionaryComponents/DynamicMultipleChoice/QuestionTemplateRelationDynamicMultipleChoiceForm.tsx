@@ -19,6 +19,7 @@ import { urlValidationSchema } from 'utils/helperFunctions';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
+
 const columns = [
   { title: 'Name', field: 'name' },
   { title: 'Value', field: 'value' },

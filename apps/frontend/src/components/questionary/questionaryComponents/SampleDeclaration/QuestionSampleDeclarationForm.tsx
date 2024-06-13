@@ -29,6 +29,7 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
     templates: sampleTemplates,
     refreshTemplates: refreshSampleTemplates,
   } = useActiveTemplates(TemplateGroupId.SAMPLE, config.templateId);
+
   const { templates: esiTemplates, refreshTemplates: refreshEsiTemplates } =
     useActiveTemplates(TemplateGroupId.SAMPLE_ESI, config.esiTemplateId);
 

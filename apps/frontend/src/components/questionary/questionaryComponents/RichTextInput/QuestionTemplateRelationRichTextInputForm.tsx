@@ -10,6 +10,7 @@ import { TextInputConfig } from 'generated/sdk';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
+
 export const QuestionTemplateRelationRichTextInputForm = (
   props: QuestionTemplateRelationFormProps
 ) => {

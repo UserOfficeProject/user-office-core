@@ -7,6 +7,7 @@ import { InstrumentPickerConfig } from 'generated/sdk';
 import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
+
 export const QuestionTemplateRelationInstrumentPickerForm = (
   props: QuestionTemplateRelationFormProps
 ) => {

@@ -9,6 +9,7 @@ import { QuestionExcerpt } from 'components/questionary/questionaryComponents/Qu
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
+
 export const QuestionTemplateRelationBooleanForm = (
   props: QuestionTemplateRelationFormProps
 ) => {

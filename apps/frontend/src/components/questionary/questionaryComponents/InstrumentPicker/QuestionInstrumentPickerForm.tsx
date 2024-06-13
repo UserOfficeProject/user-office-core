@@ -9,6 +9,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
 import { QuestionFormShell } from '../QuestionFormShell';
+
 export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
   const field = props.question;
   const config = field.config as InstrumentPickerConfig;
