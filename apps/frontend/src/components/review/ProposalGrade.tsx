@@ -215,7 +215,6 @@ const ProposalGrade = ({
                 })}
             </Field>
           </Box>
-          <ErrorMessage name="grade" />
           <NavigationFragment isLoading={isSubmitting}>
             <ButtonWithDialog
               label="Grading guide"

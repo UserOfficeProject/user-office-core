@@ -30,7 +30,7 @@ If .env file is not preset during startup of the project, it will be created usi
 
 If you want to get something running for testing purposes only, you can run the docker-compose file located at the root of the repository. Use the following steps:
 
-1. docker-compose up
+1. docker compose up
 2. Visit localhost:33000
 3. Use the default users for login, Aaron_Harris49@gmail.com (User Officer) or Javon4@hotmail.com (User) with password "Test1234!"
 
