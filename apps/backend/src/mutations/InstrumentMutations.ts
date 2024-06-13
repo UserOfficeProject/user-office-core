@@ -148,6 +148,8 @@ export default class InstrumentMutations {
         args,
       }
     );
+    const instrumentHasProposalIds: number[] = [];
+
     // TODO: Cleanup this part because it is quite ugly
     for await (const instrumentId of args.instrumentIds) {
       const allProposalsAreOnSameCallAsInstrument =
@@ -200,10 +202,13 @@ export default class InstrumentMutations {
           continue;
         }
 
-        await this.dataSource.assignProposalToInstrument(
+        const {
+          instrumentHasProposalIds: [instrumentHasProposalId],
+        } = await this.dataSource.assignProposalToInstrument(
           proposalPk,
           instrumentId
         );
+        instrumentHasProposalIds.push(instrumentHasProposalId);
 
         const technicalReview =
           await this.reviewDataSource.getProposalInstrumentTechnicalReview(
@@ -242,6 +247,7 @@ export default class InstrumentMutations {
     }
 
     result = new InstrumentsHasProposals(
+      instrumentHasProposalIds,
       args.instrumentIds,
       args.proposalPks,
       false
@@ -380,6 +386,8 @@ export default class InstrumentMutations {
           return this.fapDataSource.saveFapMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
             rankOrder: proposalWithRanking.rankOrder,
+            instrumentId: args.instrumentId,
+            fapId: args.fapId,
           });
         })
       );

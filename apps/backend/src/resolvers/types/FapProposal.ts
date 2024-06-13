@@ -31,7 +31,7 @@ export class FapProposal {
 }
 
 @Resolver(() => FapProposal)
-export class FapUserResolver {
+export class FapProposalResolver {
   @FieldResolver(() => Proposal)
   async proposal(
     @Root() fapProposal: FapProposal,

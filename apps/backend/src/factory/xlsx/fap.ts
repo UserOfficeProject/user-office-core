@@ -21,7 +21,7 @@ export type RowObj = {
   propTitle?: string;
   principalInv: string;
   instrName?: string;
-  instrAvailTime?: number;
+  instrAvailTime: number | null;
   techReviewTimeAllocation?: number | null;
   fapTimeAllocation: number | null;
   propReviewAvgScore?: number;
@@ -110,7 +110,7 @@ export const collectFapXLSXRowData = async (
 
         const reviews = await baseContext.queries.review.reviewsForProposal(
           user,
-          proposal.proposal_pk
+          { proposalPk: proposal.proposal_pk, fapId: fapId }
         );
 
         return fapDataRow(
