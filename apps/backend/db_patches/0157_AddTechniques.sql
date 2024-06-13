@@ -13,7 +13,7 @@ BEGIN
 
       CREATE TABLE technique_has_instruments (
         technique_id integer NOT NULL REFERENCES techniques (technique_id) ON UPDATE CASCADE ON DELETE CASCADE,
-        instrument_id integer NOT NULL REFERENCES instruments (instrument_id) ON UPDATE CASCADE,
+        instrument_id integer NOT NULL REFERENCES instruments (instrument_id) ON UPDATE CASCADE ON DELETE CASCADE,
         PRIMARY KEY (technique_id, instrument_id)
       );
 
