@@ -8,7 +8,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Review } from 'generated/sdk';
+import { Fap, Review } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import { getFullUserName } from 'utils/user';
 
@@ -26,9 +26,10 @@ const useStyles = makeStyles((theme) => ({
 
 type ExternalReviewsProps = {
   reviews: Review[] | null;
+  faps?: Pick<Fap, 'id' | 'code'>[] | null;
 };
 
-const ExternalReviews = ({ reviews }: ExternalReviewsProps) => {
+const ExternalReviews = ({ reviews, faps }: ExternalReviewsProps) => {
   const classes = useStyles();
 
   return (
@@ -53,6 +54,7 @@ const ExternalReviews = ({ reviews }: ExternalReviewsProps) => {
                   Score
                 </TableCell>
                 <TableCell className={classes.textBold}>Comment</TableCell>
+                <TableCell className={classes.textBold}>FAP</TableCell>
               </TableRow>
               {reviews?.map((review) => (
                 <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
@@ -63,6 +65,9 @@ const ExternalReviews = ({ reviews }: ExternalReviewsProps) => {
                       __html: review?.comment || '-',
                     }}
                   />
+                  <TableCell>
+                    {faps?.find((f) => f.id === review.fapID)?.code || '-'}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
