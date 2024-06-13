@@ -8,7 +8,6 @@ import { InstrumentPickerConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionInstrumentPickerFormCommon } from './QuestionInstrumentPickerFormCommon';
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
   const field = props.question;
@@ -29,7 +28,6 @@ export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

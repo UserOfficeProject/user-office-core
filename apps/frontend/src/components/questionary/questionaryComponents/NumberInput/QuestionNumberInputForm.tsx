@@ -23,7 +23,6 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 const useStyles = makeStyles((theme) => ({
   iconVerticalAlign: {
     verticalAlign: 'middle',
@@ -87,7 +86,6 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
     >
       {({ setFieldValue }) => (
         <>
-          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

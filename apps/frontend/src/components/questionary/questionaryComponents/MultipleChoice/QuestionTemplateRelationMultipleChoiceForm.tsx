@@ -13,7 +13,6 @@ import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -44,7 +43,6 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
     >
       {(formikProps) => (
         <>
-          <TemplateEditLabel pageType="Template" />
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <FormControlLabel

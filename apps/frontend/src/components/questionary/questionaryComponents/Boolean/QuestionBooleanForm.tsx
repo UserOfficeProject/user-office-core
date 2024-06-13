@@ -8,7 +8,6 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 export const QuestionBooleanForm = (props: QuestionFormProps) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
@@ -26,7 +25,6 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <TemplateEditLabel pageType={field.dataType} />
           <Field
             name="naturalKey"
             label="Key"

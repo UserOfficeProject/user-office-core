@@ -18,7 +18,6 @@ import {
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
@@ -62,7 +61,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
     >
       {({ values, setFieldValue }) => (
         <>
-          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             id="Key-Input"

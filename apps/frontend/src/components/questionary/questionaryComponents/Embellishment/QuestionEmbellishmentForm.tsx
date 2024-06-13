@@ -8,7 +8,6 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { EmbellishmentConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
@@ -32,7 +31,6 @@ export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
     >
       {(formikProps) => (
         <>
-          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

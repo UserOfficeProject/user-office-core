@@ -12,7 +12,6 @@ import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
@@ -49,7 +48,6 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
     >
       {(formikProps) => (
         <>
-          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             id="Key-Input"

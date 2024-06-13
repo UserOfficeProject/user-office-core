@@ -12,7 +12,6 @@ import { QuestionExcerpt } from 'components/questionary/questionaryComponents/Qu
 import { NumberInputConfig, NumberValueConstraint } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
@@ -51,7 +50,6 @@ export const QuestionTemplateRelationNumberForm = (
 
         return (
           <>
-            <TemplateEditLabel pageType="Template" />
             <QuestionExcerpt question={props.questionRel.question} />
             <Field
               name="config.small_label"

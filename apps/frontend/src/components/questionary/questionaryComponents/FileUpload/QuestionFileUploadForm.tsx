@@ -10,7 +10,6 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { FileUploadConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionFileUploadForm = (props: QuestionFormProps) => {
@@ -51,7 +50,6 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
 
         return (
           <>
-            <TemplateEditLabel pageType="Question" />
             <Field
               name="naturalKey"
               id="Key-Input"

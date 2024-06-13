@@ -8,7 +8,6 @@ import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRe
 import { TextInputConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
@@ -28,7 +27,6 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
     >
       {(formikProps) => (
         <>
-          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

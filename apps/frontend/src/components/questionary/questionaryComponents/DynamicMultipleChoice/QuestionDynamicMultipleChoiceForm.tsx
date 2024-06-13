@@ -37,7 +37,6 @@ import {
 import { urlValidationSchema } from 'utils/helperFunctions';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionFormShell } from '../QuestionFormShell';
 const columns = [
   { title: 'Name', field: 'name' },
@@ -137,7 +136,6 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
     >
       {() => (
         <>
-          <TemplateEditLabel pageType="Question" />
           <Field
             name="naturalKey"
             label="Key"

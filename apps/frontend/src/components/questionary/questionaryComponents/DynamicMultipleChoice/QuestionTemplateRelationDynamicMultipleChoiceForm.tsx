@@ -17,7 +17,6 @@ import {
 } from 'generated/sdk';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 const columns = [
@@ -52,7 +51,6 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
     >
       {() => (
         <>
-          <TemplateEditLabel pageType="Template" />
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <FormControlLabel

@@ -13,7 +13,6 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { DateConfig, SettingsId } from 'generated/sdk';
 import { minMaxDateTimeCalculations } from 'utils/Time';
 
-import TemplateEditLabel from '../../../template/QuestionTemplateLabel';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -77,7 +76,6 @@ export const QuestionTemplateRelationDateForm = (
 
         return (
           <>
-            <TemplateEditLabel pageType="Template" />
             <QuestionExcerpt question={props.questionRel.question} />
             <Field
               name="config.includeTime"
