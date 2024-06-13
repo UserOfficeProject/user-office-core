@@ -58,17 +58,6 @@ export const collectProposalXLSXData = async (
       proposal.primaryKey
     );
 
-  const reviews = await baseContext.queries.review.reviewsForProposal(
-    user,
-    proposalPk
-  );
-
-  const fapMeetingDecision =
-    await baseContext.queries.fap.getProposalFapMeetingDecision(
-      user,
-      proposal.primaryKey
-    );
-
   const instruments =
     await baseContext.queries.instrument.getInstrumentsByProposalPk(
       user,

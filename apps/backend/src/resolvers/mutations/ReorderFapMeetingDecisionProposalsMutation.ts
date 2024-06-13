@@ -18,6 +18,12 @@ export class ProposalPkWithRankOrder {
 
   @Field(() => Int)
   public rankOrder: number;
+
+  @Field(() => Int)
+  public instrumentId: number;
+
+  @Field(() => Int)
+  public fapId: number;
 }
 
 @InputType()
