@@ -8,13 +8,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Formik, Form, Field, useFormikContext, FieldArray } from 'formik';
+import { Formik, Form, Field, FieldArray } from 'formik';
 import React, { ChangeEvent } from 'react';
-import { unstable_usePrompt } from 'react-router-dom';
 
 import FormikUIPredefinedMessagesTextField, {
   PredefinedMessageKey,
 } from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import {
   InstrumentWithManagementTime,
   ProposalEndStatus,
@@ -46,17 +46,6 @@ type ProposalAdminProps = {
 const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const formik = useFormikContext();
-
-  // TODO: Test this prompt
-  unstable_usePrompt({
-    message:
-      'Changes you recently made in this tab will be lost! Are you sure?',
-    when: ({ currentLocation, nextLocation }) =>
-      formik.dirty &&
-      formik.submitCount === 0 &&
-      currentLocation.pathname !== nextLocation.pathname,
-  });
 
   const initialValues = {
     proposalPk: data.primaryKey,
@@ -119,6 +108,7 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
       >
         {({ isSubmitting, values }) => (
           <Form>
+            <PromptIfDirty />
             <Grid container spacing={2} alignItems="center">
               <Grid item sm={6} xs={12}>
                 <FormControl fullWidth margin="normal">

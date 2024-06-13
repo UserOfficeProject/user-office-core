@@ -8,10 +8,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
-import { Formik, Form, Field, useFormikContext } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
-import { unstable_usePrompt } from 'react-router-dom';
 
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import {
@@ -49,17 +49,6 @@ const FinalRankingForm = ({
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
-  const formik = useFormikContext();
-
-  // TODO: Test this prompt
-  unstable_usePrompt({
-    message:
-      'Changes you recently made in this tab will be lost! Are you sure?',
-    when: ({ currentLocation, nextLocation }) =>
-      formik.dirty &&
-      formik.submitCount === 0 &&
-      currentLocation.pathname !== nextLocation.pathname,
-  });
 
   const fapMeetingDecision = proposalData.fapMeetingDecisions?.find(
     (fmd) => fmd.instrumentId === instrumentId
@@ -157,6 +146,7 @@ const FinalRankingForm = ({
         >
           {({ isSubmitting, setFieldValue, values }): JSX.Element => (
             <Form>
+              <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
                 Fap Meeting form
               </Typography>

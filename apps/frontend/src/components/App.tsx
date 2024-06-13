@@ -23,7 +23,8 @@ import React, {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  BrowserRouter as Router,
+  createBrowserRouter,
+  RouterProvider,
   Routes,
   Route,
   Navigate,
@@ -964,6 +965,64 @@ const DefaultRoutes = () => {
   );
 };
 
+function Root() {
+  const notistackRef = React.createRef<SnackbarProvider>();
+
+  const onClickDismiss = (key: string | number | undefined) => () => {
+    notistackRef.current?.closeSnackbar(key);
+  };
+
+  return (
+    <Suspense
+      fallback={
+        <div
+          data-cy="loading"
+          style={{
+            display: 'flex',
+            width: '100vw',
+            height: '100vh',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          Loading...
+        </div>
+      }
+    >
+      <StyledEngineProvider injectFirst>
+        <SnackbarProvider
+          ref={notistackRef}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          maxSnack={1}
+          action={(key) => (
+            <IconButton onClick={onClickDismiss(key)}>
+              <Close htmlColor="white" />
+            </IconButton>
+          )}
+        >
+          <SettingsContextProvider>
+            <Theme>
+              <FeatureContextProvider>
+                <UserContextProvider>
+                  <DownloadContextProvider>
+                    <IdleContextPicker>
+                      <QueryParamProvider adapter={ReactRouter6Adapter}>
+                        <DefaultRoutes />
+                      </QueryParamProvider>
+                    </IdleContextPicker>
+                  </DownloadContextProvider>
+                </UserContextProvider>
+              </FeatureContextProvider>
+            </Theme>
+          </SettingsContextProvider>
+        </SnackbarProvider>
+      </StyledEngineProvider>
+    </Suspense>
+  );
+}
+
+const router = createBrowserRouter([{ path: '*', element: <Root /> }]);
+
 class App extends React.Component {
   state = { errorUserInformation: '' };
   static getDerivedStateFromError() {
@@ -994,62 +1053,8 @@ class App extends React.Component {
     }
   }
 
-  private notistackRef = React.createRef<SnackbarProvider>();
-
-  onClickDismiss = (key: string | number | undefined) => () => {
-    this.notistackRef.current?.closeSnackbar(key);
-  };
-
   render(): JSX.Element {
-    return (
-      <Suspense
-        fallback={
-          <div
-            data-cy="loading"
-            style={{
-              display: 'flex',
-              width: '100vw',
-              height: '100vh',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            Loading...
-          </div>
-        }
-      >
-        <StyledEngineProvider injectFirst>
-          <SnackbarProvider
-            ref={this.notistackRef}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            maxSnack={1}
-            action={(key) => (
-              <IconButton onClick={this.onClickDismiss(key)}>
-                <Close htmlColor="white" />
-              </IconButton>
-            )}
-          >
-            <SettingsContextProvider>
-              <Theme>
-                <FeatureContextProvider>
-                  <UserContextProvider>
-                    <DownloadContextProvider>
-                      <IdleContextPicker>
-                        <Router>
-                          <QueryParamProvider adapter={ReactRouter6Adapter}>
-                            <DefaultRoutes />
-                          </QueryParamProvider>
-                        </Router>
-                      </IdleContextPicker>
-                    </DownloadContextProvider>
-                  </UserContextProvider>
-                </FeatureContextProvider>
-              </Theme>
-            </SettingsContextProvider>
-          </SnackbarProvider>
-        </StyledEngineProvider>
-      </Suspense>
-    );
+    return <RouterProvider router={router} />;
   }
 }
 

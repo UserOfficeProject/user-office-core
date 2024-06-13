@@ -10,12 +10,12 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
-import { Field, Form, Formik, useFormikContext } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import React, { useState, useContext } from 'react';
-import { unstable_usePrompt } from 'react-router-dom';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
 import ErrorMessage from 'components/common/ErrorMessage';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
@@ -58,17 +58,6 @@ const ProposalGrade = ({
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { settingsMap } = useContext(SettingsContext);
-  const formik = useFormikContext();
-
-  // TODO: Test this prompt
-  unstable_usePrompt({
-    message:
-      'Changes you recently made in this tab will be lost! Are you sure?',
-    when: ({ currentLocation, nextLocation }) =>
-      formik.dirty &&
-      formik.submitCount === 0 &&
-      currentLocation.pathname !== nextLocation.pathname,
-  });
 
   const gradeDecimalPoints = parseFloat(
     settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
@@ -146,6 +135,7 @@ const ProposalGrade = ({
     >
       {({ setFieldValue }) => (
         <Form>
+          <PromptIfDirty />
           <CssBaseline />
           <InputLabel htmlFor="comment" shrink margin="dense" required>
             Comment

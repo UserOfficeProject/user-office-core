@@ -8,14 +8,14 @@ import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
-import { Formik, Form, Field, useFormikContext } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import { unstable_usePrompt } from 'react-router-dom';
 
 import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -60,17 +60,6 @@ const ProposalTechnicalReview = ({
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { user } = useContext(UserContext);
   const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
-  const formik = useFormikContext();
-
-  // TODO: Test this prompt
-  unstable_usePrompt({
-    message:
-      'Changes you recently made in this tab will be lost! Are you sure?',
-    when: ({ currentLocation, nextLocation }) =>
-      formik.dirty &&
-      formik.submitCount === 0 &&
-      currentLocation.pathname !== nextLocation.pathname,
-  });
 
   useEffect(() => {
     if (data.files) {
@@ -195,6 +184,7 @@ const ProposalTechnicalReview = ({
       >
         {({ isSubmitting, setFieldValue, values }) => (
           <Form>
+            <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
                 <FormControl fullWidth margin="normal">

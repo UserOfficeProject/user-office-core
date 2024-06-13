@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box';
-import { Formik, useFormikContext } from 'formik';
+import { Formik } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import { unstable_usePrompt } from 'react-router-dom';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import { NavigButton } from 'components/common/NavigButton';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import UOLoader from 'components/common/UOLoader';
 import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
@@ -74,17 +74,6 @@ export default function QuestionaryStepView(props: {
   const [isProposalSubmitted] = useState(
     () => (state as ProposalSubmissionState)?.proposal?.submitted ?? false
   );
-  const formik = useFormikContext();
-
-  // TODO: Test this prompt
-  unstable_usePrompt({
-    message:
-      'Changes you recently made in this step will not be saved! Are you sure?',
-    when: ({ currentLocation, nextLocation }) =>
-      !!state?.isDirty &&
-      formik.submitCount === 0 &&
-      currentLocation.pathname !== nextLocation.pathname,
-  });
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
@@ -278,6 +267,7 @@ export default function QuestionaryStepView(props: {
               ...(props.readonly && { pointerEvents: 'none', opacity: 0.7 }),
             }}
           >
+            <PromptIfDirty isDirty={state.isDirty} />
             {activeFields.map((field) => {
               return (
                 <Box
