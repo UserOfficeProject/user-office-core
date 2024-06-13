@@ -744,7 +744,7 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy=view-proposal]').first().click();
       cy.finishedLoading();
-      cy.get('[role="dialog"]').contains('Reviews').click();
+      cy.get('[role="dialog"]').contains('FAP reviews').click();
 
       cy.get('[role="dialog"]').contains('External reviews');
     });
