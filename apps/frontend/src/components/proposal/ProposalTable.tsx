@@ -272,7 +272,7 @@ const ProposalTable = ({
                 : !isPI
                   ? 'Only PI can delete proposal'
                   : 'Delete proposal',
-              disabled: !canDelete,
+              hidden: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(
                   async () => {

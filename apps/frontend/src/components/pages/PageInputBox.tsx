@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import React, { useState, useEffect } from 'react';
 
@@ -26,7 +25,6 @@ export default function PageInputBox(props: {
       <Typography variant="h6" component="h2" gutterBottom>
         <label htmlFor={props.pageName}>{props.heading}</label>
       </Typography>
-      <Divider />
       {loading ? null : (
         <Editor
           initialValue={pageContent}
