@@ -1272,4 +1272,55 @@ export default class PostgresFapDataSource implements FapDataSource {
         return true;
       });
   }
+
+  async submitFapMeetings(
+    callId: number,
+    fapId: number,
+    userId?: number
+  ): Promise<FapProposal[]> {
+    const allProposals: FapProposalRecord[] = await database
+      .select('*')
+      .from('fap_proposals')
+      .where('fap_id', fapId)
+      .andWhere('call_id', callId);
+
+    const proposals: FapMeetingDecisionRecord[] = await database
+      .select('fm.*')
+      .from('fap_meeting_decisions as fm')
+      .leftJoin('fap_proposals as fp', function () {
+        this.on('fm.proposal_pk', '=', 'fp.proposal_pk').andOn(
+          'fm.instrument_id',
+          '=',
+          'fp.instrument_id'
+        );
+      })
+      .where('fp.fap_id', fapId)
+      .andWhere('fp.call_id', callId);
+
+    const readyProposals = proposals.filter(
+      (proposal) =>
+        proposal.comment_for_management &&
+        proposal.comment_for_user &&
+        proposal.recommendation
+    );
+    readyProposals.map((proposal) => {
+      this.saveFapMeetingDecision(
+        { ...createFapMeetingDecisionObject(proposal), submitted: true },
+        userId
+      );
+    });
+
+    const incompleteProposals = allProposals.filter(
+      (proposal) =>
+        !readyProposals.find(
+          (readyProp) =>
+            readyProp.proposal_pk === proposal.proposal_pk &&
+            readyProp.instrument_id === proposal.instrument_id
+        )
+    );
+
+    return incompleteProposals.map((proposal) =>
+      createFapProposalObject(proposal)
+    );
+  }
 }

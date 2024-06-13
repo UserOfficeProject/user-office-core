@@ -41,7 +41,10 @@ import {
   RemoveProposalsFromFapsArgs,
 } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { CreateFapArgs } from '../resolvers/mutations/CreateFapMutation';
-import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
+import {
+  SaveFapMeetingDecisionInput,
+  SubmitFapMeetingDecisionsInput,
+} from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
 import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
@@ -760,5 +763,17 @@ export default class FapMutations {
     } catch (error) {
       return rejection('Something went wrong', { args, error });
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async submitFapMeetings(
+    agent: UserWithRole | null,
+    args: SubmitFapMeetingDecisionsInput
+  ) {
+    return this.dataSource.submitFapMeetings(
+      args.callId,
+      args.fapId,
+      agent?.id
+    );
   }
 }
