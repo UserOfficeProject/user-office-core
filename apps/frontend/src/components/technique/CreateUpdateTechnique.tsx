@@ -1,5 +1,9 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import {
+  updateTechniqueValidationSchema,
+  createTechniqueValidationSchema,
+} from '@user-office-software/duo-validation';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import i18n from 'i18n';
@@ -60,11 +64,11 @@ const CreateUpdateTechnique = ({
           }
         }
       }}
-      // validationSchema={
-      //   technique
-      //     ? updateTechniqueValidationSchema
-      //     : createTechniqueValidationSchema
-      // }
+      validationSchema={
+        technique
+          ? updateTechniqueValidationSchema
+          : createTechniqueValidationSchema
+      }
     >
       {() => (
         <Form>
