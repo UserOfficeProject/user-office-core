@@ -1,7 +1,15 @@
 import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import { Typography } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
 import i18n from 'i18n';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
@@ -61,6 +69,9 @@ const FapMeetingInstrumentsTable = ({
   const downloadFapXLSX = useDownloadXLSXFap();
   const [updateInstrumentTime, setUpdateInstrumentTime] =
     useState<InstrumentWithAvailabilityTime | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<Map<number, string[]>>(
+    new Map<number, string[]>()
+  );
 
   const columns = instrumentTableColumns.map((column) => ({
     ...column,
@@ -82,6 +93,12 @@ const FapMeetingInstrumentsTable = ({
     },
     [fapId, selectedCall]
   );
+
+  const instrumentMap = new Map<number, string>();
+
+  instrumentsData.map((inst) => {
+    instrumentMap.set(inst.id, inst.name);
+  });
 
   const submitInstrument = async (
     instrumentToSubmit: InstrumentWithAvailabilityTime
@@ -183,8 +200,65 @@ const FapMeetingInstrumentsTable = ({
     setUpdateInstrumentTime(null);
   };
 
+  const handleClose = () => {
+    setDialogOpen(new Map<number, string[]>());
+  };
+
   return (
     <div data-cy="Fap-meeting-components-table">
+      <Dialog
+        fullWidth
+        open={!!dialogOpen.size}
+        onClose={handleClose}
+        data-cy="confirmation-dialog"
+      >
+        <DialogTitle
+          sx={{
+            marginTop: '12px',
+            color: 'red',
+          }}
+        >
+          Some Proposals Could not be Submitted
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              fontWeight: 'bold',
+            }}
+          >
+            The Following proposals could not be submitted
+          </DialogContentText>
+          {Array.from(dialogOpen).map((proposals) => {
+            console.log(proposals);
+
+            return (
+              <>
+                <DialogContentText
+                  key={'instrument-' + proposals[0]}
+                  sx={{ ml: '10px', fontWeight: 'bold' }}
+                >
+                  {instrumentMap.get(proposals[0]) + ': '}
+                </DialogContentText>
+                {proposals[1].map((proposal) => {
+                  return (
+                    <DialogContentText
+                      key={'proposal-' + proposal}
+                      sx={{ ml: '15px' }}
+                    >
+                      {proposal}
+                    </DialogContentText>
+                  );
+                })}
+              </>
+            );
+          })}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} data-cy="confirm-ok" variant="text">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
       <MaterialTable
         icons={tableIcons}
         title={
@@ -236,6 +310,32 @@ const FapMeetingInstrumentsTable = ({
           instrument={updateInstrumentTime}
         ></FapUpdateInstrumentTime>
       )}
+      <Button
+        onClick={async () => {
+          const unSubmittedProposals = await api().SubmitFapMeetingDecisions({
+            submitFapMeetingDecisionsInput: {
+              callId: selectedCall.id,
+              fapId: fapId,
+            },
+          });
+          const unSubmittedProposalInstrumentMap = new Map<number, string[]>();
+
+          unSubmittedProposals.submitFapMeetingDecisions.map((proposal) => {
+            if (unSubmittedProposalInstrumentMap.has(proposal.instrumentId)) {
+              unSubmittedProposalInstrumentMap
+                .get(proposal.instrumentId)
+                ?.push(proposal.proposal.proposalId);
+            } else {
+              unSubmittedProposalInstrumentMap.set(proposal.instrumentId, [
+                proposal.proposal.proposalId,
+              ]);
+            }
+          });
+          setDialogOpen(unSubmittedProposalInstrumentMap);
+        }}
+      >
+        Submit All Completed
+      </Button>
     </div>
   );
 };
