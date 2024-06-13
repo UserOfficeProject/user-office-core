@@ -294,6 +294,6 @@ export const EventLabel = new Map<Event, string>([
   ],
   [
     Event.INSTRUMENT_REMOVED_FROM_TECHNIQUE,
-    'Event occurs when an assigned instrument is removed from the technique',
+    'Event occurs when an assigned instrument is removed from a technique',
   ],
 ]);

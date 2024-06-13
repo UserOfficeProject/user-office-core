@@ -302,17 +302,17 @@ interface FapReviewerNotified extends GeneralEvent {
 
 interface TechniqueCreatedEvent extends GeneralEvent {
   type: Event.TECHNIQUE_CREATED;
-  instrument: Technique;
+  technique: Technique;
 }
 
 interface TechniqueUpdatedEvent extends GeneralEvent {
   type: Event.TECHNIQUE_UPDATED;
-  instrument: Instrument;
+  technique: Technique;
 }
 
 interface TechniqueDeletedEvent extends GeneralEvent {
   type: Event.TECHNIQUE_DELETED;
-  instrument: Instrument;
+  technique: Technique;
 }
 
 interface InstrumentAssignedToTechniqueEvent extends GeneralEvent {
