@@ -61,7 +61,7 @@ const TechniqueTable = () => {
   const onTechniqueDelete = async (techniqueDeletedId: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Technique removed successfully!',
+        toastSuccessMessage: 'Technique deleted successfully!',
       }).deleteTechnique({
         id: techniqueDeletedId as number,
       });

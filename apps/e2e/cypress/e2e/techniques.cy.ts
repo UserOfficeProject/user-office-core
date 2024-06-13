@@ -41,6 +41,9 @@ context('Technique tests', () => {
   });
 
   describe('Techniques basic tests', () => {
+    let createdInstrumentId: number;
+    let createdTechniqueId: number;
+
     beforeEach(() => {
       cy.login('officer');
       cy.visit('/');
@@ -87,7 +90,20 @@ context('Technique tests', () => {
     });
 
     it('User officer should be able to delete technique', function () {
-      cy.createTechnique(technique);
+      cy.createInstrument(instrument1).then((result) => {
+        if (result.createInstrument) {
+          createdInstrumentId = result.createInstrument.id;
+        }
+      });
+      cy.createTechnique(technique).then((result) => {
+        if (result.createTechnique) {
+          createdTechniqueId = result.createTechnique.id;
+        }
+      });
+      cy.assignInstrumentsToTechnique({
+        instrumentIds: [createdInstrumentId],
+        techniqueId: createdTechniqueId,
+      });
 
       cy.contains('Techniques').click();
 
@@ -98,7 +114,7 @@ context('Technique tests', () => {
 
       cy.get('[aria-label="Save"]').click();
 
-      cy.notification({ variant: 'success', text: 'Technique removed' });
+      cy.notification({ variant: 'success', text: 'Technique deleted' });
 
       cy.contains(technique.name).should('not.exist');
     });
