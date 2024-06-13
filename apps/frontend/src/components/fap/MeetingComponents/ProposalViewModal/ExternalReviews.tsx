@@ -6,15 +6,16 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
-import { Review } from 'generated/sdk';
+import { Fap, Review } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import { getFullUserName } from 'utils/user';
 
 type ExternalReviewsProps = {
   reviews: Review[] | null;
+  faps?: Pick<Fap, 'id' | 'code'>[] | null;
 };
 
-const ExternalReviews = ({ reviews }: ExternalReviewsProps) => (
+const ExternalReviews = ({ reviews, faps }: ExternalReviewsProps) => (
   <div data-cy="Fap-meeting-components-external-reviews">
     <StyledPaper margin={[0]}>
       <Typography
@@ -48,6 +49,9 @@ const ExternalReviews = ({ reviews }: ExternalReviewsProps) => (
                     __html: review?.comment || '-',
                   }}
                 />
+                <TableCell>
+                  {faps?.find((f) => f.id === review.fapID)?.code || '-'}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

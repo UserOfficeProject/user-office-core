@@ -21,7 +21,11 @@ import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Proposal, TechnicalReview } from 'generated/sdk';
+import {
+  InstrumentWithManagementTime,
+  Proposal,
+  TechnicalReview,
+} from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -33,6 +37,7 @@ type FapProposalProps = {
 
 type TechnicalReviewInfoProps = {
   technicalReview?: TechnicalReview;
+  instrument?: InstrumentWithManagementTime | null;
   fapTimeAllocation: number | null;
   hasWriteAccess: boolean;
   onFapTimeAllocationEdit: (fapTimeAllocation: number | null) => void;
@@ -129,6 +134,7 @@ const TechnicalReviewInfo = ({
   fapTimeAllocation,
   hasWriteAccess,
   onFapTimeAllocationEdit,
+  instrument,
   ...fapProposalArgs
 }: TechnicalReviewInfoProps) => {
   const [open, setOpen] = useState(false);
@@ -162,7 +168,7 @@ const TechnicalReviewInfo = ({
           })}
           gutterBottom
         >
-          Technical review info
+          Technical review info - {instrument?.name}
         </Typography>
         <TableContainer>
           <Table sx={{ minWidth: 500 }}>

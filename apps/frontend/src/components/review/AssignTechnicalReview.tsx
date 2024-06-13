@@ -37,7 +37,7 @@ function AssignTechnicalReview({
     technicalReview?.technicalReviewAssigneeId
   );
 
-  const usersData = instrument?.scientists || [];
+  const usersData = instrument?.scientists ? [...instrument.scientists] : [];
   const instrumentContactAlreadyExists = instrument?.scientists.find(
     (scientist) => scientist.id === instrument?.instrumentContact?.id
   );

@@ -5,7 +5,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Proposal } from 'generated/sdk';
@@ -16,9 +15,10 @@ import { getFullUserName } from 'utils/user';
 
 type ProposalDetailsProps = {
   proposal: Proposal;
+  instrumentId: number;
 };
 
-const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
+const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
   const downloadPDFProposal = useDownloadPDFProposal();
 
   return (
@@ -80,7 +80,13 @@ const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Current Rank</TableCell>
-                <TableCell>{proposal.fapMeetingDecision?.rankOrder}</TableCell>
+                <TableCell>
+                  {
+                    proposal.fapMeetingDecisions?.find(
+                      (fmd) => fmd.instrumentId === instrumentId
+                    )?.rankOrder
+                  }
+                </TableCell>
               </TableRow>
               <TableRow key="instrumentAndPdf">
                 <TableCell sx={{ fontWeight: 'bold' }}>Instrument</TableCell>
@@ -107,10 +113,6 @@ const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
       </StyledPaper>
     </div>
   );
-};
-
-ProposalDetails.propTypes = {
-  proposal: PropTypes.any.isRequired,
 };
 
 export default ProposalDetails;

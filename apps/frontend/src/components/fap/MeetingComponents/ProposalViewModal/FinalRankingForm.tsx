@@ -9,7 +9,6 @@ import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { unstable_usePrompt } from 'react-router-dom';
 
@@ -18,7 +17,6 @@ import UOLoader from 'components/common/UOLoader';
 import {
   Proposal,
   ProposalEndStatus,
-  SaveFapMeetingDecisionInput,
   FapMeetingDecision,
   UserRole,
 } from 'generated/sdk';
@@ -34,6 +32,8 @@ type FinalRankingFormProps = {
   closeModal: () => void;
   meetingSubmitted: (data: FapMeetingDecision) => void;
   confirm: WithConfirmType;
+  instrumentId: number;
+  fapId: number;
 };
 
 const FinalRankingForm = ({
@@ -42,6 +42,8 @@ const FinalRankingForm = ({
   closeModal,
   meetingSubmitted,
   confirm,
+  instrumentId,
+  fapId,
 }: FinalRankingFormProps) => {
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const { api } = useDataApiWithFeedback();
@@ -59,15 +61,17 @@ const FinalRankingForm = ({
       currentLocation.pathname !== nextLocation.pathname,
   });
 
+  const fapMeetingDecision = proposalData.fapMeetingDecisions?.find(
+    (fmd) => fmd.instrumentId === instrumentId
+  );
+
   const initialData = {
     proposalPk: proposalData.primaryKey,
-    commentForUser: proposalData.fapMeetingDecision?.commentForUser ?? '',
-    commentForManagement:
-      proposalData.fapMeetingDecision?.commentForManagement ?? '',
+    commentForUser: fapMeetingDecision?.commentForUser ?? '',
+    commentForManagement: fapMeetingDecision?.commentForManagement ?? '',
     recommendation:
-      proposalData.fapMeetingDecision?.recommendation ??
-      ProposalEndStatus.UNSET,
-    submitted: proposalData.fapMeetingDecision?.submitted ?? false,
+      fapMeetingDecision?.recommendation ?? ProposalEndStatus.UNSET,
+    submitted: fapMeetingDecision?.submitted ?? false,
   };
 
   const statusOptions: Option[] = [
@@ -77,7 +81,7 @@ const FinalRankingForm = ({
     { text: 'Rejected', value: ProposalEndStatus.REJECTED },
   ];
 
-  const handleSubmit = async (values: SaveFapMeetingDecisionInput) => {
+  const handleSubmit = async (values: typeof initialData) => {
     const shouldSubmitMeetingDecision =
       (!isUserOfficer && shouldSubmit) || (isUserOfficer && values.submitted);
 
@@ -85,9 +89,11 @@ const FinalRankingForm = ({
       proposalPk: values.proposalPk,
       recommendation:
         ProposalEndStatus[values.recommendation as ProposalEndStatus],
-      commentForUser: values.commentForUser,
-      commentForManagement: values.commentForManagement,
-      submitted: shouldSubmitMeetingDecision,
+      commentForUser: values.commentForUser || null,
+      commentForManagement: values.commentForManagement || null,
+      submitted: shouldSubmitMeetingDecision || false,
+      instrumentId: instrumentId,
+      fapId: fapId,
     };
 
     await api({
@@ -97,8 +103,9 @@ const FinalRankingForm = ({
     }).saveFapMeetingDecision({ saveFapMeetingDecisionInput });
 
     meetingSubmitted({
-      ...(saveFapMeetingDecisionInput as FapMeetingDecision),
-      submittedBy: proposalData.fapMeetingDecision?.submittedBy || null,
+      ...saveFapMeetingDecisionInput,
+      submittedBy: fapMeetingDecision?.submittedBy || null,
+      rankOrder: fapMeetingDecision?.rankOrder || null,
     });
 
     if (shouldClose) {
@@ -107,8 +114,7 @@ const FinalRankingForm = ({
   };
 
   const shouldDisableForm = (isSubmitting: boolean) =>
-    (isSubmitting || proposalData.fapMeetingDecision?.submitted) &&
-    !isUserOfficer;
+    (isSubmitting || fapMeetingDecision?.submitted) && !isUserOfficer;
 
   return (
     <div data-cy="Fap-meeting-components-final-ranking-form">
@@ -354,13 +360,6 @@ const FinalRankingForm = ({
       </StyledPaper>
     </div>
   );
-};
-
-FinalRankingForm.propTypes = {
-  closeModal: PropTypes.func.isRequired,
-  proposalData: PropTypes.any.isRequired,
-  meetingSubmitted: PropTypes.func.isRequired,
-  hasWriteAccess: PropTypes.bool.isRequired,
 };
 
 export default withConfirm(FinalRankingForm);
