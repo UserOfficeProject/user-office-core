@@ -1,22 +1,32 @@
-import makeStyles from '@mui/styles/makeStyles';
+import { InputLabel } from '@mui/material';
 import React from 'react';
 
 export default function TemplateEditLabel(props: { pageType: string }) {
-  const useStyles = makeStyles((theme) => ({
-    label: {
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.grey[300],
-      fontSize: 'medium',
-    },
-  }));
-  const classes = useStyles();
   if (props.pageType === 'Template') {
     return (
-      <label className={classes.label}>
+      <InputLabel
+        sx={(theme) => ({
+          color: theme.palette.primary.main,
+          backgroundColor: theme.palette.grey[300],
+          fontSize: 'medium',
+          marginRight: 20,
+        })}
+      >
         You are editing the question as it appears on the current template
-      </label>
+      </InputLabel>
     );
   }
 
-  return <label className={classes.label}>You are editing the question</label>;
+  return (
+    <InputLabel
+      sx={(theme) => ({
+        color: theme.palette.primary.main,
+        backgroundColor: theme.palette.grey[300],
+        fontSize: 'medium',
+        marginRight: 53,
+      })}
+    >
+      You are editing the question
+    </InputLabel>
+  );
 }
