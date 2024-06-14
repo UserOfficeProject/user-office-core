@@ -191,11 +191,6 @@ export default class InstrumentMutations {
               );
             })
           );
-          // NOTE: Remove all FAP proposals that are related with the removing instruments
-          await this.fapDataSource.removeProposalsFromFapsByInstrument(
-            proposalPk,
-            proposalInstrumentsToRemove.map((i) => i.id)
-          );
         }
 
         if (proposalInstruments.find((i) => i.id === instrumentId)) {

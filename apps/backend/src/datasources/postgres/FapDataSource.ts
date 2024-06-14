@@ -303,6 +303,9 @@ export default class PostgresFapDataSource implements FapDataSource {
           })
           .join('proposal_statuses as ps', {
             'p.status_id': 'ps.proposal_status_id',
+          })
+          .where(function () {
+            this.where('ps.name', 'ilike', 'FAP_%');
           });
 
         if (callId) {
@@ -803,19 +806,6 @@ export default class PostgresFapDataSource implements FapDataSource {
       .whereIn('fap_id', fapIds)
       .del()
       .returning<FapProposalRecord[]>('*');
-
-    return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
-  }
-
-  async removeProposalsFromFapsByInstrument(
-    proposalPk: number,
-    instrumentIds: number[]
-  ): Promise<FapProposal[]> {
-    const fapProposalRecords = await database('fap_proposals')
-      .where('proposal_pk', proposalPk)
-      .whereIn('instrument_id', instrumentIds)
-      .del()
-      .returning('*');
 
     return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
   }
