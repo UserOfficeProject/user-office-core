@@ -832,10 +832,8 @@ context('Fap reviews tests', () => {
       const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
           gender: 'male',
@@ -979,10 +977,8 @@ context('Fap reviews tests', () => {
       const loggedInUserParsed = JSON.parse(loggedInUser) as UserJwt;
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        // NOTE: Change organization before assigning to avoid warning in the FAP reviewers assignment
         cy.updateUserDetails({
           ...loggedInUserParsed,
-          institutionId: 2,
           telephone: faker.phone.number('+4670#######'),
           telephone_alt: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
