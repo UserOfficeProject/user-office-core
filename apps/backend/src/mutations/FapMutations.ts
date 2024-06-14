@@ -599,6 +599,19 @@ export default class FapMutations {
 
     const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
 
+    const fapProposal = this.dataSource.getFapProposal(
+      args.fapId,
+      args.proposalPk,
+      args.instrumentId
+    );
+
+    if (!fapProposal) {
+      return rejection(
+        'Can not save FAP meeting decision to non existing FAP proposal',
+        { args }
+      );
+    }
+
     return this.dataSource
       .saveFapMeetingDecision(args, submittedBy)
       .catch((err) => {
@@ -618,7 +631,20 @@ export default class FapMutations {
   ): Promise<FapMeetingDecision | Rejection> {
     try {
       const allFapDecisions = await Promise.all(
-        args.proposals.map((proposal) => {
+        args.proposals.map(async (proposal) => {
+          const fapProposal = await this.dataSource.getFapProposal(
+            proposal.fapId,
+            proposal.proposalPk,
+            proposal.instrumentId
+          );
+
+          if (!fapProposal) {
+            return rejection(
+              'Can not save FAP meeting decision to non existing FAP proposal',
+              { args }
+            );
+          }
+
           return this.dataSource.saveFapMeetingDecision(proposal);
         })
       );

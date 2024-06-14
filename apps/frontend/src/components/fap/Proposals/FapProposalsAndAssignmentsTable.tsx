@@ -328,15 +328,15 @@ const FapProposalsAndAssignmentsTable = ({
     const allProposalReviews: ProposalReview[] = [];
 
     for (const proposalPk of proposalPks) {
-      const proposalReviews: ProposalReview[] =
-        (
-          await api().getProposalReviews({
-            proposalPk,
-          })
-        ).proposalReviews || [];
-      proposalReviews.map(
-        (proposalReview) => (proposalReview.proposalPk = proposalPk)
-      );
+      const { proposalReviews } = await api().getProposalReviews({
+        proposalPk,
+        fapId: data.id,
+      });
+
+      if (!proposalReviews) {
+        continue;
+      }
+
       allProposalReviews.push(...proposalReviews);
     }
 

@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -427,35 +428,66 @@ export default class PostgresInstrumentDataSource
     fapId: number,
     callId: number
   ): Promise<InstrumentWithAvailabilityTime[]> {
+    const fullInstrumentQuery = (query: Knex.QueryBuilder) =>
+      query
+        .select([
+          'i.*',
+          'chi.availability_time as availability_time',
+          // NOTE: This is call specific sum of all instrument technical reviews time allocation for proposals that are attached to a FAP
+          database.raw(
+            'sum(tr.time_allocation)::integer as all_faps_instrument_time_allocation'
+          ),
+        ])
+        .from('instruments as i')
+        .join('technical_review as tr', {
+          'tr.instrument_id': 'i.instrument_id',
+        })
+        .join('fap_proposals as fp', {
+          'fp.instrument_id': 'i.instrument_id',
+          'fp.proposal_pk': 'tr.proposal_pk',
+        })
+        .join('call_has_instruments as chi', {
+          'chi.instrument_id': 'i.instrument_id',
+          'chi.call_id': callId,
+        })
+        .groupBy(['i.instrument_id', 'chi.availability_time']);
+
+    const fapInstrumentQuery = (query: Knex.QueryBuilder) =>
+      query
+        .select([
+          'i.*',
+          // NOTE: This is the sum of instrument technical reviews time allocation for specific call and FAP
+          database.raw(
+            'sum(tr.time_allocation)::integer as fap_instrument_time_allocation'
+          ),
+        ])
+        .from('instruments as i')
+        .join('technical_review as tr', {
+          'tr.instrument_id': 'i.instrument_id',
+        })
+        .join('fap_proposals as fp', {
+          'fp.instrument_id': 'i.instrument_id',
+          'fp.proposal_pk': 'tr.proposal_pk',
+          'fp.fap_id': fapId,
+        })
+        .join('call_has_instruments as chi', {
+          'chi.instrument_id': 'i.instrument_id',
+          'chi.call_id': callId,
+        })
+        .groupBy(['i.instrument_id']);
+
     return database
+      .with('full_instrument', fullInstrumentQuery)
+      .with('fap_instrument', fapInstrumentQuery)
       .select([
-        'i.instrument_id',
-        'name',
-        'i.short_code',
-        'description',
-        'manager_user_id',
-        'chi.availability_time',
-        database.raw(
-          `count(sp.proposal_pk) filter (where sp.fap_id = ${fapId} and sp.call_id = ${callId}) as proposal_count`
-        ),
-        database.raw(
-          `count(*) filter (where sp.call_id = ${callId}) as full_count`
-        ),
+        'fap_instrument.*',
+        'all_faps_instrument_time_allocation',
+        'availability_time',
       ])
-      .from('instruments as i')
-      .join('fap_proposals as sp', {
-        'sp.instrument_id': 'i.instrument_id',
+      .from('fap_instrument')
+      .join('full_instrument', {
+        'full_instrument.instrument_id': 'fap_instrument.instrument_id',
       })
-      .join('call_has_instruments as chi', {
-        'chi.instrument_id': 'i.instrument_id',
-        'chi.call_id': callId,
-      })
-      .groupBy(['i.instrument_id', 'chi.availability_time'])
-      .having(
-        database.raw(
-          `count(sp.proposal_pk) filter (where sp.fap_id = ${fapId} and sp.call_id = ${callId}) > 0`
-        )
-      )
       .then(async (instruments: InstrumentWithAvailabilityTimeRecord[]) => {
         const instrumentsWithSubmittedFlag =
           await this.checkIfAllProposalsOnInstrumentSubmitted(
@@ -465,10 +497,20 @@ export default class PostgresInstrumentDataSource
           );
 
         const result = instrumentsWithSubmittedFlag.map((instrument) => {
-          const calculatedInstrumentAvailabilityTimePerFap = Math.round(
-            (instrument.proposal_count / instrument.full_count) *
-              instrument.availability_time
-          );
+          let calculatedInstrumentAvailabilityTimePerFap = null;
+          if (
+            instrument.availability_time !== null &&
+            instrument.all_faps_instrument_time_allocation > 0 &&
+            instrument.fap_instrument_time_allocation !== null
+          ) {
+            // NOTE: Using "-" sign to round down in .5 cases (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round)
+            calculatedInstrumentAvailabilityTimePerFap = -Math.round(
+              -(
+                instrument.availability_time /
+                instrument.all_faps_instrument_time_allocation
+              ) * instrument.fap_instrument_time_allocation
+            );
+          }
 
           return this.createInstrumentWithAvailabilityTimeObject({
             ...instrument,
