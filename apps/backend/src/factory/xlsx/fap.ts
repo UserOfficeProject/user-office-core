@@ -238,9 +238,7 @@ export const collectFaplXLSXData = async (
             piFullName,
             proposalAverageScore,
             instrument,
-            proposalFapMeetingDecisions?.find(
-              (fmd) => fmd.instrumentId === instrument.id
-            ) || null,
+            fapMeetingDecision,
             proposal,
             technicalReview,
             fapProposal ? fapProposal : null,
