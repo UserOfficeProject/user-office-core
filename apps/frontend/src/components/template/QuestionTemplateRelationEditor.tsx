@@ -8,6 +8,7 @@ import { createQuestionTemplateRelationForm } from 'components/questionary/Quest
 import { QuestionTemplateRelation, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
+import TemplateEditLabel from './QuestionTemplateLabel';
 const useStyles = makeStyles((theme) => ({
   closeButton: {
     position: 'absolute',
@@ -37,6 +38,7 @@ export default function QuestionTemplateRelationEditor(props: {
       data-cy="question-relation-dialogue"
     >
       <>
+        <TemplateEditLabel pageType={'Template'} />
         <IconButton
           data-cy="close-modal-btn"
           className={classes.closeButton}
