@@ -427,7 +427,7 @@ const ProposalTableInstrumentScientist = ({
     const isCurrentUserTechnicalReviewAssignee =
       isInstrumentScientist &&
       rowData.technicalReviews
-        ?.map((tr) => tr.technicalReviewAssignee.id)
+        ?.map((tr) => tr.technicalReviewAssignee?.id)
         .includes(user.id);
 
     const showView =

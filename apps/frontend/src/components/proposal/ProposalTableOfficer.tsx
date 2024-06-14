@@ -186,6 +186,12 @@ const technicalReviewColumns = [
   {
     title: 'Assigned technical reviewer',
     field: 'technicalReviewAssigneesFullName',
+    render: (rowData: ProposalViewData) =>
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((technicalReview) =>
+          getFullUserName(technicalReview.technicalReviewAssignee)
+        )
+      ),
   },
   {
     title: 'Technical time allocation',
@@ -731,16 +737,6 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      technicalReviewAssigneesFullName: fromArrayToCommaSeparated(
-        proposal.technicalReviews?.map((technicalReview) =>
-          getFullUserName(technicalReview.technicalReviewAssignee)
-        )
-      ),
-      finalTimeAllocations: `${fromArrayToCommaSeparated(
-        proposal.instruments?.map(
-          (instrument) => instrument.managementTimeAllocation
-        )
-      )} (${proposal.allocationTimeUnit}s)`,
     })
   );
 

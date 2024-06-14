@@ -1541,6 +1541,10 @@ context('Fap meeting components tests', () => {
             abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
 
           cy.addProposalTechnicalReview({
             proposalPk: createdProposal.primaryKey,
@@ -1549,11 +1553,6 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-          });
-
-          cy.assignProposalsToInstruments({
-            instrumentIds: [createdInstrumentId],
-            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFaps({
@@ -1634,6 +1633,11 @@ context('Fap meeting components tests', () => {
             proposerId: initialDBData.users.user1.id,
           });
 
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
+
           cy.addProposalTechnicalReview({
             proposalPk: createdProposal.primaryKey,
             status: TechnicalReviewStatus.FEASIBLE,
@@ -1641,11 +1645,6 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-          });
-
-          cy.assignProposalsToInstruments({
-            instrumentIds: [createdInstrumentId],
-            proposalPks: [createdProposal.primaryKey],
           });
 
           cy.assignProposalsToFaps({
@@ -1745,6 +1744,20 @@ context('Fap meeting components tests', () => {
       cy.get(
         '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
       ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+    });
+
+    it('Officer should be able to update avaliblity time', () => {
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get("[aria-label='Update instrument Time']").click();
+
+      cy.get('[data-cy="availability-time"]').type('10');
+      cy.get('[data-cy="submit-update-time"]').click();
+
+      cy.contains('Availability time updated successfully!');
     });
 
     it('Officer should be able to edit Fap Meeting form', () => {
@@ -2529,6 +2542,20 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
+
+    it('Fap Chair should be able to update avalibabity time', () => {
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get("[aria-label='Update instrument Time']").click();
+
+      cy.get('[data-cy="availability-time"]').type('10');
+      cy.get('[data-cy="submit-update-time"]').click();
+
+      cy.contains('Availability time updated successfully!');
+    });
   });
 
   describe('Fap Secretary role', () => {
@@ -2611,6 +2638,20 @@ context('Fap meeting components tests', () => {
       cy.finishedLoading();
 
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
+    });
+
+    it('Fap Secretary should be able to update avalibabity time', () => {
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get("[aria-label='Update instrument Time']").click();
+
+      cy.get('[data-cy="availability-time"]').type('10');
+      cy.get('[data-cy="submit-update-time"]').click();
+
+      cy.contains('Availability time updated successfully!');
     });
   });
 
@@ -2729,6 +2770,19 @@ context('Automatic Fap assignment to Proposal', () => {
   let firstAutoAssignmentInstrumentId: number;
   let firstAutoAssignProposalPk: number;
   let firstAutoAssignProposalId: string;
+  const scientist1 = initialDBData.users.user1;
+  const instrument1 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+  };
+  const instrument2 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+  };
 
   beforeEach(function () {
     cy.resetDB();
