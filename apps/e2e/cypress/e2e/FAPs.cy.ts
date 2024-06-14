@@ -838,7 +838,7 @@ context('Fap reviews tests', () => {
       cy.changeActiveRole(initialDBData.roles.fapChair);
     });
 
-    it.only('Fap Chair should be able to assign Fap member to proposal in existing Fap', () => {
+    it('Fap Chair should be able to assign Fap member to proposal in existing Fap', () => {
       const loggedInUser = window.localStorage.getItem('user');
 
       if (!loggedInUser) {
