@@ -120,7 +120,6 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     {
       title: '#' + i18n.format(t('instrument'), 'plural'),
       render: (data) => data.instruments.length,
-      emptyValue: '-',
     },
     {
       title: '#proposals',
@@ -129,7 +128,6 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     {
       title: '#faps',
       render: (data) => data.faps?.length,
-      emptyValue: '-',
     },
   ];
 

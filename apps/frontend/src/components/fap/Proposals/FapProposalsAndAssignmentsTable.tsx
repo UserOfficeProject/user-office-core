@@ -91,7 +91,6 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Reviewers',
     render: (data) => data.assignments?.length,
-    emptyValue: '-',
   },
   {
     title: 'Reviews',

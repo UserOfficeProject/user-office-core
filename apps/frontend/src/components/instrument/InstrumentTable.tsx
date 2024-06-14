@@ -40,7 +40,6 @@ const columns: Column<InstrumentFragment>[] = [
   {
     title: 'Scientists',
     render: (data) => data.scientists.length,
-    emptyValue: '-',
   },
 ];
 
