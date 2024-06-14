@@ -850,6 +850,7 @@ context('Fap reviews tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserDetails({
           ...loggedInUserParsed,
+          institutionId: 1,
           telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
           gender: 'male',
@@ -877,7 +878,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="confirm-k"]').click();
 
       cy.notification({
         variant: 'success',
