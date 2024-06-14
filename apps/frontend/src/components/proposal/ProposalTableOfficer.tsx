@@ -225,7 +225,10 @@ const FapReviewColumns = [
   {
     title: 'Final time allocation',
     field: 'instruments.managementTimeAllocation',
-    emptyValue: '-',
+    render: (rowData: ProposalViewData) =>
+      `${fromArrayToCommaSeparated(
+        rowData.instruments?.map((i) => i.managementTimeAllocation)
+      )} (${rowData.allocationTimeUnit}s)`,
     hidden: true,
   },
   {

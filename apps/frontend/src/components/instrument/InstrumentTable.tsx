@@ -1,3 +1,4 @@
+import { Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
 import i18n from 'i18n';
@@ -23,7 +24,7 @@ import {
 } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
 
-const columns = [
+const columns: Column<InstrumentFragment>[] = [
   {
     title: 'Name',
     field: 'name',
@@ -38,7 +39,7 @@ const columns = [
   },
   {
     title: 'Scientists',
-    field: 'scientists.length',
+    render: (data) => data.scientists.length,
     emptyValue: '-',
   },
 ];
