@@ -25,10 +25,12 @@ import {
 } from '../../../../models/Shipment';
 import { DataType } from '../../../../models/Template';
 import getRequest from '../requests/AddAssetEquipment';
+import { EquipmentApiFp } from '../sdk';
 import { createAndLogError } from '../utils/createAndLogError';
 import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 import { performApiRequest } from '../utils/performApiRequest';
 import { InstrumentDataSource } from './../../../../datasources/InstrumentDataSource';
+import { getToken } from './getToken';
 
 async function getAnswer(
   questionaryId: number,
@@ -128,6 +130,10 @@ export async function createContainer(shipmentId: number) {
     proposal.primaryKey
   );
 
+  const accessToken = await getToken();
+  
+  const api = EquipmentApiFp(accessToken);
+
   // TODO: Review the instruments code representation
   const request = getRequest(
     partCode,
@@ -151,7 +157,7 @@ export async function createContainer(shipmentId: number) {
     senderPhone ?? 'No value',
     instruments?.map((instrument) => instrument.shortCode) ?? ['No value']
   );
-
+§
   const response = await performApiRequest(request);
 
   const regexFindEquipmentCode =
