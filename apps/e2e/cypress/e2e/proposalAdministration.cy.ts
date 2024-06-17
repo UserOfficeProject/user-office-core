@@ -319,11 +319,15 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=view-proposal]').click();
       cy.finishedLoading();
 
-      cy.get('[role="dialog"]').contains('Admin').click();
+      cy.get('[role="dialog"]').find('[role="tab"]').contains('Logs').click();
 
       cy.reload();
 
-      cy.get('[data-cy="commentForUser"]').should('exist');
+      cy.get('button[role="tab"]')
+        .contains('Logs')
+        .should('have.attr', 'aria-selected', 'true');
+
+      cy.get('[data-cy="event-logs-table"]').should('exist');
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
