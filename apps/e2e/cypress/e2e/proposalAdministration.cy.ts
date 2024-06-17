@@ -97,7 +97,7 @@ context('Proposal administration tests', () => {
       cy.visit('/');
     });
 
-    it.only('Should not be able to administer proposal if not assigned to instrument', function () {
+    it('Should not be able to administer proposal if not assigned to instrument', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
