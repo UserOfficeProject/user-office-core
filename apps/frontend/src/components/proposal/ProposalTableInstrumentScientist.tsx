@@ -3,7 +3,7 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
-import { Box, Button, Dialog, DialogContent } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
@@ -38,6 +38,7 @@ import {
   SubmitTechnicalReviewInput,
   SettingsId,
   UserRole,
+  ProposalViewTechnicalReviewAssignee,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -51,18 +52,23 @@ import {
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import {
   addColumns,
+  fromArrayToCommaSeparated,
   removeColumns,
   setSortDirectionOnSortColumn,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
-import TableActionsDropdownMenu from './TableActionsDropdownMenu';
+import TableActionsDropdownMenu, {
+  DownloadMenuOption,
+  PdfDownloadMenuOption,
+} from './TableActionsDropdownMenu';
 
 type QueryParameters = {
   query: {
@@ -73,11 +79,6 @@ type QueryParameters = {
 };
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
-
-enum DownloadMenuOption {
-  PROPOSAL = 'Proposal(s)',
-  ATTACHMENT = 'Attachment(s)',
-}
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -138,24 +139,42 @@ let columns: Column<ProposalViewData>[] = [
 const technicalReviewColumns: Column<ProposalViewData>[] = [
   {
     title: 'Technical status',
-    field: 'technicalStatus',
-    emptyValue: '-',
+    field: 'technicalStatuses',
+    render: (rowData: ProposalViewData) =>
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) => tr.status)
+      ),
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocationRendered',
-    emptyValue: '-',
+    field: 'technicalTimeAllocations',
+    render: (rowData: ProposalViewData) =>
+      `${fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) => tr.timeAllocation)
+      )} (${rowData.allocationTimeUnit}s)`,
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'assignedTechnicalReviewer',
-    emptyValue: '-',
+    field: 'technicalReviewAssigneeNames',
+    render: (rowData: ProposalViewData) =>
+      fromArrayToCommaSeparated(
+        rowData.technicalReviews?.map((tr) =>
+          getFullUserName(tr.technicalReviewAssignee)
+        )
+      ),
   },
 ];
 
 const instrumentManagementColumns = (
   t: TFunction<'translation', undefined, 'translation'>
-) => [{ title: t('instrument'), field: 'instrumentName', emptyValue: '-' }];
+) => [
+  {
+    title: t('instrument'),
+    field: 'instrumentNames',
+    render: (rowData: ProposalViewData) =>
+      fromArrayToCommaSeparated(rowData.instruments?.map((i) => i.name)),
+  },
+];
 
 const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
@@ -406,10 +425,13 @@ const ProposalTableInstrumentScientist = ({
   const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
     const isCurrentUserTechnicalReviewAssignee =
-      isInstrumentScientist && rowData.technicalReviewAssigneeId === user.id;
+      isInstrumentScientist &&
+      rowData.technicalReviews
+        ?.map((tr) => tr.technicalReviewAssignee?.id)
+        .includes(user.id);
 
     const showView =
-      rowData.technicalReviewSubmitted ||
+      rowData.technicalReviews?.every((tr) => tr.submitted) ||
       (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
     return (
@@ -453,12 +475,21 @@ const ProposalTableInstrumentScientist = ({
   ) => {
     if (selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
-      const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
-        selectedProposals.map((proposal) => ({
-          proposalPk: proposal.primaryKey,
-          reviewerId: proposal.technicalReviewAssigneeId || user.id,
-          submitted: true,
-        }));
+      const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] = [];
+      selectedProposals.forEach((proposal) => {
+        if (proposal.instruments) {
+          proposal.instruments.forEach((i) => {
+            if (i.id) {
+              submittedTechnicalReviewsInput.push({
+                proposalPk: proposal.primaryKey,
+                reviewerId: user.id,
+                submitted: true,
+                instrumentId: i.id,
+              });
+            }
+          });
+        }
+      });
 
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} technical review submitted successfully!`,
@@ -468,12 +499,16 @@ const ProposalTableInstrumentScientist = ({
 
       const newProposalsData = proposalsData.map((proposalData) => ({
         ...proposalData,
-        technicalReviewSubmitted: selectedProposals.find(
-          (selectedProposal) =>
-            selectedProposal.primaryKey === proposalData.primaryKey
-        )
-          ? 1
-          : proposalData.technicalReviewSubmitted,
+        technicalReviews:
+          proposalData.technicalReviews?.map((tr) => ({
+            ...tr,
+            submitted: selectedProposals.find(
+              (selectedProposal) =>
+                selectedProposal.primaryKey === proposalData.primaryKey
+            )
+              ? true
+              : tr.submitted,
+          })) || [],
       }));
       setProposalsData(newProposalsData);
     }
@@ -527,10 +562,16 @@ const ProposalTableInstrumentScientist = ({
     setActionsMenuAnchorElement(event.currentTarget);
   };
   const handleClose = (selectedOption: string) => {
-    if (selectedOption === DownloadMenuOption.PROPOSAL) {
+    if (selectedOption === PdfDownloadMenuOption.PDF) {
       downloadPDFProposal(
         selectedProposals?.map((proposal) => proposal.primaryKey),
         selectedProposals?.[0].title || ''
+      );
+    } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
+      downloadPDFProposal(
+        selectedProposals?.map((proposal) => proposal.primaryKey),
+        selectedProposals?.[0].title || '',
+        'zip'
       );
     } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
       setOpenDownloadAttachment(true);
@@ -542,13 +583,23 @@ const ProposalTableInstrumentScientist = ({
     const invalid = [];
 
     for await (const proposal of selectedProposals) {
-      const isValidSchema =
-        await proposalTechnicalReviewValidationSchema.isValid({
-          status: proposal.status,
-          timeAllocation: proposal.technicalTimeAllocation,
-        });
-      if (!isValidSchema) {
-        invalid.push(proposal);
+      const { technicalReviews } = proposal;
+      if (technicalReviews?.length) {
+        const isValidSchema = (
+          await Promise.all(
+            technicalReviews.map(
+              async (tr) =>
+                await proposalTechnicalReviewValidationSchema.isValid({
+                  status: tr.status,
+                  timeAllocation: tr.timeAllocation,
+                })
+            )
+          )
+        ).every(Boolean);
+
+        if (!isValidSchema) {
+          invalid.push(proposal);
+        }
       }
     }
 
@@ -625,12 +676,6 @@ const ProposalTableInstrumentScientist = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      assignedTechnicalReviewer: proposal.technicalReviewAssigneeFirstName
-        ? `${proposal.technicalReviewAssigneeFirstName} ${proposal.technicalReviewAssigneeLastName}`
-        : '-',
-      technicalTimeAllocationRendered: proposal.technicalTimeAllocation
-        ? `${proposal.technicalTimeAllocation}(${proposal.allocationTimeUnit}s)`
-        : '-',
     })
   );
 
@@ -694,23 +739,20 @@ const ProposalTableInstrumentScientist = ({
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...proposal,
-                  technicalReviewAssigneeId:
-                    updatedProposal.technicalReview
-                      ?.technicalReviewAssigneeId || null,
-                  technicalReviewAssigneeFirstName:
-                    updatedProposal.technicalReview?.technicalReviewAssignee
-                      ?.firstname || null,
-                  technicalReviewAssigneeLastName:
-                    updatedProposal.technicalReview?.technicalReviewAssignee
-                      ?.lastname || null,
-                  technicalReviewSubmitted: updatedProposal.technicalReview
-                    ?.submitted
-                    ? 1
-                    : 0,
-                  technicalStatus:
-                    updatedProposal.technicalReview?.status || '',
-                  technicalTimeAllocation:
-                    updatedProposal.technicalReview?.timeAllocation || null,
+                  technicalReviews: updatedProposal.technicalReviews.map(
+                    (technicalReview) => {
+                      const technicalReviewAssignee =
+                        technicalReview.technicalReviewAssignee as ProposalViewTechnicalReviewAssignee;
+
+                      return {
+                        id: technicalReview.id,
+                        status: technicalReview.status,
+                        submitted: technicalReview.submitted,
+                        timeAllocation: technicalReview.timeAllocation,
+                        technicalReviewAssignee: technicalReviewAssignee,
+                      };
+                    }
+                  ),
                 };
               } else {
                 return proposal;
@@ -764,27 +806,30 @@ const ProposalTableInstrumentScientist = ({
       <TableActionsDropdownMenu
         event={actionsMenuAnchorElement}
         handleClose={handleClose}
-        options={Object.values(DownloadMenuOption)}
       />
       {isInstrumentScientist && (
-        <>
-          <ReviewerFilterComponent
-            reviewer={urlQueryParams.reviewer}
-            onChange={(reviewer) =>
-              setProposalFilter({ ...proposalFilter, reviewer })
-            }
-          />
-          <ProposalFilterBar
-            calls={{ data: calls, isLoading: loadingCalls }}
-            instruments={{ data: instruments, isLoading: loadingInstruments }}
-            proposalStatuses={{
-              data: proposalStatuses,
-              isLoading: loadingProposalStatuses,
-            }}
-            setProposalFilter={setProposalFilter}
-            filter={proposalFilter}
-          />
-        </>
+        <Grid container spacing={2}>
+          <Grid item sm={2} xs={12}>
+            <ReviewerFilterComponent
+              reviewer={urlQueryParams.reviewer}
+              onChange={(reviewer) =>
+                setProposalFilter({ ...proposalFilter, reviewer })
+              }
+            />
+          </Grid>
+          <Grid item sm={10} xs={12}>
+            <ProposalFilterBar
+              calls={{ data: calls, isLoading: loadingCalls }}
+              instruments={{ data: instruments, isLoading: loadingInstruments }}
+              proposalStatuses={{
+                data: proposalStatuses,
+                isLoading: loadingProposalStatuses,
+              }}
+              setProposalFilter={setProposalFilter}
+              filter={proposalFilter}
+            />
+          </Grid>
+        </Grid>
       )}
       <MaterialTable
         icons={tableIcons}

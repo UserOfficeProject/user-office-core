@@ -15,13 +15,13 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
       questionary {
         ...questionary
       }
-      technicalReview {
+      technicalReviews {
         ...coreTechnicalReview
         reviewer {
           ...basicUserDetails
         }
       }
-      reviews {
+      reviews(fapId: $fapId) {
         id
         grade
         comment
@@ -34,10 +34,14 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
           id
         }
       }
-      instrument {
+      instruments {
         id
         name
         shortCode
+      }
+      faps {
+        id
+        code
       }
       call {
         id
@@ -49,6 +53,7 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
       proposalPk
       fapMemberUserId
       dateAssigned
+      rank
       user {
         ...basicUserDetails
       }

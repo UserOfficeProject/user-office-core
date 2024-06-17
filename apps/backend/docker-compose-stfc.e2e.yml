@@ -6,7 +6,7 @@ services:
       - "3310:3310"
 
   db:
-    image: postgres:11-alpine
+    image: postgres:16-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -30,7 +30,7 @@ services:
     depends_on:
       - db
     environment:
-      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
       EXTERNAL_AUTH_TOKEN: abc
       NODE_ENV: development
       DATABASE_CONNECTION_STRING: postgres://duouser:duopassword@db:5432/duo

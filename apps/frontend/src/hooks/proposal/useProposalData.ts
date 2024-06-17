@@ -4,6 +4,12 @@ import { GetProposalQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export type ProposalData = NonNullable<GetProposalQuery['proposal']>;
+export type ProposalDataInstrument = NonNullable<
+  ProposalData['instruments']
+>[0];
+export type ProposalDataTechnicalReview = NonNullable<
+  ProposalData['technicalReviews']
+>[0];
 
 export function useProposalData(primaryKey: number | null | undefined) {
   const [proposalData, setProposalData] = useState<ProposalData | null>(null);

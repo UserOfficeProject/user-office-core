@@ -142,9 +142,8 @@ export default class FapQueries {
   ) {
     let reviewerId = null;
 
-    const proposalEvents = await this.proposalDataSource.getProposalEvents(
-      proposalPk
-    );
+    const proposalEvents =
+      await this.proposalDataSource.getProposalEvents(proposalPk);
 
     // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
     if (
@@ -164,25 +163,28 @@ export default class FapQueries {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
-  async getProposalFapMeetingDecision(
+  async getProposalFapMeetingDecisions(
     agent: UserWithRole | null,
-    proposalPk: number
+    { proposalPk, fapId }: { proposalPk: number; fapId?: number }
   ) {
-    const [fapMeetingDecision] =
-      await this.dataSource.getProposalsFapMeetingDecisions([proposalPk]);
+    const fapMeetingDecisions =
+      await this.dataSource.getProposalsFapMeetingDecisions(
+        [proposalPk],
+        fapId
+      );
     const fap = await this.dataSource.getFapByProposalPk(proposalPk);
 
-    if (!fapMeetingDecision || !fap) {
-      return null;
+    if (!fapMeetingDecisions.length || !fap) {
+      return [];
     }
 
     if (
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fap.id))
     ) {
-      return fapMeetingDecision;
+      return fapMeetingDecisions;
     } else {
-      return null;
+      return [];
     }
   }
 

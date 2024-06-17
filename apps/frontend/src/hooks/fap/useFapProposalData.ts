@@ -10,11 +10,11 @@ export function useFapProposalData(
   proposalPk?: number | null
 ): {
   loading: boolean;
-  FapProposalData: FapProposalBasics | null;
+  fapProposalData: FapProposalBasics | null;
   setFapProposalData: Dispatch<SetStateAction<FapProposalBasics | null>>;
 } {
   const api = useDataApi();
-  const [FapProposalData, setFapProposalData] =
+  const [fapProposalData, setFapProposalData] =
     useState<FapProposalBasics | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -43,5 +43,5 @@ export function useFapProposalData(
     };
   }, [fapId, api, proposalPk]);
 
-  return { loading, FapProposalData, setFapProposalData };
+  return { loading, fapProposalData, setFapProposalData };
 }

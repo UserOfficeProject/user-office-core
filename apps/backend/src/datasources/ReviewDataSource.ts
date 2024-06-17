@@ -8,8 +8,7 @@ export interface ReviewDataSource {
   removeUserForReview(id: number): Promise<Review>;
   getReview(id: number): Promise<Review | null>;
   updateReview(args: UpdateReviewArgs): Promise<Review>;
-
-  getProposalReviews(id: number): Promise<Review[]>;
+  getProposalReviews(proposalPk: number, fapId?: number): Promise<Review[]>;
   getUserReviews(
     fapIds: number[],
     userId?: number,
@@ -26,7 +25,12 @@ export interface ReviewDataSource {
     args: AddTechnicalReviewInput,
     shouldUpdateReview: boolean
   ): Promise<TechnicalReview>;
-  getTechnicalReview(proposalPk: number): Promise<TechnicalReview | null>;
+  getProposalInstrumentTechnicalReview(
+    proposalPk: number,
+    instrumentId?: number
+  ): Promise<TechnicalReview | null>;
+  // TODO: Maybe this should be called getAllProposalTechnicalReviews
+  getTechnicalReviews(proposalPk: number): Promise<TechnicalReview[] | null>;
   getTechnicalReviewById(
     technicalReviewId: number
   ): Promise<TechnicalReview | null>;

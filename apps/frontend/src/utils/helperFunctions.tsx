@@ -16,11 +16,6 @@ import {
 } from 'generated/sdk';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 
-import {
-  average,
-  getGradesFromReviews,
-  standardDeviation,
-} from './mathFunctions';
 import { FunctionType } from './utilTypes';
 
 export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
@@ -35,6 +30,11 @@ export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
 
   return result;
 };
+
+export const getUniqueArray = <T,>(array: (T | null)[]) =>
+  array?.filter((value, index, self): value is T => {
+    return value !== null && self.indexOf(value) === index;
+  });
 
 export const setSortDirectionOnSortColumn = (
   columns: Column<any>[],
@@ -62,10 +62,11 @@ export const getProposalStatus = (
   }
 };
 
-export const fromProposalToProposalView = (proposal: Proposal) => {
-  return {
+export const fromProposalToProposalView = (proposal: Proposal) =>
+  ({
     primaryKey: proposal.primaryKey,
     principalInvestigator: proposal.proposer || null,
+    principalInvestigatorId: proposal.proposer?.id,
     title: proposal.title,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,
@@ -73,34 +74,33 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
-    rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-    technicalTimeAllocation: proposal.technicalReview?.timeAllocation || null,
-    technicalReviewAssigneeId:
-      proposal.technicalReview?.technicalReviewAssigneeId || null,
-    technicalReviewAssigneeFirstName:
-      proposal.technicalReview?.technicalReviewAssignee?.firstname || null,
-    technicalReviewAssigneeLastName:
-      proposal.technicalReview?.technicalReviewAssignee?.lastname || null,
-    managementTimeAllocation: proposal.managementTimeAllocation || null,
-    technicalStatus: getTranslation(
-      proposal.technicalReview?.status as ResourceId
-    ),
-    instrumentName: proposal.instrument?.name || null,
-    instrumentId: proposal.instrument?.id || null,
-    reviewAverage:
-      average(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    reviewDeviation:
-      standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    fapId: proposal.fap?.id,
-    fapCode: proposal.fap?.code,
+    instruments: proposal.instruments?.map((instrument) => ({
+      id: instrument?.id,
+      name: instrument?.name,
+      managerUserId: instrument?.managerUserId,
+      managementTimeAllocation: instrument?.managementTimeAllocation,
+    })),
+    technicalReviews:
+      proposal.technicalReviews.map((tr) => ({
+        id: tr.id,
+        status: getTranslation(tr.status as ResourceId),
+        submitted: tr.submitted,
+        timeAllocation: tr.timeAllocation,
+        technicalReviewAssignee: {
+          id: tr.technicalReviewAssignee?.id,
+          firstname: tr.technicalReviewAssignee?.firstname,
+          lastname: tr.technicalReviewAssignee?.lastname,
+        },
+      })) || null,
+    faps: proposal.faps,
+    fapInstruments: [],
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
-  } as ProposalViewData;
-};
+  }) as ProposalViewData;
 
 export const capitalize = (s: string) =>
   s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();
@@ -211,3 +211,17 @@ export const denseTableColumns = <T extends object>(columns: Column<T>[]) =>
   columns.map((column) => {
     return denseTableColumn(column);
   });
+
+export function toArray<T>(input: T | T[]): T[] {
+  if (Array.isArray(input)) {
+    return input;
+  }
+
+  return [input];
+}
+
+export function fromArrayToCommaSeparated(
+  itemsArray?: (string | number | null | undefined)[] | null
+) {
+  return itemsArray?.map((item) => item ?? '-').join(', ') || '-';
+}

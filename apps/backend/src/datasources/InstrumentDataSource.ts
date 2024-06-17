@@ -1,15 +1,18 @@
 import {
   Instrument,
-  InstrumentHasProposals,
+  InstrumentsHasProposals,
   InstrumentWithAvailabilityTime,
+  InstrumentWithManagementTime,
 } from '../models/Instrument';
 import { BasicUserDetails } from '../models/User';
+import { ManagementTimeAllocationsInput } from '../resolvers/mutations/AdministrationProposalMutation';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
 export interface InstrumentDataSource {
   create(args: CreateInstrumentArgs): Promise<Instrument>;
   getInstrument(instrumentId: number): Promise<Instrument | null>;
   getInstrumentsByNames(instrumentNames: string[]): Promise<Instrument[]>;
+  getInstrumentsByIds(instrumentIds: number[]): Promise<Instrument[]>;
   getInstruments(
     first?: number,
     offset?: number
@@ -22,13 +25,20 @@ export interface InstrumentDataSource {
     instrumentId: number,
     callIds: number[]
   ): Promise<{ callId: number; instrumentId: number }[]>;
+  getInstrumentHasProposals(
+    instrumentId: number,
+    proposalPks: number[]
+  ): Promise<InstrumentsHasProposals>;
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
-  assignProposalsToInstrument(
-    proposalPks: number[],
+  assignProposalToInstrument(
+    proposalPk: number,
     instrumentId: number
-  ): Promise<InstrumentHasProposals>;
-  removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean>;
+  ): Promise<InstrumentsHasProposals>;
+  removeProposalsFromInstrument(
+    proposalPks: number[],
+    instrumentId?: number
+  ): Promise<boolean>;
   assignScientistsToInstrument(
     scientistIds: number[],
     instrumentId: number
@@ -46,7 +56,13 @@ export interface InstrumentDataSource {
     instrumentIds: number[]
   ): Promise<boolean>;
   getInstrumentScientists(instrumentId: number): Promise<BasicUserDetails[]>;
-  getInstrumentByProposalPk(proposalPk: number): Promise<Instrument | null>;
+  getInstrumentsByProposalPk(
+    proposalPk: number
+  ): Promise<InstrumentWithManagementTime[]>;
+  updateProposalInstrumentTimeAllocation(
+    proposalPk: number,
+    managementTimeAllocations: ManagementTimeAllocationsInput[]
+  ): Promise<boolean>;
   getInstrumentsByFapId(
     fapId: number,
     callId: number
@@ -59,7 +75,7 @@ export interface InstrumentDataSource {
   submitInstrument(
     proposalPks: number[],
     instrumentId: number
-  ): Promise<InstrumentHasProposals>;
+  ): Promise<InstrumentsHasProposals>;
   hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number
@@ -69,5 +85,4 @@ export interface InstrumentDataSource {
     instrumentId: number,
     proposalPk: number
   ): Promise<boolean>;
-  isProposalInstrumentSubmitted(proposalPk: number): Promise<boolean>;
 }

@@ -3,12 +3,14 @@ import {
   AddTechnicalReviewMutationVariables,
   AssignInstrumentsToCallMutation,
   AssignInstrumentsToCallMutationVariables,
-  AssignProposalsToInstrumentMutation,
-  AssignProposalsToInstrumentMutationVariables,
+  AssignProposalsToInstrumentsMutation,
+  AssignProposalsToInstrumentsMutationVariables,
   AssignScientistsToInstrumentMutation,
   AssignScientistsToInstrumentMutationVariables,
   CreateInstrumentMutation,
   CreateInstrumentMutationVariables,
+  RemoveProposalsFromInstrumentMutation,
+  RemoveProposalsFromInstrumentMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
   SubmitInstrumentMutation,
@@ -48,12 +50,23 @@ const assignInstrumentToCall = (
   return cy.wrap(request);
 };
 
-const assignProposalsToInstrument = (
-  assignProposalsToInstrumentInput: AssignProposalsToInstrumentMutationVariables
-): Cypress.Chainable<AssignProposalsToInstrumentMutation> => {
+const assignProposalsToInstruments = (
+  assignProposalsToInstrumentsInput: AssignProposalsToInstrumentsMutationVariables
+): Cypress.Chainable<AssignProposalsToInstrumentsMutation> => {
   const api = getE2EApi();
-  const request = api.assignProposalsToInstrument(
-    assignProposalsToInstrumentInput
+  const request = api.assignProposalsToInstruments(
+    assignProposalsToInstrumentsInput
+  );
+
+  return cy.wrap(request);
+};
+
+const removeProposalsFromInstrument = (
+  removeProposalsFromInstrumentInput: RemoveProposalsFromInstrumentMutationVariables
+): Cypress.Chainable<RemoveProposalsFromInstrumentMutation> => {
+  const api = getE2EApi();
+  const request = api.removeProposalsFromInstrument(
+    removeProposalsFromInstrumentInput
   );
 
   return cy.wrap(request);
@@ -107,8 +120,12 @@ Cypress.Commands.add(
   assignScientistsToInstrument
 );
 Cypress.Commands.add(
-  'assignProposalsToInstrument',
-  assignProposalsToInstrument
+  'assignProposalsToInstruments',
+  assignProposalsToInstruments
+);
+Cypress.Commands.add(
+  'removeProposalsFromInstrument',
+  removeProposalsFromInstrument
 );
 
 Cypress.Commands.add('assignInstrumentToCall', assignInstrumentToCall);

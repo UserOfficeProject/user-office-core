@@ -4,6 +4,8 @@ import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
+import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
+import { removeDuplicates } from '../../utils/helperFunctions';
 import database from '../postgres/database';
 import {
   createProposalViewObject,
@@ -44,18 +46,20 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'call_has_instruments.instrument_id'
       )
-      .leftJoin(
-        'internal_reviews',
-        'proposal_table_view.technical_review_id',
-        'internal_reviews.technical_review_id'
-      )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
-          this.where('internal_reviews.reviewer_id', user.id);
+          // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains internalReviewers array of objects with id equal to user.id
+          this.whereRaw(
+            'jsonb_path_exists(technical_reviews, \'$[*].internalReviewers[*].id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
         } else {
-          this.where('instrument_has_scientists.user_id', user.id).orWhere(
-            'instruments.manager_user_id',
-            user.id
+          this.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].scientists[*].id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          ).orWhereRaw(
+            'jsonb_path_exists(instruments, \'$[*].managerUserId \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
           );
         }
       });
@@ -68,29 +72,35 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .modify((query) => {
         if (filter?.text) {
           query
-            .where('proposal_table_view.title', 'ilike', `%${filter.text}%`)
+            .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('instrument_name', 'ilike', `%${filter.text}%`);
+            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+            .orWhereRaw(
+              'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+              { searchText: filter.text }
+            );
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
-          query.where(
-            'proposal_table_view.technical_review_assignee_id',
-            user.id
+          // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
+          query.whereRaw(
+            'jsonb_path_exists(technical_reviews, \'$[*].technicalReviewAssignee.id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
           );
         }
         if (filter?.callId) {
-          query.where('proposal_table_view.call_id', filter.callId);
+          query.where('call_id', filter.callId);
         }
         if (filter?.instrumentId) {
-          query.where('proposal_table_view.instrument_id', filter.instrumentId);
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          query.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+            { instrumentId: filter?.instrumentId }
+          );
         }
 
         if (filter?.proposalStatusId) {
-          query.where(
-            'proposal_table_view.proposal_status_id',
-            filter?.proposalStatusId
-          );
+          query.where('proposal_status_id', filter?.proposalStatusId);
         }
 
         if (filter?.shortCodes) {
@@ -99,7 +109,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
@@ -110,10 +120,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
 
         if (filter?.referenceNumbers) {
-          query.whereIn(
-            'proposal_table_view.proposal_id',
-            filter.referenceNumbers
-          );
+          query.whereIn('proposal_id', filter.referenceNumbers);
         }
 
         if (first) {
@@ -124,11 +131,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
       })
       .then((proposals: ProposalViewRecord[]) => {
-        const props = proposals.map((proposal) => {
-          const prop = createProposalViewObject(proposal);
-
-          return prop;
-        });
+        const props = proposals.map((proposal) =>
+          createProposalViewObject(proposal)
+        );
 
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
@@ -156,39 +161,56 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       searchText
     );
 
-    const technicalReviewers = new Set(
+    const technicalReviewers = removeDuplicates(
       proposals.proposalViews
-        .filter((proposal) => !!proposal.technicalReviewAssigneeId)
-        .map((proposal) => proposal.technicalReviewAssigneeId.toString())
+        .filter((proposal) => !!proposal.technicalReviews?.length)
+        .map(({ technicalReviews }) =>
+          (technicalReviews as ProposalViewTechnicalReview[]).map(
+            (techicalReview) =>
+              techicalReview.technicalReviewAssignee.id.toString()
+          )
+        )
+        .flat()
     );
 
     const technicalReviewersDetails =
       await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
-        Array.from(technicalReviewers),
+        technicalReviewers,
         false
       );
 
     const propsWithTechReviewerDetails = proposals.proposalViews.map(
       (proposal) => {
-        const user =
-          !!proposal.technicalReviewAssigneeId &&
-          technicalReviewersDetails.find(
-            (user) =>
-              user.userNumber === proposal.technicalReviewAssigneeId.toString()
-          );
+        let proposalTechnicalReviews: ProposalViewTechnicalReview[] = [];
+        const { technicalReviews } = proposal;
 
-        const userDetails = user
-          ? {
-              technicalReviewAssigneeFirstName: user?.firstNameKnownAs
-                ? user.firstNameKnownAs
-                : user?.givenName ?? '',
-              technicalReviewAssigneeLastName: user?.familyName ?? '',
-            }
-          : {};
+        if (technicalReviews?.length) {
+          proposalTechnicalReviews = technicalReviews.map((technicalReview) => {
+            const userDetails = technicalReviewersDetails.find(
+              (trd) =>
+                trd.userNumber ===
+                technicalReview.technicalReviewAssignee.id.toString()
+            );
+
+            const firstName = userDetails?.firstNameKnownAs
+              ? userDetails.firstNameKnownAs
+              : userDetails?.givenName ?? '';
+            const lastName = userDetails?.familyName ?? '';
+
+            return {
+              ...technicalReview,
+              technicalReviewAssignee: {
+                id: technicalReview.technicalReviewAssignee.id,
+                firstname: firstName,
+                lastname: lastName,
+              },
+            };
+          });
+        }
 
         return {
           ...proposal,
-          ...userDetails,
+          technicalReviews: proposalTechnicalReviews,
         };
       }
     );

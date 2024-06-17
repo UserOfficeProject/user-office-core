@@ -2,8 +2,8 @@ import { immerable } from 'immer';
 
 import { Questionary, TemplateGroupId } from 'generated/sdk';
 
-import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 import { SampleEsiWithQuestionary } from './SampleEsiWithQuestionary';
+import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class SampleEsiSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;

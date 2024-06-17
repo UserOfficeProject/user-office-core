@@ -25,10 +25,13 @@ export class FapProposal {
 
   @Field(() => Int, { nullable: true })
   public fapTimeAllocation?: number | null;
+
+  @Field(() => Int, { nullable: true })
+  public instrumentId?: number | null;
 }
 
 @Resolver(() => FapProposal)
-export class FapUserResolver {
+export class FapProposalResolver {
   @FieldResolver(() => Proposal)
   async proposal(
     @Root() fapProposal: FapProposal,
@@ -53,8 +56,9 @@ export class FapUserResolver {
     @Root() fapProposal: FapProposal,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.instrument.dataSource.isProposalInstrumentSubmitted(
-      fapProposal.proposalPk
+    return context.queries.fap.dataSource.isFapProposalInstrumentSubmitted(
+      fapProposal.proposalPk,
+      fapProposal.instrumentId
     );
   }
 }

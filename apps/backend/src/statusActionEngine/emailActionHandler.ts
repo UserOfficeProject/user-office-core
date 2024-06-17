@@ -2,8 +2,11 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
+import { SettingsId } from '../models/Settings';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
@@ -88,6 +91,61 @@ export const emailActionHandler = async (
           break;
         }
 
+        case EmailStatusActionRecipients.USER_OFFICE: {
+          const adminDataSource = container.resolve<AdminDataSource>(
+            Tokens.AdminDataSource
+          );
+
+          const userOfficeEmail = (
+            await adminDataSource.getSetting(SettingsId.USER_OFFICE_EMAIL)
+          )?.settingsValue;
+
+          if (!userOfficeEmail) {
+            logger.logError(
+              'Could not send email(s) to the User Office as the setting (USER_OFFICE_EMAIL) is not set.',
+              { proposalEmailsSkipped: proposals }
+            );
+
+            break;
+          }
+
+          let uoRecipient: EmailReadyType[];
+
+          if (recipientWithTemplate.combineEmails) {
+            uoRecipient = [
+              {
+                id: recipientWithTemplate.recipient.name,
+                email: userOfficeEmail,
+                proposals: proposals,
+                template: recipientWithTemplate.emailTemplate.id,
+              },
+            ];
+          } else {
+            const usersDataSource: UserDataSource = container.resolve(
+              Tokens.UserDataSource
+            );
+
+            const recipientPromises = proposals.map(async (proposal) => ({
+              id: recipientWithTemplate.recipient.name,
+              email: userOfficeEmail,
+              proposals: [proposal],
+              template: recipientWithTemplate.emailTemplate.id,
+              pi:
+                (await usersDataSource.getBasicUserInfo(proposal.proposerId)) ||
+                null,
+              coProposers:
+                (await usersDataSource.getProposalUsers(proposal.primaryKey)) ||
+                null,
+            }));
+
+            uoRecipient = await Promise.all(recipientPromises);
+          }
+
+          sendMail(uoRecipient);
+
+          break;
+        }
+
         case EmailStatusActionRecipients.OTHER: {
           if (!recipientWithTemplate.otherRecipientEmails?.length) {
             break;
@@ -125,6 +183,9 @@ const sendMail = async (recipientsWithData: EmailReadyType[]) => {
           },
           substitution_data: {
             proposals: recipientWithData.proposals,
+            pi: recipientWithData.pi,
+            coProposers: recipientWithData.coProposers,
+            // The firstName, lastName, preferredName of the main recipient
             firstName: recipientWithData.firstName,
             lastName: recipientWithData.lastName,
             preferredName: recipientWithData.preferredName,

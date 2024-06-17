@@ -9,7 +9,7 @@ query getVisit($visitId: Int!) {
     }
     proposal {
       ...proposal
-      instrument {
+      instruments {
         name
       }
     }

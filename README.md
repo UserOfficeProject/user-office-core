@@ -24,22 +24,15 @@ To be able to start both backend and frontend locally you will need to:
 2. Start the application using `npm run dev` or `npm run start`
 
 ## Check the .env file
-If .env file is not preset during startup of the project, it will be created using example.env file template
-The `example.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
+If .env file is not preset during startup of the project, it will be created using `example.development.env` file template. The `example.development.env` and `.env` files are located in `apps/backend` and `apps/frontend` accordingly.
 
 ## Running with docker-compose
 
 If you want to get something running for testing purposes only, you can run the docker-compose file located at the root of the repository. Use the following steps:
 
-1. docker-compose up
+1. docker compose up
 2. Visit localhost:33000
 3. Use the default users for login, Aaron_Harris49@gmail.com (User Officer) or Javon4@hotmail.com (User) with password "Test1234!"
-
-## Monorepo future plans
-
-Plan on how to continue with the monorepo in the future:
-
-1.  Start adding the shared libraries like: shared-types, validation and others that need to be shared between different apps (example here: https://github.com/martin-trajanovski/user-office-core-monorepo). It requires [craco](https://github.com/dilanx/craco) tool for building react apps that have sources outside src folder. This will cleanup the frontend app a lot because we can move all graphql files and scripts in the shared-types lib and validation will simplify things a lot if added directly as part of the monorepo libs.
 
 ## Available Scripts
 

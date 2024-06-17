@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  TechnicalReviewStatus,
   TemplateCategoryId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -26,6 +27,20 @@ context('Proposal administration tests', () => {
   const existingQuestionaryId = 1;
   let createdProposalPk: number;
   let createdProposalId: string;
+  let createdInstrumentId: number;
+
+  const instrument1 = {
+    name: `0000. ${faker.random.words(2)}`,
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: existingUserId,
+  };
+  const instrument2 = {
+    name: `1111. ${faker.random.words(2)}`,
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: existingUserId,
+  };
 
   beforeEach(() => {
     cy.resetDB();
@@ -34,27 +49,50 @@ context('Proposal administration tests', () => {
 
   describe('Proposal administration advanced search filter tests', () => {
     beforeEach(() => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal) {
-          createdProposalPk = result.createProposal.primaryKey;
-          createdProposalId = result.createProposal.proposalId;
-          cy.updateProposal({
-            proposalPk: result.createProposal.primaryKey,
-            proposerId: existingUserId,
-            title: proposalName1,
-            abstract: proposalAbstract1,
-          });
-          cy.answerTopic({
-            answers: [],
-            topicId: existingTopicId,
-            questionaryId: existingQuestionaryId,
-            isPartialSave: false,
-          });
-          cy.submitProposal({
-            proposalPk: result.createProposal.primaryKey,
-          });
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        cy.updateUserRoles({
+          id: existingUserId,
+          roles: [
+            initialDBData.roles.user,
+            initialDBData.roles.instrumentScientist,
+          ],
+        });
+      }
+
+      cy.createProposal({ callId: initialDBData.call.id }).then(
+        ({ createProposal }) => {
+          if (createProposal) {
+            createdProposalPk = createProposal.primaryKey;
+            createdProposalId = createProposal.proposalId;
+            cy.updateProposal({
+              proposalPk: createProposal.primaryKey,
+              proposerId: existingUserId,
+              title: proposalName1,
+              abstract: proposalAbstract1,
+            });
+            cy.answerTopic({
+              answers: [],
+              topicId: existingTopicId,
+              questionaryId: existingQuestionaryId,
+              isPartialSave: false,
+            });
+            cy.submitProposal({
+              proposalPk: createProposal.primaryKey,
+            });
+
+            cy.createInstrument(instrument1).then((result) => {
+              if (result.createInstrument) {
+                createdInstrumentId = result.createInstrument.id;
+
+                cy.assignInstrumentToCall({
+                  callId: initialDBData.call.id,
+                  instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+                });
+              }
+            });
+          }
         }
-      });
+      );
       cy.login('officer');
       cy.visit('/');
     });
@@ -63,6 +101,12 @@ context('Proposal administration tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
+
+      cy.assignProposalsToInstruments({
+        instrumentIds: [initialDBData.instrument1.id],
+        proposalPks: [createdProposalPk],
+      });
+
       cy.contains('Proposals').click();
 
       cy.get('[data-cy=view-proposal]').click();
@@ -78,24 +122,45 @@ context('Proposal administration tests', () => {
         .contains('Accepted')
         .click();
 
-      cy.get('[data-cy="managementTimeAllocation"] label').should(
-        'include.text',
-        initialDBData.call.allocationTimeUnit
-      );
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] label`
+      ).should('include.text', initialDBData.call.allocationTimeUnit);
 
-      cy.get('[data-cy="managementTimeAllocation"] input')
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      )
         .clear()
         .type('-123')
         .blur();
-      cy.contains('Must be greater than or equal to');
+      cy.get<JQuery<HTMLInputElement>>(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      ).then(($input) => {
+        expect($input[0].validity.valid).to.be.false;
+        expect($input[0].validationMessage).to.include(
+          'Value must be greater than or equal to 0'
+        );
+      });
 
-      cy.get('[data-cy="managementTimeAllocation"] input')
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      )
         .clear()
         .type('987654321')
         .blur();
-      cy.contains('Must be less than or equal to');
+      cy.get<JQuery<HTMLInputElement>>(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      ).then(($input) => {
+        expect($input[0].validity.valid).to.be.false;
+        expect($input[0].validationMessage).to.include(
+          `Value must be less than or equal to ${1e5}`
+        );
+      });
 
-      cy.get('[data-cy="managementTimeAllocation"] input').clear().type('20');
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      )
+        .clear()
+        .type('20');
 
       cy.get('[data-cy="commentForUser"]').clear().type(textUser);
       cy.get('[data-cy="commentForManagement"]').clear().type(textManager);
@@ -128,10 +193,9 @@ context('Proposal administration tests', () => {
         textManager
       );
 
-      cy.get('[data-cy="managementTimeAllocation"] input').should(
-        'have.value',
-        '20'
-      );
+      cy.get(
+        `[data-cy="managementTimeAllocation-${createdInstrumentId}"] input`
+      ).should('have.value', '20');
 
       cy.get('[data-cy="is-management-decision-submitted"] input').should(
         'have.value',
@@ -252,7 +316,9 @@ context('Proposal administration tests', () => {
 
       cy.reload();
 
-      cy.get('[data-cy="timeAllocation"]').should('exist');
+      cy.get('button[role="tab"]')
+        .contains('Technical review')
+        .should('have.attr', 'aria-selected', 'true');
     });
 
     it('Download proposal is working with dialog window showing up', () => {
@@ -274,6 +340,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Proposal(s)').click();
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -288,6 +355,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="download-proposals"]').click();
 
       cy.contains('Proposal(s)').click();
+      cy.contains('Download as single file').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
@@ -396,6 +464,8 @@ context('Proposal administration tests', () => {
 
       cy.contains('Proposal(s)').click();
 
+      cy.contains('Download as single file').click();
+
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         proposalName1
@@ -480,6 +550,52 @@ context('Proposal administration tests', () => {
             expect(text).to.include(proposalFixedAbstract);
 
             expect(numpages).to.equal(2);
+          });
+
+          // NOTE: We can't test the multi file download file size because the title and abstract are random and it can vary between some numbers. That's why we only test the file content.
+          const downloadedMultiFileZipName = `${currentYear}_proposals.zip`;
+          const multiFileZipDownloadPath = `${downloadsFolder}/${downloadedMultiFileZipName}`;
+
+          cy.task('downloadFile', {
+            url: `${Cypress.config(
+              'baseUrl'
+            )}/download/zip/proposal/${createdProposalPk},${newlyCreatedProposalPk}`,
+            token,
+            filename: downloadedMultiFileZipName,
+            downloadsFolder: downloadsFolder,
+          });
+
+          const extractedFilesDir = `${downloadsFolder}/${currentYear}_proposals_extracted`;
+
+          cy.task('unzip', {
+            source: multiFileZipDownloadPath,
+            destination: extractedFilesDir,
+          });
+
+          cy.task(
+            'readPdf',
+            `${extractedFilesDir}/${newlyCreatedProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`
+          ).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(newlyCreatedProposalId);
+            expect(text).to.include(proposalFixedName);
+            expect(text).to.include(proposalFixedAbstract);
+
+            expect(numpages).to.equal(1);
+          });
+
+          cy.task(
+            'readPdf',
+            `${extractedFilesDir}/${createdProposalId}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`
+          ).then((args) => {
+            const { text, numpages } = args as PdfParse.Result;
+
+            expect(text).to.include(createdProposalId);
+            expect(text).to.include(proposalName1);
+            expect(text).to.include(proposalAbstract1);
+
+            expect(numpages).to.equal(1);
           });
         }
       });
@@ -625,6 +741,90 @@ context('Proposal administration tests', () => {
       cy.get('table tbody tr').eq(0).contains(proposalFixedName);
     });
 
+    it('Should be able to sort propsals by instrument and technical review fields', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposalPk = result.createProposal.primaryKey;
+        if (proposalPk) {
+          cy.updateProposal({
+            proposalPk: proposalPk,
+            title: proposalFixedName,
+            abstract: proposalName2,
+            proposerId: existingUserId,
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [proposalPk],
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: proposalPk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            submitted: true,
+            reviewerId: initialDBData.users.officer.id,
+            instrumentId: createdInstrumentId,
+          });
+        }
+      });
+
+      cy.createInstrument(instrument2).then((result) => {
+        const instrumentId = result.createInstrument.id;
+        if (instrumentId) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: instrumentId }],
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [instrumentId],
+            proposalPks: [createdProposalPk],
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposalPk,
+            status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+            timeAllocation: 1,
+            submitted: true,
+            reviewerId: initialDBData.users.officer.id,
+            instrumentId: instrumentId,
+          });
+        }
+      });
+
+      cy.contains('Proposals').click();
+
+      cy.finishedLoading();
+
+      cy.get('th.MuiTableCell-root').contains('Instrument').click();
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(instrument1.name);
+      cy.get('table tbody tr').eq(1).contains(proposalName1);
+      cy.get('table tbody tr').eq(1).contains(instrument2.name);
+      cy.get('th.MuiTableCell-root').contains('Instrument').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(0).contains(proposalName1);
+      cy.get('table tbody tr').eq(0).contains(instrument2.name);
+      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(1).contains(instrument1.name);
+
+      cy.visit('/');
+
+      cy.finishedLoading();
+      cy.get('th.MuiTableCell-root').contains('Technical status').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(1).contains(proposalName1);
+      cy.get('table tbody tr').eq(1).contains(instrument2.name);
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(instrument1.name);
+      cy.get('th.MuiTableCell-root').contains('Technical status').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(0).contains(proposalName1);
+      cy.get('table tbody tr').eq(0).contains(instrument2.name);
+      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(1).contains(instrument1.name);
+    });
+
     it('User officer should see Reviews tab before doing the Admin(management decision)', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
@@ -635,10 +835,9 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy=view-proposal]').first().click();
       cy.finishedLoading();
-      cy.get('[role="dialog"]').contains('Reviews').click();
+      cy.get('[role="dialog"]').contains('FAP reviews').click();
 
       cy.get('[role="dialog"]').contains('External reviews');
-      cy.get('[role="dialog"]').contains('Fap Meeting decision');
     });
   });
 

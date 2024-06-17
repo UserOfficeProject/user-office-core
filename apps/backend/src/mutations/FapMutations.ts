@@ -16,11 +16,12 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { AssignProposalsToFapsInput } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Fap } from '../models/Fap';
+import { Fap, FapProposal, FapReviewer } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
@@ -32,15 +33,17 @@ import {
   AssignReviewersToFapArgs,
   RemoveFapReviewerFromProposalArgs,
   AssignChairOrSecretaryToFapArgs,
+  MassAssignReviewsArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
-  AssignProposalsToFapArgs,
-  AssignProposalsToFapUsingCallInstrumentArgs,
-  RemoveProposalsFromFapArgs,
-} from '../resolvers/mutations/AssignProposalsToFapMutation';
+  AssignProposalsToFapsArgs,
+  AssignProposalsToFapsUsingCallInstrumentArgs,
+  RemoveProposalsFromFapsArgs,
+} from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { CreateFapArgs } from '../resolvers/mutations/CreateFapMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
+import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
 import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
 
@@ -241,38 +244,39 @@ export default class FapMutations {
   @Authorized([Roles.USER_OFFICER])
   async assignProposalsToFapUsingCallInstrument(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapUsingCallInstrumentArgs
+    args: AssignProposalsToFapsUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
-    return this.assignProposalsToFapUsingCallInstrumentInternal(agent, args);
+    return this.assignProposalsToFapsUsingCallInstrumentsInternal(agent, args);
   }
 
-  async assignProposalsToFapUsingCallInstrumentInternal(
+  async assignProposalsToFapsUsingCallInstrumentsInternal(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapUsingCallInstrumentArgs
+    args: AssignProposalsToFapsUsingCallInstrumentArgs
   ): Promise<boolean | Rejection> {
-    const proposals = await this.proposalDataSource.getProposalsByIds(
+    const proposals = await this.proposalDataSource.getProposalsByPks(
       args.proposalPks
     );
 
     const callHasInstruments =
-      await this.callDataSource.getCallHasInstrumentsByInstrumentId(
-        args.instrumentId
+      await this.callDataSource.getCallHasInstrumentsByInstrumentIds(
+        args.instrumentIds
       );
 
     const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
+    const fapInstruments = callHasInstruments
+      .filter((callHasInstrument) => callHasInstrument.fapId)
+      .map((callHasInstrument) => ({
+        fapId: callHasInstrument.fapId,
+        instrumentId: callHasInstrument.instrumentId,
+      }));
+
     for (const callId of callIds) {
-      const callHasInstrument = callHasInstruments.find(
-        (callHasInstrument) => callHasInstrument.callId === callId
-      );
-      if (callHasInstrument && callHasInstrument.fapId) {
-        await this.assignProposalsToFapInternal(agent, {
-          proposals: proposals
+      if (fapInstruments.length) {
+        await this.assignProposalsToFapsInternal(agent, {
+          proposalPks: proposals
             .filter((proposal) => proposal.callId === callId)
-            .map((proposal) => ({
-              ...proposal,
-              callId: callId,
-            })),
-          fapId: callHasInstrument.fapId,
+            .map((proposal) => proposal.primaryKey),
+          fapInstruments: fapInstruments,
         });
       }
     }
@@ -281,21 +285,72 @@ export default class FapMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async assignProposalsToFap(
+  async assignProposalsToFaps(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapArgs
+    args: AssignProposalsToFapsArgs
   ): Promise<ProposalPks | Rejection> {
-    return this.assignProposalsToFapInternal(agent, args);
+    return this.assignProposalsToFapsInternal(agent, args);
   }
 
-  @EventBus(Event.PROPOSAL_FAP_SELECTED)
-  async assignProposalsToFapInternal(
+  @EventBus(Event.PROPOSAL_FAPS_SELECTED)
+  async assignProposalsToFapsInternal(
     agent: UserWithRole | null,
-    args: AssignProposalsToFapArgs
+    args: AssignProposalsToFapsArgs
   ): Promise<ProposalPks | Rejection> {
-    const result = await this.dataSource.assignProposalsToFap(args);
+    if (!args.fapInstruments.length) {
+      return rejection(
+        'Proposal cannot be assigned to FAP without specifying the instrument and FAP',
+        {
+          agent,
+        }
+      );
+    }
 
-    if (result.proposalPks.length !== args.proposals.length) {
+    const dataToInsert: AssignProposalsToFapsInput[] = [];
+
+    for (const proposalPk of args.proposalPks) {
+      const proposalAssignedInstruments =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(proposalPk);
+
+      const fullProposal = await this.proposalDataSource.get(proposalPk);
+
+      if (!fullProposal) {
+        return rejection(`Proposal not found with id: ${proposalPk}`, {
+          args,
+        });
+      }
+
+      for (const fapInstrument of args.fapInstruments) {
+        // NOTE: This doublechecks if the proposal is assigned to the instrument at all or have FAP selected.
+        if (
+          !proposalAssignedInstruments.find(
+            (instrument) => instrument.id === fapInstrument.instrumentId
+          ) ||
+          !fapInstrument.fapId
+        ) {
+          continue;
+        }
+
+        const {
+          instrumentHasProposalIds: [instrumentHasProposalId],
+        } = await this.instrumentDataSource.getInstrumentHasProposals(
+          fapInstrument.instrumentId,
+          [proposalPk]
+        );
+
+        dataToInsert.push({
+          call_id: fullProposal.callId,
+          fap_id: fapInstrument.fapId,
+          instrument_id: fapInstrument.instrumentId,
+          proposal_pk: proposalPk,
+          instrument_has_proposals_id: instrumentHasProposalId,
+        });
+      }
+    }
+
+    const result = await this.dataSource.assignProposalsToFaps(dataToInsert);
+
+    if (result.proposalPks.length !== args.proposalPks.length) {
       return rejection('Could not assign proposal to facility access panel', {
         agent,
       });
@@ -305,20 +360,25 @@ export default class FapMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.FAP_PROPOSAL_REMOVED)
-  async removeProposalsFromFap(
+  @EventBus(Event.PROPOSAL_FAPS_REMOVED)
+  async removeProposalsFromFaps(
     agent: UserWithRole | null,
-    args: RemoveProposalsFromFapArgs
-  ): Promise<Fap | Rejection> {
-    return this.dataSource
-      .removeProposalsFromFap(args.proposalPks, args.fapId)
-      .catch((err) => {
-        return rejection(
-          'Could not remove assigned proposal from facility access panel',
-          { agent },
-          err
-        );
-      });
+    args: RemoveProposalsFromFapsArgs
+  ): Promise<FapProposal[] | Rejection> {
+    if (!args.fapIds.length) {
+      return rejection(
+        'Proposals already removed from facility access panels',
+        {}
+      );
+    }
+
+    return this.dataSource.removeProposalsFromFaps(args).catch((err) => {
+      return rejection(
+        'Could not remove assigned proposals from facility access panel',
+        { agent },
+        err
+      );
+    });
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -363,20 +423,163 @@ export default class FapMutations {
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
       return rejection(
-        'Can not assign Fap reviewers to proposal because of insufficient permissions',
+        'Can not assign FAP reviewers to proposal because of insufficient permissions',
         { agent, args }
       );
     }
 
+    const fapProposal = await this.dataSource.getFapProposal(
+      args.fapId,
+      args.proposalPk
+    );
+
+    if (!fapProposal) {
+      return rejection(
+        'Can not assign FAP reviewers to non-existing FAP proposal',
+        { agent }
+      );
+    }
+
     return this.dataSource
-      .assignMemberToFapProposal(args.proposalPk, args.fapId, args.memberIds)
+      .assignMemberToFapProposal(
+        args.proposalPk,
+        args.fapId,
+        args.memberIds,
+        fapProposal.fapProposalId
+      )
       .catch((err) => {
         return rejection(
-          'Can not assign proposal to facility access panel',
+          'Can not assign FAP reviewers to proposal',
           { agent },
           err
         );
       });
+  }
+
+  /**
+   * Assigns all remaining reviews needed for a FAP among its members. Attempts to distribute reviews as evenly as possible.
+   * Assumes there is ony one call in the review phase for a FAP at a time.
+   * @param agent User
+   * @param args ID of the FAP to mass assign reviews for
+   * @returns Updated FAP
+   */
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
+  @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
+  async massAssignFapReviews(
+    agent: UserWithRole | null,
+    args: MassAssignReviewsArgs
+  ): Promise<Fap | Rejection> {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
+    ) {
+      return rejection(
+        'Can not assign Fap reviewers to proposals because of insufficient permissions',
+        { agent, args }
+      );
+    }
+
+    const reviewsToAssign = new Map<FapReviewer, FapProposal[]>();
+    const reviewersAssignedReviewsMap = new Map<FapReviewer, number>();
+    const reviewers = await this.dataSource.getReviewers(args.fapId);
+    const reviewsNeededMap =
+      await this.dataSource.getFapProposalToNumReviewsNeededMap(args.fapId);
+
+    for (const reviewer of reviewers) {
+      reviewersAssignedReviewsMap.set(
+        reviewer,
+        await this.dataSource.getFapReviewerProposalCountCurrentRound(
+          reviewer.userId
+        )
+      );
+    }
+
+    for (const fapProposal of [...reviewsNeededMap.keys()]) {
+      while ((reviewsNeededMap.get(fapProposal) ?? 0) > 0) {
+        const numReviewsNeeded = reviewsNeededMap.get(fapProposal) ?? 0;
+
+        const fapReviewer = await this.getReviewerWithMinNumReviews(
+          reviewersAssignedReviewsMap,
+          reviewsToAssign,
+          fapProposal.proposalPk,
+          args.fapId
+        );
+
+        const reviewersPendingAssignments =
+          reviewsToAssign.get(fapReviewer) ?? [];
+        reviewersPendingAssignments.push(fapProposal);
+        reviewsToAssign.set(fapReviewer, reviewersPendingAssignments);
+        reviewsNeededMap.set(fapProposal, numReviewsNeeded - 1);
+      }
+    }
+
+    for (const reviewer of [...reviewsToAssign.keys()]) {
+      const reviews =
+        reviewsToAssign.get(reviewer)?.map((review) => review.proposalPk) ?? [];
+      const fapProposalId = reviewsToAssign
+        .get(reviewer)
+        ?.find((rta) => rta.fapId === args.fapId)?.fapProposalId;
+
+      if (reviews.length > 0 && fapProposalId) {
+        this.dataSource
+          .assignMemberToFapProposals(
+            reviews,
+            args.fapId,
+            reviewer.userId,
+            fapProposalId
+          )
+          .catch((err) => {
+            return rejection(
+              'Can not assign proposal to facility access panel',
+              { agent },
+              err
+            );
+          });
+      }
+    }
+
+    const updatedFap = await this.dataSource.getFap(args.fapId);
+
+    return updatedFap
+      ? updatedFap
+      : rejection('Can not fetch updated Fap', { agent });
+  }
+
+  async getReviewerWithMinNumReviews(
+    reviewersAssignedReviewsMap: Map<FapReviewer, number>,
+    pendingAssignments: Map<FapReviewer, FapProposal[]>,
+    proposalPk: number,
+    fapId: number
+  ): Promise<FapReviewer> {
+    let fapReviewerWithMinNumReviews = [
+      ...reviewersAssignedReviewsMap.keys(),
+    ][0];
+    let minReviews = Number.MAX_VALUE;
+
+    for (const fapReviewer of [...reviewersAssignedReviewsMap.keys()]) {
+      const numReviews = reviewersAssignedReviewsMap.get(fapReviewer) ?? 0;
+      const numPendingReviews = (pendingAssignments.get(fapReviewer) ?? [])
+        .length;
+      const totalReviews = numReviews + numPendingReviews;
+      const isAssigned =
+        (pendingAssignments.get(fapReviewer) ?? []).some(
+          (fapProposal) => fapProposal.proposalPk === proposalPk
+        ) ||
+        (
+          await this.dataSource.getFapProposalAssignments(
+            fapId,
+            proposalPk,
+            fapReviewer.userId
+          )
+        ).length > 0;
+
+      if (totalReviews < minReviews && !isAssigned) {
+        minReviews = totalReviews;
+        fapReviewerWithMinNumReviews = fapReviewer;
+      }
+    }
+
+    return fapReviewerWithMinNumReviews;
   }
 
   @ValidateArgs(assignFapMemberToProposalValidationSchema)
@@ -411,7 +614,12 @@ export default class FapMutations {
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   async updateTimeAllocation(
     agent: UserWithRole | null,
-    { fapId, proposalPk, fapTimeAllocation = null }: UpdateFapTimeAllocationArgs
+    {
+      fapId,
+      proposalPk,
+      fapTimeAllocation = null,
+      instrumentId,
+    }: UpdateFapTimeAllocationArgs
   ) {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
@@ -424,10 +632,13 @@ export default class FapMutations {
       );
     }
 
-    const isProposalInstrumentSubmitted =
-      await this.instrumentDataSource.isProposalInstrumentSubmitted(proposalPk);
+    const isFapProposalInstrumentSubmitted =
+      await this.dataSource.isFapProposalInstrumentSubmitted(
+        proposalPk,
+        instrumentId
+      );
 
-    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
         'Could not update the time allocation because the instrument is submitted',
         { agent, fapId, proposalPk }
@@ -480,6 +691,19 @@ export default class FapMutations {
 
     const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
 
+    const fapProposal = this.dataSource.getFapProposal(
+      args.fapId,
+      args.proposalPk,
+      args.instrumentId
+    );
+
+    if (!fapProposal) {
+      return rejection(
+        'Can not save FAP meeting decision to non existing FAP proposal',
+        { args }
+      );
+    }
+
     return this.dataSource
       .saveFapMeetingDecision(args, submittedBy)
       .catch((err) => {
@@ -499,7 +723,20 @@ export default class FapMutations {
   ): Promise<FapMeetingDecision | Rejection> {
     try {
       const allFapDecisions = await Promise.all(
-        args.proposals.map((proposal) => {
+        args.proposals.map(async (proposal) => {
+          const fapProposal = await this.dataSource.getFapProposal(
+            proposal.fapId,
+            proposal.proposalPk,
+            proposal.instrumentId
+          );
+
+          if (!fapProposal) {
+            return rejection(
+              'Can not save FAP meeting decision to non existing FAP proposal',
+              { args }
+            );
+          }
+
           return this.dataSource.saveFapMeetingDecision(proposal);
         })
       );
@@ -512,6 +749,22 @@ export default class FapMutations {
       }
 
       return allFapDecisions[0];
+    } catch (error) {
+      return rejection('Something went wrong', { args, error });
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async saveReviewerRank(
+    agent: UserWithRole | null,
+    args: SaveReviewerRankArg
+  ): Promise<boolean | Rejection> {
+    try {
+      return await this.dataSource.setReviewerRank(
+        args.proposalPk,
+        args.reviewerId,
+        args.rank
+      );
     } catch (error) {
       return rejection('Something went wrong', { args, error });
     }

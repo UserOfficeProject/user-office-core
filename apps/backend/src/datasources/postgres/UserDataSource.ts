@@ -89,7 +89,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       placeholder,
       oidcSub,
       oauthRefreshToken,
-      oauthAccessToken,
       oauthIssuer,
     } = user;
 
@@ -112,7 +111,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         placeholder,
         oidc_sub: oidcSub,
         oauth_refresh_token: oauthRefreshToken,
-        oauth_access_token: oauthAccessToken,
         oauth_issuer: oauthIssuer,
       })
       .from('users')
@@ -134,7 +132,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         preferredname: firstname,
         oidc_sub: '',
         oauth_refresh_token: '',
-        oauth_access_token: '',
         oauth_issuer: '',
         gender: '',
         nationality: null,
@@ -237,7 +234,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
-      .then((user: UserRecord & InstitutionRecord) =>
+      .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
         createBasicUserObject(user)
       );
   }
@@ -259,7 +256,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
       })
       .first()
-      .then((user: UserRecord & InstitutionRecord) =>
+      .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
         !!user ? createBasicUserObject(user) : null
       );
   }
@@ -304,7 +301,6 @@ export default class PostgresUserDataSource implements UserDataSource {
     username: string,
     preferredname: string | undefined,
     oidc_sub: string,
-    oauth_access_token: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,
@@ -326,7 +322,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         username,
         preferredname,
         oidc_sub,
-        oauth_access_token,
         oauth_refresh_token,
         oauth_issuer,
         gender,
@@ -456,14 +451,18 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.orderBy(orderBy, orderDirection);
         }
       })
-      .then((usersRecord: Array<UserRecord & InstitutionRecord>) => {
-        const users = usersRecord.map((user) => createBasicUserObject(user));
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          const users = usersRecord.map((user) => createBasicUserObject(user));
 
-        return {
-          totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
-          users,
-        };
-      });
+          return {
+            totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
+            users,
+          };
+        }
+      );
   }
 
   async getPreviousCollaborators(
@@ -515,14 +514,18 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.whereNotIn('users.user_id', subtractUsers);
         }
       })
-      .then((usersRecord: Array<UserRecord & InstitutionRecord>) => {
-        const users = usersRecord.map((user) => createBasicUserObject(user));
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          const users = usersRecord.map((user) => createBasicUserObject(user));
 
-        return {
-          totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
-          users,
-        };
-      });
+          return {
+            totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
+            users,
+          };
+        }
+      );
   }
 
   async getMostRecentCollaborators(id: number): Promise<number[]> {
@@ -649,7 +652,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
       .where('p.proposal_pk', id)
-      .then((users: Array<UserRecord & InstitutionRecord>) =>
+      .then((users: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
         users.map((user) => createBasicUserObject(user))
       );
   }

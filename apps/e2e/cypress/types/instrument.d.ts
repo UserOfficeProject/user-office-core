@@ -4,8 +4,8 @@ import {
   AssignInstrumentsToCallMutation,
   AssignScientistsToInstrumentMutationVariables,
   AssignScientistsToInstrumentMutation,
-  AssignProposalsToInstrumentMutationVariables,
-  AssignProposalsToInstrumentMutation,
+  AssignProposalsToInstrumentsMutationVariables,
+  AssignProposalsToInstrumentsMutation,
   AssignInstrumentsToCallMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
@@ -16,6 +16,8 @@ import {
   SetInstrumentAvailabilityTimeMutation,
   SubmitInstrumentMutationVariables,
   SubmitInstrumentMutation,
+  RemoveProposalsFromInstrumentMutationVariables,
+  RemoveProposalsFromInstrumentMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -54,22 +56,33 @@ declare global {
       ) => Cypress.Chainable<AssignScientistsToInstrumentMutation>;
 
       /**
-       * Assigns selected proposal/s to an instrument
+       * Assigns selected proposal/s to instrument/s
        *
-       * @returns {typeof assignProposalsToInstrument}
+       * @returns {typeof assignProposalsToInstruments}
        * @memberof Chainable
        * @example
-       *    cy.assignProposalsToInstrument({
-       *      proposals: {
-       *        callId: 1,
-       *        primaryKey: 1
-       *      },
-       *      instrumentId: 1
+       *    cy.assignProposalsToInstruments({
+       *      proposalPks: [1],
+       *      instrumentId: [1]
        *    });
        */
-      assignProposalsToInstrument: (
-        assignProposalsToInstrumentInput: AssignProposalsToInstrumentMutationVariables
-      ) => Cypress.Chainable<AssignProposalsToInstrumentMutation>;
+      assignProposalsToInstruments: (
+        assignProposalsToInstrumentsInput: AssignProposalsToInstrumentsMutationVariables
+      ) => Cypress.Chainable<AssignProposalsToInstrumentsMutation>;
+
+      /**
+       * Removes selected proposal/s from all instrument/s
+       *
+       * @returns {typeof removeProposalsFromInstrument}
+       * @memberof Chainable
+       * @example
+       *    cy.removeProposalsFromInstrument({
+       *      proposalPks: [1]
+       *    });
+       */
+      removeProposalsFromInstrument: (
+        removeProposalsFromInstrumentInput: RemoveProposalsFromInstrumentMutationVariables
+      ) => Cypress.Chainable<RemoveProposalsFromInstrumentMutation>;
 
       /**
        * Assigns an instrument/s to a selected call

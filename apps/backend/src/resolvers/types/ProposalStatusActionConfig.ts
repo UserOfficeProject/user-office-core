@@ -6,6 +6,7 @@ export enum EmailStatusActionRecipients {
   INSTRUMENT_SCIENTISTS = 'INSTRUMENT_SCIENTISTS',
   FAP_REVIEWERS = 'FAP_REVIEWERS',
   FAP_CHAIR_AND_SECRETARY = 'FAP_CHAIR_AND_SECRETARY',
+  USER_OFFICE = 'USER_OFFICE',
   OTHER = 'OTHER',
 }
 
@@ -25,8 +26,9 @@ export const EmailStatusActionRecipientsWithDescription = new Map<
   ],
   [
     EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
-    'The Chair and Secretaries of the FAP this proposal is associated with ',
+    'The Chair and Secretaries of the FAP this proposal is associated with',
   ],
+  [EmailStatusActionRecipients.USER_OFFICE, 'The User Office email address'],
   [
     EmailStatusActionRecipients.OTHER,
     'Other email recipients manually added by their email',
@@ -60,6 +62,9 @@ export class EmailStatusActionRecipientsWithTemplate {
 
   @Field(() => [String], { nullable: true })
   otherRecipientEmails?: string[];
+
+  @Field(() => Boolean, { nullable: true })
+  combineEmails?: boolean;
 }
 
 @ObjectType()

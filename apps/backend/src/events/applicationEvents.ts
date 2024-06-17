@@ -1,7 +1,7 @@
 import { Call } from '../models/Call';
-import { Fap } from '../models/Fap';
+import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
-import { Instrument, InstrumentHasProposals } from '../models/Instrument';
+import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
@@ -32,12 +32,12 @@ interface ProposalSubmittedEvent extends GeneralEvent {
 }
 
 interface ProposalFeasibleEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FEASIBLE;
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE;
   proposal: Proposal;
 }
 
 interface ProposalUnfeasibleEvent extends GeneralEvent {
-  type: Event.PROPOSAL_UNFEASIBLE;
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE;
   proposal: Proposal;
 }
 
@@ -102,6 +102,16 @@ interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   technicalreview: TechnicalReview;
 }
 
+interface ProposalALLFeasibilityReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalALLFeasibilityReviewFeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE;
+  proposal: Proposal;
+}
+
 interface ProposalFapReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FAP_REVIEW_SUBMITTED;
   review: Review;
@@ -123,18 +133,18 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 }
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  instrumenthasproposals: InstrumentHasProposals;
+  type: Event.PROPOSAL_INSTRUMENTS_SELECTED;
+  instrumentshasproposals: InstrumentsHasProposals;
 }
 
-interface ProposalFapSelectedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_SELECTED;
+interface ProposalFapsSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAPS_SELECTED;
   proposalpks: ProposalPks;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
-  instrumenthasproposals: InstrumentHasProposals;
+  type: Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED;
+  instrumentshasproposals: InstrumentsHasProposals;
 }
 
 interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
@@ -227,8 +237,8 @@ interface FapMemberRemovedFromProposalEvent extends GeneralEvent {
 }
 
 interface FapProposalRemovedEvent extends GeneralEvent {
-  type: Event.FAP_PROPOSAL_REMOVED;
-  fap: Fap;
+  type: Event.PROPOSAL_FAPS_REMOVED;
+  array: FapProposal[];
 }
 
 interface FapMemberRemovedEvent extends GeneralEvent {
@@ -322,12 +332,14 @@ export type ApplicationEvent =
   | CallFapReviewEndedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
+  | ProposalALLFeasibilityReviewSubmittedEvent
+  | ProposalALLFeasibilityReviewFeasibleEvent
   | ProposalFapReviewUpdatedEvent
   | ProposalFapReviewSubmittedEvent
   | ProposalAllFapReviewsSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
-  | ProposalFapSelectedEvent
+  | ProposalFapsSelectedEvent
   | ProposalInstrumentSubmittedEvent
   | ProposalFapMeetingSubmittedEvent
   | ProposalStatusChangedByWorkflowEvent

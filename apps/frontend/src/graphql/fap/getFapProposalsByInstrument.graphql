@@ -13,22 +13,29 @@ query fapProposalsByInstrument(
       primaryKey
       title
       proposalId
+      proposer {
+        id
+        firstname
+        lastname
+        country
+      }
       status {
         ...proposalStatus
       }
-      fapMeetingDecision {
+      fapMeetingDecisions(fapId: $fapId) {
         ...fapMeetingDecision
       }
-      reviews {
+      reviews(fapId: $fapId) {
         id
         comment
         grade
         status
       }
-      technicalReview {
+      technicalReviews {
         publicComment
         status
         timeAllocation
+        instrumentId
       }
     }
     assignments {

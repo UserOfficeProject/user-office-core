@@ -1,12 +1,12 @@
 import {
   Field,
-  Float,
   Int,
   ObjectType,
   Ctx,
   FieldResolver,
   Resolver,
   Root,
+  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -17,6 +17,70 @@ import {
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 import { User } from './User';
+
+@InputType('FapInstrumentInput')
+@ObjectType()
+export class FapInstrument {
+  @Field(() => Int, { nullable: true })
+  fapId: number | null;
+
+  @Field(() => Int, { nullable: true })
+  instrumentId: number;
+}
+
+@ObjectType()
+export class ProposalViewInstrument {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  name: string;
+
+  @Field(() => Int)
+  managerUserId: number;
+
+  @Field(() => Int, { nullable: true })
+  managementTimeAllocation: number;
+}
+
+@ObjectType()
+export class ProposalViewFap {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  code: string;
+}
+
+@ObjectType()
+export class ProposalViewTechnicalReviewAssignee {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  firstname: string;
+
+  @Field(() => String)
+  lastname: string;
+}
+
+@ObjectType()
+export class ProposalViewTechnicalReview {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => TechnicalReviewStatus, { nullable: true })
+  status: TechnicalReviewStatus;
+
+  @Field(() => Boolean)
+  submitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  timeAllocation: number;
+
+  @Field(() => ProposalViewTechnicalReviewAssignee, { nullable: true })
+  technicalReviewAssignee: ProposalViewTechnicalReviewAssignee;
+}
 
 @ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
@@ -41,9 +105,6 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String)
   public proposalId: string;
 
-  @Field(() => Int, { nullable: true })
-  public rankOrder: number;
-
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus: ProposalEndStatus;
 
@@ -53,47 +114,20 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Boolean)
   public submitted: boolean;
 
-  @Field(() => Int, { nullable: true })
-  public technicalTimeAllocation: number;
+  @Field(() => [ProposalViewInstrument], { nullable: true })
+  public instruments: ProposalViewInstrument[] | null;
 
-  @Field(() => Int, { nullable: true })
-  public managementTimeAllocation: number;
+  @Field(() => [ProposalViewTechnicalReview], { nullable: true })
+  public technicalReviews: ProposalViewTechnicalReview[] | null;
 
-  @Field(() => Int, { nullable: true })
-  public technicalReviewAssigneeId: number;
+  @Field(() => [ProposalViewFap], { nullable: true })
+  public faps: ProposalViewFap[] | null;
 
-  @Field(() => String, { nullable: true })
-  public technicalReviewAssigneeFirstName: string;
-
-  @Field(() => String, { nullable: true })
-  public technicalReviewAssigneeLastName: string;
-
-  @Field(() => TechnicalReviewStatus, { nullable: true })
-  public technicalStatus: TechnicalReviewStatus;
-
-  @Field(() => Int, { nullable: true })
-  public technicalReviewSubmitted: boolean;
-
-  @Field(() => String, { nullable: true })
-  public instrumentName: string;
+  @Field(() => [FapInstrument], { nullable: true })
+  public fapInstruments: FapInstrument[] | null;
 
   @Field(() => String, { nullable: true })
   public callShortCode: string;
-
-  @Field(() => String, { nullable: true })
-  public fapCode: string;
-
-  @Field(() => Int, { nullable: true })
-  public fapId: number;
-
-  @Field(() => Float, { nullable: true })
-  public reviewAverage: number;
-
-  @Field(() => Float, { nullable: true })
-  public reviewDeviation: number;
-
-  @Field(() => Int, { nullable: true })
-  public instrumentId: number;
 
   @Field(() => Int)
   public callId: number;

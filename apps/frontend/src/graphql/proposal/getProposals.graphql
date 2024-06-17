@@ -61,13 +61,13 @@ query getProposals($filter: ProposalsFilter) {
       users {
         ...basicUserDetails
       }
-      technicalReview {
+      technicalReviews {
         ...coreTechnicalReview
         reviewer {
           ...basicUserDetails
         }
       }
-      instrument {
+      instruments {
         id
         name
       }
@@ -75,7 +75,7 @@ query getProposals($filter: ProposalsFilter) {
         id
         shortCode
       }
-      fap {
+      faps {
         id
         code
       }

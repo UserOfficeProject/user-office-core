@@ -1,6 +1,0 @@
-mutation assignProposalsToFap(
-  $proposals: [ProposalSelectionInput!]!
-  $fapId: Int!
-) {
-  assignProposalsToFap(proposals: $proposals, fapId: $fapId)
-}

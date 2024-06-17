@@ -23,7 +23,11 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Proposal, TechnicalReview } from 'generated/sdk';
+import {
+  InstrumentWithManagementTime,
+  Proposal,
+  TechnicalReview,
+} from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -34,7 +38,8 @@ type FapProposalProps = {
 };
 
 type TechnicalReviewInfoProps = {
-  technicalReview: TechnicalReview | null;
+  technicalReview?: TechnicalReview;
+  instrument?: InstrumentWithManagementTime | null;
   fapTimeAllocation: number | null;
   hasWriteAccess: boolean;
   onFapTimeAllocationEdit: (fapTimeAllocation: number | null) => void;
@@ -68,6 +73,7 @@ const OverwriteTimeAllocationDialog = ({
 }: {
   timeAllocation: number | null;
   onClose: (newValue?: number | null) => void;
+  instrumentId: number;
 } & FapProposalProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
@@ -94,7 +100,7 @@ const OverwriteTimeAllocationDialog = ({
         onSubmit={async (values) => {
           await api({
             toastSuccessMessage: 'Updated',
-          }).updateFapTimeAllocation(values);
+          }).updateFapTimeAllocation({ ...values });
 
           onClose(values.fapTimeAllocation);
         }}
@@ -151,6 +157,7 @@ const TechnicalReviewInfo = ({
   fapTimeAllocation,
   hasWriteAccess,
   onFapTimeAllocationEdit,
+  instrument,
   ...fapProposalArgs
 }: TechnicalReviewInfoProps) => {
   const classes = useStyles();
@@ -163,18 +170,23 @@ const TechnicalReviewInfo = ({
     setOpen(false);
   };
 
+  if (!technicalReview) {
+    return null;
+  }
+
   return (
     <div data-cy="Fap-meeting-components-technical-review">
       {open && (
         <OverwriteTimeAllocationDialog
           onClose={handleClose}
           timeAllocation={fapTimeAllocation}
+          instrumentId={technicalReview.instrumentId}
           {...fapProposalArgs}
         />
       )}
       <StyledPaper margin={[2, 0]}>
         <Typography variant="h6" className={classes.heading} gutterBottom>
-          Technical review info
+          Technical review info - {instrument?.name}
         </Typography>
         <TableContainer>
           <Table className={classes.table}>

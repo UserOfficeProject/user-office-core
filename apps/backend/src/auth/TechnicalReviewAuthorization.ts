@@ -2,8 +2,8 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
-import { TechnicalReview } from '../resolvers/types/TechnicalReview';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -24,9 +24,8 @@ export class TechnicalReviewAuthorization {
       return false;
     }
 
-    const technicalReview = await this.reviewDataSource.getTechnicalReviewById(
-      technicalReviewId
-    );
+    const technicalReview =
+      await this.reviewDataSource.getTechnicalReviewById(technicalReviewId);
 
     if (
       technicalReview &&
@@ -43,36 +42,48 @@ export class TechnicalReviewAuthorization {
   }
 
   private async resolveTechnicalReview(
-    technicalreviewOrProposalPk: TechnicalReview | number
+    technicalReviewTechnicalReviewIdOrProposalPk: TechnicalReview | number,
+    instrumentId?: number
   ): Promise<TechnicalReview | null> {
-    let technicalreview;
+    let technicalReview;
 
-    if (typeof technicalreviewOrProposalPk === 'number') {
-      const proposalPk = technicalreviewOrProposalPk;
-      technicalreview = await this.reviewDataSource.getTechnicalReview(
-        proposalPk
-      );
+    if (
+      instrumentId &&
+      typeof technicalReviewTechnicalReviewIdOrProposalPk === 'number'
+    ) {
+      const proposalPk = technicalReviewTechnicalReviewIdOrProposalPk;
+      technicalReview =
+        await this.reviewDataSource.getProposalInstrumentTechnicalReview(
+          proposalPk,
+          instrumentId
+        );
+    } else if (
+      typeof technicalReviewTechnicalReviewIdOrProposalPk === 'number'
+    ) {
+      const technicalReviewId = technicalReviewTechnicalReviewIdOrProposalPk;
+      technicalReview =
+        await this.reviewDataSource.getTechnicalReviewById(technicalReviewId);
     } else {
-      technicalreview = technicalreviewOrProposalPk;
+      technicalReview = technicalReviewTechnicalReviewIdOrProposalPk;
     }
 
-    return technicalreview;
+    return technicalReview;
   }
 
   async hasReadRights(
     agent: UserWithRole | null,
-    technicalreview: TechnicalReview
+    technicalReview: TechnicalReview
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
-    technicalreviewId: number
+    technicalReviewId: number
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
-    technicalreviewOrTechnicalReviewId: TechnicalReview | number
+    technicalReviewTechnicalReviewIdOrProposalPk: TechnicalReview | number
   ): Promise<boolean> {
     const technicalreview = await this.resolveTechnicalReview(
-      technicalreviewOrTechnicalReviewId
+      technicalReviewTechnicalReviewIdOrProposalPk
     );
     if (!technicalreview) {
       return false;
@@ -129,20 +140,22 @@ export class TechnicalReviewAuthorization {
 
   async hasWriteRights(
     agent: UserWithRole | null,
-    technicalreview: TechnicalReview
+    technicalReview: TechnicalReview
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    proposalPk: number
+    proposalPk: number,
+    instrumentId?: number
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    technicalreviewOrProposalPk: TechnicalReview | number
+    technicalReviewOrProposalPk: TechnicalReview | number,
+    instrumentId?: number
   ): Promise<boolean> {
     const proposalPk =
-      typeof technicalreviewOrProposalPk === 'number'
-        ? technicalreviewOrProposalPk
-        : technicalreviewOrProposalPk.proposalPk;
+      typeof technicalReviewOrProposalPk === 'number'
+        ? technicalReviewOrProposalPk
+        : technicalReviewOrProposalPk.proposalPk;
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
@@ -171,7 +184,10 @@ export class TechnicalReviewAuthorization {
       proposalPk
     );
 
-    const technicalReview = await this.resolveTechnicalReview(proposalPk);
+    const technicalReview = await this.resolveTechnicalReview(
+      proposalPk,
+      instrumentId
+    );
     if (isReviewerOfProposal && technicalReview?.submitted !== true) {
       return true;
     }

@@ -17,6 +17,7 @@ import { getFullUserName } from 'utils/user';
 
 type ProposalDetailsProps = {
   proposal: Proposal;
+  instrumentId: number;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
+const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const classes = useStyles();
 
@@ -90,11 +91,21 @@ const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
                 <TableCell className={classes.textBold}>Current Rank</TableCell>
-                <TableCell>{proposal.fapMeetingDecision?.rankOrder}</TableCell>
+                <TableCell>
+                  {
+                    proposal.fapMeetingDecisions?.find(
+                      (fmd) => fmd.instrumentId === instrumentId
+                    )?.rankOrder
+                  }
+                </TableCell>
               </TableRow>
               <TableRow key="instrumentAndPdf">
                 <TableCell className={classes.textBold}>Instrument</TableCell>
-                <TableCell>{proposal.instrument?.name}</TableCell>
+                <TableCell>
+                  {proposal.instruments
+                    ?.map((instrument) => instrument?.name)
+                    .join(', ')}
+                </TableCell>
                 <TableCell className={classes.textBold}>PDF</TableCell>
                 <TableCell>
                   <Button

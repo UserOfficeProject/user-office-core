@@ -58,6 +58,12 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
+import {
+  FapInstrument,
+  ProposalViewFap,
+  ProposalViewInstrument,
+  ProposalViewTechnicalReview,
+} from '../../resolvers/types/ProposalView';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
 
@@ -103,6 +109,7 @@ export interface ScheduledEventRecord {
   readonly proposal_pk: number;
   readonly status: ProposalBookingStatusCore;
   readonly local_contact: number | null;
+  readonly instrument_id: number;
 }
 
 export interface ProposalRecord {
@@ -124,7 +131,6 @@ export interface ProposalRecord {
   readonly notified: boolean;
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
-  readonly management_time_allocation: number;
   readonly management_decision_submitted: boolean;
 }
 export interface ProposalViewRecord {
@@ -135,26 +141,16 @@ export interface ProposalViewRecord {
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
   readonly proposal_id: string;
-  readonly rank_order: number;
   readonly final_status: number;
-  readonly technical_time_allocation: number;
-  readonly management_time_allocation: number;
   readonly notified: boolean;
-  readonly technical_review_status: number;
-  readonly technical_review_submitted: boolean;
-  readonly technical_review_assignee_id: number;
-  readonly technical_review_assignee_firstname: string;
-  readonly technical_review_assignee_lastname: string;
-  readonly instrument_name: string;
+  readonly submitted: boolean;
+  readonly instruments: ProposalViewInstrument[];
+  readonly technical_reviews: ProposalViewTechnicalReview[];
+  readonly faps: ProposalViewFap[];
+  readonly fap_instruments: FapInstrument[];
   readonly call_short_code: string;
-  readonly fap_id: number;
-  readonly fap_code: string;
-  readonly average: number;
-  readonly deviation: number;
-  readonly instrument_id: number;
   readonly call_id: number;
   readonly proposal_workflow_id: number;
-  readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
 }
@@ -238,7 +234,6 @@ export interface UserRecord {
   readonly preferredname: string;
   readonly oidc_sub: string | null;
   readonly oauth_refresh_token: string | null;
-  readonly oauth_access_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;
   readonly nationality: number;
@@ -292,7 +287,8 @@ export interface TechnicalReviewRecord {
   readonly submitted: boolean;
   readonly reviewer_id: number;
   readonly files: string;
-  readonly technical_review_assignee_id: number | null;
+  readonly technical_review_assignee_id: number;
+  readonly instrument_id: number;
 }
 
 export interface InternalReviewRecord {
@@ -418,12 +414,20 @@ export interface FapChairsRecord {
 }
 
 export interface FapProposalRecord {
+  readonly fap_proposal_id: number;
   readonly proposal_pk: number;
   readonly fap_id: number;
   readonly date_assigned: Date;
   readonly fap_time_allocation: number | null;
-  readonly instrument_submitted?: boolean;
+  readonly instrument_id: number | null;
+  readonly call_id: number;
+  readonly fap_meeting_instrument_submitted: boolean;
 }
+
+export type AssignProposalsToFapsInput = Pick<
+  FapProposalRecord,
+  'call_id' | 'fap_id' | 'instrument_id' | 'proposal_pk'
+> & { instrument_has_proposals_id: number };
 
 export interface FapAssignmentRecord {
   readonly proposal_pk: number;
@@ -433,6 +437,7 @@ export interface FapAssignmentRecord {
   readonly reassigned: boolean;
   readonly date_reassigned: Date;
   readonly email_sent: boolean;
+  readonly rank: number | null;
 }
 
 export interface FapReviewerRecord {
@@ -455,10 +460,11 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
-export interface InstrumentHasProposalsRecord {
+export interface InstrumentHasProposalRecord {
   readonly instrument_id: number;
   readonly proposal_pk: number;
   readonly submitted: boolean;
+  readonly instrument_has_proposals_id: number;
 }
 
 export interface CallHasInstrumentRecord {
@@ -474,11 +480,23 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly short_code: string;
   readonly description: string;
   readonly manager_user_id: number;
-  readonly availability_time: number;
+  readonly availability_time: number | null;
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;
   readonly fap_id: number;
+  readonly all_faps_instrument_time_allocation: number;
+  readonly fap_instrument_time_allocation: number;
+}
+
+export interface InstrumentWithManagementTimeRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly manager_user_id: number;
+  readonly management_time_allocation: number;
+  readonly submitted: boolean;
 }
 
 export interface TemplateCategoryRecord {
@@ -553,6 +571,8 @@ export interface FapMeetingDecisionRecord {
   readonly recommendation: ProposalEndStatus;
   readonly submitted: boolean;
   readonly submitted_by: number | null;
+  readonly instrument_id: number;
+  readonly fap_id: number;
 }
 
 export interface FapProposalWithReviewGradesAndRankingRecord {
@@ -565,13 +585,13 @@ export interface ProposalEventsRecord {
   readonly proposal_pk: number;
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
-  readonly proposal_feasible: boolean;
-  readonly proposal_unfeasible: boolean;
+  readonly proposal_feasibility_review_feasible: boolean;
+  readonly proposal_feasibility_review_unfeasible: boolean;
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
-  readonly proposal_fap_selected: boolean;
-  readonly proposal_instrument_selected: boolean;
+  readonly proposal_faps_selected: boolean;
+  readonly proposal_instruments_selected: boolean;
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;
   readonly proposal_all_fap_reviewers_selected: boolean;
@@ -754,7 +774,6 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.notified,
     proposal.submitted,
     proposal.reference_number_sequence,
-    proposal.management_time_allocation,
     proposal.management_decision_submitted
   );
 };
@@ -794,7 +813,8 @@ export const createTechnicalReviewObject = (
     technicalReview.submitted,
     technicalReview.reviewer_id,
     technicalReview.files ? JSON.stringify(technicalReview.files) : null,
-    technicalReview.technical_review_assignee_id
+    technicalReview.technical_review_assignee_id,
+    technicalReview.instrument_id
   );
 };
 
@@ -807,27 +827,17 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_status_name,
     proposal.proposal_status_description,
     proposal.proposal_id,
-    proposal.rank_order,
     proposal.final_status,
     proposal.notified,
-    proposal.technical_time_allocation,
-    proposal.management_time_allocation,
-    proposal.technical_review_assignee_id,
-    proposal.technical_review_assignee_firstname,
-    proposal.technical_review_assignee_lastname,
-    proposal.technical_review_status,
-    proposal.technical_review_submitted,
-    proposal.instrument_name,
+    proposal.submitted,
+    proposal.instruments,
+    proposal.technical_reviews,
+    proposal.faps,
+    proposal.fap_instruments,
     proposal.call_short_code,
-    proposal.fap_code,
-    proposal.fap_id,
-    proposal.average,
-    proposal.deviation,
-    proposal.instrument_id,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.proposal_workflow_id,
-    proposal.submitted
+    proposal.proposal_workflow_id
   );
 };
 
@@ -903,7 +913,6 @@ export const createUserObject = (user: UserRecord) => {
     user.preferredname,
     user.oidc_sub,
     user.oauth_refresh_token,
-    user.oauth_access_token,
     user.oauth_issuer,
     user.gender,
     user.nationality,
@@ -921,7 +930,9 @@ export const createUserObject = (user: UserRecord) => {
   );
 };
 
-export const createBasicUserObject = (user: UserRecord & InstitutionRecord) => {
+export const createBasicUserObject = (
+  user: UserRecord & InstitutionRecord & CountryRecord
+) => {
   return new BasicUserDetails(
     user.user_id,
     user.firstname,
@@ -932,7 +943,8 @@ export const createBasicUserObject = (user: UserRecord & InstitutionRecord) => {
     user.position,
     user.created_at,
     user.placeholder,
-    user.email
+    user.email,
+    user.country
   );
 };
 
@@ -1095,17 +1107,22 @@ export const createFapMeetingDecisionObject = (
     fapMeetingDecisionRecord.comment_for_user,
     fapMeetingDecisionRecord.comment_for_management,
     fapMeetingDecisionRecord.submitted,
-    fapMeetingDecisionRecord.submitted_by
+    fapMeetingDecisionRecord.submitted_by,
+    fapMeetingDecisionRecord.instrument_id,
+    fapMeetingDecisionRecord.fap_id
   );
 };
 
-export const createFapProposalObject = (fapAssignment: FapProposalRecord) => {
+export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
   return new FapProposal(
-    fapAssignment.proposal_pk,
-    fapAssignment.fap_id,
-    fapAssignment.date_assigned,
-    fapAssignment.fap_time_allocation,
-    fapAssignment.instrument_submitted
+    fapProposal.fap_proposal_id,
+    fapProposal.proposal_pk,
+    fapProposal.fap_id,
+    fapProposal.date_assigned,
+    fapProposal.fap_time_allocation,
+    fapProposal.instrument_id,
+    fapProposal.call_id,
+    fapProposal.fap_meeting_instrument_submitted
   );
 };
 export const createFapAssignmentObject = (
@@ -1118,7 +1135,8 @@ export const createFapAssignmentObject = (
     fapAssignment.date_assigned,
     fapAssignment.reassigned,
     fapAssignment.date_reassigned,
-    fapAssignment.email_sent
+    fapAssignment.email_sent,
+    fapAssignment.rank
   );
 };
 
@@ -1207,7 +1225,8 @@ export const createScheduledEventObject = (
     scheduledEvent.proposal_pk,
     scheduledEvent.proposal_booking_id,
     scheduledEvent.status,
-    scheduledEvent.local_contact
+    scheduledEvent.local_contact,
+    scheduledEvent.instrument_id
   );
 
 export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>

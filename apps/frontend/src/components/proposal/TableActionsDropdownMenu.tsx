@@ -1,15 +1,112 @@
-import { Menu, MenuItem } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Menu,
+  MenuItem,
+} from '@mui/material';
 import React, { useEffect } from 'react';
 
 type TableActionsDropdownMenuProps = {
   event: null | HTMLElement;
   handleClose: (option: string) => void;
-  options: string[];
 };
+
+export enum DownloadMenuOption {
+  PROPOSAL = 'Proposal(s)',
+  ATTACHMENT = 'Attachment(s)',
+}
+
+export enum PdfDownloadMenuOption {
+  PDF = 'Download as single file',
+  ZIP = 'Download as multiple files',
+}
+
+type MenuData = {
+  data: {
+    key: string;
+    subMenu: {
+      key: string;
+    }[];
+  };
+  handleClose: (option: string) => void;
+};
+
+const menuItems = [
+  {
+    key: DownloadMenuOption.PROPOSAL,
+    subMenu: [
+      { key: PdfDownloadMenuOption.PDF },
+      { key: PdfDownloadMenuOption.ZIP },
+    ],
+  },
+  { key: DownloadMenuOption.ATTACHMENT, subMenu: [] },
+];
+
+const MenuItemWithSubMenuAccordion = ({ data, handleClose }: MenuData) => {
+  const { key, subMenu } = data || {};
+
+  return (
+    <>
+      <MenuItem
+        id={key}
+        onClick={() => {
+          if (subMenu.length === 0) {
+            handleClose(key);
+          }
+        }}
+      >
+        {subMenu.length === 0 ? (
+          key
+        ) : (
+          <Accordion
+            elevation={0}
+            disableGutters
+            sx={{
+              backgroundColor: 'transparent',
+            }}
+          >
+            <AccordionSummary
+              sx={{
+                padding: 0,
+                minHeight: 0,
+              }}
+              classes={{
+                content: 'custom-accordion',
+              }}
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <span>{key}</span>
+            </AccordionSummary>
+            <AccordionDetails
+              sx={{
+                padding: 0,
+                margin: 0,
+                marginTop: 0,
+              }}
+            >
+              {subMenu.map((subMenuItem) => (
+                <MenuItem
+                  key={subMenuItem.key}
+                  onClick={() => {
+                    handleClose(subMenuItem.key);
+                  }}
+                >
+                  {subMenuItem.key}
+                </MenuItem>
+              ))}
+            </AccordionDetails>
+          </Accordion>
+        )}
+      </MenuItem>
+    </>
+  );
+};
+
 const TableActionsDropdownMenu = ({
   event,
   handleClose,
-  options,
 }: TableActionsDropdownMenuProps) => {
   const [anchorElement, setAnchorElement] = React.useState<null | HTMLElement>(
     null
@@ -60,15 +157,12 @@ const TableActionsDropdownMenu = ({
       transformOrigin={{ horizontal: 'right', vertical: 'top' }}
       anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
     >
-      {options.map((option) => (
-        <MenuItem
-          key={option}
-          onClick={() => {
-            handleClose(option);
-          }}
-        >
-          {option}
-        </MenuItem>
+      {menuItems.map((data, i) => (
+        <MenuItemWithSubMenuAccordion
+          key={i}
+          data={data}
+          handleClose={handleClose}
+        />
       ))}
     </Menu>
   );

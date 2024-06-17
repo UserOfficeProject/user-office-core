@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import CallDataSource from '../datasources/postgres/CallDataSource';
@@ -109,7 +110,7 @@ export const workflowEngine = async (
         /**
          * NOTE: We can have more than one current connection because of the multi-column workflows.
          * This is the way how we store the connection that has multiple next connections.
-         * We have multiple faparate connection records pointing to each next connection.
+         * We have multiple separate connection records pointing to each next connection.
          * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: FAP_SELECTION and NOT_FEASIBLE.
          * We store one record of FEASIBILITY_REVIEW with nextProposalStatusId = FAP_SELECTION and another one with nextProposalStatusId = NOT_FEASIBLE.
          * We go through each record and based on the currentEvent we move the proposal into the right direction
@@ -200,6 +201,15 @@ export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
   eventType: Event,
   proposalPks: number[]
 ) => {
+  if (eventType === Event.PROPOSAL_DELETED) {
+    logger.logInfo(
+      `${eventType} event triggered and workflow engine cannot continue because the referenced proposal/s are removed`,
+      { proposalPks }
+    );
+
+    return;
+  }
+
   const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
     eventType,
     proposalPks

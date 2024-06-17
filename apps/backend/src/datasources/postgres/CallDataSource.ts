@@ -1,5 +1,4 @@
 import { logger } from '@user-office-software/duo-logger';
-import BluePromise from 'bluebird';
 import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
@@ -45,6 +44,11 @@ export default class PostgresCallDataSource implements CallDataSource {
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
     const query = database('call').select(['*']);
+
+    if (filter?.shortCode) {
+      query.where('call_short_code', 'like', `%${filter.shortCode}%`);
+    }
+
     if (filter?.templateIds) {
       query.whereIn('template_id', filter.templateIds);
     }
@@ -133,13 +137,13 @@ export default class PostgresCallDataSource implements CallDataSource {
     );
   }
 
-  async getCallHasInstrumentsByInstrumentId(
-    instrumentId: number
+  async getCallHasInstrumentsByInstrumentIds(
+    instrumentIds: number[]
   ): Promise<CallHasInstrument[]> {
     return database
       .select()
       .from('call_has_instruments')
-      .where('instrument_id', instrumentId)
+      .whereIn('instrument_id', instrumentIds)
       .then((callHasInstrument: CallHasInstrumentRecord[]) =>
         callHasInstrument.map((callHasInstrument) =>
           createCallHasInstrumentObject(callHasInstrument)
@@ -236,9 +240,11 @@ export default class PostgresCallDataSource implements CallDataSource {
           .forUpdate()
           .transacting(trx);
 
+        const { referenceNumberFormat } = args;
+
         if (
-          args.referenceNumberFormat &&
-          args.referenceNumberFormat !== preUpdateCall.reference_number_format
+          referenceNumberFormat &&
+          referenceNumberFormat !== preUpdateCall.reference_number_format
         ) {
           const proposals = (await database
             .select('p.proposal_pk', 'p.reference_number_sequence')
@@ -250,21 +256,19 @@ export default class PostgresCallDataSource implements CallDataSource {
             'proposal_pk' | 'reference_number_sequence'
           >[];
 
-          await BluePromise.map(
-            proposals,
-            async (p) => {
-              await database
+          await Promise.all(
+            proposals.map(async (proposal) =>
+              database
                 .update({
                   proposal_id: await calculateReferenceNumber(
-                    args.referenceNumberFormat!,
-                    p.reference_number_sequence
+                    referenceNumberFormat,
+                    proposal.reference_number_sequence
                   ),
                 })
                 .from('proposals')
-                .where('proposal_pk', p.proposal_pk)
-                .transacting(trx);
-            },
-            { concurrency: 50 }
+                .where('proposal_pk', proposal.proposal_pk)
+                .transacting(trx)
+            )
           );
         }
 

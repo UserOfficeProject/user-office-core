@@ -23,12 +23,12 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import withPrompt, { WithPromptType } from 'utils/withPrompt';
 
+import { GenericTemplateContainer } from './GenericTemplateContainer';
+import GenericTemplateSelectModalOnCopy from './GenericTemplateSelectModalOnCopy';
 import {
   QuestionnairesList,
   QuestionnairesListRow,
 } from '../QuestionnairesList';
-import { GenericTemplateContainer } from './GenericTemplateContainer';
-import GenericTemplateSelectModalOnCopy from './GenericTemplateSelectModalOnCopy';
 
 const useStyles = makeStyles(() => ({
   questionLabel: {

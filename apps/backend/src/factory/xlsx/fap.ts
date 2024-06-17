@@ -18,7 +18,7 @@ export type RowObj = {
   propTitle?: string;
   principalInv: string;
   instrName?: string;
-  instrAvailTime?: number;
+  instrAvailTime: number | null;
   techReviewTimeAllocation?: number | null;
   fapTimeAllocation: number | null;
   propReviewAvgScore?: number;
@@ -132,10 +132,10 @@ export const collectFaplXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.review.reviewsForProposal(
-                user,
-                proposal.primaryKey
-              )
+            ? baseContext.queries.review.reviewsForProposal(user, {
+                proposalPk: proposal.primaryKey,
+                fapId: fapId,
+              })
             : null
         )
       );
@@ -147,7 +147,7 @@ export const collectFaplXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.review.technicalReviewForProposal(
+            ? baseContext.queries.review.technicalReviewsForProposal(
                 user,
                 proposal.primaryKey
               )
@@ -162,10 +162,10 @@ export const collectFaplXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.fap.getProposalFapMeetingDecision(
-                user,
-                proposal.primaryKey
-              )
+            ? baseContext.queries.fap.getProposalFapMeetingDecisions(user, {
+                proposalPk: proposal.primaryKey,
+                fapId: fapId,
+              })
             : null
         )
       );
@@ -216,16 +216,26 @@ export const collectFaplXLSXData = async (
         proposals.map(async (proposal, pIndx) => {
           const { firstname = '<missing>', lastname = '<missing>' } =
             proposalPrincipalInvestigators[pIndx] ?? {};
-          const technicalReview = technicalReviews[pIndx];
+          const technicalReview =
+            technicalReviews[pIndx]?.find(
+              (technicalReview) =>
+                technicalReview.instrumentId === instrument.id
+            ) || null;
           const reviews = proposalReviews[pIndx];
           const fapProposal = fapProposals?.[pIndx];
-          const fapMeetingDecision = fapMeetingDecisions[pIndx];
+          const proposalFapMeetingDecisions = fapMeetingDecisions[pIndx];
           const proposalAnswers = proposalsAnswers[pIndx];
 
           const proposalAverageScore = average(getGrades(reviews)) || 0;
 
+          const piFullName = `${firstname} ${lastname}`;
+          const fapMeetingDecision =
+            proposalFapMeetingDecisions?.find(
+              (fmd) => fmd.instrumentId === instrument.id
+            ) || null;
+
           return fapDataRow(
-            `${firstname} ${lastname}`,
+            piFullName,
             proposalAverageScore,
             instrument,
             fapMeetingDecision,
