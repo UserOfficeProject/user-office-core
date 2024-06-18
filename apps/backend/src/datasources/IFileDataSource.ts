@@ -1,3 +1,5 @@
+import { ReadStream } from 'pg-large-object';
+
 import { FileMetadata } from '../models/Blob';
 import { FilesMetadataFilter } from './../resolvers/queries/FilesMetadataQuery';
 export interface FileDataSource {
@@ -5,6 +7,7 @@ export interface FileDataSource {
   // Read
   getMetadata(fileId: string): Promise<FileMetadata>;
   getMetadata(filter: FilesMetadataFilter): Promise<FileMetadata[]>;
+  getBlobdata(fileName: string): Promise<ReadStream | null>;
   // write
   put(
     fileName: string,

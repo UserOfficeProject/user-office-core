@@ -40,4 +40,5 @@ export const Tokens = {
   FapDataColumns: Symbol('FapDataColumns'),
   FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),
+  DownloadService: Symbol('DownloadService'),
 };

@@ -3,11 +3,12 @@ import { container } from 'tsyringe';
 
 import { UserAuthorization } from '../../auth/UserAuthorization';
 import { Tokens } from '../../config/Tokens';
-import callFactoryService, {
-  DownloadType,
+import {
   XLSXType,
   XLSXMetaBase,
-} from '../../factory/service';
+  DownloadType,
+  DownloadService,
+} from '../../factory/DownloadService';
 import { getCurrentTimestamp } from '../../factory/util';
 import { collectFaplXLSXData } from '../../factory/xlsx/fap';
 import {
@@ -18,6 +19,10 @@ import {
 const fapDataColumns = container.resolve<string[]>(Tokens.FapDataColumns);
 
 const router = express.Router();
+
+const downloadService = container.resolve<DownloadService>(
+  Tokens.DownloadService
+);
 
 router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
@@ -61,7 +66,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    callFactoryService(
+    downloadService.callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
       { data, meta, userRole },
@@ -107,7 +112,7 @@ router.get(`/${XLSXType.Fap}/:fap_id/call/:call_id`, async (req, res, next) => {
     };
 
     const userRole = req.user.currentRole;
-    callFactoryService(
+    downloadService.callFactoryService(
       DownloadType.XLSX,
       XLSXType.Fap,
       { data, meta, userRole },

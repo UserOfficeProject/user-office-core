@@ -3,12 +3,12 @@ import { container, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { FactoryServicesAuthorized } from '../../decorators';
+import { MetaBase } from '../../factory/DownloadService';
 import {
   collectProposalPDFData,
   collectProposalPDFDataTokenAccess,
   ProposalPDFData,
 } from '../../factory/pdf/proposal';
-import { MetaBase } from '../../factory/service';
 import {
   collectProposalAttachmentData,
   ProposalAttachmentData,
