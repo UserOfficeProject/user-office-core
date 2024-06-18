@@ -41,6 +41,7 @@ import {
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
+import { EssDownloadService } from '../factory/EssDownloadService';
 import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
 import { getDataRow, populateRow } from '../factory/xlsx/FapDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
@@ -102,3 +103,5 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureBaseEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+
+mapClass(Tokens.DownloadService, EssDownloadService);

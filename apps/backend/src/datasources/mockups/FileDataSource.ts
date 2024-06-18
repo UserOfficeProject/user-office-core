@@ -1,3 +1,5 @@
+import { ReadStream } from 'pg-large-object';
+
 import { FileMetadata } from '../../models/Blob';
 import { FileDataSource } from '../IFileDataSource';
 import { FilesMetadataFilter } from './../../resolvers/queries/FilesMetadataQuery';
@@ -43,5 +45,9 @@ export default class FileDataSourceMock implements FileDataSource {
       sizeImBytes,
       new Date()
     );
+  }
+
+  async getBlobdata(fileName: string): Promise<ReadStream | null> {
+    return null;
   }
 }

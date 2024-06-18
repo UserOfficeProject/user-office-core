@@ -37,6 +37,7 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { EssDownloadService } from '../factory/EssDownloadService';
 import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
 import { getDataRow, populateRow } from '../factory/xlsx/FapDataRow';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
@@ -99,3 +100,5 @@ mapValue(
   isProduction ? () => {} : configureESSDevelopmentEnvironment
 );
 mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
+
+mapClass(Tokens.DownloadService, EssDownloadService);
