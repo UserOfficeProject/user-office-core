@@ -4,7 +4,7 @@ import fs from 'fs';
 import to from 'await-to-js';
 import { GraphQLError } from 'graphql';
 import { Client } from 'pg';
-import { LargeObjectManager } from 'pg-large-object';
+import { LargeObjectManager, ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
 import { FilesMetadataFilter } from '../../resolvers/queries/FilesMetadataQuery';
@@ -178,5 +178,47 @@ export default class PostgresFileDataSource implements FileDataSource {
       const fileStream = fs.createWriteStream(output);
       stream.pipe(fileStream);
     });
+  }
+
+  public async getBlobdata(fileName: string): Promise<ReadStream | null> {
+    if (!fileName) {
+      return null;
+    }
+
+    const result = await database('files')
+      .select('oid')
+      .where('file_name', fileName)
+      .first();
+
+    if (!result) {
+      return null;
+    }
+
+    const resp = await this.retrieveBlobData(parseInt(result.oid));
+
+    return resp;
+  }
+
+  private async retrieveBlobData(oid: number): Promise<ReadStream | null> {
+    const [connectionError, connection] = await to(
+      database.client.acquireConnection() as Promise<Client | undefined>
+    );
+    if (connectionError || !connection) {
+      return null;
+    }
+
+    const [transactionError] = await to(connection.query('BEGIN')); // start the transaction
+    if (transactionError) {
+      database.client.releaseConnection(connection);
+
+      return null;
+    }
+    const blobManager = new LargeObjectManager({ pg: connection });
+
+    const response = await blobManager.openAndReadableStreamAsync(oid);
+
+    const [, stream] = response;
+
+    return stream;
   }
 }
