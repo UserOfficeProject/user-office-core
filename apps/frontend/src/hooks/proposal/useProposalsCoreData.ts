@@ -23,7 +23,7 @@ export function useProposalsCoreData(
   const {
     reviewer,
     callId,
-    instrumentId,
+    instrumentFilter,
     proposalStatusId,
     questionaryIds,
     text,
@@ -45,7 +45,7 @@ export function useProposalsCoreData(
             filter: {
               reviewer,
               callId,
-              instrumentId,
+              instrumentFilter,
               proposalStatusId,
               questionaryIds,
               referenceNumbers,
@@ -91,7 +91,7 @@ export function useProposalsCoreData(
           .getProposalsCore({
             filter: {
               callId,
-              instrumentId,
+              instrumentFilter,
               proposalStatusId,
               questionaryIds,
               referenceNumbers,
@@ -137,7 +137,7 @@ export function useProposalsCoreData(
     [
       reviewer,
       callId,
-      instrumentId,
+      instrumentFilter,
       proposalStatusId,
       questionaryIds,
       text,
