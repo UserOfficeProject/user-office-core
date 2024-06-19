@@ -220,6 +220,7 @@ const FapMeetingInstrumentsTable = ({
                 {proposals[1].map((proposal) => {
                   return (
                     <DialogContentText
+                      data-cy={'proposal-' + proposal}
                       key={'proposal-' + proposal}
                       sx={{ ml: '15px' }}
                     >
@@ -302,6 +303,7 @@ const FapMeetingInstrumentsTable = ({
           });
           setDialogOpen(unSubmittedProposalInstrumentMap);
         }}
+        data-cy="submit-all-button"
       >
         Submit All Completed
       </Button>
