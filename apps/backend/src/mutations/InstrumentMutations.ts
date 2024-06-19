@@ -384,6 +384,8 @@ export default class InstrumentMutations {
           return this.fapDataSource.saveFapMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
             rankOrder: proposalWithRanking.rankOrder,
+            instrumentId: args.instrumentId,
+            fapId: args.fapId,
           });
         })
       );

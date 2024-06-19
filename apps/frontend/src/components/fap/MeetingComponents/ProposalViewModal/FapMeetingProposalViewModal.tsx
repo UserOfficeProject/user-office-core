@@ -69,27 +69,29 @@ const FapMeetingProposalViewModal = ({
   ]);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const { FapProposalData, loading, setFapProposalData } = useFapProposalData(
+  const { fapProposalData, loading, setFapProposalData } = useFapProposalData(
     fapId,
     proposalPk
   );
 
-  const finalHasWriteAccess = FapProposalData?.instrumentSubmitted
+  const finalHasWriteAccess = fapProposalData?.instrumentSubmitted
     ? isUserOfficer
     : hasWriteAccess;
 
-  const proposalData = (FapProposalData?.proposal ?? null) as Proposal;
+  const proposalData = (fapProposalData?.proposal ?? null) as Proposal;
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
   };
 
-  const fapTimeAllocation = FapProposalData?.fapTimeAllocation ?? null;
+  const fapTimeAllocation = fapProposalData?.fapTimeAllocation ?? null;
 
   const getInstrumentTechnicalReview = () =>
     proposalData.technicalReviews?.find(
       (technicalReview) => technicalReview.instrumentId === instrumentId
     );
+  const getInstrumentDetails = () =>
+    proposalData.instruments?.find((i) => i?.id === instrumentId);
 
   return (
     <>
@@ -121,7 +123,7 @@ const FapMeetingProposalViewModal = ({
           <Grid container>
             <Grid item xs={12}>
               <div data-cy="Fap-meeting-components-proposal-view">
-                {loading || !FapProposalData || !proposalData ? (
+                {loading || !fapProposalData || !proposalData ? (
                   <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />
                 ) : (
                   <>
@@ -131,17 +133,27 @@ const FapMeetingProposalViewModal = ({
                       proposalData={proposalData}
                       meetingSubmitted={(data) => {
                         setFapProposalData({
-                          ...FapProposalData,
+                          ...fapProposalData,
                           proposal: {
                             ...proposalData,
-                            fapMeetingDecision: data,
+                            fapMeetingDecisions:
+                              proposalData.fapMeetingDecisions?.map((fmd) => {
+                                if (fmd.instrumentId === data.instrumentId) {
+                                  return data;
+                                }
+
+                                return fmd;
+                              }) || [],
                           },
                         });
                         meetingSubmitted(data);
                       }}
+                      instrumentId={instrumentId}
+                      fapId={fapId}
                     />
                     <ExternalReviews
                       reviews={proposalData.reviews as Review[]}
+                      faps={proposalData.faps}
                     />
                     <TechnicalReviewInfo
                       hasWriteAccess={finalHasWriteAccess}
@@ -149,15 +161,19 @@ const FapMeetingProposalViewModal = ({
                       fapTimeAllocation={fapTimeAllocation}
                       onFapTimeAllocationEdit={(fapTimeAllocation) =>
                         setFapProposalData({
-                          ...FapProposalData,
+                          ...fapProposalData,
                           fapTimeAllocation,
                         })
                       }
                       proposal={proposalData}
                       fapId={fapId}
+                      instrument={getInstrumentDetails()}
                     />
 
-                    <ProposalDetails proposal={proposalData} />
+                    <ProposalDetails
+                      proposal={proposalData}
+                      instrumentId={instrumentId}
+                    />
                   </>
                 )}
               </div>

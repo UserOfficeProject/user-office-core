@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
@@ -42,11 +43,15 @@ import {
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
-  technicalStatus: 'technical_review_status',
-  fapCode: 'fap_code',
+  technicalStatuses: "technical_reviews->0->'status'",
+  technicalTimeAllocations: "technical_reviews->0->'timeAllocation'",
+  technicalReviewAssignees:
+    "technical_reviews->0->'technicalReviewAssignee'->'firstname'",
+  fapCodes: "faps->0->'code'",
   callShortCode: 'call_short_code',
-  instrumentNames: 'instrument_names',
+  instrumentNames: "instruments->0->'name'",
   statusName: 'proposal_status_id',
+  finalTimeAllocations: "instruments->0->'managementTimeAllocation'",
   proposalId: 'proposal_id',
   title: 'title',
   submitted: 'submitted',
@@ -415,7 +420,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          query.orderByRaw(`${sortField} ${sortDirection}`);
         }
 
         if (filter?.referenceNumbers) {
