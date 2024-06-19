@@ -2187,7 +2187,7 @@ context('Fap meeting components tests', () => {
         );
     });
 
-    it.only('Officer should be able to submit multiple completed Meetings forms', function () {
+    it('Officer should be able to submit multiple completed Meetings forms', function () {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
 
