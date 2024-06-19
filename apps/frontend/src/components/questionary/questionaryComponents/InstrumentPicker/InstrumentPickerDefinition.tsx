@@ -1,4 +1,4 @@
-// import { instrumentPickerValidationSchema } from '@user-office-software/duo-validation';
+import { instrumentPickerValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
@@ -26,7 +26,7 @@ export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
     answerRenderer: (answer) => <InstrumentPickerAnswerRenderer {...answer} />,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: null,
+  createYupValidationSchema: instrumentPickerValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || null,
   searchCriteriaComponent: InstrumentPickerSearchCriteriaComponent,
 };

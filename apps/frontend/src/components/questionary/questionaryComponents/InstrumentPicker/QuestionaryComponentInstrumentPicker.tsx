@@ -28,10 +28,14 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
   },
 }));
+/* InstrumentIdAndTime is used to save the 
+instrument id and requested time in database*/
 interface InstrumentIdAndTime {
   instrumentId: string;
   timeRequested?: string;
 }
+/* InstrumentIdNameAndTime is used to display the 
+instrument id, name and requested time in frontend*/
 interface InstrumentIdNameAndTime {
   instrumentId: string;
   instrumentName?: string;
@@ -53,6 +57,7 @@ export function QuestionaryComponentInstrumentPicker(
   const [stateValue, setStateValue] = useState<
     Array<InstrumentIdAndTime> | InstrumentIdAndTime
   >(value);
+
   const config = answer.config as InstrumentPickerConfig;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
@@ -167,7 +172,10 @@ export function QuestionaryComponentInstrumentPicker(
               <TextField
                 key={value.instrumentId}
                 value={value.timeRequested === '0' ? '' : value.timeRequested}
+                required={config.required}
+                error={isError}
                 label={`Request Time`}
+                type="number"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -185,34 +193,62 @@ export function QuestionaryComponentInstrumentPicker(
       </Stack>
     ) : (
       <Stack direction="row" spacing={3} marginTop={3}>
-        <TextField
-          key={requestTimeForInstrument.instrumentId}
-          value={
-            requestTimeForInstrument.timeRequested === '0'
-              ? ''
-              : requestTimeForInstrument.timeRequested
-          }
-          label={`Request Time`}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                {requestTimeForInstrument.instrumentName}:
-              </InputAdornment>
-            ),
-          }}
-          data-time-request={
-            requestTimeForInstrument.instrumentId + '-time-request'
-          }
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            handleTimeInput(
-              e.target.value,
-              requestTimeForInstrument.instrumentId
-            );
-          }}
-        />
+        {requestTimeForInstrument?.instrumentId && (
+          <TextField
+            key={requestTimeForInstrument.instrumentId}
+            value={
+              requestTimeForInstrument.timeRequested === '0'
+                ? ''
+                : requestTimeForInstrument.timeRequested
+            }
+            required={config.required}
+            error={isError}
+            label={`Request Time`}
+            type="number"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  {requestTimeForInstrument.instrumentName}:
+                </InputAdornment>
+              ),
+            }}
+            data-time-request={
+              requestTimeForInstrument.instrumentId + '-time-request'
+            }
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+              handleTimeInput(
+                e.target.value,
+                requestTimeForInstrument.instrumentId
+              );
+            }}
+          />
+        )}
       </Stack>
     );
   };
+
+  const DisplayErrorMessage = () => {
+    let errormessage: string;
+    if (config.requestTime) {
+      errormessage = Array.isArray(fieldError)
+        ? fieldError
+            .map(
+              (e: { instrumendId: string; timeRequested: string }) =>
+                e.timeRequested
+            )
+            .join(' ')
+        : fieldError.timeRequested === undefined
+          ? fieldError
+          : fieldError.timeRequested;
+    } else {
+      errormessage = Array.isArray(fieldError)
+        ? fieldError[0].instumentId
+        : fieldError;
+    }
+
+    return isError && <FormHelperText>{errormessage}</FormHelperText>;
+  };
+
   const SelectMenuItem = config.isMultipleSelect ? MultiMenuItem : MenuItem;
 
   switch (config.variant) {
@@ -254,8 +290,10 @@ export function QuestionaryComponentInstrumentPicker(
               );
             })}
           </Select>
-          {config.requestTime && <DynamicTimeFields />}
-          {isError && <FormHelperText>{fieldError}</FormHelperText>}
+          {config.requestTime && requestTimeForInstrument && (
+            <DynamicTimeFields />
+          )}
+          {isError && <DisplayErrorMessage />}
         </FormControl>
       );
     default:

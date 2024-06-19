@@ -15,7 +15,7 @@ const InstrumentPickerAnswerRenderer: AnswerRenderer = ({
     () =>
       Array.isArray(value)
         ? value.map((v: { instrumentId: string }) => Number(v.instrumentId))
-        : toArray<number>(Number(value.instrumentId)),
+        : toArray<number>(Number(value?.instrumentId || '0')),
     [value]
   );
   const { instruments } = useInstrumentsByIdsData(ids);
