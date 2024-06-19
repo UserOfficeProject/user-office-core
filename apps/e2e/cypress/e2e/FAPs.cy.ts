@@ -205,6 +205,7 @@ function initializationBeforeTests() {
 
     cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
       const createdProposal = result.createProposal;
+      cy.wrap(createdProposal.proposalId).as('proposal1Id');
       if (createdProposal) {
         firstCreatedProposalPk = createdProposal.primaryKey;
         firstCreatedProposalId = createdProposal.proposalId;
@@ -2184,6 +2185,136 @@ context('Fap meeting components tests', () => {
             instrumentAvailabilityTime - newFapTimeAllocation
           } ${initialDBData.call.allocationTimeUnit}s`
         );
+    });
+
+    it.only('Officer should be able to submit multiple completed Meetings forms', function () {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+
+        cy.wrap(createdProposal.proposalId).as('proposal2Id');
+
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 5,
+            submitted: true,
+            reviewerId: 0,
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
+
+          cy.assignProposalsToFaps({
+            fapInstruments: [
+              { instrumentId: createdInstrumentId, fapId: createdFapId },
+            ],
+            proposalPks: [createdProposal.primaryKey],
+          });
+
+          cy.assignReviewersToFap({
+            fapId: createdFapId,
+            memberIds: [fapMembers.reviewer2.id],
+          });
+          cy.assignFapReviewersToProposal({
+            fapId: createdFapId,
+            memberIds: [fapMembers.reviewer2.id],
+            proposalPk: firstCreatedProposalPk,
+          });
+          cy.assignFapReviewersToProposal({
+            fapId: createdFapId,
+            memberIds: [fapMembers.reviewer.id],
+            proposalPk: createdProposal.primaryKey,
+          });
+          cy.assignFapReviewersToProposal({
+            fapId: createdFapId,
+            memberIds: [fapMembers.reviewer2.id],
+            proposalPk: createdProposal.primaryKey,
+          });
+
+          // Manually changing the proposal status to be shown in the Faps. -------->
+          cy.changeProposalsStatus({
+            statusId: initialDBData.proposalStatuses.fapReview.id,
+            proposalPks: [createdProposal.primaryKey],
+          });
+
+          cy.getProposalReviews({
+            proposalPk: firstCreatedProposalPk,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
+                  grade: index ? 2 : 4,
+                  status: ReviewStatus.SUBMITTED,
+                  fapID: createdFapId,
+                });
+              });
+            }
+          });
+
+          cy.getProposalReviews({
+            proposalPk: createdProposal.primaryKey,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
+                  grade: index ? 1 : 5,
+                  status: ReviewStatus.SUBMITTED,
+                  fapID: createdFapId,
+                });
+              });
+            }
+          });
+        }
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+
+      cy.get('[aria-label="View proposal details"]').first().click();
+
+      cy.get('[role="dialog"] > header + div').scrollTo('top');
+
+      cy.setTinyMceContent('commentForUser', 'Test');
+      cy.setTinyMceContent('commentForManagement', 'Test');
+
+      cy.get('[data-cy="proposalFapMeetingRecommendation"]').click();
+      cy.get('[data-value="ACCEPTED"]').click();
+
+      cy.get('[data-cy="is-fap-meeting-submitted"]').click();
+      cy.get('[data-cy="saveAndContinue"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="submit-all-button"]').click();
+
+      cy.get('@proposal1Id').then((proposalId) => {
+        cy.get('[data-cy="proposal-' + proposalId + '"]');
+      });
+
+      cy.get('@proposal2Id').then((proposalId) => {
+        cy.get('[data-cy="proposal-' + proposalId + '"]').should('not.exist');
+      });
     });
 
     it('Officer should be able to submit an instrument if all proposals Fap meetings are submitted in existing Fap', () => {
