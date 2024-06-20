@@ -49,7 +49,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   }
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
         <StyledPaper margin={[0, 0, 2, 0]}>
           {loadingContent ? (

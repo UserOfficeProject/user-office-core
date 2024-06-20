@@ -6,7 +6,7 @@ import CallsTable from './CallsTable';
 
 const CallPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <CallsTable />
       </StyledPaper>
