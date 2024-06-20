@@ -1300,18 +1300,21 @@ export default class PostgresFapDataSource implements FapDataSource {
       .where('fp.fap_id', fapId)
       .andWhere('fp.call_id', callId);
 
-    const readyProposals = proposals.filter(
+    const readyProposals: FapMeetingDecisionRecord[] = proposals.filter(
       (proposal) =>
         proposal.comment_for_management &&
         proposal.comment_for_user &&
         proposal.recommendation
     );
-    readyProposals.map((proposal) => {
-      this.saveFapMeetingDecision(
-        { ...createFapMeetingDecisionObject(proposal), submitted: true },
-        userId
-      );
-    });
+
+    await Promise.all(
+      readyProposals.map((proposal) =>
+        this.saveFapMeetingDecision(
+          { ...createFapMeetingDecisionObject(proposal), submitted: true },
+          userId
+        )
+      )
+    );
 
     const incompleteProposals = allProposals.filter(
       (proposal) =>
