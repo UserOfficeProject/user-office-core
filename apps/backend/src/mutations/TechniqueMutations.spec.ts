@@ -35,7 +35,7 @@ describe('Test technique Mutations', () => {
 
   test('A logged in user officer can update a technique', () => {
     const techniqueToUpdate = {
-      id: 1,
+      techniqueId: 1,
       name: 'Dummy technique 1',
       shortCode: 'technique_1',
       description: 'Technique 1 description',
@@ -49,7 +49,7 @@ describe('Test technique Mutations', () => {
   test('A user cannot update a technique', () => {
     return expect(
       techniqueMutations.update(dummyUserWithRole, {
-        id: 1,
+        techniqueId: 1,
         name: 'Test technique',
         shortCode: '2024-06-07',
         description: 'Test technique description',
@@ -60,7 +60,7 @@ describe('Test technique Mutations', () => {
   test('A logged in user officer can delete a technique', () => {
     return expect(
       techniqueMutations.delete(dummyUserOfficerWithRole, {
-        id: 1,
+        techniqueId: 1,
       })
     ).resolves.toBe(dummyTechnique1);
   });
@@ -68,7 +68,7 @@ describe('Test technique Mutations', () => {
   test('A user cannot delete a technique', () => {
     return expect(
       techniqueMutations.delete(dummyUserWithRole, {
-        id: 1,
+        techniqueId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });

@@ -1,13 +1,8 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import {
-  updateTechniqueValidationSchema,
-  createTechniqueValidationSchema,
-} from '@user-office-software/duo-validation';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-mui';
 import i18n from 'i18n';
-import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -45,7 +40,7 @@ const CreateUpdateTechnique = ({
               toastSuccessMessage: t('technique') + ' updated successfully!',
             }).updateTechnique({
               ...values,
-              id: technique.id,
+              techniqueId: technique.techniqueId,
             });
 
             close(updateTechnique);
@@ -64,11 +59,6 @@ const CreateUpdateTechnique = ({
           }
         }
       }}
-      validationSchema={
-        technique
-          ? updateTechniqueValidationSchema
-          : createTechniqueValidationSchema
-      }
     >
       {() => (
         <Form>
@@ -126,16 +116,6 @@ const CreateUpdateTechnique = ({
       )}
     </Formik>
   );
-};
-
-CreateUpdateTechnique.propTypes = {
-  technique: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    shortCode: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-  }),
-  close: PropTypes.func.isRequired,
 };
 
 export default CreateUpdateTechnique;

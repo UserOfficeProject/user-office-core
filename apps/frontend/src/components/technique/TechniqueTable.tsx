@@ -54,16 +54,15 @@ const TechniqueTable = () => {
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const [openTechniqueAssignment, setOpenTechniqueAssignment] = useState(false);
-  const [selectedTechniques, setSelectedTechniques] = useState<
-    TechniqueFragment[]
-  >([]);
+  const [selectedTechnique, setSelectedTechnique] =
+    useState<TechniqueFragment | null>(null);
 
   const onTechniqueDelete = async (techniqueDeletedId: number | string) => {
     try {
       await api({
         toastSuccessMessage: 'Technique deleted successfully!',
       }).deleteTechnique({
-        id: techniqueDeletedId as number,
+        techniqueId: techniqueDeletedId as number,
       });
 
       return true;
@@ -76,73 +75,74 @@ const TechniqueTable = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function setAssigningTechniqueId(technique: TechniqueFragment): void {
-    const techniqueList: TechniqueFragment[] = [];
-    techniqueList.push(technique);
-    setSelectedTechniques(techniqueList);
+    setSelectedTechnique(technique);
     setOpenTechniqueAssignment(true);
   }
 
   const assignInstrumentsToTechniques = async (
     instruments: InstrumentFragment[]
   ): Promise<void> => {
-    const techniqueId = selectedTechniques[0].id;
-    if (instruments?.length) {
-      await api({
-        toastSuccessMessage: `Instrument/s assigned to the selected technique successfully!`,
-      }).assignInstrumentsToTechnique({
-        instrumentIds: instruments.map((instrument) => instrument.id),
-        techniqueId,
-      });
+    if (selectedTechnique) {
+      const techniqueId = selectedTechnique.techniqueId;
+      if (instruments?.length) {
+        await api({
+          toastSuccessMessage: `Instrument/s assigned to the selected technique successfully!`,
+        }).assignInstrumentsToTechnique({
+          instrumentIds: instruments.map((instrument) => instrument.id),
+          techniqueId,
+        });
+
+        setTechniques((techniques) =>
+          techniques.map((techniqueItem) => {
+            if (techniqueItem.techniqueId === techniqueId) {
+              return {
+                ...techniqueItem,
+                instruments: [...techniqueItem.instruments, ...instruments],
+              };
+            } else {
+              return techniqueItem;
+            }
+          })
+        );
+      }
     }
-    setTechniques((techniques) =>
-      techniques.map((techniqueItem) => {
-        if (techniqueItem.id === techniqueId) {
-          return {
-            ...techniqueItem,
-            instruments: [...techniqueItem.instruments, ...instruments],
-          };
-        } else {
-          return techniqueItem;
-        }
-      })
-    );
   };
 
-  const AssignedInstruments = React.useCallback(
-    ({ rowData }) => {
-      return <AssignedInstrumentsTable technique={rowData} />;
-    },
-    [setTechniques]
-  );
+  const AssignedInstruments = React.useCallback(({ rowData }) => {
+    return <AssignedInstrumentsTable technique={rowData} />;
+  }, []);
 
   const removeIntrumentsFromTechnique = async (
     instrumentIds: number[]
   ): Promise<void> => {
-    const techniqueId = selectedTechniques[0].id;
-    if (instrumentIds?.length) {
-      instrumentIds.forEach(async (instrumentId) => {
-        await api({
-          toastSuccessMessage: `Instrument/s unassigned from selected technique successfully!`,
-        }).removeInstrumentFromTechnique({
-          instrumentId,
-          techniqueId,
+    if (selectedTechnique) {
+      const techniqueId = selectedTechnique.techniqueId;
+      if (instrumentIds?.length) {
+        instrumentIds.forEach(async (instrumentId) => {
+          await api({
+            toastSuccessMessage: `Instrument/s unassigned from selected technique successfully!`,
+          }).removeInstrumentFromTechnique({
+            instrumentId,
+            techniqueId,
+          });
         });
-      });
+        setTechniques((techniques) =>
+          techniques.map((techniqueItem) => {
+            if (techniqueItem.techniqueId === techniqueId) {
+              return {
+                ...techniqueItem,
+                instruments: techniqueItem.instruments.filter(
+                  (instrument) =>
+                    !instrumentIds.find((id) => id === instrument.id)
+                ),
+              };
+            } else {
+              return techniqueItem;
+            }
+          })
+        );
+      }
     }
-    setTechniques((techniques) =>
-      techniques.map((techniqueItem) => {
-        if (techniqueItem.id === techniqueId) {
-          return {
-            ...techniqueItem,
-            instruments: techniqueItem.instruments.filter(
-              (instrument) => !instrumentIds.find((id) => id === instrument.id)
-            ),
-          };
-        } else {
-          return techniqueItem;
-        }
-      })
-    );
   };
 
   const createModal = (
@@ -161,8 +161,8 @@ const TechniqueTable = () => {
   return (
     <>
       <Dialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
+        aria-labelledby="instrument-select-title"
+        aria-describedby="instrument-select-description"
         open={openTechniqueAssignment}
         onClose={(): void => setOpenTechniqueAssignment(false)}
         maxWidth="xs"
@@ -172,13 +172,9 @@ const TechniqueTable = () => {
           <AssignInstrumentsToTechniques
             assignInstrumentsToTechniques={assignInstrumentsToTechniques}
             close={(): void => setOpenTechniqueAssignment(false)}
-            instrumentIds={selectedTechniques
-              .map((selecteTechnique) =>
-                (selecteTechnique.instruments || []).map(
-                  (instrument) => instrument.id
-                )
-              )
-              .flat()}
+            instrumentIds={(selectedTechnique?.instruments || []).map(
+              (instrument) => instrument.id
+            )}
             removeIntrumentsFromTechnique={removeIntrumentsFromTechnique}
           />
         </DialogContent>

@@ -18,7 +18,7 @@ import { Instrument } from './Instrument';
 @Directive('@key(fields: "id")')
 export class Technique implements Partial<TechniqueOrigin> {
   @Field(() => Int)
-  public id: number;
+  public techniqueId: number;
 
   @Field()
   public name: string;
@@ -39,7 +39,7 @@ export class TechniqueResolver {
   ): Promise<Instrument[] | null> {
     const instruments =
       context.queries.technique.dataSource.getInstrumentsByTechniqueId(
-        technique.id
+        technique.techniqueId
       );
 
     return isRejection(instruments) ? [] : instruments;

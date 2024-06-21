@@ -59,7 +59,7 @@ export default class TechniqueMutations {
       .catch((error) => {
         return rejection(
           'Could not update technique',
-          { agent, techniqueId: args.id },
+          { agent, techniqueId: args.techniqueId },
           error
         );
       });
@@ -72,14 +72,14 @@ export default class TechniqueMutations {
   @Authorized([Roles.USER_OFFICER])
   async delete(
     agent: UserWithRole | null,
-    args: { id: number }
+    args: { techniqueId: number }
   ): Promise<Technique | Rejection> {
     const deletedTechnique = await this.dataSource
-      .delete(args.id)
+      .delete(args.techniqueId)
       .catch((error) => {
         return rejection(
           'Could not delete technique',
-          { agent, techniqueId: args.id },
+          { agent, techniqueId: args.techniqueId },
           error
         );
       });

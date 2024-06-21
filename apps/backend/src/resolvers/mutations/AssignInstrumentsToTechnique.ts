@@ -20,7 +20,7 @@ export class AssignInstrumentsToTechniqueArgs {
 }
 
 @Resolver()
-export class AssignScientsitsToInstrumentMutation {
+export class AssignInstrumentsToTechniqueMutation {
   @Mutation(() => Boolean)
   async assignInstrumentsToTechnique(
     @Args() args: AssignInstrumentsToTechniqueArgs,

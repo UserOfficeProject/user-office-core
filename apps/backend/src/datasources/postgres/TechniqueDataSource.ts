@@ -1,5 +1,4 @@
 import { injectable } from 'tsyringe';
-import { Int } from 'type-graphql';
 
 import { Instrument } from '../../models/Instrument';
 import { Technique } from '../../models/Technique';
@@ -8,7 +7,6 @@ import { TechniqueDataSource } from '../TechniqueDataSource';
 import database from './database';
 import {
   InstrumentRecord,
-  TechniqueHasInstrumentsRecord,
   TechniqueRecord,
   createInstrumentObject,
 } from './records';
@@ -17,7 +15,7 @@ import {
 export default class PostgresTechniqueDataSource
   implements TechniqueDataSource
 {
-  createTechniqueObject(technique: TechniqueRecord): any {
+  createTechniqueObject(technique: TechniqueRecord): Technique {
     return new Technique(
       technique.technique_id,
       technique.name,
@@ -80,20 +78,13 @@ export default class PostgresTechniqueDataSource
   async getInstrumentsByTechniqueId(
     techniqueId: number
   ): Promise<Instrument[]> {
-    const instrumentIds = await database
-      .select()
-      .from('technique_has_instruments')
-      .where('technique_id', techniqueId)
-      .then((results: TechniqueHasInstrumentsRecord[]) =>
-        results.map((result) => {
-          return Int.parseValue(result.instrument_id);
-        })
-      );
-
     return database
       .select()
-      .from('instruments')
-      .whereIn('instrument_id', instrumentIds)
+      .from('instruments as instr')
+      .join('technique_has_instruments as tech_instr', {
+        'instr.instrument_id': 'tech_instr.instrument_id',
+      })
+      .where('technique_id', techniqueId)
       .then((results: InstrumentRecord[]) =>
         results.map(createInstrumentObject)
       );
@@ -106,7 +97,7 @@ export default class PostgresTechniqueDataSource
         short_code: technique.shortCode,
         description: technique.description,
       })
-      .where('technique_id', technique.id)
+      .where('technique_id', technique.techniqueId)
       .returning('*');
 
     return technique ? this.createTechniqueObject(result) : Promise.reject();

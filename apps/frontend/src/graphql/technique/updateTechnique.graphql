@@ -1,11 +1,11 @@
 mutation updateTechnique(
-  $id: Int!
+  $techniqueId: Int!
   $name: String!
   $shortCode: String!
   $description: String!
 ) {
   updateTechnique(
-    id: $id
+    techniqueId: $techniqueId
     name: $name
     shortCode: $shortCode
     description: $description

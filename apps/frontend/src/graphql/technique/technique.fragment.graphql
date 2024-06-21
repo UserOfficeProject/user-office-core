@@ -1,5 +1,5 @@
 fragment technique on Technique {
-  id
+  techniqueId
   name
   shortCode
   description

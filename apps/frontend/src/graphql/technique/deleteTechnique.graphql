@@ -1,5 +1,5 @@
-mutation deleteTechnique($id: Int!) {
-  deleteTechnique(id: $id) {
-    id
+mutation deleteTechnique($techniqueId: Int!) {
+  deleteTechnique(techniqueId: $techniqueId) {
+    techniqueId
   }
 }

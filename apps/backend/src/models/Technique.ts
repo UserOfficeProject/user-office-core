@@ -1,6 +1,6 @@
 export class Technique {
   constructor(
-    public id: number,
+    public techniqueId: number,
     public name: string,
     public shortCode: string,
     public description: string

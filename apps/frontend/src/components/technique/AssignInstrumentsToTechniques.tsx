@@ -70,7 +70,9 @@ const AssignInstrumentsToTechniques = ({
 
             await assignInstrumentsToTechniques(addedInstruments || null);
 
-            await removeIntrumentsFromTechnique(deletedInstruments);
+            if (deletedInstruments.length != 0) {
+              await removeIntrumentsFromTechnique(deletedInstruments);
+            }
           } else {
             await assignInstrumentsToTechniques(selectedInstruments || null);
           }
