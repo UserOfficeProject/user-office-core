@@ -239,7 +239,7 @@ const FapProposalsAndAssignmentsTable = ({
     );
   };
 
-  const handleAssMembersToFapProposals = async (
+  const handleAssignMembersToFapProposals = async (
     _: React.MouseEventHandler<HTMLButtonElement>,
     proposalsToAssign: FapProposalType | FapProposalType[]
   ): Promise<void> => {
@@ -568,7 +568,7 @@ const FapProposalsAndAssignmentsTable = ({
     tableActions.push({
       icon: () => <AssignmentInd data-cy="assign-fap-members" />,
       tooltip: 'Assign Fap members',
-      onClick: handleAssMembersToFapProposals,
+      onClick: handleAssignMembersToFapProposals,
       position: 'toolbarOnSelect',
     });
   hasRightToAssignReviewers &&
