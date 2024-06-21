@@ -8,7 +8,7 @@ import { LargeObjectManager, ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
 import { FilesMetadataFilter } from '../../resolvers/queries/FilesMetadataQuery';
-import { FileDataSource } from '../IFileDataSource';
+import { FileDataSource } from '../FileDataSource';
 import database from './database';
 import { FileRecord, createFileMetadata } from './records';
 
