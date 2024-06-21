@@ -36,7 +36,7 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { EventBus } from '../events/eventBus';
-import { EssDownloadService } from '../factory/EssDownloadService';
+import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { SampleEsiDataSourceMock } from './../datasources/mockups/SampleEsiDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
@@ -90,7 +90,7 @@ mapValue(Tokens.EmailEventHandler, essEmailHandler);
 mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
-mapClass(Tokens.DownloadService, EssDownloadService);
+mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 jest.mock('../decorators/EventBus', () => {
   return () => jest.fn();
