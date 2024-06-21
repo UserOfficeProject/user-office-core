@@ -87,23 +87,25 @@ const TechniqueTable = () => {
       if (instruments?.length) {
         await api({
           toastSuccessMessage: `Instrument/s assigned to the selected technique successfully!`,
-        }).assignInstrumentsToTechnique({
-          instrumentIds: instruments.map((instrument) => instrument.id),
-          techniqueId,
-        });
-
-        setTechniques((techniques) =>
-          techniques.map((techniqueItem) => {
-            if (techniqueItem.techniqueId === techniqueId) {
-              return {
-                ...techniqueItem,
-                instruments: [...techniqueItem.instruments, ...instruments],
-              };
-            } else {
-              return techniqueItem;
-            }
+        })
+          .assignInstrumentsToTechnique({
+            instrumentIds: instruments.map((instrument) => instrument.id),
+            techniqueId,
           })
-        );
+          .then(() => {
+            setTechniques((techniques) =>
+              techniques.map((techniqueItem) => {
+                if (techniqueItem.techniqueId === techniqueId) {
+                  return {
+                    ...techniqueItem,
+                    instruments: [...techniqueItem.instruments, ...instruments],
+                  };
+                } else {
+                  return techniqueItem;
+                }
+              })
+            );
+          });
       }
     }
   };
@@ -121,26 +123,29 @@ const TechniqueTable = () => {
         instrumentIds.forEach(async (instrumentId) => {
           await api({
             toastSuccessMessage: `Instrument/s unassigned from selected technique successfully!`,
-          }).removeInstrumentFromTechnique({
-            instrumentId,
-            techniqueId,
-          });
-        });
-        setTechniques((techniques) =>
-          techniques.map((techniqueItem) => {
-            if (techniqueItem.techniqueId === techniqueId) {
-              return {
-                ...techniqueItem,
-                instruments: techniqueItem.instruments.filter(
-                  (instrument) =>
-                    !instrumentIds.find((id) => id === instrument.id)
-                ),
-              };
-            } else {
-              return techniqueItem;
-            }
           })
-        );
+            .removeInstrumentFromTechnique({
+              instrumentId,
+              techniqueId,
+            })
+            .then(() => {
+              setTechniques((techniques) =>
+                techniques.map((techniqueItem) => {
+                  if (techniqueItem.techniqueId === techniqueId) {
+                    return {
+                      ...techniqueItem,
+                      instruments: techniqueItem.instruments.filter(
+                        (instrument) =>
+                          !instrumentIds.find((id) => id === instrument.id)
+                      ),
+                    };
+                  } else {
+                    return techniqueItem;
+                  }
+                })
+              );
+            });
+        });
       }
     }
   };
