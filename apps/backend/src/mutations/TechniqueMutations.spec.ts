@@ -33,6 +33,26 @@ describe('Test technique Mutations', () => {
     ).resolves.toMatchObject({ id: 1, ...techniqueToCreate });
   });
 
+  test('A user officer cannot create a technique with a short code greater than 20 characters', async () => {
+    return expect(
+      techniqueMutations.create(dummyUserWithRole, {
+        name: 'Test technique',
+        shortCode: 'a'.repeat(21),
+        description: 'Test technique description',
+      })
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
+  });
+
+  test('A user officer cannot create a technique with a name greater than 100 characters', async () => {
+    return expect(
+      techniqueMutations.create(dummyUserWithRole, {
+        name: 'a'.repeat(101),
+        shortCode: 'technique_1',
+        description: 'Test technique description',
+      })
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
+  });
+
   test('A logged in user officer can update a technique', () => {
     const techniqueToUpdate = {
       id: 1,
@@ -44,6 +64,28 @@ describe('Test technique Mutations', () => {
     return expect(
       techniqueMutations.update(dummyUserOfficerWithRole, techniqueToUpdate)
     ).resolves.toStrictEqual({ ...techniqueToUpdate });
+  });
+
+  test('A user officer cannot update a technique with a short code greater than 20 characters', async () => {
+    return expect(
+      techniqueMutations.update(dummyUserWithRole, {
+        id: 1,
+        name: 'Test technique',
+        shortCode: 'a'.repeat(21),
+        description: 'Test technique description',
+      })
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
+  });
+
+  test('A user officer cannot update a technique with a name greater than 100 characters', async () => {
+    return expect(
+      techniqueMutations.update(dummyUserWithRole, {
+        id: 1,
+        name: 'a'.repeat(101),
+        shortCode: 'technique_1',
+        description: 'Test technique description',
+      })
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A user cannot update a technique', () => {
