@@ -5,7 +5,7 @@ mutation updateTechnique(
   $description: String!
 ) {
   updateTechnique(
-    techniqueId: $techniqueId
+    id: $techniqueId
     name: $name
     shortCode: $shortCode
     description: $description

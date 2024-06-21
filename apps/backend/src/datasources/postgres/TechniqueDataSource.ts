@@ -97,7 +97,7 @@ export default class PostgresTechniqueDataSource
         short_code: technique.shortCode,
         description: technique.description,
       })
-      .where('technique_id', technique.techniqueId)
+      .where('technique_id', technique.id)
       .returning('*');
 
     return technique ? this.createTechniqueObject(result) : Promise.reject();

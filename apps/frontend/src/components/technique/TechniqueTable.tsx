@@ -83,7 +83,7 @@ const TechniqueTable = () => {
     instruments: InstrumentFragment[]
   ): Promise<void> => {
     if (selectedTechnique) {
-      const techniqueId = selectedTechnique.techniqueId;
+      const techniqueId = selectedTechnique.id;
       if (instruments?.length) {
         await api({
           toastSuccessMessage: `Instrument/s assigned to the selected technique successfully!`,
@@ -95,7 +95,7 @@ const TechniqueTable = () => {
           .then(() => {
             setTechniques((techniques) =>
               techniques.map((techniqueItem) => {
-                if (techniqueItem.techniqueId === techniqueId) {
+                if (techniqueItem.id === techniqueId) {
                   return {
                     ...techniqueItem,
                     instruments: [...techniqueItem.instruments, ...instruments],
@@ -118,7 +118,7 @@ const TechniqueTable = () => {
     instrumentIds: number[]
   ): Promise<void> => {
     if (selectedTechnique) {
-      const techniqueId = selectedTechnique.techniqueId;
+      const techniqueId = selectedTechnique.id;
       if (instrumentIds?.length) {
         instrumentIds.forEach(async (instrumentId) => {
           await api({
@@ -131,7 +131,7 @@ const TechniqueTable = () => {
             .then(() => {
               setTechniques((techniques) =>
                 techniques.map((techniqueItem) => {
-                  if (techniqueItem.techniqueId === techniqueId) {
+                  if (techniqueItem.id === techniqueId) {
                     return {
                       ...techniqueItem,
                       instruments: techniqueItem.instruments.filter(

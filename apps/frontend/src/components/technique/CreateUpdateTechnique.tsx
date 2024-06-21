@@ -40,7 +40,7 @@ const CreateUpdateTechnique = ({
               toastSuccessMessage: t('technique') + ' updated successfully!',
             }).updateTechnique({
               ...values,
-              techniqueId: technique.techniqueId,
+              techniqueId: technique.id,
             });
 
             close(updateTechnique);

@@ -14,7 +14,7 @@ import { Technique } from '../types/Technique';
 @ArgsType()
 export class UpdateTechniqueArgs {
   @Field(() => Int)
-  public techniqueId: number;
+  public id: number;
 
   @Field(() => String)
   public name: string;

@@ -59,7 +59,7 @@ export default class TechniqueMutations {
       .catch((error) => {
         return rejection(
           'Could not update technique',
-          { agent, techniqueId: args.techniqueId },
+          { agent, techniqueId: args.id },
           error
         );
       });

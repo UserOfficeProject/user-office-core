@@ -1,5 +1,5 @@
 mutation deleteTechnique($techniqueId: Int!) {
   deleteTechnique(techniqueId: $techniqueId) {
-    techniqueId
+    ...technique
   }
 }

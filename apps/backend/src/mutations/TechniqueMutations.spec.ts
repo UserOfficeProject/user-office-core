@@ -35,7 +35,7 @@ describe('Test technique Mutations', () => {
 
   test('A logged in user officer can update a technique', () => {
     const techniqueToUpdate = {
-      techniqueId: 1,
+      id: 1,
       name: 'Dummy technique 1',
       shortCode: 'technique_1',
       description: 'Technique 1 description',
@@ -49,7 +49,7 @@ describe('Test technique Mutations', () => {
   test('A user cannot update a technique', () => {
     return expect(
       techniqueMutations.update(dummyUserWithRole, {
-        techniqueId: 1,
+        id: 1,
         name: 'Test technique',
         shortCode: '2024-06-07',
         description: 'Test technique description',
