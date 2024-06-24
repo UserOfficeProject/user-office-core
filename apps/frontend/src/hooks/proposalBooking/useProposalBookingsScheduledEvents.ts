@@ -51,7 +51,7 @@ export function useProposalBookingsScheduledEvents({
 }: {
   onlyUpcoming?: boolean;
   notDraft?: boolean;
-  instrumentId?: number;
+  instrumentId?: number | null;
 } = {}) {
   const [proposalScheduledEvents, setProposalScheduledEvents] = useState<
     ProposalScheduledEvent[]

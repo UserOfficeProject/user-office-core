@@ -105,10 +105,6 @@ export interface FapDataSource {
   removeProposalsFromFaps(
     args: RemoveProposalsFromFapsArgs
   ): Promise<FapProposal[]>;
-  removeProposalsFromFapsByInstrument(
-    proposalPk: number,
-    instrumentIds: number[]
-  ): Promise<FapProposal[]>;
   assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,

@@ -605,27 +605,6 @@ export class FapDataSourceMock implements FapDataSource {
     throw new Error(`FAPs not found ${fapIds}`);
   }
 
-  async removeProposalsFromFapsByInstrument(
-    proposalPk: number,
-    instrumentIds: number[]
-  ) {
-    const fap = dummyFapProposals.find(
-      (element) =>
-        element.fapId &&
-        element.instrumentId &&
-        instrumentIds.includes(element.instrumentId) &&
-        element.proposalPk === proposalPk
-    );
-
-    if (fap) {
-      return [fap];
-    }
-
-    throw new Error(
-      `FAPs not found with proposalPk ${proposalPk} and instrumentId ${instrumentIds}`
-    );
-  }
-
   async assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,

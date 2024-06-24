@@ -811,19 +811,6 @@ export default class PostgresFapDataSource implements FapDataSource {
     return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
   }
 
-  async removeProposalsFromFapsByInstrument(
-    proposalPk: number,
-    instrumentIds: number[]
-  ): Promise<FapProposal[]> {
-    const fapProposalRecords = await database('fap_proposals')
-      .where('proposal_pk', proposalPk)
-      .whereIn('instrument_id', instrumentIds)
-      .del()
-      .returning('*');
-
-    return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
-  }
-
   async assignMemberToFapProposals(
     proposalPks: number[],
     fapId: number,
