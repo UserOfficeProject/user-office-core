@@ -285,7 +285,7 @@ const ProposalTableInstrumentScientist = ({
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
-    instrument: NumberParam,
+    instrument: StringParam,
     proposalStatus: withDefault(NumberParam, statusFilter),
     questionId: StringParam,
     compareOperator: StringParam,
@@ -299,7 +299,13 @@ const ProposalTableInstrumentScientist = ({
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: urlQueryParams.call,
-    instrumentId: urlQueryParams.instrument,
+    instrumentFilter: {
+      instrumentId: urlQueryParams.instrument
+        ? +urlQueryParams.instrument
+        : null,
+      showAllProposals: !urlQueryParams.instrument,
+      showMultiInstrumentProposals: false,
+    },
     proposalStatusId: urlQueryParams.proposalStatus,
     referenceNumbers: urlQueryParams.proposalid
       ? [urlQueryParams.proposalid]
@@ -323,7 +329,7 @@ const ProposalTableInstrumentScientist = ({
     useProposalsCoreData(
       {
         proposalStatusId: proposalFilter.proposalStatusId,
-        instrumentId: proposalFilter.instrumentId,
+        instrumentFilter: proposalFilter.instrumentFilter,
         callId: proposalFilter.callId,
         questionFilter: proposalFilter.questionFilter,
         reviewer: proposalFilter.reviewer,

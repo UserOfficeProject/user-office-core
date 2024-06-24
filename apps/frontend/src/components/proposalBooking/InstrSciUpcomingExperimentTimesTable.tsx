@@ -15,9 +15,9 @@ export default function InstrSciUpcomingExperimentTimesTable() {
 
   const { instruments, loadingInstruments } = useInstrumentsData();
 
-  const [selectedInstrumentId, setSelectedInstrumentId] = useState<number>(
-    urlQueryParams.instrument ? urlQueryParams.instrument : 0
-  );
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState<
+    number | null | undefined
+  >(urlQueryParams.instrument ? urlQueryParams.instrument : null);
 
   const { loading, proposalScheduledEvents } =
     useProposalBookingsScheduledEvents({
@@ -34,8 +34,8 @@ export default function InstrSciUpcomingExperimentTimesTable() {
           instruments={instruments}
           isLoading={loadingInstruments}
           instrumentId={selectedInstrumentId}
-          onChange={(instrumentId) => {
-            setSelectedInstrumentId(instrumentId);
+          onChange={(instrumentFilter) => {
+            setSelectedInstrumentId(instrumentFilter.instrumentId);
           }}
         />
         <ExperimentsTable
