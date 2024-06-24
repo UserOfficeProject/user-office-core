@@ -2288,31 +2288,30 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
-
-      cy.get('[aria-label="View proposal details"]').first().click();
-
-      cy.get('[role="dialog"] > header + div').scrollTo('top');
-
-      cy.setTinyMceContent('commentForUser', 'Test');
-      cy.setTinyMceContent('commentForManagement', 'Test');
-
-      cy.get('[data-cy="proposalFapMeetingRecommendation"]').click();
-      cy.get('[data-value="ACCEPTED"]').click();
-
-      cy.get('[data-cy="is-fap-meeting-submitted"]').click();
-      cy.get('[data-cy="saveAndContinue"]').click();
+      cy.saveFapMeetingDecision({
+        saveFapMeetingDecisionInput: {
+          commentForManagement: 'test',
+          commentForUser: 'test',
+          proposalPk: firstCreatedProposalPk,
+          submitted: true,
+          recommendation: ProposalEndStatus.ACCEPTED,
+          instrumentId: createdInstrumentId,
+          fapId: createdFapId,
+        },
+      });
 
       cy.finishedLoading();
 
       cy.get('[data-cy="submit-all-button"]').click();
 
-      cy.get('@proposal1Id').then((proposalId) => {
-        cy.get('[data-cy="proposal-' + proposalId + '"]');
-      });
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+
+      cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
+        'not.exist'
+      );
 
       cy.get('@proposal2Id').then((proposalId) => {
-        cy.get('[data-cy="proposal-' + proposalId + '"]').should('not.exist');
+        cy.get('[data-cy="proposal-' + proposalId + '"]').should('exist');
       });
     });
 
@@ -2688,6 +2687,7 @@ context('Fap meeting components tests', () => {
     });
 
     it('Fap Chair should be able to submit multiple completed Meetings forms', function () {
+      cy.logout();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
 
@@ -2783,36 +2783,34 @@ context('Fap meeting components tests', () => {
         }
       });
 
-      cy.login('officer');
+      cy.saveFapMeetingDecision({
+        saveFapMeetingDecisionInput: {
+          commentForManagement: 'test',
+          commentForUser: 'test',
+          proposalPk: firstCreatedProposalPk,
+          submitted: true,
+          recommendation: ProposalEndStatus.ACCEPTED,
+          instrumentId: createdInstrumentId,
+          fapId: createdFapId,
+        },
+      });
+
+      cy.login(fapMembers.chair);
+      cy.changeActiveRole(initialDBData.roles.fapChair);
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
-
-      cy.finishedLoading();
-
-      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
-
-      cy.get('[aria-label="View proposal details"]').first().click();
-
-      cy.get('[role="dialog"] > header + div').scrollTo('top');
-
-      cy.setTinyMceContent('commentForUser', 'Test');
-      cy.setTinyMceContent('commentForManagement', 'Test');
-
-      cy.get('[data-cy="proposalFapMeetingRecommendation"]').click();
-      cy.get('[data-value="ACCEPTED"]').click();
-
-      cy.get('[data-cy="is-fap-meeting-submitted"]').click();
-      cy.get('[data-cy="saveAndContinue"]').click();
 
       cy.finishedLoading();
 
       cy.get('[data-cy="submit-all-button"]').click();
 
-      cy.get('@proposal1Id').then((proposalId) => {
-        cy.get('[data-cy="proposal-' + proposalId + '"]');
-      });
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+
+      cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
+        'not.exist'
+      );
 
       cy.get('@proposal2Id').then((proposalId) => {
-        cy.get('[data-cy="proposal-' + proposalId + '"]').should('not.exist');
+        cy.get('[data-cy="proposal-' + proposalId + '"]').should('exist');
       });
     });
   });
@@ -2914,6 +2912,7 @@ context('Fap meeting components tests', () => {
     });
 
     it('Fap Secretary should be able to submit multiple completed Meetings forms', function () {
+      cy.logout();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
 
@@ -3009,36 +3008,36 @@ context('Fap meeting components tests', () => {
         }
       });
 
-      cy.login('officer');
+      cy.saveFapMeetingDecision({
+        saveFapMeetingDecisionInput: {
+          commentForManagement: 'test',
+          commentForUser: 'test',
+          proposalPk: firstCreatedProposalPk,
+          submitted: true,
+          recommendation: ProposalEndStatus.ACCEPTED,
+          instrumentId: createdInstrumentId,
+          fapId: createdFapId,
+        },
+      });
+
+      cy.login(fapMembers.secretary);
+      cy.changeActiveRole(initialDBData.roles.fapSecretary);
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
-      cy.get('[aria-label="View proposal details"]').first().click();
-
-      cy.get('[role="dialog"] > header + div').scrollTo('top');
-
-      cy.setTinyMceContent('commentForUser', 'Test');
-      cy.setTinyMceContent('commentForManagement', 'Test');
-
-      cy.get('[data-cy="proposalFapMeetingRecommendation"]').click();
-      cy.get('[data-value="ACCEPTED"]').click();
-
-      cy.get('[data-cy="is-fap-meeting-submitted"]').click();
-      cy.get('[data-cy="saveAndContinue"]').click();
-
-      cy.finishedLoading();
-
       cy.get('[data-cy="submit-all-button"]').click();
 
-      cy.get('@proposal1Id').then((proposalId) => {
-        cy.get('[data-cy="proposal-' + proposalId + '"]');
-      });
+      cy.contains('Some Proposals Could not be Submitted');
+
+      cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
+        'not.exist'
+      );
 
       cy.get('@proposal2Id').then((proposalId) => {
-        cy.get('[data-cy="proposal-' + proposalId + '"]').should('not.exist');
+        cy.get('[data-cy="proposal-' + proposalId + '"]').should('exist');
       });
     });
   });
