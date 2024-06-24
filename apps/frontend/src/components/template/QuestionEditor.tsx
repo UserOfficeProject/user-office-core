@@ -7,6 +7,8 @@ import { createQuestionForm } from 'components/questionary/QuestionaryComponentR
 import { Question, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
+import TemplateEditLabel from './QuestionTemplateLabel';
+
 export default function QuestionEditor(props: {
   field: Question | null;
   dispatch: React.Dispatch<Event>;
@@ -20,6 +22,7 @@ export default function QuestionEditor(props: {
   return (
     <StyledModal open={props.field != null}>
       <>
+        <TemplateEditLabel pageType={'Question'} />
         <IconButton
           data-cy="close-modal-btn"
           sx={(theme) => ({

@@ -224,7 +224,7 @@ const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
-    field: 'finalTimeAllocationsRendered',
+    field: 'finalTimeAllocations',
     emptyValue: '-',
     hidden: true,
   },
@@ -740,7 +740,7 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      finalTimeAllocationsRendered: `${fromArrayToCommaSeparated(
+      finalTimeAllocations: `${fromArrayToCommaSeparated(
         proposal.instruments?.map(
           (instrument) => instrument.managementTimeAllocation
         )

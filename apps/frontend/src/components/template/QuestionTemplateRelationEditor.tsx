@@ -7,6 +7,8 @@ import { createQuestionTemplateRelationForm } from 'components/questionary/Quest
 import { QuestionTemplateRelation, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
+import TemplateEditLabel from './QuestionTemplateLabel';
+
 export default function QuestionTemplateRelationEditor(props: {
   field: QuestionTemplateRelation | null;
   dispatch: React.Dispatch<Event>;
@@ -23,6 +25,7 @@ export default function QuestionTemplateRelationEditor(props: {
       data-cy="question-relation-dialogue"
     >
       <>
+        <TemplateEditLabel pageType={'Template'} />
         <IconButton
           data-cy="close-modal-btn"
           sx={(theme) => ({
