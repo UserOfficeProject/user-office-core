@@ -303,6 +303,9 @@ export default class PostgresFapDataSource implements FapDataSource {
           })
           .join('proposal_statuses as ps', {
             'p.status_id': 'ps.proposal_status_id',
+          })
+          .where(function () {
+            this.where('ps.name', 'ilike', 'FAP_%');
           });
 
         if (callId) {

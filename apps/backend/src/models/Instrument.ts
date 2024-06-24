@@ -44,8 +44,3 @@ export class InstrumentsHasProposals {
     public submitted: boolean
   ) {}
 }
-
-export enum InstrumentFilter {
-  ALL = 'all',
-  MULTI = 'multi',
-}
