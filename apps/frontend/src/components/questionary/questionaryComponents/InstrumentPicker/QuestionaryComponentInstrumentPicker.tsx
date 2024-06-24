@@ -61,28 +61,7 @@ export function QuestionaryComponentInstrumentPicker(
   const config = answer.config as InstrumentPickerConfig;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
-  const valueWithInstrumentName = Array.isArray(value)
-    ? value.map((v: InstrumentIdAndTime) => {
-        return {
-          instrumentId: v.instrumentId,
-          instrumentName: config.instruments.find(
-            (i) => i.id.toString() === v.instrumentId
-          )?.name,
-          timeRequested: v.timeRequested,
-        };
-      })
-    : {
-        instrumentId: value?.instrumentId as string,
-        instrumentName: config.instruments.find(
-          (i) => i.id.toString() === value?.instrumentId
-        )?.name,
-        timeRequested: value?.timeRequested as string,
-      };
-  const [requestTimeForInstrument, setRequestTimeForInstrument] = useState<
-    Array<InstrumentIdNameAndTime> | InstrumentIdNameAndTime
-  >(valueWithInstrumentName);
-  useEffect(() => {
-    setStateValue(answer.value);
+  const getValueWithInstrumentName = () => {
     const valueWithInstrumentName = Array.isArray(value)
       ? value.map((v: InstrumentIdAndTime) => {
           return {
@@ -100,6 +79,16 @@ export function QuestionaryComponentInstrumentPicker(
           )?.name,
           timeRequested: value?.timeRequested as string,
         };
+
+    return valueWithInstrumentName;
+  };
+  const valueWithInstrumentName = getValueWithInstrumentName;
+  const [requestTimeForInstrument, setRequestTimeForInstrument] = useState<
+    Array<InstrumentIdNameAndTime> | InstrumentIdNameAndTime
+  >(valueWithInstrumentName);
+  useEffect(() => {
+    setStateValue(answer.value);
+    const valueWithInstrumentName = getValueWithInstrumentName;
     setRequestTimeForInstrument(valueWithInstrumentName);
   }, [answer, config.instruments.length]);
 
@@ -163,67 +152,40 @@ export function QuestionaryComponentInstrumentPicker(
     onComplete(newInstrumentTime);
   };
   const DynamicTimeFields = () => {
-    return requestTimeForInstrument &&
-      Array.isArray(requestTimeForInstrument) ? (
-      <Stack direction="row" spacing={3} marginTop={3}>
-        {requestTimeForInstrument.map((value) => {
-          if (value.instrumentId)
-            return (
-              <TextField
-                key={value.instrumentId}
-                value={value.timeRequested === '0' ? '' : value.timeRequested}
-                required={config.required}
-                error={isError}
-                label={`Request Time`}
-                type="number"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {value.instrumentName}:
-                    </InputAdornment>
-                  ),
-                }}
-                data-time-request={value.instrumentId + '-time-request'}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                  handleTimeInput(e.target.value, value.instrumentId);
-                }}
-              />
-            );
-        })}
-      </Stack>
-    ) : (
-      <Stack direction="row" spacing={3} marginTop={3}>
-        {requestTimeForInstrument?.instrumentId && (
-          <TextField
-            key={requestTimeForInstrument.instrumentId}
-            value={
-              requestTimeForInstrument.timeRequested === '0'
-                ? ''
-                : requestTimeForInstrument.timeRequested
-            }
-            required={config.required}
-            error={isError}
-            label={`Request Time`}
-            type="number"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  {requestTimeForInstrument.instrumentName}:
-                </InputAdornment>
-              ),
-            }}
-            data-time-request={
-              requestTimeForInstrument.instrumentId + '-time-request'
-            }
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-              handleTimeInput(
-                e.target.value,
-                requestTimeForInstrument.instrumentId
+    const requestTime = Array.isArray(requestTimeForInstrument)
+      ? requestTimeForInstrument
+      : [requestTimeForInstrument];
+
+    return (
+      requestTimeForInstrument && (
+        <Stack direction="row" spacing={3} marginTop={3}>
+          {requestTime.map((value: InstrumentIdNameAndTime) => {
+            if (value.instrumentId)
+              return (
+                <TextField
+                  key={value.instrumentId}
+                  value={value.timeRequested === '0' ? '' : value.timeRequested}
+                  required={config.required}
+                  error={isError}
+                  label={`Request Time`}
+                  type="number"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {value.instrumentName}:
+                      </InputAdornment>
+                    ),
+                    inputProps: { step: '0.5', min: '0.5' },
+                  }}
+                  data-time-request={value.instrumentId + '-time-request'}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    handleTimeInput(e.target.value, value.instrumentId);
+                  }}
+                />
               );
-            }}
-          />
-        )}
-      </Stack>
+          })}
+        </Stack>
+      )
     );
   };
 
