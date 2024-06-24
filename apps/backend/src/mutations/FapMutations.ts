@@ -263,14 +263,18 @@ export default class FapMutations {
       );
 
     const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
-    const fapInstruments = callHasInstruments
-      .filter((callHasInstrument) => callHasInstrument.fapId)
-      .map((callHasInstrument) => ({
-        fapId: callHasInstrument.fapId,
-        instrumentId: callHasInstrument.instrumentId,
-      }));
 
     for (const callId of callIds) {
+      const fapInstruments = callHasInstruments
+        .filter(
+          (callHasInstrument) =>
+            callHasInstrument.fapId && callHasInstrument.callId === callId
+        )
+        .map((callHasInstrument) => ({
+          fapId: callHasInstrument.fapId,
+          instrumentId: callHasInstrument.instrumentId,
+        }));
+
       if (fapInstruments.length) {
         await this.assignProposalsToFapsInternal(agent, {
           proposalPks: proposals
