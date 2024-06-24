@@ -1,10 +1,11 @@
+import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import RemoveDone from '@mui/icons-material/RemoveDone';
 import { Typography } from '@mui/material';
 import i18n from 'i18n';
 import { useSnackbar } from 'notistack';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -16,6 +17,8 @@ import { useInstrumentsByFapData } from 'hooks/instrument/useInstrumentsByFapDat
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+
+import FapUpdateInstrumentTime from './FapUpdateInstrumentTime';
 
 type FapMeetingInstrumentsTableProps = {
   fapId: number;
@@ -57,6 +60,8 @@ const FapMeetingInstrumentsTable = ({
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
   const downloadFapXLSX = useDownloadXLSXFap();
+  const [updateInstrumentTime, setUpdateInstrumentTime] =
+    useState<InstrumentWithAvailabilityTime | null>(null);
 
   const columns = instrumentTableColumns.map((column) => ({
     ...column,
@@ -164,6 +169,7 @@ const FapMeetingInstrumentsTable = ({
 
   const DoneAllIcon = (): JSX.Element => <DoneAll />;
   const RemoveDoneIcon = (): JSX.Element => <RemoveDone />;
+  const AddTimeIcon = (): JSX.Element => <AddAlarmIcon />;
 
   const accessDependentActions = [];
 
@@ -222,14 +228,30 @@ const FapMeetingInstrumentsTable = ({
         tooltip: 'Unsubmit ' + i18n.format(t('instrument'), 'lowercase'),
       })
     );
+    accessDependentActions.push((rowData: InstrumentWithAvailabilityTime) => ({
+      icon: AddTimeIcon,
+      onClick: () => {
+        setUpdateInstrumentTime(rowData);
+      },
+      tooltip: 'Update ' + i18n.format(t('instrument'), 'lowercase') + ' Time',
+    }));
   }
+
+  const updatedInstrumentTime = (newTime: number, instrumentId: number) => {
+    setInstrumentsData(
+      instrumentsData.map((inst) =>
+        inst.id === instrumentId ? { ...inst, availabilityTime: newTime } : inst
+      )
+    );
+    setUpdateInstrumentTime(null);
+  };
 
   return (
     <div data-cy="Fap-meeting-components-table">
       <MaterialTable
         icons={tableIcons}
         title={
-          <Typography variant="h6" component="h2">
+          <Typography variant="h6" component="h1">
             {`${code} - ${i18n.format(
               t('instrument'),
               'plural'
@@ -268,6 +290,15 @@ const FapMeetingInstrumentsTable = ({
           debounceInterval: 400,
         }}
       />
+
+      {updateInstrumentTime && selectedCall && (
+        <FapUpdateInstrumentTime
+          close={(): void => setUpdateInstrumentTime(null)}
+          updateTime={updatedInstrumentTime}
+          callId={selectedCall.id}
+          instrument={updateInstrumentTime}
+        ></FapUpdateInstrumentTime>
+      )}
     </div>
   );
 };

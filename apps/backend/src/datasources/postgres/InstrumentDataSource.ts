@@ -198,6 +198,31 @@ export default class PostgresInstrumentDataSource
       });
   }
 
+  async getInstrumentHasProposals(
+    instrumentId: number,
+    proposalPks: number[]
+  ): Promise<InstrumentsHasProposals> {
+    return database
+      .select<InstrumentHasProposalRecord[]>('*')
+      .from('instrument_has_proposals')
+      .whereIn('proposal_pk', proposalPks)
+      .andWhere('instrument_id', instrumentId)
+      .then((ihp) => {
+        if (!ihp || ihp.length !== proposalPks.length) {
+          throw new GraphQLError(
+            `Could not get instrument proposals records with ${proposalPks} and instrument id: ${instrumentId}`
+          );
+        }
+
+        return new InstrumentsHasProposals(
+          ihp.map((i) => i.instrument_has_proposals_id),
+          [instrumentId],
+          proposalPks,
+          ihp.every((i) => i.submitted)
+        );
+      });
+  }
+
   async getUserInstruments(userId: number): Promise<Instrument[]> {
     return database
       .select([
@@ -274,6 +299,7 @@ export default class PostgresInstrumentDataSource
       .then(([result]: InstrumentHasProposalRecord[]) => {
         if (result) {
           return new InstrumentsHasProposals(
+            [result.instrument_has_proposals_id],
             [instrumentId],
             [result.proposal_pk],
             false
@@ -290,39 +316,17 @@ export default class PostgresInstrumentDataSource
     proposalPks: number[],
     instrumentId?: number
   ): Promise<boolean> {
-    const result = await database.transaction(async (trx) => {
-      const ihp = await trx('instrument_has_proposals')
-        .del()
-        .whereIn('proposal_pk', proposalPks)
-        .modify((query) => {
-          if (instrumentId) {
-            query.andWhere('instrument_id', instrumentId);
-          }
-        });
+    const result = await database('instrument_has_proposals')
+      .del()
+      .whereIn('proposal_pk', proposalPks)
+      .modify((query) => {
+        if (instrumentId) {
+          query.andWhere('instrument_id', instrumentId);
+        }
+      })
+      .returning<InstrumentHasProposalRecord[]>('*');
 
-      await trx('technical_review')
-        .del()
-        .whereIn('proposal_pk', proposalPks)
-        .modify((query) => {
-          if (instrumentId) {
-            query.andWhere('instrument_id', instrumentId);
-          }
-        });
-
-      await trx('fap_proposals')
-        .del()
-        .whereIn('proposal_pk', proposalPks)
-        .modify((query) => {
-          if (instrumentId) {
-            query.andWhere('instrument_id', instrumentId);
-          }
-        })
-        .returning('*');
-
-      return await trx.commit(ihp);
-    });
-
-    if (result) {
+    if (result?.length) {
       return true;
     } else {
       return false;
@@ -499,7 +503,7 @@ export default class PostgresInstrumentDataSource
             instrument.all_faps_instrument_time_allocation > 0 &&
             instrument.fap_instrument_time_allocation !== null
           ) {
-            // NOTE: Using - sign to round down in .5 cases (https://stackoverflow.com/questions/35821815/javascript-rounding-down-in-5-cases)
+            // NOTE: Using "-" sign to round down in .5 cases (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round)
             calculatedInstrumentAvailabilityTimePerFap = -Math.round(
               -(
                 instrument.availability_time /
@@ -641,7 +645,26 @@ export default class PostgresInstrumentDataSource
       );
     }
 
-    return new InstrumentsHasProposals([instrumentId], proposalPks, true);
+    const instrumentHasProposls = await this.getInstrumentHasProposals(
+      instrumentId,
+      proposalPks
+    );
+
+    if (
+      instrumentHasProposls.instrumentHasProposalIds.length !==
+      proposalPks.length
+    ) {
+      throw new GraphQLError(
+        `Some record from instrument proposals was not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+      );
+    }
+
+    return new InstrumentsHasProposals(
+      instrumentHasProposls.instrumentHasProposalIds,
+      [instrumentId],
+      proposalPks,
+      true
+    );
   }
 
   async unsubmitInstrument(
@@ -664,7 +687,26 @@ export default class PostgresInstrumentDataSource
       );
     }
 
-    return new InstrumentsHasProposals([instrumentId], proposalPks, false);
+    const instrumentHasProposls = await this.getInstrumentHasProposals(
+      instrumentId,
+      proposalPks
+    );
+
+    if (
+      instrumentHasProposls.instrumentHasProposalIds.length !==
+      proposalPks.length
+    ) {
+      throw new GraphQLError(
+        `Some record from instrument proposals was not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+      );
+    }
+
+    return new InstrumentsHasProposals(
+      instrumentHasProposls.instrumentHasProposalIds,
+      [instrumentId],
+      proposalPks,
+      true
+    );
   }
 
   async hasInstrumentScientistInstrument(

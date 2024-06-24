@@ -7,9 +7,9 @@ import Select from '@mui/material/Select';
 import makeStyles from '@mui/styles/makeStyles';
 import React, { Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import { useQueryParams, StringParam } from 'use-query-params';
 
-import { InstrumentFragment } from 'generated/sdk';
+import { InstrumentFilterInput, InstrumentFragment } from 'generated/sdk';
 
 const useStyles = makeStyles(() => ({
   loadingText: {
@@ -26,10 +26,11 @@ export enum InstrumentFilterEnum {
 type InstrumentFilterProps = {
   instruments?: InstrumentFragment[];
   isLoading?: boolean;
-  onChange?: Dispatch<number>;
+  onChange?: Dispatch<InstrumentFilterInput>;
   shouldShowAll?: boolean;
   shouldShowMultiple?: boolean;
-  instrumentId?: number;
+  showMultiInstrumentProposals?: boolean;
+  instrumentId?: number | null;
 };
 
 const InstrumentFilter = ({
@@ -39,10 +40,11 @@ const InstrumentFilter = ({
   onChange,
   shouldShowAll,
   shouldShowMultiple,
+  showMultiInstrumentProposals,
 }: InstrumentFilterProps) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
-    instrument: NumberParam,
+    instrument: StringParam,
   });
   const { t } = useTranslation();
 
@@ -66,15 +68,36 @@ const InstrumentFilter = ({
           <Select
             id="instrument-select"
             aria-labelledby="instrument-select-label"
-            onChange={(instrument) => {
+            onChange={(e) => {
+              const newValue: InstrumentFilterInput = {
+                instrumentId: null,
+                showMultiInstrumentProposals: false,
+                showAllProposals: false,
+              };
               setQuery({
-                instrument: instrument.target.value
-                  ? (instrument.target.value as number)
+                instrument: e.target.value
+                  ? e.target.value.toString()
                   : undefined,
               });
-              onChange?.(instrument.target.value as number);
+              if (
+                e.target.value === InstrumentFilterEnum.ALL ||
+                e.target.value === InstrumentFilterEnum.MULTI
+              ) {
+                newValue.instrumentId = null;
+                newValue.showMultiInstrumentProposals =
+                  e.target.value === InstrumentFilterEnum.MULTI;
+                newValue.showAllProposals =
+                  e.target.value === InstrumentFilterEnum.ALL;
+              } else {
+                newValue.instrumentId = +e.target.value;
+              }
+              onChange?.(newValue);
             }}
-            value={instrumentId || InstrumentFilterEnum.ALL}
+            value={
+              showMultiInstrumentProposals
+                ? InstrumentFilterEnum.MULTI
+                : instrumentId || InstrumentFilterEnum.ALL
+            }
             data-cy="instrument-filter"
           >
             <ListSubheader sx={{ lineHeight: 1 }}>

@@ -11,11 +11,9 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { InstrumentFilter as InstrumentFilterEnum } from '../../models/Instrument';
 import { QuestionFilterCompareOperator } from '../../models/Questionary';
 import { ReviewerFilter } from '../../models/Review';
 import { DataType } from '../../models/Template';
-import { InstrumentFilter } from '../CustomScalars';
 import { Proposal } from '../types/Proposal';
 
 @InputType()
@@ -34,6 +32,18 @@ export class QuestionFilterInput {
 }
 
 @InputType()
+export class InstrumentFilterInput {
+  @Field(() => Int, { nullable: true })
+  public instrumentId: number;
+
+  @Field(() => Boolean)
+  public showMultiInstrumentProposals: boolean;
+
+  @Field(() => Boolean)
+  public showAllProposals: boolean;
+}
+
+@InputType()
 export class ProposalsFilter {
   @Field(() => String, { nullable: true })
   public text?: string;
@@ -47,8 +57,8 @@ export class ProposalsFilter {
   @Field(() => Int, { nullable: true })
   public callId?: number;
 
-  @Field(() => InstrumentFilter, { nullable: true })
-  public instrumentId?: number | InstrumentFilterEnum;
+  @Field(() => InstrumentFilterInput, { nullable: true })
+  public instrumentFilter?: InstrumentFilterInput;
 
   @Field(() => Int, { nullable: true })
   public proposalStatusId?: number;

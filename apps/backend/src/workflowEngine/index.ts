@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import CallDataSource from '../datasources/postgres/CallDataSource';
@@ -200,6 +201,15 @@ export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
   eventType: Event,
   proposalPks: number[]
 ) => {
+  if (eventType === Event.PROPOSAL_DELETED) {
+    logger.logInfo(
+      `${eventType} event triggered and workflow engine cannot continue because the referenced proposal/s are removed`,
+      { proposalPks }
+    );
+
+    return;
+  }
+
   const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
     eventType,
     proposalPks

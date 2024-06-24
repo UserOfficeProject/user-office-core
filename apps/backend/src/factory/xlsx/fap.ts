@@ -228,8 +228,14 @@ export const collectFaplXLSXData = async (
 
           const proposalAverageScore = average(getGrades(reviews)) || 0;
 
+          const piFullName = `${firstname} ${lastname}`;
+          const fapMeetingDecision =
+            proposalFapMeetingDecisions?.find(
+              (fmd) => fmd.instrumentId === instrument.id
+            ) || null;
+
           return fapDataRow(
-            `${firstname} ${lastname}`,
+            piFullName,
             proposalAverageScore,
             instrument,
             proposalFapMeetingDecisions?.find(

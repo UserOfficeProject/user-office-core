@@ -5,7 +5,6 @@ import { Knex } from 'knex';
 import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
-import { InstrumentFilter } from '../../models/Instrument';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
@@ -376,19 +375,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.callId) {
           query.where('call_id', filter?.callId);
         }
-        if (
-          filter?.instrumentId &&
-          filter.instrumentId !== InstrumentFilter.ALL
-        ) {
-          if (filter.instrumentId === InstrumentFilter.MULTI) {
-            query.whereRaw('jsonb_array_length(instruments) > 1');
-          } else {
-            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
-            query.whereRaw(
-              'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-              { instrumentId: filter?.instrumentId }
-            );
-          }
+
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          query.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+            { instrumentId: filter.instrumentFilter.instrumentId }
+          );
         }
 
         if (filter?.proposalStatusId) {
@@ -477,7 +472,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.callId) {
           query.where('proposals.call_id', filter.callId);
         }
-        if (filter?.instrumentId) {
+        if (filter?.instrumentFilter?.instrumentId) {
           query
             .leftJoin(
               'instrument_has_proposals',
@@ -486,7 +481,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             )
             .where(
               'instrument_has_proposals.instrument_id',
-              filter.instrumentId
+              filter.instrumentFilter.instrumentId
             );
         }
 
@@ -586,19 +581,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             { userId: user.id }
           );
         }
-        if (
-          filter?.instrumentId &&
-          filter.instrumentId !== InstrumentFilter.ALL
-        ) {
-          if (filter.instrumentId === InstrumentFilter.MULTI) {
-            query.whereRaw('jsonb_array_length(instruments) > 1');
-          } else {
-            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
-            query.whereRaw(
-              'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-              { instrumentId: filter?.instrumentId }
-            );
-          }
+
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          query.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+            { instrumentId: filter.instrumentFilter?.instrumentId }
+          );
         }
 
         if (filter?.proposalStatusId) {

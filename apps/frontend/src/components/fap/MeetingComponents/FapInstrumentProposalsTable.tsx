@@ -464,6 +464,7 @@ const FapInstrumentProposalsTable = ({
         (fmd) => fmd.instrumentId === fapInstrument.id
       );
 
+      // NOTE: Per instrument there is only one `fapMeetingDecision`. And when we load the proposals for this table we pass the `instrumentId` as input parameter to filter `fapMeetingDecisions` by instrument only.
       const fapMeetingDecisions = [
         {
           proposalPk: item.proposal.primaryKey,

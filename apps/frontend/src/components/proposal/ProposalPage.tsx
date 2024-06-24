@@ -49,7 +49,13 @@ export default function ProposalPage() {
     });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
-    instrumentId: urlQueryParams.instrument,
+    instrumentFilter: {
+      instrumentId: urlQueryParams.instrument
+        ? +urlQueryParams.instrument
+        : null,
+      showAllProposals: !urlQueryParams.instrument,
+      showMultiInstrumentProposals: false,
+    },
     proposalStatusId: urlQueryParams.proposalStatus,
     referenceNumbers: urlQueryParams.proposalid
       ? [urlQueryParams.proposalid]

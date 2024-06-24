@@ -1,3 +1,5 @@
+import { GraphQLError } from 'graphql';
+
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
@@ -9,6 +11,7 @@ import database from './database';
 import {
   createReviewObject,
   createTechnicalReviewObject,
+  InstrumentHasProposalRecord,
   ReviewRecord,
   TechnicalReviewRecord,
 } from './records';
@@ -51,6 +54,19 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         );
     }
 
+    const instrumentHasProposalRecord = await database
+      .select<InstrumentHasProposalRecord>('*')
+      .from('instrument_has_proposals')
+      .where('instrument_id', instrumentId)
+      .andWhere('proposal_pk', proposalPk)
+      .first();
+
+    if (!instrumentHasProposalRecord) {
+      throw new GraphQLError(
+        `Could not create technical review for proposal ${proposalPk} with instrument: ${instrumentId}`
+      );
+    }
+
     return database
       .insert({
         proposal_pk: proposalPk,
@@ -62,6 +78,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         reviewer_id: reviewerId,
         files,
         instrument_id: instrumentId,
+        instrument_has_proposals_id:
+          instrumentHasProposalRecord.instrument_has_proposals_id,
       })
       .returning('*')
       .into('technical_review')
@@ -184,28 +202,30 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     proposalPk: number,
     fapId?: number
   ): Promise<Review[]> {
-    return (
-      database
-        .select()
-        .from('fap_reviews as fr')
-        .join('fap_assignments', {
-          'fap_assignments.proposal_pk': 'fr.proposal_pk',
-          'fap_assignments.fap_member_user_id': 'fr.user_id',
-        })
-        .distinctOn('fr.review_id')
-        .where('fr.proposal_pk', proposalPk)
-        .modify((query) => {
-          if (fapId) {
-            query.andWhere('fr.fap_id', fapId);
-          }
-        })
-        // TODO: Check this because the orderby doesn't work as it should
-        .orderBy('fr.review_id', 'asc')
-        .orderBy('fap_assignments.rank', 'asc')
-        .then((reviews: ReviewRecord[]) => {
-          return reviews.map((review) => createReviewObject(review));
-        })
-    );
+    const subQuery = database
+      .select('*')
+      .from('fap_reviews as fr')
+      .join('fap_assignments', {
+        'fap_assignments.proposal_pk': 'fr.proposal_pk',
+        'fap_assignments.fap_member_user_id': 'fr.user_id',
+      })
+      .distinctOn('fr.review_id')
+      .where('fr.proposal_pk', proposalPk)
+      .modify((query) => {
+        if (fapId) {
+          query.andWhere('fr.fap_id', fapId);
+        }
+      })
+      .orderBy('fr.review_id', 'asc')
+      .as('fa');
+
+    return database
+      .select('*')
+      .from(subQuery)
+      .orderBy('fa.rank', 'asc')
+      .then((reviews: ReviewRecord[]) => {
+        return reviews.map((review) => createReviewObject(review));
+      });
   }
 
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {

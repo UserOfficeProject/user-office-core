@@ -331,11 +331,19 @@ export default class FapMutations {
           continue;
         }
 
+        const {
+          instrumentHasProposalIds: [instrumentHasProposalId],
+        } = await this.instrumentDataSource.getInstrumentHasProposals(
+          fapInstrument.instrumentId,
+          [proposalPk]
+        );
+
         dataToInsert.push({
           call_id: fullProposal.callId,
           fap_id: fapInstrument.fapId,
           instrument_id: fapInstrument.instrumentId,
           proposal_pk: proposalPk,
+          instrument_has_proposals_id: instrumentHasProposalId,
         });
       }
     }
