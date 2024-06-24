@@ -18,7 +18,7 @@ fragment proposal on Proposal {
   notified
   submitted
   managementDecisionSubmitted
-  fapMeetingDecision {
+  fapMeetingDecisions {
     ...fapMeetingDecision
   }
 }

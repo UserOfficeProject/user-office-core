@@ -22,10 +22,10 @@ query fapProposalsByInstrument(
       status {
         ...proposalStatus
       }
-      fapMeetingDecision {
+      fapMeetingDecisions(fapId: $fapId) {
         ...fapMeetingDecision
       }
-      reviews {
+      reviews(fapId: $fapId) {
         id
         comment
         grade
