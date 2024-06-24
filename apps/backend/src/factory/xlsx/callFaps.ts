@@ -1,4 +1,3 @@
-// import { Review } from '../../models/Review';
 import { stripHtml } from 'string-strip-html';
 import { container } from 'tsyringe';
 
@@ -18,7 +17,7 @@ const ProposalEndStatusStringValue = {
   [ProposalEndStatus.REJECTED]: 'Rejected',
 };
 
-export type CallRowRowObj = RowObj & {
+export type CallRowObj = RowObj & {
   fapMeetingDecision?: string | null;
   fapMeetingExComment?: string | null;
   fapMeetingInComment?: string | null;
@@ -86,10 +85,8 @@ const collectFAPRowData = async (
     const instName: (string | number)[][] = [[inst.sheetName]];
 
     const sortedData = sortByRankOrAverageScore(inst.rows).map(
-      (row: CallRowRowObj) => populateRow(row)
+      (row: CallRowObj) => populateRow(row)
     );
-
-    instName.concat(instName);
 
     return instName.concat(sortedData);
   });
@@ -101,7 +98,7 @@ const collectFAPRowData = async (
     : allRowData;
 };
 
-function populateRow(row: CallRowRowObj): (string | number)[] {
+function populateRow(row: CallRowObj): (string | number)[] {
   const individualReviews = row.reviews?.flatMap((rev) => [
     rev.grade,
     rev.comment && stripHtml(rev.comment).result,
@@ -127,7 +124,7 @@ export const CallFapDataColumns = [
   'Principal Investigator',
   'PI Country',
   'Instrument Name',
-  'Requested Time',
+  'Requested User Time',
   'Proposal Title',
   'Average score',
   'Fap Time allocation',
