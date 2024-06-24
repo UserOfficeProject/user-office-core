@@ -23,7 +23,7 @@ import ProposalTableOfficer from './ProposalTableOfficer';
 
 export type ProposalUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
-  instrument: QueryParamConfig<number | null | undefined>;
+  instrument: QueryParamConfig<string | null | undefined>;
   proposalStatus: QueryParamConfig<number | null | undefined>;
   reviewModal: QueryParamConfig<number | null | undefined>;
   compareOperator: QueryParamConfig<string | null | undefined>;
@@ -38,7 +38,7 @@ export default function ProposalPage() {
     useQueryParams<ProposalUrlQueryParamsType>({
       ...DefaultQueryParams,
       call: NumberParam,
-      instrument: NumberParam,
+      instrument: StringParam,
       proposalStatus: NumberParam,
       reviewModal: NumberParam,
       questionId: StringParam,
@@ -49,7 +49,13 @@ export default function ProposalPage() {
     });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
-    instrumentId: urlQueryParams.instrument,
+    instrumentFilter: {
+      instrumentId: urlQueryParams.instrument
+        ? +urlQueryParams.instrument
+        : null,
+      showAllProposals: !urlQueryParams.instrument,
+      showMultiInstrumentProposals: false,
+    },
     proposalStatusId: urlQueryParams.proposalStatus,
     referenceNumbers: urlQueryParams.proposalid
       ? [urlQueryParams.proposalid]

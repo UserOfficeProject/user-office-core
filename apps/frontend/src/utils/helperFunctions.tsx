@@ -156,7 +156,13 @@ export const urlValidationSchema = () => {
 };
 
 export const getValueFromKey = (object: any, key: string | undefined) => {
-  return key?.split('.').reduce((o, i) => o[i], object);
+  return key?.split('.').reduce((o, i) => {
+    if (Array.isArray(o)) {
+      return o.map((item) => item?.[i]).join(', ');
+    }
+
+    return o?.[i];
+  }, object);
 };
 
 export const denseTableColumn = <T extends object>(
