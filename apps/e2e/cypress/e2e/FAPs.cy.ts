@@ -2304,8 +2304,6 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="submit-all-button"]').click();
 
-      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
-
       cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
         'not.exist'
       );
@@ -2803,8 +2801,6 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="submit-all-button"]').click();
 
-      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
-
       cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
         'not.exist'
       );
@@ -3025,8 +3021,6 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
-
-      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
       cy.get('[data-cy="submit-all-button"]').click();
 
