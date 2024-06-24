@@ -88,6 +88,14 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
     setAdministration(administrationValues);
   };
 
+  if (!data.instruments?.length) {
+    return (
+      <div data-cy="no-instrument-message">
+        Proposal has to be assigned to an instrument for administration
+      </div>
+    );
+  }
+
   return (
     <>
       <Typography variant="h6" component="h2" gutterBottom>
