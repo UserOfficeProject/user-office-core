@@ -2297,7 +2297,8 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('button[aria-label="Unsubmit instrument"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -2554,7 +2555,8 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('button[aria-label="Unsubmit instrument"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -2651,7 +2653,8 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('button[aria-label="Submit instrument"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
