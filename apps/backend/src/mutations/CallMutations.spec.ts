@@ -38,6 +38,7 @@ describe('Test Call Mutations', () => {
         templateId: 1,
         title: 'Title',
         description: 'Description',
+        needTechReview: true,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -75,6 +76,7 @@ describe('Test Call Mutations', () => {
         templateId: 1,
         title: 'Title',
         description: 'Description',
+        needTechReview: true,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -103,6 +105,7 @@ describe('Test Call Mutations', () => {
       templateId: 1,
       title: 'Title',
       description: 'Description',
+      needTechReview: true,
     };
 
     return expect(
@@ -136,6 +139,7 @@ describe('Test Call Mutations', () => {
       title: 'Title',
       description: 'Description',
       pdfTemplateId: 1,
+      needTechReview: true,
     };
 
     return expect(

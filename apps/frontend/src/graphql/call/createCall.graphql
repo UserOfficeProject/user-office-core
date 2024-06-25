@@ -3,6 +3,7 @@ mutation createCall(
   $startCall: DateTime!
   $endCall: DateTime!
   $endCallInternal: DateTime
+  $needTechReview: Boolean!
   $startReview: DateTime!
   $endReview: DateTime!
   $startFapReview: DateTime
@@ -30,6 +31,7 @@ mutation createCall(
       startCall: $startCall
       endCall: $endCall
       endCallInternal: $endCallInternal
+      needTechReview: $needTechReview
       startReview: $startReview
       endReview: $endReview
       startFapReview: $startFapReview

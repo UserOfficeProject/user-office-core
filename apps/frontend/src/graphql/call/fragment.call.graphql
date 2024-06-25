@@ -4,6 +4,7 @@ fragment call on Call {
   startCall
   endCall
   endCallInternal
+  needTechReview
   startReview
   endReview
   startFapReview

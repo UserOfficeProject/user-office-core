@@ -152,6 +152,7 @@ const createCalls = async () => {
       allocationTimeUnit: AllocationTimeUnits.Day,
       title: faker.random.words(8),
       description: faker.random.words(10),
+      needTechReview: true,
     });
   }, MAX_CALLS);
 };

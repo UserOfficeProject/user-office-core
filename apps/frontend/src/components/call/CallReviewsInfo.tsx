@@ -1,5 +1,7 @@
 import DateAdapter from '@mui/lab/AdapterLuxon';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import useTheme from '@mui/material/styles/useTheme';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
@@ -42,6 +44,17 @@ const CallReviewAndNotification = () => {
   return (
     <>
       <LocalizationProvider dateAdapter={DateAdapter}>
+        <FormControlLabel
+          control={<Checkbox />}
+          label="Do Proposals on this call need a Technical Review"
+          checked={formik.values.needTechReview ?? true}
+          onChange={() =>
+            formik.setFieldValue(
+              'needTechReview',
+              !formik.values.needTechReview
+            )
+          }
+        />
         <Field
           name="startReview"
           label="Start of review"
