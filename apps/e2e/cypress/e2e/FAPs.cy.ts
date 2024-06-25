@@ -369,7 +369,7 @@ context('Fap reviews tests', () => {
       );
       cy.get('[data-cy="fap-selection"]').contains(instrument.name);
       cy.get('[data-cy="fap-selection"]').click();
-      cy.get('[data-cy="fap-selection-options"]').contains(fap1.code).click();
+      cy.get('[role="listbox"] li[role="option"]').contains(fap1.code).click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -2654,7 +2654,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
       cy.get('button[aria-label="Submit instrument"]').should('not.exist');
-      cy.get('button[aria-label="Submit instrument"]').should('exist');
+      cy.get('button[aria-label="Unsubmit instrument"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
