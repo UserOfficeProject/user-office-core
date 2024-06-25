@@ -90,8 +90,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   },
   {
     title: 'Reviewers',
-    field: 'assignments.length',
-    emptyValue: '-',
+    render: (data) => data.assignments?.length,
   },
   {
     title: 'Reviews',
@@ -223,11 +222,11 @@ const FapProposalsAndAssignmentsTable = ({
   ): Promise<void> => {
     await api({
       toastSuccessMessage: 'Assignment/s removed',
-    }).removeProposalsFromFap({
+    }).removeProposalsFromFaps({
       proposalPks: proposalsToRemove.map(
         (proposalToRemove) => proposalToRemove.proposalPk
       ),
-      fapId: data.id,
+      fapIds: [data.id],
     });
 
     setFapProposalsData((fapProposalData) =>
@@ -291,6 +290,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     const { proposalReviews } = await api().getProposalReviews({
       proposalPk,
+      fapId: data.id,
     });
 
     if (!proposalReviews) {

@@ -72,6 +72,11 @@ h6 {
   color: var(--PALETTE_PRIMARY_ACCENT);
 }
 
+/* Table headers */
+.MuiTable-root th.MuiTableCell-head span {
+  white-space: nowrap;
+}
+
 /* Table row buttons */
 .MuiTable-root .MuiTableRow-root .MuiIconButton-root:not(.Mui-disabled) {
   color: var(--PALETTE_PRIMARY_ACCENT);

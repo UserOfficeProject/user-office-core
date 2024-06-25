@@ -30,15 +30,9 @@ If .env file is not preset during startup of the project, it will be created usi
 
 If you want to get something running for testing purposes only, you can run the docker-compose file located at the root of the repository. Use the following steps:
 
-1. docker-compose up
+1. docker compose up
 2. Visit localhost:33000
 3. Use the default users for login, Aaron_Harris49@gmail.com (User Officer) or Javon4@hotmail.com (User) with password "Test1234!"
-
-## Monorepo future plans
-
-Plan on how to continue with the monorepo in the future:
-
-1.  Start adding the shared libraries like: shared-types, validation and others that need to be shared between different apps (example here: https://github.com/martin-trajanovski/user-office-core-monorepo). It requires [craco](https://github.com/dilanx/craco) tool for building react apps that have sources outside src folder. This will cleanup the frontend app a lot because we can move all graphql files and scripts in the shared-types lib and validation will simplify things a lot if added directly as part of the monorepo libs.
 
 ## Available Scripts
 
