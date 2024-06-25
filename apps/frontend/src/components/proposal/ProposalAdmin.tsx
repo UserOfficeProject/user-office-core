@@ -1,16 +1,13 @@
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Formik, Form, Field, FieldArray } from 'formik';
 import React, { ChangeEvent } from 'react';
 
+import CheckboxWithLabel from 'components/common/FormikCheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import FormikUIPredefinedMessagesTextField, {
   PredefinedMessageKey,
 } from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
@@ -119,29 +116,16 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
             <PromptIfDirty />
             <Grid container spacing={2} alignItems="center">
               <Grid item sm={6} xs={12}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="finalStatus"
-                    shrink={!!values.finalStatus}
-                    required
-                  >
-                    Status
-                  </InputLabel>
-                  <Field
-                    name="finalStatus"
-                    component={Select}
-                    data-cy="proposal-final-status"
-                    disabled={!isUserOfficer || isSubmitting}
-                    MenuProps={{ 'data-cy': 'proposal-final-status-options' }}
-                    required
-                  >
-                    {statusOptions.map(({ value, text }) => (
-                      <MenuItem value={value} key={value}>
-                        {text}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
+                <Select
+                  name="finalStatus"
+                  options={statusOptions}
+                  inputLabel={{ htmlFor: 'status', required: true }}
+                  label="Status"
+                  data-cy="proposal-final-status"
+                  required
+                  formControl={{ margin: 'normal' }}
+                  disabled={!isUserOfficer || isSubmitting}
+                />
               </Grid>
               <Grid item sm={6} xs={12}>
                 <FieldArray
@@ -216,26 +200,11 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
               </Grid>
               <Grid item xs={12}>
                 <StyledButtonContainer>
-                  {/* <Field
+                  <CheckboxWithLabel
                     id="managementDecisionSubmitted"
                     name="managementDecisionSubmitted"
-                    component={CheckboxWithLabel}
-                    type="checkbox"
-                    Label={{
-                      label: 'Submitted',
-                    }}
                     data-cy="is-management-decision-submitted"
-                    disabled={!isUserOfficer || isSubmitting}
-                  /> */}
-                  <Field
-                    id="managementDecisionSubmitted"
-                    name="managementDecisionSubmitted"
-                    component={Checkbox}
-                    type="checkbox"
-                    Label={{
-                      label: 'Submitted',
-                    }}
-                    data-cy="is-management-decision-submitted"
+                    label="Submitted"
                     disabled={!isUserOfficer || isSubmitting}
                   />
 

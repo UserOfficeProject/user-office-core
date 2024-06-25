@@ -1,8 +1,11 @@
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import IconButton from '@mui/material/IconButton';
 import { TextFieldProps } from '@mui/material/TextField';
+import MuiTextField, {
+  TextFieldProps as MUITextFieldProps,
+} from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import { Field, FieldAttributes, useField } from 'formik';
+import { FieldAttributes, useField } from 'formik';
 import React, { useState } from 'react';
 
 import PredefinedMessagesModal from './PredefinedMessagesModal';
@@ -19,14 +22,32 @@ export enum PredefinedMessageKey {
  * This is Textarea which is loading all predefined messages from the database filtered by some specific key.
  * It is easy to just search and select the message you want to use for that specific form input.
  */
-const FormikUIPredefinedMessagesTextField = (
-  props: FieldAttributes<TextFieldProps> & {
-    'message-key'?: PredefinedMessageKey;
+const FormikUIPredefinedMessagesTextField = ({
+  name,
+  ...otherProps
+}: FieldAttributes<TextFieldProps> & {
+  'message-key'?: PredefinedMessageKey;
+}) => {
+  if (!name) {
+    throw new Error(
+      'FormikUIPredefinedMessagesTextField cannot be used without a required name property'
+    );
   }
-) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [field, _, helpers] = useField(props.name);
+  const [field, meta, helpers] = useField(name);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const configTextField: MUITextFieldProps = {
+    ...field,
+    ...otherProps,
+    fullWidth: true,
+    multiline: true,
+    rows: 3,
+  };
+
+  if (meta && meta.touched && meta.error) {
+    configTextField.error = true;
+    configTextField.helperText = meta.error;
+  }
 
   const openPredefinedMessagesModal = () => {
     setModalOpen(true);
@@ -39,13 +60,13 @@ const FormikUIPredefinedMessagesTextField = (
           open={modalOpen}
           setOpen={setModalOpen}
           selectedMessage={field.value as string}
-          messageKey={props['message-key']}
+          messageKey={otherProps['message-key']}
           setFormFieldValue={helpers.setValue}
         />
       )}
 
-      <Field
-        {...props}
+      <MuiTextField
+        {...configTextField}
         InputProps={{
           endAdornment: (
             <Tooltip title="Select from predefined messages">

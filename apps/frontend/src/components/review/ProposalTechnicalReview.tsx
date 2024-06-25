@@ -1,20 +1,18 @@
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
 import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
+import CheckboxWithLabel from 'components/common/FormikCheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import { UserContext } from 'context/UserContextProvider';
@@ -182,48 +180,31 @@ const ProposalTechnicalReview = ({
           }
         }}
       >
-        {({ isSubmitting, setFieldValue, values }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form>
             <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="status"
-                    shrink={!!values.status}
-                    required
-                  >
-                    Status
-                  </InputLabel>
-                  <Field
-                    name="status"
-                    type="text"
-                    component={Select}
-                    data-cy="technical-review-status"
-                    disabled={shouldDisableForm(isSubmitting)}
-                    MenuProps={{ 'data-cy': 'technical-review-status-options' }}
-                    required
-                  >
-                    {statusOptions.map(({ value, text }) => (
-                      <MenuItem value={value} key={value}>
-                        {text}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
+                <Select
+                  name="status"
+                  options={statusOptions}
+                  inputLabel={{ htmlFor: 'status', required: true }}
+                  label="Status"
+                  data-cy="technical-review-status"
+                  required
+                  formControl={{ margin: 'normal' }}
+                />
               </Grid>
               <Grid item sm={6} xs={12}>
-                <Field
+                <TextField
                   name="timeAllocation"
                   label={`Time allocation(${proposal.call?.allocationTimeUnit}s)`}
                   id="time-allocation-input"
                   type="number"
-                  component={TextField}
-                  fullWidth
-                  autoComplete="off"
                   data-cy="timeAllocation"
                   disabled={shouldDisableForm(isSubmitting)}
                   required
+                  autoComplete="off"
                 />
               </Grid>
               {(isUserOfficer || isInstrumentScientist) && (
@@ -333,27 +314,12 @@ const ProposalTechnicalReview = ({
               <Grid item xs={12}>
                 <StyledButtonContainer>
                   {isUserOfficer && (
-                    // <Field
-                    //   id="submitted"
-                    //   name="submitted"
-                    //   component={CheckboxWithLabel}
-                    //   type="checkbox"
-                    //   Label={{
-                    //     label: 'Submitted',
-                    //   }}
-                    //   disabled={isSubmitting}
-                    //   data-cy="is-review-submitted"
-                    // />
-                    <Field
+                    <CheckboxWithLabel
                       id="submitted"
                       name="submitted"
-                      component={Checkbox}
-                      type="checkbox"
-                      Label={{
-                        label: 'Submitted',
-                      }}
-                      disabled={isSubmitting}
                       data-cy="is-review-submitted"
+                      label="Submitted"
+                      disabled={isSubmitting}
                     />
                   )}
                   <Button
