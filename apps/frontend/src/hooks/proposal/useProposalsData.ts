@@ -12,7 +12,7 @@ export function useProposalsData(filter: ProposalsFilter) {
 
   const {
     callId,
-    instrumentId,
+    instrumentFilter,
     proposalStatusId,
     questionaryIds,
     questionFilter,
@@ -29,7 +29,7 @@ export function useProposalsData(filter: ProposalsFilter) {
       .getProposals({
         filter: {
           callId,
-          instrumentId,
+          instrumentFilter,
           proposalStatusId,
           questionaryIds,
           questionFilter,
@@ -53,7 +53,7 @@ export function useProposalsData(filter: ProposalsFilter) {
     };
   }, [
     callId,
-    instrumentId,
+    instrumentFilter,
     proposalStatusId,
     questionaryIds,
     questionFilter,

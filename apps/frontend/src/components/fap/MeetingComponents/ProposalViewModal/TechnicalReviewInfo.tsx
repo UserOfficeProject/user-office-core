@@ -23,7 +23,11 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Proposal, TechnicalReview } from 'generated/sdk';
+import {
+  InstrumentWithManagementTime,
+  Proposal,
+  TechnicalReview,
+} from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -35,6 +39,7 @@ type FapProposalProps = {
 
 type TechnicalReviewInfoProps = {
   technicalReview?: TechnicalReview;
+  instrument?: InstrumentWithManagementTime | null;
   fapTimeAllocation: number | null;
   hasWriteAccess: boolean;
   onFapTimeAllocationEdit: (fapTimeAllocation: number | null) => void;
@@ -152,6 +157,7 @@ const TechnicalReviewInfo = ({
   fapTimeAllocation,
   hasWriteAccess,
   onFapTimeAllocationEdit,
+  instrument,
   ...fapProposalArgs
 }: TechnicalReviewInfoProps) => {
   const classes = useStyles();
@@ -180,7 +186,7 @@ const TechnicalReviewInfo = ({
       )}
       <StyledPaper margin={[2, 0]}>
         <Typography variant="h6" className={classes.heading} gutterBottom>
-          Technical review info
+          Technical review info - {instrument?.name}
         </Typography>
         <TableContainer>
           <Table className={classes.table}>

@@ -9,6 +9,8 @@ import {
   AssignScientistsToInstrumentMutationVariables,
   CreateInstrumentMutation,
   CreateInstrumentMutationVariables,
+  RemoveProposalsFromInstrumentMutation,
+  RemoveProposalsFromInstrumentMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
   SubmitInstrumentMutation,
@@ -54,6 +56,17 @@ const assignProposalsToInstruments = (
   const api = getE2EApi();
   const request = api.assignProposalsToInstruments(
     assignProposalsToInstrumentsInput
+  );
+
+  return cy.wrap(request);
+};
+
+const removeProposalsFromInstrument = (
+  removeProposalsFromInstrumentInput: RemoveProposalsFromInstrumentMutationVariables
+): Cypress.Chainable<RemoveProposalsFromInstrumentMutation> => {
+  const api = getE2EApi();
+  const request = api.removeProposalsFromInstrument(
+    removeProposalsFromInstrumentInput
   );
 
   return cy.wrap(request);
@@ -109,6 +122,10 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'assignProposalsToInstruments',
   assignProposalsToInstruments
+);
+Cypress.Commands.add(
+  'removeProposalsFromInstrument',
+  removeProposalsFromInstrument
 );
 
 Cypress.Commands.add('assignInstrumentToCall', assignInstrumentToCall);

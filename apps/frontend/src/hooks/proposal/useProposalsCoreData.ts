@@ -23,7 +23,7 @@ export function useProposalsCoreData(
   const {
     reviewer,
     callId,
-    instrumentId,
+    instrumentFilter,
     proposalStatusId,
     questionaryIds,
     text,
@@ -45,7 +45,7 @@ export function useProposalsCoreData(
             filter: {
               reviewer,
               callId,
-              instrumentId,
+              instrumentFilter,
               proposalStatusId,
               questionaryIds,
               referenceNumbers,
@@ -68,9 +68,13 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatuses: proposal.technicalStatuses?.map(
-                      (technicalStatus) =>
-                        getTranslation(technicalStatus as ResourceId)
+                    technicalReviews: proposal.technicalReviews?.map(
+                      (technicalReview) => ({
+                        ...technicalReview,
+                        status: getTranslation(
+                          technicalReview.status as ResourceId
+                        ),
+                      })
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId
@@ -87,7 +91,7 @@ export function useProposalsCoreData(
           .getProposalsCore({
             filter: {
               callId,
-              instrumentId,
+              instrumentFilter,
               proposalStatusId,
               questionaryIds,
               referenceNumbers,
@@ -110,9 +114,13 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatuses: proposal.technicalStatuses?.map(
-                      (technicalStatus) =>
-                        getTranslation(technicalStatus as ResourceId)
+                    technicalReviews: proposal.technicalReviews?.map(
+                      (technicalReview) => ({
+                        ...technicalReview,
+                        status: getTranslation(
+                          technicalReview.status as ResourceId
+                        ),
+                      })
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId
@@ -129,7 +137,7 @@ export function useProposalsCoreData(
     [
       reviewer,
       callId,
-      instrumentId,
+      instrumentFilter,
       proposalStatusId,
       questionaryIds,
       text,
@@ -159,8 +167,6 @@ export function useProposalsCoreData(
   };
 }
 
-export interface ProposalViewData
-  extends Omit<ProposalView, 'technicalStatuses'> {
+export interface ProposalViewData extends ProposalView {
   status: string;
-  technicalStatuses: string[] | null;
 }

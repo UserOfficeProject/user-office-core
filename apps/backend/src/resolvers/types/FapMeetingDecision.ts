@@ -25,4 +25,10 @@ export class FapMeetingDecision implements Partial<FapMeetingDecisionOrigin> {
 
   @Field(() => Int, { nullable: true })
   public submittedBy?: number | null;
+
+  @Field(() => Int)
+  public instrumentId: number;
+
+  @Field(() => Int)
+  public fapId: number;
 }

@@ -31,6 +31,12 @@ export class SaveFapMeetingDecisionInput {
 
   @Field(() => Boolean, { nullable: true })
   public submitted?: boolean;
+
+  @Field(() => Int)
+  public instrumentId: number;
+
+  @Field(() => Int)
+  public fapId: number;
 }
 
 @Resolver()

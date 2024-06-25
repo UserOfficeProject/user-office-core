@@ -288,11 +288,13 @@ export async function createListenToRabbitMQHandler() {
   const SCHEDULER_EXCHANGE_NAME = process.env.RABBITMQ_SCHEDULER_EXCHANGE_NAME;
 
   if (!SCHEDULER_EXCHANGE_NAME) {
-    throw new Error('SCHEDULER_EXCHANGE_NAME environment variable not set');
+    throw new Error(
+      'RABBITMQ_SCHEDULER_EXCHANGE_NAME environment variable not set'
+    );
   }
 
   if (!EVENT_SCHEDULING_QUEUE_NAME) {
-    throw new Error('EVENT_SCHEDULING_QUEUE_NAME env variable not set');
+    throw new Error('RABBITMQ_SCHEDULER_EXCHANGE_NAME env variable not set');
   }
 
   const rabbitMQ = await getRabbitMQMessageBroker();

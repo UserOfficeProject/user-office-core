@@ -75,7 +75,7 @@ query getProposals($filter: ProposalsFilter) {
         id
         shortCode
       }
-      fap {
+      faps {
         id
         code
       }
