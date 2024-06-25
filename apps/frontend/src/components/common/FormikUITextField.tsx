@@ -1,30 +1,40 @@
 import MuiTextField, {
-  TextFieldProps as MUITextFieldProps,
+  TextFieldProps as MuiTextFieldProps,
 } from '@mui/material/TextField';
-import { useField } from 'formik';
-import React from 'react';
+import { FieldProps, getIn } from 'formik';
+import * as React from 'react';
 
-const FormikUITextField = ({ name, ...otherProps }: MUITextFieldProps) => {
-  if (!name) {
-    throw new Error(
-      'FormikUITextField cannot be used without a required name property'
-    );
-  }
+export interface TextFieldProps
+  extends FieldProps,
+    Omit<MuiTextFieldProps, 'name' | 'value' | 'error'> {}
 
-  const [field, meta] = useField(name);
+export function fieldToTextField({
+  disabled,
+  field: { onBlur: fieldOnBlur, ...field },
+  form: { isSubmitting, touched, errors },
+  onBlur,
+  helperText,
+  fullWidth,
+  ...props
+}: TextFieldProps): MuiTextFieldProps {
+  const fieldError = getIn(errors, field.name);
+  const showError = getIn(touched, field.name) && !!fieldError;
 
-  const configTextField: MUITextFieldProps = {
+  return {
+    error: showError,
+    helperText: showError ? fieldError : helperText,
+    disabled: disabled ?? isSubmitting,
+    fullWidth: fullWidth !== undefined ? fullWidth : true,
+    onBlur:
+      onBlur ??
+      function (e) {
+        fieldOnBlur(e ?? field.name);
+      },
     ...field,
-    ...otherProps,
-    fullWidth: true,
+    ...props,
   };
+}
 
-  if (meta && meta.touched && meta.error) {
-    configTextField.error = true;
-    configTextField.helperText = meta.error;
-  }
-
-  return <MuiTextField {...configTextField} />;
-};
-
-export default FormikUITextField;
+export default function TextField({ children, ...props }: TextFieldProps) {
+  return <MuiTextField {...fieldToTextField(props)}>{children}</MuiTextField>;
+}

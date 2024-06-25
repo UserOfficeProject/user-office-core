@@ -171,7 +171,6 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   name="commentForUser"
                   label="Comment for user"
                   type="text"
-                  component={TextField}
                   margin="normal"
                   fullWidth
                   autoComplete="off"
@@ -187,7 +186,6 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   name="commentForManagement"
                   label="Comment for management"
                   type="text"
-                  component={TextField}
                   margin="normal"
                   fullWidth
                   autoComplete="off"

@@ -44,11 +44,8 @@ const columns = [
 ];
 
 const InstrumentTable = () => {
-  const {
-    loadingInstruments,
-    instruments,
-    setInstrumentsWithLoading: setInstruments,
-  } = useInstrumentsData();
+  const { loadingInstruments, instruments, setInstruments } =
+    useInstrumentsData();
 
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();

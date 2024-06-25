@@ -282,7 +282,4 @@ export function SuperMaterialTable<Entry extends EntryID>({
   );
 }
 
-export default React.memo(
-  SuperMaterialTable,
-  (prevProps, nextProps) => prevProps.isLoading === nextProps.isLoading
-) as typeof SuperMaterialTable;
+export default SuperMaterialTable;

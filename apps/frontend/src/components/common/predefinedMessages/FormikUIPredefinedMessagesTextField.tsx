@@ -39,9 +39,6 @@ const FormikUIPredefinedMessagesTextField = ({
   const configTextField: MUITextFieldProps = {
     ...field,
     ...otherProps,
-    fullWidth: true,
-    multiline: true,
-    rows: 3,
   };
 
   if (meta && meta.touched && meta.error) {

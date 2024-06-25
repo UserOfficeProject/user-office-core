@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
@@ -53,36 +53,36 @@ export default function UpdateUserInformation(
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const [countriesList, setCountriesList] = useState<Option[]>([]);
 
-  const initialValues = {
-    username: userData?.username,
-    firstname: userData?.firstname,
-    middlename: userData?.middlename || '',
-    lastname: userData?.lastname,
-    preferredname: userData?.preferredname || '',
-    gender:
-      userData?.gender !== 'male' && userData?.gender !== 'female'
-        ? 'other'
-        : userData?.gender,
-    othergender: userData?.gender,
-    nationality: userData?.nationality,
-    birthdate: DateTime.fromJSDate(new Date(userData?.birthdate)),
-    institutionId: userData?.institutionId,
-    department: userData?.department,
-    position: userData?.position,
-    oldEmail: userData?.email,
-    email: userData?.email,
-    telephone: userData?.telephone,
-    telephone_alt: userData?.telephone_alt || '',
-    user_title: userData?.user_title,
-    oidcSub: userData?.oidcSub,
-  };
-
   // NOTE: User should be older than 18 years.
   const userMaxBirthDate = DateTime.now().minus({ years: 18 });
 
   if (!userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
+
+  const initialValues = {
+    username: userData.username,
+    firstname: userData.firstname,
+    middlename: userData.middlename || '',
+    lastname: userData.lastname,
+    preferredname: userData.preferredname || '',
+    gender:
+      userData.gender !== 'male' && userData.gender !== 'female'
+        ? 'other'
+        : userData.gender,
+    othergender: userData.gender,
+    nationality: userData.nationality,
+    birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
+    institutionId: userData.institutionId,
+    department: userData.department,
+    position: userData.position,
+    oldEmail: userData.email,
+    email: userData.email,
+    telephone: userData.telephone,
+    telephone_alt: userData.telephone_alt || '',
+    user_title: userData.user_title,
+    oidcSub: userData.oidcSub,
+  };
 
   const userTitleOptions: Option[] = [
     { text: 'Ms.', value: 'Ms.' },
@@ -181,31 +181,35 @@ export default function UpdateUserInformation(
                   data-cy="title"
                   required
                 />
-                <TextField
+                <Field
                   name="firstname"
                   label="Firstname"
                   id="firstname-input"
+                  component={TextField}
                   type="text"
                   data-cy="firstname"
                 />
-                <TextField
+                <Field
                   name="middlename"
                   label="Middle name"
                   id="middlename-input"
+                  component={TextField}
                   type="text"
                   data-cy="middlename"
                 />
-                <TextField
+                <Field
                   name="lastname"
                   label="Lastname"
                   id="lastname-input"
+                  component={TextField}
                   type="text"
                   data-cy="lastname"
                 />
-                <TextField
+                <Field
                   name="preferredname"
                   label="Preferred name"
                   id="preferredname-input"
+                  component={TextField}
                   type="text"
                   data-cy="preferredname"
                 />
@@ -218,10 +222,11 @@ export default function UpdateUserInformation(
                   required
                 />
                 {values.gender === 'other' && (
-                  <TextField
+                  <Field
                     name="othergender"
                     label="Please specify gender"
                     id="othergender-input"
+                    component={TextField}
                     type="text"
                     data-cy="othergender"
                   />
@@ -275,10 +280,11 @@ export default function UpdateUserInformation(
                   https://orcid.org/{values.oidcSub}
                 </Link>
               </FormControl>
-              <TextField
+              <Field
                 name="username"
                 label="Username"
                 id="username-input"
+                component={TextField}
                 type="text"
                 autoComplete="off"
                 data-cy="username"
@@ -294,10 +300,11 @@ export default function UpdateUserInformation(
               />
               {values.institutionId && +values.institutionId === 1 && (
                 <>
-                  <TextField
+                  <Field
                     name="otherInstitution"
                     label="Please specify institution"
                     id="institution-input"
+                    component={TextField}
                     type="text"
                     margin="normal"
                     data-cy="otherInstitution"
@@ -305,41 +312,46 @@ export default function UpdateUserInformation(
                   />
                 </>
               )}
-              <TextField
+              <Field
                 name="department"
                 label="Department"
                 id="department-input"
+                component={TextField}
                 type="text"
                 data-cy="department"
                 required
               />
-              <TextField
+              <Field
                 name="position"
                 label="Position"
                 id="position-input"
+                component={TextField}
                 type="text"
                 data-cy="position"
                 required
               />
-              <TextField
+              <Field
                 name="email"
                 label="E-mail"
                 id="email-input"
+                component={TextField}
                 type="email"
                 data-cy="email"
               />
-              <TextField
+              <Field
                 name="telephone"
                 label="Telephone"
                 id="telephone-input"
+                component={TextField}
                 type="text"
                 data-cy="telephone"
                 required
               />
-              <TextField
+              <Field
                 name="telephone_alt"
                 label="Telephone Alt."
                 id="telephone-alt-input"
+                component={TextField}
                 type="text"
                 data-cy="telephone-alt"
               />

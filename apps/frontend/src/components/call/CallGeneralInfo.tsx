@@ -17,7 +17,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -28,6 +27,7 @@ import { Field, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';
 import { FeatureContext } from 'context/FeatureContextProvider';

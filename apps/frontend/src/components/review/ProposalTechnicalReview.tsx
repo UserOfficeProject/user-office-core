@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
 import {
@@ -196,13 +196,14 @@ const ProposalTechnicalReview = ({
                 />
               </Grid>
               <Grid item sm={6} xs={12}>
-                <TextField
+                <Field
                   name="timeAllocation"
                   label={`Time allocation(${proposal.call?.allocationTimeUnit}s)`}
                   id="time-allocation-input"
                   type="number"
                   data-cy="timeAllocation"
                   disabled={shouldDisableForm(isSubmitting)}
+                  component={TextField}
                   required
                   autoComplete="off"
                 />
