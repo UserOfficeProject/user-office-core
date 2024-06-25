@@ -7,7 +7,7 @@ BEGIN
       CREATE TABLE IF NOT EXISTS techniques (
         technique_id SERIAL PRIMARY KEY,
         name VARCHAR(200) NOT NULL,
-        short_code VARCHAR(20) UNIQUE,
+        short_code VARCHAR(20) UNIQUE NOT NULL,
         description TEXT NOT NULL
       );
 

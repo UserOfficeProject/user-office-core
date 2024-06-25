@@ -177,9 +177,9 @@ const TechniqueTable = () => {
           <AssignInstrumentsToTechniques
             assignInstrumentsToTechniques={assignInstrumentsToTechniques}
             close={(): void => setOpenTechniqueAssignment(false)}
-            instrumentIds={(selectedTechnique?.instruments || []).map(
-              (instrument) => instrument.id
-            )}
+            currentlyAssignedInstrumentIds={(
+              selectedTechnique?.instruments || []
+            ).map((instrument) => instrument.id)}
             removeIntrumentsFromTechnique={removeIntrumentsFromTechnique}
           />
         </DialogContent>

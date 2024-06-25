@@ -17,18 +17,18 @@ type AssignInstrumentsToTechniquesProps = {
     instrument: InstrumentFragment[]
   ) => Promise<void>;
   removeIntrumentsFromTechnique: (id: number[]) => Promise<void>;
-  instrumentIds: (number | null)[];
+  currentlyAssignedInstrumentIds: number[];
 };
 
 const AssignInstrumentsToTechniques = ({
   close,
   assignInstrumentsToTechniques,
   removeIntrumentsFromTechnique,
-  instrumentIds,
+  currentlyAssignedInstrumentIds,
 }: AssignInstrumentsToTechniquesProps) => {
   const { instruments, loadingInstruments } = useInstruments();
 
-  const uniqueInstrumentIds = getUniqueArray(instrumentIds);
+  const uniqueInstrumentIds = getUniqueArray(currentlyAssignedInstrumentIds);
 
   return (
     <Container
@@ -47,34 +47,33 @@ const AssignInstrumentsToTechniques = ({
             )
           );
 
-          if (instrumentIds.length != 0) {
+          if (currentlyAssignedInstrumentIds.length != 0) {
             const addedInstruments = selectedInstruments.filter(
               (instrument) =>
-                !instrumentIds.find(
+                !currentlyAssignedInstrumentIds.find(
                   (selectedInstrumentId) =>
                     selectedInstrumentId === instrument.id
                 )
             );
-            const deletedInstruments: number[] = [];
 
-            instrumentIds.forEach((id) => {
-              if (
-                id != null &&
+            const deletedInstruments = currentlyAssignedInstrumentIds.filter(
+              (id) =>
                 !selectedInstruments.find(
                   (selectedInstrumentId) => selectedInstrumentId.id === id
                 )
-              ) {
-                deletedInstruments.push(id);
-              }
-            });
+            );
 
-            await assignInstrumentsToTechniques(addedInstruments || null);
+            if (addedInstruments.length != 0) {
+              await assignInstrumentsToTechniques(addedInstruments);
+            }
 
             if (deletedInstruments.length != 0) {
               await removeIntrumentsFromTechnique(deletedInstruments);
             }
           } else {
-            await assignInstrumentsToTechniques(selectedInstruments || null);
+            if (selectedInstruments.length != 0) {
+              await assignInstrumentsToTechniques(selectedInstruments);
+            }
           }
 
           close();
