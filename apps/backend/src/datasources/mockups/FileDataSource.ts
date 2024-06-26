@@ -48,6 +48,6 @@ export default class FileDataSourceMock implements FileDataSource {
   }
 
   async getBlobdata(fileName: string): Promise<ReadStream | null> {
-    return null;
+    return fileName ? new ReadStream() : null;
   }
 }

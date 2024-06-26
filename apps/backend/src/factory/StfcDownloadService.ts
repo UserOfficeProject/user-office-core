@@ -68,15 +68,8 @@ export class StfcDownloadService implements DownloadService {
           message: 'Could not download generated',
         });
       }
-    } else {
-      fetchDataAndStreamResponse(
-        downloadType,
-        type,
-        properties,
-        req,
-        res,
-        next
-      );
     }
+
+    fetchDataAndStreamResponse(downloadType, type, properties, req, res, next);
   }
 }
