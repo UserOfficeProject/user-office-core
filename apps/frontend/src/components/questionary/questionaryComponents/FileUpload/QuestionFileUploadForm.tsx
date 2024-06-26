@@ -1,4 +1,3 @@
-import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
@@ -6,6 +5,7 @@ import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -85,43 +85,20 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
             </TitledContainer>
 
             <TitledContainer label="Constraints">
-              {/* <Field
-                name="config.required"
-                id="Is-Required-Input"
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{
-                  label: 'Is required',
-                }}
-                data-cy="required"
-              /> */}
               <Field
                 name="config.required"
                 id="Is-Required-Input"
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Is required',
                 }}
                 data-cy="required"
               />
-              {/* <Field
-                name="config.omitFromPdf"
-                id="Omit-from-pdf-checkbox"
-                component={CheckboxWithLabel}
-                checked={
-                  (formikProps.values.config as FileUploadConfig).omitFromPdf
-                }
-                type="checkbox"
-                Label={{
-                  label: 'Omit from PDF',
-                }}
-                data-cy="omitFromPdf"
-              /> */}
               <Field
                 name="config.omitFromPdf"
                 id="Omit-from-pdf-checkbox"
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 checked={
                   (formikProps.values.config as FileUploadConfig).omitFromPdf
                 }

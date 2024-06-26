@@ -6,6 +6,7 @@ import { Field } from 'formik';
 import React, { ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -126,24 +127,12 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
             />
 
             <Box component="div">
-              {/* <Field
-                name="config.multiline"
-                checked={
-                  (formikProps.values.config as TextInputConfig).multiline
-                }
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{
-                  label: 'Multiple lines',
-                }}
-                data-cy="multiline"
-              /> */}
               <Field
                 name="config.multiline"
                 checked={
                   (formikProps.values.config as TextInputConfig).multiline
                 }
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Multiple lines',
@@ -153,7 +142,7 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
             </Box>
 
             <Box component="div">
-              {/* <Field
+              <Field
                 name="config.isCounterHidden"
                 checked={
                   (formikProps.values.config as TextInputConfig).isCounterHidden
@@ -164,31 +153,11 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
                   label: 'Hide counter',
                 }}
                 data-cy="multiline"
-              /> */}
-              <Field
-                name="config.isCounterHidden"
-                checked={
-                  (formikProps.values.config as TextInputConfig).isCounterHidden
-                }
-                component={Checkbox}
-                type="checkbox"
-                Label={{
-                  label: 'Hide counter',
-                }}
-                data-cy="multiline"
               />
             </Box>
 
-            {/* <Field
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Enable rich text question',
-              }}
-              name="config.isHtmlQuestion"
-            /> */}
             <Field
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Enable rich text question',

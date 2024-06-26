@@ -2,7 +2,6 @@ import DoneAll from '@mui/icons-material/DoneAll';
 import Save from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
@@ -15,6 +14,7 @@ import React, { useState, useContext } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
 import ErrorMessage from 'components/common/ErrorMessage';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -215,21 +215,10 @@ const ProposalGrade = ({
               {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
             </ButtonWithDialog>
             {hasAccessRights && (
-              // <Field
-              //   id="submitted"
-              //   name="submitted"
-              //   component={CheckboxWithLabel}
-              //   type="checkbox"
-              //   Label={{
-              //     label: 'Submitted',
-              //   }}
-              //   disabled={isSubmitting}
-              //   data-cy="is-grade-submitted"
-              // />
               <Field
                 id="submitted"
                 name="submitted"
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Submitted',

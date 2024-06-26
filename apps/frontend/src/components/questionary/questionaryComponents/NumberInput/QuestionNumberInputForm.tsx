@@ -3,7 +3,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import LaunchIcon from '@mui/icons-material/Launch';
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
@@ -15,6 +14,7 @@ import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import InputDialog from 'components/common/InputDialog';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -102,18 +102,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            {/* <Field
-              name="config.required"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Is required',
-              }}
-              InputProps={{ 'data-cy': 'required' }}
-            /> */}
             <Field
               name="config.required"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Is required',

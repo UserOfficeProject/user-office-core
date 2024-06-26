@@ -99,11 +99,13 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
                 label="Template name"
                 noOptionsText="No active templates"
                 items={templateOptions}
-                InputProps={{ 'data-cy': 'template-id' }}
+                InputProps={{
+                  'data-cy': 'template-id',
+                  endAdornment: (
+                    <RefreshListIcon onClick={refreshSampleTemplates} />
+                  ),
+                }}
                 TextFieldProps={{ margin: 'none' }}
-                AdornmentIcon={
-                  <RefreshListIcon onClick={refreshSampleTemplates} />
-                }
                 required
               />
               <Link
@@ -122,11 +124,13 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
                   label="ESI template name"
                   noOptionsText="No active templates"
                   items={ESITemplateOptions}
-                  InputProps={{ 'data-cy': 'esi-template-id' }}
+                  InputProps={{
+                    'data-cy': 'esi-template-id',
+                    endAdornment: (
+                      <RefreshListIcon onClick={refreshEsiTemplates} />
+                    ),
+                  }}
                   TextFieldProps={{ margin: 'none' }}
-                  AdornmentIcon={
-                    <RefreshListIcon onClick={refreshEsiTemplates} />
-                  }
                 />
                 <Link
                   href="/SampleEsiTemplates/"

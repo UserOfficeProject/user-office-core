@@ -1,10 +1,11 @@
-import { Checkbox, Collapse, FormControl, TextField } from '@mui/material';
+import { Collapse, FormControl, TextField } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import { default as React } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
@@ -64,17 +65,8 @@ export const QuestionTemplateRelationGenericTemplateForm = (
               fullWidth
               data-cy="addEntryButtonLabel"
             />
-            {/* <Field
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Can copy',
-              }}
-              name="config.canCopy"
-              checked={(formikProps.values.config as SubTemplateConfig).canCopy}
-            /> */}
             <Field
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Can copy',
@@ -95,32 +87,16 @@ export const QuestionTemplateRelationGenericTemplateForm = (
                 fullWidth
                 data-cy="copyButtonLabel"
               />
-              {/* <Field
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{
-                  label: 'Multiple copy selection',
-                }}
-                name="config.isMultipleCopySelect"
-              /> */}
               <Field
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Multiple copy selection',
                 }}
                 name="config.isMultipleCopySelect"
               />
-              {/* <Field
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{
-                  label: 'Copy is complete',
-                }}
-                name="config.isCompleteOnCopy"
-              /> */}
               <Field
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Copy is complete',

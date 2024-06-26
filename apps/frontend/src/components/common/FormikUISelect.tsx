@@ -5,67 +5,94 @@ import FormHelperText, {
 import InputLabel, { InputLabelProps } from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import MuiSelect, { SelectProps as MuiSelectProps } from '@mui/material/Select';
-import { useField } from 'formik';
-import React from 'react';
+import { FieldProps, getIn } from 'formik';
+import * as React from 'react';
 
 import { Option } from 'utils/utilTypes';
 
-type SelectProps = MuiSelectProps & {
-  options: Option[];
+export interface SelectProps
+  extends FieldProps,
+    Omit<MuiSelectProps, 'name' | 'value'> {
   formControl?: FormControlProps;
   formHelperText?: FormHelperTextProps;
   inputLabel?: InputLabelProps;
-};
+}
 
-const FormikUISelect = ({
-  name,
-  options,
+export function fieldToSelect({
+  disabled,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  field: { onBlur: _onBlur, onChange: fieldOnChange, ...field },
+  form: { isSubmitting, touched, errors, setFieldTouched, setFieldValue },
+  onClose,
+  fullWidth,
+  ...props
+}: Omit<
+  SelectProps,
+  'formControl' | 'formHelperText' | 'inputLabel'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+>): MuiSelectProps & { formError: any } {
+  const fieldError = getIn(errors, field.name);
+  const showError = getIn(touched, field.name) && !!fieldError;
+
+  return {
+    disabled: disabled ?? isSubmitting,
+    error: showError,
+    formError: showError ? fieldError : undefined,
+    fullWidth: fullWidth !== undefined ? fullWidth : true,
+    onBlur: () => {
+      // no-op
+    },
+    onChange:
+      fieldOnChange ??
+      (() => {
+        // no-op
+      }),
+    onClose:
+      onClose ??
+      (async (e: React.SyntheticEvent) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dataset = (e.target as any).dataset as DOMStringMap;
+        if (dataset && dataset.value) {
+          await setFieldValue(field.name, dataset.value, false);
+        }
+        setFieldTouched(field.name, true, true);
+      }),
+    ...field,
+    ...props,
+  };
+}
+
+export default function Select({
   formControl,
   inputLabel,
   formHelperText,
-  ...otherProps
-}: SelectProps) => {
-  if (!name) {
-    throw new Error(
-      'FormikUISelect cannot be used without a required name property'
-    );
-  }
-
+  options,
+  ...selectProps
+}: SelectProps & { options: Option[] }) {
   if (!options) {
     throw new Error(
-      'FormikUISelect cannot be used without a required options property'
+      'Select cannot be used without a required options property'
     );
   }
 
-  const [field, meta] = useField(name);
-
-  const configSelect: SelectProps = {
-    ...field,
-    ...otherProps,
-    options: options,
-    fullWidth: true,
-  };
-
-  if (meta && meta.touched && meta.error) {
-    configSelect.error = true;
-  }
+  const { error, formError, disabled, fullWidth, ...selectFieldProps } =
+    fieldToSelect(selectProps);
   const { children: formHelperTextChildren, ...formHelperTextProps } =
     formHelperText || {};
-
-  const shouldDisplayFormHelperText = meta.error || formHelperTextChildren;
+  const shouldDisplayFormHelperText = error || formHelperTextChildren;
 
   return (
     <FormControl
-      disabled={configSelect.disabled}
-      error={configSelect.error}
-      fullWidth={configSelect.fullWidth}
+      disabled={disabled}
+      error={error}
+      fullWidth={fullWidth}
       {...formControl}
     >
-      <InputLabel id={configSelect.labelId} {...inputLabel}>
-        {configSelect.label}
+      <InputLabel id={selectFieldProps.labelId} {...inputLabel}>
+        {selectFieldProps.label}
       </InputLabel>
-      <MuiSelect {...configSelect}>
-        {configSelect.options.map(({ value, text }) => (
+      <MuiSelect {...selectFieldProps}>
+        {options.map(({ value, text }) => (
           <MenuItem value={value} key={value}>
             {text}
           </MenuItem>
@@ -73,11 +100,9 @@ const FormikUISelect = ({
       </MuiSelect>
       {shouldDisplayFormHelperText && (
         <FormHelperText {...formHelperTextProps}>
-          {configSelect.error ? configSelect.error : formHelperTextChildren}
+          {error ? formError : formHelperTextChildren}
         </FormHelperText>
       )}
     </FormControl>
   );
-};
-
-export default FormikUISelect;
+}

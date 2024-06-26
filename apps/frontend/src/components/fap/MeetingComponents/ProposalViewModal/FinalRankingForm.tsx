@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
@@ -11,6 +10,7 @@ import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/du
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -270,21 +270,10 @@ const FinalRankingForm = ({
                           </Box>
                         )}
                         {isUserOfficer && (
-                          // <Field
-                          //   id="submitted"
-                          //   name="submitted"
-                          //   component={CheckboxWithLabel}
-                          //   type="checkbox"
-                          //   Label={{
-                          //     label: 'Submitted',
-                          //   }}
-                          //   disabled={isSubmitting}
-                          //   data-cy="is-fap-meeting-submitted"
-                          // />
                           <Field
                             id="submitted"
                             name="submitted"
-                            component={Checkbox}
+                            component={CheckboxWithLabel}
                             type="checkbox"
                             Label={{
                               label: 'Submitted',

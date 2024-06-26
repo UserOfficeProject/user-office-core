@@ -82,11 +82,13 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
                 label="Template name"
                 noOptionsText="No active templates"
                 items={templateOptions}
-                InputProps={{ 'data-cy': 'template-id' }}
+                InputProps={{
+                  'data-cy': 'template-id',
+                  endAdornment: (
+                    <RefreshListIcon onClick={refreshSampleTemplates} />
+                  ),
+                }}
                 TextFieldProps={{ margin: 'none' }}
-                AdornmentIcon={
-                  <RefreshListIcon onClick={refreshSampleTemplates} />
-                }
                 required
               />
               <Link
@@ -105,10 +107,12 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
                   label="ESI template name"
                   noOptionsText="No active templates"
                   items={ESITemplateOptions}
-                  InputProps={{ 'data-cy': 'esi-template-id' }}
-                  AdornmentIcon={
-                    <RefreshListIcon onClick={refreshEsiTemplates} />
-                  }
+                  InputProps={{
+                    'data-cy': 'esi-template-id',
+                    endAdornment: (
+                      <RefreshListIcon onClick={refreshEsiTemplates} />
+                    ),
+                  }}
                   TextFieldProps={{ margin: 'none' }}
                 />
                 <Link

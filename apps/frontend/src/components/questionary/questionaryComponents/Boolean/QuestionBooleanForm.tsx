@@ -1,9 +1,9 @@
-import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
@@ -46,18 +46,9 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            {/* <Field
-              name="config.required"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'User must check it to continue',
-              }}
-              data-cy="required"
-            /> */}
             <Field
               name="config.required"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'User must check it to continue',

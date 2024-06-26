@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Formik, Form, Field, FieldArray } from 'formik';
 import React, { ChangeEvent } from 'react';
 
-import CheckboxWithLabel from 'components/common/FormikCheckboxWithLabel';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
 import FormikUIPredefinedMessagesTextField, {
   PredefinedMessageKey,
@@ -116,9 +116,10 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
             <PromptIfDirty />
             <Grid container spacing={2} alignItems="center">
               <Grid item sm={6} xs={12}>
-                <Select
+                <Field
                   name="finalStatus"
                   options={statusOptions}
+                  component={Select}
                   inputLabel={{ htmlFor: 'status', required: true }}
                   label="Status"
                   data-cy="proposal-final-status"
@@ -198,11 +199,13 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
               </Grid>
               <Grid item xs={12}>
                 <StyledButtonContainer>
-                  <CheckboxWithLabel
+                  <Field
                     id="managementDecisionSubmitted"
                     name="managementDecisionSubmitted"
+                    component={CheckboxWithLabel}
+                    type="checkbox"
                     data-cy="is-management-decision-submitted"
-                    label="Submitted"
+                    Label={{ label: 'Submitted' }}
                     disabled={!isUserOfficer || isSubmitting}
                   />
 

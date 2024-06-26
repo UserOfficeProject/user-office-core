@@ -10,7 +10,7 @@ import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
-import CheckboxWithLabel from 'components/common/FormikCheckboxWithLabel';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import PromptIfDirty from 'components/common/PromptIfDirty';
@@ -185,9 +185,10 @@ const ProposalTechnicalReview = ({
             <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
-                <Select
+                <Field
                   name="status"
                   options={statusOptions}
+                  component={Select}
                   inputLabel={{ htmlFor: 'status', required: true }}
                   label="Status"
                   data-cy="technical-review-status"
@@ -315,11 +316,13 @@ const ProposalTechnicalReview = ({
               <Grid item xs={12}>
                 <StyledButtonContainer>
                   {isUserOfficer && (
-                    <CheckboxWithLabel
+                    <Field
                       id="submitted"
                       name="submitted"
+                      component={CheckboxWithLabel}
+                      type="checkbox"
                       data-cy="is-review-submitted"
-                      label="Submitted"
+                      Label={{ label: 'Submitted' }}
                       disabled={isSubmitting}
                     />
                   )}

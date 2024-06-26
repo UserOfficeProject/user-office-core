@@ -1,13 +1,97 @@
-import Autocomplete from '@mui/material/Autocomplete';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import MuiAutocomplete, {
+  AutocompleteProps as MuiAutocompleteProps,
+} from '@mui/material/Autocomplete';
 import { InputProps } from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
-import { useField } from 'formik';
+import { FieldProps } from 'formik';
+import { Field } from 'formik';
 import React, { useState } from 'react';
+import invariant from 'tiny-warning';
 
 import { Option } from 'utils/utilTypes';
+
+export type { AutocompleteRenderInputParams } from '@mui/material/Autocomplete';
+
+export interface AutocompleteProps<
+  T,
+  Multiple extends boolean | undefined,
+  DisableClearable extends boolean | undefined,
+  FreeSolo extends boolean | undefined,
+> extends FieldProps,
+    Omit<
+      MuiAutocompleteProps<T, Multiple, DisableClearable, FreeSolo>,
+      'name' | 'value' | 'defaultValue'
+    > {
+  type?: string;
+}
+
+export function fieldToAutocomplete<
+  T,
+  Multiple extends boolean | undefined,
+  DisableClearable extends boolean | undefined,
+  FreeSolo extends boolean | undefined,
+>({
+  disabled,
+  field,
+  form: { isSubmitting, setFieldValue },
+  type,
+  onChange,
+  onBlur,
+  freeSolo,
+  ...props
+}: AutocompleteProps<
+  T,
+  Multiple,
+  DisableClearable,
+  FreeSolo
+>): MuiAutocompleteProps<T, Multiple, DisableClearable, FreeSolo> {
+  if (process.env.NODE_ENV !== 'production') {
+    if (props.multiple) {
+      invariant(
+        Array.isArray(field.value),
+        `value for ${field.name} is not an array, this can caused unexpected behaviour`
+      );
+    }
+  }
+
+  const {
+    onChange: _onChange,
+    onBlur: _onBlur,
+    multiple: _multiple,
+    ...fieldSubselection
+  } = field;
+
+  return {
+    freeSolo,
+    onBlur:
+      onBlur ??
+      function (event) {
+        field.onBlur(event ?? field.name);
+      },
+    onChange:
+      onChange ??
+      function (_event, value) {
+        setFieldValue(field.name, value);
+      },
+    disabled: disabled ?? isSubmitting,
+    loading: isSubmitting,
+    ...fieldSubselection,
+    ...props,
+  };
+}
+
+function Autocomplete<
+  T,
+  Multiple extends boolean | undefined,
+  DisableClearable extends boolean | undefined,
+  FreeSolo extends boolean | undefined,
+>(props: AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>) {
+  return <MuiAutocomplete {...fieldToAutocomplete(props)} />;
+}
 
 type FormikUIAutocompleteProps = {
   items: Option[];
@@ -18,89 +102,56 @@ type FormikUIAutocompleteProps = {
   required?: boolean;
   disabled?: boolean;
   TextFieldProps?: MUITextFieldProps;
-  InputProps?: Partial<InputProps> & {
-    'data-cy'?: string;
-    startAdornment?: React.ReactNode;
-    endAdornment?: React.ReactNode;
-  };
+  InputProps?: Partial<InputProps> & { 'data-cy'?: string };
   multiple?: boolean;
   'data-cy'?: string;
-  AdornmentIcon?: JSX.Element;
-  isOptionEqualToValue?: () => boolean;
 };
 
 const FormikUIAutocomplete = ({
-  name,
   items,
-  ...otherProps
+  name,
+  label,
+  loading = false,
+  noOptionsText,
+  required,
+  disabled,
+  InputProps,
+  TextFieldProps,
+  multiple = false,
+  ...props
 }: FormikUIAutocompleteProps) => {
-  const options = items.map((item) => item.value);
-  const [field, meta, helpers] = useField(name);
   const [adornmentVisible, setAdornmentVisible] = useState(false);
-
-  if (!name) {
-    throw new Error(
-      'FormikUISelect cannot be used without a required name property'
-    );
-  }
-
-  if (!items) {
-    throw new Error(
-      'FormikUISelect cannot be used without a required options property'
-    );
-  }
-
-  const configAutocomplete = {
-    ...field,
-    ...otherProps,
-    multiple: otherProps.multiple || false,
-    loading: otherProps.multiple || false,
-  };
-
-  const configTextField: MUITextFieldProps = {
-    ...otherProps.TextFieldProps,
-    name: name,
-    label: otherProps.label,
-    required: otherProps.required,
-    disabled: otherProps.disabled,
-    onBlur: () => helpers.setTouched(true, true),
-  };
-
-  if (meta && meta.touched && meta.error) {
-    configTextField.error = true;
-    configTextField.helperText = meta.error;
-  }
+  const options = items.map((item) => item.value);
 
   return (
-    <Autocomplete
+    <Field
       id={name + '-input'}
+      name={name}
+      component={Autocomplete}
+      loading={loading}
+      multiple={multiple}
       options={options}
-      {...configAutocomplete}
+      noOptionsText={noOptionsText}
       getOptionLabel={(option: number | string) => {
         const foundOption = items.find((item) => item.value === option);
 
         return foundOption?.text || '';
       }}
-      onChange={(_, value) => {
-        helpers.setTouched(true, false);
-        helpers.setValue(value, true);
-      }}
       renderInput={(params: MUITextFieldProps) => (
         <MuiTextField
           {...params}
-          {...configTextField}
-          inputProps={{
-            ...params.inputProps,
-            'data-cy': otherProps['data-cy'],
-          }}
+          {...TextFieldProps}
+          label={label}
+          required={required}
+          disabled={disabled}
           InputProps={{
             ...params.InputProps,
-            ...otherProps.InputProps,
+            ...InputProps,
             endAdornment: (
               <InputAdornment position="start">
-                {otherProps.AdornmentIcon && adornmentVisible
-                  ? { ...otherProps.AdornmentIcon }
-                  : null}
+                {params.InputProps?.endAdornment && adornmentVisible
+                  ? params.InputProps.endAdornment
+                  : null}{' '}
                 {params.InputProps?.endAdornment}
               </InputAdornment>
             ),
@@ -113,57 +164,10 @@ const FormikUIAutocomplete = ({
           }}
         />
       )}
-      ListboxProps={{ id: otherProps['data-cy'] + '-options' }}
-      data-cy={otherProps['data-cy']}
-      isOptionEqualToValue={otherProps.isOptionEqualToValue}
+      ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
+      data-cy={props['data-cy']}
     />
   );
-
-  // return (
-  //   <Field
-  //     id={name + '-input'}
-  //     name={name}
-  //     component={Autocomplete}
-  //     loading={loading}
-  //     multiple={multiple}
-  //     options={options}
-  //     noOptionsText={noOptionsText}
-  //     getOptionLabel={(option: number | string) => {
-  //       const foundOption = items.find((item) => item.value === option);
-
-  //       return foundOption?.text || '';
-  //     }}
-  //     renderInput={(params: MUITextFieldProps) => (
-  //       <MuiTextField
-  //         {...params}
-  //         {...TextFieldProps}
-  //         label={label}
-  //         required={required}
-  //         disabled={disabled}
-  //         InputProps={{
-  //           ...params.InputProps,
-  //           ...InputProps,
-  //           endAdornment: (
-  //             <InputAdornment position="start">
-  //               {AdornmentIcon && adornmentVisible
-  //                 ? { ...AdornmentIcon }
-  //                 : null}
-  //               {params.InputProps?.endAdornment}
-  //             </InputAdornment>
-  //           ),
-  //         }}
-  //         onFocus={() => {
-  //           setAdornmentVisible(true);
-  //         }}
-  //         onBlur={() => {
-  //           setAdornmentVisible(false);
-  //         }}
-  //       />
-  //     )}
-  //     ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
-  //     data-cy={props['data-cy']}
-  //   />
-  // );
 };
 
 export default FormikUIAutocomplete;

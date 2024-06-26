@@ -336,8 +336,10 @@ const CallGeneralInfo = ({
           loading={loadingTemplates}
           noOptionsText="No templates"
           items={templateOptions}
-          InputProps={{ 'data-cy': 'call-template' }}
-          AdornmentIcon={<RefreshListIcon onClick={reloadTemplates} />}
+          InputProps={{
+            'data-cy': 'call-template',
+            endAdornment: <RefreshListIcon onClick={reloadTemplates} />,
+          }}
           required
         />
         <Link
@@ -368,8 +370,10 @@ const CallGeneralInfo = ({
             loading={loadingTemplates}
             noOptionsText="No templates"
             items={esiTemplateOptions}
-            InputProps={{ 'data-cy': 'call-esi-template' }}
-            AdornmentIcon={<RefreshListIcon onClick={reloadEsi} />}
+            InputProps={{
+              'data-cy': 'call-esi-template',
+              endAdornment: <RefreshListIcon onClick={reloadEsi} />,
+            }}
             required
           />
           <Link
@@ -401,8 +405,10 @@ const CallGeneralInfo = ({
         loading={loadingTemplates}
         noOptionsText="No templates"
         items={pdfTemplateOptions}
-        InputProps={{ 'data-cy': 'call-pdf-template' }}
-        AdornmentIcon={<RefreshListIcon onClick={reloadPdfTemplates} />}
+        InputProps={{
+          'data-cy': 'call-pdf-template',
+          endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
+        }}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -412,8 +418,8 @@ const CallGeneralInfo = ({
         items={proposalWorkflowOptions}
         InputProps={{
           'data-cy': 'call-workflow',
+          endAdornment: <RefreshListIcon onClick={reloadProposalWorkflows} />,
         }}
-        AdornmentIcon={<RefreshListIcon onClick={reloadProposalWorkflows} />}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>

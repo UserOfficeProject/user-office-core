@@ -1,4 +1,3 @@
-import Checkbox from '@mui/material/Checkbox';
 import useTheme from '@mui/material/styles/useTheme';
 import TextField from '@mui/material/TextField';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
@@ -9,6 +8,7 @@ import { Field } from 'formik';
 import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -80,18 +80,9 @@ export const QuestionTemplateRelationDateForm = (
         return (
           <>
             <QuestionExcerpt question={props.questionRel.question} />
-            {/* <Field
-              name="config.includeTime"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Include time',
-              }}
-              inputProps={{ 'data-cy': 'includeTime' }}
-            /> */}
             <Field
               name="config.includeTime"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Include time',
@@ -108,18 +99,9 @@ export const QuestionTemplateRelationDateForm = (
               data-cy="tooltip"
             />
             <TitledContainer label="Constraints">
-              {/* <Field
-                name="config.required"
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{
-                  label: 'Is required',
-                }}
-                data-cy="required"
-              /> */}
               <Field
                 name="config.required"
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Is required',

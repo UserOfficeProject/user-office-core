@@ -17,7 +17,7 @@ import { Field, Form, Formik } from 'formik';
 import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
-import Autocomplete from 'components/common/FormikUIAutocomplete';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import FormikUIDatePicker from 'components/common/FormikUIDatePicker';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
@@ -173,9 +173,10 @@ export default function UpdateUserInformation(
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={DateAdapter}>
-                <Select
+                <Field
                   name="user_title"
                   options={userTitleOptions}
+                  component={Select}
                   inputLabel={{ htmlFor: 'user_title', required: true }}
                   label="Title"
                   data-cy="title"
@@ -213,8 +214,9 @@ export default function UpdateUserInformation(
                   type="text"
                   data-cy="preferredname"
                 />
-                <Select
+                <Field
                   name="gender"
+                  component={Select}
                   options={genderOptions}
                   inputLabel={{ htmlFor: 'gender', required: true }}
                   label="Gender"
@@ -231,7 +233,7 @@ export default function UpdateUserInformation(
                     data-cy="othergender"
                   />
                 )}
-                <Autocomplete
+                <FormikUIAutocomplete
                   name="nationality"
                   label="Nationality"
                   items={nationalitiesList}
@@ -290,7 +292,7 @@ export default function UpdateUserInformation(
                 data-cy="username"
                 disabled
               />
-              <Autocomplete
+              <FormikUIAutocomplete
                 name="institutionId"
                 label="Institution"
                 items={institutionsList}

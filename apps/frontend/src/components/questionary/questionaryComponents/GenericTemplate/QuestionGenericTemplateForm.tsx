@@ -1,10 +1,11 @@
-import { Checkbox, Collapse, FormControl, TextField } from '@mui/material';
+import { Collapse, FormControl, TextField } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
@@ -98,19 +99,8 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
               fullWidth
               data-cy="addEntryButtonLabel"
             />
-            {/* <Field
-              component={CheckboxWithLabel}
-              type="checkbox"
-              id="can-copy-checkbox-input"
-              data-cy="cancopy"
-              Label={{
-                label: 'Can copy',
-              }}
-              name="config.canCopy"
-              checked={(formikProps.values.config as SubTemplateConfig).canCopy}
-            /> */}
             <Field
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               id="can-copy-checkbox-input"
               data-cy="cancopy"
@@ -133,18 +123,8 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
                 fullWidth
                 data-cy="copyButtonLabel"
               />
-              {/* <Field
-                component={CheckboxWithLabel}
-                type="checkbox"
-                id="is-multiple-copy-select-checkbox-input"
-                Label={{
-                  label: 'Multiple copy selection',
-                }}
-                name="config.isMultipleCopySelect"
-                data-cy="isMultipleCopySelect"
-              /> */}
               <Field
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 id="is-multiple-copy-select-checkbox-input"
                 Label={{
@@ -153,18 +133,8 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
                 name="config.isMultipleCopySelect"
                 data-cy="isMultipleCopySelect"
               />
-              {/* <Field
-                component={CheckboxWithLabel}
-                type="checkbox"
-                id="is-complete-on-copy-checkbox-input"
-                Label={{
-                  label: 'Copy is complete',
-                }}
-                name="config.isCompleteOnCopy"
-                data-cy="isCompleteOnCopy"
-              /> */}
               <Field
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 id="is-complete-on-copy-checkbox-input"
                 Label={{

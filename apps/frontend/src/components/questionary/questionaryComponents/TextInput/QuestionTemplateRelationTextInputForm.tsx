@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
 import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React, { ChangeEvent } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -37,18 +37,9 @@ export const QuestionTemplateRelationTextInputForm = (
           <QuestionExcerpt question={props.questionRel.question} />
 
           <TitledContainer label="Constraints">
-            {/* <Field
-              name="config.required"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Is required',
-              }}
-              data-cy="required"
-            /> */}
             <Field
               name="config.required"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Is required',
@@ -105,24 +96,12 @@ export const QuestionTemplateRelationTextInputForm = (
               data-cy="placeholder"
             />
             <Box component="div">
-              {/* <Field
-                name="config.multiline"
-                checked={
-                  (formikProps.values.config as TextInputConfig).multiline
-                }
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{
-                  label: 'Multiple lines',
-                }}
-                data-cy="multiline"
-              /> */}
               <Field
                 name="config.multiline"
                 checked={
                   (formikProps.values.config as TextInputConfig).multiline
                 }
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Multiple lines',
@@ -132,7 +111,7 @@ export const QuestionTemplateRelationTextInputForm = (
             </Box>
 
             <Box component="div">
-              {/* <Field
+              <Field
                 name="config.isCounterHidden"
                 checked={
                   (formikProps.values.config as TextInputConfig).isCounterHidden
@@ -143,32 +122,12 @@ export const QuestionTemplateRelationTextInputForm = (
                   label: 'Hide counter',
                 }}
                 data-cy="multiline"
-              /> */}
-              <Field
-                name="config.isCounterHidden"
-                checked={
-                  (formikProps.values.config as TextInputConfig).isCounterHidden
-                }
-                component={Checkbox}
-                type="checkbox"
-                Label={{
-                  label: 'Hide counter',
-                }}
-                data-cy="multiline"
               />
             </Box>
 
-            {/* <Field
-              name="config.isHtmlQuestion"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Enable rich text question',
-              }}
-            /> */}
             <Field
               name="config.isHtmlQuestion"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Enable rich text question',
