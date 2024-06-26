@@ -59,11 +59,7 @@ const FapMeetingInstrumentsTable = ({
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsByFapData(fapId, selectedCall.id);
   const { api } = useDataApiWithFeedback();
-  const hasAccessRights = useCheckAccess([
-    UserRole.USER_OFFICER,
-    UserRole.FAP_CHAIR,
-    UserRole.FAP_SECRETARY,
-  ]);
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
   const downloadFapXLSX = useDownloadXLSXFap();
