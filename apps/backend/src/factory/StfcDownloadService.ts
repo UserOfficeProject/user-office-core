@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FileDataSource } from '../datasources/FileDataSource';
 import { Role } from '../models/Role';
 import {
@@ -38,18 +39,28 @@ export class StfcDownloadService implements DownloadService {
     ) {
       const data = properties?.data[0] as ProposalPDFData;
 
-      const fileDataSource = container.resolve<FileDataSource>(
-        Tokens.FileDataSource
-      );
-      proposalPdfData = await fileDataSource.getBlobdata(
-        `Migrated-${data.proposal.proposalId}.pdf`
+      const callDataSource = container.resolve<CallDataSource>(
+        Tokens.CallDataSource
       );
 
-      if (proposalPdfData) {
-        isPdfAvailable = true;
-        fileName = `${data.proposal.proposalId}_${
-          data.principalInvestigator.lastname
-        }_${data.proposal.created.getUTCFullYear()}.pdf`;
+      const call = await callDataSource.getCall(data.proposal.callId);
+
+      const facility = getFacilityName(call?.shortCode);
+
+      if (facility != null) {
+        const fileDataSource = container.resolve<FileDataSource>(
+          Tokens.FileDataSource
+        );
+        proposalPdfData = await fileDataSource.getBlobdata(
+          `${facility}-${data.proposal.proposalId}.pdf`
+        );
+
+        if (proposalPdfData) {
+          isPdfAvailable = true;
+          fileName = `${data.proposal.proposalId}_${
+            data.principalInvestigator.lastname
+          }_${data.proposal.created.getUTCFullYear()}.pdf`;
+        }
       }
     }
 
@@ -68,8 +79,26 @@ export class StfcDownloadService implements DownloadService {
           message: 'Could not generate proposal pdf',
         });
       }
+    } else {
+      fetchDataAndStreamResponse(
+        downloadType,
+        type,
+        properties,
+        req,
+        res,
+        next
+      );
     }
-
-    fetchDataAndStreamResponse(downloadType, type, properties, req, res, next);
   }
+}
+function getFacilityName(shortCode: string | undefined) {
+  if (!shortCode) {
+    return null;
+  }
+  const facilityList = ['ISIS', 'Artemis', 'HPL', 'LSF'];
+  facilityList.forEach((facility) => {
+    if (shortCode.includes(facility)) {
+      return facility;
+    }
+  });
 }
