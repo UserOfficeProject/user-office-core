@@ -21,12 +21,12 @@ import {
   useTheme,
 } from '@mui/material';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';

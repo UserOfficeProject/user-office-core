@@ -2,21 +2,21 @@
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { PickerValidDate } from '@mui/x-date-pickers';
 import {
-  DatePicker as MuiDatePicker,
-  DatePickerProps as MuiDatePickerProps,
-} from '@mui/x-date-pickers/DatePicker';
+  DateTimePicker as MuiDateTimePicker,
+  DateTimePickerProps as MuiDateTimePickerProps,
+} from '@mui/x-date-pickers/DateTimePicker';
 import { FieldProps, getIn } from 'formik';
 import * as React from 'react';
 
 import { createErrorHandler } from 'utils/errorHandler';
 
-export interface DatePickerProps
+export interface DateTimePickerProps
   extends FieldProps,
-    Omit<MuiDatePickerProps<PickerValidDate>, 'name' | 'value' | 'error'> {
+    Omit<MuiDateTimePickerProps<PickerValidDate>, 'name' | 'value' | 'error'> {
   textField?: TextFieldProps;
 }
 
-export function fieldToDatePicker({
+export function fieldToDateTimePicker({
   field: { onChange: _onChange, ...field },
   form: {
     isSubmitting,
@@ -32,7 +32,7 @@ export function fieldToDatePicker({
   onChange,
   onError,
   ...props
-}: DatePickerProps): MuiDatePickerProps<PickerValidDate> {
+}: DateTimePickerProps): MuiDateTimePickerProps<PickerValidDate> {
   const fieldError = getIn(errors, field.name);
   const showError = getIn(touched, field.name) && !!fieldError;
 
@@ -70,11 +70,13 @@ export function fieldToDatePicker({
   };
 }
 
-export default function DatePicker({
+export default function DateTimePicker({
   children,
   ...props
-}: React.PropsWithChildren<DatePickerProps>) {
+}: React.PropsWithChildren<DateTimePickerProps>) {
   return (
-    <MuiDatePicker {...fieldToDatePicker(props)}>{children}</MuiDatePicker>
+    <MuiDateTimePicker {...fieldToDateTimePicker(props)}>
+      {children}
+    </MuiDateTimePicker>
   );
 }

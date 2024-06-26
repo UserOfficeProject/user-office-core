@@ -149,8 +149,8 @@ const FormikUIAutocomplete = ({
             ...InputProps,
             endAdornment: (
               <InputAdornment position="start">
-                {params.InputProps?.endAdornment && adornmentVisible
-                  ? params.InputProps.endAdornment
+                {InputProps?.endAdornment && adornmentVisible
+                  ? InputProps.endAdornment
                   : null}{' '}
                 {params.InputProps?.endAdornment}
               </InputAdornment>

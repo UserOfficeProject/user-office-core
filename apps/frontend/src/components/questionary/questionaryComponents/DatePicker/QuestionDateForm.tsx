@@ -2,13 +2,13 @@ import Checkbox from '@mui/material/Checkbox';
 import useTheme from '@mui/material/styles/useTheme';
 import TextField from '@mui/material/TextField';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
 import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
+import DatePicker from 'components/common/FormikUIDatePicker';
+import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';

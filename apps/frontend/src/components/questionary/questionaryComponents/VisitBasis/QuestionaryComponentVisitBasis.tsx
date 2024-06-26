@@ -1,11 +1,11 @@
 import useTheme from '@mui/material/styles/useTheme';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
 import { useContext } from 'react';
 import React from 'react';
 
+import DatePicker from 'components/common/FormikUIDatePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
   createMissingContextErrorMessage,

@@ -18,7 +18,7 @@ import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import FormikUIDatePicker from 'components/common/FormikUIDatePicker';
+import DatePicker from 'components/common/FormikUIDatePicker';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import ImpersonateButton from 'components/common/ImpersonateButton';
@@ -242,17 +242,19 @@ export default function UpdateUserInformation(
                   loading={!nationalities}
                   noOptionsText="No nationalities"
                 />
-
-                <FormikUIDatePicker
+                <Field
                   name="birthdate"
                   label="Birthdate"
-                  format={format || undefined}
-                  data-cy="birthdate"
-                  closeOnSelect
-                  slotProps={{
-                    textField: { fullWidth: true, name: 'birthdate' },
+                  id="birthdate-input"
+                  inputFormat={format}
+                  inputProps={{ placeholder: format }}
+                  component={DatePicker}
+                  textField={{
+                    fullWidth: true,
+                    'data-cy': 'birthdate',
                   }}
                   maxDate={userMaxBirthDate}
+                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
                 />
               </LocalizationProvider>
             </Grid>

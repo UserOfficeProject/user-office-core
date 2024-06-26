@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
@@ -83,14 +84,16 @@ function DateFilter(props: DateFilterProps) {
               setPresetValue(null);
             }}
             sx={(theme) => ({ marginRight: theme.spacing(1) })}
-            // renderInput={(tfProps: TextFieldProps) => (
-            //   <TextField
-            //     {...tfProps}
-            //     fullWidth
-            //     data-cy="from-date-picker"
-            //     margin="none"
-            //   />
-            // )}
+            slots={{
+              textField: (tfProps) => (
+                <TextField
+                  {...tfProps}
+                  fullWidth
+                  data-cy="from-date-picker"
+                  margin="none"
+                />
+              ),
+            }}
           />
         </Grid>
 
@@ -107,14 +110,16 @@ function DateFilter(props: DateFilterProps) {
               setPresetValue(null);
             }}
             sx={(theme) => ({ marginRight: theme.spacing(1) })}
-            // renderInput={(tfProps: TextFieldProps) => (
-            //   <TextField
-            //     {...tfProps}
-            //     fullWidth
-            //     margin="none"
-            //     data-cy="to-date-picker"
-            //   />
-            // )}
+            slots={{
+              textField: (tfProps) => (
+                <TextField
+                  {...tfProps}
+                  fullWidth
+                  data-cy="to-date-picker"
+                  margin="none"
+                />
+              ),
+            }}
           />
         </Grid>
         <Grid item sm={6} xs={12}>

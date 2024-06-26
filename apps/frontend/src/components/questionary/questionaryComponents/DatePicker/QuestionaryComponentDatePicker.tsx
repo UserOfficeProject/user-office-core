@@ -1,13 +1,13 @@
 import FormControl from '@mui/material/FormControl';
 import useTheme from '@mui/material/styles/useTheme';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
 import { DateTime } from 'luxon';
 import React from 'react';
 
+import DatePicker from 'components/common/FormikUIDatePicker';
+import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { DateConfig, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
