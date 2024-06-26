@@ -61,8 +61,8 @@ export default class PostgresTechniqueDataSource
   }
 
   async getTechniques(
-    first?: number | undefined,
-    offset?: number | undefined
+    first?: number,
+    offset?: number
   ): Promise<{ totalCount: number; techniques: Technique[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
