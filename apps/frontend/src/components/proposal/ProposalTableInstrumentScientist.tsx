@@ -437,6 +437,7 @@ const ProposalTableInstrumentScientist = ({
         .includes(user.id);
 
     const showView =
+      !rowData.technicalReviews ||
       rowData.technicalReviews?.every((tr) => tr.submitted) ||
       (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
 
@@ -444,9 +445,7 @@ const ProposalTableInstrumentScientist = ({
       <>
         <Tooltip
           title={
-            showView
-              ? 'View proposal and technical review'
-              : 'Edit technical review'
+            showView ? 'View proposal Information' : 'Edit technical review'
           }
         >
           <IconButton

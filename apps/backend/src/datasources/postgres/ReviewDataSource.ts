@@ -78,8 +78,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         reviewer_id: reviewerId,
         files,
         instrument_id: instrumentId,
-        instrument_has_proposals_id:
-          instrumentHasProposalRecord.instrument_has_proposals_id,
       })
       .returning('*')
       .into('technical_review')

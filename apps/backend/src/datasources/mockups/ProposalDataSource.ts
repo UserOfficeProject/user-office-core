@@ -417,4 +417,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getProposalById(proposalId: string): Promise<Proposal | null> {
     return dummyProposal.proposalId === proposalId ? dummyProposal : null;
   }
+
+  async proposalNeedTechReview(proposalPk: number): Promise<boolean> {
+    return true;
+  }
 }
