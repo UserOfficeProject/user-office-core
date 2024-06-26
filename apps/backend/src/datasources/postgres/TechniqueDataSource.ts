@@ -25,15 +25,25 @@ export default class PostgresTechniqueDataSource
   }
 
   async create(args: CreateTechniqueArgs): Promise<Technique> {
-    const [technique]: TechniqueRecord[] = await database('techniques')
-      .insert({
-        short_code: args.shortCode,
-        name: args.name,
-        description: args.description,
-      })
-      .returning('*');
+    try {
+      const [technique]: TechniqueRecord[] = await database('techniques')
+        .insert({
+          short_code: args.shortCode,
+          name: args.name,
+          description: args.description,
+        })
+        .returning('*');
 
-    return technique ? this.createTechniqueObject(technique) : Promise.reject();
+      if (technique) {
+        return this.createTechniqueObject(technique);
+      } else {
+        throw new Error(
+          'Failed to create technique: no technique returned from insert'
+        );
+      }
+    } catch (error) {
+      throw new Error(`Error creating technique: ${error}`);
+    }
   }
 
   async getTechnique(techniqueId: number): Promise<Technique | null> {
@@ -42,9 +52,12 @@ export default class PostgresTechniqueDataSource
       .from('techniques')
       .where('technique_id', techniqueId)
       .first()
-      .then((technique: TechniqueRecord | undefined) =>
-        technique ? this.createTechniqueObject(technique) : null
-      );
+      .then((technique: TechniqueRecord | undefined) => {
+        return technique ? this.createTechniqueObject(technique) : null;
+      })
+      .catch((error) => {
+        throw new Error(`Error getting technique: ${error}`);
+      });
   }
 
   async getTechniques(
@@ -72,6 +85,9 @@ export default class PostgresTechniqueDataSource
           totalCount: techniques[0] ? techniques[0].full_count : 0,
           techniques: result,
         };
+      })
+      .catch((error) => {
+        throw new Error(`Error getting techniques: ${error}`);
       });
   }
 
@@ -87,29 +103,52 @@ export default class PostgresTechniqueDataSource
       .where('technique_id', techniqueId)
       .then((results: InstrumentRecord[]) =>
         results.map(createInstrumentObject)
-      );
+      )
+      .catch((error) => {
+        throw new Error(`Error getting instruments by technique ID: ${error}`);
+      });
   }
 
   async update(technique: Technique): Promise<Technique> {
-    const [result]: TechniqueRecord[] = await database('techniques')
-      .update({
-        name: technique.name,
-        short_code: technique.shortCode,
-        description: technique.description,
-      })
-      .where('technique_id', technique.id)
-      .returning('*');
+    try {
+      const [result]: TechniqueRecord[] = await database('techniques')
+        .update({
+          name: technique.name,
+          short_code: technique.shortCode,
+          description: technique.description,
+        })
+        .where('technique_id', technique.id)
+        .returning('*');
 
-    return technique ? this.createTechniqueObject(result) : Promise.reject();
+      if (result) {
+        return this.createTechniqueObject(result);
+      } else {
+        throw new Error(
+          'Error updating technique: no technique returned from update'
+        );
+      }
+    } catch (error) {
+      throw new Error(`Error updating technique: ${error}`);
+    }
   }
 
   async delete(techniqueId: number): Promise<Technique> {
-    const [result]: TechniqueRecord[] = await database('techniques')
-      .delete()
-      .where('technique_id', techniqueId)
-      .returning('*');
+    try {
+      const [result]: TechniqueRecord[] = await database('techniques')
+        .delete()
+        .where('technique_id', techniqueId)
+        .returning('*');
 
-    return result ? this.createTechniqueObject(result) : Promise.reject();
+      if (result) {
+        return this.createTechniqueObject(result);
+      } else {
+        throw new Error(
+          'Error deleting technique: no technique returned from delete'
+        );
+      }
+    } catch (error) {
+      throw new Error(`Error deleting technique: ${error}`);
+    }
   }
 
   async assignInstrumentsToTechnique(
@@ -121,14 +160,20 @@ export default class PostgresTechniqueDataSource
       instrument_id: instrumentId,
     }));
 
-    const result = await database('technique_has_instruments').insert(
-      dataToInsert
-    );
+    try {
+      const result = await database('technique_has_instruments').insert(
+        dataToInsert
+      );
 
-    if (result) {
-      return true;
-    } else {
-      return false;
+      if (result) {
+        return true;
+      } else {
+        throw new Error(
+          'Error assigning instrument(s) to technique: no technique returned from insert'
+        );
+      }
+    } catch (error) {
+      throw new Error(`Error assigning instrument(s) to technique: ${error}`);
     }
   }
 
@@ -136,15 +181,21 @@ export default class PostgresTechniqueDataSource
     instrumentId: number,
     techniqueId: number
   ): Promise<boolean> {
-    const result = await database('technique_has_instruments')
-      .where('instrument_id', instrumentId)
-      .andWhere('technique_id', techniqueId)
-      .del();
+    try {
+      const result = await database('technique_has_instruments')
+        .where('instrument_id', instrumentId)
+        .andWhere('technique_id', techniqueId)
+        .del();
 
-    if (result) {
-      return true;
-    } else {
-      return false;
+      if (result) {
+        return true;
+      } else {
+        throw new Error(
+          'Error removing instrument(s) to technique: no technique returned from delete'
+        );
+      }
+    } catch (error) {
+      throw new Error(`Error removing instrument(s) to technique: ${error}`);
     }
   }
 }

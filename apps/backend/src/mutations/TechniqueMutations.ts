@@ -7,7 +7,6 @@ import {
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
-import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -25,8 +24,7 @@ import { TechniqueDataSource } from './../datasources/TechniqueDataSource';
 export default class TechniqueMutations {
   constructor(
     @inject(Tokens.TechniqueDataSource)
-    private dataSource: TechniqueDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    private dataSource: TechniqueDataSource
   ) {}
 
   @EventBus(Event.TECHNIQUE_CREATED)
@@ -39,7 +37,7 @@ export default class TechniqueMutations {
     const technique = await this.dataSource.create(args).catch((error) => {
       return rejection(
         'Could not create technique',
-        { agent, shortCode: args.shortCode },
+        { agent, args: args },
         error
       );
     });
@@ -58,8 +56,8 @@ export default class TechniqueMutations {
       .update(args)
       .catch((error) => {
         return rejection(
-          'Could not update technique',
-          { agent, techniqueId: args.id },
+          `Could not update technique '${args.id}`,
+          { agent, args: args },
           error
         );
       });
@@ -78,8 +76,8 @@ export default class TechniqueMutations {
       .delete(args.id)
       .catch((error) => {
         return rejection(
-          'Could not delete technique',
-          { agent, techniqueId: args.id },
+          `Could not delete technique '${args.id}'`,
+          { agent, args: args },
           error
         );
       });
@@ -98,8 +96,8 @@ export default class TechniqueMutations {
       .assignInstrumentsToTechnique(args.instrumentIds, args.techniqueId)
       .catch((error) => {
         return rejection(
-          'Could not assign instruments to technique',
-          { agent, args },
+          `Could not assign instruments to technique '${args.techniqueId}`,
+          { agent, args: args },
           error
         );
       });
@@ -116,8 +114,8 @@ export default class TechniqueMutations {
       .removeInstrumentFromTechnique(args.instrumentId, args.techniqueId)
       .catch((error) => {
         return rejection(
-          'Could not remove assigned instrument from technique',
-          { agent, args },
+          `Could not remove assigned instrument from technique '${args.techniqueId}`,
+          { agent, args: args },
           error
         );
       });
