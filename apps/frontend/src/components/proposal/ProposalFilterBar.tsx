@@ -89,14 +89,18 @@ const ProposalFilterBar = ({
 
       <Grid item sm={3} xs={12}>
         <InstrumentFilter
-          instrumentId={filter.instrumentId as number}
+          instrumentId={filter.instrumentFilter?.instrumentId}
+          showMultiInstrumentProposals={
+            filter.instrumentFilter?.showMultiInstrumentProposals
+          }
           instruments={instruments?.data}
           isLoading={instruments?.isLoading}
           shouldShowAll={true}
-          onChange={(instrumentId) => {
+          shouldShowMultiple={true}
+          onChange={(instrumentFilterValue) => {
             setProposalFilter({
               ...filter,
-              instrumentId,
+              instrumentFilter: instrumentFilterValue,
             });
           }}
         />

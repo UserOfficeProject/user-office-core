@@ -138,12 +138,13 @@ export class ProposalResolver {
   @FieldResolver(() => [Review], { nullable: true })
   async reviews(
     @Root() proposal: Proposal,
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('fapId', () => Int, { nullable: true }) fapId?: number
   ): Promise<Review[] | null> {
-    return await context.queries.review.reviewsForProposal(
-      context.user,
-      proposal.primaryKey
-    );
+    return await context.queries.review.reviewsForProposal(context.user, {
+      proposalPk: proposal.primaryKey,
+      fapId: fapId,
+    });
   }
 
   @FieldResolver(() => [TechnicalReview])
@@ -170,12 +171,12 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => Fap, { nullable: true })
-  async fap(
+  @FieldResolver(() => [Fap], { nullable: true })
+  async faps(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Fap | null> {
-    return await context.queries.fap.dataSource.getFapByProposalPk(
+  ): Promise<Fap[] | null> {
+    return await context.queries.fap.dataSource.getFapsByProposalPk(
       proposal.primaryKey
     );
   }
@@ -200,14 +201,15 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => FapMeetingDecision, { nullable: true })
-  async fapMeetingDecision(
+  @FieldResolver(() => [FapMeetingDecision], { nullable: true })
+  async fapMeetingDecisions(
     @Root() proposal: Proposal,
-    @Ctx() context: ResolverContext
-  ): Promise<FapMeetingDecision | null> {
-    return await context.queries.fap.getProposalFapMeetingDecision(
+    @Ctx() context: ResolverContext,
+    @Arg('fapId', () => Int, { nullable: true }) fapId?: number
+  ): Promise<FapMeetingDecision[]> {
+    return await context.queries.fap.getProposalFapMeetingDecisions(
       context.user,
-      proposal.primaryKey
+      { proposalPk: proposal.primaryKey, fapId: fapId }
     );
   }
 

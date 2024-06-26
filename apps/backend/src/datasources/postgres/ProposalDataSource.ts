@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
@@ -42,14 +43,17 @@ import {
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
-  technicalStatus: 'technical_review_status',
-  fapCode: 'fap_code',
-  rankOrder: 'rank_order',
-  reviewAverage: 'average',
-  reviewDeviation: 'deviation',
+  'technicalReviews.status': "technical_reviews->0->'status'",
+  'technicalReviews.timeAllocation': "technical_reviews->0->'timeAllocation'",
+  // NOTE: For now sorting by first name only is completly fine because the full name is constructed from frist + last
+  technicalReviewAssigneesFullName:
+    "technical_reviews->0->'technicalReviewAssignee'->'firstname'",
+  'faps.code': "faps->0->'code'",
   callShortCode: 'call_short_code',
-  instrumentNames: 'instrument_names',
+  'instruments.name': "instruments->0->'name'",
   statusName: 'proposal_status_id',
+  'instruments.managementTimeAllocation':
+    "instruments->0->'managementTimeAllocation'",
   proposalId: 'proposal_id',
   title: 'title',
   submitted: 'submitted',
@@ -345,7 +349,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     query
-      .leftJoin('answers', 'answers.questionary_id', 'ptw.questionary_id')
+      .leftJoin(
+        'answers',
+        'answers.questionary_id',
+        'proposal_table_view.questionary_id'
+      )
       .andWhere('answers.question_id', questionFilter.questionId)
       .modify(questionFilterQuery, questionFilter);
 
@@ -361,26 +369,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     return database
-      .with(
-        'ptw',
-        database
-          .select([
-            '*',
-            database.raw(
-              // eslint-disable-next-line quotes
-              "array_to_string(instrument_names, ',') all_instrument_names"
-            ),
-          ])
-          .from('proposal_table_view')
-      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('ptw')
+      .from('proposal_table_view')
       .modify((query) => {
         if (filter?.callId) {
           query.where('call_id', filter?.callId);
         }
-        if (filter?.instrumentId) {
-          query.whereRaw('? = ANY(instrument_ids)', filter?.instrumentId);
+
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          query.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+            { instrumentId: filter.instrumentFilter.instrumentId }
+          );
         }
 
         if (filter?.proposalStatusId) {
@@ -406,13 +409,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
-          searchText = `%${searchText}%`;
-
           query
-            .whereRaw('proposal_id ILIKE ?', searchText)
-            .orWhereRaw('title ILIKE ?', searchText)
-            .orWhereRaw('proposal_status_name ILIKE ?', searchText)
-            .orWhereRaw('all_instrument_names ILIKE ?', searchText);
+            .whereRaw('proposal_id ILIKE ?', `%${searchText}%`)
+            .orWhereRaw('title ILIKE ?', `%${searchText}%`)
+            .orWhereRaw('proposal_status_name ILIKE ?', `%${searchText}%`)
+            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+            .orWhereRaw(
+              'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+              { searchText }
+            );
         }
 
         if (sortField && sortDirection) {
@@ -420,7 +425,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          query.orderByRaw(`${sortField} ${sortDirection}`);
         }
 
         if (filter?.referenceNumbers) {
@@ -467,7 +472,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.callId) {
           query.where('proposals.call_id', filter.callId);
         }
-        if (filter?.instrumentId) {
+        if (filter?.instrumentFilter?.instrumentId) {
           query
             .leftJoin(
               'instrument_has_proposals',
@@ -476,7 +481,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             )
             .where(
               'instrument_has_proposals.instrument_id',
-              filter.instrumentId
+              filter.instrumentFilter.instrumentId
             );
         }
 
@@ -533,28 +538,23 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return database
-      .with(
-        'ptw',
-        database
-          .select([
-            '*',
-            database.raw(
-              // eslint-disable-next-line quotes
-              "array_to_string(instrument_names, ',') all_instrument_names"
-            ),
-          ])
-          .from('proposal_table_view')
-      )
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('ptw')
+      .from('proposal_table_view')
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
-          this.whereRaw('? = ANY(internal_technical_reviewer_ids)', user.id);
+          // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains internalReviewers array of objects with id equal to user.id
+          this.whereRaw(
+            'jsonb_path_exists(technical_reviews, \'$[*].internalReviewers[*].id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
         } else {
           this.whereRaw(
-            '? = ANY(instrument_scientist_ids)',
-            user.id
-          ).orWhereRaw('? = ANY(instrument_manager_ids)', user.id);
+            'jsonb_path_exists(instruments, \'$[*].scientists[*].id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          ).orWhereRaw(
+            'jsonb_path_exists(instruments, \'$[*].managerUserId \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
         }
       })
       .distinct('proposal_pk')
@@ -565,16 +565,31 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
             .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            .orWhere('all_instrument_names', 'ilike', `%${filter.text}%`);
+            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+            .orWhereRaw(
+              'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+              { searchText: filter.text }
+            );
         }
         if (filter?.callId) {
           query.where('call_id', filter.callId);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
-          query.whereRaw('? = ANY(technical_review_assignee_ids)', user.id);
+          // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
+          query.whereRaw(
+            'jsonb_path_exists(technical_reviews, \'$[*].technicalReviewAssignee.id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
         }
-        if (filter?.instrumentId) {
-          query.whereRaw('? = ANY(instrument_ids)', filter.instrumentId);
+
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          query.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+            { instrumentId: filter.instrumentFilter?.instrumentId }
+          );
         }
 
         if (filter?.proposalStatusId) {

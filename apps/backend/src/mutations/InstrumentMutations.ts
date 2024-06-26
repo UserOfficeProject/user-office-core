@@ -148,6 +148,8 @@ export default class InstrumentMutations {
         args,
       }
     );
+    const instrumentHasProposalIds: number[] = [];
+
     // TODO: Cleanup this part because it is quite ugly
     for await (const instrumentId of args.instrumentIds) {
       const allProposalsAreOnSameCallAsInstrument =
@@ -192,13 +194,16 @@ export default class InstrumentMutations {
         }
 
         if (proposalInstruments.find((i) => i.id === instrumentId)) {
-          break;
+          continue;
         }
 
-        await this.dataSource.assignProposalToInstrument(
+        const {
+          instrumentHasProposalIds: [instrumentHasProposalId],
+        } = await this.dataSource.assignProposalToInstrument(
           proposalPk,
           instrumentId
         );
+        instrumentHasProposalIds.push(instrumentHasProposalId);
 
         const technicalReview =
           await this.reviewDataSource.getProposalInstrumentTechnicalReview(
@@ -237,6 +242,7 @@ export default class InstrumentMutations {
     }
 
     result = new InstrumentsHasProposals(
+      instrumentHasProposalIds,
       args.instrumentIds,
       args.proposalPks,
       false
@@ -318,15 +324,12 @@ export default class InstrumentMutations {
 
   @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED)
   @ValidateArgs(submitInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER])
   async submitInstrument(
     agent: UserWithRole | null,
     args: InstrumentSubmitArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
+    if (!this.userAuth.isUserOfficer(agent)) {
       return rejection('Submitting instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
@@ -375,6 +378,8 @@ export default class InstrumentMutations {
           return this.fapDataSource.saveFapMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
             rankOrder: proposalWithRanking.rankOrder,
+            instrumentId: args.instrumentId,
+            fapId: args.fapId,
           });
         })
       );
