@@ -84,10 +84,10 @@ export function QuestionaryComponentInstrumentPicker(
   };
   const [requestTimeForInstrument, setRequestTimeForInstrument] = useState<
     Array<InstrumentIdNameAndTime> | InstrumentIdNameAndTime
-  >(getValueWithInstrumentName);
+  >(getValueWithInstrumentName());
   useEffect(() => {
     setStateValue(answer.value);
-    setRequestTimeForInstrument(getValueWithInstrumentName);
+    setRequestTimeForInstrument(getValueWithInstrumentName());
   }, [answer, config.instruments.length]);
 
   const label = (
