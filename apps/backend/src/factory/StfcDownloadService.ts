@@ -65,7 +65,7 @@ export class StfcDownloadService implements DownloadService {
       } catch (error) {
         next({
           error,
-          message: 'Could not download generated',
+          message: 'Could not generate proposal pdf',
         });
       }
     }
