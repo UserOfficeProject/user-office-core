@@ -28,11 +28,7 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
   async getTechnique(techniqueId: number): Promise<Technique | null> {
     const technique = dummyTechniques.find((t) => t.id === techniqueId);
 
-    if (technique) {
-      return technique;
-    } else {
-      return null;
-    }
+    return technique ? technique : null;
   }
 
   async getTechniques(
