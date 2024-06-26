@@ -22,13 +22,12 @@ const CreateUpdateTechnique = ({
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
-  const initialValues = technique
-    ? { ...technique }
-    : {
-        name: '',
-        shortCode: '',
-        description: '',
-      };
+  const initialValues = {
+    name: '',
+    shortCode: '',
+    description: '',
+    ...technique,
+  };
 
   return (
     <Formik
