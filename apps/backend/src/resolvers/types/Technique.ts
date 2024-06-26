@@ -42,6 +42,6 @@ export class TechniqueResolver {
         technique.id
       );
 
-    return isRejection(instruments) ? [] : instruments;
+    return isRejection(instruments) ? null : instruments;
   }
 }
