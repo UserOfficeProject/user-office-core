@@ -1,4 +1,3 @@
-import Checkbox from '@mui/material/Checkbox';
 import useTheme from '@mui/material/styles/useTheme';
 import TextField from '@mui/material/TextField';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
@@ -7,6 +6,7 @@ import { Field } from 'formik';
 import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import DatePicker from 'components/common/FormikUIDatePicker';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TitledContainer from 'components/common/TitledContainer';
@@ -100,20 +100,10 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-            {/* <Field
-              name="config.includeTime"
-              id="Include-time-Input"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Include time',
-              }}
-              inputProps={{ 'data-cy': 'includeTime' }}
-            /> */}
             <Field
               name="config.includeTime"
               id="Include-time-Input"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Include time',
@@ -131,20 +121,10 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
             />
 
             <TitledContainer label="Constraints">
-              {/* <Field
-                name="config.required"
-                id="Is-Required-Input"
-                component={CheckboxWithLabel}
-                type="checkbox"
-                Label={{
-                  label: 'Is required',
-                }}
-                data-cy="required"
-              /> */}
               <Field
                 name="config.required"
                 id="Is-Required-Input"
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
                   label: 'Is required',

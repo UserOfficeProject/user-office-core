@@ -8,6 +8,7 @@ import { updateFapValidationSchema } from '@user-office-software/duo-validation/
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
 import { Fap, UserRole } from 'generated/sdk';
@@ -161,22 +162,16 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }
                 disabled={!hasAccessRights || isExecutingCall}
               />
-              <FormControlLabel
-                control={
-                  <Field
-                    id="active"
-                    name="active"
-                    type="checkbox"
-                    component={Checkbox}
-                    checked={values.active}
-                    onChange={(): void => {
-                      setFieldValue('active', !values.active);
-                    }}
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                    disabled={!hasAccessRights || isExecutingCall}
-                  />
-                }
-                label="Active"
+              <Field
+                id="active"
+                name="active"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Active',
+                }}
+                data-cy="fapActive"
+                disabled={!hasAccessRights || isExecutingCall}
               />
             </Grid>
           </Grid>

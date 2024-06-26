@@ -1,6 +1,4 @@
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { createFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
@@ -8,6 +6,7 @@ import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import UOLoader from 'components/common/UOLoader';
 import { Fap } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -81,18 +80,15 @@ const AddFap = ({ close }: AddFapProps) => {
             disabled={isExecutingCall}
           />
 
-          <FormControlLabel
-            control={
-              <Field
-                id="active"
-                name="active"
-                component={Checkbox}
-                type="checkbox"
-                inputProps={{ 'aria-label': 'primary checkbox' }}
-                data-cy="fapActive"
-              />
-            }
-            label="Active"
+          <Field
+            id="active"
+            name="active"
+            component={CheckboxWithLabel}
+            type="checkbox"
+            Label={{
+              label: 'Active',
+            }}
+            data-cy="fapActive"
           />
 
           <Button

@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
 import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
@@ -58,18 +57,9 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            {/* <Field
-              name="config.required"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Is required',
-              }}
-              data-cy="required"
-            /> */}
             <Field
               name="config.required"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               Label={{
                 label: 'Is required',
