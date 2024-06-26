@@ -7,9 +7,9 @@ import { Technique } from '../types/Technique';
 export class DeleteTechniqueMutation {
   @Mutation(() => Technique)
   async deleteTechnique(
-    @Arg('techniqueId', () => Int) techniqueId: number,
+    @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.technique.delete(context.user, { techniqueId });
+    return context.mutations.technique.delete(context.user, { id });
   }
 }

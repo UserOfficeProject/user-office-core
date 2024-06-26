@@ -102,7 +102,7 @@ describe('Test technique Mutations', () => {
   test('A logged in user officer can delete a technique', () => {
     return expect(
       techniqueMutations.delete(dummyUserOfficerWithRole, {
-        techniqueId: 1,
+        id: 1,
       })
     ).resolves.toBe(dummyTechnique1);
   });
@@ -110,7 +110,7 @@ describe('Test technique Mutations', () => {
   test('A user cannot delete a technique', () => {
     return expect(
       techniqueMutations.delete(dummyUserWithRole, {
-        techniqueId: 1,
+        id: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });

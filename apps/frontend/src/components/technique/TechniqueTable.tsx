@@ -1,3 +1,4 @@
+import { Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Dialog, DialogContent, Typography } from '@mui/material';
 import React, { useState } from 'react';
@@ -21,7 +22,7 @@ import {
   UserRole,
 } from '../../generated/sdk';
 
-const columns = [
+const columns: Column<TechniqueFragment>[] = [
   {
     title: 'Name',
     field: 'name',
@@ -36,8 +37,7 @@ const columns = [
   },
   {
     title: 'Instruments',
-    field: 'instruments.length',
-    emptyValue: '-',
+    render: (data) => data.instruments.length,
   },
 ];
 
@@ -62,7 +62,7 @@ const TechniqueTable = () => {
       await api({
         toastSuccessMessage: 'Technique deleted successfully!',
       }).deleteTechnique({
-        techniqueId: techniqueDeletedId as number,
+        id: techniqueDeletedId as number,
       });
 
       return true;
