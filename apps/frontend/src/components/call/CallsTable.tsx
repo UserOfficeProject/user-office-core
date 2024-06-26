@@ -1,3 +1,4 @@
+import { Column } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
 import Unarchive from '@mui/icons-material/Unarchive';
 import Grid from '@mui/material/Grid';
@@ -88,7 +89,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   };
 
   // NOTE: Here we keep the columns inside the component just because of the timezone shown in the title
-  const columns = [
+  const columns: Column<Call>[] = [
     { title: 'Short Code', field: 'shortCode' },
     {
       title: `Start Date (${timezone})`,
@@ -119,8 +120,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     },
     {
       title: '#' + i18n.format(t('instrument'), 'plural'),
-      field: 'instruments.length',
-      emptyValue: '-',
+      render: (data) => data.instruments.length,
     },
     {
       title: '#proposals',
@@ -128,8 +128,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     },
     {
       title: '#faps',
-      field: 'faps.length',
-      emptyValue: '-',
+      render: (data) => data.faps?.length,
     },
   ];
 

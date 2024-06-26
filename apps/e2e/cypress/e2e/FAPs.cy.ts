@@ -2513,7 +2513,7 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit instrument"] button').should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -2610,7 +2610,7 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit instrument"] button').should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -2865,6 +2865,54 @@ context('Automatic Fap assignment to Proposal', () => {
         cy.contains('td', firstAutoAssignProposalId)
           .siblings()
           .should('contain.text', fap1.code);
+      }
+    });
+  });
+
+  it('Proposal should be automatically assigned to the right FAP, when multiple Instruments are assigned to a Proposal', () => {
+    cy.createInstrument(instrument2).then((result) => {
+      if (result.createInstrument) {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [
+            {
+              instrumentId: result.createInstrument.id,
+              fapId: createdFapId,
+            },
+          ],
+        });
+        cy.assignInstrumentToCall({
+          callId: createdCallId,
+          instrumentFapIds: [
+            {
+              instrumentId: firstAutoAssignmentInstrumentId,
+              fapId: createdFapId,
+            },
+          ],
+        });
+
+        cy.assignProposalsToInstruments({
+          proposalPks: [firstAutoAssignProposalPk],
+          instrumentIds: [
+            result.createInstrument.id,
+            firstAutoAssignmentInstrumentId,
+          ],
+        });
+
+        cy.login('officer');
+        cy.visit('/Proposals');
+
+        cy.contains('td', firstAutoAssignProposalId)
+          .closest('tr')
+          .find(`td:contains(${initialDBData.fap.code})`)
+          .invoke('text')
+          .then((text) => {
+            const firstFapCount = text.split(initialDBData.fap.code).length - 1;
+            const secondFapCount = text.split(fap1.code).length - 1;
+
+            expect(firstFapCount).to.eq(1);
+            expect(secondFapCount).to.eq(1);
+          });
       }
     });
   });

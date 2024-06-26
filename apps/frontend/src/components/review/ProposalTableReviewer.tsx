@@ -103,9 +103,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const [selectedCallId, setSelectedCallId] = useState<number>(
     urlQueryParams.call || 0
   );
-  const [selectedInstrumentId, setSelectedInstrumentId] = useState<number>(
-    urlQueryParams.instrument || 0
-  );
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState<
+    number | null | undefined
+  >(urlQueryParams.instrument || null);
 
   const { loading, userData, setUserData, setUserWithReviewsFilter } =
     useUserWithReviewsData({
@@ -404,11 +404,11 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
             instruments={instruments}
             isLoading={loadingInstruments}
             instrumentId={selectedInstrumentId}
-            onChange={(instrumentId) => {
-              setSelectedInstrumentId(instrumentId);
+            onChange={(instrumentFilter) => {
+              setSelectedInstrumentId(instrumentFilter.instrumentId);
               setUserWithReviewsFilter((filters) => ({
                 ...filters,
-                instrumentId,
+                instrumentId: instrumentFilter.instrumentId,
               }));
             }}
           />
