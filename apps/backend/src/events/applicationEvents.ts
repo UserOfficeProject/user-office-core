@@ -8,7 +8,7 @@ import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
-import { Technique, TechniqueHasInstruments } from '../models/Technique';
+import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -317,12 +317,12 @@ interface TechniqueDeletedEvent extends GeneralEvent {
 
 interface InstrumentsAssignedToTechniqueEvent extends GeneralEvent {
   type: Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE;
-  techniquehasinstruments: TechniqueHasInstruments;
+  boolean: boolean;
 }
 
 interface InstrumentsRemovedFromTechniqueEvent extends GeneralEvent {
   type: Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE;
-  techniquehasinstruments: TechniqueHasInstruments;
+  boolean: boolean;
 }
 
 export type ApplicationEvent =
