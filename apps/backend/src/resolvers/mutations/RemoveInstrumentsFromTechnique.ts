@@ -11,9 +11,9 @@ import {
 import { ResolverContext } from '../../context';
 
 @ArgsType()
-export class RemoveInstrumentFromTechniqueArgs {
-  @Field(() => Int)
-  public instrumentId: number;
+export class RemoveInstrumentsFromTechniqueArgs {
+  @Field(() => [Int])
+  public instrumentIds: number[];
 
   @Field(() => Int)
   public techniqueId: number;
@@ -22,11 +22,11 @@ export class RemoveInstrumentFromTechniqueArgs {
 @Resolver()
 export class RemoveInstrumentsFromTechnique {
   @Mutation(() => Boolean)
-  async removeInstrumentFromTechnique(
-    @Args() args: RemoveInstrumentFromTechniqueArgs,
+  async removeInstrumentsFromTechnique(
+    @Args() args: RemoveInstrumentsFromTechniqueArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.technique.removeInstrumentFromTechnique(
+    return context.mutations.technique.removeInstrumentsFromTechnique(
       context.user,
       args
     );

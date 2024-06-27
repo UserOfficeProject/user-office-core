@@ -16,7 +16,7 @@ import { Technique } from '../models/Technique';
 import { UserWithRole } from '../models/User';
 import { AssignInstrumentsToTechniqueArgs } from '../resolvers/mutations/AssignInstrumentsToTechnique';
 import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutation';
-import { RemoveInstrumentFromTechniqueArgs } from '../resolvers/mutations/RemoveInstrumentFromTechnique';
+import { RemoveInstrumentsFromTechniqueArgs } from '../resolvers/mutations/RemoveInstrumentsFromTechnique';
 import { UpdateTechniqueArgs } from '../resolvers/mutations/UpdateTechniqueMutations';
 import { TechniqueDataSource } from './../datasources/TechniqueDataSource';
 
@@ -85,7 +85,7 @@ export default class TechniqueMutations {
     return deletedTechnique;
   }
 
-  @EventBus(Event.INSTRUMENT_ASSIGNED_TO_TECHNIQUE)
+  @EventBus(Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE)
   @ValidateArgs(assignInstrumentsToTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignInstrumentsToTechnique(
@@ -103,18 +103,18 @@ export default class TechniqueMutations {
       });
   }
 
-  @EventBus(Event.INSTRUMENT_REMOVED_FROM_TECHNIQUE)
+  @EventBus(Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE)
   @ValidateArgs(removeInstrumentsFromTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async removeInstrumentFromTechnique(
+  async removeInstrumentsFromTechnique(
     agent: UserWithRole | null,
-    args: RemoveInstrumentFromTechniqueArgs
+    args: RemoveInstrumentsFromTechniqueArgs
   ): Promise<boolean | Rejection> {
     return this.dataSource
-      .removeInstrumentFromTechnique(args.instrumentId, args.techniqueId)
+      .removeInstrumentsFromTechnique(args.instrumentIds, args.techniqueId)
       .catch((error) => {
         return rejection(
-          `Could not remove assigned instrument from technique '${args.techniqueId}`,
+          `Could not remove assigned instruments from technique '${args.techniqueId}`,
           { agent, args: args },
           error
         );

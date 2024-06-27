@@ -8,7 +8,7 @@ import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
-import { Technique } from '../models/Technique';
+import { Technique, TechniqueHasInstruments } from '../models/Technique';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -315,16 +315,14 @@ interface TechniqueDeletedEvent extends GeneralEvent {
   technique: Technique;
 }
 
-interface InstrumentAssignedToTechniqueEvent extends GeneralEvent {
-  type: Event.INSTRUMENT_ASSIGNED_TO_TECHNIQUE;
-  instrument: Instrument;
-  technique: Technique;
+interface InstrumentsAssignedToTechniqueEvent extends GeneralEvent {
+  type: Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE;
+  techniquehasinstruments: TechniqueHasInstruments;
 }
 
-interface InstrumentRemovedFromTechniqueEvent extends GeneralEvent {
-  type: Event.INSTRUMENT_REMOVED_FROM_TECHNIQUE;
-  instrument: Instrument;
-  technique: Technique;
+interface InstrumentsRemovedFromTechniqueEvent extends GeneralEvent {
+  type: Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE;
+  techniquehasinstruments: TechniqueHasInstruments;
 }
 
 export type ApplicationEvent =
@@ -386,5 +384,5 @@ export type ApplicationEvent =
   | TechniqueCreatedEvent
   | TechniqueUpdatedEvent
   | TechniqueDeletedEvent
-  | InstrumentAssignedToTechniqueEvent
-  | InstrumentRemovedFromTechniqueEvent;
+  | InstrumentsAssignedToTechniqueEvent
+  | InstrumentsRemovedFromTechniqueEvent;

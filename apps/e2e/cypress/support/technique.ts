@@ -3,8 +3,8 @@ import {
   AssignInstrumentsToTechniqueMutationVariables,
   CreateTechniqueMutation,
   CreateTechniqueMutationVariables,
-  RemoveInstrumentFromTechniqueMutation,
-  RemoveInstrumentFromTechniqueMutationVariables,
+  RemoveInstrumentsFromTechniqueMutation,
+  RemoveInstrumentsFromTechniqueMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -29,12 +29,12 @@ const assignInstrumentsToTechnique = (
   return cy.wrap(request);
 };
 
-const removeInstrumentFromTechnique = (
-  removeInstrumentFromTechniqueInput: RemoveInstrumentFromTechniqueMutationVariables
-): Cypress.Chainable<RemoveInstrumentFromTechniqueMutation> => {
+const removeInstrumentsFromTechnique = (
+  removeInstrumentsFromTechniqueInput: RemoveInstrumentsFromTechniqueMutationVariables
+): Cypress.Chainable<RemoveInstrumentsFromTechniqueMutation> => {
   const api = getE2EApi();
-  const request = api.removeInstrumentFromTechnique(
-    removeInstrumentFromTechniqueInput
+  const request = api.removeInstrumentsFromTechnique(
+    removeInstrumentsFromTechniqueInput
   );
 
   return cy.wrap(request);
@@ -46,6 +46,6 @@ Cypress.Commands.add(
   assignInstrumentsToTechnique
 );
 Cypress.Commands.add(
-  'removeInstrumentFromTechnique',
-  removeInstrumentFromTechnique
+  'removeInstrumentsFromTechnique',
+  removeInstrumentsFromTechnique
 );

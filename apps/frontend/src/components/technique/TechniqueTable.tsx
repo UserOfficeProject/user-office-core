@@ -120,32 +120,30 @@ const TechniqueTable = () => {
     if (selectedTechnique) {
       const techniqueId = selectedTechnique.id;
       if (instrumentIds?.length) {
-        instrumentIds.forEach(async (instrumentId) => {
-          await api({
-            toastSuccessMessage: `Instrument/s unassigned from selected technique successfully!`,
+        await api({
+          toastSuccessMessage: `Instrument/s removed from selected technique successfully!`,
+        })
+          .removeInstrumentsFromTechnique({
+            instrumentIds,
+            techniqueId,
           })
-            .removeInstrumentFromTechnique({
-              instrumentId,
-              techniqueId,
-            })
-            .then(() => {
-              setTechniques((techniques) =>
-                techniques.map((techniqueItem) => {
-                  if (techniqueItem.id === techniqueId) {
-                    return {
-                      ...techniqueItem,
-                      instruments: techniqueItem.instruments.filter(
-                        (instrument) =>
-                          !instrumentIds.find((id) => id === instrument.id)
-                      ),
-                    };
-                  } else {
-                    return techniqueItem;
-                  }
-                })
-              );
-            });
-        });
+          .then(() => {
+            setTechniques((techniques) =>
+              techniques.map((techniqueItem) => {
+                if (techniqueItem.id === techniqueId) {
+                  return {
+                    ...techniqueItem,
+                    instruments: techniqueItem.instruments.filter(
+                      (instrument) =>
+                        !instrumentIds.find((id) => id === instrument.id)
+                    ),
+                  };
+                } else {
+                  return techniqueItem;
+                }
+              })
+            );
+          });
       }
     }
   };

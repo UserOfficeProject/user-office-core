@@ -1,9 +1,9 @@
-mutation removeInstrumentFromTechnique(
-  $instrumentId: Int!
+mutation removeInstrumentsFromTechnique(
+  $instrumentIds: [Int!]!
   $techniqueId: Int!
 ) {
-  removeInstrumentFromTechnique(
-    instrumentId: $instrumentId
+  removeInstrumentsFromTechnique(
+    instrumentIds: $instrumentIds
     techniqueId: $techniqueId
   )
 }

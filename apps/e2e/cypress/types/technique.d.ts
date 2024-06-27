@@ -1,7 +1,7 @@
 import {
   CreateTechniqueMutationVariables,
   AssignInstrumentsToTechniqueMutationVariables,
-  RemoveInstrumentFromTechniqueMutationVariables,
+  RemoveInstrumentsFromTechniqueMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -44,14 +44,14 @@ declare global {
        * @returns {typeof removeProposalsFromInstrument}
        * @memberof Chainable
        * @example
-       *    cy.removeInstrumentFromTechnique({
-       *      instrumentId: 1,
+       *    cy.removeInstrumentsFromTechnique({
+       *      instrumentIds: [1, 2],
        *      techniqueId: 2,
        *    });
        */
-      removeInstrumentFromTechnique: (
-        removeInstrumentFromTechniqueInput: RemoveInstrumentFromTechniqueMutationVariables
-      ) => Cypress.Chainable<RemoveInstrumentFromTechniqueMutation>;
+      removeInstrumentsFromTechnique: (
+        removeInstrumentsFromTechniqueInput: RemoveInstrumentsFromTechniqueMutationVariables
+      ) => Cypress.Chainable<RemoveInstrumentsFromTechniqueMutation>;
     }
   }
 }

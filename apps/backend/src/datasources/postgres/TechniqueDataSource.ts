@@ -177,25 +177,26 @@ export default class PostgresTechniqueDataSource
     }
   }
 
-  async removeInstrumentFromTechnique(
-    instrumentId: number,
+  async removeInstrumentsFromTechnique(
+    instrumentIds: number[],
     techniqueId: number
   ): Promise<boolean> {
     try {
       const result = await database('technique_has_instruments')
-        .where('instrument_id', instrumentId)
+        .whereIn('instrument_id', instrumentIds)
         .andWhere('technique_id', techniqueId)
-        .del();
+        .del()
+        .returning('*');
 
       if (result) {
         return true;
       } else {
         throw new Error(
-          'Error removing instrument(s) to technique: no technique returned from delete'
+          'Error removing instrument(s) from technique: no row(s) returned from delete'
         );
       }
     } catch (error) {
-      throw new Error(`Error removing instrument(s) to technique: ${error}`);
+      throw new Error(`Error removing instrument(s) from technique: ${error}`);
     }
   }
 }
