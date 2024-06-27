@@ -197,15 +197,15 @@ export default function createHandler() {
               );
 
               description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is removed from technique: ${technique?.name}`;
-            }
 
-            await eventLogsDataSource.set(
-              event.loggedInUserId,
-              event.type,
-              json,
-              '',
-              description
-            );
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].techniqueId,
+                description
+              );
+            }
           }
           break;
         case Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE:
@@ -223,15 +223,15 @@ export default function createHandler() {
               );
 
               description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is attached to technique: ${technique?.name}`;
-            }
 
-            await eventLogsDataSource.set(
-              event.loggedInUserId,
-              event.type,
-              json,
-              '',
-              description
-            );
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].techniqueId,
+                description
+              );
+            }
           }
           break;
         default: {
