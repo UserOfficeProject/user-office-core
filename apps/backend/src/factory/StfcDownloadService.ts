@@ -79,16 +79,11 @@ export class StfcDownloadService implements DownloadService {
           message: 'Could not generate proposal pdf',
         });
       }
-    } else {
-      fetchDataAndStreamResponse(
-        downloadType,
-        type,
-        properties,
-        req,
-        res,
-        next
-      );
+
+      return;
     }
+
+    fetchDataAndStreamResponse(downloadType, type, properties, req, res, next);
   }
 }
 function getFacilityName(shortCode: string | undefined) {
