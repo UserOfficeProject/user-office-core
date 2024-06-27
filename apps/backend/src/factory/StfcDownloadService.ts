@@ -92,13 +92,16 @@ export class StfcDownloadService implements DownloadService {
   }
 }
 function getFacilityName(shortCode: string | undefined) {
+  let facility = null;
   if (!shortCode) {
-    return null;
+    return facility;
   }
   const facilityList = ['ISIS', 'Artemis', 'HPL', 'LSF'];
-  facilityList.forEach((facility) => {
-    if (shortCode.includes(facility)) {
-      return facility;
+  facilityList.forEach((fac) => {
+    if (shortCode.includes(fac)) {
+      facility = fac;
     }
   });
+
+  return facility;
 }
