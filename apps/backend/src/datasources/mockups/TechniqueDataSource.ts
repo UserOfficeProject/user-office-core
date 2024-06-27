@@ -60,7 +60,7 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
   }
 
   async removeInstrumentsFromTechnique(
-    instrumentId: number,
+    instrumentIds: number[],
     techniqueId: number
   ): Promise<boolean> {
     return true;

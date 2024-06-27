@@ -138,10 +138,10 @@ describe('Test technique Mutations', () => {
 
   test('A logged in user officer can remove an assigned instrument from a technique', async () => {
     return expect(
-      techniqueMutations.removeInstrumentFromTechnique(
+      techniqueMutations.removeInstrumentsFromTechnique(
         dummyUserOfficerWithRole,
         {
-          instrumentId: 1,
+          instrumentIds: [1],
           techniqueId: 1,
         }
       )
@@ -150,8 +150,8 @@ describe('Test technique Mutations', () => {
 
   test('A user cannot remove an assigned instrument from a technique', async () => {
     return expect(
-      techniqueMutations.removeInstrumentFromTechnique(dummyUserWithRole, {
-        instrumentId: 1,
+      techniqueMutations.removeInstrumentsFromTechnique(dummyUserWithRole, {
+        instrumentIds: [1],
         techniqueId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
