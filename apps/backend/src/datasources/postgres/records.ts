@@ -289,7 +289,7 @@ export interface TechnicalReviewRecord {
   readonly submitted: boolean;
   readonly reviewer_id: number;
   readonly files: string;
-  readonly technical_review_assignee_id: number;
+  readonly technical_review_assignee_id: number | null;
   readonly instrument_id: number;
 }
 
