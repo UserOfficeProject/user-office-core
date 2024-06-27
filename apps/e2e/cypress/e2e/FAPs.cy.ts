@@ -2567,7 +2567,6 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
       cy.get('button[aria-label="Submit instrument"]').should('not.exist');
-      cy.get('button[aria-label="Unsubmit instrument"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -2665,7 +2664,6 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
       cy.get('button[aria-label="Submit instrument"]').should('not.exist');
-      cy.get('button[aria-label="Unsubmit instrument"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 

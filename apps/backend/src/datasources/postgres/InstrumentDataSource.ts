@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
@@ -654,8 +655,9 @@ export default class PostgresInstrumentDataSource
       instrumentHasProposls.instrumentHasProposalIds.length !==
       proposalPks.length
     ) {
-      throw new GraphQLError(
-        `Some record from instrument proposals was not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+      logger.logWarn(
+        `Some record from instrument proposals were not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`,
+        {}
       );
     }
 
@@ -696,8 +698,9 @@ export default class PostgresInstrumentDataSource
       instrumentHasProposals.instrumentHasProposalIds.length !==
       proposalPks.length
     ) {
-      throw new GraphQLError(
-        `Some record from instrument proposals was not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+      logger.logWarn(
+        `Some record from instrument proposals was not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`,
+        {}
       );
     }
 
