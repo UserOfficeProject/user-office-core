@@ -233,14 +233,14 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return true;
   }
 
-  async submitInstrument(
+  async submitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
     return dummyInstrumentHasProposals;
   }
 
-  async unsubmitInstrument(
+  async unsubmitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {

@@ -43,7 +43,7 @@ export class InstrumentAvailabilityTimeArgs {
 }
 
 @ArgsType()
-export class InstrumentSubmitArgs {
+export class InstrumentSubmitInFapArgs {
   @Field(() => Int)
   public instrumentId: number;
 
@@ -76,11 +76,11 @@ export class UpdateInstrumentMutation {
   }
 
   @Mutation(() => Boolean)
-  async submitInstrument(
-    @Args() args: InstrumentSubmitArgs,
+  async submitInstrumentInFap(
+    @Args() args: InstrumentSubmitInFapArgs,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.instrument.submitInstrument(
+    const res = await context.mutations.instrument.submitInstrumentInFap(
       context.user,
       args
     );
@@ -89,11 +89,11 @@ export class UpdateInstrumentMutation {
   }
 
   @Mutation(() => Boolean)
-  async unsubmitInstrument(
-    @Args() args: InstrumentSubmitArgs,
+  async unsubmitInstrumentInFap(
+    @Args() args: InstrumentSubmitInFapArgs,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.instrument.unsubmitInstrument(
+    const res = await context.mutations.instrument.unsubmitInstrumentInFap(
       context.user,
       args
     );

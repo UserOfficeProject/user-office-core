@@ -1,7 +1,0 @@
-mutation unsubmitInstrument($callId: Int!, $instrumentId: Int!, $fapId: Int!) {
-  unsubmitInstrument(
-    callId: $callId
-    instrumentId: $instrumentId
-    fapId: $fapId
-  )
-}

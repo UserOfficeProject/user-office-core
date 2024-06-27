@@ -625,7 +625,7 @@ export default class PostgresInstrumentDataSource
     }
   }
 
-  async submitInstrument(
+  async submitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
@@ -641,7 +641,7 @@ export default class PostgresInstrumentDataSource
 
     if (!records?.length) {
       throw new GraphQLError(
-        `Some record from fap_proposals not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+        `No fap_proposals found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
       );
     }
 
@@ -667,7 +667,7 @@ export default class PostgresInstrumentDataSource
     );
   }
 
-  async unsubmitInstrument(
+  async unsubmitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
@@ -683,17 +683,17 @@ export default class PostgresInstrumentDataSource
 
     if (!records?.length) {
       throw new GraphQLError(
-        `Some record from fap_proposals not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+        `No fap_proposals found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
       );
     }
 
-    const instrumentHasProposls = await this.getInstrumentHasProposals(
+    const instrumentHasProposals = await this.getInstrumentHasProposals(
       instrumentId,
       proposalPks
     );
 
     if (
-      instrumentHasProposls.instrumentHasProposalIds.length !==
+      instrumentHasProposals.instrumentHasProposalIds.length !==
       proposalPks.length
     ) {
       throw new GraphQLError(
@@ -702,7 +702,7 @@ export default class PostgresInstrumentDataSource
     }
 
     return new InstrumentsHasProposals(
-      instrumentHasProposls.instrumentHasProposalIds,
+      instrumentHasProposals.instrumentHasProposalIds,
       [instrumentId],
       proposalPks,
       true

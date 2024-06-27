@@ -52,11 +52,7 @@ const FapMeetingInstrumentsTable = ({
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsByFapData(fapId, selectedCall.id);
   const { api } = useDataApiWithFeedback();
-  const hasAccessRights = useCheckAccess([
-    UserRole.USER_OFFICER,
-    UserRole.FAP_CHAIR,
-    UserRole.FAP_SECRETARY,
-  ]);
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
   const downloadFapXLSX = useDownloadXLSXFap();
@@ -84,7 +80,7 @@ const FapMeetingInstrumentsTable = ({
     [fapId, selectedCall]
   );
 
-  const submitInstrument = async (
+  const submitInstrumentInFap = async (
     instrumentToSubmit: InstrumentWithAvailabilityTime
   ) => {
     if (!selectedCall) {
@@ -106,14 +102,14 @@ const FapMeetingInstrumentsTable = ({
         );
 
       if (allProposalsOnInstrumentHaveRankings) {
-        const { submitInstrument } = await api({
-          toastSuccessMessage: 'Instrument submitted!',
-        }).submitInstrument({
+        const { submitInstrumentInFap } = await api({
+          toastSuccessMessage: 'Instrument submitted in FAP!',
+        }).submitInstrumentInFap({
           callId: selectedCall.id,
           instrumentId: instrumentToSubmit.id,
           fapId: fapId,
         });
-        if (submitInstrument) {
+        if (submitInstrumentInFap) {
           const newInstrumentsData = instrumentsData.map((instrument) => {
             if (instrument.id === instrumentToSubmit.id) {
               return { ...instrument, submitted: true };
@@ -132,25 +128,25 @@ const FapMeetingInstrumentsTable = ({
     }
   };
 
-  const unsubmitInstrument = async (
-    instrumentToSubmit: InstrumentWithAvailabilityTime
+  const unsubmitInstrumentInFap = async (
+    instrumentToUnsubmit: InstrumentWithAvailabilityTime
   ) => {
     if (!selectedCall) {
       return;
     }
 
-    if (instrumentToSubmit) {
-      if (instrumentToSubmit.submitted) {
-        const { unsubmitInstrument } = await api({
+    if (instrumentToUnsubmit) {
+      if (instrumentToUnsubmit.submitted) {
+        const { unsubmitInstrumentInFap } = await api({
           toastSuccessMessage: 'Instrument submitted!',
-        }).unsubmitInstrument({
+        }).unsubmitInstrumentInFap({
           callId: selectedCall.id,
-          instrumentId: instrumentToSubmit.id,
+          instrumentId: instrumentToUnsubmit.id,
           fapId: fapId,
         });
-        if (unsubmitInstrument) {
+        if (unsubmitInstrumentInFap) {
           const newInstrumentsData = instrumentsData.map((instrument) => {
-            if (instrument.id === instrumentToSubmit.id) {
+            if (instrument.id === instrumentToUnsubmit.id) {
               return { ...instrument, submitted: false };
             }
 
@@ -190,11 +186,11 @@ const FapMeetingInstrumentsTable = ({
         ) =>
           confirm(
             () => {
-              submitInstrument(rowData as InstrumentWithAvailabilityTime);
+              submitInstrumentInFap(rowData as InstrumentWithAvailabilityTime);
             },
             {
               title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `No further changes to Fap meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
+              description: `No further changes to Fap meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
                 'instrument'
               )}?`,
             }
@@ -216,11 +212,13 @@ const FapMeetingInstrumentsTable = ({
         ) =>
           confirm(
             () => {
-              unsubmitInstrument(rowData as InstrumentWithAvailabilityTime);
+              unsubmitInstrumentInFap(
+                rowData as InstrumentWithAvailabilityTime
+              );
             },
             {
               title: 'Unsubmit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `This action will reopen the proposal reordering in the meeting components. Are you sure you want to unsubmit the ${t(
+              description: `This action will reopen the proposal reordering in the meeting components. Are you sure you want to unsubmit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
                 'instrument'
               )}?`,
             }

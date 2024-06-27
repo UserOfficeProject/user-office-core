@@ -2247,6 +2247,12 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Drag proposals to reorder"]').should('not.exist');
 
+      cy.intercept({ url: '/graphql', method: 'POST' }, (req) => {
+        if (req.body.operationName === 'reorderFapMeetingDecisionProposals') {
+          req.alias = 'reorderFapMeetingDecisionProposals';
+        }
+      });
+
       // NOTE: Trying to catch the failure of cy.reorderFapMeetingDecisionProposals because instrument is submitted
       cy.on('fail', (err) => {
         if (
@@ -2275,6 +2281,11 @@ context('Fap meeting components tests', () => {
           ],
         },
       });
+
+      cy.wait('@reorderFapMeetingDecisionProposals').then((res) => {
+        expect(res.response?.body.data).to.eq(null);
+        expect(res.response?.body.error).to.haveOwnProperty('error');
+      });
     });
 
     it('Officer should be able to edit Fap Meeting form after instrument is submitted', () => {
@@ -2287,7 +2298,7 @@ context('Fap meeting components tests', () => {
           fapId: createdFapId,
         },
       });
-      cy.submitInstrument({
+      cy.submitInstrumentInFap({
         callId: initialDBData.call.id,
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
@@ -2547,7 +2558,7 @@ context('Fap meeting components tests', () => {
           fapId: createdFapId,
         },
       });
-      cy.submitInstrument({
+      cy.submitInstrumentInFap({
         callId: initialDBData.call.id,
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
@@ -2645,7 +2656,7 @@ context('Fap meeting components tests', () => {
           fapId: createdFapId,
         },
       });
-      cy.submitInstrument({
+      cy.submitInstrumentInFap({
         callId: initialDBData.call.id,
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
