@@ -1,30 +1,32 @@
+import { Science } from '@mui/icons-material';
 import { instrumentPickerValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
-import ScienceIcon from 'components/common/icons/ScienceIcon';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentTechniquePicker } from './QuestionaryComponentTechniquePicker';
+import { QuestionTechniquePickerForm } from './QuestionTechniquePickerForm';
+import { QuestionTemplateRelationTechniquePickerForm } from './QuestionTemplateRelationTechniquePickerForm';
+import TechniquePickerAnswerRenderer from './TechniquePickerAnswerRenderer';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const techniquePickerDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.TECHNIQUE_PICKER,
   name: 'Technique Picker',
   questionaryComponent: QuestionaryComponentTechniquePicker,
-  questionForm: () => QuestionInstrumentPickerForm,
+  questionForm: () => QuestionTechniquePickerForm,
   questionTemplateRelationForm: () =>
-    QuestionTemplateRelationInstrumentPickerForm,
+    QuestionTemplateRelationTechniquePickerForm,
   readonly: false,
   creatable: true,
-  icon: <ScienceIcon />,
+  icon: <Science />,
   renderers: {
-    answerRenderer: (answer) => <InstrumentPickerAnswerRenderer {...answer} />,
+    answerRenderer: (answer) => <TechniquePickerAnswerRenderer {...answer} />,
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: instrumentPickerValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || null,
-  searchCriteriaComponent: InstrumentPickerSearchCriteriaComponent,
 };
 
 export {};
