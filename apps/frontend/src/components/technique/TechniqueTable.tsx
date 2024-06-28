@@ -1,10 +1,10 @@
 import { Column } from '@material-table/core';
-import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Dialog, DialogContent, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -71,7 +71,7 @@ const TechniqueTable = () => {
     }
   };
 
-  const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
+  const AssignmentIndIcon = (): JSX.Element => <ScienceIcon />;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function setAssigningTechniqueId(technique: TechniqueFragment): void {
