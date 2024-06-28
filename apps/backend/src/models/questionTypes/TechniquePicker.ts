@@ -8,7 +8,7 @@ import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import FapMutations from '../../mutations/FapMutations';
 import InstrumentMutations from '../../mutations/InstrumentMutations';
-import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
+import { TechniquePickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
@@ -29,19 +29,19 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
 
     return new Promise((resolve) => resolve(true));
   },
-  createBlankConfig: (): InstrumentPickerConfig => {
-    const config = new InstrumentPickerConfig();
+  createBlankConfig: (): TechniquePickerConfig => {
+    const config = new TechniquePickerConfig();
     config.small_label = '';
     config.required = false;
     config.tooltip = '';
     config.variant = 'dropdown';
-    config.instruments = [];
+    config.techniques = [];
     config.isMultipleSelect = false;
 
     return config;
   },
   getDefaultAnswer: (field) =>
-    (field.config as InstrumentPickerConfig).isMultipleSelect ? [] : null,
+    (field.config as TechniquePickerConfig).isMultipleSelect ? [] : null,
   filterQuery: (queryBuilder, filter) => {
     const value = JSON.parse(filter.value).value;
     switch (filter.compareOperator) {
@@ -54,7 +54,7 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     }
   },
   transformConfig: async (config, callId) => {
-    const fallBackConfig = { ...config, instruments: [] };
+    const fallBackConfig = { ...config, techniques: [] };
     try {
       if (!callId) return fallBackConfig;
 
