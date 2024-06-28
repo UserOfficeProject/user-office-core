@@ -34,4 +34,15 @@ export class TechniqueQuery {
   techniques(@Ctx() context: ResolverContext) {
     return context.queries.technique.getAll(context.user);
   }
+
+  @Query(() => [Technique], { nullable: true })
+  techniquesByIds(
+    @Arg('techniqueIds', () => [Int]) techniqueIds: number[],
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.technique.getTechniquesByIds(
+      context.user,
+      techniqueIds
+    );
+  }
 }

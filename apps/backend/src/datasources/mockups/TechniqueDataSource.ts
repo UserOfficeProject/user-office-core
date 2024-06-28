@@ -65,4 +65,23 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
   ): Promise<boolean> {
     return true;
   }
+
+  async assignProposalToTechnique(
+    proposalPk: number,
+    techniqueIds: number[]
+  ): Promise<boolean> {
+    if (proposalPk && techniqueIds) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {
+    if (techniqueIds) {
+      return dummyTechniques;
+    }
+
+    return [];
+  }
 }
